@@ -8,6 +8,7 @@ import {
     GrammarAction,
     IAnyOrAlt,
     ICstVisitor,
+    IRecognitionException,
     IRuleConfig,
     IToken,
     ITokenGrammarPath,
@@ -26,7 +27,9 @@ import {
 import { TreeBuilder } from "./tree_builder"
 import { LooksAhead } from "./looksahead"
 import { LexerAdapter } from "./lexer_adapter"
-import { RecognizerEngine } from "./recognizer"
+import { RecognizerApi, RecognizerEngine } from "./recognizer"
+import { ErrorHandler } from "./error_handler"
+import { PROD_TYPE } from "../grammar/lookahead"
 
 // TODO: verification that the BaseParser ONLY contains methods
 //       from the traits
@@ -43,7 +46,9 @@ export class BaseParser
         TreeBuilder,
         LooksAhead,
         LexerAdapter,
-        RecognizerEngine {
+        RecognizerEngine,
+        RecognizerApi,
+        ErrorHandler {
     // Recoverable Trait
     addToResyncTokens(token: IToken, resyncTokens: IToken[]): IToken[] {
         return undefined
@@ -146,6 +151,10 @@ export class BaseParser
         tokIdxInRule: number
     ): ITokenGrammarPath {
         return undefined
+    }
+
+    getHumanReadableRuleStack(): string[] {
+        return []
     }
 
     // TreeBuilder Trait
@@ -341,6 +350,7 @@ export class BaseParser
 
     set input(newInput: IToken[]) {}
 
+    // ---------- RecognizerEngine Trait -----------------
     atLeastOneInternal<OUT>(
         prodOccurrence: number,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
@@ -488,4 +498,396 @@ export class BaseParser
         fullName: string,
         idxInCallingRule: number
     ): void {}
+
+    isBackTracking(): boolean {
+        return false
+    }
+
+    getCurrRuleFullName(): string {
+        return ""
+    }
+
+    shortRuleNameToFullName(shortName: string): string {
+        return undefined
+    }
+
+    isAtEndOfInput(): boolean {
+        return false
+    }
+
+    reset(): void {}
+
+    // ---------- RecognizerAPI Trait -----------------
+    AT_LEAST_ONE<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
+    ): void {}
+
+    AT_LEAST_ONE1<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
+    ): void {}
+
+    AT_LEAST_ONE2<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
+    ): void {}
+
+    AT_LEAST_ONE3<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
+    ): void {}
+
+    AT_LEAST_ONE4<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
+    ): void {}
+
+    AT_LEAST_ONE5<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
+    ): void {}
+
+    AT_LEAST_ONE6<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
+    ): void {}
+
+    AT_LEAST_ONE7<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
+    ): void {}
+
+    AT_LEAST_ONE8<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
+    ): void {}
+
+    AT_LEAST_ONE9<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
+    ): void {}
+
+    AT_LEAST_ONE_SEP<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void {}
+
+    AT_LEAST_ONE_SEP1<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void {}
+
+    AT_LEAST_ONE_SEP2<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void {}
+
+    AT_LEAST_ONE_SEP3<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void {}
+
+    AT_LEAST_ONE_SEP4<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void {}
+
+    AT_LEAST_ONE_SEP5<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void {}
+
+    AT_LEAST_ONE_SEP6<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void {}
+
+    AT_LEAST_ONE_SEP7<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void {}
+
+    AT_LEAST_ONE_SEP8<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void {}
+
+    AT_LEAST_ONE_SEP9<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void {}
+
+    CONSUME(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
+        return undefined
+    }
+
+    CONSUME1(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
+        return undefined
+    }
+
+    CONSUME2(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
+        return undefined
+    }
+
+    CONSUME3(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
+        return undefined
+    }
+
+    CONSUME4(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
+        return undefined
+    }
+
+    CONSUME5(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
+        return undefined
+    }
+
+    CONSUME6(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
+        return undefined
+    }
+
+    CONSUME7(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
+        return undefined
+    }
+
+    CONSUME8(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
+        return undefined
+    }
+
+    CONSUME9(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
+        return undefined
+    }
+
+    MANY<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): void {}
+
+    MANY1<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): void {}
+
+    MANY2<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): void {}
+
+    MANY3<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): void {}
+
+    MANY4<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): void {}
+
+    MANY5<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): void {}
+
+    MANY6<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): void {}
+
+    MANY7<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): void {}
+
+    MANY8<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): void {}
+
+    MANY9<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): void {}
+
+    MANY_SEP<OUT>(options: ManySepMethodOpts<OUT>): void {}
+
+    MANY_SEP1<OUT>(options: ManySepMethodOpts<OUT>): void {}
+
+    MANY_SEP2<OUT>(options: ManySepMethodOpts<OUT>): void {}
+
+    MANY_SEP3<OUT>(options: ManySepMethodOpts<OUT>): void {}
+
+    MANY_SEP4<OUT>(options: ManySepMethodOpts<OUT>): void {}
+
+    MANY_SEP5<OUT>(options: ManySepMethodOpts<OUT>): void {}
+
+    MANY_SEP6<OUT>(options: ManySepMethodOpts<OUT>): void {}
+
+    MANY_SEP7<OUT>(options: ManySepMethodOpts<OUT>): void {}
+
+    MANY_SEP8<OUT>(options: ManySepMethodOpts<OUT>): void {}
+
+    MANY_SEP9<OUT>(options: ManySepMethodOpts<OUT>): void {}
+
+    OPTION<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): OUT {
+        return undefined
+    }
+
+    OPTION1<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): OUT {
+        return undefined
+    }
+
+    OPTION2<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): OUT {
+        return undefined
+    }
+
+    OPTION3<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): OUT {
+        return undefined
+    }
+
+    OPTION4<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): OUT {
+        return undefined
+    }
+
+    OPTION5<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): OUT {
+        return undefined
+    }
+
+    OPTION6<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): OUT {
+        return undefined
+    }
+
+    OPTION7<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): OUT {
+        return undefined
+    }
+
+    OPTION8<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): OUT {
+        return undefined
+    }
+
+    OPTION9<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): OUT {
+        return undefined
+    }
+
+    OR<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+        return undefined
+    }
+
+    OR1<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+        return undefined
+    }
+
+    OR2<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+        return undefined
+    }
+
+    OR3<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+        return undefined
+    }
+
+    OR4<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+        return undefined
+    }
+
+    OR5<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+        return undefined
+    }
+
+    OR6<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+        return undefined
+    }
+
+    OR7<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+        return undefined
+    }
+
+    OR8<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+        return undefined
+    }
+
+    OR9<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+        return undefined
+    }
+
+    OVERRIDE_RULE<T>(
+        name: string,
+        impl: (...implArgs: any[]) => T,
+        config?: IRuleConfig<T>
+    ): (idxInCallingRule?: number, ...args: any[]) => T {
+        return function(p1: number, p2: any) {
+            return undefined
+        }
+    }
+
+    RULE<T>(
+        name: string,
+        implementation: (...implArgs: any[]) => T,
+        config?: IRuleConfig<T>
+    ): (idxInCallingRule?: number, ...args: any[]) => any | T {
+        return function(p1: number, p2: any) {
+            return undefined
+        }
+    }
+
+    SUBRULE<T>(ruleToCall: (idx: number) => T, options?: SubruleMethodOpts): T {
+        return undefined
+    }
+
+    SUBRULE1<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T {
+        return undefined
+    }
+
+    SUBRULE2<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T {
+        return undefined
+    }
+
+    SUBRULE3<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T {
+        return undefined
+    }
+
+    SUBRULE4<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T {
+        return undefined
+    }
+
+    SUBRULE5<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T {
+        return undefined
+    }
+
+    SUBRULE6<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T {
+        return undefined
+    }
+
+    SUBRULE7<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T {
+        return undefined
+    }
+
+    SUBRULE8<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T {
+        return undefined
+    }
+
+    SUBRULE9<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T {
+        return undefined
+    }
+
+    BACKTRACK<T>(
+        grammarRule: (...args: any[]) => T,
+        args?: any[]
+    ): () => boolean {
+        return function() {
+            return false
+        }
+    }
+
+    // ---------- ErrorHandler Trait -----------------
+    SAVE_ERROR(error: IRecognitionException): IRecognitionException {
+        return undefined
+    }
+
+    get errors(): IRecognitionException[] {
+        return []
+    }
+
+    raiseEarlyExitException(
+        occurrence: number,
+        prodType: PROD_TYPE,
+        userDefinedErrMsg: string
+    ): void {}
+
+    raiseNoAltException(occurrence: number, errMsgTypes: string): void {}
 }

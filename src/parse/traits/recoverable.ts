@@ -371,6 +371,17 @@ export class Recoverable {
 
         return grammarPath
     }
+    getHumanReadableRuleStack(this: Parser): string[] {
+        if (!isEmpty(this.LAST_EXPLICIT_RULE_STACK)) {
+            return map(this.LAST_EXPLICIT_RULE_STACK, currIdx =>
+                this.shortRuleNameToFullName(this.RULE_STACK[currIdx])
+            )
+        } else {
+            return map(this.RULE_STACK, currShortName =>
+                this.shortRuleNameToFullName(currShortName)
+            )
+        }
+    }
 }
 
 export function attemptInRepetitionRecovery(

@@ -1,0 +1,109 @@
+import { IRecognitionException } from "../../../api"
+import {
+    EarlyExitException,
+    isRecognitionException,
+    NoViableAltException
+} from "../exceptions_public"
+import { cloneArr } from "../../utils/utils"
+import {
+    getLookaheadPathsForOptionalProd,
+    getLookaheadPathsForOr,
+    PROD_TYPE
+} from "../grammar/lookahead"
+import { Parser } from "../parser_public"
+
+export class ErrorHandler {
+    SAVE_ERROR(
+        this: Parser,
+        error: IRecognitionException
+    ): IRecognitionException {
+        if (isRecognitionException(error)) {
+            error.context = {
+                ruleStack: this.getHumanReadableRuleStack(),
+                ruleOccurrenceStack: cloneArr(this.RULE_OCCURRENCE_STACK)
+            }
+            this._errors.push(error)
+            return error
+        } else {
+            throw Error(
+                "Trying to save an Error which is not a RecognitionException"
+            )
+        }
+    }
+
+    // TODO: extract these methods to ErrorHandler Trait?
+    get errors(this: Parser): IRecognitionException[] {
+        return cloneArr(this._errors)
+    }
+
+    set errors(this: Parser, newErrors: IRecognitionException[]) {
+        this._errors = newErrors
+    }
+
+    // TODO: consider caching the error message computed information
+    raiseEarlyExitException(
+        this: Parser,
+        occurrence: number,
+        prodType: PROD_TYPE,
+        userDefinedErrMsg: string
+    ): void {
+        let ruleName = this.getCurrRuleFullName()
+        let ruleGrammar = this.getGAstProductions().get(ruleName)
+        let lookAheadPathsPerAlternative = getLookaheadPathsForOptionalProd(
+            occurrence,
+            ruleGrammar,
+            prodType,
+            this.maxLookahead
+        )
+        let insideProdPaths = lookAheadPathsPerAlternative[0]
+        let actualTokens = []
+        for (let i = 1; i < this.maxLookahead; i++) {
+            actualTokens.push(this.LA(i))
+        }
+        let msg = this.errorMessageProvider.buildEarlyExitMessage({
+            expectedIterationPaths: insideProdPaths,
+            actual: actualTokens,
+            previous: this.LA(0),
+            customUserDescription: userDefinedErrMsg,
+            ruleName: ruleName
+        })
+
+        throw this.SAVE_ERROR(
+            new EarlyExitException(msg, this.LA(1), this.LA(0))
+        )
+    }
+
+    // TODO: consider caching the error message computed information
+    raiseNoAltException(
+        this: Parser,
+        occurrence: number,
+        errMsgTypes: string
+    ): void {
+        let ruleName = this.getCurrRuleFullName()
+        let ruleGrammar = this.getGAstProductions().get(ruleName)
+        // TODO: getLookaheadPathsForOr can be slow for large enough maxLookahead and certain grammars, consider caching ?
+        let lookAheadPathsPerAlternative = getLookaheadPathsForOr(
+            occurrence,
+            ruleGrammar,
+            this.maxLookahead
+        )
+
+        let actualTokens = []
+        for (let i = 1; i < this.maxLookahead; i++) {
+            actualTokens.push(this.LA(i))
+        }
+        let previousToken = this.LA(0)
+
+        let errMsg = this.errorMessageProvider.buildNoViableAltMessage({
+            expectedPathsPerAlt: lookAheadPathsPerAlternative,
+            actual: actualTokens,
+            previous: previousToken,
+            customUserDescription: errMsgTypes,
+            ruleName: this.getCurrRuleFullName()
+        })
+
+        throw this.SAVE_ERROR(
+            new NoViableAltException(errMsg, this.LA(1), previousToken)
+        )
+    }
+}
