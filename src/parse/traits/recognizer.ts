@@ -1,15 +1,18 @@
 import {
     AtLeastOneSepMethodOpts,
+    ConsumeMethodOpts,
     DSLMethodOpts,
     DSLMethodOptsWithErr,
     GrammarAction,
     IAnyOrAlt,
     IRuleConfig,
+    IToken,
     ManySepMethodOpts,
     OrMethodOpts,
+    SubruleMethodOpts,
     TokenType
 } from "../../../api"
-import { has, isArray } from "../../utils/utils"
+import { cloneArr, has, isArray } from "../../utils/utils"
 import {
     AT_LEAST_ONE_IDX,
     AT_LEAST_ONE_SEP_IDX,
@@ -20,7 +23,11 @@ import {
     OPTION_IDX,
     OR_IDX
 } from "../grammar/keys"
-import { isRecognitionException } from "../exceptions_public"
+import {
+    isRecognitionException,
+    MismatchedTokenException,
+    NotAllInputParsedException
+} from "../exceptions_public"
 import { PROD_TYPE } from "../grammar/lookahead"
 import {
     AbstractNextTerminalAfterProductionWalker,
@@ -29,7 +36,8 @@ import {
     NextTerminalAfterManySepWalker,
     NextTerminalAfterManyWalker
 } from "../grammar/interpreter"
-import { DEFAULT_RULE_CONFIG, Parser } from "../parser_public"
+import { DEFAULT_RULE_CONFIG, IParserState, Parser } from "../parser_public"
+import { IN_RULE_RECOVERY_EXCEPTION } from "./recoverable"
 
 export class RecognizerApi {}
 
@@ -664,5 +672,161 @@ export class RecognizerEngine {
                 this.nestedRuleFinallyClause(laKey, nestedName)
             }
         }
+    }
+
+    ruleFinallyStateUpdate(this: Parser): void {
+        this.RULE_STACK.pop()
+        this.RULE_OCCURRENCE_STACK.pop()
+
+        // NOOP when cst is disabled
+        this.cstFinallyStateUpdate()
+
+        if (this.RULE_STACK.length === 0 && !this.isAtEndOfInput()) {
+            let firstRedundantTok = this.LA(1)
+            let errMsg = this.errorMessageProvider.buildNotAllInputParsedMessage(
+                {
+                    firstRedundant: firstRedundantTok,
+                    ruleName: this.getCurrRuleFullName()
+                }
+            )
+            this.SAVE_ERROR(
+                new NotAllInputParsedException(errMsg, firstRedundantTok)
+            )
+        }
+    }
+
+    subruleInternal<T>(
+        this: Parser,
+        ruleToCall: (idx: number) => T,
+        idx: number,
+        options?: SubruleMethodOpts
+    ) {
+        let ruleResult
+        try {
+            const args = options !== undefined ? options.ARGS : undefined
+            ruleResult = ruleToCall.call(this, idx, args)
+            this.cstPostNonTerminal(
+                ruleResult,
+                options !== undefined && options.LABEL !== undefined
+                    ? options.LABEL
+                    : (<any>ruleToCall).ruleName
+            )
+            return ruleResult
+        } catch (e) {
+            if (isRecognitionException(e) && e.partialCstResult !== undefined) {
+                this.cstPostNonTerminal(
+                    e.partialCstResult,
+                    options !== undefined && options.LABEL !== undefined
+                        ? options.LABEL
+                        : (<any>ruleToCall).ruleName
+                )
+
+                delete e.partialCstResult
+            }
+            throw e
+        }
+    }
+
+    consumeInternal(
+        this: Parser,
+        tokType: TokenType,
+        idx: number,
+        options: ConsumeMethodOpts
+    ): IToken {
+        let consumedToken
+        try {
+            let nextToken = this.LA(1)
+            if (this.tokenMatcher(nextToken, tokType) === true) {
+                this.consumeToken()
+                consumedToken = nextToken
+            } else {
+                let msg
+                let previousToken = this.LA(0)
+                if (options !== undefined && options.ERR_MSG) {
+                    msg = options.ERR_MSG
+                } else {
+                    msg = this.errorMessageProvider.buildMismatchTokenMessage({
+                        expected: tokType,
+                        actual: nextToken,
+                        previous: previousToken,
+                        ruleName: this.getCurrRuleFullName()
+                    })
+                }
+                throw this.SAVE_ERROR(
+                    new MismatchedTokenException(msg, nextToken, previousToken)
+                )
+            }
+        } catch (eFromConsumption) {
+            // no recovery allowed during backtracking, otherwise backtracking may recover invalid syntax and accept it
+            // but the original syntax could have been parsed successfully without any backtracking + recovery
+            if (
+                this.recoveryEnabled &&
+                // TODO: more robust checking of the exception type. Perhaps Typescript extending expressions?
+                eFromConsumption.name === "MismatchedTokenException" &&
+                !this.isBackTracking()
+            ) {
+                let follows = this.getFollowsForInRuleRecovery(
+                    <any>tokType,
+                    idx
+                )
+                try {
+                    consumedToken = this.tryInRuleRecovery(
+                        <any>tokType,
+                        follows
+                    )
+                } catch (eFromInRuleRecovery) {
+                    if (
+                        eFromInRuleRecovery.name === IN_RULE_RECOVERY_EXCEPTION
+                    ) {
+                        // failed in RuleRecovery.
+                        // throw the original error in order to trigger reSync error recovery
+                        throw eFromConsumption
+                    } else {
+                        throw eFromInRuleRecovery
+                    }
+                }
+            } else {
+                throw eFromConsumption
+            }
+        }
+
+        this.cstPostTerminal(
+            options !== undefined && options.LABEL !== undefined
+                ? options.LABEL
+                : tokType.tokenName,
+            consumedToken
+        )
+        return consumedToken
+    }
+
+    saveRecogState(this: Parser): IParserState {
+        // errors is a getter which will clone the errors array
+        let savedErrors = this.errors
+        let savedRuleStack = cloneArr(this.RULE_STACK)
+        return {
+            errors: savedErrors,
+            lexerState: this.exportLexerState(),
+            RULE_STACK: savedRuleStack,
+            CST_STACK: this.CST_STACK,
+            LAST_EXPLICIT_RULE_STACK: this.LAST_EXPLICIT_RULE_STACK
+        }
+    }
+
+    reloadRecogState(this: Parser, newState: IParserState) {
+        this.errors = newState.errors
+        this.importLexerState(newState.lexerState)
+        this.RULE_STACK = newState.RULE_STACK
+    }
+
+    ruleInvocationStateUpdate(
+        this: Parser,
+        shortName: string,
+        fullName: string,
+        idxInCallingRule: number
+    ): void {
+        this.RULE_OCCURRENCE_STACK.push(idxInCallingRule)
+        this.RULE_STACK.push(shortName)
+        // NOOP when cst is disabled
+        this.cstInvocationStateUpdate(fullName, shortName)
     }
 }

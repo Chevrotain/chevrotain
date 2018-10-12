@@ -1,6 +1,7 @@
 import { IFollowKey, Recoverable } from "./recoverable"
 import {
     AtLeastOneSepMethodOpts,
+    ConsumeMethodOpts,
     CstNode,
     DSLMethodOpts,
     DSLMethodOptsWithErr,
@@ -12,10 +13,16 @@ import {
     ITokenGrammarPath,
     ManySepMethodOpts,
     OrMethodOpts,
+    SubruleMethodOpts,
     TokenType
 } from "../../../api"
 import { AbstractNextTerminalAfterProductionWalker } from "../grammar/interpreter"
-import { lookAheadSequence, Parser, TokenMatcher } from "../parser_public"
+import {
+    IParserState,
+    lookAheadSequence,
+    Parser,
+    TokenMatcher
+} from "../parser_public"
 import { TreeBuilder } from "./tree_builder"
 import { LooksAhead } from "./looksahead"
 import { LexerAdapter } from "./lexer_adapter"
@@ -162,17 +169,13 @@ export class BaseParser
 
     getBaseCstVisitorConstructor(
         this: Parser
-    ): {
-        new (...args: any[]): ICstVisitor<any, any>
-    } {
+    ): { new (...args: any[]): ICstVisitor<any, any> } {
         return undefined
     }
 
     getBaseCstVisitorConstructorWithDefaults(
         this: Parser
-    ): {
-        new (...args: any[]): ICstVisitor<any, any>
-    } {
+    ): { new (...args: any[]): ICstVisitor<any, any> } {
         return undefined
     }
 
@@ -456,5 +459,33 @@ export class BaseParser
         separatorLookAheadFunc: () => boolean,
         action: GrammarAction<OUT>,
         nextTerminalAfterWalker: typeof AbstractNextTerminalAfterProductionWalker
+    ): void {}
+
+    consumeInternal(
+        tokType: TokenType,
+        idx: number,
+        options: ConsumeMethodOpts
+    ): IToken {
+        return undefined
+    }
+
+    reloadRecogState(newState: IParserState): void {}
+
+    ruleFinallyStateUpdate(): void {}
+
+    saveRecogState(): IParserState {
+        return undefined
+    }
+
+    subruleInternal<T>(
+        ruleToCall: (idx: number) => T,
+        idx: number,
+        options?: SubruleMethodOpts
+    ): any {}
+
+    ruleInvocationStateUpdate(
+        shortName: string,
+        fullName: string,
+        idxInCallingRule: number
     ): void {}
 }

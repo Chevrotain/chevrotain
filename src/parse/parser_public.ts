@@ -181,7 +181,7 @@ export interface IParserUnresolvedRefDefinitionError
     unresolvedRefName: string
 }
 
-interface IParserState {
+export interface IParserState {
     errors: IRecognitionException[]
     lexerState: any
     RULE_STACK: string[]
@@ -1172,39 +1172,7 @@ export class Parser extends BaseParser implements Recoverable {
         return ruleImplementation
     }
 
-    // TODO: extract to recognizer_engine trait?
-    protected ruleInvocationStateUpdate(
-        shortName: string,
-        fullName: string,
-        idxInCallingRule: number
-    ): void {
-        this.RULE_OCCURRENCE_STACK.push(idxInCallingRule)
-        this.RULE_STACK.push(shortName)
-        // NOOP when cst is disabled
-        this.cstInvocationStateUpdate(fullName, shortName)
-    }
-
-    protected ruleFinallyStateUpdate(): void {
-        this.RULE_STACK.pop()
-        this.RULE_OCCURRENCE_STACK.pop()
-
-        // NOOP when cst is disabled
-        this.cstFinallyStateUpdate()
-
-        if (this.RULE_STACK.length === 0 && !this.isAtEndOfInput()) {
-            let firstRedundantTok = this.LA(1)
-            let errMsg = this.errorMessageProvider.buildNotAllInputParsedMessage(
-                {
-                    firstRedundant: firstRedundantTok,
-                    ruleName: this.getCurrRuleFullName()
-                }
-            )
-            this.SAVE_ERROR(
-                new NotAllInputParsedException(errMsg, firstRedundantTok)
-            )
-        }
-    }
-
+    // other functionality
     // TODO: should this be a member method or a utility? it does not have any state or usage of 'this'...
     // TODO: should this be more explicitly part of the public API?
     public getNextPossibleTokenTypes(
@@ -1218,141 +1186,6 @@ export class Parser extends BaseParser implements Recoverable {
             grammarPath
         ).startWalking()
         return nextPossibleTokenTypes
-    }
-
-    protected subruleInternal<T>(
-        ruleToCall: (idx: number) => T,
-        idx: number,
-        options?: SubruleMethodOpts
-    ) {
-        let ruleResult
-        try {
-            const args = options !== undefined ? options.ARGS : undefined
-            ruleResult = ruleToCall.call(this, idx, args)
-            this.cstPostNonTerminal(
-                ruleResult,
-                options !== undefined && options.LABEL !== undefined
-                    ? options.LABEL
-                    : (<any>ruleToCall).ruleName
-            )
-            return ruleResult
-        } catch (e) {
-            if (isRecognitionException(e) && e.partialCstResult !== undefined) {
-                this.cstPostNonTerminal(
-                    e.partialCstResult,
-                    options !== undefined && options.LABEL !== undefined
-                        ? options.LABEL
-                        : (<any>ruleToCall).ruleName
-                )
-
-                delete e.partialCstResult
-            }
-            throw e
-        }
-    }
-
-    /**
-     * @param tokType - The Type of Token we wish to consume (Reference to its constructor function).
-     * @param idx - Occurrence index of consumed token in the invoking parser rule text
-     *         for example:
-     *         IDENT (DOT IDENT)*
-     *         the first ident will have idx 1 and the second one idx 2
-     *         * note that for the second ident the idx is always 2 even if its invoked 30 times in the same rule
-     *           the idx is about the position in grammar (source code) and has nothing to do with a specific invocation
-     *           details.
-     * @param options -
-     *
-     * @returns {Token} - The consumed Token.
-     */
-    protected consumeInternal(
-        tokType: TokenType,
-        idx: number,
-        options: ConsumeMethodOpts
-    ): IToken {
-        let consumedToken
-        try {
-            let nextToken = this.LA(1)
-            if (this.tokenMatcher(nextToken, tokType) === true) {
-                this.consumeToken()
-                consumedToken = nextToken
-            } else {
-                let msg
-                let previousToken = this.LA(0)
-                if (options !== undefined && options.ERR_MSG) {
-                    msg = options.ERR_MSG
-                } else {
-                    msg = this.errorMessageProvider.buildMismatchTokenMessage({
-                        expected: tokType,
-                        actual: nextToken,
-                        previous: previousToken,
-                        ruleName: this.getCurrRuleFullName()
-                    })
-                }
-                throw this.SAVE_ERROR(
-                    new MismatchedTokenException(msg, nextToken, previousToken)
-                )
-            }
-        } catch (eFromConsumption) {
-            // no recovery allowed during backtracking, otherwise backtracking may recover invalid syntax and accept it
-            // but the original syntax could have been parsed successfully without any backtracking + recovery
-            if (
-                this.recoveryEnabled &&
-                // TODO: more robust checking of the exception type. Perhaps Typescript extending expressions?
-                eFromConsumption.name === "MismatchedTokenException" &&
-                !this.isBackTracking()
-            ) {
-                let follows = this.getFollowsForInRuleRecovery(
-                    <any>tokType,
-                    idx
-                )
-                try {
-                    consumedToken = this.tryInRuleRecovery(
-                        <any>tokType,
-                        follows
-                    )
-                } catch (eFromInRuleRecovery) {
-                    if (
-                        eFromInRuleRecovery.name === IN_RULE_RECOVERY_EXCEPTION
-                    ) {
-                        // failed in RuleRecovery.
-                        // throw the original error in order to trigger reSync error recovery
-                        throw eFromConsumption
-                    } else {
-                        throw eFromInRuleRecovery
-                    }
-                }
-            } else {
-                throw eFromConsumption
-            }
-        }
-
-        this.cstPostTerminal(
-            options !== undefined && options.LABEL !== undefined
-                ? options.LABEL
-                : tokType.tokenName,
-            consumedToken
-        )
-        return consumedToken
-    }
-
-    // other functionality
-    protected saveRecogState(): IParserState {
-        // errors is a getter which will clone the errors array
-        let savedErrors = this.errors
-        let savedRuleStack = cloneArr(this.RULE_STACK)
-        return {
-            errors: savedErrors,
-            lexerState: this.exportLexerState(),
-            RULE_STACK: savedRuleStack,
-            CST_STACK: this.CST_STACK,
-            LAST_EXPLICIT_RULE_STACK: this.LAST_EXPLICIT_RULE_STACK
-        }
-    }
-
-    protected reloadRecogState(newState: IParserState) {
-        this.errors = newState.errors
-        this.importLexerState(newState.lexerState)
-        this.RULE_STACK = newState.RULE_STACK
     }
 }
 

@@ -149,7 +149,7 @@ class EcmaScriptQuirksParser extends Parser {
         return false
     }
 
-    protected consumeInternal(tokClass: TokenType, idx: number): IToken {
+    consumeInternal(tokClass: TokenType, idx: number): IToken {
         this.skipWhitespace()
         let nextToken = this.consumeExpected(tokClass)
         if (nextToken !== false) {
