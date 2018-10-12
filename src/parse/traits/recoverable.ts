@@ -2,6 +2,7 @@ import { createTokenInstance, EOF } from "../../scan/tokens_public"
 import { AbstractNextTerminalAfterProductionWalker } from "../grammar/interpreter"
 import { Parser } from "../parser_public"
 import {
+    cloneArr,
     contains,
     dropRight,
     find,
@@ -9,7 +10,7 @@ import {
     isEmpty,
     map
 } from "../../utils/utils"
-import { IToken, TokenType } from "../../../api"
+import { IToken, ITokenGrammarPath, TokenType } from "../../../api"
 import { MismatchedTokenException } from "../exceptions_public"
 import { IN } from "../constants"
 
@@ -352,6 +353,23 @@ export class Recoverable {
     ): void {
         // by default this is a NO-OP
         // The actual implementation is with the function(not method) below
+    }
+
+    getCurrentGrammarPath(
+        this: Parser,
+        tokType: TokenType,
+        tokIdxInRule: number
+    ): ITokenGrammarPath {
+        let pathRuleStack: string[] = this.getHumanReadableRuleStack()
+        let pathOccurrenceStack: number[] = cloneArr(this.RULE_OCCURRENCE_STACK)
+        let grammarPath: any = {
+            ruleStack: pathRuleStack,
+            occurrenceStack: pathOccurrenceStack,
+            lastTok: tokType,
+            lastTokOccurrence: tokIdxInRule
+        }
+
+        return grammarPath
     }
 }
 

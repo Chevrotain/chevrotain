@@ -189,4 +189,22 @@ export class TreeBuilder {
         let occurrenceStack = this.RULE_OCCURRENCE_STACK
         return occurrenceStack[occurrenceStack.length - 1]
     }
+
+    nestedRuleInvocationStateUpdate(
+        this: Parser,
+        nestedRuleName: string,
+        shortNameKey: number
+    ): void {
+        this.RULE_OCCURRENCE_STACK.push(1)
+        this.RULE_STACK.push(<any>shortNameKey)
+        this.cstNestedInvocationStateUpdate(nestedRuleName, shortNameKey)
+    }
+
+    nestedRuleFinallyStateUpdate(this: Parser): void {
+        this.RULE_STACK.pop()
+        this.RULE_OCCURRENCE_STACK.pop()
+
+        // NOOP when cst is disabled
+        this.cstNestedFinallyStateUpdate()
+    }
 }

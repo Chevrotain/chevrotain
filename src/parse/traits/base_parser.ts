@@ -1,9 +1,17 @@
 import { IFollowKey, Recoverable } from "./recoverable"
 import {
+    AtLeastOneSepMethodOpts,
     CstNode,
+    DSLMethodOpts,
+    DSLMethodOptsWithErr,
+    GrammarAction,
     IAnyOrAlt,
     ICstVisitor,
+    IRuleConfig,
     IToken,
+    ITokenGrammarPath,
+    ManySepMethodOpts,
+    OrMethodOpts,
     TokenType
 } from "../../../api"
 import { AbstractNextTerminalAfterProductionWalker } from "../grammar/interpreter"
@@ -11,6 +19,7 @@ import { lookAheadSequence, Parser, TokenMatcher } from "../parser_public"
 import { TreeBuilder } from "./tree_builder"
 import { LooksAhead } from "./looksahead"
 import { LexerAdapter } from "./lexer_adapter"
+import { RecognizerEngine } from "./recognizer"
 
 // TODO: verification that the BaseParser ONLY contains methods
 //       from the traits
@@ -22,7 +31,12 @@ import { LexerAdapter } from "./lexer_adapter"
  * - https://www.typescriptlang.org/docs/handbook/mixins.html
  */
 export class BaseParser
-    implements Recoverable, TreeBuilder, LooksAhead, LexerAdapter {
+    implements
+        Recoverable,
+        TreeBuilder,
+        LooksAhead,
+        LexerAdapter,
+        RecognizerEngine {
     // Recoverable Trait
     addToResyncTokens(token: IToken, resyncTokens: IToken[]): IToken[] {
         return undefined
@@ -119,6 +133,14 @@ export class BaseParser
         nextToksWalker: typeof AbstractNextTerminalAfterProductionWalker
     ): void {}
 
+    getCurrentGrammarPath(
+        this: Parser,
+        tokType: TokenType,
+        tokIdxInRule: number
+    ): ITokenGrammarPath {
+        return undefined
+    }
+
     // TreeBuilder Trait
     cstFinallyStateUpdate(): void {}
 
@@ -195,6 +217,13 @@ export class BaseParser
     }
 
     nestedRuleFinallyClause(laKey: number, nestedName: string): void {}
+
+    nestedRuleFinallyStateUpdate(): void {}
+
+    nestedRuleInvocationStateUpdate(
+        nestedRuleName: string,
+        shortNameKey: number
+    ): void {}
 
     // LooksAhead Trait
     getKeyForAutomaticLookahead(
@@ -307,6 +336,125 @@ export class BaseParser
 
     importLexerState(newState: number): void {}
 
-    // TODO: this does not get overriden by applyMixins
     set input(newInput: IToken[]) {}
+
+    atLeastOneInternal<OUT>(
+        prodOccurrence: number,
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
+    ): void {}
+
+    atLeastOneInternalLogic<OUT>(
+        prodOccurrence: number,
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
+        key: number
+    ): void {}
+
+    atLeastOneInternalNoCst<OUT>(
+        prodOccurrence: number,
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
+    ): void {}
+
+    atLeastOneSepFirstInternal<OUT>(
+        prodOccurrence: number,
+        options: AtLeastOneSepMethodOpts<OUT>
+    ): void {}
+
+    atLeastOneSepFirstInternalLogic<OUT>(
+        prodOccurrence: number,
+        options: AtLeastOneSepMethodOpts<OUT>,
+        key: number
+    ): void {}
+
+    atLeastOneSepFirstInternalNoCst<OUT>(
+        prodOccurrence: number,
+        options: AtLeastOneSepMethodOpts<OUT>
+    ): void {}
+
+    defineRule<T>(
+        ruleName: string,
+        impl: (...implArgs: any[]) => T,
+        config: IRuleConfig<T>
+    ): (idxInCallingRule?: number, ...args: any[]) => T {
+        return function(p1: number, p2: any) {
+            return undefined
+        }
+    }
+
+    doSingleRepetition(action: Function): any {}
+
+    manyInternal<OUT>(
+        prodOccurrence: number,
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): void {}
+
+    manyInternalLogic<OUT>(
+        prodOccurrence: number,
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
+        key: number
+    ): void {}
+
+    manyInternalNoCst<OUT>(
+        prodOccurrence: number,
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): void {}
+
+    manySepFirstInternal<OUT>(
+        prodOccurrence: number,
+        options: ManySepMethodOpts<OUT>
+    ): void {}
+
+    manySepFirstInternalLogic<OUT>(
+        prodOccurrence: number,
+        options: ManySepMethodOpts<OUT>,
+        key: number
+    ): void {}
+
+    manySepFirstInternalNoCst<OUT>(
+        prodOccurrence: number,
+        options: ManySepMethodOpts<OUT>
+    ): void {}
+
+    optionInternal<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
+        occurrence: number
+    ): OUT {
+        return undefined
+    }
+
+    optionInternalLogic<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
+        occurrence: number,
+        key: number
+    ): OUT {
+        return undefined
+    }
+
+    optionInternalNoCst<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
+        occurrence: number
+    ): OUT {
+        return undefined
+    }
+
+    orInternal<T>(
+        altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>,
+        occurrence: number
+    ): T {
+        return undefined
+    }
+
+    orInternalNoCst<T>(
+        altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>,
+        occurrence: number
+    ): T {
+        return undefined
+    }
+
+    repetitionSepSecondInternal<OUT>(
+        prodOccurrence: number,
+        separator: TokenType,
+        separatorLookAheadFunc: () => boolean,
+        action: GrammarAction<OUT>,
+        nextTerminalAfterWalker: typeof AbstractNextTerminalAfterProductionWalker
+    ): void {}
 }

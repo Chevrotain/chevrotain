@@ -106,6 +106,7 @@ import { BaseParser } from "./traits/base_parser"
 import { LooksAhead } from "./traits/looksahead"
 import { TreeBuilder } from "./traits/tree_builder"
 import { LexerAdapter } from "./traits/lexer_adapter"
+import { RecognizerApi, RecognizerEngine } from "./traits/recognizer"
 
 export const END_OF_FILE = createTokenInstance(
     EOF,
@@ -133,7 +134,7 @@ const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
     serializedGrammar: null
 })
 
-const DEFAULT_RULE_CONFIG: IRuleConfig<any> = Object.freeze({
+export const DEFAULT_RULE_CONFIG: IRuleConfig<any> = Object.freeze({
     recoveryValueFunc: () => undefined,
     resyncEnabled: true
 })
@@ -502,12 +503,93 @@ export class Parser extends BaseParser implements Recoverable {
         augmentTokenTypes(values(this.tokensMap))
     }
 
+    protected SAVE_ERROR(error: IRecognitionException): IRecognitionException {
+        if (isRecognitionException(error)) {
+            error.context = {
+                ruleStack: this.getHumanReadableRuleStack(),
+                ruleOccurrenceStack: cloneArr(this.RULE_OCCURRENCE_STACK)
+            }
+            this._errors.push(error)
+            return error
+        } else {
+            throw Error(
+                "Trying to save an Error which is not a RecognitionException"
+            )
+        }
+    }
+
+    // TODO: extract these methods to ErrorHandler Trait?
     public get errors(): IRecognitionException[] {
         return cloneArr(this._errors)
     }
 
     public set errors(newErrors: IRecognitionException[]) {
         this._errors = newErrors
+    }
+
+    // TODO: consider caching the error message computed information
+    protected raiseEarlyExitException(
+        occurrence: number,
+        prodType: PROD_TYPE,
+        userDefinedErrMsg: string
+    ): void {
+        let ruleName = this.getCurrRuleFullName()
+        let ruleGrammar = this.getGAstProductions().get(ruleName)
+        let lookAheadPathsPerAlternative = getLookaheadPathsForOptionalProd(
+            occurrence,
+            ruleGrammar,
+            prodType,
+            this.maxLookahead
+        )
+        let insideProdPaths = lookAheadPathsPerAlternative[0]
+        let actualTokens = []
+        for (let i = 1; i < this.maxLookahead; i++) {
+            actualTokens.push(this.LA(i))
+        }
+        let msg = this.errorMessageProvider.buildEarlyExitMessage({
+            expectedIterationPaths: insideProdPaths,
+            actual: actualTokens,
+            previous: this.LA(0),
+            customUserDescription: userDefinedErrMsg,
+            ruleName: ruleName
+        })
+
+        throw this.SAVE_ERROR(
+            new EarlyExitException(msg, this.LA(1), this.LA(0))
+        )
+    }
+
+    // TODO: consider caching the error message computed information
+    protected raiseNoAltException(
+        occurrence: number,
+        errMsgTypes: string
+    ): void {
+        let ruleName = this.getCurrRuleFullName()
+        let ruleGrammar = this.getGAstProductions().get(ruleName)
+        // TODO: getLookaheadPathsForOr can be slow for large enough maxLookahead and certain grammars, consider caching ?
+        let lookAheadPathsPerAlternative = getLookaheadPathsForOr(
+            occurrence,
+            ruleGrammar,
+            this.maxLookahead
+        )
+
+        let actualTokens = []
+        for (let i = 1; i < this.maxLookahead; i++) {
+            actualTokens.push(this.LA(i))
+        }
+        let previousToken = this.LA(0)
+
+        let errMsg = this.errorMessageProvider.buildNoViableAltMessage({
+            expectedPathsPerAlt: lookAheadPathsPerAlternative,
+            actual: actualTokens,
+            previous: previousToken,
+            customUserDescription: errMsgTypes,
+            ruleName: this.getCurrRuleFullName()
+        })
+
+        throw this.SAVE_ERROR(
+            new NoViableAltException(errMsg, this.LA(1), previousToken)
+        )
     }
 
     public reset(): void {
@@ -521,6 +603,7 @@ export class Parser extends BaseParser implements Recoverable {
         this.RULE_OCCURRENCE_STACK = []
     }
 
+    // TODO: does this belong to lexerAdapter trait?
     public isAtEndOfInput(): boolean {
         return this.tokenMatcher(this.LA(1), EOF)
     }
@@ -533,6 +616,7 @@ export class Parser extends BaseParser implements Recoverable {
         return serializeGrammar(this.gastProductionsCache.values())
     }
 
+    // TODO: extract to content assist trait?
     public computeContentAssist(
         startRuleName: string,
         precedingInput: IToken[]
@@ -553,6 +637,28 @@ export class Parser extends BaseParser implements Recoverable {
         )
     }
 
+    protected getCurrRuleFullName(): string {
+        let shortName = this.getLastExplicitRuleShortName()
+        return this.shortRuleNameToFull.get(shortName)
+    }
+
+    protected shortRuleNameToFullName(shortName: string) {
+        return this.shortRuleNameToFull.get(shortName)
+    }
+
+    protected getHumanReadableRuleStack(): string[] {
+        if (!isEmpty(this.LAST_EXPLICIT_RULE_STACK)) {
+            return map(this.LAST_EXPLICIT_RULE_STACK, currIdx =>
+                this.shortRuleNameToFullName(this.RULE_STACK[currIdx])
+            )
+        } else {
+            return map(this.RULE_STACK, currShortName =>
+                this.shortRuleNameToFullName(currShortName)
+            )
+        }
+    }
+
+    // TODO: extract recognizer (API?) trait
     BACKTRACK<T>(
         grammarRule: (...args: any[]) => T,
         args?: any[]
@@ -578,47 +684,11 @@ export class Parser extends BaseParser implements Recoverable {
         }
     }
 
-    protected SAVE_ERROR(error: IRecognitionException): IRecognitionException {
-        if (isRecognitionException(error)) {
-            error.context = {
-                ruleStack: this.getHumanReadableRuleStack(),
-                ruleOccurrenceStack: cloneArr(this.RULE_OCCURRENCE_STACK)
-            }
-            this._errors.push(error)
-            return error
-        } else {
-            throw Error(
-                "Trying to save an Error which is not a RecognitionException"
-            )
-        }
-    }
-
     protected isBackTracking(): boolean {
         return !isEmpty(this.isBackTrackingStack)
     }
 
-    protected getCurrRuleFullName(): string {
-        let shortName = this.getLastExplicitRuleShortName()
-        return this.shortRuleNameToFull.get(shortName)
-    }
-
-    protected shortRuleNameToFullName(shortName: string) {
-        return this.shortRuleNameToFull.get(shortName)
-    }
-
-    protected getHumanReadableRuleStack(): string[] {
-        if (!isEmpty(this.LAST_EXPLICIT_RULE_STACK)) {
-            return map(this.LAST_EXPLICIT_RULE_STACK, currIdx =>
-                this.shortRuleNameToFullName(this.RULE_STACK[currIdx])
-            )
-        } else {
-            return map(this.RULE_STACK, currShortName =>
-                this.shortRuleNameToFullName(currShortName)
-            )
-        }
-    }
-
-    // Parsing DSL
+    // Parsing DSL Trait
     public CONSUME(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
         return this.consumeInternal(tokType, 0, options)
     }
@@ -1102,6 +1172,7 @@ export class Parser extends BaseParser implements Recoverable {
         return ruleImplementation
     }
 
+    // TODO: extract to recognizer_engine trait?
     protected ruleInvocationStateUpdate(
         shortName: string,
         fullName: string,
@@ -1132,40 +1203,6 @@ export class Parser extends BaseParser implements Recoverable {
                 new NotAllInputParsedException(errMsg, firstRedundantTok)
             )
         }
-    }
-
-    // TODO: extract to cst
-    protected nestedRuleInvocationStateUpdate(
-        nestedRuleName: string,
-        shortNameKey: number
-    ): void {
-        this.RULE_OCCURRENCE_STACK.push(1)
-        this.RULE_STACK.push(<any>shortNameKey)
-        this.cstNestedInvocationStateUpdate(nestedRuleName, shortNameKey)
-    }
-
-    protected nestedRuleFinallyStateUpdate(): void {
-        this.RULE_STACK.pop()
-        this.RULE_OCCURRENCE_STACK.pop()
-
-        // NOOP when cst is disabled
-        this.cstNestedFinallyStateUpdate()
-    }
-
-    protected getCurrentGrammarPath(
-        tokType: TokenType,
-        tokIdxInRule: number
-    ): ITokenGrammarPath {
-        let pathRuleStack: string[] = this.getHumanReadableRuleStack()
-        let pathOccurrenceStack: number[] = cloneArr(this.RULE_OCCURRENCE_STACK)
-        let grammarPath: any = {
-            ruleStack: pathRuleStack,
-            occurrenceStack: pathOccurrenceStack,
-            lastTok: tokType,
-            lastTokOccurrence: tokIdxInRule
-        }
-
-        return grammarPath
     }
 
     // TODO: should this be a member method or a utility? it does not have any state or usage of 'this'...
@@ -1317,687 +1354,16 @@ export class Parser extends BaseParser implements Recoverable {
         this.importLexerState(newState.lexerState)
         this.RULE_STACK = newState.RULE_STACK
     }
-
-    protected defineRule<T>(
-        ruleName: string,
-        impl: (...implArgs: any[]) => T,
-        config: IRuleConfig<T>
-    ): (idxInCallingRule?: number, ...args: any[]) => T {
-        if (this.selfAnalysisDone) {
-            throw Error(
-                `Grammar rule <${ruleName}> may not be defined after the 'performSelfAnalysis' method has been called'\n` +
-                    `Make sure that all grammar rule definitions are done before 'performSelfAnalysis' is called.`
-            )
-        }
-        let resyncEnabled = has(config, "resyncEnabled")
-            ? config.resyncEnabled
-            : DEFAULT_RULE_CONFIG.resyncEnabled
-        let recoveryValueFunc = has(config, "recoveryValueFunc")
-            ? config.recoveryValueFunc
-            : DEFAULT_RULE_CONFIG.recoveryValueFunc
-
-        // performance optimization: Use small integers as keys for the longer human readable "full" rule names.
-        // this greatly improves Map access time (as much as 8% for some performance benchmarks).
-        /* tslint:disable */
-        let shortName =
-            this.ruleShortNameIdx <<
-            (BITS_FOR_METHOD_IDX + BITS_FOR_OCCURRENCE_IDX)
-        /* tslint:enable */
-
-        this.ruleShortNameIdx++
-        this.shortRuleNameToFull.put(shortName, ruleName)
-        this.fullRuleNameToShort.put(ruleName, shortName)
-
-        function invokeRuleWithTry(args: any[]) {
-            try {
-                // TODO: dynamically get rid of this?
-                if (this.outputCst === true) {
-                    impl.apply(this, args)
-                    return this.CST_STACK[this.CST_STACK.length - 1]
-                } else {
-                    return impl.apply(this, args)
-                }
-            } catch (e) {
-                let isFirstInvokedRule = this.RULE_STACK.length === 1
-                // note the reSync is always enabled for the first rule invocation, because we must always be able to
-                // reSync with EOF and just output some INVALID ParseTree
-                // during backtracking reSync recovery is disabled, otherwise we can't be certain the backtracking
-                // path is really the most valid one
-                let reSyncEnabled =
-                    resyncEnabled &&
-                    !this.isBackTracking() &&
-                    this.recoveryEnabled
-
-                if (isRecognitionException(e)) {
-                    if (reSyncEnabled) {
-                        let reSyncTokType = this.findReSyncTokenType()
-                        if (this.isInCurrentRuleReSyncSet(reSyncTokType)) {
-                            e.resyncedTokens = this.reSyncTo(reSyncTokType)
-                            if (this.outputCst) {
-                                let partialCstResult = this.CST_STACK[
-                                    this.CST_STACK.length - 1
-                                ]
-                                partialCstResult.recoveredNode = true
-                                return partialCstResult
-                            } else {
-                                return recoveryValueFunc()
-                            }
-                        } else {
-                            if (this.outputCst) {
-                                const partialCstResult = this.CST_STACK[
-                                    this.CST_STACK.length - 1
-                                ]
-                                partialCstResult.recoveredNode = true
-                                e.partialCstResult = partialCstResult
-                            }
-                            // to be handled Further up the call stack
-                            throw e
-                        }
-                    } else if (isFirstInvokedRule) {
-                        // otherwise a Redundant input error will be created as well and we cannot guarantee that this is indeed the case
-                        this.moveToTerminatedState()
-                        // the parser should never throw one of its own errors outside its flow.
-                        // even if error recovery is disabled
-                        return recoveryValueFunc()
-                    } else {
-                        // to be handled Further up the call stack
-                        throw e
-                    }
-                } else {
-                    // some other Error type which we don't know how to handle (for example a built in JavaScript Error)
-                    throw e
-                }
-            } finally {
-                this.ruleFinallyStateUpdate()
-            }
-        }
-
-        let wrappedGrammarRule
-
-        wrappedGrammarRule = function(
-            idxInCallingRule: number = 0,
-            args: any[]
-        ) {
-            this.ruleInvocationStateUpdate(
-                shortName,
-                ruleName,
-                idxInCallingRule
-            )
-            return invokeRuleWithTry.call(this, args)
-        }
-
-        let ruleNamePropName = "ruleName"
-        wrappedGrammarRule[ruleNamePropName] = ruleName
-        return wrappedGrammarRule
-    }
-
-    // Implementation of parsing DSL
-    protected optionInternal<OUT>(
-        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
-        occurrence: number
-    ): OUT {
-        let key = this.getKeyForAutomaticLookahead(OPTION_IDX, occurrence)
-        let nestedName = this.nestedRuleBeforeClause(
-            actionORMethodDef as DSLMethodOpts<OUT>,
-            key
-        )
-        try {
-            return this.optionInternalLogic(actionORMethodDef, occurrence, key)
-        } finally {
-            if (nestedName !== undefined) {
-                this.nestedRuleFinallyClause(key, nestedName)
-            }
-        }
-    }
-
-    protected optionInternalNoCst<OUT>(
-        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
-        occurrence: number
-    ): OUT {
-        let key = this.getKeyForAutomaticLookahead(OPTION_IDX, occurrence)
-        return this.optionInternalLogic(actionORMethodDef, occurrence, key)
-    }
-
-    protected optionInternalLogic<OUT>(
-        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
-        occurrence: number,
-        key: number
-    ): OUT {
-        let lookAheadFunc = this.getLookaheadFuncForOption(key, occurrence)
-        let action
-        let predicate
-        if ((<DSLMethodOpts<OUT>>actionORMethodDef).DEF !== undefined) {
-            action = (<DSLMethodOpts<OUT>>actionORMethodDef).DEF
-            predicate = (<DSLMethodOpts<OUT>>actionORMethodDef).GATE
-            // predicate present
-            if (predicate !== undefined) {
-                let orgLookaheadFunction = lookAheadFunc
-                lookAheadFunc = () => {
-                    return (
-                        predicate.call(this) && orgLookaheadFunction.call(this)
-                    )
-                }
-            }
-        } else {
-            action = actionORMethodDef
-        }
-
-        if (lookAheadFunc.call(this) === true) {
-            return action.call(this)
-        }
-        return undefined
-    }
-
-    protected atLeastOneInternal<OUT>(
-        prodOccurrence: number,
-        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
-    ): void {
-        let laKey = this.getKeyForAutomaticLookahead(
-            AT_LEAST_ONE_IDX,
-            prodOccurrence
-        )
-        let nestedName = this.nestedRuleBeforeClause(
-            actionORMethodDef as DSLMethodOptsWithErr<OUT>,
-            laKey
-        )
-        try {
-            return this.atLeastOneInternalLogic(
-                prodOccurrence,
-                actionORMethodDef,
-                laKey
-            )
-        } finally {
-            if (nestedName !== undefined) {
-                this.nestedRuleFinallyClause(laKey, nestedName)
-            }
-        }
-    }
-
-    protected atLeastOneInternalNoCst<OUT>(
-        prodOccurrence: number,
-        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
-    ): void {
-        let key = this.getKeyForAutomaticLookahead(
-            AT_LEAST_ONE_IDX,
-            prodOccurrence
-        )
-        this.atLeastOneInternalLogic(prodOccurrence, actionORMethodDef, key)
-    }
-
-    protected atLeastOneInternalLogic<OUT>(
-        prodOccurrence: number,
-        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
-        key: number
-    ): void {
-        let lookAheadFunc = this.getLookaheadFuncForAtLeastOne(
-            key,
-            prodOccurrence
-        )
-
-        let action
-        let predicate
-        if ((<DSLMethodOptsWithErr<OUT>>actionORMethodDef).DEF !== undefined) {
-            action = (<DSLMethodOptsWithErr<OUT>>actionORMethodDef).DEF
-            predicate = (<DSLMethodOptsWithErr<OUT>>actionORMethodDef).GATE
-            // predicate present
-            if (predicate !== undefined) {
-                let orgLookaheadFunction = lookAheadFunc
-                lookAheadFunc = () => {
-                    return (
-                        predicate.call(this) && orgLookaheadFunction.call(this)
-                    )
-                }
-            }
-        } else {
-            action = actionORMethodDef
-        }
-
-        if ((<Function>lookAheadFunc).call(this) === true) {
-            ;(<any>action).call(this)
-            while ((<Function>lookAheadFunc).call(this) === true) {
-                this.doSingleRepetition(action)
-            }
-        } else {
-            throw this.raiseEarlyExitException(
-                prodOccurrence,
-                PROD_TYPE.REPETITION_MANDATORY,
-                (<DSLMethodOptsWithErr<OUT>>actionORMethodDef).ERR_MSG
-            )
-        }
-
-        // note that while it may seem that this can cause an error because by using a recursive call to
-        // AT_LEAST_ONE we change the grammar to AT_LEAST_TWO, AT_LEAST_THREE ... , the possible recursive call
-        // from the tryInRepetitionRecovery(...) will only happen IFF there really are TWO/THREE/.... items.
-
-        // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
-        this.attemptInRepetitionRecovery(
-            this.atLeastOneInternal,
-            [prodOccurrence, actionORMethodDef],
-            <any>lookAheadFunc,
-            AT_LEAST_ONE_IDX,
-            prodOccurrence,
-            NextTerminalAfterAtLeastOneWalker
-        )
-    }
-
-    protected atLeastOneSepFirstInternal<OUT>(
-        prodOccurrence: number,
-        options: AtLeastOneSepMethodOpts<OUT>
-    ): void {
-        let laKey = this.getKeyForAutomaticLookahead(
-            AT_LEAST_ONE_SEP_IDX,
-            prodOccurrence
-        )
-        let nestedName = this.nestedRuleBeforeClause(options, laKey)
-        try {
-            this.atLeastOneSepFirstInternalLogic(prodOccurrence, options, laKey)
-        } finally {
-            if (nestedName !== undefined) {
-                this.nestedRuleFinallyClause(laKey, nestedName)
-            }
-        }
-    }
-
-    protected atLeastOneSepFirstInternalNoCst<OUT>(
-        prodOccurrence: number,
-        options: AtLeastOneSepMethodOpts<OUT>
-    ): void {
-        let laKey = this.getKeyForAutomaticLookahead(
-            AT_LEAST_ONE_SEP_IDX,
-            prodOccurrence
-        )
-        this.atLeastOneSepFirstInternalLogic(prodOccurrence, options, laKey)
-    }
-
-    protected atLeastOneSepFirstInternalLogic<OUT>(
-        prodOccurrence: number,
-        options: AtLeastOneSepMethodOpts<OUT>,
-        key: number
-    ): void {
-        let action = options.DEF
-        let separator = options.SEP
-
-        let firstIterationLookaheadFunc = this.getLookaheadFuncForAtLeastOneSep(
-            key,
-            prodOccurrence
-        )
-
-        // 1st iteration
-        if (firstIterationLookaheadFunc.call(this) === true) {
-            ;(<GrammarAction<OUT>>action).call(this)
-
-            //  TODO: Optimization can move this function construction into "attemptInRepetitionRecovery"
-            //  because it is only needed in error recovery scenarios.
-            let separatorLookAheadFunc = () => {
-                return this.tokenMatcher(this.LA(1), separator)
-            }
-
-            // 2nd..nth iterations
-            while (this.tokenMatcher(this.LA(1), separator) === true) {
-                // note that this CONSUME will never enter recovery because
-                // the separatorLookAheadFunc checks that the separator really does exist.
-                this.CONSUME(separator)
-                // No need for checking infinite loop here due to consuming the separator.
-                ;(<GrammarAction<OUT>>action).call(this)
-            }
-
-            // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
-            this.attemptInRepetitionRecovery(
-                this.repetitionSepSecondInternal,
-                [
-                    prodOccurrence,
-                    separator,
-                    separatorLookAheadFunc,
-                    action,
-                    NextTerminalAfterAtLeastOneSepWalker
-                ],
-                separatorLookAheadFunc,
-                AT_LEAST_ONE_SEP_IDX,
-                prodOccurrence,
-                NextTerminalAfterAtLeastOneSepWalker
-            )
-        } else {
-            throw this.raiseEarlyExitException(
-                prodOccurrence,
-                PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR,
-                options.ERR_MSG
-            )
-        }
-    }
-
-    protected manyInternal<OUT>(
-        prodOccurrence: number,
-        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-    ): void {
-        let laKey = this.getKeyForAutomaticLookahead(MANY_IDX, prodOccurrence)
-        let nestedName = this.nestedRuleBeforeClause(
-            actionORMethodDef as DSLMethodOpts<OUT>,
-            laKey
-        )
-        try {
-            return this.manyInternalLogic(
-                prodOccurrence,
-                actionORMethodDef,
-                laKey
-            )
-        } finally {
-            if (nestedName !== undefined) {
-                this.nestedRuleFinallyClause(laKey, nestedName)
-            }
-        }
-    }
-
-    protected manyInternalNoCst<OUT>(
-        prodOccurrence: number,
-        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-    ): void {
-        let laKey = this.getKeyForAutomaticLookahead(MANY_IDX, prodOccurrence)
-        return this.manyInternalLogic(prodOccurrence, actionORMethodDef, laKey)
-    }
-
-    protected manyInternalLogic<OUT>(
-        prodOccurrence: number,
-        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
-        key: number
-    ) {
-        let lookaheadFunction = this.getLookaheadFuncForMany(
-            key,
-            prodOccurrence
-        )
-
-        let action
-        let predicate
-        if ((<DSLMethodOpts<OUT>>actionORMethodDef).DEF !== undefined) {
-            action = (<DSLMethodOpts<OUT>>actionORMethodDef).DEF
-            predicate = (<DSLMethodOpts<OUT>>actionORMethodDef).GATE
-            // predicate present
-            if (predicate !== undefined) {
-                let orgLookaheadFunction = lookaheadFunction
-                lookaheadFunction = () => {
-                    return (
-                        predicate.call(this) && orgLookaheadFunction.call(this)
-                    )
-                }
-            }
-        } else {
-            action = actionORMethodDef
-        }
-
-        while (lookaheadFunction.call(this)) {
-            this.doSingleRepetition(action)
-        }
-
-        // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
-        this.attemptInRepetitionRecovery(
-            this.manyInternal,
-            [prodOccurrence, actionORMethodDef],
-            <any>lookaheadFunction,
-            MANY_IDX,
-            prodOccurrence,
-            NextTerminalAfterManyWalker
-        )
-    }
-
-    protected manySepFirstInternal<OUT>(
-        prodOccurrence: number,
-        options: ManySepMethodOpts<OUT>
-    ): void {
-        let laKey = this.getKeyForAutomaticLookahead(
-            MANY_SEP_IDX,
-            prodOccurrence
-        )
-        let nestedName = this.nestedRuleBeforeClause(options, laKey)
-        try {
-            this.manySepFirstInternalLogic(prodOccurrence, options, laKey)
-        } finally {
-            if (nestedName !== undefined) {
-                this.nestedRuleFinallyClause(laKey, nestedName)
-            }
-        }
-    }
-
-    protected manySepFirstInternalNoCst<OUT>(
-        prodOccurrence: number,
-        options: ManySepMethodOpts<OUT>
-    ): void {
-        let laKey = this.getKeyForAutomaticLookahead(
-            MANY_SEP_IDX,
-            prodOccurrence
-        )
-        this.manySepFirstInternalLogic(prodOccurrence, options, laKey)
-    }
-
-    protected manySepFirstInternalLogic<OUT>(
-        prodOccurrence: number,
-        options: ManySepMethodOpts<OUT>,
-        key: number
-    ): void {
-        let action = options.DEF
-        let separator = options.SEP
-
-        let firstIterationLaFunc = this.getLookaheadFuncForManySep(
-            key,
-            prodOccurrence
-        )
-        // 1st iteration
-        if (firstIterationLaFunc.call(this) === true) {
-            action.call(this)
-
-            let separatorLookAheadFunc = () => {
-                return this.tokenMatcher(this.LA(1), separator)
-            }
-            // 2nd..nth iterations
-            while (this.tokenMatcher(this.LA(1), separator) === true) {
-                // note that this CONSUME will never enter recovery because
-                // the separatorLookAheadFunc checks that the separator really does exist.
-                this.CONSUME(separator)
-                // No need for checking infinite loop here due to consuming the separator.
-                action.call(this)
-            }
-
-            // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
-            this.attemptInRepetitionRecovery(
-                this.repetitionSepSecondInternal,
-                [
-                    prodOccurrence,
-                    separator,
-                    separatorLookAheadFunc,
-                    action,
-                    NextTerminalAfterManySepWalker
-                ],
-                separatorLookAheadFunc,
-                MANY_SEP_IDX,
-                prodOccurrence,
-                NextTerminalAfterManySepWalker
-            )
-        }
-    }
-
-    protected repetitionSepSecondInternal<OUT>(
-        prodOccurrence: number,
-        separator: TokenType,
-        separatorLookAheadFunc: () => boolean,
-        action: GrammarAction<OUT>,
-        nextTerminalAfterWalker: typeof AbstractNextTerminalAfterProductionWalker
-    ): void {
-        while (separatorLookAheadFunc()) {
-            // note that this CONSUME will never enter recovery because
-            // the separatorLookAheadFunc checks that the separator really does exist.
-            this.CONSUME(separator)
-            action.call(this)
-        }
-
-        // we can only arrive to this function after an error
-        // has occurred (hence the name 'second') so the following
-        // IF will always be entered, its possible to remove it...
-        // however it is kept to avoid confusion and be consistent.
-        // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
-        /* istanbul ignore else */
-        this.attemptInRepetitionRecovery(
-            this.repetitionSepSecondInternal,
-            [
-                prodOccurrence,
-                separator,
-                separatorLookAheadFunc,
-                action,
-                nextTerminalAfterWalker
-            ],
-            separatorLookAheadFunc,
-            AT_LEAST_ONE_SEP_IDX,
-            prodOccurrence,
-            nextTerminalAfterWalker
-        )
-    }
-
-    protected doSingleRepetition(action: Function): any {
-        const beforeIteration = this.getLexerPosition()
-        const result = action.call(this)
-        const afterIteration = this.getLexerPosition()
-
-        if (afterIteration === beforeIteration) {
-            throw Error(
-                "Infinite loop detected\n" +
-                    "\tSee: https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#INFINITE_LOOP\n" +
-                    "\tFor Further details."
-            )
-        }
-
-        return result
-    }
-
-    protected orInternalNoCst<T>(
-        altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>,
-        occurrence: number
-    ): T {
-        let alts = isArray(altsOrOpts)
-            ? (altsOrOpts as IAnyOrAlt<T>[])
-            : (altsOrOpts as OrMethodOpts<T>).DEF
-        let laFunc = this.getLookaheadFuncForOr(occurrence, alts)
-        let altIdxToTake = laFunc.call(this, alts)
-        if (altIdxToTake !== undefined) {
-            let chosenAlternative: any = alts[altIdxToTake]
-            return chosenAlternative.ALT.call(this)
-        }
-        this.raiseNoAltException(
-            occurrence,
-            (altsOrOpts as OrMethodOpts<T>).ERR_MSG
-        )
-    }
-
-    protected orInternal<T>(
-        altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>,
-        occurrence: number
-    ): T {
-        let laKey = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
-        let nestedName = this.nestedRuleBeforeClause(
-            <OrMethodOpts<T>>altsOrOpts,
-            laKey
-        )
-
-        try {
-            let alts = isArray(altsOrOpts)
-                ? (altsOrOpts as IAnyOrAlt<T>[])
-                : (altsOrOpts as OrMethodOpts<T>).DEF
-
-            let laFunc = this.getLookaheadFuncForOr(occurrence, alts)
-            let altIdxToTake = laFunc.call(this, alts)
-            if (altIdxToTake !== undefined) {
-                let chosenAlternative: any = alts[altIdxToTake]
-                let nestedAltBeforeClauseResult = this.nestedAltBeforeClause(
-                    chosenAlternative,
-                    occurrence,
-                    OR_IDX,
-                    altIdxToTake
-                )
-                try {
-                    return chosenAlternative.ALT.call(this)
-                } finally {
-                    if (nestedAltBeforeClauseResult !== undefined) {
-                        this.nestedRuleFinallyClause(
-                            nestedAltBeforeClauseResult.shortName,
-                            nestedAltBeforeClauseResult.nestedName
-                        )
-                    }
-                }
-            }
-            this.raiseNoAltException(
-                occurrence,
-                (altsOrOpts as OrMethodOpts<T>).ERR_MSG
-            )
-        } finally {
-            if (nestedName !== undefined) {
-                this.nestedRuleFinallyClause(laKey, nestedName)
-            }
-        }
-    }
-
-    // TODO: consider caching the error message computed information
-    protected raiseEarlyExitException(
-        occurrence: number,
-        prodType: PROD_TYPE,
-        userDefinedErrMsg: string
-    ): void {
-        let ruleName = this.getCurrRuleFullName()
-        let ruleGrammar = this.getGAstProductions().get(ruleName)
-        let lookAheadPathsPerAlternative = getLookaheadPathsForOptionalProd(
-            occurrence,
-            ruleGrammar,
-            prodType,
-            this.maxLookahead
-        )
-        let insideProdPaths = lookAheadPathsPerAlternative[0]
-        let actualTokens = []
-        for (let i = 1; i < this.maxLookahead; i++) {
-            actualTokens.push(this.LA(i))
-        }
-        let msg = this.errorMessageProvider.buildEarlyExitMessage({
-            expectedIterationPaths: insideProdPaths,
-            actual: actualTokens,
-            previous: this.LA(0),
-            customUserDescription: userDefinedErrMsg,
-            ruleName: ruleName
-        })
-
-        throw this.SAVE_ERROR(
-            new EarlyExitException(msg, this.LA(1), this.LA(0))
-        )
-    }
-
-    // TODO: consider caching the error message computed information
-    protected raiseNoAltException(
-        occurrence: number,
-        errMsgTypes: string
-    ): void {
-        let ruleName = this.getCurrRuleFullName()
-        let ruleGrammar = this.getGAstProductions().get(ruleName)
-        // TODO: getLookaheadPathsForOr can be slow for large enough maxLookahead and certain grammars, consider caching ?
-        let lookAheadPathsPerAlternative = getLookaheadPathsForOr(
-            occurrence,
-            ruleGrammar,
-            this.maxLookahead
-        )
-
-        let actualTokens = []
-        for (let i = 1; i < this.maxLookahead; i++) {
-            actualTokens.push(this.LA(i))
-        }
-        let previousToken = this.LA(0)
-
-        let errMsg = this.errorMessageProvider.buildNoViableAltMessage({
-            expectedPathsPerAlt: lookAheadPathsPerAlternative,
-            actual: actualTokens,
-            previous: previousToken,
-            customUserDescription: errMsgTypes,
-            ruleName: this.getCurrRuleFullName()
-        })
-
-        throw this.SAVE_ERROR(
-            new NoViableAltException(errMsg, this.LA(1), previousToken)
-        )
-    }
 }
 
-applyMixins(Parser, [Recoverable, LooksAhead, TreeBuilder, LexerAdapter])
+applyMixins(Parser, [
+    Recoverable,
+    LooksAhead,
+    TreeBuilder,
+    LexerAdapter,
+    RecognizerEngine,
+    RecognizerApi
+])
 // Manually copying the only accessor the traits define.
 const inputDescriptor = Object.getOwnPropertyDescriptor(
     LexerAdapter.prototype,
