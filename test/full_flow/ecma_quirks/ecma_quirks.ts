@@ -1,14 +1,16 @@
 import { createToken } from "../../../src/scan/tokens_public"
 import { Lexer } from "../../../src/scan/lexer_public"
+import { Parser } from "../../../src/parse/traits/parser_traits"
+
 import {
     END_OF_FILE,
     lookAheadSequence,
-    Parser,
     TokenMatcher
 } from "../../../src/parse/parser_public"
 import { MismatchedTokenException } from "../../../src/parse/exceptions_public"
 import { every, flatten, forEach, map } from "../../../src/utils/utils"
 import { IAnyOrAlt, IToken, TokenType } from "../../../api"
+import { MixedInParser } from "../../../src/parse/traits/parser_traits"
 
 const Return = createToken({
     name: "Return",
@@ -149,7 +151,11 @@ class EcmaScriptQuirksParser extends Parser {
         return false
     }
 
-    consumeInternal(tokClass: TokenType, idx: number): IToken {
+    consumeInternal(
+        this: MixedInParser & EcmaScriptQuirksParser,
+        tokClass: TokenType,
+        idx: number
+    ): IToken {
         this.skipWhitespace()
         let nextToken = this.consumeExpected(tokClass)
         if (nextToken !== false) {

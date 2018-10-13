@@ -4,7 +4,7 @@
 // generally one should avoid having to use backtracking, and this specific example can be resolved by parsing
 // both statements in a single rule and only distinguishing between them later, but lets see an example of using backtracking :)
 
-import { Parser } from "../../../src/parse/parser_public"
+import { Parser } from "../../../src/parse/traits/parser_traits"
 import { IParserConfig, IToken } from "../../../api"
 
 export enum RET_TYPE {

@@ -5,7 +5,7 @@
  * INSERT (32, "SHAHAR") INTO schema2.Persons
  * DELETE (31, "SHAHAR") FROM schema2.Persons
  */
-import { Parser } from "../../../../src/parse/parser_public"
+import { Parser } from "../../../../src/parse/traits/parser_traits"
 import * as allTokens from "./sql_recovery_tokens"
 import {
     INVALID_DDL,

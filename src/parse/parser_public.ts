@@ -1,17 +1,7 @@
-import {
-    EarlyExitException,
-    isRecognitionException,
-    MismatchedTokenException,
-    NotAllInputParsedException,
-    NoViableAltException
-} from "./exceptions_public"
 import { classNameFromInstance, HashTable } from "../lang/lang_extensions"
-import { validateRuleIsOverridden } from "./grammar/checks"
 import {
     applyMixins,
-    cloneArr,
     cloneObj,
-    contains,
     defaults,
     every,
     first,
@@ -31,21 +21,11 @@ import {
 } from "../utils/utils"
 import { computeAllProdsFollows } from "./grammar/follow"
 import { createTokenInstance, EOF, tokenName } from "../scan/tokens_public"
+import { deserializeGrammar } from "./gast_builder"
 import {
-    getLookaheadPathsForOptionalProd,
-    getLookaheadPathsForOr,
-    PROD_TYPE
-} from "./grammar/lookahead"
-import { buildTopProduction, deserializeGrammar } from "./gast_builder"
-import {
-    AbstractNextTerminalAfterProductionWalker,
     IFirstAfterRepetition,
     NextAfterTokenWalker,
-    nextPossibleTokensAfter,
-    NextTerminalAfterAtLeastOneSepWalker,
-    NextTerminalAfterAtLeastOneWalker,
-    NextTerminalAfterManySepWalker,
-    NextTerminalAfterManyWalker
+    nextPossibleTokensAfter
 } from "./grammar/interpreter"
 import {
     augmentTokenTypes,
@@ -54,16 +34,6 @@ import {
     tokenStructuredMatcherNoCategories
 } from "../scan/tokens"
 import { analyzeCst } from "./cst/cst"
-import {
-    AT_LEAST_ONE_IDX,
-    AT_LEAST_ONE_SEP_IDX,
-    BITS_FOR_METHOD_IDX,
-    BITS_FOR_OCCURRENCE_IDX,
-    MANY_IDX,
-    MANY_SEP_IDX,
-    OPTION_IDX,
-    OR_IDX
-} from "./grammar/keys"
 import {
     defaultGrammarValidatorErrorProvider,
     defaultParserErrorProvider
@@ -74,13 +44,7 @@ import {
     validateGrammar
 } from "./grammar/gast/gast_resolver_public"
 import {
-    AtLeastOneSepMethodOpts,
-    ConsumeMethodOpts,
     CstNode,
-    DSLMethodOpts,
-    DSLMethodOptsWithErr,
-    GrammarAction,
-    IAnyOrAlt,
     IgnoredParserIssues,
     IParserConfig,
     IParserDefinitionError,
@@ -91,22 +55,19 @@ import {
     ISyntacticContentAssistPath,
     IToken,
     ITokenGrammarPath,
-    ManySepMethodOpts,
-    OrMethodOpts,
-    SubruleMethodOpts,
     TokenType,
     TokenVocabulary
 } from "../../api"
 import {
     attemptInRepetitionRecovery as enabledAttemptInRepetitionRecovery,
-    IN_RULE_RECOVERY_EXCEPTION,
     Recoverable
 } from "./traits/recoverable"
-import { BaseParser } from "./traits/base_parser"
 import { LooksAhead } from "./traits/looksahead"
 import { TreeBuilder } from "./traits/tree_builder"
 import { LexerAdapter } from "./traits/lexer_adapter"
 import { RecognizerApi, RecognizerEngine } from "./traits/recognizer"
+import { ErrorHandler } from "./traits/error_handler"
+import { MixedInParser } from "./traits/parser_traits"
 
 export const END_OF_FILE = createTokenInstance(
     EOF,
@@ -197,12 +158,10 @@ export function EMPTY_ALT<T>(value: T = undefined): () => T {
     }
 }
 
-export class Parser extends BaseParser implements Recoverable {
+export class Parser {
     // Recoverable Trait fields
-    protected firstAfterRepMap = new HashTable<IFirstAfterRepetition>()
-    protected resyncFollows: HashTable<TokenType[]> = new HashTable<
-        TokenType[]
-    >()
+    firstAfterRepMap = new HashTable<IFirstAfterRepetition>()
+    resyncFollows: HashTable<TokenType[]> = new HashTable<TokenType[]>()
 
     static NO_RESYNC: boolean = false
     // Set this flag to true if you don't want the Parser to throw error when problems in it's definition are detected.
@@ -289,12 +248,12 @@ export class Parser extends BaseParser implements Recoverable {
     }
 
     // caching
-    protected allRuleNames: string[] = []
-    protected baseCstVisitorConstructor: Function
-    protected baseCstVisitorWithDefaultsConstructor: Function
-    protected gastProductionsCache: HashTable<Rule> = new HashTable<Rule>()
+    allRuleNames: string[] = []
+    baseCstVisitorConstructor: Function
+    baseCstVisitorWithDefaultsConstructor: Function
+    gastProductionsCache: HashTable<Rule> = new HashTable<Rule>()
 
-    protected _errors: IRecognitionException[] = []
+    _errors: IRecognitionException[] = []
 
     // These configuration properties are also assigned in the constructor
     // This is a little bit of duplication but seems to help with performance regression on V8
@@ -303,51 +262,49 @@ export class Parser extends BaseParser implements Recoverable {
      * This flag enables or disables error recovery (fault tolerance) of the parser.
      * If this flag is disabled the parser will halt on the first error.
      */
-    protected recoveryEnabled: boolean = DEFAULT_PARSER_CONFIG.recoveryEnabled
-    protected dynamicTokensEnabled: boolean =
-        DEFAULT_PARSER_CONFIG.dynamicTokensEnabled
-    protected maxLookahead: number = DEFAULT_PARSER_CONFIG.maxLookahead
-    protected ignoredIssues: IgnoredParserIssues =
-        DEFAULT_PARSER_CONFIG.ignoredIssues
-    protected outputCst: boolean = DEFAULT_PARSER_CONFIG.outputCst
-    protected serializedGrammar: ISerializedGast[] =
+    recoveryEnabled: boolean = DEFAULT_PARSER_CONFIG.recoveryEnabled
+    dynamicTokensEnabled: boolean = DEFAULT_PARSER_CONFIG.dynamicTokensEnabled
+    maxLookahead: number = DEFAULT_PARSER_CONFIG.maxLookahead
+    ignoredIssues: IgnoredParserIssues = DEFAULT_PARSER_CONFIG.ignoredIssues
+    outputCst: boolean = DEFAULT_PARSER_CONFIG.outputCst
+    serializedGrammar: ISerializedGast[] =
         DEFAULT_PARSER_CONFIG.serializedGrammar
 
     // adapters
-    protected errorMessageProvider: IParserErrorMessageProvider =
+    errorMessageProvider: IParserErrorMessageProvider =
         DEFAULT_PARSER_CONFIG.errorMessageProvider
 
-    protected isBackTrackingStack = []
-    protected className: string = "Parser"
-    protected RULE_STACK: string[] = []
-    protected RULE_OCCURRENCE_STACK: number[] = []
-    protected CST_STACK: CstNode[] = []
-    protected tokensMap: { [fqn: string]: TokenType } = {}
+    isBackTrackingStack = []
+    className: string = "Parser"
+    RULE_STACK: string[] = []
+    RULE_OCCURRENCE_STACK: number[] = []
+    CST_STACK: CstNode[] = []
+    tokensMap: { [fqn: string]: TokenType } = {}
 
     /* istanbul ignore next - Using plain array as dictionary will be tested on older node.js versions and IE11 */
-    protected lookAheadFuncsCache: any = isES2015MapSupported() ? new Map() : []
-    protected definitionErrors: IParserDefinitionError[] = []
-    protected definedRulesNames: string[] = []
+    lookAheadFuncsCache: any = isES2015MapSupported() ? new Map() : []
+    definitionErrors: IParserDefinitionError[] = []
+    definedRulesNames: string[] = []
 
-    protected shortRuleNameToFull = new HashTable<string>()
-    protected fullRuleNameToShort = new HashTable<number>()
+    shortRuleNameToFull = new HashTable<string>()
+    fullRuleNameToShort = new HashTable<number>()
 
     // The shortName Index must be coded "after" the first 8bits to enable building unique lookahead keys
-    protected ruleShortNameIdx = 256
-    protected tokenMatcher: TokenMatcher = tokenStructuredMatcherNoCategories
-    protected LAST_EXPLICIT_RULE_STACK: number[] = []
-    protected selfAnalysisDone = false
+    ruleShortNameIdx = 256
+    tokenMatcher: TokenMatcher = tokenStructuredMatcherNoCategories
+    LAST_EXPLICIT_RULE_STACK: number[] = []
+    selfAnalysisDone = false
 
     // lexerState
-    protected tokVector: IToken[] = []
-    protected tokVectorLength = 0
-    protected currIdx: number = -1
+    tokVector: IToken[] = []
+    tokVectorLength = 0
+    currIdx: number = -1
 
     constructor(
         tokenVocabulary: TokenVocabulary,
         config: IParserConfig = DEFAULT_PARSER_CONFIG
     ) {
-        super()
+        const that: MixedInParser = this as any
         if (isArray(tokenVocabulary)) {
             // This only checks for Token vocabularies provided as arrays.
             // That is good enough because the main objective is to detect users of pre-V4.0 APIs
@@ -378,7 +335,7 @@ export class Parser extends BaseParser implements Recoverable {
         // effectively means that this optional feature does not exist
         // when not used.
         if (this.recoveryEnabled) {
-            this.attemptInRepetitionRecovery = enabledAttemptInRepetitionRecovery
+            that.attemptInRepetitionRecovery = enabledAttemptInRepetitionRecovery
         }
 
         this.dynamicTokensEnabled = has(config, "dynamicTokensEnabled")
@@ -413,40 +370,41 @@ export class Parser extends BaseParser implements Recoverable {
             // TODO: PARSER.PROTOTYPE?
             // TODO but prevent inheritance???
             // TODO: is Object.getPrototypeOf needed???
-            this.getLaFuncFromCache = Object.getPrototypeOf(
+            that.getLaFuncFromCache = Object.getPrototypeOf(
                 this
             ).getLaFuncFromMap
-            this.setLaFuncCache = Object.getPrototypeOf(
+            that.setLaFuncCache = Object.getPrototypeOf(
                 this
             ).setLaFuncCacheUsingMap
         } else {
-            this.getLaFuncFromCache = Object.getPrototypeOf(
+            that.getLaFuncFromCache = Object.getPrototypeOf(
                 this
             ).getLaFuncFromObj
-            this.setLaFuncCache = Object.getPrototypeOf(this).setLaFuncUsingObj
+            that.setLaFuncCache = Object.getPrototypeOf(this).setLaFuncUsingObj
         }
 
         if (!this.outputCst) {
-            this.cstInvocationStateUpdate = NOOP
-            this.cstFinallyStateUpdate = NOOP
-            this.cstPostTerminal = NOOP
-            this.cstPostNonTerminal = NOOP
+            that.cstInvocationStateUpdate = NOOP
+            that.cstFinallyStateUpdate = NOOP
+            that.cstPostTerminal = NOOP
+            that.cstPostNonTerminal = NOOP
             // TODO: maybe access this._proto?
-            this.getLastExplicitRuleShortName = Object.getPrototypeOf(
+            that.getLastExplicitRuleShortName = Object.getPrototypeOf(
                 this
             ).getLastExplicitRuleShortNameNoCst
-            this.getPreviousExplicitRuleShortName = Object.getPrototypeOf(
+            that.getPreviousExplicitRuleShortName = Object.getPrototypeOf(
                 this
             ).getPreviousExplicitRuleShortNameNoCst
-            this.getLastExplicitRuleOccurrenceIndex = Object.getPrototypeOf(
+            that.getLastExplicitRuleOccurrenceIndex = Object.getPrototypeOf(
                 this
             ).getLastExplicitRuleOccurrenceIndexNoCst
-            this.manyInternal = this.manyInternalNoCst
-            this.orInternal = this.orInternalNoCst
-            this.optionInternal = this.optionInternalNoCst
-            this.atLeastOneInternal = this.atLeastOneInternalNoCst
-            this.manySepFirstInternal = this.manySepFirstInternalNoCst
-            this.atLeastOneSepFirstInternal = this.atLeastOneSepFirstInternalNoCst
+            that.manyInternal = that.manyInternalNoCst
+            that.orInternal = that.orInternalNoCst
+            that.optionInternal = that.optionInternalNoCst
+            that.atLeastOneInternal = that.atLeastOneInternalNoCst
+            that.manySepFirstInternal = that.manySepFirstInternalNoCst
+            that.atLeastOneSepFirstInternal =
+                that.atLeastOneSepFirstInternalNoCst
         }
 
         this.className = classNameFromInstance(this)
@@ -556,19 +514,6 @@ applyMixins(Parser, [
     TreeBuilder,
     LexerAdapter,
     RecognizerEngine,
-    RecognizerApi
+    RecognizerApi,
+    ErrorHandler
 ])
-
-// TODO: extract repeatign pattern to utility
-// Manually copying the only accessor the traits define.
-const inputDescriptor = Object.getOwnPropertyDescriptor(
-    LexerAdapter.prototype,
-    "input"
-)
-Object.defineProperty(Parser.prototype, "input", inputDescriptor)
-
-const errorsDescriptor = Object.getOwnPropertyDescriptor(
-    LexerAdapter.prototype,
-    "errors"
-)
-Object.defineProperty(Parser.prototype, "input", errorsDescriptor)

@@ -1,6 +1,6 @@
+import { Parser } from "../../../src/parse/traits/parser_traits"
 import {
     EMPTY_ALT,
-    Parser,
     ParserDefinitionErrorType
 } from "../../../src/parse/parser_public"
 import { actionDec, DotTok, IdentTok, qualifiedName } from "./samples"
@@ -613,11 +613,11 @@ describe("The reference resolver validation full flow", () => {
         "won't throw an error when trying to init a parser with definition errors but with a flag active to defer handling" +
             "of definition errors",
         () => {
-            Parser.DEFER_DEFINITION_ERRORS_HANDLING = true
+            ;(Parser as any).DEFER_DEFINITION_ERRORS_HANDLING = true
             expect(() => new InvalidRefParser2()).to.not.throw()
             expect(() => new InvalidRefParser2()).to.not.throw()
             expect(() => new InvalidRefParser2()).to.not.throw()
-            Parser.DEFER_DEFINITION_ERRORS_HANDLING = false
+            ;(Parser as any).DEFER_DEFINITION_ERRORS_HANDLING = false
         }
     )
 })
@@ -670,12 +670,12 @@ describe("The rule names validation full flow", () => {
         "won't throw an errors when trying to init a parser with definition errors but with a flag active to defer handling" +
             "of definition errors (ruleName validation",
         () => {
-            Parser.DEFER_DEFINITION_ERRORS_HANDLING = true
+            ;(Parser as any).DEFER_DEFINITION_ERRORS_HANDLING = true
             expect(() => new InvalidRuleNameParser()).to.not.throw()
             expect(() => new InvalidRuleNameParser()).to.not.throw()
             expect(() => new DuplicateRulesParser()).to.not.throw()
             expect(() => new DuplicateRulesParser()).to.not.throw()
-            Parser.DEFER_DEFINITION_ERRORS_HANDLING = false
+            ;(Parser as any).DEFER_DEFINITION_ERRORS_HANDLING = false
         }
     )
 })

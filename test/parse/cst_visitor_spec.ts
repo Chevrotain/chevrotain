@@ -1,5 +1,5 @@
 import { createToken } from "../../src/scan/tokens_public"
-import { Parser } from "../../src/parse/parser_public"
+import { Parser } from "../../src/parse/traits/parser_traits"
 import { createRegularToken } from "../utils/matchers"
 import { keys } from "../../src/utils/utils"
 import { IToken } from "../../api"
@@ -14,7 +14,7 @@ describe("The CSTVisitor", () => {
     class CstTerminalParserReturnVisitor extends Parser {
         constructor(input: IToken[] = []) {
             super(ALL_TOKENS, { outputCst: true })
-            Parser.performSelfAnalysis(this)
+            this.performSelfAnalysis()
         }
 
         public testRule = this.RULE("testRule", () => {

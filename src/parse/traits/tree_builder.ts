@@ -7,11 +7,12 @@ import {
 import { CstNode, ICstVisitor, IToken } from "../../../api"
 import { Parser } from "../parser_public"
 import { getKeyForAltIndex } from "../grammar/keys"
+import { MixedInParser } from "./parser_traits"
 
 export class TreeBuilder {
     // CST
     cstNestedInvocationStateUpdate(
-        this: Parser,
+        this: MixedInParser,
         nestedName: string,
         shortName: string | number
     ): void {
@@ -26,7 +27,7 @@ export class TreeBuilder {
     }
 
     cstInvocationStateUpdate(
-        this: Parser,
+        this: MixedInParser,
         fullRuleName: string,
         shortName: string | number
     ): void {
@@ -37,23 +38,27 @@ export class TreeBuilder {
         })
     }
 
-    cstFinallyStateUpdate(this: Parser): void {
+    cstFinallyStateUpdate(this: MixedInParser): void {
         this.LAST_EXPLICIT_RULE_STACK.pop()
         this.CST_STACK.pop()
     }
 
-    cstNestedFinallyStateUpdate(this: Parser): void {
+    cstNestedFinallyStateUpdate(this: MixedInParser): void {
         this.CST_STACK.pop()
     }
 
-    cstPostTerminal(this: Parser, key: string, consumedToken: IToken): void {
+    cstPostTerminal(
+        this: MixedInParser,
+        key: string,
+        consumedToken: IToken
+    ): void {
         // TODO: would save the "current rootCST be faster than locating it for each terminal?
         let rootCst = this.CST_STACK[this.CST_STACK.length - 1]
         addTerminalToCst(rootCst, consumedToken, key)
     }
 
     cstPostNonTerminal(
-        this: Parser,
+        this: MixedInParser,
         ruleCstResult: CstNode,
         ruleName: string
     ): void {
@@ -65,7 +70,7 @@ export class TreeBuilder {
     }
 
     getBaseCstVisitorConstructor(
-        this: Parser
+        this: MixedInParser
     ): {
         new (...args: any[]): ICstVisitor<any, any>
     } {
@@ -82,7 +87,7 @@ export class TreeBuilder {
     }
 
     getBaseCstVisitorConstructorWithDefaults(
-        this: Parser
+        this: MixedInParser
     ): {
         new (...args: any[]): ICstVisitor<any, any>
     } {
@@ -100,7 +105,7 @@ export class TreeBuilder {
     }
 
     nestedRuleBeforeClause(
-        this: Parser,
+        this: MixedInParser,
         methodOpts: { NAME?: string },
         laKey: number
     ): string {
@@ -115,7 +120,7 @@ export class TreeBuilder {
     }
 
     nestedAltBeforeClause(
-        this: Parser,
+        this: MixedInParser,
         methodOpts: { NAME?: string },
         occurrence: number,
         methodKeyIdx: number,
@@ -142,7 +147,7 @@ export class TreeBuilder {
     }
 
     nestedRuleFinallyClause(
-        this: Parser,
+        this: MixedInParser,
         laKey: number,
         nestedName: string
     ): void {
@@ -154,44 +159,44 @@ export class TreeBuilder {
         addNoneTerminalToCst(parentCstNode, nestedName, nestedRuleCst)
     }
 
-    getLastExplicitRuleShortName(this: Parser): string {
+    getLastExplicitRuleShortName(this: MixedInParser): string {
         let lastExplictIndex = this.LAST_EXPLICIT_RULE_STACK[
             this.LAST_EXPLICIT_RULE_STACK.length - 1
         ]
         return this.RULE_STACK[lastExplictIndex]
     }
 
-    getLastExplicitRuleShortNameNoCst(this: Parser): string {
+    getLastExplicitRuleShortNameNoCst(this: MixedInParser): string {
         let ruleStack = this.RULE_STACK
         return ruleStack[ruleStack.length - 1]
     }
 
-    getPreviousExplicitRuleShortName(this: Parser): string {
+    getPreviousExplicitRuleShortName(this: MixedInParser): string {
         let lastExplicitIndex = this.LAST_EXPLICIT_RULE_STACK[
             this.LAST_EXPLICIT_RULE_STACK.length - 2
         ]
         return this.RULE_STACK[lastExplicitIndex]
     }
 
-    getPreviousExplicitRuleShortNameNoCst(this: Parser): string {
+    getPreviousExplicitRuleShortNameNoCst(this: MixedInParser): string {
         let ruleStack = this.RULE_STACK
         return ruleStack[ruleStack.length - 2]
     }
 
-    getLastExplicitRuleOccurrenceIndex(this: Parser): number {
+    getLastExplicitRuleOccurrenceIndex(this: MixedInParser): number {
         let lastExplicitIndex = this.LAST_EXPLICIT_RULE_STACK[
             this.LAST_EXPLICIT_RULE_STACK.length - 1
         ]
         return this.RULE_OCCURRENCE_STACK[lastExplicitIndex]
     }
 
-    getLastExplicitRuleOccurrenceIndexNoCst(this: Parser): number {
+    getLastExplicitRuleOccurrenceIndexNoCst(this: MixedInParser): number {
         let occurrenceStack = this.RULE_OCCURRENCE_STACK
         return occurrenceStack[occurrenceStack.length - 1]
     }
 
     nestedRuleInvocationStateUpdate(
-        this: Parser,
+        this: MixedInParser,
         nestedRuleName: string,
         shortNameKey: number
     ): void {
@@ -200,7 +205,7 @@ export class TreeBuilder {
         this.cstNestedInvocationStateUpdate(nestedRuleName, shortNameKey)
     }
 
-    nestedRuleFinallyStateUpdate(this: Parser): void {
+    nestedRuleFinallyStateUpdate(this: MixedInParser): void {
         this.RULE_STACK.pop()
         this.RULE_OCCURRENCE_STACK.pop()
 

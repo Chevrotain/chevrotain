@@ -13,6 +13,7 @@ import {
 import { IToken, ITokenGrammarPath, TokenType } from "../../../api"
 import { MismatchedTokenException } from "../exceptions_public"
 import { IN } from "../constants"
+import { MixedInParser } from "./parser_traits"
 
 export const EOF_FOLLOW_KEY: any = {}
 
@@ -55,7 +56,7 @@ export class Recoverable {
     }
 
     tryInRepetitionRecovery(
-        this: Parser,
+        this: MixedInParser,
         grammarRule: Function,
         grammarRuleArgs: any[],
         lookAheadFunc: () => boolean,
@@ -116,7 +117,7 @@ export class Recoverable {
     }
 
     shouldInRepetitionRecoveryBeTried(
-        this: Parser,
+        this: MixedInParser,
         expectTokAfterLastMatch?: TokenType,
         nextTokIdx?: number
     ): boolean {
@@ -156,7 +157,7 @@ export class Recoverable {
 
     // Error Recovery functionality
     getFollowsForInRuleRecovery(
-        this: Parser,
+        this: MixedInParser,
         tokType: TokenType,
         tokIdxInRule: number
     ): TokenType[] {
@@ -166,7 +167,7 @@ export class Recoverable {
     }
 
     tryInRuleRecovery(
-        this: Parser,
+        this: MixedInParser,
         expectedTokType: TokenType,
         follows: TokenType[]
     ): IToken {
@@ -185,7 +186,7 @@ export class Recoverable {
     }
 
     canPerformInRuleRecovery(
-        this: Parser,
+        this: MixedInParser,
         expectedToken: TokenType,
         follows: TokenType[]
     ): boolean {
@@ -196,7 +197,7 @@ export class Recoverable {
     }
 
     canRecoverWithSingleTokenInsertion(
-        this: Parser,
+        this: MixedInParser,
         expectedTokType: TokenType,
         follows: TokenType[]
     ): boolean {
@@ -219,7 +220,7 @@ export class Recoverable {
     }
 
     canRecoverWithSingleTokenDeletion(
-        this: Parser,
+        this: MixedInParser,
         expectedTokType: TokenType
     ): boolean {
         let isNextTokenWhatIsExpected = this.tokenMatcher(
@@ -229,13 +230,16 @@ export class Recoverable {
         return isNextTokenWhatIsExpected
     }
 
-    isInCurrentRuleReSyncSet(this: Parser, tokenTypeIdx: TokenType): boolean {
+    isInCurrentRuleReSyncSet(
+        this: MixedInParser,
+        tokenTypeIdx: TokenType
+    ): boolean {
         let followKey = this.getCurrFollowKey()
         let currentRuleReSyncSet = this.getFollowSetFromFollowKey(followKey)
         return contains(currentRuleReSyncSet, tokenTypeIdx)
     }
 
-    findReSyncTokenType(this: Parser): TokenType {
+    findReSyncTokenType(this: MixedInParser): TokenType {
         let allPossibleReSyncTokTypes = this.flattenFollowSet()
         // this loop will always terminate as EOF is always in the follow stack and also always (virtually) in the input
         let nextToken = this.LA(1)
@@ -250,7 +254,7 @@ export class Recoverable {
         }
     }
 
-    getCurrFollowKey(this: Parser): IFollowKey {
+    getCurrFollowKey(this: MixedInParser): IFollowKey {
         // the length is at least one as we always add the ruleName to the stack before invoking the rule.
         if (this.RULE_STACK.length === 1) {
             return EOF_FOLLOW_KEY
@@ -266,7 +270,7 @@ export class Recoverable {
         }
     }
 
-    buildFullFollowKeyStack(this: Parser): IFollowKey[] {
+    buildFullFollowKeyStack(this: MixedInParser): IFollowKey[] {
         let explicitRuleStack = this.RULE_STACK
         let explicitOccurrenceStack = this.RULE_OCCURRENCE_STACK
 
@@ -294,7 +298,7 @@ export class Recoverable {
         })
     }
 
-    flattenFollowSet(this: Parser): TokenType[] {
+    flattenFollowSet(this: MixedInParser): TokenType[] {
         let followStack = map(this.buildFullFollowKeyStack(), currKey => {
             return this.getFollowSetFromFollowKey(currKey)
         })
@@ -302,7 +306,7 @@ export class Recoverable {
     }
 
     getFollowSetFromFollowKey(
-        this: Parser,
+        this: MixedInParser,
         followKey: IFollowKey
     ): TokenType[] {
         if (followKey === EOF_FOLLOW_KEY) {
@@ -321,7 +325,7 @@ export class Recoverable {
     // It does not make any sense to include a virtual EOF token in the list of resynced tokens
     // as EOF does not really exist and thus does not contain any useful information (line/column numbers)
     addToResyncTokens(
-        this: Parser,
+        this: MixedInParser,
         token: IToken,
         resyncTokens: IToken[]
     ): IToken[] {
@@ -331,7 +335,7 @@ export class Recoverable {
         return resyncTokens
     }
 
-    reSyncTo(this: Parser, tokType: TokenType): IToken[] {
+    reSyncTo(this: MixedInParser, tokType: TokenType): IToken[] {
         let resyncedTokens = []
         let nextTok = this.LA(1)
         while (this.tokenMatcher(nextTok, tokType) === false) {
@@ -343,7 +347,7 @@ export class Recoverable {
     }
 
     attemptInRepetitionRecovery(
-        this: Parser,
+        this: MixedInParser,
         prodFunc: Function,
         args: any[],
         lookaheadFunc: () => boolean,
@@ -356,7 +360,7 @@ export class Recoverable {
     }
 
     getCurrentGrammarPath(
-        this: Parser,
+        this: MixedInParser,
         tokType: TokenType,
         tokIdxInRule: number
     ): ITokenGrammarPath {
@@ -371,7 +375,7 @@ export class Recoverable {
 
         return grammarPath
     }
-    getHumanReadableRuleStack(this: Parser): string[] {
+    getHumanReadableRuleStack(this: MixedInParser): string[] {
         if (!isEmpty(this.LAST_EXPLICIT_RULE_STACK)) {
             return map(this.LAST_EXPLICIT_RULE_STACK, currIdx =>
                 this.shortRuleNameToFullName(this.RULE_STACK[currIdx])
@@ -385,7 +389,7 @@ export class Recoverable {
 }
 
 export function attemptInRepetitionRecovery(
-    this: Parser,
+    this: MixedInParser,
     prodFunc: Function,
     args: any[],
     lookaheadFunc: () => boolean,

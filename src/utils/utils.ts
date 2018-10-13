@@ -7,6 +7,9 @@
  so writing several dozen utils which may be slower than the original lodash, does not matter as much
  considering they will not be invoked in hotspots...
  */
+import { LexerAdapter } from "../parse/traits/lexer_adapter"
+import { Parser } from "../parse/parser_public"
+
 export function isEmpty(arr: any[]): boolean {
     return arr && arr.length === 0
 }
@@ -431,8 +434,25 @@ export function isES2015MapSupported(): boolean {
 
 export function applyMixins(derivedCtor: any, baseCtors: any[]) {
     baseCtors.forEach(baseCtor => {
-        Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
-            derivedCtor.prototype[name] = baseCtor.prototype[name]
+        const baseProto = baseCtor.prototype
+        Object.getOwnPropertyNames(baseProto).forEach(propName => {
+            const basePropDescriptor = Object.getOwnPropertyDescriptor(
+                baseProto,
+                propName
+            )
+            // Handle Accessors
+            if (
+                basePropDescriptor &&
+                (basePropDescriptor.get || basePropDescriptor.set)
+            ) {
+                Object.defineProperty(
+                    derivedCtor.prototype,
+                    propName,
+                    basePropDescriptor
+                )
+            } else {
+                derivedCtor.prototype[propName] = baseCtor.prototype[propName]
+            }
         })
     })
 }

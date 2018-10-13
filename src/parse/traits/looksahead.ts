@@ -10,10 +10,11 @@ import { lookAheadSequence, TokenMatcher } from "../parser_public"
 import { IAnyOrAlt, IOrAltWithGate } from "../../../api"
 import { getKeyForAutomaticLookahead, OR_IDX } from "../grammar/keys"
 import { Parser } from "../parser_public"
+import { MixedInParser } from "./parser_traits"
 
 export class LooksAhead {
     lookAheadBuilderForOptional(
-        this: Parser,
+        this: MixedInParser,
         alt: lookAheadSequence,
         tokenMatcher: TokenMatcher,
         dynamicTokensEnabled: boolean
@@ -26,7 +27,7 @@ export class LooksAhead {
     }
 
     lookAheadBuilderForAlternatives(
-        this: Parser,
+        this: MixedInParser,
         alts: lookAheadSequence[],
         hasPredicates: boolean,
         tokenMatcher: TokenMatcher,
@@ -42,7 +43,7 @@ export class LooksAhead {
 
     // this actually returns a number, but it is always used as a string (object prop key)
     getKeyForAutomaticLookahead(
-        this: Parser,
+        this: MixedInParser,
         dslMethodIdx: number,
         occurrence: number
     ): number {
@@ -55,7 +56,7 @@ export class LooksAhead {
     }
 
     getLookaheadFuncForOr(
-        this: Parser,
+        this: MixedInParser,
         occurrence: number,
         alts: IAnyOrAlt<any>[]
     ): () => number {
@@ -85,7 +86,7 @@ export class LooksAhead {
 
     // Automatic lookahead calculation
     getLookaheadFuncForOption(
-        this: Parser,
+        this: MixedInParser,
         key: number,
         occurrence: number
     ): () => boolean {
@@ -98,7 +99,7 @@ export class LooksAhead {
     }
 
     getLookaheadFuncForMany(
-        this: Parser,
+        this: MixedInParser,
         key: number,
         occurrence: number
     ): () => boolean {
@@ -111,7 +112,7 @@ export class LooksAhead {
     }
 
     getLookaheadFuncForManySep(
-        this: Parser,
+        this: MixedInParser,
         key: number,
         occurrence: number
     ): () => boolean {
@@ -124,7 +125,7 @@ export class LooksAhead {
     }
 
     getLookaheadFuncForAtLeastOne(
-        this: Parser,
+        this: MixedInParser,
         key: number,
         occurrence: number
     ): () => boolean {
@@ -137,7 +138,7 @@ export class LooksAhead {
     }
 
     getLookaheadFuncForAtLeastOneSep(
-        this: Parser,
+        this: MixedInParser,
         key: number,
         occurrence: number
     ): () => boolean {
@@ -150,7 +151,7 @@ export class LooksAhead {
     }
 
     getLookaheadFuncFor(
-        this: Parser,
+        this: MixedInParser,
         key: number,
         occurrence: number,
         maxLookahead: number,
@@ -176,28 +177,32 @@ export class LooksAhead {
     }
 
     /* istanbul ignore next */
-    getLaFuncFromCache(this: Parser, key: number): Function {
+    getLaFuncFromCache(this: MixedInParser, key: number): Function {
         return undefined
     }
 
-    getLaFuncFromMap(this: Parser, key: number): Function {
+    getLaFuncFromMap(this: MixedInParser, key: number): Function {
         return this.lookAheadFuncsCache.get(key)
     }
 
     /* istanbul ignore next - Using plain array as dictionary will be tested on older node.js versions and IE11 */
-    getLaFuncFromObj(this: Parser, key: number): Function {
+    getLaFuncFromObj(this: MixedInParser, key: number): Function {
         return this.lookAheadFuncsCache[key]
     }
 
     /* istanbul ignore next */
-    setLaFuncCache(this: Parser, key: number, value: Function): void {}
+    setLaFuncCache(this: MixedInParser, key: number, value: Function): void {}
 
-    setLaFuncCacheUsingMap(this: Parser, key: number, value: Function): void {
+    setLaFuncCacheUsingMap(
+        this: MixedInParser,
+        key: number,
+        value: Function
+    ): void {
         this.lookAheadFuncsCache.set(key, value)
     }
 
     /* istanbul ignore next - Using plain array as dictionary will be tested on older node.js versions and IE11 */
-    setLaFuncUsingObj(this: Parser, key: number, value: Function): void {
+    setLaFuncUsingObj(this: MixedInParser, key: number, value: Function): void {
         this.lookAheadFuncsCache[key] = value
     }
 }

@@ -5,12 +5,14 @@ import {
     DSLMethodOptsWithErr,
     GrammarAction,
     IAnyOrAlt,
+    IParserConfig,
     IRuleConfig,
     IToken,
     ManySepMethodOpts,
     OrMethodOpts,
     SubruleMethodOpts,
-    TokenType
+    TokenType,
+    TokenVocabulary
 } from "../../../api"
 import { cloneArr, contains, has, isArray, isEmpty } from "../../utils/utils"
 import {
@@ -47,10 +49,12 @@ import { defaultGrammarValidatorErrorProvider } from "../errors_public"
 import { buildTopProduction } from "../gast_builder"
 import { validateRuleIsOverridden } from "../grammar/checks"
 import { EOF } from "../../scan/tokens_public"
+import { MixedInParser } from "./parser_traits"
 
+// TODO: split into two files.
 export class RecognizerApi {
     CONSUME(
-        this: Parser,
+        this: MixedInParser,
         tokType: TokenType,
         options?: ConsumeMethodOpts
     ): IToken {
@@ -58,7 +62,7 @@ export class RecognizerApi {
     }
 
     CONSUME1(
-        this: Parser,
+        this: MixedInParser,
         tokType: TokenType,
         options?: ConsumeMethodOpts
     ): IToken {
@@ -66,7 +70,7 @@ export class RecognizerApi {
     }
 
     CONSUME2(
-        this: Parser,
+        this: MixedInParser,
         tokType: TokenType,
         options?: ConsumeMethodOpts
     ): IToken {
@@ -74,7 +78,7 @@ export class RecognizerApi {
     }
 
     CONSUME3(
-        this: Parser,
+        this: MixedInParser,
         tokType: TokenType,
         options?: ConsumeMethodOpts
     ): IToken {
@@ -82,7 +86,7 @@ export class RecognizerApi {
     }
 
     CONSUME4(
-        this: Parser,
+        this: MixedInParser,
         tokType: TokenType,
         options?: ConsumeMethodOpts
     ): IToken {
@@ -90,7 +94,7 @@ export class RecognizerApi {
     }
 
     CONSUME5(
-        this: Parser,
+        this: MixedInParser,
         tokType: TokenType,
         options?: ConsumeMethodOpts
     ): IToken {
@@ -98,7 +102,7 @@ export class RecognizerApi {
     }
 
     CONSUME6(
-        this: Parser,
+        this: MixedInParser,
         tokType: TokenType,
         options?: ConsumeMethodOpts
     ): IToken {
@@ -106,7 +110,7 @@ export class RecognizerApi {
     }
 
     CONSUME7(
-        this: Parser,
+        this: MixedInParser,
         tokType: TokenType,
         options?: ConsumeMethodOpts
     ): IToken {
@@ -114,7 +118,7 @@ export class RecognizerApi {
     }
 
     CONSUME8(
-        this: Parser,
+        this: MixedInParser,
         tokType: TokenType,
         options?: ConsumeMethodOpts
     ): IToken {
@@ -122,7 +126,7 @@ export class RecognizerApi {
     }
 
     CONSUME9(
-        this: Parser,
+        this: MixedInParser,
         tokType: TokenType,
         options?: ConsumeMethodOpts
     ): IToken {
@@ -130,7 +134,7 @@ export class RecognizerApi {
     }
 
     SUBRULE<T>(
-        this: Parser,
+        this: MixedInParser,
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T {
@@ -138,7 +142,7 @@ export class RecognizerApi {
     }
 
     SUBRULE1<T>(
-        this: Parser,
+        this: MixedInParser,
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T {
@@ -146,7 +150,7 @@ export class RecognizerApi {
     }
 
     SUBRULE2<T>(
-        this: Parser,
+        this: MixedInParser,
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T {
@@ -154,7 +158,7 @@ export class RecognizerApi {
     }
 
     SUBRULE3<T>(
-        this: Parser,
+        this: MixedInParser,
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T {
@@ -162,7 +166,7 @@ export class RecognizerApi {
     }
 
     SUBRULE4<T>(
-        this: Parser,
+        this: MixedInParser,
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T {
@@ -170,7 +174,7 @@ export class RecognizerApi {
     }
 
     SUBRULE5<T>(
-        this: Parser,
+        this: MixedInParser,
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T {
@@ -178,7 +182,7 @@ export class RecognizerApi {
     }
 
     SUBRULE6<T>(
-        this: Parser,
+        this: MixedInParser,
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T {
@@ -186,7 +190,7 @@ export class RecognizerApi {
     }
 
     SUBRULE7<T>(
-        this: Parser,
+        this: MixedInParser,
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T {
@@ -194,7 +198,7 @@ export class RecognizerApi {
     }
 
     SUBRULE8<T>(
-        this: Parser,
+        this: MixedInParser,
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T {
@@ -202,7 +206,7 @@ export class RecognizerApi {
     }
 
     SUBRULE9<T>(
-        this: Parser,
+        this: MixedInParser,
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T {
@@ -210,367 +214,397 @@ export class RecognizerApi {
     }
 
     OPTION<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
         return this.optionInternal(actionORMethodDef, 0)
     }
 
     OPTION1<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
         return this.optionInternal(actionORMethodDef, 1)
     }
 
     OPTION2<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
         return this.optionInternal(actionORMethodDef, 2)
     }
 
     OPTION3<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
         return this.optionInternal(actionORMethodDef, 3)
     }
 
     OPTION4<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
         return this.optionInternal(actionORMethodDef, 4)
     }
 
     OPTION5<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
         return this.optionInternal(actionORMethodDef, 5)
     }
 
     OPTION6<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
         return this.optionInternal(actionORMethodDef, 6)
     }
 
     OPTION7<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
         return this.optionInternal(actionORMethodDef, 7)
     }
 
     OPTION8<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
         return this.optionInternal(actionORMethodDef, 8)
     }
 
     OPTION9<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
         return this.optionInternal(actionORMethodDef, 9)
     }
 
-    OR<T>(this: Parser, altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+    OR<T>(
+        this: MixedInParser,
+        altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>
+    ): T {
         return this.orInternal(altsOrOpts, 0)
     }
 
-    OR1<T>(this: Parser, altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+    OR1<T>(
+        this: MixedInParser,
+        altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>
+    ): T {
         return this.orInternal(altsOrOpts, 1)
     }
 
-    OR2<T>(this: Parser, altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+    OR2<T>(
+        this: MixedInParser,
+        altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>
+    ): T {
         return this.orInternal(altsOrOpts, 2)
     }
 
-    OR3<T>(this: Parser, altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+    OR3<T>(
+        this: MixedInParser,
+        altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>
+    ): T {
         return this.orInternal(altsOrOpts, 3)
     }
 
-    OR4<T>(this: Parser, altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+    OR4<T>(
+        this: MixedInParser,
+        altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>
+    ): T {
         return this.orInternal(altsOrOpts, 4)
     }
 
-    OR5<T>(this: Parser, altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+    OR5<T>(
+        this: MixedInParser,
+        altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>
+    ): T {
         return this.orInternal(altsOrOpts, 5)
     }
 
-    OR6<T>(this: Parser, altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+    OR6<T>(
+        this: MixedInParser,
+        altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>
+    ): T {
         return this.orInternal(altsOrOpts, 6)
     }
 
-    OR7<T>(this: Parser, altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+    OR7<T>(
+        this: MixedInParser,
+        altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>
+    ): T {
         return this.orInternal(altsOrOpts, 7)
     }
 
-    OR8<T>(this: Parser, altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+    OR8<T>(
+        this: MixedInParser,
+        altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>
+    ): T {
         return this.orInternal(altsOrOpts, 8)
     }
 
-    OR9<T>(this: Parser, altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+    OR9<T>(
+        this: MixedInParser,
+        altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>
+    ): T {
         return this.orInternal(altsOrOpts, 9)
     }
 
     MANY<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): void {
         this.manyInternal(0, actionORMethodDef)
     }
 
     MANY1<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): void {
         this.manyInternal(1, actionORMethodDef)
     }
 
     MANY2<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): void {
         this.manyInternal(2, actionORMethodDef)
     }
 
     MANY3<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): void {
         this.manyInternal(3, actionORMethodDef)
     }
 
     MANY4<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): void {
         this.manyInternal(4, actionORMethodDef)
     }
 
     MANY5<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): void {
         this.manyInternal(5, actionORMethodDef)
     }
 
     MANY6<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): void {
         this.manyInternal(6, actionORMethodDef)
     }
 
     MANY7<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): void {
         this.manyInternal(7, actionORMethodDef)
     }
 
     MANY8<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): void {
         this.manyInternal(8, actionORMethodDef)
     }
 
     MANY9<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): void {
         this.manyInternal(9, actionORMethodDef)
     }
 
-    MANY_SEP<OUT>(this: Parser, options: ManySepMethodOpts<OUT>): void {
+    MANY_SEP<OUT>(this: MixedInParser, options: ManySepMethodOpts<OUT>): void {
         this.manySepFirstInternal(0, options)
     }
 
-    MANY_SEP1<OUT>(this: Parser, options: ManySepMethodOpts<OUT>): void {
+    MANY_SEP1<OUT>(this: MixedInParser, options: ManySepMethodOpts<OUT>): void {
         this.manySepFirstInternal(1, options)
     }
 
-    MANY_SEP2<OUT>(this: Parser, options: ManySepMethodOpts<OUT>): void {
+    MANY_SEP2<OUT>(this: MixedInParser, options: ManySepMethodOpts<OUT>): void {
         this.manySepFirstInternal(2, options)
     }
 
-    MANY_SEP3<OUT>(this: Parser, options: ManySepMethodOpts<OUT>): void {
+    MANY_SEP3<OUT>(this: MixedInParser, options: ManySepMethodOpts<OUT>): void {
         this.manySepFirstInternal(3, options)
     }
 
-    MANY_SEP4<OUT>(this: Parser, options: ManySepMethodOpts<OUT>): void {
+    MANY_SEP4<OUT>(this: MixedInParser, options: ManySepMethodOpts<OUT>): void {
         this.manySepFirstInternal(4, options)
     }
 
-    MANY_SEP5<OUT>(this: Parser, options: ManySepMethodOpts<OUT>): void {
+    MANY_SEP5<OUT>(this: MixedInParser, options: ManySepMethodOpts<OUT>): void {
         this.manySepFirstInternal(5, options)
     }
 
-    MANY_SEP6<OUT>(this: Parser, options: ManySepMethodOpts<OUT>): void {
+    MANY_SEP6<OUT>(this: MixedInParser, options: ManySepMethodOpts<OUT>): void {
         this.manySepFirstInternal(6, options)
     }
 
-    MANY_SEP7<OUT>(this: Parser, options: ManySepMethodOpts<OUT>): void {
+    MANY_SEP7<OUT>(this: MixedInParser, options: ManySepMethodOpts<OUT>): void {
         this.manySepFirstInternal(7, options)
     }
 
-    MANY_SEP8<OUT>(this: Parser, options: ManySepMethodOpts<OUT>): void {
+    MANY_SEP8<OUT>(this: MixedInParser, options: ManySepMethodOpts<OUT>): void {
         this.manySepFirstInternal(8, options)
     }
 
-    MANY_SEP9<OUT>(this: Parser, options: ManySepMethodOpts<OUT>): void {
+    MANY_SEP9<OUT>(this: MixedInParser, options: ManySepMethodOpts<OUT>): void {
         this.manySepFirstInternal(9, options)
     }
 
     AT_LEAST_ONE<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): void {
         this.atLeastOneInternal(0, actionORMethodDef)
     }
 
     AT_LEAST_ONE1<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): void {
         return this.atLeastOneInternal(1, actionORMethodDef)
     }
 
     AT_LEAST_ONE2<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): void {
         this.atLeastOneInternal(2, actionORMethodDef)
     }
 
     AT_LEAST_ONE3<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): void {
         this.atLeastOneInternal(3, actionORMethodDef)
     }
 
     AT_LEAST_ONE4<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): void {
         this.atLeastOneInternal(4, actionORMethodDef)
     }
 
     AT_LEAST_ONE5<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): void {
         this.atLeastOneInternal(5, actionORMethodDef)
     }
 
     AT_LEAST_ONE6<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): void {
         this.atLeastOneInternal(6, actionORMethodDef)
     }
 
     AT_LEAST_ONE7<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): void {
         this.atLeastOneInternal(7, actionORMethodDef)
     }
 
     AT_LEAST_ONE8<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): void {
         this.atLeastOneInternal(8, actionORMethodDef)
     }
 
     AT_LEAST_ONE9<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): void {
         this.atLeastOneInternal(9, actionORMethodDef)
     }
 
     AT_LEAST_ONE_SEP<OUT>(
-        this: Parser,
+        this: MixedInParser,
         options: AtLeastOneSepMethodOpts<OUT>
     ): void {
         this.atLeastOneSepFirstInternal(0, options)
     }
 
     AT_LEAST_ONE_SEP1<OUT>(
-        this: Parser,
+        this: MixedInParser,
         options: AtLeastOneSepMethodOpts<OUT>
     ): void {
         this.atLeastOneSepFirstInternal(1, options)
     }
 
     AT_LEAST_ONE_SEP2<OUT>(
-        this: Parser,
+        this: MixedInParser,
         options: AtLeastOneSepMethodOpts<OUT>
     ): void {
         this.atLeastOneSepFirstInternal(2, options)
     }
 
     AT_LEAST_ONE_SEP3<OUT>(
-        this: Parser,
+        this: MixedInParser,
         options: AtLeastOneSepMethodOpts<OUT>
     ): void {
         this.atLeastOneSepFirstInternal(3, options)
     }
 
     AT_LEAST_ONE_SEP4<OUT>(
-        this: Parser,
+        this: MixedInParser,
         options: AtLeastOneSepMethodOpts<OUT>
     ): void {
         this.atLeastOneSepFirstInternal(4, options)
     }
 
     AT_LEAST_ONE_SEP5<OUT>(
-        this: Parser,
+        this: MixedInParser,
         options: AtLeastOneSepMethodOpts<OUT>
     ): void {
         this.atLeastOneSepFirstInternal(5, options)
     }
 
     AT_LEAST_ONE_SEP6<OUT>(
-        this: Parser,
+        this: MixedInParser,
         options: AtLeastOneSepMethodOpts<OUT>
     ): void {
         this.atLeastOneSepFirstInternal(6, options)
     }
 
     AT_LEAST_ONE_SEP7<OUT>(
-        this: Parser,
+        this: MixedInParser,
         options: AtLeastOneSepMethodOpts<OUT>
     ): void {
         this.atLeastOneSepFirstInternal(7, options)
     }
 
     AT_LEAST_ONE_SEP8<OUT>(
-        this: Parser,
+        this: MixedInParser,
         options: AtLeastOneSepMethodOpts<OUT>
     ): void {
         this.atLeastOneSepFirstInternal(8, options)
     }
 
     AT_LEAST_ONE_SEP9<OUT>(
-        this: Parser,
+        this: MixedInParser,
         options: AtLeastOneSepMethodOpts<OUT>
     ): void {
         this.atLeastOneSepFirstInternal(9, options)
     }
 
     RULE<T>(
-        this: Parser,
+        this: MixedInParser,
         name: string,
         implementation: (...implArgs: any[]) => T,
         // TODO: how to describe the optional return type of CSTNode? T|CstNode is not good because it is not backward
@@ -614,7 +648,7 @@ export class RecognizerApi {
     }
 
     OVERRIDE_RULE<T>(
-        this: Parser,
+        this: MixedInParser,
         name: string,
         impl: (...implArgs: any[]) => T,
         config: IRuleConfig<T> = DEFAULT_RULE_CONFIG
@@ -645,7 +679,7 @@ export class RecognizerApi {
     }
 
     BACKTRACK<T>(
-        this: Parser,
+        this: MixedInParser,
         grammarRule: (...args: any[]) => T,
         args?: any[]
     ): () => boolean {
@@ -673,7 +707,7 @@ export class RecognizerApi {
 
 export class RecognizerEngine {
     defineRule<T>(
-        this: Parser,
+        this: MixedInParser,
         ruleName: string,
         impl: (...implArgs: any[]) => T,
         config: IRuleConfig<T>
@@ -788,7 +822,7 @@ export class RecognizerEngine {
 
     // Implementation of parsing DSL
     optionInternal<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
         occurrence: number
     ): OUT {
@@ -807,7 +841,7 @@ export class RecognizerEngine {
     }
 
     optionInternalNoCst<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
         occurrence: number
     ): OUT {
@@ -816,7 +850,7 @@ export class RecognizerEngine {
     }
 
     optionInternalLogic<OUT>(
-        this: Parser,
+        this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
         occurrence: number,
         key: number
@@ -847,7 +881,7 @@ export class RecognizerEngine {
     }
 
     atLeastOneInternal<OUT>(
-        this: Parser,
+        this: MixedInParser,
         prodOccurrence: number,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): void {
@@ -873,7 +907,7 @@ export class RecognizerEngine {
     }
 
     atLeastOneInternalNoCst<OUT>(
-        this: Parser,
+        this: MixedInParser,
         prodOccurrence: number,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): void {
@@ -885,7 +919,7 @@ export class RecognizerEngine {
     }
 
     atLeastOneInternalLogic<OUT>(
-        this: Parser,
+        this: MixedInParser,
         prodOccurrence: number,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
         key: number
@@ -942,7 +976,7 @@ export class RecognizerEngine {
     }
 
     atLeastOneSepFirstInternal<OUT>(
-        this: Parser,
+        this: MixedInParser,
         prodOccurrence: number,
         options: AtLeastOneSepMethodOpts<OUT>
     ): void {
@@ -961,7 +995,7 @@ export class RecognizerEngine {
     }
 
     atLeastOneSepFirstInternalNoCst<OUT>(
-        this: Parser,
+        this: MixedInParser,
         prodOccurrence: number,
         options: AtLeastOneSepMethodOpts<OUT>
     ): void {
@@ -973,7 +1007,7 @@ export class RecognizerEngine {
     }
 
     atLeastOneSepFirstInternalLogic<OUT>(
-        this: Parser,
+        this: MixedInParser,
         prodOccurrence: number,
         options: AtLeastOneSepMethodOpts<OUT>,
         key: number
@@ -1030,7 +1064,7 @@ export class RecognizerEngine {
     }
 
     manyInternal<OUT>(
-        this: Parser,
+        this: MixedInParser,
         prodOccurrence: number,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): void {
@@ -1053,7 +1087,7 @@ export class RecognizerEngine {
     }
 
     manyInternalNoCst<OUT>(
-        this: Parser,
+        this: MixedInParser,
         prodOccurrence: number,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): void {
@@ -1062,7 +1096,7 @@ export class RecognizerEngine {
     }
 
     manyInternalLogic<OUT>(
-        this: Parser,
+        this: MixedInParser,
         prodOccurrence: number,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
         key: number
@@ -1106,7 +1140,7 @@ export class RecognizerEngine {
     }
 
     manySepFirstInternal<OUT>(
-        this: Parser,
+        this: MixedInParser,
         prodOccurrence: number,
         options: ManySepMethodOpts<OUT>
     ): void {
@@ -1125,7 +1159,7 @@ export class RecognizerEngine {
     }
 
     manySepFirstInternalNoCst<OUT>(
-        this: Parser,
+        this: MixedInParser,
         prodOccurrence: number,
         options: ManySepMethodOpts<OUT>
     ): void {
@@ -1137,7 +1171,7 @@ export class RecognizerEngine {
     }
 
     manySepFirstInternalLogic<OUT>(
-        this: Parser,
+        this: MixedInParser,
         prodOccurrence: number,
         options: ManySepMethodOpts<OUT>,
         key: number
@@ -1184,7 +1218,7 @@ export class RecognizerEngine {
     }
 
     repetitionSepSecondInternal<OUT>(
-        this: Parser,
+        this: MixedInParser,
         prodOccurrence: number,
         separator: TokenType,
         separatorLookAheadFunc: () => boolean,
@@ -1220,7 +1254,7 @@ export class RecognizerEngine {
         )
     }
 
-    doSingleRepetition(this: Parser, action: Function): any {
+    doSingleRepetition(this: MixedInParser, action: Function): any {
         const beforeIteration = this.getLexerPosition()
         const result = action.call(this)
         const afterIteration = this.getLexerPosition()
@@ -1237,7 +1271,7 @@ export class RecognizerEngine {
     }
 
     orInternalNoCst<T>(
-        this: Parser,
+        this: MixedInParser,
         altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>,
         occurrence: number
     ): T {
@@ -1257,7 +1291,7 @@ export class RecognizerEngine {
     }
 
     orInternal<T>(
-        this: Parser,
+        this: MixedInParser,
         altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>,
         occurrence: number
     ): T {
@@ -1304,7 +1338,7 @@ export class RecognizerEngine {
         }
     }
 
-    ruleFinallyStateUpdate(this: Parser): void {
+    ruleFinallyStateUpdate(this: MixedInParser): void {
         this.RULE_STACK.pop()
         this.RULE_OCCURRENCE_STACK.pop()
 
@@ -1326,7 +1360,7 @@ export class RecognizerEngine {
     }
 
     subruleInternal<T>(
-        this: Parser,
+        this: MixedInParser,
         ruleToCall: (idx: number) => T,
         idx: number,
         options?: SubruleMethodOpts
@@ -1358,7 +1392,7 @@ export class RecognizerEngine {
     }
 
     consumeInternal(
-        this: Parser,
+        this: MixedInParser,
         tokType: TokenType,
         idx: number,
         options: ConsumeMethodOpts
@@ -1429,7 +1463,7 @@ export class RecognizerEngine {
         return consumedToken
     }
 
-    saveRecogState(this: Parser): IParserState {
+    saveRecogState(this: MixedInParser): IParserState {
         // errors is a getter which will clone the errors array
         let savedErrors = this.errors
         let savedRuleStack = cloneArr(this.RULE_STACK)
@@ -1442,14 +1476,14 @@ export class RecognizerEngine {
         }
     }
 
-    reloadRecogState(this: Parser, newState: IParserState) {
+    reloadRecogState(this: MixedInParser, newState: IParserState) {
         this.errors = newState.errors
         this.importLexerState(newState.lexerState)
         this.RULE_STACK = newState.RULE_STACK
     }
 
     ruleInvocationStateUpdate(
-        this: Parser,
+        this: MixedInParser,
         shortName: string,
         fullName: string,
         idxInCallingRule: number
@@ -1460,24 +1494,24 @@ export class RecognizerEngine {
         this.cstInvocationStateUpdate(fullName, shortName)
     }
 
-    isBackTracking(this: Parser): boolean {
+    isBackTracking(this: MixedInParser): boolean {
         return !isEmpty(this.isBackTrackingStack)
     }
 
-    getCurrRuleFullName(this: Parser): string {
+    getCurrRuleFullName(this: MixedInParser): string {
         let shortName = this.getLastExplicitRuleShortName()
         return this.shortRuleNameToFull.get(shortName)
     }
 
-    shortRuleNameToFullName(this: Parser, shortName: string) {
+    shortRuleNameToFullName(this: MixedInParser, shortName: string) {
         return this.shortRuleNameToFull.get(shortName)
     }
 
-    public isAtEndOfInput(this: Parser): boolean {
+    public isAtEndOfInput(this: MixedInParser): boolean {
         return this.tokenMatcher(this.LA(1), EOF)
     }
 
-    public reset(this: Parser): void {
+    public reset(this: MixedInParser): void {
         this.resetLexerState()
 
         this.isBackTrackingStack = []

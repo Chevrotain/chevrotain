@@ -11,10 +11,11 @@ import {
     PROD_TYPE
 } from "../grammar/lookahead"
 import { Parser } from "../parser_public"
+import { MixedInParser } from "./parser_traits"
 
 export class ErrorHandler {
     SAVE_ERROR(
-        this: Parser,
+        this: MixedInParser,
         error: IRecognitionException
     ): IRecognitionException {
         if (isRecognitionException(error)) {
@@ -32,17 +33,17 @@ export class ErrorHandler {
     }
 
     // TODO: extract these methods to ErrorHandler Trait?
-    get errors(this: Parser): IRecognitionException[] {
+    get errors(this: MixedInParser): IRecognitionException[] {
         return cloneArr(this._errors)
     }
 
-    set errors(this: Parser, newErrors: IRecognitionException[]) {
+    set errors(this: MixedInParser, newErrors: IRecognitionException[]) {
         this._errors = newErrors
     }
 
     // TODO: consider caching the error message computed information
     raiseEarlyExitException(
-        this: Parser,
+        this: MixedInParser,
         occurrence: number,
         prodType: PROD_TYPE,
         userDefinedErrMsg: string
@@ -75,7 +76,7 @@ export class ErrorHandler {
 
     // TODO: consider caching the error message computed information
     raiseNoAltException(
-        this: Parser,
+        this: MixedInParser,
         occurrence: number,
         errMsgTypes: string
     ): void {

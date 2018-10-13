@@ -54,6 +54,7 @@ import {
 import * as defs from "../api"
 import { IProduction } from "../api"
 import { TokenType } from "../api"
+import { MixedInParser } from "./parse/traits/parser_traits"
 
 interface ParserConstructor {
     new (
@@ -138,7 +139,7 @@ interface RuleConstructor {
  * defines the public API of
  * changes here may require major version change. (semVer)
  */
-let API: {
+const API: {
     VERSION: typeof defs.VERSION
     Parser: ParserConstructor
     ParserDefinitionErrorType: typeof defs.ParserDefinitionErrorType
@@ -189,7 +190,12 @@ let API: {
 API.VERSION = VERSION
 
 // runtime API
-API.Parser = Parser
+API.Parser = Parser as any
+// TypeCheck Multi Trait Parser API against official Chevrotain API
+// The only thing this does not check is the constructor signature.
+const mixedDummyInstance: MixedInParser = null
+const officalDummyInstance: defs.Parser = mixedDummyInstance
+
 API.ParserDefinitionErrorType = ParserDefinitionErrorType
 API.Lexer = Lexer
 API.LexerDefinitionErrorType = LexerDefinitionErrorType

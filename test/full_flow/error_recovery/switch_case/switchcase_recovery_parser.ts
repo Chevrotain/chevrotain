@@ -28,7 +28,7 @@
  * }
  */
 
-import { Parser } from "../../../../src/parse/parser_public"
+import { Parser } from "../../../../src/parse/traits/parser_traits"
 import * as allTokens from "./Switchcase_recovery_tokens"
 import {
     CaseTok,

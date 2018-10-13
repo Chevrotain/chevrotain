@@ -1,5 +1,5 @@
 import { createToken } from "../../src/scan/tokens_public"
-import { Parser } from "../../src/parse/parser_public"
+import { Parser } from "../../src/parse/traits/parser_traits"
 import { tokenStructuredMatcher } from "../../src/scan/tokens"
 import { createRegularToken } from "../utils/matchers"
 import { map } from "../../src/utils/utils"

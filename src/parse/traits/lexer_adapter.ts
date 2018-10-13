@@ -1,20 +1,21 @@
 import { END_OF_FILE, Parser } from "../parser_public"
 import { IToken } from "../../../api"
+import { MixedInParser } from "./parser_traits"
 
 export class LexerAdapter {
     // lexer related methods
-    set input(this: Parser, newInput: IToken[]) {
+    set input(this: MixedInParser, newInput: IToken[]) {
         this.reset()
         this.tokVector = newInput
         this.tokVectorLength = newInput.length
     }
 
-    get input(this: Parser): IToken[] {
+    get input(this: MixedInParser): IToken[] {
         return this.tokVector
     }
 
     // skips a token and returns the next token
-    SKIP_TOKEN(this: Parser): IToken {
+    SKIP_TOKEN(this: MixedInParser): IToken {
         if (this.currIdx <= this.tokVector.length - 2) {
             this.consumeToken()
             return this.LA(1)
@@ -25,7 +26,7 @@ export class LexerAdapter {
 
     // Lexer (accessing Token vector) related methods which can be overridden to implement lazy lexers
     // or lexers dependent on parser context.
-    LA(this: Parser, howMuch: number): IToken {
+    LA(this: MixedInParser, howMuch: number): IToken {
         // does: is this optimization (saving tokVectorLength benefits?)
         if (
             this.currIdx + howMuch < 0 ||
@@ -37,27 +38,27 @@ export class LexerAdapter {
         }
     }
 
-    consumeToken(this: Parser) {
+    consumeToken(this: MixedInParser) {
         this.currIdx++
     }
 
-    exportLexerState(this: Parser): number {
+    exportLexerState(this: MixedInParser): number {
         return this.currIdx
     }
 
-    importLexerState(this: Parser, newState: number) {
+    importLexerState(this: MixedInParser, newState: number) {
         this.currIdx = newState
     }
 
-    resetLexerState(this: Parser): void {
+    resetLexerState(this: MixedInParser): void {
         this.currIdx = -1
     }
 
-    moveToTerminatedState(this: Parser): void {
+    moveToTerminatedState(this: MixedInParser): void {
         this.currIdx = this.tokVector.length - 1
     }
 
-    getLexerPosition(this: Parser): number {
+    getLexerPosition(this: MixedInParser): number {
         return this.exportLexerState()
     }
 }

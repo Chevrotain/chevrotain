@@ -1,6 +1,8 @@
 import { EOF, createToken } from "../../src/scan/tokens_public"
 import { Lexer } from "../../src/scan/lexer_public"
-import { Parser, EMPTY_ALT } from "../../src/parse/parser_public"
+import { Parser } from "../../src/parse/traits/parser_traits"
+import { EMPTY_ALT } from "../../src/parse/parser_public"
+
 import {
     EarlyExitException,
     MismatchedTokenException,
@@ -814,6 +816,29 @@ function defineRecognizerSpecs(
                             this.CONSUME(IntTok)
                         })
                         this.performSelfAnalysis()
+
+                        this.RULE("badRule", () => {
+                            this.CONSUME(IntTok)
+                        })
+                    }
+                }
+
+                expect(() => new WrongOrderOfSelfAnalysisParser()).to.throw(
+                    "Grammar rule <badRule> may not be defined after the 'performSelfAnalysis' method has been called"
+                )
+            })
+
+            it("Will throw an error is performSelfAnalysis is called before all the rules have been defined - static invocation", () => {
+                class WrongOrderOfSelfAnalysisParser extends Parser {
+                    constructor(input: IToken[] = []) {
+                        super(ALL_TOKENS)
+                        this.input = input
+
+                        this.RULE("goodRule", () => {
+                            this.CONSUME(IntTok)
+                        })
+                        // old deprecated static api
+                        ;(Parser as any).performSelfAnalysis(this)
 
                         this.RULE("badRule", () => {
                             this.CONSUME(IntTok)
