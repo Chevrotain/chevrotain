@@ -16,6 +16,12 @@ import { MixedInParser } from "./parser_traits"
  * Trait responsible for runtime parsing errors.
  */
 export class ErrorHandler {
+    _errors: IRecognitionException[]
+
+    initErrorHandler() {
+        this._errors = []
+    }
+
     SAVE_ERROR(
         this: MixedInParser,
         error: IRecognitionException

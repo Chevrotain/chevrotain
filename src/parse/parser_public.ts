@@ -255,8 +255,6 @@ export class Parser {
     baseCstVisitorWithDefaultsConstructor: Function
     gastProductionsCache: HashTable<Rule> = new HashTable<Rule>()
 
-    _errors: IRecognitionException[] = []
-
     // These configuration properties are also assigned in the constructor
     // This is a little bit of duplication but seems to help with performance regression on V8
     // Probably due to hidden class changes.
@@ -307,6 +305,8 @@ export class Parser {
         config: IParserConfig = DEFAULT_PARSER_CONFIG
     ) {
         const that: MixedInParser = this as any
+        that.initErrorHandler()
+
         if (isArray(tokenVocabulary)) {
             // This only checks for Token vocabularies provided as arrays.
             // That is good enough because the main objective is to detect users of pre-V4.0 APIs
