@@ -10,9 +10,9 @@ import {
     ManySepMethodOpts,
     OrMethodOpts,
     SubruleMethodOpts,
-    TokenType
+    TokenType, TokenVocabulary
 } from "../../../api"
-import { cloneArr, has, isArray, isEmpty } from "../../utils/utils"
+import {cloneArr, cloneObj, every, flatten, has, isArray, isEmpty, isObject, reduce, uniq, values} from "../../utils/utils"
 import {
     AT_LEAST_ONE_IDX,
     AT_LEAST_ONE_SEP_IDX,
@@ -38,14 +38,88 @@ import {
 } from "../grammar/interpreter"
 import { DEFAULT_RULE_CONFIG, IParserState } from "../parser_public"
 import { IN_RULE_RECOVERY_EXCEPTION } from "./recoverable"
-import { EOF } from "../../scan/tokens_public"
+import {EOF, tokenName} from "../../scan/tokens_public"
 import { MixedInParser } from "./parser_traits"
+import {augmentTokenTypes, isTokenType} from "../../scan/tokens"
 
 /**
  * This trait is responsible for the runtime parsing engine
  * Used by the official API (recognizer_api.ts)
  */
 export class RecognizerEngine {
+
+    definedRulesNames: string[]
+    tokensMap: { [fqn: string]: TokenType }
+
+
+    initRecognizerEngine(tokenVocabulary: TokenVocabulary) {
+        this.definedRulesNames = []
+        this.tokensMap = {}
+
+        if (isArray(tokenVocabulary)) {
+            // This only checks for Token vocabularies provided as arrays.
+            // That is good enough because the main objective is to detect users of pre-V4.0 APIs
+            // rather than all edge cases of empty Token vocabularies.
+            if (isEmpty(tokenVocabulary as any[])) {
+                throw Error(
+                    "A Token Vocabulary cannot be empty.\n" +
+                    "\tNote that the first argument for the parser constructor\n" +
+                    "\tis no longer a Token vector (since v4.0)."
+                )
+            }
+
+            if (typeof (tokenVocabulary as any[])[0].startOffset === "number") {
+                throw Error(
+                    "The Parser constructor no longer accepts a token vector as the first argument.\n" +
+                    "\tSee: http://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_4-0-0\n" +
+                    "\tFor Further details."
+                )
+            }
+        }
+
+        if (isArray(tokenVocabulary)) {
+            this.tokensMap = <any>reduce(
+                <any>tokenVocabulary,
+                (acc, tokenClazz: TokenType) => {
+                    acc[tokenName(tokenClazz)] = tokenClazz
+                    return acc
+                },
+                {}
+            )
+        } else if (
+            has(tokenVocabulary, "modes") &&
+            every(flatten(values((<any>tokenVocabulary).modes)), isTokenType)
+        ) {
+            let allTokenTypes = flatten(values((<any>tokenVocabulary).modes))
+            let uniqueTokens = uniq(allTokenTypes)
+            this.tokensMap = <any>reduce(
+                uniqueTokens,
+                (acc, tokenClazz: TokenType) => {
+                    acc[tokenName(tokenClazz)] = tokenClazz
+                    return acc
+                },
+                {}
+            )
+        } else if (isObject(tokenVocabulary)) {
+            this.tokensMap = cloneObj(tokenVocabulary)
+        } else {
+            throw new Error(
+                "<tokensDictionary> argument must be An Array of Token constructors," +
+                " A dictionary of Token constructors or an IMultiModeLexerDefinition"
+            )
+        }
+
+        // always add EOF to the tokenNames -> constructors map. it is useful to assure all the input has been
+        // parsed with a clear error message ("expecting EOF but found ...")
+        /* tslint:disable */
+        this.tokensMap["EOF"] = EOF
+
+        // Because ES2015+ syntax should be supported for creating Token classes
+        // We cannot assume that the Token classes were created using the "extendToken" utilities
+        // Therefore we must augment the Token classes both on Lexer initialization and on Parser initialization
+        augmentTokenTypes(values(this.tokensMap))
+    }
+
     defineRule<T>(
         this: MixedInParser,
         ruleName: string,

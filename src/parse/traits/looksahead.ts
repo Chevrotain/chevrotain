@@ -5,9 +5,13 @@ import {
     buildSingleAlternativeLookaheadFunction,
     PROD_TYPE
 } from "../grammar/lookahead"
-import { isFunction, some } from "../../utils/utils"
-import { lookAheadSequence, TokenMatcher } from "../parser_public"
-import { IAnyOrAlt, IOrAltWithGate } from "../../../api"
+import { has, isES2015MapSupported, isFunction, some } from "../../utils/utils"
+import {
+    DEFAULT_PARSER_CONFIG,
+    lookAheadSequence,
+    TokenMatcher
+} from "../parser_public"
+import { IAnyOrAlt, IOrAltWithGate, IParserConfig } from "../../../api"
 import { getKeyForAutomaticLookahead, OR_IDX } from "../grammar/keys"
 import { MixedInParser } from "./parser_traits"
 
@@ -15,6 +19,43 @@ import { MixedInParser } from "./parser_traits"
  * Trait responsible for the lookahead related utilities and optimizations.
  */
 export class LooksAhead {
+    maxLookahead: number
+    lookAheadFuncsCache: any
+    dynamicTokensEnabled: boolean
+
+    initLooksAhead(config: IParserConfig) {
+        this.dynamicTokensEnabled = has(config, "dynamicTokensEnabled")
+            ? config.dynamicTokensEnabled
+            : DEFAULT_PARSER_CONFIG.dynamicTokensEnabled
+
+        this.maxLookahead = has(config, "maxLookahead")
+            ? config.maxLookahead
+            : DEFAULT_PARSER_CONFIG.maxLookahead
+
+        /* istanbul ignore next - Using plain array as dictionary will be tested on older node.js versions and IE11 */
+        this.lookAheadFuncsCache = isES2015MapSupported() ? new Map() : []
+
+        // Performance optimization on newer engines that support ES6 Map
+        // For larger Maps this is slightly faster than using a plain object (array in our case).
+        /* istanbul ignore else - The else branch will be tested on older node.js versions and IE11 */
+        if (isES2015MapSupported()) {
+            // TODO: PARSER.PROTOTYPE?
+            // TODO but prevent inheritance???
+            // TODO: is Object.getPrototypeOf needed???
+            this.getLaFuncFromCache = Object.getPrototypeOf(
+                this
+            ).getLaFuncFromMap
+            this.setLaFuncCache = Object.getPrototypeOf(
+                this
+            ).setLaFuncCacheUsingMap
+        } else {
+            this.getLaFuncFromCache = Object.getPrototypeOf(
+                this
+            ).getLaFuncFromObj
+            this.setLaFuncCache = Object.getPrototypeOf(this).setLaFuncUsingObj
+        }
+    }
+
     lookAheadBuilderForOptional(
         this: MixedInParser,
         alt: lookAheadSequence,

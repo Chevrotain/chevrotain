@@ -10,7 +10,16 @@ import { MixedInParser } from "./parser_traits"
  * - Streaming Lexer.
  */
 export class LexerAdapter {
-    // lexer related methods
+    tokVector: IToken[]
+    tokVectorLength
+    currIdx: number
+
+    initLexerAdapter() {
+        this.tokVector = []
+        this.tokVectorLength = 0
+        this.currIdx = -1
+    }
+
     set input(this: MixedInParser, newInput: IToken[]) {
         this.reset()
         this.tokVector = newInput

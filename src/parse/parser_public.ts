@@ -1,26 +1,18 @@
 import { classNameFromInstance, HashTable } from "../lang/lang_extensions"
 import {
     applyMixins,
-    cloneObj,
-    defaults,
     every,
     first,
-    flatten,
     forEach,
     has,
-    isArray,
     isEmpty,
-    isES2015MapSupported,
-    isObject,
     isUndefined,
     map,
     NOOP,
-    reduce,
-    uniq,
     values
 } from "../utils/utils"
 import { computeAllProdsFollows } from "./grammar/follow"
-import { createTokenInstance, EOF, tokenName } from "../scan/tokens_public"
+import { createTokenInstance, EOF } from "../scan/tokens_public"
 import { deserializeGrammar } from "./gast_builder"
 import {
     IFirstAfterRepetition,
@@ -28,8 +20,6 @@ import {
     nextPossibleTokensAfter
 } from "./grammar/interpreter"
 import {
-    augmentTokenTypes,
-    isTokenType,
     tokenStructuredMatcher,
     tokenStructuredMatcherNoCategories
 } from "../scan/tokens"
@@ -48,7 +38,6 @@ import {
     IgnoredParserIssues,
     IParserConfig,
     IParserDefinitionError,
-    IParserErrorMessageProvider,
     IRecognitionException,
     IRuleConfig,
     ISerializedGast,
@@ -178,10 +167,10 @@ export class Parser {
      *  @deprecated use the **instance** method with the same name instead
      */
     static performSelfAnalysis(parserInstance: Parser): void {
-        parserInstance.performSelfAnalysis()
+        ;(parserInstance as any).performSelfAnalysis()
     }
 
-    public performSelfAnalysis(): void {
+    public performSelfAnalysis(this: MixedInParser): void {
         let defErrorsMsgs
 
         this.selfAnalysisDone = true
@@ -263,28 +252,18 @@ export class Parser {
      * If this flag is disabled the parser will halt on the first error.
      */
     recoveryEnabled: boolean = DEFAULT_PARSER_CONFIG.recoveryEnabled
-    dynamicTokensEnabled: boolean = DEFAULT_PARSER_CONFIG.dynamicTokensEnabled
-    maxLookahead: number = DEFAULT_PARSER_CONFIG.maxLookahead
     ignoredIssues: IgnoredParserIssues = DEFAULT_PARSER_CONFIG.ignoredIssues
     outputCst: boolean = DEFAULT_PARSER_CONFIG.outputCst
     serializedGrammar: ISerializedGast[] =
         DEFAULT_PARSER_CONFIG.serializedGrammar
-
-    errorMessageProvider: IParserErrorMessageProvider =
-        DEFAULT_PARSER_CONFIG.errorMessageProvider
 
     isBackTrackingStack = []
     className: string = "Parser"
     RULE_STACK: string[] = []
     RULE_OCCURRENCE_STACK: number[] = []
     CST_STACK: CstNode[] = []
-    tokensMap: { [fqn: string]: TokenType } = {}
 
-    /* istanbul ignore next - Using plain array as dictionary will be tested on older node.js versions and IE11 */
-    lookAheadFuncsCache: any = isES2015MapSupported() ? new Map() : []
     definitionErrors: IParserDefinitionError[] = []
-    definedRulesNames: string[] = []
-
     shortRuleNameToFull = new HashTable<string>()
     fullRuleNameToShort = new HashTable<number>()
 
@@ -294,38 +273,15 @@ export class Parser {
     LAST_EXPLICIT_RULE_STACK: number[] = []
     selfAnalysisDone = false
 
-    // lexerState
-    tokVector: IToken[] = []
-    tokVectorLength = 0
-    currIdx: number = -1
-
     constructor(
         tokenVocabulary: TokenVocabulary,
         config: IParserConfig = DEFAULT_PARSER_CONFIG
     ) {
         const that: MixedInParser = this as any
         that.initErrorHandler(config)
-
-        if (isArray(tokenVocabulary)) {
-            // This only checks for Token vocabularies provided as arrays.
-            // That is good enough because the main objective is to detect users of pre-V4.0 APIs
-            // rather than all edge cases of empty Token vocabularies.
-            if (isEmpty(tokenVocabulary as any[])) {
-                throw Error(
-                    "A Token Vocabulary cannot be empty.\n" +
-                        "\tNote that the first argument for the parser constructor\n" +
-                        "\tis no longer a Token vector (since v4.0)."
-                )
-            }
-
-            if (typeof (tokenVocabulary as any[])[0].startOffset === "number") {
-                throw Error(
-                    "The Parser constructor no longer accepts a token vector as the first argument.\n" +
-                        "\tSee: http://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_4-0-0\n" +
-                        "\tFor Further details."
-                )
-            }
-        }
+        that.initLexerAdapter()
+        that.initLooksAhead(config)
+        that.initRecognizerEngine(tokenVocabulary)
 
         // configuration
         this.recoveryEnabled = has(config, "recoveryEnabled")
@@ -339,14 +295,6 @@ export class Parser {
             that.attemptInRepetitionRecovery = enabledAttemptInRepetitionRecovery
         }
 
-        this.dynamicTokensEnabled = has(config, "dynamicTokensEnabled")
-            ? config.dynamicTokensEnabled
-            : DEFAULT_PARSER_CONFIG.dynamicTokensEnabled
-
-        this.maxLookahead = has(config, "maxLookahead")
-            ? config.maxLookahead
-            : DEFAULT_PARSER_CONFIG.maxLookahead
-
         this.ignoredIssues = has(config, "ignoredIssues")
             ? config.ignoredIssues
             : DEFAULT_PARSER_CONFIG.ignoredIssues
@@ -358,26 +306,6 @@ export class Parser {
         this.serializedGrammar = has(config, "serializedGrammar")
             ? config.serializedGrammar
             : DEFAULT_PARSER_CONFIG.serializedGrammar
-
-        // Performance optimization on newer engines that support ES6 Map
-        // For larger Maps this is slightly faster than using a plain object (array in our case).
-        /* istanbul ignore else - The else branch will be tested on older node.js versions and IE11 */
-        if (isES2015MapSupported()) {
-            // TODO: PARSER.PROTOTYPE?
-            // TODO but prevent inheritance???
-            // TODO: is Object.getPrototypeOf needed???
-            that.getLaFuncFromCache = Object.getPrototypeOf(
-                this
-            ).getLaFuncFromMap
-            that.setLaFuncCache = Object.getPrototypeOf(
-                this
-            ).setLaFuncCacheUsingMap
-        } else {
-            that.getLaFuncFromCache = Object.getPrototypeOf(
-                this
-            ).getLaFuncFromObj
-            that.setLaFuncCache = Object.getPrototypeOf(this).setLaFuncUsingObj
-        }
 
         if (!this.outputCst) {
             that.cstInvocationStateUpdate = NOOP
@@ -405,38 +333,6 @@ export class Parser {
 
         this.className = classNameFromInstance(this)
 
-        if (isArray(tokenVocabulary)) {
-            this.tokensMap = <any>reduce(
-                <any>tokenVocabulary,
-                (acc, tokenClazz: TokenType) => {
-                    acc[tokenName(tokenClazz)] = tokenClazz
-                    return acc
-                },
-                {}
-            )
-        } else if (
-            has(tokenVocabulary, "modes") &&
-            every(flatten(values((<any>tokenVocabulary).modes)), isTokenType)
-        ) {
-            let allTokenTypes = flatten(values((<any>tokenVocabulary).modes))
-            let uniqueTokens = uniq(allTokenTypes)
-            this.tokensMap = <any>reduce(
-                uniqueTokens,
-                (acc, tokenClazz: TokenType) => {
-                    acc[tokenName(tokenClazz)] = tokenClazz
-                    return acc
-                },
-                {}
-            )
-        } else if (isObject(tokenVocabulary)) {
-            this.tokensMap = cloneObj(tokenVocabulary)
-        } else {
-            throw new Error(
-                "<tokensDictionary> argument must be An Array of Token constructors," +
-                    " A dictionary of Token constructors or an IMultiModeLexerDefinition"
-            )
-        }
-
         const noTokenCategoriesUsed = every(
             values(tokenVocabulary),
             tokenConstructor => isEmpty(tokenConstructor.categoryMatches)
@@ -444,17 +340,6 @@ export class Parser {
         this.tokenMatcher = noTokenCategoriesUsed
             ? tokenStructuredMatcherNoCategories
             : tokenStructuredMatcher
-
-        // always add EOF to the tokenNames -> constructors map. it is useful to assure all the input has been
-        // parsed with a clear error message ("expecting EOF but found ...")
-        /* tslint:disable */
-        this.tokensMap["EOF"] = EOF
-        /* tslint:enable */
-
-        // Because ES2015+ syntax should be supported for creating Token classes
-        // We cannot assume that the Token classes were created using the "extendToken" utilities
-        // Therefore we must augment the Token classes both on Lexer initialization and on Parser initialization
-        augmentTokenTypes(values(this.tokensMap))
     }
 
     // other stuff
@@ -468,6 +353,7 @@ export class Parser {
 
     // TODO: extract to content assist trait?
     public computeContentAssist(
+        this: MixedInParser,
         startRuleName: string,
         precedingInput: IToken[]
     ): ISyntacticContentAssistPath[] {
