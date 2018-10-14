@@ -1,25 +1,32 @@
-import { IRecognitionException } from "../../../api"
+import {IParserConfig, IParserErrorMessageProvider, IRecognitionException} from "../../../api"
 import {
     EarlyExitException,
     isRecognitionException,
     NoViableAltException
 } from "../exceptions_public"
-import { cloneArr } from "../../utils/utils"
+import {cloneArr, defaults} from "../../utils/utils"
 import {
     getLookaheadPathsForOptionalProd,
     getLookaheadPathsForOr,
     PROD_TYPE
 } from "../grammar/lookahead"
 import { MixedInParser } from "./parser_traits"
+import {DEFAULT_PARSER_CONFIG} from "../parser_public"
 
 /**
  * Trait responsible for runtime parsing errors.
  */
 export class ErrorHandler {
     _errors: IRecognitionException[]
+    errorMessageProvider: IParserErrorMessageProvider =
+        DEFAULT_PARSER_CONFIG.errorMessageProvider
 
-    initErrorHandler() {
+    initErrorHandler(config:IParserConfig) {
         this._errors = []
+        this.errorMessageProvider = defaults(
+            config.errorMessageProvider,
+            DEFAULT_PARSER_CONFIG.errorMessageProvider
+        )
     }
 
     SAVE_ERROR(

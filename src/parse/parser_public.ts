@@ -87,7 +87,7 @@ export type TokenMatcher = (token: IToken, tokType: TokenType) => boolean
 
 export type lookAheadSequence = TokenType[][]
 
-const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
+export const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
     recoveryEnabled: false,
     maxLookahead: 4,
     ignoredIssues: <any>{},
@@ -270,7 +270,6 @@ export class Parser {
     serializedGrammar: ISerializedGast[] =
         DEFAULT_PARSER_CONFIG.serializedGrammar
 
-    // adapters
     errorMessageProvider: IParserErrorMessageProvider =
         DEFAULT_PARSER_CONFIG.errorMessageProvider
 
@@ -305,7 +304,7 @@ export class Parser {
         config: IParserConfig = DEFAULT_PARSER_CONFIG
     ) {
         const that: MixedInParser = this as any
-        that.initErrorHandler()
+        that.initErrorHandler(config)
 
         if (isArray(tokenVocabulary)) {
             // This only checks for Token vocabularies provided as arrays.
@@ -355,11 +354,6 @@ export class Parser {
         this.outputCst = has(config, "outputCst")
             ? config.outputCst
             : DEFAULT_PARSER_CONFIG.outputCst
-
-        this.errorMessageProvider = defaults(
-            config.errorMessageProvider,
-            DEFAULT_PARSER_CONFIG.errorMessageProvider
-        )
 
         this.serializedGrammar = has(config, "serializedGrammar")
             ? config.serializedGrammar
