@@ -1,7 +1,14 @@
-import { END_OF_FILE, Parser } from "../parser_public"
+import { END_OF_FILE } from "../parser_public"
 import { IToken } from "../../../api"
 import { MixedInParser } from "./parser_traits"
 
+/**
+ * Trait responsible abstracting over the interaction with Lexer output (Token vector).
+ *
+ * This could be generalized to support other kinds of lexers, e.g.
+ * - Just in Time Lexing / Lexer-Less parsing.
+ * - Streaming Lexer.
+ */
 export class LexerAdapter {
     // lexer related methods
     set input(this: MixedInParser, newInput: IToken[]) {

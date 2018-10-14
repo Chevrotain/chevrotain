@@ -10,9 +10,11 @@ import {
     getLookaheadPathsForOr,
     PROD_TYPE
 } from "../grammar/lookahead"
-import { Parser } from "../parser_public"
 import { MixedInParser } from "./parser_traits"
 
+/**
+ * Trait responsible for runtime parsing errors.
+ */
 export class ErrorHandler {
     SAVE_ERROR(
         this: MixedInParser,

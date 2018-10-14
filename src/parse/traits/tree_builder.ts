@@ -5,10 +5,12 @@ import {
     createBaseVisitorConstructorWithDefaults
 } from "../cst/cst_visitor"
 import { CstNode, ICstVisitor, IToken } from "../../../api"
-import { Parser } from "../parser_public"
 import { getKeyForAltIndex } from "../grammar/keys"
 import { MixedInParser } from "./parser_traits"
 
+/**
+ * This trait is responsible for the CST building logic.
+ */
 export class TreeBuilder {
     // CST
     cstNestedInvocationStateUpdate(

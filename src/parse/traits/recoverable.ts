@@ -1,6 +1,5 @@
 import { createTokenInstance, EOF } from "../../scan/tokens_public"
 import { AbstractNextTerminalAfterProductionWalker } from "../grammar/interpreter"
-import { Parser } from "../parser_public"
 import {
     cloneArr,
     contains,
@@ -32,9 +31,9 @@ export function InRuleRecoveryException(message: string) {
 
 InRuleRecoveryException.prototype = Error.prototype
 
-// https://www.typescriptlang.org/docs/handbook/mixins.html
-// TODO: convert to mixins.html example
-// TODO: "Traceable" , "TreeBuilder"
+/**
+ * This trait is responsible for the error recovery and fault tolerant logic
+ */
 export class Recoverable {
     public getTokenToInsert(tokType: TokenType): IToken {
         let tokToInsert = createTokenInstance(

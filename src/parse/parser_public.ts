@@ -65,7 +65,9 @@ import {
 import { LooksAhead } from "./traits/looksahead"
 import { TreeBuilder } from "./traits/tree_builder"
 import { LexerAdapter } from "./traits/lexer_adapter"
-import { RecognizerApi, RecognizerEngine } from "./traits/recognizer"
+import { RecognizerApi } from "./traits/recognizer_api"
+import { RecognizerEngine } from "./traits/recognizer_engine"
+
 import { ErrorHandler } from "./traits/error_handler"
 import { MixedInParser } from "./traits/parser_traits"
 

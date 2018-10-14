@@ -9,9 +9,11 @@ import { isFunction, some } from "../../utils/utils"
 import { lookAheadSequence, TokenMatcher } from "../parser_public"
 import { IAnyOrAlt, IOrAltWithGate } from "../../../api"
 import { getKeyForAutomaticLookahead, OR_IDX } from "../grammar/keys"
-import { Parser } from "../parser_public"
 import { MixedInParser } from "./parser_traits"
 
+/**
+ * Trait responsible for the lookahead related utilities and optimizations.
+ */
 export class LooksAhead {
     lookAheadBuilderForOptional(
         this: MixedInParser,
