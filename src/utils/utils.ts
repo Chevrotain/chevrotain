@@ -436,6 +436,10 @@ export function applyMixins(derivedCtor: any, baseCtors: any[]) {
     baseCtors.forEach(baseCtor => {
         const baseProto = baseCtor.prototype
         Object.getOwnPropertyNames(baseProto).forEach(propName => {
+            if (propName === "constructor") {
+                return
+            }
+
             const basePropDescriptor = Object.getOwnPropertyDescriptor(
                 baseProto,
                 propName
