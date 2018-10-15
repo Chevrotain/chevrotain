@@ -1,7 +1,7 @@
 import { EOF, createToken } from "../../src/scan/tokens_public"
 import { Lexer } from "../../src/scan/lexer_public"
-import { Parser } from "../../src/parse/traits/parser_traits"
-import { EMPTY_ALT } from "../../src/parse/parser_public"
+import { Parser } from "../../src/parse/parser/traits/parser_traits"
+import { EMPTY_ALT } from "../../src/parse/parser/parser"
 
 import {
     EarlyExitException,

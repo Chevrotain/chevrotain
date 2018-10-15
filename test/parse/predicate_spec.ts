@@ -1,4 +1,4 @@
-import { Parser } from "../../src/parse/traits/parser_traits"
+import { Parser } from "../../src/parse/parser/traits/parser_traits"
 import {
     EarlyExitException,
     NoViableAltException

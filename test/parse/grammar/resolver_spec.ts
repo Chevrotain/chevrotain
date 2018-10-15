@@ -1,6 +1,6 @@
 import { HashTable } from "../../../src/lang/lang_extensions"
 import { GastRefResolverVisitor } from "../../../src/parse/grammar/resolver"
-import { ParserDefinitionErrorType } from "../../../src/parse/parser_public"
+import { ParserDefinitionErrorType } from "../../../src/parse/parser/parser"
 import {
     Alternation,
     Flat,

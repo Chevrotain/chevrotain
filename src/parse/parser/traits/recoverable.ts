@@ -1,18 +1,29 @@
-import { createTokenInstance, EOF } from "../../scan/tokens_public"
-import { AbstractNextTerminalAfterProductionWalker } from "../grammar/interpreter"
+import { createTokenInstance, EOF } from "../../../scan/tokens_public"
+import {
+    AbstractNextTerminalAfterProductionWalker,
+    IFirstAfterRepetition
+} from "../../grammar/interpreter"
 import {
     cloneArr,
     contains,
     dropRight,
     find,
     flatten,
+    has,
     isEmpty,
     map
-} from "../../utils/utils"
-import { IToken, ITokenGrammarPath, TokenType } from "../../../api"
-import { MismatchedTokenException } from "../exceptions_public"
-import { IN } from "../constants"
+} from "../../../utils/utils"
+import {
+    IParserConfig,
+    IToken,
+    ITokenGrammarPath,
+    TokenType
+} from "../../../../api"
+import { MismatchedTokenException } from "../../exceptions_public"
+import { IN } from "../../constants"
 import { MixedInParser } from "./parser_traits"
+import { HashTable } from "../../../lang/lang_extensions"
+import { DEFAULT_PARSER_CONFIG } from "../parser"
 
 export const EOF_FOLLOW_KEY: any = {}
 
@@ -35,6 +46,26 @@ InRuleRecoveryException.prototype = Error.prototype
  * This trait is responsible for the error recovery and fault tolerant logic
  */
 export class Recoverable {
+    recoveryEnabled: boolean
+    firstAfterRepMap: HashTable<IFirstAfterRepetition>
+    resyncFollows: HashTable<TokenType[]>
+
+    initRecoverable(config: IParserConfig) {
+        this.firstAfterRepMap = new HashTable<IFirstAfterRepetition>()
+        this.resyncFollows = new HashTable<TokenType[]>()
+
+        this.recoveryEnabled = has(config, "recoveryEnabled")
+            ? config.recoveryEnabled
+            : DEFAULT_PARSER_CONFIG.recoveryEnabled
+
+        // performance optimization, NOOP will be inlined which
+        // effectively means that this optional feature does not exist
+        // when not used.
+        if (this.recoveryEnabled) {
+            this.attemptInRepetitionRecovery = attemptInRepetitionRecovery
+        }
+    }
+
     public getTokenToInsert(tokType: TokenType): IToken {
         let tokToInsert = createTokenInstance(
             tokType,

@@ -4,15 +4,20 @@ import {
     buildLookaheadFuncForOr,
     buildSingleAlternativeLookaheadFunction,
     PROD_TYPE
-} from "../grammar/lookahead"
-import { has, isES2015MapSupported, isFunction, some } from "../../utils/utils"
+} from "../../grammar/lookahead"
+import {
+    has,
+    isES2015MapSupported,
+    isFunction,
+    some
+} from "../../../utils/utils"
 import {
     DEFAULT_PARSER_CONFIG,
     lookAheadSequence,
     TokenMatcher
-} from "../parser_public"
-import { IAnyOrAlt, IOrAltWithGate, IParserConfig } from "../../../api"
-import { getKeyForAutomaticLookahead, OR_IDX } from "../grammar/keys"
+} from "../parser"
+import { IAnyOrAlt, IOrAltWithGate, IParserConfig } from "../../../../api"
+import { getKeyForAutomaticLookahead, OR_IDX } from "../../grammar/keys"
 import { MixedInParser } from "./parser_traits"
 
 /**

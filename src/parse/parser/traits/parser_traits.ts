@@ -5,8 +5,9 @@ import { RecognizerApi } from "./recognizer_api"
 import { RecognizerEngine } from "./recognizer_engine"
 import { Recoverable } from "./recoverable"
 import { TreeBuilder } from "./tree_builder"
-import { Parser as ParserConstructorImpel } from "../parser_public"
-import * as defs from "../../../api"
+import { Parser as ParserConstructorImpel } from "../parser"
+import * as defs from "../../../../api"
+import { ContentAssist } from "./context_assist"
 
 /**
  * This Type combines all the Parser traits.
@@ -23,7 +24,8 @@ export type MixedInParser = ParserConstructorImpel &
     RecognizerApi &
     RecognizerEngine &
     Recoverable &
-    TreeBuilder
+    TreeBuilder &
+    ContentAssist
 
 interface MixedInParserConstructor {
     new (

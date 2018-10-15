@@ -6,22 +6,22 @@ import {
     GrammarAction,
     IAnyOrAlt,
     IRuleConfig,
+    ISerializedGast,
     IToken,
     ManySepMethodOpts,
     OrMethodOpts,
     SubruleMethodOpts,
     TokenType
-} from "../../../api"
-import { contains } from "../../utils/utils"
-import { isRecognitionException } from "../exceptions_public"
-import {
-    DEFAULT_RULE_CONFIG,
-    ParserDefinitionErrorType
-} from "../parser_public"
-import { defaultGrammarValidatorErrorProvider } from "../errors_public"
-import { buildTopProduction } from "../gast_builder"
-import { validateRuleIsOverridden } from "../grammar/checks"
+} from "../../../../api"
+import { contains } from "../../../utils/utils"
+import { isRecognitionException } from "../../exceptions_public"
+import { DEFAULT_RULE_CONFIG, ParserDefinitionErrorType } from "../parser"
+import { defaultGrammarValidatorErrorProvider } from "../../errors_public"
+import { buildTopProduction } from "../../gast_builder"
+import { validateRuleIsOverridden } from "../../grammar/checks"
 import { MixedInParser } from "./parser_traits"
+import { Rule, serializeGrammar } from "../../grammar/gast/gast_public"
+import { HashTable } from "../../../lang/lang_extensions"
 
 /**
  * This trait is responsible for implementing the offical API
@@ -681,5 +681,16 @@ export class RecognizerApi {
                 this.isBackTrackingStack.pop()
             }
         }
+    }
+
+    // GAST export APIs
+    public getGAstProductions(this: MixedInParser): HashTable<Rule> {
+        return this.gastProductionsCache
+    }
+
+    public getSerializedGastProductions(
+        this: MixedInParser
+    ): ISerializedGast[] {
+        return serializeGrammar(this.gastProductionsCache.values())
     }
 }

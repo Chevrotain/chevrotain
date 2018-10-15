@@ -1,8 +1,8 @@
-import { Parser } from "../../../src/parse/traits/parser_traits"
+import { Parser } from "../../../src/parse/parser/traits/parser_traits"
 import {
     EMPTY_ALT,
     ParserDefinitionErrorType
-} from "../../../src/parse/parser_public"
+} from "../../../src/parse/parser/parser"
 import { actionDec, DotTok, IdentTok, qualifiedName } from "./samples"
 import {
     getFirstNoneTerminal,

@@ -1,16 +1,16 @@
 import { createToken } from "../../../src/scan/tokens_public"
 import { Lexer } from "../../../src/scan/lexer_public"
-import { Parser } from "../../../src/parse/traits/parser_traits"
+import { Parser } from "../../../src/parse/parser/traits/parser_traits"
 
 import {
     END_OF_FILE,
     lookAheadSequence,
     TokenMatcher
-} from "../../../src/parse/parser_public"
+} from "../../../src/parse/parser/parser"
 import { MismatchedTokenException } from "../../../src/parse/exceptions_public"
 import { every, flatten, forEach, map } from "../../../src/utils/utils"
 import { IAnyOrAlt, IToken, TokenType } from "../../../api"
-import { MixedInParser } from "../../../src/parse/traits/parser_traits"
+import { MixedInParser } from "../../../src/parse/parser/traits/parser_traits"
 
 const Return = createToken({
     name: "Return",

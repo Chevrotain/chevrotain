@@ -7,8 +7,6 @@
  so writing several dozen utils which may be slower than the original lodash, does not matter as much
  considering they will not be invoked in hotspots...
  */
-import { LexerAdapter } from "../parse/traits/lexer_adapter"
-import { Parser } from "../parse/parser_public"
 
 export function isEmpty(arr: any[]): boolean {
     return arr && arr.length === 0

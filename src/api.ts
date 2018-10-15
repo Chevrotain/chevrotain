@@ -2,7 +2,7 @@ import {
     Parser,
     ParserDefinitionErrorType,
     EMPTY_ALT
-} from "./parse/parser_public"
+} from "./parse/parser/parser"
 import { Lexer, LexerDefinitionErrorType } from "./scan/lexer_public"
 import {
     createToken,
@@ -54,7 +54,7 @@ import {
 import * as defs from "../api"
 import { IProduction } from "../api"
 import { TokenType } from "../api"
-import { MixedInParser } from "./parse/traits/parser_traits"
+import { MixedInParser } from "./parse/parser/traits/parser_traits"
 
 interface ParserConstructor {
     new (

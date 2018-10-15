@@ -2,28 +2,27 @@ import {
     IParserConfig,
     IParserErrorMessageProvider,
     IRecognitionException
-} from "../../../api"
+} from "../../../../api"
 import {
     EarlyExitException,
     isRecognitionException,
     NoViableAltException
-} from "../exceptions_public"
-import { cloneArr, defaults } from "../../utils/utils"
+} from "../../exceptions_public"
+import { cloneArr, defaults } from "../../../utils/utils"
 import {
     getLookaheadPathsForOptionalProd,
     getLookaheadPathsForOr,
     PROD_TYPE
-} from "../grammar/lookahead"
+} from "../../grammar/lookahead"
 import { MixedInParser } from "./parser_traits"
-import { DEFAULT_PARSER_CONFIG } from "../parser_public"
+import { DEFAULT_PARSER_CONFIG } from "../parser"
 
 /**
  * Trait responsible for runtime parsing errors.
  */
 export class ErrorHandler {
     _errors: IRecognitionException[]
-    errorMessageProvider: IParserErrorMessageProvider =
-        DEFAULT_PARSER_CONFIG.errorMessageProvider
+    errorMessageProvider: IParserErrorMessageProvider
 
     initErrorHandler(config: IParserConfig) {
         this._errors = []

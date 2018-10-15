@@ -1,17 +1,55 @@
-import { addNoneTerminalToCst, addTerminalToCst } from "../cst/cst"
-import { isUndefined } from "../../utils/utils"
+import { addNoneTerminalToCst, addTerminalToCst } from "../../cst/cst"
+import { has, isUndefined, NOOP } from "../../../utils/utils"
 import {
     createBaseSemanticVisitorConstructor,
     createBaseVisitorConstructorWithDefaults
-} from "../cst/cst_visitor"
-import { CstNode, ICstVisitor, IToken } from "../../../api"
-import { getKeyForAltIndex } from "../grammar/keys"
+} from "../../cst/cst_visitor"
+import { CstNode, ICstVisitor, IParserConfig, IToken } from "../../../../api"
+import { getKeyForAltIndex } from "../../grammar/keys"
 import { MixedInParser } from "./parser_traits"
+import { DEFAULT_PARSER_CONFIG } from "../parser"
 
 /**
  * This trait is responsible for the CST building logic.
  */
 export class TreeBuilder {
+    outputCst: boolean
+    CST_STACK: CstNode[]
+    baseCstVisitorConstructor: Function
+    baseCstVisitorWithDefaultsConstructor: Function
+    LAST_EXPLICIT_RULE_STACK: number[]
+
+    initTreeBuilder(this: MixedInParser, config: IParserConfig) {
+        this.LAST_EXPLICIT_RULE_STACK = []
+        this.CST_STACK = []
+        this.outputCst = has(config, "outputCst")
+            ? config.outputCst
+            : DEFAULT_PARSER_CONFIG.outputCst
+
+        if (!this.outputCst) {
+            this.cstInvocationStateUpdate = NOOP
+            this.cstFinallyStateUpdate = NOOP
+            this.cstPostTerminal = NOOP
+            this.cstPostNonTerminal = NOOP
+            // TODO: maybe access this._proto?
+            this.getLastExplicitRuleShortName = Object.getPrototypeOf(
+                this
+            ).getLastExplicitRuleShortNameNoCst
+            this.getPreviousExplicitRuleShortName = Object.getPrototypeOf(
+                this
+            ).getPreviousExplicitRuleShortNameNoCst
+            this.getLastExplicitRuleOccurrenceIndex = Object.getPrototypeOf(
+                this
+            ).getLastExplicitRuleOccurrenceIndexNoCst
+            this.manyInternal = this.manyInternalNoCst
+            this.orInternal = this.orInternalNoCst
+            this.optionInternal = this.optionInternalNoCst
+            this.atLeastOneInternal = this.atLeastOneInternalNoCst
+            this.manySepFirstInternal = this.manySepFirstInternalNoCst
+            this.atLeastOneSepFirstInternal = this.atLeastOneSepFirstInternalNoCst
+        }
+    }
+
     // CST
     cstNestedInvocationStateUpdate(
         this: MixedInParser,

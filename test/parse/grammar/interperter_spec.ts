@@ -34,7 +34,7 @@ import {
     augmentTokenTypes,
     tokenStructuredMatcher
 } from "../../../src/scan/tokens"
-import { Parser } from "../../../src/parse/traits/parser_traits"
+import { Parser } from "../../../src/parse/parser/traits/parser_traits"
 import {
     Alternation,
     Flat,

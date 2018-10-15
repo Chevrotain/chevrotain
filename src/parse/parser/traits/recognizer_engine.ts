@@ -5,14 +5,29 @@ import {
     DSLMethodOptsWithErr,
     GrammarAction,
     IAnyOrAlt,
+    IParserConfig,
     IRuleConfig,
+    ISerializedGast,
     IToken,
     ManySepMethodOpts,
     OrMethodOpts,
     SubruleMethodOpts,
-    TokenType, TokenVocabulary
-} from "../../../api"
-import {cloneArr, cloneObj, every, flatten, has, isArray, isEmpty, isObject, reduce, uniq, values} from "../../utils/utils"
+    TokenType,
+    TokenVocabulary
+} from "../../../../api"
+import {
+    cloneArr,
+    cloneObj,
+    every,
+    flatten,
+    has,
+    isArray,
+    isEmpty,
+    isObject,
+    reduce,
+    uniq,
+    values
+} from "../../../utils/utils"
 import {
     AT_LEAST_ONE_IDX,
     AT_LEAST_ONE_SEP_IDX,
@@ -22,39 +37,79 @@ import {
     MANY_SEP_IDX,
     OPTION_IDX,
     OR_IDX
-} from "../grammar/keys"
+} from "../../grammar/keys"
 import {
     isRecognitionException,
     MismatchedTokenException,
     NotAllInputParsedException
-} from "../exceptions_public"
-import { PROD_TYPE } from "../grammar/lookahead"
+} from "../../exceptions_public"
+import { PROD_TYPE } from "../../grammar/lookahead"
 import {
     AbstractNextTerminalAfterProductionWalker,
     NextTerminalAfterAtLeastOneSepWalker,
     NextTerminalAfterAtLeastOneWalker,
     NextTerminalAfterManySepWalker,
     NextTerminalAfterManyWalker
-} from "../grammar/interpreter"
-import { DEFAULT_RULE_CONFIG, IParserState } from "../parser_public"
+} from "../../grammar/interpreter"
+import {
+    DEFAULT_PARSER_CONFIG,
+    DEFAULT_RULE_CONFIG,
+    IParserState,
+    TokenMatcher
+} from "../parser"
 import { IN_RULE_RECOVERY_EXCEPTION } from "./recoverable"
-import {EOF, tokenName} from "../../scan/tokens_public"
+import { EOF, tokenName } from "../../../scan/tokens_public"
 import { MixedInParser } from "./parser_traits"
-import {augmentTokenTypes, isTokenType} from "../../scan/tokens"
+import {
+    augmentTokenTypes,
+    isTokenType,
+    tokenStructuredMatcher,
+    tokenStructuredMatcherNoCategories
+} from "../../../scan/tokens"
+import { classNameFromInstance, HashTable } from "../../../lang/lang_extensions"
+import { Rule } from "../../grammar/gast/gast_public"
 
 /**
  * This trait is responsible for the runtime parsing engine
  * Used by the official API (recognizer_api.ts)
  */
 export class RecognizerEngine {
-
+    isBackTrackingStack
+    className: string
+    RULE_STACK: string[]
+    RULE_OCCURRENCE_STACK: number[]
     definedRulesNames: string[]
     tokensMap: { [fqn: string]: TokenType }
+    allRuleNames: string[]
+    gastProductionsCache: HashTable<Rule>
+    serializedGrammar: ISerializedGast[]
+    shortRuleNameToFull: HashTable<string>
+    fullRuleNameToShort: HashTable<number>
+    // The shortName Index must be coded "after" the first 8bits to enable building unique lookahead keys
+    ruleShortNameIdx: number
+    tokenMatcher: TokenMatcher
 
+    initRecognizerEngine(
+        tokenVocabulary: TokenVocabulary,
+        config: IParserConfig
+    ) {
+        this.className = classNameFromInstance(this)
+        // TODO: would using an ES6 Map or plain object be faster (CST building scenario)
+        this.shortRuleNameToFull = new HashTable<string>()
+        this.fullRuleNameToShort = new HashTable<number>()
+        this.ruleShortNameIdx = 256
+        this.tokenMatcher = tokenStructuredMatcherNoCategories
 
-    initRecognizerEngine(tokenVocabulary: TokenVocabulary) {
         this.definedRulesNames = []
         this.tokensMap = {}
+        this.allRuleNames = []
+        this.isBackTrackingStack = []
+        this.RULE_STACK = []
+        this.RULE_OCCURRENCE_STACK = []
+        this.gastProductionsCache = new HashTable<Rule>()
+        this.serializedGrammar = has(config, "serializedGrammar")
+            ? config.serializedGrammar
+            : DEFAULT_PARSER_CONFIG.serializedGrammar
 
         if (isArray(tokenVocabulary)) {
             // This only checks for Token vocabularies provided as arrays.
@@ -63,16 +118,16 @@ export class RecognizerEngine {
             if (isEmpty(tokenVocabulary as any[])) {
                 throw Error(
                     "A Token Vocabulary cannot be empty.\n" +
-                    "\tNote that the first argument for the parser constructor\n" +
-                    "\tis no longer a Token vector (since v4.0)."
+                        "\tNote that the first argument for the parser constructor\n" +
+                        "\tis no longer a Token vector (since v4.0)."
                 )
             }
 
             if (typeof (tokenVocabulary as any[])[0].startOffset === "number") {
                 throw Error(
                     "The Parser constructor no longer accepts a token vector as the first argument.\n" +
-                    "\tSee: http://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_4-0-0\n" +
-                    "\tFor Further details."
+                        "\tSee: http://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_4-0-0\n" +
+                        "\tFor Further details."
                 )
             }
         }
@@ -105,7 +160,7 @@ export class RecognizerEngine {
         } else {
             throw new Error(
                 "<tokensDictionary> argument must be An Array of Token constructors," +
-                " A dictionary of Token constructors or an IMultiModeLexerDefinition"
+                    " A dictionary of Token constructors or an IMultiModeLexerDefinition"
             )
         }
 
@@ -113,6 +168,16 @@ export class RecognizerEngine {
         // parsed with a clear error message ("expecting EOF but found ...")
         /* tslint:disable */
         this.tokensMap["EOF"] = EOF
+
+        // TODO: This check may not be accurate for multi mode lexers
+        const noTokenCategoriesUsed = every(
+            values(tokenVocabulary),
+            tokenConstructor => isEmpty(tokenConstructor.categoryMatches)
+        )
+
+        this.tokenMatcher = noTokenCategoriesUsed
+            ? tokenStructuredMatcherNoCategories
+            : tokenStructuredMatcher
 
         // Because ES2015+ syntax should be supported for creating Token classes
         // We cannot assume that the Token classes were created using the "extendToken" utilities

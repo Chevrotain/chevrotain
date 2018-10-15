@@ -1,38 +1,24 @@
-import { classNameFromInstance, HashTable } from "../lang/lang_extensions"
+import { classNameFromInstance } from "../../lang/lang_extensions"
 import {
     applyMixins,
-    every,
-    first,
     forEach,
     has,
     isEmpty,
-    isUndefined,
     map,
-    NOOP,
     values
-} from "../utils/utils"
-import { computeAllProdsFollows } from "./grammar/follow"
-import { createTokenInstance, EOF } from "../scan/tokens_public"
-import { deserializeGrammar } from "./gast_builder"
-import {
-    IFirstAfterRepetition,
-    NextAfterTokenWalker,
-    nextPossibleTokensAfter
-} from "./grammar/interpreter"
-import {
-    tokenStructuredMatcher,
-    tokenStructuredMatcherNoCategories
-} from "../scan/tokens"
-import { analyzeCst } from "./cst/cst"
+} from "../../utils/utils"
+import { computeAllProdsFollows } from "../grammar/follow"
+import { createTokenInstance, EOF } from "../../scan/tokens_public"
+import { deserializeGrammar } from "../gast_builder"
+import { analyzeCst } from "../cst/cst"
 import {
     defaultGrammarValidatorErrorProvider,
     defaultParserErrorProvider
-} from "./errors_public"
-import { Rule, serializeGrammar } from "./grammar/gast/gast_public"
+} from "../errors_public"
 import {
     resolveGrammar,
     validateGrammar
-} from "./grammar/gast/gast_resolver_public"
+} from "../grammar/gast/gast_resolver_public"
 import {
     CstNode,
     IgnoredParserIssues,
@@ -40,17 +26,11 @@ import {
     IParserDefinitionError,
     IRecognitionException,
     IRuleConfig,
-    ISerializedGast,
-    ISyntacticContentAssistPath,
     IToken,
-    ITokenGrammarPath,
     TokenType,
     TokenVocabulary
-} from "../../api"
-import {
-    attemptInRepetitionRecovery as enabledAttemptInRepetitionRecovery,
-    Recoverable
-} from "./traits/recoverable"
+} from "../../../api"
+import { Recoverable } from "./traits/recoverable"
 import { LooksAhead } from "./traits/looksahead"
 import { TreeBuilder } from "./traits/tree_builder"
 import { LexerAdapter } from "./traits/lexer_adapter"
@@ -59,6 +39,7 @@ import { RecognizerEngine } from "./traits/recognizer_engine"
 
 import { ErrorHandler } from "./traits/error_handler"
 import { MixedInParser } from "./traits/parser_traits"
+import { ContentAssist } from "./traits/context_assist"
 
 export const END_OF_FILE = createTokenInstance(
     EOF,
@@ -150,11 +131,6 @@ export function EMPTY_ALT<T>(value: T = undefined): () => T {
 }
 
 export class Parser {
-    // Recoverable Trait fields
-    firstAfterRepMap = new HashTable<IFirstAfterRepetition>()
-    resyncFollows: HashTable<TokenType[]> = new HashTable<TokenType[]>()
-
-    static NO_RESYNC: boolean = false
     // Set this flag to true if you don't want the Parser to throw error when problems in it's definition are detected.
     // (normally during the parser's constructor).
     // This is a design time flag, it will not affect the runtime error handling of the parser, just design time errors,
@@ -238,39 +214,8 @@ export class Parser {
         }
     }
 
-    // caching
-    allRuleNames: string[] = []
-    baseCstVisitorConstructor: Function
-    baseCstVisitorWithDefaultsConstructor: Function
-    gastProductionsCache: HashTable<Rule> = new HashTable<Rule>()
-
-    // These configuration properties are also assigned in the constructor
-    // This is a little bit of duplication but seems to help with performance regression on V8
-    // Probably due to hidden class changes.
-    /**
-     * This flag enables or disables error recovery (fault tolerance) of the parser.
-     * If this flag is disabled the parser will halt on the first error.
-     */
-    recoveryEnabled: boolean = DEFAULT_PARSER_CONFIG.recoveryEnabled
     ignoredIssues: IgnoredParserIssues = DEFAULT_PARSER_CONFIG.ignoredIssues
-    outputCst: boolean = DEFAULT_PARSER_CONFIG.outputCst
-    serializedGrammar: ISerializedGast[] =
-        DEFAULT_PARSER_CONFIG.serializedGrammar
-
-    isBackTrackingStack = []
-    className: string = "Parser"
-    RULE_STACK: string[] = []
-    RULE_OCCURRENCE_STACK: number[] = []
-    CST_STACK: CstNode[] = []
-
     definitionErrors: IParserDefinitionError[] = []
-    shortRuleNameToFull = new HashTable<string>()
-    fullRuleNameToShort = new HashTable<number>()
-
-    // The shortName Index must be coded "after" the first 8bits to enable building unique lookahead keys
-    ruleShortNameIdx = 256
-    tokenMatcher: TokenMatcher = tokenStructuredMatcherNoCategories
-    LAST_EXPLICIT_RULE_STACK: number[] = []
     selfAnalysisDone = false
 
     constructor(
@@ -281,112 +226,14 @@ export class Parser {
         that.initErrorHandler(config)
         that.initLexerAdapter()
         that.initLooksAhead(config)
-        that.initRecognizerEngine(tokenVocabulary)
-
-        // configuration
-        this.recoveryEnabled = has(config, "recoveryEnabled")
-            ? config.recoveryEnabled
-            : DEFAULT_PARSER_CONFIG.recoveryEnabled
-
-        // performance optimization, NOOP will be inlined which
-        // effectively means that this optional feature does not exist
-        // when not used.
-        if (this.recoveryEnabled) {
-            that.attemptInRepetitionRecovery = enabledAttemptInRepetitionRecovery
-        }
+        that.initRecognizerEngine(tokenVocabulary, config)
+        that.initRecoverable(config)
+        that.initTreeBuilder(config)
+        that.initContentAssist()
 
         this.ignoredIssues = has(config, "ignoredIssues")
             ? config.ignoredIssues
             : DEFAULT_PARSER_CONFIG.ignoredIssues
-
-        this.outputCst = has(config, "outputCst")
-            ? config.outputCst
-            : DEFAULT_PARSER_CONFIG.outputCst
-
-        this.serializedGrammar = has(config, "serializedGrammar")
-            ? config.serializedGrammar
-            : DEFAULT_PARSER_CONFIG.serializedGrammar
-
-        if (!this.outputCst) {
-            that.cstInvocationStateUpdate = NOOP
-            that.cstFinallyStateUpdate = NOOP
-            that.cstPostTerminal = NOOP
-            that.cstPostNonTerminal = NOOP
-            // TODO: maybe access this._proto?
-            that.getLastExplicitRuleShortName = Object.getPrototypeOf(
-                this
-            ).getLastExplicitRuleShortNameNoCst
-            that.getPreviousExplicitRuleShortName = Object.getPrototypeOf(
-                this
-            ).getPreviousExplicitRuleShortNameNoCst
-            that.getLastExplicitRuleOccurrenceIndex = Object.getPrototypeOf(
-                this
-            ).getLastExplicitRuleOccurrenceIndexNoCst
-            that.manyInternal = that.manyInternalNoCst
-            that.orInternal = that.orInternalNoCst
-            that.optionInternal = that.optionInternalNoCst
-            that.atLeastOneInternal = that.atLeastOneInternalNoCst
-            that.manySepFirstInternal = that.manySepFirstInternalNoCst
-            that.atLeastOneSepFirstInternal =
-                that.atLeastOneSepFirstInternalNoCst
-        }
-
-        this.className = classNameFromInstance(this)
-
-        const noTokenCategoriesUsed = every(
-            values(tokenVocabulary),
-            tokenConstructor => isEmpty(tokenConstructor.categoryMatches)
-        )
-        this.tokenMatcher = noTokenCategoriesUsed
-            ? tokenStructuredMatcherNoCategories
-            : tokenStructuredMatcher
-    }
-
-    // other stuff
-    public getGAstProductions(): HashTable<Rule> {
-        return this.gastProductionsCache
-    }
-
-    public getSerializedGastProductions(): ISerializedGast[] {
-        return serializeGrammar(this.gastProductionsCache.values())
-    }
-
-    // TODO: extract to content assist trait?
-    public computeContentAssist(
-        this: MixedInParser,
-        startRuleName: string,
-        precedingInput: IToken[]
-    ): ISyntacticContentAssistPath[] {
-        let startRuleGast = this.gastProductionsCache.get(startRuleName)
-
-        if (isUndefined(startRuleGast)) {
-            throw Error(
-                `Rule ->${startRuleName}<- does not exist in this grammar.`
-            )
-        }
-
-        return nextPossibleTokensAfter(
-            [startRuleGast],
-            precedingInput,
-            this.tokenMatcher,
-            this.maxLookahead
-        )
-    }
-
-    // other functionality
-    // TODO: should this be a member method or a utility? it does not have any state or usage of 'this'...
-    // TODO: should this be more explicitly part of the public API?
-    public getNextPossibleTokenTypes(
-        grammarPath: ITokenGrammarPath
-    ): TokenType[] {
-        let topRuleName = first(grammarPath.ruleStack)
-        let gastProductions = this.getGAstProductions()
-        let topProduction = gastProductions.get(topRuleName)
-        let nextPossibleTokenTypes = new NextAfterTokenWalker(
-            topProduction,
-            grammarPath
-        ).startWalking()
-        return nextPossibleTokenTypes
     }
 }
 
@@ -397,5 +244,6 @@ applyMixins(Parser, [
     LexerAdapter,
     RecognizerEngine,
     RecognizerApi,
-    ErrorHandler
+    ErrorHandler,
+    ContentAssist
 ])
