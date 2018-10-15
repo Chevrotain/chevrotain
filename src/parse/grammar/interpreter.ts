@@ -10,7 +10,7 @@ import {
 } from "../../utils/utils"
 import { tokenName } from "../../scan/tokens_public"
 import { first } from "./first"
-import { TokenMatcher } from "../parser_public"
+import { TokenMatcher } from "../parser/parser"
 import {
     AbstractProduction,
     Alternation,

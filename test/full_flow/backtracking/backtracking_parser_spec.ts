@@ -64,7 +64,6 @@ describe("Simple backtracking example", () => {
         let result = parser.statement()
 
         expect(parser.errors.length).to.equal(0)
-        expect(parser.isAtEndOfInput()).to.equal(true)
         expect(result).to.equal(RET_TYPE.WITH_EQUALS)
     })
 
@@ -85,7 +84,6 @@ describe("Simple backtracking example", () => {
         let result = parser.statement()
 
         expect(parser.errors.length).to.equal(0)
-        expect(parser.isAtEndOfInput()).to.equal(true)
         expect(result).to.equal(RET_TYPE.WITH_DEFAULT)
     })
 })

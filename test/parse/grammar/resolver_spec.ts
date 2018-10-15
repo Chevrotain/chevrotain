@@ -1,6 +1,6 @@
 import { HashTable } from "../../../src/lang/lang_extensions"
 import { GastRefResolverVisitor } from "../../../src/parse/grammar/resolver"
-import { ParserDefinitionErrorType } from "../../../src/parse/parser_public"
+import { ParserDefinitionErrorType } from "../../../src/parse/parser/parser"
 import {
     Alternation,
     Flat,
@@ -15,13 +15,6 @@ import {
 } from "../../../src/parse/grammar/gast/gast_public"
 import { defaultGrammarResolverErrorProvider } from "../../../src/parse/errors_public"
 import { assignOccurrenceIndices } from "../../../src/parse/grammar/gast/gast_resolver_public"
-import {
-    ColonTok,
-    IdentTok,
-    LSquareTok,
-    qualifiedName,
-    RSquareTok
-} from "./samples"
 import { createToken } from "../../../src/scan/tokens_public"
 import { DslMethodsCollectorVisitor } from "../../../src/parse/grammar/gast/gast"
 import { forEach, map, uniq } from "../../../src/utils/utils"

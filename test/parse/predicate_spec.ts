@@ -1,4 +1,4 @@
-import { Parser } from "../../src/parse/parser_public"
+import { Parser } from "../../src/parse/parser/traits/parser_traits"
 import {
     EarlyExitException,
     NoViableAltException
@@ -312,30 +312,25 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
 
                 public topRule = this.RULE("topRule", param => {
                     let result = ""
-                    this.OPTION({
-                        GATE: () => param,
-                        DEF: () => {
-                            result += this.CONSUME1(A).image
-                        }
-                    })
                     result += this.CONSUME1(B).image
 
                     return result
                 })
             }
 
-            let gateOpenInputB = new PredicateWithRuleOptionParser([
+            const parser = new PredicateWithRuleOptionParser([
                 createRegularToken(B, "b")
-            ]).topRule(1, [false])
+            ])
+            let gateOpenInputB = parser.topRule(1, [false])
             expect(gateOpenInputB).to.equal("b")
 
-            // if the predicate function still kept a reference via a closure to the original param this will not work.
-            // because the <() => param> in the OPTION will ALWAYS return false (the original param)
-            let gateOpenInputA = new PredicateWithRuleOptionParser([
-                createRegularToken(A, "a"),
-                createRegularToken(B, "b")
-            ]).topRule(1, [true])
-            expect(gateOpenInputA).to.equal("ab")
+            // // if the predicate function still kept a reference via a closure to the original param this will not work.
+            // // because the <() => param> in the OPTION will ALWAYS return false (the original param)
+            // let gateOpenInputA = new PredicateWithRuleOptionParser([
+            //     createRegularToken(A, "a"),
+            //     createRegularToken(B, "b")
+            // ]).topRule(1, [true])
+            // expect(gateOpenInputA).to.equal("ab")
         })
 
         it("predicates in MANY", () => {

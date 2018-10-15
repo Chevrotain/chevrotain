@@ -1,4 +1,4 @@
-import { Parser } from "../../../src/parse/parser_public"
+import { Parser } from "../../../src/parse/parser/traits/parser_traits"
 import { createToken } from "../../../src/scan/tokens_public"
 
 describe("The Recognizer's Configuration", () => {

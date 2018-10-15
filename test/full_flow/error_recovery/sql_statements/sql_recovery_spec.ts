@@ -85,7 +85,6 @@ describe("Error Recovery SQL DDL Example", () => {
         parser.input = input
         let ptResult = parser.ddl()
         expect(parser.errors.length).to.equal(0)
-        expect(parser.isAtEndOfInput()).to.equal(true)
         assertAllThreeStatementsPresentAndValid(ptResult)
     })
 
@@ -116,7 +115,6 @@ describe("Error Recovery SQL DDL Example", () => {
             // one error encountered
             expect(parser.errors.length).to.equal(1)
             // yet the whole input has been parsed
-            expect(parser.isAtEndOfInput()).to.equal(true)
             // and the output parseTree contains ALL three statements
             assertAllThreeStatementsPresentAndValid(ptResult)
             let insertedSemiColon: IToken =
@@ -131,7 +129,6 @@ describe("Error Recovery SQL DDL Example", () => {
             parser.input = input
             let ptResult: any = parser.ddl()
             expect(parser.errors.length).to.equal(1)
-            expect(parser.isAtEndOfInput()).to.equal(true)
             expect(ptResult.payload.tokenType).to.equal(INVALID_DDL)
             expect(ptResult.children).to.have.length(0)
         })
@@ -166,7 +163,6 @@ describe("Error Recovery SQL DDL Example", () => {
             // one error encountered
             expect(parser.errors.length).to.equal(1)
             // yet the whole input has been parsed
-            expect(parser.isAtEndOfInput()).to.equal(true)
             // and the output parseTree contains ALL three statements
             assertAllThreeStatementsPresentAndValid(ptResult)
         })
@@ -176,7 +172,6 @@ describe("Error Recovery SQL DDL Example", () => {
             parser.input = input
             let ptResult: any = parser.ddl()
             expect(parser.errors.length).to.equal(1)
-            expect(parser.isAtEndOfInput()).to.equal(true)
             expect(ptResult.payload.tokenType).to.equal(INVALID_DDL)
             expect(ptResult.children).to.have.length(0)
         })
@@ -213,7 +208,6 @@ describe("Error Recovery SQL DDL Example", () => {
             // one error encountered
             expect(parser.errors.length).to.equal(1)
             // yet the whole input has been parsed
-            expect(parser.isAtEndOfInput()).to.equal(true)
             expect(ptResult.payload.tokenType).to.equal(STATEMENTS)
             // 3 statements found
             expect(ptResult.children.length).to.equal(3)
@@ -269,7 +263,6 @@ describe("Error Recovery SQL DDL Example", () => {
             // one error encountered
             expect(parser.errors.length).to.equal(1)
             // yet the whole input has been parsed
-            expect(parser.isAtEndOfInput()).to.equal(true)
             expect(ptResult.payload.tokenType).to.equal(STATEMENTS)
             // 3 statements found
             expect(ptResult.children.length).to.equal(3)
@@ -295,7 +288,6 @@ describe("Error Recovery SQL DDL Example", () => {
             // one error encountered
             expect(parser.errors.length).to.equal(1)
             // yet the whole input has been parsed
-            expect(parser.isAtEndOfInput()).to.equal(true)
             expect(ptResult.payload.tokenType).to.equal(INVALID_DDL)
             expect(ptResult.children).to.have.length(0)
         })
@@ -349,7 +341,6 @@ describe("Error Recovery SQL DDL Example", () => {
         let parser = new DDLExampleRecoveryParser(input1)
         parser.ddl()
         expect(parser.errors.length).to.equal(0)
-        expect(parser.isAtEndOfInput()).to.equal(true)
 
         let input2: any = flatten([
             // DELETE (31, "SHAHAR") FROM schema2.Persons
@@ -364,7 +355,6 @@ describe("Error Recovery SQL DDL Example", () => {
         parser.input = input2
         let ptResult: any = parser.ddl()
         expect(parser.errors.length).to.equal(0)
-        expect(parser.isAtEndOfInput()).to.equal(true)
         // verify returned ParseTree
         expect(ptResult.payload.tokenType).to.equal(STATEMENTS)
         expect(ptResult.children.length).to.equal(1)
@@ -401,7 +391,6 @@ describe("Error Recovery SQL DDL Example", () => {
         parser.input = input
         let ptResult = parser.ddl()
         expect(parser.errors.length).to.equal(1)
-        expect(parser.isAtEndOfInput()).to.equal(true)
         assertAllThreeStatementsPresentAndValid(ptResult)
     })
 })

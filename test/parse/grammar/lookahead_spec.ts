@@ -1,4 +1,4 @@
-import { END_OF_FILE, Parser } from "../../../src/parse/parser_public"
+import { END_OF_FILE, Parser } from "../../../src/parse/parser/parser"
 import { createToken } from "../../../src/scan/tokens_public"
 import {
     buildAlternativesLookAheadFunc,

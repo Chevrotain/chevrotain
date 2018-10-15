@@ -1,14 +1,16 @@
 import { createToken } from "../../../src/scan/tokens_public"
 import { Lexer } from "../../../src/scan/lexer_public"
+import { Parser } from "../../../src/parse/parser/traits/parser_traits"
+
 import {
     END_OF_FILE,
     lookAheadSequence,
-    Parser,
     TokenMatcher
-} from "../../../src/parse/parser_public"
+} from "../../../src/parse/parser/parser"
 import { MismatchedTokenException } from "../../../src/parse/exceptions_public"
 import { every, flatten, forEach, map } from "../../../src/utils/utils"
 import { IAnyOrAlt, IToken, TokenType } from "../../../api"
+import { MixedInParser } from "../../../src/parse/parser/traits/parser_traits"
 
 const Return = createToken({
     name: "Return",
@@ -149,7 +151,11 @@ class EcmaScriptQuirksParser extends Parser {
         return false
     }
 
-    protected consumeInternal(tokClass: TokenType, idx: number): IToken {
+    consumeInternal(
+        this: MixedInParser & EcmaScriptQuirksParser,
+        tokClass: TokenType,
+        idx: number
+    ): IToken {
         this.skipWhitespace()
         let nextToken = this.consumeExpected(tokClass)
         if (nextToken !== false) {
@@ -173,15 +179,15 @@ class EcmaScriptQuirksParser extends Parser {
         }
     }
 
-    protected exportLexerState(): number {
+    exportLexerState(): number {
         return this.textIdx
     }
 
-    protected importLexerState(newState: number) {
+    importLexerState(newState: number) {
         this.textIdx = newState
     }
 
-    protected lookAheadBuilderForOptional(
+    lookAheadBuilderForOptional(
         alt: lookAheadSequence,
         tokenMatcher: TokenMatcher,
         dynamicTokensEnabled: boolean
@@ -215,7 +221,7 @@ class EcmaScriptQuirksParser extends Parser {
         }
     }
 
-    protected lookAheadBuilderForAlternatives(
+    lookAheadBuilderForAlternatives(
         alts: lookAheadSequence[],
         hasPredicates: boolean,
         tokenMatcher: TokenMatcher,

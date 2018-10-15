@@ -10,7 +10,7 @@ import {
 } from "../../utils/utils"
 import { possiblePathsFrom } from "./interpreter"
 import { RestWalker } from "./rest"
-import { Predicate, TokenMatcher, lookAheadSequence } from "../parser_public"
+import { Predicate, TokenMatcher, lookAheadSequence } from "../parser/parser"
 import {
     tokenStructuredMatcher,
     tokenStructuredMatcherNoCategories

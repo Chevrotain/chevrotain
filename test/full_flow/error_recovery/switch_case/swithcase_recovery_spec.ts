@@ -63,7 +63,6 @@ describe("Error Recovery switch-case Example", () => {
 
         let parseResult = parser.switchStmt()
         expect(parser.errors.length).to.equal(0)
-        expect(parser.isAtEndOfInput()).to.equal(true)
 
         expect(parseResult).to.deep.equal({
             Terry: 2,
@@ -110,7 +109,6 @@ describe("Error Recovery switch-case Example", () => {
         parser.input = input
 
         let parseResult = parser.switchStmt()
-        expect(parser.isAtEndOfInput()).to.equal(true)
 
         expect(parseResult).to.deep.equal({
             Terry: 2,
@@ -143,8 +141,6 @@ describe("Error Recovery switch-case Example", () => {
         let parseResult = parser.switchStmt()
         expect(parser.errors.length).to.equal(1)
         expect(parser.errors[0]).to.be.an.instanceof(EarlyExitException)
-        // we have re-synced to the end of the input therefore all the input has been "parsed"
-        expect(parser.isAtEndOfInput()).to.equal(true)
         expect(parseResult).to.deep.equal({})
     })
 
@@ -191,7 +187,6 @@ describe("Error Recovery switch-case Example", () => {
 
         let parseResult = parser.switchStmt()
         expect(parser.errors.length).to.equal(1)
-        expect(parser.isAtEndOfInput()).to.equal(true)
 
         expect(parseResult).to.deep.equal({
             Terry: 2,
@@ -240,7 +235,6 @@ describe("Error Recovery switch-case Example", () => {
 
         let parseResult = parser.switchStmt()
         expect(parser.errors.length).to.equal(1)
-        expect(parser.isAtEndOfInput()).to.equal(true)
         expect(parseResult).to.deep.equal({
             Terry: 2,
             Robert: 4,
@@ -292,7 +286,6 @@ describe("Error Recovery switch-case Example", () => {
 
         let parseResult = parser.switchStmt()
         expect(parser.errors.length).to.equal(1)
-        expect(parser.isAtEndOfInput()).to.equal(true)
         expect(parseResult).to.deep.equal({
             Terry: 2,
             Robert: 4,
@@ -316,7 +309,6 @@ describe("Error Recovery switch-case Example", () => {
         let parseResult = parser.caseStmt()
         expect(parser.errors.length).to.equal(1)
         expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException)
-        expect(parser.isAtEndOfInput()).to.equal(true)
         expect(parseResult).to.deep.equal({ Terry: 2 })
     })
 
@@ -336,7 +328,6 @@ describe("Error Recovery switch-case Example", () => {
         let parseResult = parser.caseStmt()
         expect(parser.errors.length).to.equal(1)
         expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException)
-        expect(parser.isAtEndOfInput()).to.equal(true) // in rule recovery failed, will now re-sync to EOF
         expect(parseResult).to.deep.equal({ invalid1: undefined })
     })
 })

@@ -18,7 +18,7 @@ import {
     IParserDuplicatesDefinitionError,
     IParserEmptyAlternativeDefinitionError,
     ParserDefinitionErrorType
-} from "../parser_public"
+} from "../parser/parser"
 import { getProductionDslName, isOptionalProd } from "./gast/gast"
 import { tokenName } from "../../scan/tokens_public"
 import {
