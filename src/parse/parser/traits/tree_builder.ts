@@ -31,16 +31,9 @@ export class TreeBuilder {
             this.cstFinallyStateUpdate = NOOP
             this.cstPostTerminal = NOOP
             this.cstPostNonTerminal = NOOP
-            // TODO: maybe access this._proto?
-            this.getLastExplicitRuleShortName = Object.getPrototypeOf(
-                this
-            ).getLastExplicitRuleShortNameNoCst
-            this.getPreviousExplicitRuleShortName = Object.getPrototypeOf(
-                this
-            ).getPreviousExplicitRuleShortNameNoCst
-            this.getLastExplicitRuleOccurrenceIndex = Object.getPrototypeOf(
-                this
-            ).getLastExplicitRuleOccurrenceIndexNoCst
+            this.getLastExplicitRuleShortName = this.getLastExplicitRuleShortNameNoCst
+            this.getPreviousExplicitRuleShortName = this.getPreviousExplicitRuleShortNameNoCst
+            this.getLastExplicitRuleOccurrenceIndex = this.getLastExplicitRuleOccurrenceIndexNoCst
             this.manyInternal = this.manyInternalNoCst
             this.orInternal = this.orInternalNoCst
             this.optionInternal = this.optionInternalNoCst

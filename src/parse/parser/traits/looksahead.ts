@@ -44,20 +44,11 @@ export class LooksAhead {
         // For larger Maps this is slightly faster than using a plain object (array in our case).
         /* istanbul ignore else - The else branch will be tested on older node.js versions and IE11 */
         if (isES2015MapSupported()) {
-            // TODO: PARSER.PROTOTYPE?
-            // TODO but prevent inheritance???
-            // TODO: is Object.getPrototypeOf needed???
-            this.getLaFuncFromCache = Object.getPrototypeOf(
-                this
-            ).getLaFuncFromMap
-            this.setLaFuncCache = Object.getPrototypeOf(
-                this
-            ).setLaFuncCacheUsingMap
+            this.getLaFuncFromCache = this.getLaFuncFromMap
+            this.setLaFuncCache = this.setLaFuncCacheUsingMap
         } else {
-            this.getLaFuncFromCache = Object.getPrototypeOf(
-                this
-            ).getLaFuncFromObj
-            this.setLaFuncCache = Object.getPrototypeOf(this).setLaFuncUsingObj
+            this.getLaFuncFromCache = this.getLaFuncFromObj
+            this.setLaFuncCache = this.setLaFuncUsingObj
         }
     }
 
