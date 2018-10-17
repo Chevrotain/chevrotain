@@ -56,7 +56,7 @@ Chevrotain is written using Typescript, so compilation to javascript is needed.
 
 Alternatively during development one would want to recompile on file changes.
 
--   `yarn run watch`
+-   `yarn run compile_watch`
 
 The compilation result will appear in the **lib** folder.
 
