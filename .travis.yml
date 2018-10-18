@@ -1,37 +1,35 @@
 language: node_js
 env:
-  global:
-   - CXX=g++-4.8
-cache:
-  directories:
-    - node_modules
+    global:
+        - CXX=g++-4.8
+cache: yarn
 matrix:
-  include:
-    - node_js: "10"
-      env: NPM_TASK=ci_full_build_coveralls DEPLOY=true
-    - node_js: "8"
-      env: NPM_TASK=ci_full_build
-    - node_js: "6"
-      env: NPM_TASK=ci_full_build REMOVE_VUEPRESS=true
+    include:
+        - node_js: "10"
+          env: NPM_TASK=ci_full_build_coveralls DEPLOY=true
+        - node_js: "8"
+          env: NPM_TASK=ci_full_build
+        - node_js: "6"
+          env: NPM_TASK=ci_full_build REMOVE_VUEPRESS=true
 addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-4.8
+    apt:
+        sources:
+            - ubuntu-toolchain-r-test
+        packages:
+            - g++-4.8
 install:
-  # vuepress requires node.js > 8, remove under node.js 6
-  - if [ $REMOVE_VUEPRESS == "true" ]; then yarn remove vuepress; fi
-  - yarn
+    # vuepress requires node.js > 8, remove under node.js 6
+    - if [ $REMOVE_VUEPRESS == "true" ]; then yarn remove vuepress; fi
+    - yarn
 script:
-  - yarn run $NPM_TASK
+    - yarn run $NPM_TASK
 deploy:
-  - provider: script
-    script: bash scripts/deploy.sh
-    on:
-      tags: true
-      all_branches: true
-      condition: $DEPLOY = true
-    skip_cleanup: true
+    - provider: script
+      script: bash scripts/deploy.sh
+      on:
+          tags: true
+          all_branches: true
+          condition: $DEPLOY = true
+      skip_cleanup: true
 notifications:
-  email: false
+    email: false
