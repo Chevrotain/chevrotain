@@ -20,14 +20,8 @@
     },
     "license": " Apache-2.0",
     "author": {
-        "name": "Shahar Soel",
-        "email": "shahar.soel@gmail.com"
+        "name": "Shahar Soel"
     },
-    "contributors": [
-        {
-            "name": "Firas Najjar"
-        }
-    ],
     "files": [
         "lib/src/**/*.js",
         "lib/chevrotain.d.ts",
