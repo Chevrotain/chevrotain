@@ -2938,6 +2938,10 @@ ecc-jsbn@~0.1.1:
   dependencies:
     jsbn "~0.1.0"
 
+edge-launcher@1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/edge-launcher/-/edge-launcher-1.2.2.tgz#eb40aafbd067a6ea76efffab0647bcd5509b37b2"
+
 ee-first@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/ee-first/-/ee-first-1.1.1.tgz#590c61156b0ae2f4f0255732a158b266bc56b21d"
@@ -4791,6 +4795,12 @@ karma-chrome-launcher@~2.2.0:
   dependencies:
     fs-access "^1.0.0"
     which "^1.2.1"
+
+karma-edge-launcher@^0.4.2:
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/karma-edge-launcher/-/karma-edge-launcher-0.4.2.tgz#3d9529b09b13c909c5f3ceee12d00e7f9a989b3d"
+  dependencies:
+    edge-launcher "1.2.2"
 
 karma-firefox-launcher@~1.1.0:
   version "1.1.0"
