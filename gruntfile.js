@@ -1,15 +1,7 @@
-const _ = require("lodash")
-
-const karmaConf = process.env.TRAVIS ? "karma_sauce.conf.js" : "karma.conf.js"
-
-const fourSpaces = "    "
 const examples_test_command = "yarn test"
-
 const INSTALL_LINK = "yarn install && yarn link chevrotain"
 const INSTALL_LINK_TEST = INSTALL_LINK + " && " + examples_test_command
 const UNLINK = " && yarn unlink chevrotain"
-
-const banner = "/*! <%= pkg.name %> - v<%= pkg.version %> */"
 
 module.exports = function(grunt) {
     const pkg = grunt.file.readJSON("package.json")
@@ -79,7 +71,7 @@ module.exports = function(grunt) {
 
         karma: {
             options: {
-                configFile: karmaConf,
+                configFile: "karma.conf.js",
                 singleRun: true,
                 client: {
                     captureConsole: true
