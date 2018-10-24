@@ -11,7 +11,10 @@ matrix:
           env: NPM_TASK=ci_full_build
         - node_js: "6"
           env: NPM_TASK=ci_full_build REMOVE_VUEPRESS=true
+        - node_js: "10"
+          env: NPM_TASK=ci_browser_tests
 addons:
+    chrome: stable
     apt:
         sources:
             - ubuntu-toolchain-r-test

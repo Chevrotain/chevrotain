@@ -1,4 +1,3 @@
-// Karma.conf for local testing on chrome.
 module.exports = function(config) {
     "use strict"
     config.set({
@@ -42,7 +41,9 @@ module.exports = function(config) {
         // - PhantomJS
         // - IE (only Windows; has to be installed with `npm install karma-ie-launcher`)
         // TODO: conditional to add IE + Edge | Safari depending on current OS.
-        browsers: ["IE", "Chrome", "Firefox", "Edge"],
+        browsers: process.env.TRAVIS
+            ? ["ChromeHeadless"]
+            : ["IE", "Chrome", "Firefox", "Edge"],
 
         // If browser does not capture in given timeout [ms], kill it
         captureTimeout: 10000000,
