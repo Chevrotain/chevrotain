@@ -64,7 +64,7 @@
         "website:dev": "vuepress dev docs",
         "website:build": "vuepress build docs",
         "dead_links": "awesome_bot docs/*.md docs/*/*.md diagrams/*.md examples/*.md examples/*/*.md examples/*/*/*.md readme.md --allow-dupe --allow-redirect --skip-save-results",
-        "upload_website": "yarn run website:build && node ../chevrotain_docs/scripts/upload_website.js",
+        "upload_website": "yarn run website:build && ./scripts/deploy_gh_pages.sh",
         "integration_tests": "grunt integration_tests",
         "karma": "grunt browsers_tests",
         "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
