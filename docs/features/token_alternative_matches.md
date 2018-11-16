@@ -1,6 +1,6 @@
 # Token Alternative Matches
 
-Chevrotain supports attempting a secondary **longer** after a token has (already) been matched.
+Chevrotain supports attempting a secondary **longer** match after a token has (already) been matched.
 This capability is most often used to disambiguate the keywords vs identifiers ambiguity.
 
 For example:
