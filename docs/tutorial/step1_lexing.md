@@ -39,7 +39,7 @@ in the rest of tutorial because ES2015 has no support for static fields.
 How can we define Tokens for Identifiers or Integers?
 
 ```javascript
-const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
+const Identifier = createToken({ name: "Identifier", pattern: /[a-zA-Z]\w*/ })
 
 const Integer = createToken({ name: "Integer", pattern: /0|[1-9]\d+/ })
 ```
