@@ -11,7 +11,6 @@
     var Lexer = chevrotain.Lexer
     var Parser = chevrotain.Parser
 
-    // In ES6, custom inheritance implementation (such as 'createToken({name:...)') can be replaced with simple "class X extends Y"...
     var True = createToken({ name: "True", pattern: /true/ })
     var False = createToken({ name: "False", pattern: /false/ })
     var Null = createToken({ name: "Null", pattern: /null/ })
