@@ -41,7 +41,7 @@ How can we define Tokens for Identifiers or Integers?
 ```javascript
 const Identifier = createToken({ name: "Identifier", pattern: /[a-zA-Z]\w*/ })
 
-const Integer = createToken({ name: "Integer", pattern: /0|[1-9]\d+/ })
+const Integer = createToken({ name: "Integer", pattern: /0|[1-9]\d*/ })
 ```
 
 ## Skipping Tokens
