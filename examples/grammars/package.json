@@ -16,7 +16,7 @@
         "lodash": "^4.17.4",
         "mocha": "^5.2.0",
         "ohm-js": "^0.14.0",
-        "shift-parser": "^5.2.1",
+        "shift-parser": "^6.0.0",
         "typescript": "3.0.3",
         "uglify-js": "^3.4.9",
         "xregexp": "^4.2.0"
