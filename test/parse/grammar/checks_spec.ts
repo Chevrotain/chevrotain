@@ -996,7 +996,7 @@ describe("The prefix ambiguity detection full flow", () => {
             "Comma, Comma, Comma, Comma"
         )
         expect(() => new AlternativesAmbiguityParser()).to.throw(
-            "see https://sap.github.io/chevrotain/documentation/4_1_0/interfaces/iparserconfig.html#ignoredissues for more details\n"
+            "interfaces/iparserconfig.html#ignoredissues for more details\n"
         )
     })
 
