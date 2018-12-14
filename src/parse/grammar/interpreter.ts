@@ -291,7 +291,12 @@ export function possiblePathsFrom(
         } else if (prod instanceof Option) {
             result = getAlternativesForProd(prod.definition)
         } else if (prod instanceof RepetitionMandatory) {
-            return getAlternativesForProd(prod.definition)
+            const newDef = prod.definition.concat([
+                new Repetition({
+                    definition: prod.definition
+                })
+            ])
+            return getAlternativesForProd(newDef)
         } else if (prod instanceof RepetitionMandatoryWithSeparator) {
             const newDef = [
                 new Flat({ definition: prod.definition }),
@@ -312,7 +317,12 @@ export function possiblePathsFrom(
             ])
             result = getAlternativesForProd(newDef)
         } else if (prod instanceof Repetition) {
-            result = getAlternativesForProd(prod.definition)
+            const newDef = prod.definition.concat([
+                new Repetition({
+                    definition: prod.definition
+                })
+            ])
+            result = getAlternativesForProd(newDef)
         } else if (prod instanceof Alternation) {
             forEach(prod.definition, currAlt => {
                 result = getAlternativesForProd(currAlt.definition)

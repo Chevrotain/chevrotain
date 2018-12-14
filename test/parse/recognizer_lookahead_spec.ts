@@ -1601,4 +1601,57 @@ describe("lookahead Regular Tokens Mode", () => {
             expect(threeIterationsParser.rule()).to.equal(3)
         })
     })
+
+    describe("Lookahead bug: MANY in OR", () => {
+        class ManyInOrBugParser extends Parser {
+            constructor() {
+                super(ALL_TOKENS, {
+                    outputCst: false,
+                    ignoredIssues: {
+                        main: {
+                            OR: true
+                        }
+                    }
+                })
+                this.performSelfAnalysis()
+            }
+
+            public main = this.RULE("main", () => {
+                this.OR([
+                    { ALT: () => this.SUBRULE(this.alt1) },
+                    { ALT: () => this.SUBRULE(this.alt2) }
+                ])
+            })
+
+            public alt1 = this.RULE("alt1", () => {
+                this.MANY(() => {
+                    this.CONSUME(Comma)
+                })
+                this.CONSUME(OneTok)
+            })
+
+            public alt2 = this.RULE("alt2", () => {
+                this.MANY(() => {
+                    this.CONSUME(Comma)
+                })
+                this.CONSUME(TwoTok)
+            })
+        }
+
+        let manyInOrBugParser
+        before(() => {
+            manyInOrBugParser = new ManyInOrBugParser()
+        })
+
+        it("Won't throw NoViableAltException when the repetition appears twice", () => {
+            let input = [
+                createRegularToken(Comma),
+                createRegularToken(Comma),
+                createRegularToken(TwoTok)
+            ]
+            manyInOrBugParser.input = input
+            manyInOrBugParser.main()
+            expect(manyInOrBugParser.errors).to.be.empty
+        })
+    })
 })

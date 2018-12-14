@@ -18,6 +18,7 @@ import {
     IProductionWithOccurrence,
     TokenType
 } from "../../api"
+import { DEFAULT_PARSER_CONFIG } from "./parser/parser"
 
 export const defaultParserErrorProvider: IParserErrorMessageProvider = {
     buildMismatchTokenMessage({
@@ -267,7 +268,9 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
         currMessage =
             currMessage +
             "To Resolve this, try one of of the following: \n" +
-            "1. Refactor your grammar to be LL(K) for the current value of k (by default k=5)\n" +
+            `1. Refactor your grammar to be LL(K) for the current value of k (by default k=${
+                DEFAULT_PARSER_CONFIG.maxLookahead
+            }})\n` +
             "2. Increase the value of K for your grammar by providing a larger 'maxLookahead' value in the parser's config\n" +
             "3. This issue can be ignored (if you know what you are doing...), see" +
             " https://sap.github.io/chevrotain/documentation/" +

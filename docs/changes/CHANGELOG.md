@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+-   [Alternations ambiguity may not be detected when short repetitions.](https://github.com/SAP/chevrotain/issues/854)
+
 ## 4.1.0 (9-28-2018)
 
 #### Minor Changes

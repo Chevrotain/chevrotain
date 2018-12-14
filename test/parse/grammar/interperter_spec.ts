@@ -714,10 +714,18 @@ describe("The chevrotain grammar interpreter capabilities", () => {
             ).to.deep.equal([[Alpha, Alpha], [Gamma]])
             expect(
                 extractPartialPaths(possiblePathsFrom(rep, 3))
-            ).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
+            ).to.deep.equal([
+                [Alpha, Alpha, Alpha],
+                [Alpha, Alpha, Gamma],
+                [Gamma]
+            ])
             expect(
                 extractPartialPaths(possiblePathsFrom(rep, 4))
-            ).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
+            ).to.deep.equal([
+                [Alpha, Alpha, Alpha, Alpha],
+                [Alpha, Alpha, Gamma],
+                [Gamma]
+            ])
         })
 
         it("Mandatory Repetition", () => {
@@ -739,10 +747,13 @@ describe("The chevrotain grammar interpreter capabilities", () => {
             ).to.deep.equal([[Alpha, Alpha]])
             expect(
                 extractPartialPaths(possiblePathsFrom(repMand, 3))
-            ).to.deep.equal([[Alpha, Alpha, Gamma]])
+            ).to.deep.equal([[Alpha, Alpha, Alpha], [Alpha, Alpha, Gamma]])
             expect(
                 extractPartialPaths(possiblePathsFrom(repMand, 4))
-            ).to.deep.equal([[Alpha, Alpha, Gamma]])
+            ).to.deep.equal([
+                [Alpha, Alpha, Alpha, Alpha],
+                [Alpha, Alpha, Gamma]
+            ])
         })
 
         it("Repetition with Separator", () => {

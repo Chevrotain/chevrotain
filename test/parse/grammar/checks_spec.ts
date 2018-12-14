@@ -952,6 +952,54 @@ describe("The prefix ambiguity detection full flow", () => {
         )
     })
 
+    it("will throw an error when an an alts ambiguity is detected", () => {
+        const OneTok = createToken({ name: "OneTok" })
+        const TwoTok = createToken({ name: "TwoTok" })
+        const Comma = createToken({ name: "Comma" })
+
+        const ALL_TOKENS = [OneTok, TwoTok, Comma]
+
+        class AlternativesAmbiguityParser extends Parser {
+            constructor() {
+                super(ALL_TOKENS)
+                this.performSelfAnalysis()
+            }
+
+            public main = this.RULE("main", () => {
+                this.OR([
+                    { ALT: () => this.SUBRULE(this.alt1) },
+                    { ALT: () => this.SUBRULE(this.alt2) }
+                ])
+            })
+
+            public alt1 = this.RULE("alt1", () => {
+                this.MANY(() => {
+                    this.CONSUME(Comma)
+                })
+                this.CONSUME(OneTok)
+            })
+
+            public alt2 = this.RULE("alt2", () => {
+                this.MANY(() => {
+                    this.CONSUME(Comma)
+                })
+                this.CONSUME(TwoTok)
+            })
+        }
+        expect(() => new AlternativesAmbiguityParser()).to.throw(
+            "Ambiguous alternatives: <1 ,2>"
+        )
+        expect(() => new AlternativesAmbiguityParser()).to.throw(
+            "in <OR> inside <main> Rule"
+        )
+        expect(() => new AlternativesAmbiguityParser()).to.throw(
+            "Comma, Comma, Comma, Comma"
+        )
+        expect(() => new AlternativesAmbiguityParser()).to.throw(
+            "see https://sap.github.io/chevrotain/documentation/4_1_0/interfaces/iparserconfig.html#ignoredissues for more details\n"
+        )
+    })
+
     it("will throw an error when an a common prefix ambiguity is detected - implicit occurrence idx", () => {
         class PrefixAltAmbiguity2 extends Parser {
             constructor(input: IToken[] = []) {
