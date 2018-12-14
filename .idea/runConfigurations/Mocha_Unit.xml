@@ -1,7 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Mocha Unit" type="mocha-javascript-test-runner" factoryName="Mocha">
+  <configuration default="false" name="Mocha Unit" type="mocha-javascript-test-runner">
     <node-interpreter>project</node-interpreter>
     <node-options />
+    <mocha-package>$PROJECT_DIR$/node_modules/mocha</mocha-package>
     <working-directory>$PROJECT_DIR$</working-directory>
     <pass-parent-env>true</pass-parent-env>
     <envs>
@@ -11,6 +12,6 @@
     <extra-mocha-options />
     <test-kind>PATTERN</test-kind>
     <test-pattern>./lib/test/**/*spec.js</test-pattern>
-    <method />
+    <method v="2" />
   </configuration>
 </component>
