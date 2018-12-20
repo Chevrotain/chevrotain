@@ -263,7 +263,7 @@ output = {
 Providing a **NAME** property to the DSL methods will create an in-lined rule.
 It is equivalent to extraction to a separate grammar rule with two differences:
 
--   To avoid naming conflicts in-lined rules **must** start with a dollar($) sign.
+-   To avoid naming conflicts in-lined rules **must** start with a dollar(\$) sign.
 -   In-lined rules do not posses error recovery (re-sync) capabilities as do regular rules.
 
 Syntax Limitation:

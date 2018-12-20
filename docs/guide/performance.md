@@ -172,7 +172,7 @@ It is important to note that:
 
 -   Avoid dynamically changing the parser instance. The line:
 
-    > "$.c1 || ($.c1 = ..." ($ is 'this')
+    > "$.c1 || ($.c1 = ..." (\$ is 'this')
 
     Will cause a 'c1' property to be assigned to the parser instance.
     This may seem innocent but if enough properties are added dynamically to an instance

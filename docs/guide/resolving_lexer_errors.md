@@ -226,7 +226,7 @@ parser invocation the added initilization cost may be counter productive.
 
 ## Unexpected RegExp Anchor Error
 
-A Token RegExp pattern used in a chevrotain lexer may not use the start/end of input anchors ('$' and '^').
+A Token RegExp pattern used in a chevrotain lexer may not use the start/end of input anchors ('\$' and '^').
 
 ```javascript
 const createToken = chevrotain.createToken
