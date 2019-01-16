@@ -6,13 +6,11 @@ cache: yarn
 matrix:
     include:
         - node_js: "10"
-          env: NPM_TASK=ci_full_build_coveralls DEPLOY=true
+          env: NOM_TASKS="ci_full_build_coveralls karma" DEPLOY=true
         - node_js: "8"
-          env: NPM_TASK=ci_full_build
+          env: NOM_TASKS=ci_full_build
         - node_js: "6"
-          env: NPM_TASK=ci_full_build REMOVE_VUEPRESS=true
-        - node_js: "10"
-          env: NPM_TASK=ci_browser_tests
+          env: NOM_TASKS=ci_full_build REMOVE_VUEPRESS=true
 addons:
     chrome: stable
     apt:
@@ -25,7 +23,7 @@ install:
     - if [ $REMOVE_VUEPRESS == "true" ]; then yarn remove vuepress; fi
     - yarn
 script:
-    - yarn run $NPM_TASK
+    - ./node_modules/.bin/npm-run-all $NOM_TASKS
 deploy:
     - provider: script
       script: bash scripts/deploy.sh
