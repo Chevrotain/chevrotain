@@ -35,7 +35,7 @@ import {
     IToken,
     TokenType
 } from "../../api"
-import { defaultLexerErrorProvider } from "../parse/lexer_errors_public"
+import { defaultLexerErrorProvider } from "../scan/lexer_errors_public"
 
 export interface ILexingResult {
     tokens: IToken[]

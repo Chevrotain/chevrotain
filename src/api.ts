@@ -55,7 +55,7 @@ import * as defs from "../api"
 import { IProduction } from "../api"
 import { TokenType } from "../api"
 import { MixedInParser } from "./parse/parser/traits/parser_traits"
-import { defaultLexerErrorProvider } from "./parse/lexer_errors_public"
+import { defaultLexerErrorProvider } from "./scan/lexer_errors_public"
 
 interface ParserConstructor {
     new (
