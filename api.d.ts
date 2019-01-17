@@ -1113,7 +1113,55 @@ export interface ILexerConfig {
      * Note that this would have negative performance implications.
      */
     safeMode?: boolean
+
+    /**
+     * A custom error message provider.
+     * Can be used to override the default error messages.
+     * For example:
+     *   - Translating the error messages to a different languages.
+     *   - Changing the formatting.
+     */
+    errorMessageProvider?: ILexerErrorMessageProvider
 }
+
+export interface ILexerErrorMessageProvider {
+    /**
+     * Unexpected Character Error happens when lexer could not find token match for input text
+     *
+     * @param text - Input text.
+     *
+     * @param errorStartOffset - Offset in input text where error starts.
+     *
+     * @param errorLength - Error length.
+     *
+     * @param errorLine - Line number where the error occured.
+     *
+     * @param errorColumn - Column number where the error occured.
+     */
+    buildUnexpectedCharacterMessage(
+        text: string,
+        errorStartOffset: number,
+        errorLength: number,
+        errorLine: number,
+        errorColumn: number
+    ): string
+
+    /**
+     * Unable To Pop Lexer Mode Error happens when lexer tries to pop the last remaining mode from the mode stack.
+     *
+     * @param token - The Token that requested pop mode.
+     */
+    buildUnableToPopLexerModeMessage(token: IToken): string
+}
+
+/**
+ * This is the default logic Chevrotain uses to construct lexing error messages.
+ * It can be used as a reference or as a starting point customize a lexer's
+ * error messages.
+ *
+ * - See: {@link ILexerConfig.errorMessageProvider}
+ */
+export declare const defaultLexerErrorProvider: ILexerErrorMessageProvider
 
 /**
  * A subset of the regExp interface.
