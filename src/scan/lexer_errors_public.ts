@@ -7,18 +7,17 @@ export const defaultLexerErrorProvider: ILexerErrorMessageProvider = {
         }<- The Mode Stack is empty`
     },
 
-    buildUnexpectedCharacterMessage(
-        text: string,
-        errorStartOffset: number,
-        errorLength: number,
-        errorLine: number,
-        errorColumn: number
+    buildUnexpectedCharactersMessage(
+        fullText: string,
+        startOffset: number,
+        length: number,
+        line?: number,
+        column?: number
     ): string {
         return (
-            `unexpected character: ->${text.charAt(
-                errorStartOffset
-            )}<- at offset: ${errorStartOffset},` +
-            ` skipped ${errorLength} characters.`
+            `unexpected character: ->${fullText.charAt(
+                startOffset
+            )}<- at offset: ${startOffset},` + ` skipped ${length} characters.`
         )
     }
 }

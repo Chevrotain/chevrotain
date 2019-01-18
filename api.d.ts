@@ -1126,28 +1126,33 @@ export interface ILexerConfig {
 
 export interface ILexerErrorMessageProvider {
     /**
-     * Unexpected Character Error happens when lexer could not find token match for input text
+     * An Unexpected Character Error occurs when the lexer is unable to match a range of one or more
+     * characters in the input text against any of the Token Types in it's Lexer definition
      *
-     * @param text - Input text.
+     * @param fullText - Full original input text.
      *
-     * @param errorStartOffset - Offset in input text where error starts.
+     * @param startOffset - Offset in input text where error starts.
      *
-     * @param errorLength - Error length.
+     * @param length - Error length.
      *
-     * @param errorLine - Line number where the error occured.
+     * @param line - Line number where the error occured. (optional)
+     *                    Will not be provided when lexer is not defined to track lines/columns
      *
-     * @param errorColumn - Column number where the error occured.
+     * @param column - Column number where the error occured. (optional)
+     *                    Will not be provided when lexer is not defined to track lines/columns
      */
-    buildUnexpectedCharacterMessage(
-        text: string,
-        errorStartOffset: number,
-        errorLength: number,
-        errorLine: number,
-        errorColumn: number
+    buildUnexpectedCharactersMessage(
+        fullText: string,
+        startOffset: number,
+        length: number,
+        line?: number,
+        column?: number
     ): string
 
     /**
-     * Unable To Pop Lexer Mode Error happens when lexer tries to pop the last remaining mode from the mode stack.
+     * Unable To Pop Lexer Mode Error happens when lexer tries to pop the last remaining mode from the mode stack
+     * so that there is no longer any active lexer mode
+     * This error only relevant for multi-mode lexers
      *
      * @param token - The Token that requested pop mode.
      */

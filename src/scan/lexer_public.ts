@@ -668,7 +668,7 @@ export class Lexer {
 
                 errLength = offset - errorStartOffset
                 // at this point we either re-synced or reached the end of the input text
-                msg = this.config.errorMessageProvider.buildUnexpectedCharacterMessage(
+                msg = this.config.errorMessageProvider.buildUnexpectedCharactersMessage(
                     orgText,
                     errorStartOffset,
                     errLength,

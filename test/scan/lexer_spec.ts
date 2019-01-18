@@ -28,7 +28,11 @@ import {
 } from "../../src/scan/lexer"
 import { setEquality } from "../utils/matchers"
 import { tokenStructuredMatcher } from "../../src/scan/tokens"
-import { IMultiModeLexerDefinition } from "../../api"
+import {
+    IMultiModeLexerDefinition,
+    ILexerErrorMessageProvider,
+    IToken
+} from "../../api"
 
 const ORG_SUPPORT_STICKY = SUPPORT_STICKY
 function defineLexerSpecs(
@@ -1783,6 +1787,57 @@ function defineLexerSpecs(
                     expect(
                         badLexer.lexerDefinitionErrors[0].message
                     ).to.include("2")
+                })
+
+                describe("custom lexer error provider", () => {
+                    const customErrorProvider: ILexerErrorMessageProvider = {
+                        buildUnableToPopLexerModeMessage(
+                            token: IToken
+                        ): string {
+                            return `No pop for you ${token.image}`
+                        },
+
+                        buildUnexpectedCharactersMessage(
+                            fullText: string,
+                            startOffset: number,
+                            length: number,
+                            line?: number,
+                            column?: number
+                        ): string {
+                            return `[${line}, ${column}] Unknown character ${fullText.charAt(
+                                startOffset
+                            )} at position ${startOffset} skipped ${length}`
+                        }
+                    }
+
+                    const ModeLexerWithCustomErrors = new Lexer(
+                        modeLexerDefinition,
+                        {
+                            errorMessageProvider: customErrorProvider
+                        }
+                    )
+
+                    it("supports custom unexpected characters lexer error message", () => {
+                        let input = "1 LETTERS EXIT_LETTERS +"
+                        let lexResult = ModeLexerWithCustomErrors.tokenize(
+                            input
+                        )
+                        expect(lexResult.errors).to.have.lengthOf(1)
+                        expect(lexResult.errors[0].message).to.equal(
+                            "[1, 24] Unknown character + at position 23 skipped 1"
+                        )
+                    })
+
+                    it("supports custom unable to pop lexer mode error message", () => {
+                        let input = "1 EXIT_NUMBERS 2"
+                        let lexResult = ModeLexerWithCustomErrors.tokenize(
+                            input
+                        )
+                        expect(lexResult.errors).to.have.lengthOf(1)
+                        expect(lexResult.errors[0].message).to.equal(
+                            "No pop for you EXIT_NUMBERS"
+                        )
+                    })
                 })
 
                 context("custom pattern", () => {
