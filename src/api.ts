@@ -55,6 +55,7 @@ import * as defs from "../api"
 import { IProduction } from "../api"
 import { TokenType } from "../api"
 import { MixedInParser } from "./parse/parser/traits/parser_traits"
+import { defaultLexerErrorProvider } from "./scan/lexer_errors_public"
 
 interface ParserConstructor {
     new (
@@ -145,6 +146,7 @@ const API: {
     ParserDefinitionErrorType: typeof defs.ParserDefinitionErrorType
     Lexer: LexerConstructor
     LexerDefinitionErrorType: typeof defs.LexerDefinitionErrorType
+    defaultLexerErrorProvider: typeof defs.defaultLexerErrorProvider
     EOF: defs.TokenType
     tokenName: typeof defs.tokenName
     tokenLabel: typeof defs.tokenLabel
@@ -216,6 +218,7 @@ API.EarlyExitException = EarlyExitException
 API.MismatchedTokenException = MismatchedTokenException
 API.NotAllInputParsedException = NotAllInputParsedException
 API.NoViableAltException = NoViableAltException
+API.defaultLexerErrorProvider = defaultLexerErrorProvider
 //
 // // grammar reflection API
 API.Flat = Flat

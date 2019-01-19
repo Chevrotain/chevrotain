@@ -35,6 +35,7 @@ import {
     IToken,
     TokenType
 } from "../../api"
+import { defaultLexerErrorProvider } from "../scan/lexer_errors_public"
 
 export interface ILexingResult {
     tokens: IToken[]
@@ -72,7 +73,8 @@ const DEFAULT_LEXER_CONFIG: ILexerConfig = {
     lineTerminatorsPattern: /\n|\r\n?/g,
     lineTerminatorCharacters: ["\n", "\r"],
     ensureOptimizations: false,
-    safeMode: false
+    safeMode: false,
+    errorMessageProvider: defaultLexerErrorProvider
 }
 
 Object.freeze(DEFAULT_LEXER_CONFIG)
@@ -398,9 +400,10 @@ export class Lexer {
             ) {
                 // if we try to pop the last mode there lexer will no longer have ANY mode.
                 // thus the pop is ignored, an error will be created and the lexer will continue parsing in the previous mode.
-                let msg = `Unable to pop Lexer Mode after encountering Token ->${
-                    popToken.image
-                }<- The Mode Stack is empty`
+                let msg = this.config.errorMessageProvider.buildUnableToPopLexerModeMessage(
+                    popToken
+                )
+
                 errors.push({
                     offset: popToken.startOffset,
                     line:
@@ -665,11 +668,13 @@ export class Lexer {
 
                 errLength = offset - errorStartOffset
                 // at this point we either re-synced or reached the end of the input text
-                msg =
-                    `unexpected character: ->${orgText.charAt(
-                        errorStartOffset
-                    )}<- at offset: ${errorStartOffset},` +
-                    ` skipped ${offset - errorStartOffset} characters.`
+                msg = this.config.errorMessageProvider.buildUnexpectedCharactersMessage(
+                    orgText,
+                    errorStartOffset,
+                    errLength,
+                    errorLine,
+                    errorColumn
+                )
                 errors.push({
                     offset: errorStartOffset,
                     line: errorLine,
