@@ -35,7 +35,7 @@
         in the official examples and documentation, therefore it is likely that
         only the constructor need be modified in existing parsers.
 
--   Automatic [Concrete Syntax Tree](http://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html) output is now enabled by default.
+-   Automatic [Concrete Syntax Tree](https://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html) output is now enabled by default.
     This means that parser which rely on **embedded actions** must **explicitly** disable
     the CST output, for example:
 

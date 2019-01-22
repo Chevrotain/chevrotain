@@ -126,7 +126,7 @@ export class RecognizerEngine {
             if (typeof (tokenVocabulary as any[])[0].startOffset === "number") {
                 throw Error(
                     "The Parser constructor no longer accepts a token vector as the first argument.\n" +
-                        "\tSee: http://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_4-0-0\n" +
+                        "\tSee: https://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_4-0-0\n" +
                         "\tFor Further details."
                 )
             }

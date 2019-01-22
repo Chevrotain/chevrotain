@@ -92,8 +92,8 @@ This parser
     ```
 
 -   This error may also occur due to source code transformations of the parser.
-    See: [Minification](http://sap.github.io/chevrotain/docs/FAQ.html#MINIFIED)
-    and [Webpack](http://sap.github.io/chevrotain/docs/FAQ.html#WEBPACK) FAQ sections.
+    See: [Minification](https://sap.github.io/chevrotain/docs/FAQ.html#MINIFIED)
+    and [Webpack](https://sap.github.io/chevrotain/docs/FAQ.html#WEBPACK) FAQ sections.
 
     Basically if a code snippet such as:
 
@@ -153,7 +153,7 @@ $.MANY(() => {
 This is similar to the previous example as if the condition is false, once
 again the parser will consume nothing in the iteration.
 Modeling conditional grammar paths must be done using Chevrotain grammar constructs
-such as OPTION and/or [GATE](http://sap.github.io/chevrotain/docs/features/gates.html).
+such as OPTION and/or [GATE](https://sap.github.io/chevrotain/docs/features/gates.html).
 
 For example the above example should be written as:
 

@@ -9,4 +9,4 @@ syntax errors instead of stopping on the first one and also provide
 a partial output structure for an invalid input.
 
 For more details on Fault Tolerance and error recovery see
-the [in-depth](http://sap.github.io/chevrotain/docs/tutorial/step4_fault_tolerance.html) guide.
+the [in-depth](https://sap.github.io/chevrotain/docs/tutorial/step4_fault_tolerance.html) guide.

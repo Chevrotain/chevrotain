@@ -14,7 +14,7 @@
 
 #### Breaking Changes
 
--   [BREAKING_CHANGES For V4.0](http://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_4-0-0)
+-   [BREAKING_CHANGES For V4.0](https://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_4-0-0)
 
 #### Major Changes
 
@@ -135,7 +135,7 @@
 
 #### Documentation
 
--   [New documentation website generated using vuepress.](http://sap.github.io/chevrotain/docs/)
+-   [New documentation website generated using vuepress.](https://sap.github.io/chevrotain/docs/)
 
 ## 3.1.0 (4-13-2018)
 
@@ -153,7 +153,7 @@
 
 #### Breaking Changes
 
--   [BREAKING_CHANGES for V3.0](http://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_3-0-0)
+-   [BREAKING_CHANGES for V3.0](https://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_3-0-0)
 
 #### Major Changes
 
@@ -182,7 +182,7 @@
 
 #### Breaking Changes
 
--   [BREAKING_CHANGES for V2.0](http://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_2-0-0)
+-   [BREAKING_CHANGES for V2.0](https://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_2-0-0)
 
 #### Major Changes
 
