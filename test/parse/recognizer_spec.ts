@@ -1164,6 +1164,43 @@ function defineRecognizerSpecs(
                 expect(parser.errors[0].message).to.not.include("PlusTok")
             })
 
+            it("Will not throw a JS runtime exception on noViableAlt - issue #887", () => {
+                class MaxlookaheadOneAlt extends Parser {
+                    constructor(input: IToken[] = []) {
+                        super([PlusTok, MinusTok], { maxLookahead: 1 })
+                        this.input = input
+                        this.performSelfAnalysis()
+                    }
+
+                    public rule = this.RULE("rule", () => {
+                        this.OR([
+                            {
+                                ALT: () => {
+                                    this.CONSUME1(PlusTok)
+                                }
+                            },
+                            {
+                                ALT: () => {
+                                    this.CONSUME1(MinusTok)
+                                }
+                            }
+                        ])
+                    })
+                }
+
+                let parser = new MaxlookaheadOneAlt([])
+                parser.rule()
+                expect(parser.errors[0]).to.be.an.instanceof(
+                    NoViableAltException
+                )
+                expect(parser.errors[0].context.ruleStack).to.deep.equal([
+                    "rule"
+                ])
+                expect(parser.errors[0].message).to.include("MinusTok")
+                expect(parser.errors[0].message).to.include("+")
+                expect(parser.errors[0].message).to.not.include("PlusTok")
+            })
+
             it("Supports custom error messages for OR", () => {
                 class LabelAltParser2 extends Parser {
                     constructor(input: IToken[] = []) {

@@ -108,7 +108,7 @@ export class ErrorHandler {
         )
 
         let actualTokens = []
-        for (let i = 1; i < this.maxLookahead; i++) {
+        for (let i = 1; i <= this.maxLookahead; i++) {
             actualTokens.push(this.LA(i))
         }
         let previousToken = this.LA(0)
