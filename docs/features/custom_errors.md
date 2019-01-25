@@ -1,12 +1,17 @@
 # Customizable Error Messages.
 
-Chevrotain allows users to customize the parsing error messages.
-This can be accomplished by implementing the [IParserErrorMessageProvider](https://sap.github.io/chevrotain/documentation/4_1_1/interfaces/iparsererrormessageprovider.html)
-interface.
+Chevrotain allows users to customize both the parser and lexer error messages.
+This can be accomplished by implementing the following interfaces:
 
-See [executable example](https://github.com/SAP/chevrotain/blob/master/examples/parser/custom_errors/custom_errors.js).
+-   [IParserErrorMessageProvider](https://sap.github.io/chevrotain/documentation/4_1_1/interfaces/iparsererrormessageprovider.html)
+-   [IParserErrorMessageProvider](https://sap.github.io/chevrotain/documentation/4_1_1/interfaces/ilexererrormessageprovider.html)
 
-In addition it is also possible to provide strings values to be used in errors
+See executable examples:
+
+-   [Custom Parser Errors](https://github.com/SAP/chevrotain/blob/master/examples/parser/custom_errors/custom_errors.js).
+-   [Custom Lexer Errors](https://github.com/SAP/chevrotain/blob/master/examples/lexer/custom_errors/custom_errors.js).
+
+In addition it is also possible to directly provide strings values to be used in errors
 for specific parsing DSL methods, for example:
 
 ```javascript
