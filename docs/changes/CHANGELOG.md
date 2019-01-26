@@ -2,11 +2,11 @@
 
 #### Minor Changes
 
--   [Runtime check for removed Token vector argument in Parser constructor.](https://github.com/SAP/chevrotain/issues/825)
+-   [Support Custom Lexer Error Messages](https://github.com/SAP/chevrotain/issues/877) Thanks @morwen!
 
 #### Bug Fixes
 
--   [Alternations ambiguity may not be detected when short repetitions.](https://github.com/SAP/chevrotain/issues/854)
+-   [Error when building a noAltException with maxLookahead === 1.](https://github.com/SAP/chevrotain/issues/887)
 
 ## 4.1.1 (12-14-2018)
 
@@ -16,11 +16,9 @@
 
 ## 4.1.0 (9-28-2018)
 
-#### Minor Changes#### Minor Changes
+#### Minor Changes
 
 -   [Runtime check for removed Token vector argument in Parser constructor.](https://github.com/SAP/chevrotain/issues/825)
-
-*   [Runtime check for removed Token vector argument in Parser constructor.](https://github.com/SAP/chevrotain/issues/825)
 
 ## 4.0.0 (9-26-2018)
 
