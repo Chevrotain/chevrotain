@@ -25,7 +25,7 @@ const Comment = createToken({
     group: "singleLineComments"
 })
 
-CustomErrorsLexer = new Lexer([
+const TokenGroupsLexer = new Lexer([
     Whitespace, // Whitespace is very common in most languages so placing it first generally speeds up the lexing.
     If,
     Else,
@@ -41,7 +41,7 @@ module.exports = {
     Whitespace: Whitespace,
 
     tokenize: function(text) {
-        const lexResult = CustomErrorsLexer.tokenize(text)
+        const lexResult = TokenGroupsLexer.tokenize(text)
 
         if (lexResult.errors.length > 0) {
             throw new Error("sad sad panda lexing errors detected")

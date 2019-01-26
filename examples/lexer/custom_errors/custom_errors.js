@@ -1,8 +1,8 @@
 const { createToken, Lexer } = require("chevrotain")
 
-const A = createToken({ name: "if", pattern: /A/ })
-const B = createToken({ name: "else", pattern: /B/ })
-const C = createToken({ name: "return", pattern: /C/ })
+const A = createToken({ name: "A", pattern: /A/ })
+const B = createToken({ name: "B", pattern: /B/ })
+const C = createToken({ name: "C", pattern: /C/ })
 const Whitespace = createToken({
     name: "Whitespace",
     pattern: /\s+/,
@@ -11,7 +11,7 @@ const Whitespace = createToken({
 
 // A link to the detailed API for the ILexerErrorMessageProvider can be found here:
 // https://sap.github.io/chevrotain/docs/features/custom_errors.htmlconst OyVeyErrorMessageProvider = {
-OyVeyErrorMessageProvider = {
+const OyVeyErrorMessageProvider = {
     buildUnexpectedCharactersMessage(
         fullText,
         startOffset,
@@ -27,7 +27,7 @@ OyVeyErrorMessageProvider = {
     }
 }
 
-CustomErrorsLexer = new Lexer([Whitespace, A, B, C], {
+const CustomErrorsLexer = new Lexer([Whitespace, A, B, C], {
     errorMessageProvider: OyVeyErrorMessageProvider
 })
 
