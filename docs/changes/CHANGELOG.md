@@ -1,3 +1,13 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+-   [Runtime check for removed Token vector argument in Parser constructor.](https://github.com/SAP/chevrotain/issues/825)
+
+#### Bug Fixes
+
+-   [Alternations ambiguity may not be detected when short repetitions.](https://github.com/SAP/chevrotain/issues/854)
+
 ## 4.1.1 (12-14-2018)
 
 #### Bug Fixes
@@ -6,9 +16,11 @@
 
 ## 4.1.0 (9-28-2018)
 
-#### Minor Changes
+#### Minor Changes#### Minor Changes
 
 -   [Runtime check for removed Token vector argument in Parser constructor.](https://github.com/SAP/chevrotain/issues/825)
+
+*   [Runtime check for removed Token vector argument in Parser constructor.](https://github.com/SAP/chevrotain/issues/825)
 
 ## 4.0.0 (9-26-2018)
 
