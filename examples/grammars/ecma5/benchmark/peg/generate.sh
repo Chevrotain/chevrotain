@@ -1,1 +1,0 @@
-pegjs -o javascript_peg.js javascript.pegjs
