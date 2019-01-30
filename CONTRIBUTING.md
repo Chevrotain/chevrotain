@@ -3,7 +3,7 @@
 #### Bug Reports
 
 Please provide a (**simple**) way to reproduce the problem.
-A bug that can not be reproduced is less likely be solved.
+A bug that can not be reproduced is less likely to be solved.
 
 #### Feature Requests
 
@@ -26,7 +26,7 @@ See some [existing examples][examples] to get started.
 
 Details:
 
--   An Example **must** include some tests with an **\_spec.js** suffix.
+-   An Example **must** include some tests with a **\_spec.js** suffix.
 
 #### Contributing To Chevrotain's Runtime Source code.
 
@@ -34,7 +34,7 @@ This can be more complex as more in-depth knowledge of chevrotain internals may 
 
 Details:
 
--   ~100% code coverage is **required**.
+-   ~100% test coverage is **required**.
     -   It is possible to disable coverage for specific code, but there must be a very good reason to do so.
 -   Try to maintain the same code style used in the rest of Chevrotain's source code.
     -   The linting will take care of most of this automatically.
@@ -50,7 +50,7 @@ Examine the [package.json][package] scripts for all the available tasks:
 
 #### Some basic dev flows to get started
 
-Chevrotain is written using Typescript, so compilation to javascript is needed.
+Chevrotain is written using Typescript, so compilation to JavaScript is needed.
 
 -   `yarn run compile`
 
