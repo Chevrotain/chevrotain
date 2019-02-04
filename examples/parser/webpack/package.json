@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "devDependencies": {
     "mocha": "^5.2.0",
-    "webpack": "4.25.0",
+    "webpack": "4.29.1",
     "webpack-cli": "^3.0.1"
   },
   "dependencies": {
