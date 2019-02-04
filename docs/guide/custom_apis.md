@@ -162,7 +162,7 @@ There are two APIs for code generation and execution.
 
 -   [Combinator Style](https://github.com/SAP/chevrotain/tree/master/examples/custom_apis/combinator)
 
--   Generator Style (TBD)
+-   [Generator Style (external project)](https://github.com/rdking/chevrotain-ebnf)
 
 ## Limitations
 
