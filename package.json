@@ -122,7 +122,7 @@
     "typedoc": "0.14.2",
     "typescript": "3.2.4",
     "vuepress": "^0.14.2",
-    "webpack": "4.29.0",
+    "webpack": "4.29.1",
     "webpack-cli": "^3.0.0",
     "xregexp": "^4.2.0"
   },
