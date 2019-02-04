@@ -153,16 +153,16 @@ There are two APIs for code generation and execution.
 
     This can be useful for development and testing purposes but be wary
     as certain execution environments disallow the use of eval/new Function.
-    Specifically webpages with content security policy enabled and browser extensions.
+    Specifically web pages with content security policy enabled and browser extensions.
     However if the custom API is targeting only a node.js runtime this can be very
     useful for example for a combinator style API in which code generation is best
     avoided.
 
 ## Runnable Examples
 
--   [Combinator Style](https://github.com/SAP/chevrotain/tree/master/examples/custom_apis/combinator)
+-   [Combinator Style](https://github.com/SAP/chevrotain/tree/master/examples/custom_apis/combinator).
 
--   [Generator Style (external project)](https://github.com/rdking/chevrotain-ebnf)
+-   [Generator Style (external project)](https://github.com/rdking/chevrotain-ebnf) by @rdking.
 
 ## Limitations
 
