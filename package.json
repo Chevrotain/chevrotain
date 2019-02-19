@@ -46,7 +46,7 @@
     "dev_integration_tests": "npm-run-all clean quick_build dts integration_tests",
     "---------- DEV FLOWS --------": "",
     "watch": "tsc -w",
-    "unit_tests": "node_modules/.bin/_mocha \"./lib/test/**/*spec.js\"",
+    "unit_tests": "mocha \"./lib/test/**/*spec.js\"",
     "format": "prettier --no-editorconfig --write \"**/*.@(ts|js|md|yml)\"",
     "quick_build": "tsc && yarn run bundle",
     "---------- BUILD STEPS --------": "",
@@ -95,9 +95,9 @@
     "grunt-karma": "~3.0.0",
     "grunt-run": "^0.8.0",
     "if-env": "^1.0.0",
-    "jsdom": "12.0.0",
+    "jsdom": "13.2.0",
     "jsonfile": "^5.0.0",
-    "karma": "3.1.4",
+    "karma": "4.0.0",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "~2.2.0",
     "karma-edge-launcher": "^0.4.2",
@@ -108,7 +108,7 @@
     "karma-safari-launcher": "^1.0.0",
     "load-grunt-tasks": "^4.0.0",
     "lodash": "^4.17.4",
-    "mocha": "^5.2.0",
+    "mocha": "^6.0.0",
     "mock-require": "^3.0.1",
     "npm-run-all": "^4.1.2",
     "nyc": "^13.0.1",
@@ -120,9 +120,9 @@
     "sinon-chai": "^3.0.0",
     "tslint": "^5.8.0",
     "typedoc": "0.14.2",
-    "typescript": "3.2.4",
+    "typescript": "3.3.3",
     "vuepress": "^0.14.2",
-    "webpack": "4.29.0",
+    "webpack": "4.29.5",
     "webpack-cli": "^3.0.0",
     "xregexp": "^4.2.0"
   },
@@ -140,5 +140,11 @@
       "lib/test/**/*.*",
       "test/test.config.js"
     ]
+  },
+  "mocha" : {
+    "recursive": true,
+    "reporter": "spec",
+    "require" : "./test/test.config",
+    "ui": "bdd"
   }
 }
