@@ -7,7 +7,7 @@ jobs:
         steps:
             - checkout
             - run: yarn
-            - run: yarn run ci_full_flow
+            - run: yarn run ci_full_build
             - run: yarn karma
 
     build-node10:
