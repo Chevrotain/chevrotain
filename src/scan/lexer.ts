@@ -565,7 +565,7 @@ export function findStartOfInputAnchor(
                 "\tToken Type: ->" +
                 tokenName(currType) +
                 "<- static 'PATTERN' cannot contain start of input anchor '^'\n" +
-                "\tSee https://github.com/SAP/chevrotain/blob/master/docs/resolving_lexer_errors.md#ANCHORS\n" +
+                "\tSee sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#ANCHORS" +
                 "\tfor details.",
             type: LexerDefinitionErrorType.SOI_ANCHOR_FOUND,
             tokenTypes: [currType]
