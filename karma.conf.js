@@ -42,7 +42,7 @@ module.exports = function(config) {
         // - IE (only Windows; has to be installed with `npm install karma-ie-launcher`)
         // TODO: conditional to add IE + Edge | Safari depending on current OS.
         browsers: process.env.CIRCLE_PROJECT_REPONAME
-            ? ["Chrome", "Firefox"]
+            ? ["ChromeHeadless"]
             : ["IE", "Chrome", "Firefox", "Edge"],
 
         // If browser does not capture in given timeout [ms], kill it
