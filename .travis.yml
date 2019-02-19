@@ -6,7 +6,7 @@ cache: yarn
 matrix:
     include:
         - node_js: "10"
-          env: NOM_TASKS="ci_full_build_coveralls karma" DEPLOY=true
+          env: NOM_TASKS="ci_full_build karma" DEPLOY=true
         - node_js: "8"
           env: NOM_TASKS=ci_full_build
         - node_js: "6"
