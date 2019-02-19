@@ -41,8 +41,8 @@ module.exports = function(config) {
         // - PhantomJS
         // - IE (only Windows; has to be installed with `npm install karma-ie-launcher`)
         // TODO: conditional to add IE + Edge | Safari depending on current OS.
-        browsers: process.env.TRAVIS
-            ? ["ChromeHeadless"]
+        browsers: process.env.CIRCLE_PROJECT_REPONAME
+            ? ["Chrome", "Firefox"]
             : ["IE", "Chrome", "Firefox", "Edge"],
 
         // If browser does not capture in given timeout [ms], kill it
