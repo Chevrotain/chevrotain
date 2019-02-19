@@ -17,7 +17,7 @@ jobs:
     steps:
       - checkout
       - run: yarn
-      - run: yarn run ci_full_flow
+      - run: yarn run ci_full_build
 
   build-node8:
     docker:
@@ -26,7 +26,7 @@ jobs:
     steps:
       - checkout
       - run: yarn
-      - run: yarn run ci_full_flow
+      - run: yarn run ci_full_build
 
   deploy:
     docker:
@@ -35,7 +35,7 @@ jobs:
     steps:
       - checkout
       - run: yarn
-      - run: yarn run ci_full_flow
+      - run: yarn run ci_full_build
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
       - run: npm publish
 
