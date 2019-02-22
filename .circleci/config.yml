@@ -7,8 +7,8 @@ jobs:
         steps:
             - checkout
             - run: yarn
-            - run: yarn run ci_full_build
-            - run: yarn karma
+            - run: yarn run build
+            - run: yarn run test
 
     build-node10:
         docker:
@@ -17,7 +17,8 @@ jobs:
         steps:
             - checkout
             - run: yarn
-            - run: yarn run ci_full_build
+            - run: yarn run build
+            - run: yarn run test
 
     build-node8:
         docker:
@@ -26,7 +27,8 @@ jobs:
         steps:
             - checkout
             - run: yarn
-            - run: yarn run ci_full_build
+            - run: yarn run build
+            - run: yarn run test
 
     deploy:
         docker:
@@ -37,7 +39,7 @@ jobs:
             - run: yarn
             - run: yarn run ci_full_build
             - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-            - run: npm publish
+            - run: yarn run lerna:publish
 
 workflows:
     version: 2
