@@ -1,0 +1,18 @@
+import { HashTable } from "../lang/lang_extensions";
+import { TokenType } from "../../api";
+export declare function tokenStructuredMatcher(tokInstance: any, tokConstructor: any): boolean;
+export declare function tokenStructuredMatcherNoCategories(token: any, tokType: any): boolean;
+export declare let tokenShortNameIdx: number;
+export declare const tokenIdxToClass: HashTable<TokenType>;
+export declare function augmentTokenTypes(tokenTypes: TokenType[]): void;
+export declare function expandCategories(tokenTypes: TokenType[]): TokenType[];
+export declare function assignTokenDefaultProps(tokenTypes: TokenType[]): void;
+export declare function assignCategoriesTokensProp(tokenTypes: TokenType[]): void;
+export declare function assignCategoriesMapProp(tokenTypes: TokenType[]): void;
+export declare function singleAssignCategoriesToksMap(path: TokenType[], nextNode: TokenType): void;
+export declare function hasShortKeyProperty(tokType: TokenType): boolean;
+export declare function hasCategoriesProperty(tokType: TokenType): boolean;
+export declare function hasExtendingTokensTypesProperty(tokType: TokenType): boolean;
+export declare function hasExtendingTokensTypesMapProperty(tokType: TokenType): boolean;
+export declare function hasTokenNameProperty(tokType: TokenType): boolean;
+export declare function isTokenType(tokType: TokenType): boolean;

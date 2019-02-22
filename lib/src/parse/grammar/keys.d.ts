@@ -1,0 +1,12 @@
+export declare const BITS_FOR_METHOD_IDX = 4;
+export declare const BITS_FOR_OCCURRENCE_IDX = 4;
+export declare const BITS_FOR_RULE_IDX = 24;
+export declare const BITS_FOR_ALT_IDX = 8;
+export declare const OR_IDX: number;
+export declare const OPTION_IDX: number;
+export declare const MANY_IDX: number;
+export declare const AT_LEAST_ONE_IDX: number;
+export declare const MANY_SEP_IDX: number;
+export declare const AT_LEAST_ONE_SEP_IDX: number;
+export declare function getKeyForAutomaticLookahead(ruleIdx: number, dslMethodIdx: number, occurrence: number): number;
+export declare function getKeyForAltIndex(ruleIdx: number, dslMethodIdx: number, occurrence: number, altIdx: number): number;

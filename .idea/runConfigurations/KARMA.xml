@@ -1,7 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="KARMA" type="JavaScriptTestRunnerKarma" factoryName="Karma" singleton="true">
-    <config-file value="$PROJECT_DIR$/karma.conf.js" />
+  <configuration default="false" name="KARMA" type="JavaScriptTestRunnerKarma" singleton="true">
+    <config-file value="$PROJECT_DIR$/packages/chevrotain/karma.conf.js" />
     <karma-package-dir value="$PROJECT_DIR$/node_modules/karma" />
+    <working-directory value="$PROJECT_DIR$" />
     <node-interpreter value="project" />
     <envs />
     <RunnerSettings RunnerId="KarmaCoverageProgramRunner" />
@@ -10,6 +11,6 @@
     <ConfigurationWrapper RunnerId="KarmaCoverageProgramRunner" />
     <ConfigurationWrapper RunnerId="KarmaJavaScriptTestRunnerDebug" />
     <ConfigurationWrapper RunnerId="KarmaJavaScriptTestRunnerRun" />
-    <method />
+    <method v="2" />
   </configuration>
 </component>

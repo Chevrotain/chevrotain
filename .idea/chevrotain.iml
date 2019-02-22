@@ -2,15 +2,14 @@
 <module type="WEB_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/test_integration" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/chevrotain/test" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/chevrotain/test_integration" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/bin" />
       <excludeFolder url="file://$MODULE_DIR$/bower_components" />
       <excludeFolder url="file://$MODULE_DIR$/coverage" />
       <excludeFolder url="file://$MODULE_DIR$/dev" />
       <excludeFolder url="file://$MODULE_DIR$/doc" />
-      <excludeFolder url="file://$MODULE_DIR$/docs/.vuepress/dist" />
       <excludeFolder url="file://$MODULE_DIR$/examples/grammars/node_modules" />
       <excludeFolder url="file://$MODULE_DIR$/examples/language_services/bin/examples/coverage" />
       <excludeFolder url="file://$MODULE_DIR$/examples/language_services/node_modules" />
@@ -19,6 +18,7 @@
       <excludeFolder url="file://$MODULE_DIR$/examples/parser/webpack/gen" />
       <excludeFolder url="file://$MODULE_DIR$/lib" />
       <excludeFolder url="file://$MODULE_DIR$/node_modules" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/chevrotain/docs/.vuepress/dist" />
       <excludeFolder url="file://$MODULE_DIR$/release" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
