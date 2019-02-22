@@ -1,6 +1,6 @@
 {
     "name": "chevrotain_examples_lexer",
-    "version": "0.1.0",
+    "version": "4.2.0",
     "scripts": {
         "test": "mocha \"!(node_modules)/**/*spec.js\""
     },

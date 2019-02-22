@@ -2,3 +2,4 @@
 /dev
 /lib
 .nyc_output/
+/coverage

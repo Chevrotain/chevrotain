@@ -1,24 +1,14 @@
 {
     "name": "chevrotain_examples_grammars",
-    "version": "0.1.0",
+    "version": "4.2.0",
     "scripts": {
         "test": "mocha \"!(node_modules)/**/*spec.js\""
     },
     "dependencies": {
-        "chevrotain": "*"
+        "chevrotain": "4.2.0"
     },
     "devDependencies": {
         "acorn": "^6.0.3",
-        "antlr4": "^4.7.0",
-        "babylon": "^6.18.0",
-        "benchmark": "^2.1.4",
-        "chai": "^4.1.2",
-        "lodash": "^4.17.4",
-        "mocha": "^6.0.1",
-        "ohm-js": "^0.14.0",
-        "shift-parser": "^6.0.0",
-        "typescript": "3.0.3",
-        "uglify-js": "^3.4.9",
         "xregexp": "^4.2.0"
     },
     "private": true

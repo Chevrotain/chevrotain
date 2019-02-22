@@ -7,7 +7,7 @@
       "examples/*"
     ],
     "nohoist": [
-      "**/grunt-karma"
+      "**/grunt-**"
     ]
   },
   "scripts": {
