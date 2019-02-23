@@ -3,6 +3,7 @@
  * For some strange reason this is only needed for interpreter.js
  * In other compiled files there are no issues.
  * TODO: Try to remove this script in the future, perhaps it is a bug in TS source maps or nyc instrumentation.
+ *      - 23/02/19 still broken with TypeScript 3.3.0
  */
 const fs = require("fs-extra")
 const path = require("path")

@@ -54,18 +54,6 @@ const pkgJson = jf.readFileSync(packagePath)
 const apiString = fs.readFileSync(versionPath, "utf8").toString()
 const changeLogString = fs.readFileSync(changeLogPath, "utf8").toString()
 
-let mode = ""
-if (_.includes(process.argv, "patch")) {
-    mode = "patch"
-} else if (_.includes(process.argv, "minor")) {
-    mode = "minor"
-} else if (_.includes(process.argv, "major")) {
-    mode = "major"
-} else {
-    console.log("release mode (patch|minor) not provided")
-    process.exit(-1)
-}
-
 module.exports = {
     versionPath: versionPath,
     packagePath: packagePath,
@@ -75,7 +63,5 @@ module.exports = {
     pkgJson: pkgJson,
     apiString: apiString,
     changeLogString: changeLogString,
-    currVersion: pkgJson.version,
-    mode: mode,
-    tagPrefix: "v"
+    currVersion: pkgJson.version
 }

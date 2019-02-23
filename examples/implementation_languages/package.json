@@ -2,7 +2,7 @@
     "name": "chevrotain_examples_implementation_languages",
     "version": "4.2.0",
     "scripts": {
-        "build" :"npm-run-all build:ts build:coffee",
+        "build": "npm-run-all build:ts build:coffee",
         "build:ts": "tsc ./typescript/typescript_json.ts --types \" \"",
         "build:coffee": "coffee -c ./coffeescript/coffeescript_json.coffee",
         "test": "mocha \"*spec.js\""

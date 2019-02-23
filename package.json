@@ -1,34 +1,34 @@
 {
-  "name": "root",
-  "private": true,
-  "workspaces": {
-    "packages": [
-      "packages/*",
-      "examples/*"
-    ],
-    "nohoist": [
-      "**/grunt-**"
-    ]
-  },
-  "scripts": {
-    "lerna:version": "lerna version",
-    "lerna:publish": "lerna publish from-git --yes",
-    "ci": "npm-run-all format:validate build test",
-    "build": "lerna run build",
-    "test": "lerna run test",
-    "format:fix": "prettier --write \"**/*.@(ts|js|json|md)\"",
-    "format:validate": "prettier --list-different \"**/*.@(ts|js|json|md)\""
-  },
-  "prettier": {
-    "semi": false,
-    "tabWidth": 4
-  },
-  "devDependencies": {
-    "lerna": "^3.13.0",
-    "shx": "^0.3.2",
-    "npm-run-all": "^4.1.2",
-    "mocha": "^6.0.1",
-    "prettier": "1.16.4",
-    "lodash": "^4.17.4"
-  }
+    "name": "root",
+    "private": true,
+    "workspaces": {
+        "packages": [
+            "packages/*",
+            "examples/*"
+        ],
+        "nohoist": [
+            "**/grunt-**"
+        ]
+    },
+    "scripts": {
+        "lerna:version": "lerna version",
+        "lerna:publish": "lerna publish from-git --yes",
+        "ci": "npm-run-all format:validate build test",
+        "build": "lerna run build",
+        "test": "lerna run test",
+        "format:fix": "prettier --write \"**/*.@(ts|js|json|md)\"",
+        "format:validate": "prettier --list-different \"**/*.@(ts|js|json|md)\""
+    },
+    "prettier": {
+        "semi": false,
+        "tabWidth": 4
+    },
+    "devDependencies": {
+        "lerna": "^3.13.0",
+        "shx": "^0.3.2",
+        "npm-run-all": "^4.1.2",
+        "mocha": "^6.0.1",
+        "prettier": "1.16.4",
+        "lodash": "^4.17.4"
+    }
 }

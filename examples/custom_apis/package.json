@@ -7,7 +7,6 @@
     "dependencies": {
         "chevrotain": "4.2.0"
     },
-    "devDependencies": {
-    },
+    "devDependencies": {},
     "private": true
 }
