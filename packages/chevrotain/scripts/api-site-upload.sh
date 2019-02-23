@@ -1,15 +1,16 @@
 set -e
-cd dev
 rm -rf gh-pages
 mkdir gh-pages
 cd gh-pages
-git clone https://github.com/SAP/chevrotain.git .
+git clone https://github.com/SAP/chevrotain.git . --depth 1
 git checkout gh-pages
 
-## But what about the API docs???
-## see: https://github.com/SAP/chevrotain/blob/gh-pages/scripts/upload_docs.js
+node ../update-api-docs.js
 
 git add -A
-git commit -m 'Update api docs site'
-# how to push from circle-ci
 git push
+
+# cleanup
+cd ..
+rm -rf gh-pages
+

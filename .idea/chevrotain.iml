@@ -18,7 +18,9 @@
       <excludeFolder url="file://$MODULE_DIR$/examples/parser/webpack/gen" />
       <excludeFolder url="file://$MODULE_DIR$/lib" />
       <excludeFolder url="file://$MODULE_DIR$/node_modules" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/chevrotain/.nyc_output" />
       <excludeFolder url="file://$MODULE_DIR$/packages/chevrotain/docs/.vuepress/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/chevrotain/scripts/gh-pages" />
       <excludeFolder url="file://$MODULE_DIR$/release" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
