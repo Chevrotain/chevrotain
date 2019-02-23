@@ -39,7 +39,7 @@
     },
     "scripts": {
         "---------- CI FLOWS --------": "",
-        "build": "npm-run-all clean lint compile dts docs:build bundle",
+        "build": "npm-run-all clean lint compile dts api-site:build bundle",
         "test": "npm-run-all compile_def coverage check_coverage karma",
         "version": "node ./scripts/version-update.js && npm-run-all website:build",
         "postversion": "npm-run-all website:build website:upload api-site:upload",
