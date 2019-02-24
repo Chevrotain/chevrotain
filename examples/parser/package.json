@@ -1,19 +1,19 @@
 {
     "name": "chevrotain_examples_parser",
-    "version": "0.1.0",
+    "version": "4.2.0",
     "scripts": {
-        "build_minification": "grunt --gruntfile minification/gruntfile.js",
-        "build_webpack": "cd webpack && yarn install && yarn bundle && rm -rf node_modules && cd ..",
-        "build_serialized_grammar": "node ./serialized_grammar/gen_serialized.js",
-        "pretest": "npm run build_minification && npm run build_serialized_grammar && npm run build_webpack",
+        "build": "npm-run-all build:minification build:webpack build:serialized-grammar",
+        "build:minification": "grunt --gruntfile minification/gruntfile.js",
+        "build:webpack": "cd webpack && yarn install && yarn bundle && shx rm -rf node_modules && cd ..",
+        "build:serialized-grammar": "node ./serialized_grammar/gen_serialized.js",
         "test": "mocha \"!(node_modules)/**/*spec.js\""
     },
     "dependencies": {
-        "chevrotain": "*",
-        "lodash": "~4.17.10",
-        "shx": "^0.3.2"
+        "chevrotain": "4.2.0",
+        "lodash": "~4.17.10"
     },
     "devDependencies": {
+        "shx": "^0.3.2",
         "chai": "^4.1.2",
         "grunt": "^1.0.1",
         "grunt-cli": "~1.3.1",

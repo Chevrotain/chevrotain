@@ -1,31 +1,9 @@
 /.idea/workspace.xml
-/node_modules
+node_modules
 /.idea/dictionaries/
-
-/coverage
-/dev
-/lib
-
 /.tscache
 .baseDir.ts
 /bower_components
-
-/sauce.json
-
 /npm-debug.log
-
-# prettier watcher task is not portable (linux/mac/windows) because a different executable ([.cmd])
-# is needed on windows, so not possible to share it on SCM.
-/.idea/watcherTasks.xml
-
-.nyc_output/
-
-# we want to avoid locking version of Chevrotain in the examples sub packages.
-package-lock.json
-
-/static
-/package-lock.json
-
 yarn-error.log
-/docs/.vuepress/dist/
 .DS_Store

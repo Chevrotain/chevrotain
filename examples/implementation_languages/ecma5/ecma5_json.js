@@ -81,7 +81,7 @@ function JsonParserES5() {
         $.CONSUME(LSquare)
         $.MANY_SEP({
             SEP: Comma,
-            DEF: () => {
+            DEF: function() {
                 $.SUBRULE2($.value)
             }
         })
