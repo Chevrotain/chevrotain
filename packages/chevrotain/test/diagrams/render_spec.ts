@@ -7,6 +7,9 @@ const { lt } = require("semver")
 
 // more in depth testing will require jsdom to support SVG elements (WIP).
 describe("The Chevrotain diagrams rendering APIs", function() {
+    // The JSDom tests that actually perform network traffic seem unstable...
+    this.retries(4)
+
     const serializedGrammar = new DDLExampleRecoveryParser().getSerializedGastProductions()
 
     let skipOnBrowser = it
