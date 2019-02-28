@@ -1,5 +1,5 @@
 const path = require("path")
-const UglifyJsPlugin = require("uglifyjs-webpack-plugin")
+const TerserPlugin = require("terser-webpack-plugin")
 const { allTokens } = require("./src/our_grammar")
 
 // extract the names of the TokenTypes to avoid name mangling them.
@@ -18,8 +18,8 @@ module.exports = {
     },
     optimization: {
         minimizer: [
-            new UglifyJsPlugin({
-                uglifyOptions: {
+            new TerserPlugin({
+                terserOptions: {
                     mangle: {
                         // Avoid mangling TokenType names.
                         reserved: allTokenNames
