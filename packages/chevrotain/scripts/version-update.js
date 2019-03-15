@@ -35,13 +35,6 @@ _.forEach(config.docFilesPaths, function(currDocPath) {
 })
 
 console.log("bumping unpkg link in: <" + config.readmePath + ">")
-const currItemContents = fs.readFileSync(config.readmePath, "utf8").toString()
-const bumpedReadmeContents = currItemContents.replace(
-    oldVersionRegExpGlobal,
-    newVersion
-)
-fs.writeFileSync(config.readmePath, bumpedReadmeContents)
-
 console.log("bumping version on <" + config.versionPath + ">")
 const oldVersionRegExpGlobal = new RegExp(oldVersion, "g")
 const bumpedVersionTsFileContents = config.apiString.replace(
@@ -50,14 +43,14 @@ const bumpedVersionTsFileContents = config.apiString.replace(
 )
 fs.writeFileSync(config.versionPath, bumpedVersionTsFileContents)
 
+const readmeContents = fs.readFileSync(config.readmePath, "utf8").toString()
+const bumpedReadmeContents = readmeContents.replace(
+    oldVersionRegExpGlobal,
+    newVersion
+)
+fs.writeFileSync(config.readmePath, bumpedReadmeContents)
+
 // Just adding to the current commit is sufficient as lerna does the commit + tag + push
 myRepo.addSync(
     [config.versionPath, config.changeLogPath].concat(config.docFilesPaths)
 )
-
-// version has already been increased...
-// TODO: lerna should do the commits
-// myRepo.commitSync("update docs for release " + config.currVersion)
-// myRepo.push("origin", "master", () => {
-//     console.log("finished push to branch")
-// })
