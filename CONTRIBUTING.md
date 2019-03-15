@@ -101,6 +101,27 @@ including linting / doc generation / d.ts API creation / ...
 -   `yarn run ci_full_build`
     -   Node > 4 is required to pass the coverage checks.
 
+#### Release Process
+
+The release process **requires push permissions to master**.
+
+-   Update the [CHANGELOG](./packages/chevrotain/docs/changes/CHANGELOG.md).
+    -   The header must be `## X.Y.Z (INSERT_DATE_HERE)` (**literally**).
+-   Update the [BREAKING_CHANGES.md](./packages/chevrotain/docs/changes/BREAKING_CHANGES.md).
+    -   Only for major versions...
+-   Push the changes related updates to master.
+-   execute `yarn run lerna:version` and follow the instructions.
+    -   This will update version related files and push a new version **tag** to github.
+    -   Circle-CI will execute a deployment to npmjs.com due to this new tag.
+    -   Additionally new website contents will be pushed to the gh-pages branch.
+-   Check that the release was successful.
+
+    -   On [circle-ci](https://circleci.com/gh/SAP/chevrotain)
+    -   On [npmjs.com](https://www.npmjs.com/package/chevrotain)
+    -   On [The website](https://sap.github.io/chevrotain/docs/changes/CHANGELOG.html)
+    -   On [The APIs webpage](https://sap.github.io/chevrotain/documentation/)
+        -   The URL being redirected to should include the latest version number.
+
 #### Legal
 
 All Contributors must sign the [CLA][cla].
