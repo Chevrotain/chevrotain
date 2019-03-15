@@ -17,32 +17,6 @@
 const { createToken, createTokenInstance, Lexer } = require("chevrotain")
 const _ = require("lodash")
 
-/**
- *
- * Works like a / +/y regExp.
- *  - Note the usage of the 'y' (sticky) flag.
- *    This can be used to match from a specific offset in the text
- *    in our case from startOffset.
- *
- * The reason this has been implemented "manually" is because the sticky flag is not supported
- * on all modern node.js versions (4.0 specifically).
- */
-function matchWhiteSpace(text, startOffset) {
-    let result = ""
-    let offset = startOffset
-    // ignoring tabs in this example
-    while (text[offset] === " ") {
-        offset++
-        result += " "
-    }
-
-    if (result === "") {
-        return null
-    }
-
-    return [result]
-}
-
 // State required for matching the indentations
 let indentStack = [0]
 let lastOffsetChecked
@@ -51,7 +25,8 @@ let lastOffsetChecked
  * This custom Token matcher uses Lexer context ("matchedTokens" and "groups" arguments)
  * combined with state via closure ("indentStack" and "lastTextMatched") to match indentation.
  *
- * @param {string} text - remaining text to lex, sent by the Chevrotain lexer.
+ * @param {string} text - the full text to lex, sent by the Chevrotain lexer.
+ * @param {number} offset - the offset to start matching in the text.
  * @param {IToken[]} matchedTokens - Tokens lexed so far, sent by the Chevrotain Lexer.
  * @param {object} groups - Token groups already lexed, sent by the Chevrotain Lexer.
  * @param {string} type - determines if this function matches Indent or Outdent tokens.
@@ -77,41 +52,38 @@ function matchIndentBase(text, offset, matchedTokens, groups, type) {
     if (isFirstLine || isStartOfLine) {
         let match
         let currIndentLevel = undefined
-        const isZeroIndent = text.length < offset && text[offset] !== " "
-        if (isZeroIndent) {
-            // Matching zero spaces Outdent would not consume any chars, thus it would cause an infinite loop.
-            // This check prevents matching a sequence of zero spaces outdents.
-            if (lastOffsetChecked !== offset) {
-                currIndentLevel = 0
-                match = [""]
-                lastOffsetChecked = offset
-            }
-        } else {
-            // possible non-empty indentation
-            match = matchWhiteSpace(text, offset)
-            if (match !== null) {
-                currIndentLevel = match[0].length
-            }
+
+        const wsRegExp = / +/y
+        wsRegExp.lastIndex = offset
+        // possible non-empty indentation
+        match = wsRegExp.exec(text)
+        if (match !== null) {
+            currIndentLevel = match[0].length
         }
 
         if (currIndentLevel !== undefined) {
-            const lastIndentLevel = _.last(indentStack)
-            if (currIndentLevel > lastIndentLevel && type === "indent") {
+            const prevIndentLevel = _.last(indentStack)
+            // deeper indentation
+            if (currIndentLevel > prevIndentLevel && type === "indent") {
                 indentStack.push(currIndentLevel)
                 return match
+                // shallower indentation
             } else if (
-                currIndentLevel < lastIndentLevel &&
+                currIndentLevel < prevIndentLevel &&
                 type === "outdent"
             ) {
+                const matchIndentIndex = _.findLastIndex(
+                    indentStack,
+                    stackIndentDepth => stackIndentDepth === currIndentLevel
+                )
+                const numberOfDedents = indentStack
+
                 //if we need more than one outdent token, add all but the last one
+                // TODO: should this be "> 1"?
                 if (indentStack.length > 2) {
-                    const image = ""
-                    const offset = _.last(matchedTokens).endOffset + 1
-                    const line = _.last(matchedTokens).endLine
-                    const column = _.last(matchedTokens).endColumn + 1
                     while (
                         indentStack.length > 2 &&
-                        //stop before the last Outdent
+                        // stop before the last Outdent
                         indentStack[indentStack.length - 2] > currIndentLevel
                     ) {
                         indentStack.pop()

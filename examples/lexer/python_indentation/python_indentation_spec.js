@@ -46,32 +46,19 @@ describe("The Chevrotain Lexer ability to lex python like indentation.", () => {
 
     it("Can Lex another simple python style if-else ", () => {
         const input =
-            "print 333\n" +
-            "if (1)\n" +
-            "  if (2)\n" +
-            "    if(3)\n" +
-            "else\n" +
-            "  print 666\n"
+            "if 1\n" + "  if 2\n" + "    if 3\n" + "else\n" + "  print 666\n"
 
         const lexResult = tokenize(input)
         const actualTokenTypes = lexResult.tokens.map(tok => tok.tokenType.name)
         expect(actualTokenTypes).to.eql([
-            "Print",
-            "IntegerLiteral",
             "If",
-            "LParen",
             "IntegerLiteral",
-            "RParen",
             "Indent",
             "If",
-            "LParen",
             "IntegerLiteral",
-            "RParen",
             "Indent",
             "If",
-            "LParen",
             "IntegerLiteral",
-            "RParen",
             // TODO: BUG there should be two outdents before the else
             "Else",
             // TODO: BUG there should an indent before the print
