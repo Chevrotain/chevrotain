@@ -74,7 +74,7 @@
         "bundle:spec": "webpack --config webpack_specs.config.js"
     },
     "dependencies": {
-        "regexp-to-ast": "0.3.5"
+        "regexp-to-ast": "0.4.0"
     },
     "devDependencies": {
         "@types/chai": "^4.0.10",
