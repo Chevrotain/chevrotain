@@ -1,3 +1,18 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+-   [Updated regexp-to-ast to version 0.4.0](https://github.com/SAP/chevrotain/issues/877).
+
+    -   This should provide a performance boost to the initialization time of large lexers.
+    -   Thanks to [@morwen](https://github.com/morwen) :thumbsup
+
+#### Bug Fixes
+
+-   [Fix broken link to docs in lexer disallowed anchors error message](https://github.com/SAP/chevrotain/pull/903).
+
+    -   Thanks [@triplepointfive](https://github.com/triplepointfive) :thumbsup
+
 ## 4.2.0 (1-26-2019)
 
 #### Minor Changes
