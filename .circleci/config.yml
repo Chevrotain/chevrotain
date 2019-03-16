@@ -39,6 +39,8 @@ jobs:
             - run: yarn
             - run: yarn run build
             - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+            # To help debug when lerna detects changes to the working tree
+            - run: git status
             - run: yarn run lerna:publish
 
 workflows:
