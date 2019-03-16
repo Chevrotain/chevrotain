@@ -42,7 +42,7 @@
         "build": "npm-run-all clean lint compile dts api-site:build bundle",
         "test": "npm-run-all compile:def coverage check-coverage karma",
         "version": "node ./scripts/version-update.js && npm-run-all website:build",
-        "postversion": "npm-run-all website:build website:upload api-site:upload",
+        "postversion": "npm-run-all website:build website:upload api-site:build api-site:upload",
         "---------- DEV FLOWS --------": "",
         "watch": "tsc -w",
         "unit-tests": "mocha \"./lib/test/**/*spec.js\"",

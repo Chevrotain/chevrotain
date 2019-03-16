@@ -5,11 +5,13 @@ const path = require("path")
 pkgPath = path.join(__dirname, "../package.json")
 const pkg = fs.readJsonSync(pkgPath)
 
+console.log("updating api docs re-direct")
+
 const version = pkg.version
 const noDotsVersion = version.replace(/\./g, "_")
 const newVersionApiDocsDir = path.join(
     __dirname,
-    "./gh-pages/documentation/" + noDotsVersion
+    "../gh-pages/documentation/" + noDotsVersion
 )
 
 try {
@@ -26,7 +28,7 @@ try {
 // Update redirect to latest docs
 const docsIndexHtmlPath = path.join(
     __dirname,
-    "./gh-pages/documentation/index.html"
+    "../gh-pages/documentation/index.html"
 )
 const docsIndexHtmlString = fs
     .readFileSync(docsIndexHtmlPath, "utf8")
