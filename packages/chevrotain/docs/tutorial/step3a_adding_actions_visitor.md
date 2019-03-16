@@ -15,7 +15,7 @@ This can be accomplished using a CST (Concrete Syntax Tree) Visitor defined **ou
 
 ## Enabling CST
 
-This feature is controlled by the **outputCst** flag of the parser [configuration object](https://sap.github.io/chevrotain/documentation/4_2_0/interfaces/iparserconfig.html).
+This feature is controlled by the **outputCst** flag of the parser [configuration object](https://sap.github.io/chevrotain/documentation/4_3_0/interfaces/iparserconfig.html).
 
 -   Since version 4.0, CST output is **enabled by default**.
 

@@ -1,6 +1,6 @@
 {
     "name": "chevrotain_examples_implementation_languages",
-    "version": "4.2.0",
+    "version": "4.3.0",
     "scripts": {
         "build": "npm-run-all build:ts build:coffee",
         "build:ts": "tsc ./typescript/typescript_json.ts --types \" \"",
@@ -8,13 +8,13 @@
         "test": "mocha \"*spec.js\""
     },
     "dependencies": {
-        "chevrotain": "4.2.0"
+        "chevrotain": "^4.3.0"
     },
     "devDependencies": {
         "coffee-script": "^1.11.1",
         "mocha": "^6.0.1",
-        "typescript": "3.3.3333",
-        "npm-run-all": "^4.1.5"
+        "npm-run-all": "^4.1.5",
+        "typescript": "3.3.3333"
     },
     "private": true
 }
