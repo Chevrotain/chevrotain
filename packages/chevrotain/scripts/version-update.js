@@ -6,6 +6,8 @@ const fs = require("fs")
 const myRepo = git("")
 
 const newVersion = config.currVersion
+const oldVersion = require("../lib/src/version").VERSION
+const oldVersionRegExpGlobal = new RegExp(oldVersion.replace(/\./g, "\\."), "g")
 
 const dateTemplateRegExp = /^(## X\.Y\.Z )\(INSERT_DATE_HERE\)/
 if (!dateTemplateRegExp.test(config.changeLogString)) {
@@ -25,10 +27,14 @@ const changeLogDate = config.changeLogString.replace(
 fs.writeFileSync(config.changeLogPath, changeLogDate)
 
 _.forEach(config.docFilesPaths, function(currDocPath) {
+    if (_.includes(currDocPath, "changes")) {
+        console.log("SKIPPING bumping file: <" + currDocPath + ">")
+        return
+    }
     console.log("bumping file: <" + currDocPath + ">")
     const currItemContents = fs.readFileSync(currDocPath, "utf8").toString()
     const bumpedItemContents = currItemContents.replace(
-        /\d+_\d+_\d+/,
+        /\d+_\d+_\d+/g,
         newVersion.replace(/\./g, "_")
     )
     fs.writeFileSync(currDocPath, bumpedItemContents)
@@ -37,10 +43,8 @@ _.forEach(config.docFilesPaths, function(currDocPath) {
 console.log("bumping unpkg link in: <" + config.readmePath + ">")
 console.log("bumping version on <" + config.versionPath + ">")
 
-const oldVersion = require("../lib/src/version").VERSION
-const oldVersionRegExpGlobal = new RegExp(oldVersion, "g")
 const bumpedVersionTsFileContents = config.apiString.replace(
-    /\d+\.\d+\.\d+/g,
+    oldVersionRegExpGlobal,
     newVersion
 )
 fs.writeFileSync(config.versionPath, bumpedVersionTsFileContents)
