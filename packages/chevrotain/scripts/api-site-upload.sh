@@ -11,6 +11,7 @@ git checkout gh-pages
 node ../scripts/update-api-docs.js
 
 git add -A
+git commit
 git push
 
 # cleanup
