@@ -36,6 +36,8 @@ _.forEach(config.docFilesPaths, function(currDocPath) {
 
 console.log("bumping unpkg link in: <" + config.readmePath + ">")
 console.log("bumping version on <" + config.versionPath + ">")
+
+const oldVersion = require("../lib/src/version").VERSION
 const oldVersionRegExpGlobal = new RegExp(oldVersion, "g")
 const bumpedVersionTsFileContents = config.apiString.replace(
     /\d+\.\d+\.\d+/g,
