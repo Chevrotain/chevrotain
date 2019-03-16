@@ -37,7 +37,7 @@ jobs:
         steps:
             - checkout
             - run: yarn
-            - run: yarn run ci_full_build
+            - run: yarn run build
             - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
             - run: yarn run lerna:publish
 
