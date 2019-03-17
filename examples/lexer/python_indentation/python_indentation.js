@@ -17,41 +17,15 @@
 const { createToken, createTokenInstance, Lexer } = require("chevrotain")
 const _ = require("lodash")
 
-/**
- *
- * Works like a / +/y regExp.
- *  - Note the usage of the 'y' (sticky) flag.
- *    This can be used to match from a specific offset in the text
- *    in our case from startOffset.
- *
- * The reason this has been implemented "manually" is because the sticky flag is not supported
- * on all modern node.js versions (4.0 specifically).
- */
-function matchWhiteSpace(text, startOffset) {
-    let result = ""
-    let offset = startOffset
-    // ignoring tabs in this example
-    while (text[offset] === " ") {
-        offset++
-        result += " "
-    }
-
-    if (result === "") {
-        return null
-    }
-
-    return [result]
-}
-
 // State required for matching the indentations
 let indentStack = [0]
-let lastOffsetChecked
 
 /**
  * This custom Token matcher uses Lexer context ("matchedTokens" and "groups" arguments)
  * combined with state via closure ("indentStack" and "lastTextMatched") to match indentation.
  *
- * @param {string} text - remaining text to lex, sent by the Chevrotain lexer.
+ * @param {string} text - the full text to lex, sent by the Chevrotain lexer.
+ * @param {number} offset - the offset to start matching in the text.
  * @param {IToken[]} matchedTokens - Tokens lexed so far, sent by the Chevrotain Lexer.
  * @param {object} groups - Token groups already lexed, sent by the Chevrotain Lexer.
  * @param {string} type - determines if this function matches Indent or Outdent tokens.
@@ -77,66 +51,68 @@ function matchIndentBase(text, offset, matchedTokens, groups, type) {
     if (isFirstLine || isStartOfLine) {
         let match
         let currIndentLevel = undefined
-        const isZeroIndent = text.length < offset && text[offset] !== " "
-        if (isZeroIndent) {
-            // Matching zero spaces Outdent would not consume any chars, thus it would cause an infinite loop.
-            // This check prevents matching a sequence of zero spaces outdents.
-            if (lastOffsetChecked !== offset) {
-                currIndentLevel = 0
-                match = [""]
-                lastOffsetChecked = offset
-            }
-        } else {
-            // possible non-empty indentation
-            match = matchWhiteSpace(text, offset)
-            if (match !== null) {
-                currIndentLevel = match[0].length
-            }
+
+        const wsRegExp = / +/y
+        wsRegExp.lastIndex = offset
+        match = wsRegExp.exec(text)
+        // possible non-empty indentation
+        if (match !== null) {
+            currIndentLevel = match[0].length
+        }
+        // "empty" indentation means indentLevel of 0.
+        else {
+            currIndentLevel = 0
         }
 
-        if (currIndentLevel !== undefined) {
-            const lastIndentLevel = _.last(indentStack)
-            if (currIndentLevel > lastIndentLevel && type === "indent") {
-                indentStack.push(currIndentLevel)
-                return match
-            } else if (
-                currIndentLevel < lastIndentLevel &&
-                type === "outdent"
-            ) {
-                //if we need more than one outdent token, add all but the last one
-                if (indentStack.length > 2) {
-                    const image = ""
-                    const offset = _.last(matchedTokens).endOffset + 1
-                    const line = _.last(matchedTokens).endLine
-                    const column = _.last(matchedTokens).endColumn + 1
-                    while (
-                        indentStack.length > 2 &&
-                        //stop before the last Outdent
-                        indentStack[indentStack.length - 2] > currIndentLevel
-                    ) {
-                        indentStack.pop()
-                        matchedTokens.push(
-                            createTokenInstance(
-                                Outdent,
-                                "",
-                                NaN,
-                                NaN,
-                                NaN,
-                                NaN,
-                                NaN,
-                                NaN
-                            )
-                        )
-                    }
-                }
-                indentStack.pop()
-                return match
-            } else {
-                // same indent, this should be lexed as simple whitespace and ignored
-                return null
+        const prevIndentLevel = _.last(indentStack)
+        // deeper indentation
+        if (currIndentLevel > prevIndentLevel && type === "indent") {
+            indentStack.push(currIndentLevel)
+            return match
+        }
+        // shallower indentation
+        else if (currIndentLevel < prevIndentLevel && type === "outdent") {
+            const matchIndentIndex = _.findLastIndex(
+                indentStack,
+                stackIndentDepth => stackIndentDepth === currIndentLevel
+            )
+
+            // any outdent must match some previous indentation level.
+            if (matchIndentIndex === -1) {
+                throw Error(`invalid outdent at offset: ${offset}`)
             }
+
+            const numberOfDedents = indentStack.length - matchIndentIndex - 1
+
+            // This is a little tricky
+            // 1. If there is no match (0 level indent) than this custom token
+            //    matcher would return "null" and so we need to add all the required outdents ourselves.
+            // 2. If there was match (> 0 level indent) than we need to add minus one number of outsents
+            //    because the lexer would create one due to returning a none null result.
+            let iStart = match !== null ? 1 : 0
+            for (let i = iStart; i < numberOfDedents; i++) {
+                indentStack.pop()
+                matchedTokens.push(
+                    createTokenInstance(
+                        Outdent,
+                        "",
+                        NaN,
+                        NaN,
+                        NaN,
+                        NaN,
+                        NaN,
+                        NaN
+                    )
+                )
+            }
+
+            // even though we are adding fewer outdents directly we still need to update the indent stack fully.
+            if (iStart === 1) {
+                indentStack.pop()
+            }
+            return match
         } else {
-            // indentation cannot be matched without at least one space character.
+            // same indent, this should be lexed as simple whitespace and ignored
             return null
         }
     } else {
@@ -218,7 +194,6 @@ module.exports = {
     tokenize: function(text) {
         // have to reset the indent stack between processing of different text inputs
         indentStack = [0]
-        lastOffsetChecked = undefined
 
         const lexResult = customPatternLexer.tokenize(text)
 
