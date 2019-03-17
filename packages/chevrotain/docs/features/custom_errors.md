@@ -4,7 +4,7 @@ Chevrotain allows users to customize both the parser and lexer error messages.
 This can be accomplished by implementing the following interfaces:
 
 -   [IParserErrorMessageProvider](https://sap.github.io/chevrotain/documentation/4_3_0/interfaces/iparsererrormessageprovider.html)
--   [IParserErrorMessageProvider](https://sap.github.io/chevrotain/documentation/4_3_0/interfaces/ilexererrormessageprovider.html)
+-   [ILexerErrorMessageProvider](https://sap.github.io/chevrotain/documentation/4_3_0/interfaces/ilexererrormessageprovider.html)
 
 See executable examples:
 
