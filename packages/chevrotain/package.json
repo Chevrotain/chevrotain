@@ -37,6 +37,7 @@
         "type": "git",
         "url": "git://github.com/SAP/chevrotain.git"
     },
+    "homepage": "https://sap.github.io/chevrotain/docs/",
     "scripts": {
         "---------- CI FLOWS --------": "",
         "build": "npm-run-all clean lint compile dts api-site:build bundle",
