@@ -7,7 +7,7 @@
         "webpack-cli": "^3.0.1"
     },
     "dependencies": {
-        "chevrotain": "4.3.0"
+        "chevrotain": "4.3.1"
     },
     "scripts": {
         "bundle": "webpack",
