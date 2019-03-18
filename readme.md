@@ -49,7 +49,7 @@ as any other pure code without requiring any new tools or processes.
 
 -   **[HTML API docs](https://sap.github.io/chevrotain/documentation).**
 
-    -   [The Parsing DSL Docs](https://sap.github.io/chevrotain/documentation/4_3_0/classes/parser.html#at_least_one).
+    -   [The Parsing DSL Docs](https://sap.github.io/chevrotain/documentation/4_3_1/classes/parser.html#at_least_one).
 
 ## Dependencies
 
