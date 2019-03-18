@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+-   [Missing README.md in the npm package](https://github.com/SAP/chevrotain/issues/926).
+
 ## 4.3.0 (3-16-2019)
 
 #### Minor Changes
