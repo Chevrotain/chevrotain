@@ -152,13 +152,13 @@ class Calculator extends Parser {
             return $.OR([
                 // categorieshesisExpression has the highest precedence and thus it appears
                 // in the "lowest" leaf in the expression ParseTree.
-                { ALT: () => $.SUBRULE($.categorieshesisExpression) },
+                { ALT: () => $.SUBRULE($.parenthesisExpression) },
                 { ALT: () => parseInt($.CONSUME(NumberLiteral).image, 10) },
                 { ALT: () => $.SUBRULE($.powerFunction) }
             ])
         })
 
-        $.RULE("categorieshesisExpression", () => {
+        $.RULE("parenthesisExpression", () => {
             let expValue
 
             $.CONSUME(LParen)
