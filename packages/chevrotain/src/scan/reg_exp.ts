@@ -6,7 +6,9 @@ import {
     contains,
     PRINT_ERROR,
     PRINT_WARNING,
-    find
+    find,
+    isArray,
+    every
 } from "../utils/utils"
 
 const regExpParser = new RegExpParser()
@@ -130,10 +132,10 @@ export function firstChar(ast): number[] {
 
                 // reached a mandatory production, no more start codes can be found on this alternative
                 if (
-                    //
-                    atom.quantifier === undefined ||
-                    (atom.quantifier !== undefined &&
-                        atom.quantifier.atLeast > 0)
+                    // for groups, we need to walk the tree to determine whether their "innards" are
+                    // wholly optional or not; for non-groups, a simple quantifier check works
+                    (atom.quantifier === undefined && atom.type !== "Group") ||
+                    !isWholeOptional(atom)
                 ) {
                     break
                 }
@@ -179,6 +181,20 @@ function findCode(setNode, targetCharCodes) {
             )
         }
     })
+}
+
+function isWholeOptional(ast) {
+    if (ast.quantifier && ast.quantifier.atLeast === 0) {
+        return true
+    }
+
+    if (!ast.value) {
+        return false
+    }
+
+    return isArray(ast.value)
+        ? every(ast.value, isWholeOptional)
+        : isWholeOptional(ast.value)
 }
 
 class CharCodeFinder extends BaseRegExpVisitor {

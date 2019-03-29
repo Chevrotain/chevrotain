@@ -64,6 +64,15 @@ describe("the regExp analysis", () => {
         it("will not compute when using complements #2", () => {
             expect(getStartCodes(/[^a-z]/, true)).to.be.empty
         })
+
+        it("correctly handles nested groups with and without quantifiers", () => {
+            expect(getStartCodes(/((ab)?)c/)).to.deep.equal([97, 99])
+            expect(getStartCodes(/((ab))(c)/)).to.deep.equal([97])
+            expect(getStartCodes(/((ab))?c/)).to.deep.equal([97, 99])
+            expect(getStartCodes(/((a?((b?))))?c/)).to.deep.equal([97, 98, 99])
+            expect(getStartCodes(/((a?((b))))c/)).to.deep.equal([97, 98])
+            expect(getStartCodes(/((a+((b))))c/)).to.deep.equal([97])
+        })
     })
 
     context("can match charCode", () => {
