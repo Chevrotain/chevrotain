@@ -1,5 +1,6 @@
 /packages/chevrotain/lib
 /packages/chevrotain/dev
+/packages/chevrotain/coverage
 /packages/chevrotain/scripts/gh-pages
 /examples/parser/minification/gen/
 /examples/parser/webpack/gen/
@@ -8,6 +9,6 @@
 /packages/chevrotain/docs/.vuepress/dist
 **/node_modules/
 /examples/parser/webpack/lib
-
+/greenkeeper.json
 .nyc_output
 

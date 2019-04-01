@@ -130,12 +130,17 @@ export function firstChar(ast): number[] {
                         throw Error("Non Exhaustive Match")
                 }
 
-                // reached a mandatory production, no more start codes can be found on this alternative
+                // reached a mandatory production, no more **start** codes can be found on this alternative
+                const isOptionalQuantifier =
+                    atom.quantifier !== undefined &&
+                    atom.quantifier.atLeast === 0
                 if (
-                    // for groups, we need to walk the tree to determine whether their "innards" are
-                    // wholly optional or not; for non-groups, a simple quantifier check works
-                    (atom.quantifier === undefined && atom.type !== "Group") ||
-                    !isWholeOptional(atom)
+                    // A group may be optional due to empty contents /(?:)/
+                    // or if everything inside it is optional /((a)?)/
+                    (atom.type === "Group" &&
+                        isWholeOptional(atom) === false) ||
+                    // If this term is not a group it may only be optional if it has an optional quantifier
+                    (atom.type !== "Group" && isOptionalQuantifier === false)
                 ) {
                     break
                 }

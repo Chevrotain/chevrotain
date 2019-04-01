@@ -66,6 +66,7 @@ describe("the regExp analysis", () => {
         })
 
         it("correctly handles nested groups with and without quantifiers", () => {
+            expect(getStartCodes(/(?:)c/)).to.deep.equal([99])
             expect(getStartCodes(/((ab)?)c/)).to.deep.equal([97, 99])
             expect(getStartCodes(/((ab))(c)/)).to.deep.equal([97])
             expect(getStartCodes(/((ab))?c/)).to.deep.equal([97, 99])

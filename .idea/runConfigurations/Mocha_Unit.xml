@@ -1,9 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Mocha Unit" type="mocha-javascript-test-runner">
+  <configuration default="false" name="Mocha Unit" type="mocha-javascript-test-runner" factoryName="Mocha">
     <node-interpreter>project</node-interpreter>
     <node-options />
-    <mocha-package>$PROJECT_DIR$/node_modules/mocha</mocha-package>
-    <working-directory>$PROJECT_DIR$</working-directory>
+    <working-directory>$PROJECT_DIR$/packages/chevrotain</working-directory>
     <pass-parent-env>true</pass-parent-env>
     <envs>
       <env name="SKIP_JS_DOM" value="true" />
