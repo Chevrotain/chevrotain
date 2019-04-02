@@ -2,7 +2,7 @@
 
 #### Bug Fixes
 
--   [Failure Lexing RegExp patterns starting with empty or "fully optional" groups.](https://github.com/SAP/chevrotain/pull/934).
+-   [Failure Lexing RegExp patterns starting with empty or "fully optional" groups](https://github.com/SAP/chevrotain/pull/934).
     -   Thanks to [@jmrog](https://github.com/jmrog) :thumbsup
 
 ## 4.3.1 (3-18-2019)
