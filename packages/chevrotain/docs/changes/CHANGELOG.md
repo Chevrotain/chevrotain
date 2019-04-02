@@ -1,3 +1,10 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+-   [Failure Lexing RegExp patterns starting with empty or "fully optional" groups.](https://github.com/SAP/chevrotain/pull/934).
+    -   Thanks to [@jmrog](https://github.com/jmrog) :thumbsup
+
 ## 4.3.1 (3-18-2019)
 
 #### Bug Fixes
@@ -397,7 +404,7 @@ Lexer Performance oriented release.
 
 -   [Certain RegExp meta characters won't be handled correctly in small RegExps.](https://github.com/SAP/chevrotain/issues/433)
 
-## 0.27.0 (3-27-2017)
+## 0.27.0 (3-27-]62017)
 
 #### Major Changes
 
