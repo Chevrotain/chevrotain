@@ -27,7 +27,7 @@ There are two major differences.
 
 How to enable CST output?
 
-This feature is controlled by the **outputCst** flag of the parser [configuration object](https://sap.github.io/chevrotain/documentation/4_3_1/interfaces/iparserconfig.html).
+This feature is controlled by the **outputCst** flag of the parser [configuration object](https://sap.github.io/chevrotain/documentation/4_3_2/interfaces/iparserconfig.html).
 
 -   Since 4.0 CST output is **enabled by default**.
 

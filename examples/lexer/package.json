@@ -1,11 +1,11 @@
 {
     "name": "chevrotain_examples_lexer",
-    "version": "4.3.1",
+    "version": "4.3.2",
     "scripts": {
         "test": "mocha \"!(node_modules)/**/*spec.js\""
     },
     "dependencies": {
-        "chevrotain": "^4.3.1",
+        "chevrotain": "^4.3.2",
         "lodash": "~4.17.10"
     },
     "devDependencies": {

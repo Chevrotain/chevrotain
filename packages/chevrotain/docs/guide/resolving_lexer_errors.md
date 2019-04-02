@@ -343,14 +343,14 @@ const myLexer = new chevrotain.Lexer([], {
 })
 ```
 
-[position_tracking]: https://sap.github.io/chevrotain/documentation/4_3_1/interfaces/ilexerconfig.html#positiontracking
-[line_terminator_docs]: https://sap.github.io/chevrotain/documentation/4_3_1/interfaces/ilexerconfig.html#lineTerminatorsPattern
-[start_chars_hint]: https://sap.github.io/chevrotain/documentation/4_3_1/interfaces/itokenconfig.html#start_chars_hint
+[position_tracking]: https://sap.github.io/chevrotain/documentation/4_3_2/interfaces/ilexerconfig.html#positiontracking
+[line_terminator_docs]: https://sap.github.io/chevrotain/documentation/4_3_2/interfaces/ilexerconfig.html#lineTerminatorsPattern
+[start_chars_hint]: https://sap.github.io/chevrotain/documentation/4_3_2/interfaces/itokenconfig.html#start_chars_hint
 [keywords_idents]: https://github.com/SAP/Chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js
 [mdn_char_code]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/charCodeAt
 [fill_16_bits]: https://jsperf.com/fill-16-bits
 [regexp_to_ast]: https://github.com/bd82/regexp-to-ast
 [unicode_mdn]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/unicode
 [custom_token_patterns]: https://sap.github.io/chevrotain/docs/guide/custom_token_patterns.html
-[line_terminator_pattern]: https://sap.github.io/chevrotain/documentation/4_3_1/interfaces/ilexerconfig.html#lineterminatorspattern
-[line_terminator_characters]: https://sap.github.io/chevrotain/documentation/4_3_1/interfaces/ilexerconfig.html#lineTerminatorCharacters
+[line_terminator_pattern]: https://sap.github.io/chevrotain/documentation/4_3_2/interfaces/ilexerconfig.html#lineterminatorspattern
+[line_terminator_characters]: https://sap.github.io/chevrotain/documentation/4_3_2/interfaces/ilexerconfig.html#lineTerminatorCharacters
