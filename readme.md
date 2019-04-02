@@ -1,7 +1,6 @@
 [![Join the chat at https://gitter.im/chevrotain-parser/Lobby](https://badges.gitter.im/chevrotain-parser/Lobby.svg)](https://gitter.im/chevrotain-parser/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![npm](https://img.shields.io/npm/v/chevrotain.svg)](https://www.npmjs.com/package/chevrotain)
 [![CircleCI](https://circleci.com/gh/SAP/chevrotain.svg?style=svg)](https://circleci.com/gh/SAP/chevrotain)
-[![Dependency status](https://img.shields.io/david/SAP/chevrotain.svg)](https://david-dm.org/SAP/chevrotain)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![Greenkeeper badge](https://badges.greenkeeper.io/SAP/chevrotain.svg)](https://greenkeeper.io/)
 
