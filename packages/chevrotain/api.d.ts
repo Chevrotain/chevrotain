@@ -1624,6 +1624,14 @@ export interface CstNode {
      * the fullName will **also** include the name of the top level rule containing this nested rule.
      */
     readonly fullName?: string
+    readonly location: {
+        startOffset: number
+        startLine?: number
+        startColumn?: number
+        endOffset?: number
+        endLine?: number
+        endColumn?: number
+    }
 }
 
 export declare type CstChildrenDictionary = {

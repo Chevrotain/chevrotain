@@ -55,7 +55,10 @@ export class TreeBuilder {
                 this.shortRuleNameToFull.get(
                     this.getLastExplicitRuleShortName()
                 ) + nestedName,
-            children: {}
+            children: {},
+            location: {
+                startOffset: Number.MAX_VALUE
+            }
         })
     }
 
@@ -67,7 +70,10 @@ export class TreeBuilder {
         this.LAST_EXPLICIT_RULE_STACK.push(this.RULE_STACK.length - 1)
         this.CST_STACK.push({
             name: fullRuleName,
-            children: {}
+            children: {},
+            location: {
+                startOffset: Number.MAX_VALUE
+            }
         })
     }
 
