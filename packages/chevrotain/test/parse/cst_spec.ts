@@ -461,6 +461,70 @@ context("CST", () => {
         expect(tokenStructuredMatcher(cst.children.C[0], C)).to.be.true
     })
 
+    it("Can output a CST with node location information", () => {
+        class CstTerminalParser extends Parser {
+            constructor(input: IToken[] = []) {
+                super(ALL_TOKENS)
+                this.input = input
+
+                this.performSelfAnalysis()
+            }
+
+            public testRule = this.RULE("testRule", () => {
+                this.SUBRULE(this.first)
+                this.CONSUME(B)
+                this.CONSUME(C)
+                this.SUBRULE(this.second)
+            })
+
+            public first = this.RULE("first", () => {
+                this.CONSUME(A)
+            })
+
+            public second = this.RULE("second", () => {
+                this.CONSUME(D)
+            })
+        }
+
+        let input = [
+            createRegularToken(A, "", 1, 1, 1, 2, 1, 2),
+            createRegularToken(B, "", 12, 1, 3, 13, 1, 4),
+            createRegularToken(C, "", 15, 2, 10, 16, 3, 15),
+            createRegularToken(D, "", 17, 5, 2, 18, 5, 4)
+        ]
+        let parser = new CstTerminalParser(input)
+        let cst = parser.testRule()
+        expect(cst.name).to.equal("testRule")
+        expect(cst.children).to.have.keys("B", "C", "first", "second")
+        expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
+        expect(tokenStructuredMatcher(cst.children.C[0], C)).to.be.true
+        expect(cst.children.first[0].name).to.equal("first")
+        expect(cst.children.second[0].name).to.equal("second")
+        expect(tokenStructuredMatcher(cst.children.first[0].children.A[0], A))
+            .to.be.true
+
+        expect(cst.children.first[0].location.startOffset).to.equal(1)
+        expect(cst.children.first[0].location.startLine).to.equal(1)
+        expect(cst.children.first[0].location.startColumn).to.equal(1)
+        expect(cst.children.first[0].location.endOffset).to.equal(2)
+        expect(cst.children.first[0].location.endLine).to.equal(1)
+        expect(cst.children.first[0].location.endColumn).to.equal(2)
+
+        expect(cst.children.second[0].location.startOffset).to.equal(17)
+        expect(cst.children.second[0].location.startLine).to.equal(5)
+        expect(cst.children.second[0].location.startColumn).to.equal(2)
+        expect(cst.children.second[0].location.endOffset).to.equal(18)
+        expect(cst.children.second[0].location.endLine).to.equal(5)
+        expect(cst.children.second[0].location.endColumn).to.equal(4)
+
+        expect(cst.location.startOffset).to.equal(1)
+        expect(cst.location.startLine).to.equal(1)
+        expect(cst.location.startColumn).to.equal(1)
+        expect(cst.location.endOffset).to.equal(18)
+        expect(cst.location.endLine).to.equal(5)
+        expect(cst.location.endColumn).to.equal(15)
+    })
+
     context("nested rules", () => {
         context("Can output cst when using OPTION", () => {
             class CstOptionalNestedTerminalParser extends Parser {
