@@ -5,6 +5,7 @@ import {
     has,
     isEmpty,
     map,
+    toFastProperties,
     values
 } from "../../utils/utils"
 import { computeAllProdsFollows } from "../grammar/follow"
@@ -234,6 +235,9 @@ export class Parser {
         this.ignoredIssues = has(config, "ignoredIssues")
             ? config.ignoredIssues
             : DEFAULT_PARSER_CONFIG.ignoredIssues
+
+        // Avoid performance regressions in newer versions of V8
+        toFastProperties(this)
     }
 }
 

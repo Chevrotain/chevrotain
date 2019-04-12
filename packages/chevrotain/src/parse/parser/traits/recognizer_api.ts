@@ -622,7 +622,7 @@ export class RecognizerApi {
         }
 
         let ruleImplementation = this.defineRule(name, implementation, config)
-        this.constructor.prototype[name] = ruleImplementation
+        this[name] = ruleImplementation
         return ruleImplementation
     }
 
@@ -653,7 +653,7 @@ export class RecognizerApi {
         }
 
         let ruleImplementation = this.defineRule(name, impl, config)
-        this.constructor.prototype[name] = ruleImplementation
+        this[name] = ruleImplementation
         return ruleImplementation
     }
 
