@@ -475,6 +475,7 @@ export function toFastProperties(toBecomeFast) {
 
     return toBecomeFast
     // Eval prevents optimization of this method (even though this is dead code)
+    /* istanbul ignore next */
     // tslint:disable-next-line
     eval(toBecomeFast)
 }
