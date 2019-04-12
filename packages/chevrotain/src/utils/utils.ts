@@ -475,5 +475,6 @@ export function toFastProperties(toBecomeFast) {
 
     return toBecomeFast
     // Eval prevents optimization of this method (even though this is dead code)
+    // tslint:disable-next-line
     eval(toBecomeFast)
 }
