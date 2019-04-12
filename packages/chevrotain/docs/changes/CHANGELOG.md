@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+-   [Performance regressions in Chrome Beta (74)](https://github.com/SAP/chevrotain/issues/942)
+
 ## 4.3.2 (4-2-2019)
 
 #### Bug Fixes
