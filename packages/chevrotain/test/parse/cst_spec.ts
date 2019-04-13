@@ -20,6 +20,40 @@ context("CST", () => {
 
     const ALL_TOKENS = [A, B, C, D, E]
 
+    it("Can output a CST with orderedChildren", () => {
+        class CstTerminalParser extends Parser {
+            constructor(input: IToken[] = []) {
+                super(ALL_TOKENS, { cstOrderedChildren: true })
+                this.input = input
+
+                this.performSelfAnalysis()
+            }
+
+            public testRule = this.RULE("testRule", () => {
+                this.CONSUME(A)
+                this.CONSUME(B)
+                this.SUBRULE(this.bamba)
+            })
+
+            public bamba = this.RULE("bamba", () => {
+                this.CONSUME(C)
+            })
+        }
+
+        let input = [
+            createRegularToken(A),
+            createRegularToken(B),
+            createRegularToken(C)
+        ]
+        let parser = new CstTerminalParser(input)
+        let cst = parser.testRule()
+        expect(cst.name).to.equal("testRule")
+        expect(cst.orderedChildren).to.have.lengthOf(3)
+        expect(cst.orderedChildren[0].tokenType).to.equal(A)
+        expect(cst.orderedChildren[1].tokenType).to.equal(B)
+        expect(cst.orderedChildren[2].name).to.equal("bamba")
+    })
+
     it("Can output a CST for a flat structure", () => {
         class CstTerminalParser extends Parser {
             constructor(input: IToken[] = []) {

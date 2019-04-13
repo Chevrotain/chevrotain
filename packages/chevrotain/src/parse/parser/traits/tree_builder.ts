@@ -26,7 +26,7 @@ export class TreeBuilder {
             ? config.outputCst
             : DEFAULT_PARSER_CONFIG.outputCst
 
-        this.cstOrderedChildren = has(config, "outputCst")
+        this.cstOrderedChildren = has(config, "cstOrderedChildren")
             ? config.cstOrderedChildren
             : DEFAULT_PARSER_CONFIG.cstOrderedChildren
 
@@ -277,6 +277,10 @@ export class TreeBuilder {
             rootCst.children[ruleName] = [ruleResult]
         } else {
             rootCst.children[ruleName].push(ruleResult)
+        }
+
+        if (this.cstOrderedChildren === true) {
+            rootCst.orderedChildren.push(ruleResult)
         }
     }
 }
