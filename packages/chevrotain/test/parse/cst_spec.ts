@@ -31,7 +31,12 @@ context("CST", () => {
 
             public testRule = this.RULE("testRule", () => {
                 this.CONSUME(A)
-                this.CONSUME(B)
+                this.OPTION({
+                    NAME: "$nestedOption",
+                    DEF: () => {
+                        this.CONSUME(B)
+                    }
+                })
                 this.SUBRULE(this.bamba)
             })
 
@@ -50,7 +55,7 @@ context("CST", () => {
         expect(cst.name).to.equal("testRule")
         expect(cst.orderedChildren).to.have.lengthOf(3)
         expect(cst.orderedChildren[0].tokenType).to.equal(A)
-        expect(cst.orderedChildren[1].tokenType).to.equal(B)
+        expect(cst.orderedChildren[1].name).to.equal("$nestedOption")
         expect(cst.orderedChildren[2].name).to.equal("bamba")
     })
 
