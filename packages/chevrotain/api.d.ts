@@ -1618,6 +1618,11 @@ export interface ICstVisitor<IN, OUT> {
 export interface CstNode {
     readonly name: string
     readonly children: CstChildrenDictionary
+    /**
+     * An ordered list of the CST children.
+     * This is an optional feature that needs to be enabled by the "cstOrderedChildren" flag on the IParserConfig object.
+     */
+    readonly orderedChildren?: (CstNode | IToken)[]
     readonly recoveredNode?: boolean
     /**
      * Only relevant for [in-lined](http://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html#in-lined-rules) rules.
@@ -1673,6 +1678,9 @@ export interface IParserConfig {
      * For in-depth docs on [Concrete Syntax Trees](http://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html):
      */
     outputCst?: boolean
+
+    cstOrderedChildren?: boolean
+
     /**
      * A custom error message provider.
      * Can be used to override the default error messages.

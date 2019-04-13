@@ -64,6 +64,7 @@ export const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
     ignoredIssues: <any>{},
     dynamicTokensEnabled: false,
     outputCst: true,
+    cstOrderedChildren: false,
     errorMessageProvider: defaultParserErrorProvider,
     serializedGrammar: null
 })

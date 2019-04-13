@@ -29,30 +29,6 @@ import {
     IToken
 } from "../../../api"
 
-export function addTerminalToCst(
-    node: CstNode,
-    token: IToken,
-    tokenTypeName: string
-): void {
-    if (node.children[tokenTypeName] === undefined) {
-        node.children[tokenTypeName] = [token]
-    } else {
-        node.children[tokenTypeName].push(token)
-    }
-}
-
-export function addNoneTerminalToCst(
-    node: CstNode,
-    ruleName: string,
-    ruleResult: any
-): void {
-    if (node.children[ruleName] === undefined) {
-        node.children[ruleName] = [ruleResult]
-    } else {
-        node.children[ruleName].push(ruleResult)
-    }
-}
-
 export interface DefAndKeyAndName {
     def: IProduction[]
     key: number

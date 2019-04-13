@@ -1,4 +1,3 @@
-import { addNoneTerminalToCst, addTerminalToCst } from "../../cst/cst"
 import { has, isUndefined, NOOP } from "../../../utils/utils"
 import {
     createBaseSemanticVisitorConstructor,
@@ -14,6 +13,7 @@ import { DEFAULT_PARSER_CONFIG } from "../parser"
  */
 export class TreeBuilder {
     outputCst: boolean
+    cstOrderedChildren: boolean
     CST_STACK: CstNode[]
     baseCstVisitorConstructor: Function
     baseCstVisitorWithDefaultsConstructor: Function
@@ -25,6 +25,10 @@ export class TreeBuilder {
         this.outputCst = has(config, "outputCst")
             ? config.outputCst
             : DEFAULT_PARSER_CONFIG.outputCst
+
+        this.cstOrderedChildren = has(config, "outputCst")
+            ? config.cstOrderedChildren
+            : DEFAULT_PARSER_CONFIG.cstOrderedChildren
 
         if (!this.outputCst) {
             this.cstInvocationStateUpdate = NOOP
@@ -49,14 +53,20 @@ export class TreeBuilder {
         nestedName: string,
         shortName: string | number
     ): void {
-        this.CST_STACK.push({
+        const newCstNode: any = {
             name: nestedName,
             fullName:
                 this.shortRuleNameToFull.get(
                     this.getLastExplicitRuleShortName()
                 ) + nestedName,
             children: {}
-        })
+        }
+
+        if (this.cstOrderedChildren === true) {
+            newCstNode.orderedChildren = []
+        }
+
+        this.CST_STACK.push(newCstNode)
     }
 
     cstInvocationStateUpdate(
@@ -65,10 +75,17 @@ export class TreeBuilder {
         shortName: string | number
     ): void {
         this.LAST_EXPLICIT_RULE_STACK.push(this.RULE_STACK.length - 1)
-        this.CST_STACK.push({
+
+        const newCstNode: any = {
             name: fullRuleName,
             children: {}
-        })
+        }
+
+        if (this.cstOrderedChildren === true) {
+            newCstNode.orderedChildren = []
+        }
+
+        this.CST_STACK.push(newCstNode)
     }
 
     cstFinallyStateUpdate(this: MixedInParser): void {
@@ -86,8 +103,7 @@ export class TreeBuilder {
         consumedToken: IToken
     ): void {
         // TODO: would save the "current rootCST be faster than locating it for each terminal?
-        let rootCst = this.CST_STACK[this.CST_STACK.length - 1]
-        addTerminalToCst(rootCst, consumedToken, key)
+        this.addTerminalToCst(consumedToken, key)
     }
 
     cstPostNonTerminal(
@@ -95,11 +111,7 @@ export class TreeBuilder {
         ruleCstResult: CstNode,
         ruleName: string
     ): void {
-        addNoneTerminalToCst(
-            this.CST_STACK[this.CST_STACK.length - 1],
-            ruleName,
-            ruleCstResult
-        )
+        this.addNoneTerminalToCst(ruleName, ruleCstResult)
     }
 
     getBaseCstVisitorConstructor(
@@ -188,8 +200,7 @@ export class TreeBuilder {
         let nestedRuleCst = cstStack[cstStack.length - 1]
         this.nestedRuleFinallyStateUpdate()
         // this return a different result than the previous invocation because "nestedRuleFinallyStateUpdate" pops the cst stack
-        let parentCstNode = cstStack[cstStack.length - 1]
-        addNoneTerminalToCst(parentCstNode, nestedName, nestedRuleCst)
+        this.addNoneTerminalToCst(nestedName, nestedRuleCst)
     }
 
     getLastExplicitRuleShortName(this: MixedInParser): string {
@@ -244,5 +255,28 @@ export class TreeBuilder {
 
         // NOOP when cst is disabled
         this.cstNestedFinallyStateUpdate()
+    }
+
+    addTerminalToCst(token: IToken, tokenTypeName: string): void {
+        let rootCst = this.CST_STACK[this.CST_STACK.length - 1]
+
+        if (rootCst.children[tokenTypeName] === undefined) {
+            rootCst.children[tokenTypeName] = [token]
+        } else {
+            rootCst.children[tokenTypeName].push(token)
+        }
+
+        if (this.cstOrderedChildren === true) {
+            rootCst.orderedChildren.push(token)
+        }
+    }
+
+    addNoneTerminalToCst(ruleName: string, ruleResult: any): void {
+        let rootCst = this.CST_STACK[this.CST_STACK.length - 1]
+        if (rootCst.children[ruleName] === undefined) {
+            rootCst.children[ruleName] = [ruleResult]
+        } else {
+            rootCst.children[ruleName].push(ruleResult)
+        }
     }
 }
