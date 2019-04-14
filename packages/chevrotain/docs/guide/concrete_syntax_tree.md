@@ -29,7 +29,7 @@ How to enable CST output?
 
 This feature is controlled by the **outputCst** flag of the parser [configuration object](https://sap.github.io/chevrotain/documentation/4_3_3/interfaces/iparserconfig.html).
 
--   Since 4.0 CST output is **enabled by default**.
+-   Since version 4.0 CST output is **enabled by default**.
 
 ## Structure
 
@@ -48,6 +48,12 @@ export interface CstNode {
     readonly name:string
 
     readonly children:CstChildrenDictionary
+
+    /**
+     * An ordered list of the CST children.
+     * This is an **optional** feature that needs to be enabled by the "cstOrderedChildren" flag on the IParserConfig object.
+     */
+    readonly orderedChildren?: (CstNode | IToken)[]
 
     readonly recoveredNode?:boolean
 }
@@ -292,6 +298,15 @@ Syntax Limitation:
         })
     })
     ```
+
+## Ordered Array of Children
+
+Sometimes an ordered array of the CstNode's children is needed, for example for
+a rule made up of an alternation of different types of statements we may need to handle the statements in the same order
+in which they appeared in the text.
+
+This feature is enabled by the **cstOrderedChildren** flag of the parser [configuration object](https://sap.github.io/chevrotain/documentation/4_3_3/interfaces/iparserconfig.html#cstorderedchildren).
+which would expose the `orderedChildren` property on the [CstNodes](https://sap.github.io/chevrotain/documentation/4_3_3/interfaces/cstnode.html).
 
 ## Fault Tolerance
 
