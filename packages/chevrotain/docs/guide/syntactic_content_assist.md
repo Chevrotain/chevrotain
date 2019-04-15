@@ -2,7 +2,10 @@
 
 ### TLDR
 
-See: [**Runnable example**](https://github.com/SAP/chevrotain/blob/master/examples/parser/content_assist/official_feature_content_assist.js) for quick starting.
+for quick starting, see:
+
+-   [**Runnable example - simple**](https://github.com/SAP/chevrotain/blob/master/examples/parser/content_assist/content_assist_simple.js)
+-   [**Runnable example - complex**](https://github.com/SAP/chevrotain/blob/master/examples/parser/content_assist/content_assist_complex.js)
 
 ## Introduction
 
@@ -14,6 +17,28 @@ It could be used as a building block in a semantic suggestions provider, but it 
 
 Also note that this feature is implemented as a **separate** interpreted backtracking parser,
 completely unrelated to the normal parsing flow except for using the same internal grammar representation.
+
+## Basic Flow
+
+The `computeContentAssist` method is called on a Parser instance and given as inputs the starting rule's name
+and a partial token vector, the output of this method would be the (first) possible Token Types that can appear after the
+partial token vector.
+
+See the simple [**Runnable example**](https://github.com/SAP/chevrotain/blob/master/examples/parser/content_assist/content_assist_simple.js)
+to understand this flow.
+
+## Advance Flow
+
+A real world scenario would be far more complex than the simple scenario shown above, For example:
+
+-   A Partial Identifier may lead to suggestions being offered from a table of symbols.
+-   For some types of tokens suggestions may not be offered (e.g Commas).
+-   Filtering on the suggested Identifier names may have to take into account the current semantic scope.
+
+These concerns are not part of the Chevrotain library, Chevrotain only deals with **syntactic** context assist
+and it is the responsibility of the end users to handle the **semantic** content assistance logic of their specific languages.
+However, a more complex [**Runnable example**](https://github.com/SAP/chevrotain/blob/master/examples/parser/content_assist/content_assist_complex.js)
+is provided to demonstrate some of these possible "advance" flows mentioned above.
 
 ## Limitations
 
