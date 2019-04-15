@@ -28,11 +28,9 @@ const createToken = chevrotain.createToken
 const From = createToken({ name: "From", pattern: /FROM/ })
 ```
 
-There is nothing much to it. The pattern property is a RegExp which will be used when splitting up the input string
+There is nothing much to it. We simply use the [**createToken** API](https://sap.github.io/chevrotain/documentation/4_3_3/globals.html#createtoken)
+to define the tokens, and provide it with a `name` property and a `pattern` property which is a RegExp which will be used when splitting up the input string
 into separate Tokens.
-
-We will use the [**createToken** API](https://sap.github.io/chevrotain/documentation/4_3_3/globals.html#createtoken)
-in the rest of tutorial because ES2015 has no support for static fields.
 
 ## More complex Tokens
 
