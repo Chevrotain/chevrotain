@@ -382,7 +382,8 @@ describe("The GAst Builder namespace", () => {
                 text: "this.CONSUME2(IdentTok)",
                 type: ProdType.TERMINAL
             },
-            []
+            [],
+            "someName"
         )
         expect(actual).to.be.an.instanceof(Terminal)
         expect((<Terminal>actual).idx).to.equal(2)
@@ -398,11 +399,12 @@ describe("The GAst Builder namespace", () => {
                     text: "this.CONSUME2(IdentTok)",
                     type: ProdType.TERMINAL
                 },
-                []
+                [],
+                "someName"
             )
 
         expect(buildMissingTerminal).to.throw(
-            "Terminal Token name: " + "IdentTok" + " not found"
+            "Terminal Token name: <IdentTok> not found in rule: <someName>"
         )
     })
 
@@ -413,7 +415,8 @@ describe("The GAst Builder namespace", () => {
                 text: "this.SUBRULE(this.bamba(1))",
                 type: ProdType.REF
             },
-            []
+            [],
+            "someName"
         )
         expect(actual).to.be.an.instanceof(NonTerminal)
         expect((<NonTerminal>actual).idx).to.equal(0)
@@ -427,7 +430,8 @@ describe("The GAst Builder namespace", () => {
                 text: "this.OR(...)",
                 type: ProdType.OR
             },
-            []
+            [],
+            "someName"
         )
         expect(actual).to.be.an.instanceof(Alternation)
         expect((<Alternation>actual).definition.length).to.equal(0)
@@ -440,7 +444,8 @@ describe("The GAst Builder namespace", () => {
                 text: "this.MANY(...)",
                 type: ProdType.MANY
             },
-            []
+            [],
+            "someName"
         )
         expect(actual).to.be.an.instanceof(Repetition)
         expect((<Repetition>actual).definition.length).to.equal(0)
@@ -454,7 +459,8 @@ describe("The GAst Builder namespace", () => {
                 text: "this.MANY_SEP({SEP:toString...)",
                 type: ProdType.MANY_SEP
             },
-            []
+            [],
+            "someName"
         )
         expect(actual).to.be.an.instanceof(RepetitionWithSeparator)
         expect((<Repetition>actual).definition.length).to.equal(0)
@@ -468,7 +474,8 @@ describe("The GAst Builder namespace", () => {
                     text: "this.MANY_SEP({SEP: MISSING...)",
                     type: ProdType.MANY_SEP
                 },
-                []
+                [],
+                "someName"
             )
         ).to.throw("Separator Terminal Token name: MISSING not found")
     })
@@ -480,7 +487,8 @@ describe("The GAst Builder namespace", () => {
                 text: "this.AT_LEAST_ONE(...)",
                 type: ProdType.AT_LEAST_ONE
             },
-            []
+            [],
+            "someName"
         )
         expect(actual).to.be.an.instanceof(RepetitionMandatory)
         expect((<RepetitionMandatory>actual).definition.length).to.equal(0)
@@ -493,7 +501,8 @@ describe("The GAst Builder namespace", () => {
                 text: "this.OPTION(...)",
                 type: ProdType.OPTION
             },
-            []
+            [],
+            "someName"
         )
         expect(actual).to.be.an.instanceof(Option)
         expect((<Option>actual).definition.length).to.equal(0)
@@ -506,7 +515,8 @@ describe("The GAst Builder namespace", () => {
                 text: "this.OR(...)",
                 type: ProdType.OR
             },
-            []
+            [],
+            "someName"
         )
         expect(actual).to.be.an.instanceof(Alternation)
         expect((<Alternation>actual).definition.length).to.equal(0)

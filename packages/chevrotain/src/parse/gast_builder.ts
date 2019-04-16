@@ -149,32 +149,33 @@ function buildTopLevel(
         definition: [],
         orgText: orgText
     })
-    return buildAbstractProd(topLevelProd, topRange, allRanges)
+    return buildAbstractProd(topLevelProd, topRange, allRanges, name)
 }
 
 export function buildProdGast(
     prodRange: IProdRange,
-    allRanges: IProdRange[]
+    allRanges: IProdRange[],
+    ruleName: string
 ): IProduction {
     switch (prodRange.type) {
         case ProdType.AT_LEAST_ONE:
-            return buildAtLeastOneProd(prodRange, allRanges)
+            return buildAtLeastOneProd(prodRange, allRanges, ruleName)
         case ProdType.AT_LEAST_ONE_SEP:
-            return buildAtLeastOneSepProd(prodRange, allRanges)
+            return buildAtLeastOneSepProd(prodRange, allRanges, ruleName)
         case ProdType.MANY_SEP:
-            return buildManySepProd(prodRange, allRanges)
+            return buildManySepProd(prodRange, allRanges, ruleName)
         case ProdType.MANY:
-            return buildManyProd(prodRange, allRanges)
+            return buildManyProd(prodRange, allRanges, ruleName)
         case ProdType.OPTION:
-            return buildOptionProd(prodRange, allRanges)
+            return buildOptionProd(prodRange, allRanges, ruleName)
         case ProdType.OR:
-            return buildOrProd(prodRange, allRanges)
+            return buildOrProd(prodRange, allRanges, ruleName)
         case ProdType.FLAT:
-            return buildFlatProd(prodRange, allRanges)
+            return buildFlatProd(prodRange, allRanges, ruleName)
         case ProdType.REF:
             return buildRefProd(prodRange)
         case ProdType.TERMINAL:
-            return buildTerminalProd(prodRange)
+            return buildTerminalProd(prodRange, ruleName)
         /* istanbul ignore next */
         default:
             throw Error("non exhaustive match")
@@ -193,7 +194,7 @@ function buildRefProd(prodRange: IProdRange): NonTerminal {
     return newRef
 }
 
-function buildTerminalProd(prodRange: IProdRange): Terminal {
+function buildTerminalProd(prodRange: IProdRange, ruleName: string): Terminal {
     let reResult = terminalRegEx.exec(prodRange.text)
     let isImplicitOccurrenceIdx = reResult[1] === undefined
     let terminalOccurrence = isImplicitOccurrenceIdx
@@ -203,9 +204,7 @@ function buildTerminalProd(prodRange: IProdRange): Terminal {
     let terminalType = terminalNameToConstructor[terminalName]
     if (!terminalType) {
         throw Error(
-            "Terminal Token name: " +
-                terminalName +
-                " not found\n" +
+            `Terminal Token name: <${terminalName}> not found in rule: <${ruleName}>  \n` +
                 "\tSee: https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#TERMINAL_NAME_NOT_FOUND\n" +
                 "\tFor Further details."
         )
@@ -227,7 +226,8 @@ function buildProdWithOccurrence<T extends AbsProdWithOccurrence>(
     regEx: RegExp,
     prodInstance: T,
     prodRange: IProdRange,
-    allRanges: IProdRange[]
+    allRanges: IProdRange[],
+    ruleName: string
 ): T {
     let reResult = regEx.exec(prodRange.text)
     let isImplicitOccurrenceIdx = reResult[1] === undefined
@@ -237,54 +237,62 @@ function buildProdWithOccurrence<T extends AbsProdWithOccurrence>(
     if (!isUndefined(nestedName)) {
         ;(prodInstance as IOptionallyNamedProduction).name = nestedName
     }
-    return buildAbstractProd(prodInstance, prodRange.range, allRanges)
+    return buildAbstractProd(prodInstance, prodRange.range, allRanges, ruleName)
 }
 
 function buildAtLeastOneProd(
     prodRange: IProdRange,
-    allRanges: IProdRange[]
+    allRanges: IProdRange[],
+    ruleName: string
 ): RepetitionMandatory {
     return buildProdWithOccurrence(
         atLeastOneRegEx,
         new RepetitionMandatory({ definition: [] }),
         prodRange,
-        allRanges
+        allRanges,
+        ruleName
     )
 }
 
 function buildAtLeastOneSepProd(
     prodRange: IProdRange,
-    allRanges: IProdRange[]
+    allRanges: IProdRange[],
+    ruleName: string
 ): RepetitionWithSeparator {
     return buildRepetitionWithSep(
         prodRange,
         allRanges,
         RepetitionMandatoryWithSeparator,
-        atLeastOneWithSeparatorRegEx
+        atLeastOneWithSeparatorRegEx,
+        ruleName
     )
 }
 
 function buildManyProd(
     prodRange: IProdRange,
-    allRanges: IProdRange[]
+    allRanges: IProdRange[],
+    ruleName: string
 ): Repetition {
     return buildProdWithOccurrence(
         manyRegEx,
         new Repetition({ definition: [] }),
         prodRange,
-        allRanges
+        allRanges,
+        ruleName
     )
 }
 
 function buildManySepProd(
     prodRange: IProdRange,
-    allRanges: IProdRange[]
+    allRanges: IProdRange[],
+    ruleName: string
 ): RepetitionWithSeparator {
     return buildRepetitionWithSep(
         prodRange,
         allRanges,
         RepetitionWithSeparator,
-        manyWithSeparatorRegEx
+        manyWithSeparatorRegEx,
+        ruleName
     )
 }
 
@@ -292,7 +300,8 @@ function buildRepetitionWithSep(
     prodRange: IProdRange,
     allRanges: IProdRange[],
     repConstructor: Function,
-    regExp: RegExp
+    regExp: RegExp,
+    ruleName: string
 ): RepetitionWithSeparator {
     let reResult = regExp.exec(prodRange.text)
     let isImplicitOccurrenceIdx = reResult[1] === undefined
@@ -314,35 +323,48 @@ function buildRepetitionWithSep(
         ;(repetitionInstance as IOptionallyNamedProduction).name = nestedName
     }
     return <any>(
-        buildAbstractProd(repetitionInstance, prodRange.range, allRanges)
+        buildAbstractProd(
+            repetitionInstance,
+            prodRange.range,
+            allRanges,
+            ruleName
+        )
     )
 }
 
 function buildOptionProd(
     prodRange: IProdRange,
-    allRanges: IProdRange[]
+    allRanges: IProdRange[],
+    ruleName: string
 ): Option {
     return buildProdWithOccurrence(
         optionRegEx,
         new Option({ definition: [] }),
         prodRange,
-        allRanges
+        allRanges,
+        ruleName
     )
 }
 
 function buildOrProd(
     prodRange: IProdRange,
-    allRanges: IProdRange[]
+    allRanges: IProdRange[],
+    ruleName: string
 ): Alternation {
     return buildProdWithOccurrence(
         orRegEx,
         new Alternation({ definition: [] }),
         prodRange,
-        allRanges
+        allRanges,
+        ruleName
     )
 }
 
-function buildFlatProd(prodRange: IProdRange, allRanges: IProdRange[]): Flat {
+function buildFlatProd(
+    prodRange: IProdRange,
+    allRanges: IProdRange[],
+    ruleName: string
+): Flat {
     let prodInstance = new Flat({ definition: [] })
     let reResult = orPartRegEx.exec(prodRange.text)
 
@@ -350,13 +372,14 @@ function buildFlatProd(prodRange: IProdRange, allRanges: IProdRange[]): Flat {
     if (!isUndefined(nestedName)) {
         ;(prodInstance as IOptionallyNamedProduction).name = nestedName
     }
-    return buildAbstractProd(prodInstance, prodRange.range, allRanges)
+    return buildAbstractProd(prodInstance, prodRange.range, allRanges, ruleName)
 }
 
 function buildAbstractProd<T extends AbstractProduction>(
     prod: T,
     topLevelRange: IRange,
-    allRanges: IProdRange[]
+    allRanges: IProdRange[],
+    ruleName: string
 ): T {
     let secondLevelProds = getDirectlyContainedRanges(topLevelRange, allRanges)
     let secondLevelInOrder = sortBy(secondLevelProds, prodRng => {
@@ -365,7 +388,7 @@ function buildAbstractProd<T extends AbstractProduction>(
 
     let definition: IProduction[] = []
     forEach(secondLevelInOrder, prodRng => {
-        definition.push(buildProdGast(prodRng, allRanges))
+        definition.push(buildProdGast(prodRng, allRanges, ruleName))
     })
 
     prod.definition = definition
