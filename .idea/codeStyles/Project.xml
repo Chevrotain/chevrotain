@@ -2,7 +2,7 @@
   <code_scheme name="Project" version="173">
     <option name="RIGHT_MARGIN" value="140" />
     <option name="FORMATTER_TAGS_ENABLED" value="true" />
-    <JSCodeStyleSettings>
+    <JSCodeStyleSettings version="0">
       <option name="USE_SEMICOLON_AFTER_STATEMENT" value="false" />
       <option name="FORCE_SEMICOLON_STYLE" value="true" />
       <option name="ALIGN_OBJECT_PROPERTIES" value="1" />
@@ -12,7 +12,7 @@
       <option name="SPACES_WITHIN_OBJECT_LITERAL_BRACES" value="true" />
       <option name="SPACES_WITHIN_IMPORTS" value="true" />
     </JSCodeStyleSettings>
-    <TypeScriptCodeStyleSettings>
+    <TypeScriptCodeStyleSettings version="0">
       <option name="USE_SEMICOLON_AFTER_STATEMENT" value="false" />
       <option name="FORCE_SEMICOLON_STYLE" value="true" />
       <option name="SPACE_AFTER_TYPE_COLON" value="false" />

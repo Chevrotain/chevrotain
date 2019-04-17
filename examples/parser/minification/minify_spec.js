@@ -5,7 +5,7 @@ describe("Chevrotain minification support", () => {
     it("Cannot be minified without custom compression options", () => {
         expect(() => {
             require("./gen/no_compression.min").parseJson("")
-        }).to.throw(/Terminal Token name: \w+ not found/)
+        }).to.throw(/Terminal Token name: <\w+> not found/)
     })
 
     it("Can be minified using selective name mangling", () => {
