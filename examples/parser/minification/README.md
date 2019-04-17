@@ -1,7 +1,8 @@
 ### Minificaion of Chevrotain Grammars
 
 Chevrotain relies on **Function.prototype.toString** and **Function.name**
-to run. This means that minification of Chevrotain grammars must be done carefully.
+to run. This means that minification of Chevrotain parsers must be done carefully, otherwise
+a minified parser may fail during initialization.
 
 A Chevrotain grammar **may or may not** be adversely affected by minification.
 It depends on the source structure and how [Uglifyjs](https://github.com/mishoo/UglifyJS2) recognizes the Token names (public/private),
@@ -11,7 +12,7 @@ There is **no guarantee** it will continue to do so in the future (after refacto
 The takeaway from this is that is is **highly recommended** to use a more **robust** minification configuration
 when minifing Chevrotain grammars.
 
-There are a couple ways to solve this using [Uglifyjs's](https://github.com/mishoo/UglifyJS2) configuration options:
+There are a several ways to solve this using [Uglifyjs's](https://github.com/mishoo/UglifyJS2) configuration options:
 
 #### Completely disable name mangling.
 
@@ -21,6 +22,11 @@ but will also increase the size of the minified file.
 #### Selectively avoid the mangling of the specific's grammar Token names.
 
 This is the **recommended** approach as it will allow the maximum minification.
+
+#### Use Grammar Serialization
+
+This would indirectly solve the problem by avoiding the reliance on text analysis during the initialization of the minified parser.
+See: [Grammar Serialization Example](../serialized_grammar) for more details.
 
 #### Runnable Example
 
