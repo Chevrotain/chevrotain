@@ -12,9 +12,9 @@ export function createRegularToken(
     startOffset = 1,
     startLine = 1,
     startColumn = 1,
-    endOffset = undefined,
-    endLine = 1,
-    endColumn = undefined
+    endOffset = Number.MAX_VALUE,
+    endLine = Number.MAX_VALUE,
+    endColumn = Number.MAX_VALUE
 ): IToken {
     return {
         image: image,
