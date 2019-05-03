@@ -931,6 +931,60 @@ context("CST", () => {
             expect(tokenStructuredMatcher(nestedCst.children.C[0], C)).to.be
                 .true
         })
+
+        it("Can output a CST with nested rules with node location information", () => {
+            class CstTerminalParser extends Parser {
+                constructor(input: IToken[] = []) {
+                    super(ALL_TOKENS)
+                    this.input = input
+
+                    this.performSelfAnalysis()
+                }
+
+                public testRule = this.RULE("testRule", () => {
+                    this.OPTION({
+                        NAME: "$nestedOption",
+                        DEF: () => {
+                            this.CONSUME(A)
+                        }
+                    })
+                    this.CONSUME(B)
+                })
+            }
+
+            let input = [
+                createRegularToken(A, "", 1, 1, 1, 2, 1, 2),
+                createRegularToken(B, "", 12, 1, 3, 13, 2, 4)
+            ]
+            let parser = new CstTerminalParser(input)
+            let cst = parser.testRule()
+            expect(cst.name).to.equal("testRule")
+            expect(cst.children).to.have.keys("$nestedOption", "B")
+            expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
+
+            let nestedCst = cst.children.$nestedOption[0]
+            expect(nestedCst.children.A).to.have.length(1)
+            expect(tokenStructuredMatcher(nestedCst.children.A[0], A)).to.be
+                .true
+
+            expect(nestedCst.location).to.deep.equal({
+                startOffset: 1,
+                startLine: 1,
+                startColumn: 1,
+                endOffset: 2,
+                endLine: 1,
+                endColumn: 2
+            })
+
+            expect(cst.location).to.deep.equal({
+                startOffset: 1,
+                startLine: 1,
+                startColumn: 1,
+                endOffset: 13,
+                endLine: 2,
+                endColumn: 4
+            })
+        })
     })
 
     context("Error Recovery", () => {
