@@ -503,26 +503,32 @@ context("CST", () => {
         expect(tokenStructuredMatcher(cst.children.first[0].children.A[0], A))
             .to.be.true
 
-        expect(cst.children.first[0].location.startOffset).to.equal(1)
-        expect(cst.children.first[0].location.startLine).to.equal(1)
-        expect(cst.children.first[0].location.startColumn).to.equal(1)
-        expect(cst.children.first[0].location.endOffset).to.equal(2)
-        expect(cst.children.first[0].location.endLine).to.equal(1)
-        expect(cst.children.first[0].location.endColumn).to.equal(2)
+        expect(cst.children.first[0].location).to.deep.equal({
+            startOffset: 1,
+            startLine: 1,
+            startColumn: 1,
+            endOffset: 2,
+            endLine: 1,
+            endColumn: 2
+        })
 
-        expect(cst.children.second[0].location.startOffset).to.equal(17)
-        expect(cst.children.second[0].location.startLine).to.equal(5)
-        expect(cst.children.second[0].location.startColumn).to.equal(2)
-        expect(cst.children.second[0].location.endOffset).to.equal(18)
-        expect(cst.children.second[0].location.endLine).to.equal(5)
-        expect(cst.children.second[0].location.endColumn).to.equal(4)
+        expect(cst.children.second[0].location).to.deep.equal({
+            startOffset: 17,
+            startLine: 5,
+            startColumn: 2,
+            endOffset: 18,
+            endLine: 5,
+            endColumn: 4
+        })
 
-        expect(cst.location.startOffset).to.equal(1)
-        expect(cst.location.startLine).to.equal(1)
-        expect(cst.location.startColumn).to.equal(1)
-        expect(cst.location.endOffset).to.equal(18)
-        expect(cst.location.endLine).to.equal(5)
-        expect(cst.location.endColumn).to.equal(15)
+        expect(cst.location).to.deep.equal({
+            startOffset: 1,
+            startLine: 1,
+            startColumn: 1,
+            endOffset: 18,
+            endLine: 5,
+            endColumn: 15
+        })
     })
 
     context("nested rules", () => {
