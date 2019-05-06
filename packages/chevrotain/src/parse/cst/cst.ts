@@ -58,58 +58,46 @@ export function addNoneTerminalToCst(
 }
 
 function setNodeLocation(node: CstNode, locationInformation: any) {
-    if (node.location.startOffset > locationInformation.startOffset) {
+    if (
+        isNaN(node.location.startOffset) ||
+        node.location.startOffset > locationInformation.startOffset
+    ) {
         node.location.startOffset = locationInformation.startOffset
     }
 
-    if (locationInformation.startLine) {
-        if (node.location.startLine) {
-            if (node.location.startLine > locationInformation.startLine) {
-                node.location.startLine = locationInformation.startLine
-            }
-        } else {
-            node.location.startLine = locationInformation.startLine
-        }
+    if (
+        isNaN(node.location.startLine) ||
+        node.location.startLine > locationInformation.startLine
+    ) {
+        node.location.startLine = locationInformation.startLine
     }
 
-    if (locationInformation.startColumn) {
-        if (node.location.startColumn) {
-            if (node.location.startColumn > locationInformation.startColumn) {
-                node.location.startColumn = locationInformation.startColumn
-            }
-        } else {
-            node.location.startColumn = locationInformation.startColumn
-        }
+    if (
+        isNaN(node.location.startColumn) ||
+        node.location.startColumn > locationInformation.startColumn
+    ) {
+        node.location.startColumn = locationInformation.startColumn
     }
 
-    if (locationInformation.endOffset) {
-        if (node.location.endOffset) {
-            if (node.location.endOffset < locationInformation.endOffset) {
-                node.location.endOffset = locationInformation.endOffset
-            }
-        } else {
-            node.location.endOffset = locationInformation.endOffset
-        }
+    if (
+        isNaN(node.location.endOffset) ||
+        node.location.endOffset < locationInformation.endOffset
+    ) {
+        node.location.endOffset = locationInformation.endOffset
     }
 
-    if (locationInformation.endLine) {
-        if (node.location.endLine) {
-            if (node.location.endLine < locationInformation.endLine) {
-                node.location.endLine = locationInformation.endLine
-            }
-        } else {
-            node.location.endLine = locationInformation.endLine
-        }
+    if (
+        isNaN(node.location.endLine) ||
+        node.location.endLine < locationInformation.endLine
+    ) {
+        node.location.endLine = locationInformation.endLine
     }
 
-    if (locationInformation.endColumn) {
-        if (node.location.endColumn) {
-            if (node.location.endColumn < locationInformation.endColumn) {
-                node.location.endColumn = locationInformation.endColumn
-            }
-        } else {
-            node.location.endColumn = locationInformation.endColumn
-        }
+    if (
+        isNaN(node.location.endColumn) ||
+        node.location.endColumn < locationInformation.endColumn
+    ) {
+        node.location.endColumn = locationInformation.endColumn
     }
 }
 

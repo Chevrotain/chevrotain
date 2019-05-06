@@ -57,7 +57,12 @@ export class TreeBuilder {
                 ) + nestedName,
             children: {},
             location: {
-                startOffset: Number.MAX_VALUE
+                startOffset: NaN,
+                startLine: NaN,
+                startColumn: NaN,
+                endOffset: NaN,
+                endLine: NaN,
+                endColumn: NaN
             }
         })
     }
@@ -72,7 +77,12 @@ export class TreeBuilder {
             name: fullRuleName,
             children: {},
             location: {
-                startOffset: Number.MAX_VALUE
+                startOffset: NaN,
+                startLine: NaN,
+                startColumn: NaN,
+                endOffset: NaN,
+                endLine: NaN,
+                endColumn: NaN
             }
         })
     }
