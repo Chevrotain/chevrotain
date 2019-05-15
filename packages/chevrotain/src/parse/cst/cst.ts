@@ -29,6 +29,67 @@ import {
     IToken
 } from "../../../api"
 
+export function setNodeLocationOnlyOffset(
+    node: CstNode,
+    locationInformation: any
+): void {
+    if (
+        // isNaN(node.location.startOffset) ||
+        node.location.startOffset > locationInformation.startOffset
+    ) {
+        node.location.startOffset = locationInformation.startOffset
+    }
+}
+
+export function setNodeLocationOnlyStart(
+    node: CstNode,
+    locationInformation: any
+): void {
+    setNodeLocationOnlyOffset(node, locationInformation)
+
+    if (
+        // isNaN(node.location.startLine) ||
+        node.location.startLine > locationInformation.startLine
+    ) {
+        node.location.startLine = locationInformation.startLine
+    }
+
+    if (
+        // isNaN(node.location.startColumn) ||
+        node.location.startColumn > locationInformation.startColumn
+    ) {
+        node.location.startColumn = locationInformation.startColumn
+    }
+}
+
+export function setNodeLocationFull(
+    node: CstNode,
+    locationInformation: any
+): void {
+    setNodeLocationOnlyStart(node, locationInformation)
+
+    if (
+        // isNaN(node.location.endOffset) ||
+        node.location.endOffset < locationInformation.endOffset
+    ) {
+        node.location.endOffset = locationInformation.endOffset
+    }
+
+    if (
+        // isNaN(node.location.endLine) ||
+        node.location.endLine < locationInformation.endLine
+    ) {
+        node.location.endLine = locationInformation.endLine
+    }
+
+    if (
+        // isNaN(node.location.endColumn) ||
+        node.location.endColumn < locationInformation.endColumn
+    ) {
+        node.location.endColumn = locationInformation.endColumn
+    }
+}
+
 export function addTerminalToCst(
     node: CstNode,
     token: IToken,
@@ -39,8 +100,6 @@ export function addTerminalToCst(
     } else {
         node.children[tokenTypeName].push(token)
     }
-
-    setNodeLocation(node, token)
 }
 
 export function addNoneTerminalToCst(
@@ -52,52 +111,6 @@ export function addNoneTerminalToCst(
         node.children[ruleName] = [ruleResult]
     } else {
         node.children[ruleName].push(ruleResult)
-    }
-
-    setNodeLocation(node, ruleResult.location)
-}
-
-function setNodeLocation(node: CstNode, locationInformation: any) {
-    if (
-        isNaN(node.location.startOffset) ||
-        node.location.startOffset > locationInformation.startOffset
-    ) {
-        node.location.startOffset = locationInformation.startOffset
-    }
-
-    if (
-        isNaN(node.location.startLine) ||
-        node.location.startLine > locationInformation.startLine
-    ) {
-        node.location.startLine = locationInformation.startLine
-    }
-
-    if (
-        isNaN(node.location.startColumn) ||
-        node.location.startColumn > locationInformation.startColumn
-    ) {
-        node.location.startColumn = locationInformation.startColumn
-    }
-
-    if (
-        isNaN(node.location.endOffset) ||
-        node.location.endOffset < locationInformation.endOffset
-    ) {
-        node.location.endOffset = locationInformation.endOffset
-    }
-
-    if (
-        isNaN(node.location.endLine) ||
-        node.location.endLine < locationInformation.endLine
-    ) {
-        node.location.endLine = locationInformation.endLine
-    }
-
-    if (
-        isNaN(node.location.endColumn) ||
-        node.location.endColumn < locationInformation.endColumn
-    ) {
-        node.location.endColumn = locationInformation.endColumn
     }
 }
 

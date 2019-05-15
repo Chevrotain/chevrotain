@@ -464,7 +464,9 @@ context("CST", () => {
     it("Can output a CST with node location information", () => {
         class CstTerminalParser extends Parser {
             constructor(input: IToken[] = []) {
-                super(ALL_TOKENS)
+                super(ALL_TOKENS, {
+                    nodePositionTracking: "full"
+                })
                 this.input = input
 
                 this.performSelfAnalysis()
@@ -935,7 +937,9 @@ context("CST", () => {
         it("Can output a CST with nested rules with node location information", () => {
             class CstTerminalParser extends Parser {
                 constructor(input: IToken[] = []) {
-                    super(ALL_TOKENS)
+                    super(ALL_TOKENS, {
+                        nodePositionTracking: "full"
+                    })
                     this.input = input
 
                     this.performSelfAnalysis()

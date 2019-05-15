@@ -11,7 +11,12 @@ import {
 import { computeAllProdsFollows } from "../grammar/follow"
 import { createTokenInstance, EOF } from "../../scan/tokens_public"
 import { deserializeGrammar } from "../gast_builder"
-import { analyzeCst } from "../cst/cst"
+import {
+    analyzeCst,
+    setNodeLocationOnlyOffset,
+    setNodeLocationOnlyStart,
+    setNodeLocationFull
+} from "../cst/cst"
 import {
     defaultGrammarValidatorErrorProvider,
     defaultParserErrorProvider
@@ -65,7 +70,8 @@ export const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
     dynamicTokensEnabled: false,
     outputCst: true,
     errorMessageProvider: defaultParserErrorProvider,
-    serializedGrammar: null
+    serializedGrammar: null,
+    nodePositionTracking: null
 })
 
 export const DEFAULT_RULE_CONFIG: IRuleConfig<any> = Object.freeze({
@@ -218,6 +224,7 @@ export class Parser {
     ignoredIssues: IgnoredParserIssues = DEFAULT_PARSER_CONFIG.ignoredIssues
     definitionErrors: IParserDefinitionError[] = []
     selfAnalysisDone = false
+    setNodeLocation: Function
 
     constructor(
         tokenVocabulary: TokenVocabulary,
@@ -235,6 +242,16 @@ export class Parser {
         this.ignoredIssues = has(config, "ignoredIssues")
             ? config.ignoredIssues
             : DEFAULT_PARSER_CONFIG.ignoredIssues
+
+        if (/full/i.test(config.nodePositionTracking)) {
+            this.setNodeLocation = setNodeLocationFull
+        } else if (/onlyStart/i.test(config.nodePositionTracking)) {
+            this.setNodeLocation = setNodeLocationOnlyStart
+        } else if (/onlyOffset/i.test(config.nodePositionTracking)) {
+            this.setNodeLocation = setNodeLocationOnlyOffset
+        } else {
+            this.setNodeLocation = function() {}
+        }
 
         // Avoid performance regressions in newer versions of V8
         toFastProperties(this)

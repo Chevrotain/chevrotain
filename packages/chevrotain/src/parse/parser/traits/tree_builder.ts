@@ -57,12 +57,12 @@ export class TreeBuilder {
                 ) + nestedName,
             children: {},
             location: {
-                startOffset: NaN,
-                startLine: NaN,
-                startColumn: NaN,
-                endOffset: NaN,
-                endLine: NaN,
-                endColumn: NaN
+                startOffset: Number.MAX_VALUE,
+                startLine: Number.MAX_VALUE,
+                startColumn: Number.MAX_VALUE,
+                endOffset: -1,
+                endLine: -1,
+                endColumn: -1
             }
         })
     }
@@ -77,12 +77,12 @@ export class TreeBuilder {
             name: fullRuleName,
             children: {},
             location: {
-                startOffset: NaN,
-                startLine: NaN,
-                startColumn: NaN,
-                endOffset: NaN,
-                endLine: NaN,
-                endColumn: NaN
+                startOffset: Number.MAX_VALUE,
+                startLine: Number.MAX_VALUE,
+                startColumn: Number.MAX_VALUE,
+                endOffset: -1,
+                endLine: -1,
+                endColumn: -1
             }
         })
     }
@@ -104,6 +104,7 @@ export class TreeBuilder {
         // TODO: would save the "current rootCST be faster than locating it for each terminal?
         let rootCst = this.CST_STACK[this.CST_STACK.length - 1]
         addTerminalToCst(rootCst, consumedToken, key)
+        this.setNodeLocation(rootCst, consumedToken)
     }
 
     cstPostNonTerminal(
@@ -115,6 +116,10 @@ export class TreeBuilder {
             this.CST_STACK[this.CST_STACK.length - 1],
             ruleName,
             ruleCstResult
+        )
+        this.setNodeLocation(
+            this.CST_STACK[this.CST_STACK.length - 1],
+            ruleCstResult.location
         )
     }
 
@@ -206,6 +211,7 @@ export class TreeBuilder {
         // this return a different result than the previous invocation because "nestedRuleFinallyStateUpdate" pops the cst stack
         let parentCstNode = cstStack[cstStack.length - 1]
         addNoneTerminalToCst(parentCstNode, nestedName, nestedRuleCst)
+        this.setNodeLocation(parentCstNode, nestedRuleCst.location)
     }
 
     getLastExplicitRuleShortName(this: MixedInParser): string {
