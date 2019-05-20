@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+-   [Better handling of infinite loops in repetitions.](https://github.com/SAP/chevrotain/issues/958).
+
 ## 4.3.3 (4-12-2019)
 
 #### Bug Fixes

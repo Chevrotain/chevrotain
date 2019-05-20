@@ -115,6 +115,9 @@ This parser
 
 ## Infinite Loop Detected
 
+-   Note **This error is only relevant in versions prior to 4.4.0**
+    See: https://github.com/SAP/chevrotain/issues/958
+
 A repetition must consume at least one token in each iteration.
 Entering an iteration while failing to do so would cause an **infinite loop** because
 the condition to entering the next iteration would still be true while the parser state has
