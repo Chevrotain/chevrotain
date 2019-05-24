@@ -1624,14 +1624,16 @@ export interface CstNode {
      * the fullName will **also** include the name of the top level rule containing this nested rule.
      */
     readonly fullName?: string
-    readonly location: {
-        startOffset: number
-        startLine?: number
-        startColumn?: number
-        endOffset?: number
-        endLine?: number
-        endColumn?: number
-    }
+    location?: CstNodeLocation
+}
+
+export interface CstNodeLocation {
+    startOffset?: number
+    startLine?: number
+    startColumn?: number
+    endOffset?: number
+    endLine?: number
+    endColumn?: number
 }
 
 export declare type CstChildrenDictionary = {
@@ -1684,7 +1686,7 @@ export interface IParserConfig {
     /**
      * Enable computation of CST nodes location
      */
-    nodePositionTracking?: "full" | "onlyStart" | "onlyOffset"
+    nodePositionTracking?: "full" | "onlyStart" | "onlyOffset" | "none"
     /**
      * A custom error message provider.
      * Can be used to override the default error messages.

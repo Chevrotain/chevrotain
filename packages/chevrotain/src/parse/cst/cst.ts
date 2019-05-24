@@ -24,78 +24,42 @@ import { GAstVisitor } from "../grammar/gast/gast_visitor_public"
 import {
     CstChildrenDictionary,
     CstNode,
+    CstNodeLocation,
     IOptionallyNamedProduction,
     IProduction,
     IToken
 } from "../../../api"
 
 export function setNodeLocationOnlyOffset(
-    node: CstNode,
+    nodeLocation: CstNodeLocation,
     locationInformation: any
 ): void {
-    if (
-        // isNaN(node.location.startOffset) ||
-        node.location.startOffset > locationInformation.startOffset
-    ) {
-        node.location.startOffset = locationInformation.startOffset
+    if (nodeLocation.startOffset > locationInformation.startOffset) {
+        nodeLocation.startOffset = locationInformation.startOffset
     }
 }
 
 export function setNodeLocationOnlyStart(
-    node: CstNode,
+    nodeLocation: CstNodeLocation,
     locationInformation: any
 ): void {
-    setNodeLocationOnlyOffset(node, locationInformation)
-
-    // TODO: performance optimize - reduce if conditions See Comment in: 'setNodeLocationFull'
-    if (
-        // isNaN(node.location.startLine) ||
-        node.location.startLine > locationInformation.startLine
-    ) {
-        node.location.startLine = locationInformation.startLine
-    }
-
-    if (
-        // isNaN(node.location.startColumn) ||
-        node.location.startColumn > locationInformation.startColumn
-    ) {
-        node.location.startColumn = locationInformation.startColumn
+    if (nodeLocation.startOffset > locationInformation.startOffset) {
+        nodeLocation.startOffset = locationInformation.startOffset
+        nodeLocation.startColumn = locationInformation.startColumn
+        nodeLocation.startLine = locationInformation.startLine
     }
 }
 
 export function setNodeLocationFull(
-    node: CstNode,
+    nodeLocation: CstNodeLocation,
     locationInformation: any
 ): void {
-    setNodeLocationOnlyStart(node, locationInformation)
+    setNodeLocationOnlyStart(nodeLocation, locationInformation)
 
-    // TODO: we could avoid some IF conditions here, may provide performance boost
-    // e.g IF endLine changes than we know endColumn and endOffset MUST have changed too,
-    //     So no need to re-ask the IF condition we can directly assign the new value.
-    // Similarly if end Column changed than the endOffset must have also changed.
-    // ---------------------------------------------------------------------------
-    // TODO:
-    //  inspect performance optimization of not passing the node but passing the location
-    //  object only to reduce runtime object access cost.
-    if (
-        // isNaN(node.location.endOffset) ||
-        node.location.endOffset < locationInformation.endOffset
-    ) {
-        node.location.endOffset = locationInformation.endOffset
-    }
-
-    if (
-        // isNaN(node.location.endLine) ||
-        node.location.endLine < locationInformation.endLine
-    ) {
-        node.location.endLine = locationInformation.endLine
-    }
-
-    if (
-        // isNaN(node.location.endColumn) ||
-        node.location.endColumn < locationInformation.endColumn
-    ) {
-        node.location.endColumn = locationInformation.endColumn
+    if (nodeLocation.endOffset < locationInformation.endOffset) {
+        nodeLocation.endOffset = locationInformation.endOffset
+        nodeLocation.endColumn = locationInformation.endColumn
+        nodeLocation.endLine = locationInformation.endLine
     }
 }
 

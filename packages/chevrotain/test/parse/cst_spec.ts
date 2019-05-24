@@ -529,7 +529,7 @@ context("CST", () => {
             startColumn: 1,
             endOffset: 18,
             endLine: 5,
-            endColumn: 15
+            endColumn: 4
         })
     })
 

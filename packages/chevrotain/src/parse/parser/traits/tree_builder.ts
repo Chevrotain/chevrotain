@@ -1,10 +1,22 @@
-import { addNoneTerminalToCst, addTerminalToCst } from "../../cst/cst"
+import {
+    addNoneTerminalToCst,
+    addTerminalToCst,
+    setNodeLocationFull,
+    setNodeLocationOnlyOffset,
+    setNodeLocationOnlyStart
+} from "../../cst/cst"
 import { has, isUndefined, NOOP } from "../../../utils/utils"
 import {
     createBaseSemanticVisitorConstructor,
     createBaseVisitorConstructorWithDefaults
 } from "../../cst/cst_visitor"
-import { CstNode, ICstVisitor, IParserConfig, IToken } from "../../../../api"
+import {
+    CstNode,
+    CstNodeLocation,
+    ICstVisitor,
+    IParserConfig,
+    IToken
+} from "../../../../api"
 import { getKeyForAltIndex } from "../../grammar/keys"
 import { MixedInParser } from "./parser_traits"
 import { DEFAULT_PARSER_CONFIG } from "../parser"
@@ -18,6 +30,10 @@ export class TreeBuilder {
     baseCstVisitorConstructor: Function
     baseCstVisitorWithDefaultsConstructor: Function
     LAST_EXPLICIT_RULE_STACK: number[]
+
+    // TODO: this method should have a better signature
+    setNodeLocation: Function
+    setInitialNodeLocation: Function
 
     initTreeBuilder(this: MixedInParser, config: IParserConfig) {
         this.LAST_EXPLICIT_RULE_STACK = []
@@ -41,6 +57,62 @@ export class TreeBuilder {
             this.manySepFirstInternal = this.manySepFirstInternalNoCst
             this.atLeastOneSepFirstInternal = this.atLeastOneSepFirstInternalNoCst
         }
+
+        // TODO: case insensitive options are an awesome idea.
+        //       but we should be consistent so if we do this we should apply it at the lexer level too
+        //       or not at all.
+        if (/full/i.test(config.nodePositionTracking)) {
+            this.setNodeLocation = setNodeLocationFull
+            this.setInitialNodeLocation = this.setInitialNodeLocationFull
+        } else if (/onlyStart/i.test(config.nodePositionTracking)) {
+            this.setNodeLocation = setNodeLocationOnlyStart
+            this.setInitialNodeLocation = this.setInitialNodeLocationOnlyStart
+        } else if (/onlyOffset/i.test(config.nodePositionTracking)) {
+            this.setNodeLocation = setNodeLocationOnlyOffset
+            this.setInitialNodeLocation = this.setInitialNodeLocationOnlyOffset
+        } else if (/none/i.test(config.nodePositionTracking)) {
+            this.setNodeLocation = NOOP
+            this.setInitialNodeLocation = NOOP
+        } else {
+            throw Error(
+                `Invalid <nodePositionTracking> config option: "${
+                    config.nodePositionTracking
+                }"`
+            )
+        }
+    }
+
+    setInitialNodeLocationOnlyOffset(cstNode: CstNode): void {
+        cstNode.location = {
+            startOffset: Infinity
+        }
+    }
+
+    setInitialNodeLocationOnlyStart(cstNode: CstNode): void {
+        cstNode.location = {
+            startOffset: Infinity,
+            startLine: Infinity,
+            startColumn: Infinity
+        }
+    }
+
+    // TODO: I am not yet sure about which initial values should be used
+    //   For Invalid Nodes we currently use NaN
+    //   -  https://github.com/SAP/chevrotain/blob/fb714a7650dbff3b3342448fd284365384c85880/packages/chevrotain/src/parse/parser/parser.ts#L45-L54
+    //  But this would make the conditions more complicated (and slower?)
+    //  Number.MAX_VALUE is bad because it is a valid value theoretically so it cannot be distinguished
+    //  from a Node with invalid location info (e.g recovered node)
+    //  Perhaps we should use +/- Infinity
+    //  But If we can use NaN and still keep things fast that would see the best for me.
+    setInitialNodeLocationFull(cstNode: CstNode): void {
+        cstNode.location = {
+            startOffset: Infinity,
+            startLine: Infinity,
+            startColumn: Infinity,
+            endOffset: -Infinity,
+            endLine: -Infinity,
+            endColumn: -Infinity
+        }
     }
 
     // CST
@@ -49,32 +121,18 @@ export class TreeBuilder {
         nestedName: string,
         shortName: string | number
     ): void {
-        this.CST_STACK.push({
+        const cstNode: CstNode = {
             name: nestedName,
             fullName:
                 this.shortRuleNameToFull.get(
                     this.getLastExplicitRuleShortName()
                 ) + nestedName,
-            children: {},
-            // TODO: lets only assign needed values depending on the config option
-            //       chosen in "NodeLocationTracking" this will save memory.
-            location: {
-                // TODO: I am not yet sure about which initial values should be used
-                //   For Invalid Nodes we currently use NaN
-                //   -  https://github.com/SAP/chevrotain/blob/fb714a7650dbff3b3342448fd284365384c85880/packages/chevrotain/src/parse/parser/parser.ts#L45-L54
-                //  But this would make the conditions more complicated (and slower?)
-                //  Number.MAX_VALUE is bad because it is a valid value theoretically so it cannot be distinguished
-                //  from a Node with invalid location info (e.g recovered node)
-                //  Perhaps we should use +/- Infinity
-                //  But If we can use NaN and still keep things fast that would see the best for me.
-                startOffset: Number.MAX_VALUE,
-                startLine: Number.MAX_VALUE,
-                startColumn: Number.MAX_VALUE,
-                endOffset: -1,
-                endLine: -1,
-                endColumn: -1
-            }
-        })
+            children: {}
+        }
+
+        this.setInitialNodeLocation(cstNode)
+
+        this.CST_STACK.push(cstNode)
     }
 
     cstInvocationStateUpdate(
@@ -83,18 +141,15 @@ export class TreeBuilder {
         shortName: string | number
     ): void {
         this.LAST_EXPLICIT_RULE_STACK.push(this.RULE_STACK.length - 1)
-        this.CST_STACK.push({
+
+        const cstNode: CstNode = {
             name: fullRuleName,
-            children: {},
-            location: {
-                startOffset: Number.MAX_VALUE,
-                startLine: Number.MAX_VALUE,
-                startColumn: Number.MAX_VALUE,
-                endOffset: -1,
-                endLine: -1,
-                endColumn: -1
-            }
-        })
+            children: {}
+        }
+
+        this.setInitialNodeLocation(cstNode)
+
+        this.CST_STACK.push(cstNode)
     }
 
     cstFinallyStateUpdate(this: MixedInParser): void {
@@ -114,7 +169,7 @@ export class TreeBuilder {
         // TODO: would save the "current rootCST be faster than locating it for each terminal?
         let rootCst = this.CST_STACK[this.CST_STACK.length - 1]
         addTerminalToCst(rootCst, consumedToken, key)
-        this.setNodeLocation(rootCst, consumedToken)
+        this.setNodeLocation(rootCst.location, consumedToken)
     }
 
     cstPostNonTerminal(
@@ -122,17 +177,10 @@ export class TreeBuilder {
         ruleCstResult: CstNode,
         ruleName: string
     ): void {
-        addNoneTerminalToCst(
-            this.CST_STACK[this.CST_STACK.length - 1],
-            ruleName,
-            ruleCstResult
-        )
-        this.setNodeLocation(
-            // TODO: why are we accessing 'this.CST_STACK[this.CST_STACK.length - 1],'
-            //   twice? lets extract this value at the start of the function
-            this.CST_STACK[this.CST_STACK.length - 1],
-            ruleCstResult.location
-        )
+        let node = this.CST_STACK[this.CST_STACK.length - 1]
+
+        addNoneTerminalToCst(node, ruleName, ruleCstResult)
+        this.setNodeLocation(node.location, ruleCstResult.location)
     }
 
     getBaseCstVisitorConstructor(
@@ -223,7 +271,7 @@ export class TreeBuilder {
         // this return a different result than the previous invocation because "nestedRuleFinallyStateUpdate" pops the cst stack
         let parentCstNode = cstStack[cstStack.length - 1]
         addNoneTerminalToCst(parentCstNode, nestedName, nestedRuleCst)
-        this.setNodeLocation(parentCstNode, nestedRuleCst.location)
+        this.setNodeLocation(parentCstNode.location, nestedRuleCst.location)
     }
 
     getLastExplicitRuleShortName(this: MixedInParser): string {

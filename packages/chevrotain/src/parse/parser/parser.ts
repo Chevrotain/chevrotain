@@ -226,9 +226,6 @@ export class Parser {
     definitionErrors: IParserDefinitionError[] = []
     selfAnalysisDone = false
 
-    // TODO: this method belongs in tree_builder.ts and it should have a better signature
-    setNodeLocation: Function
-
     constructor(
         tokenVocabulary: TokenVocabulary,
         config: IParserConfig = DEFAULT_PARSER_CONFIG
@@ -245,22 +242,6 @@ export class Parser {
         this.ignoredIssues = has(config, "ignoredIssues")
             ? config.ignoredIssues
             : DEFAULT_PARSER_CONFIG.ignoredIssues
-
-        // TODO: this initialization logic should be placed in `initTreeBuilder()`
-        // TODO: case insensitive options are an awesome idea.
-        //       but we should be consistent so if we do this we should apply it at the lexer level too
-        //       or not at all.
-        if (/full/i.test(config.nodePositionTracking)) {
-            this.setNodeLocation = setNodeLocationFull
-        } else if (/onlyStart/i.test(config.nodePositionTracking)) {
-            this.setNodeLocation = setNodeLocationOnlyStart
-        } else if (/onlyOffset/i.test(config.nodePositionTracking)) {
-            this.setNodeLocation = setNodeLocationOnlyOffset
-            // TODO: if "nodePositionTracking" is set to unidentified value
-            //       lets throw an error
-        } else {
-            this.setNodeLocation = NOOP
-        }
 
         // Avoid performance regressions in newer versions of V8
         toFastProperties(this)
