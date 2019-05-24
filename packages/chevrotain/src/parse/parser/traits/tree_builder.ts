@@ -34,6 +34,7 @@ export class TreeBuilder {
     // TODO: this method should have a better signature
     setNodeLocation: Function
     setInitialNodeLocation: Function
+    nodePositionTracking: "full" | "onlyStart" | "onlyOffset" | "none"
 
     initTreeBuilder(this: MixedInParser, config: IParserConfig) {
         this.LAST_EXPLICIT_RULE_STACK = []
@@ -41,6 +42,10 @@ export class TreeBuilder {
         this.outputCst = has(config, "outputCst")
             ? config.outputCst
             : DEFAULT_PARSER_CONFIG.outputCst
+
+        this.nodePositionTracking = has(config, "nodePositionTracking")
+            ? config.nodePositionTracking
+            : DEFAULT_PARSER_CONFIG.nodePositionTracking
 
         if (!this.outputCst) {
             this.cstInvocationStateUpdate = NOOP
@@ -61,16 +66,16 @@ export class TreeBuilder {
         // TODO: case insensitive options are an awesome idea.
         //       but we should be consistent so if we do this we should apply it at the lexer level too
         //       or not at all.
-        if (/full/i.test(config.nodePositionTracking)) {
+        if (/full/i.test(this.nodePositionTracking)) {
             this.setNodeLocation = setNodeLocationFull
             this.setInitialNodeLocation = this.setInitialNodeLocationFull
-        } else if (/onlyStart/i.test(config.nodePositionTracking)) {
+        } else if (/onlyStart/i.test(this.nodePositionTracking)) {
             this.setNodeLocation = setNodeLocationOnlyStart
             this.setInitialNodeLocation = this.setInitialNodeLocationOnlyStart
-        } else if (/onlyOffset/i.test(config.nodePositionTracking)) {
+        } else if (/onlyOffset/i.test(this.nodePositionTracking)) {
             this.setNodeLocation = setNodeLocationOnlyOffset
             this.setInitialNodeLocation = this.setInitialNodeLocationOnlyOffset
-        } else if (/none/i.test(config.nodePositionTracking)) {
+        } else if (/none/i.test(this.nodePositionTracking)) {
             this.setNodeLocation = NOOP
             this.setInitialNodeLocation = NOOP
         } else {

@@ -72,7 +72,7 @@ export const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
     outputCst: true,
     errorMessageProvider: defaultParserErrorProvider,
     serializedGrammar: null,
-    nodePositionTracking: null
+    nodePositionTracking: <"full" | "onlyStart" | "onlyOffset" | "none">"none"
 })
 
 export const DEFAULT_RULE_CONFIG: IRuleConfig<any> = Object.freeze({
