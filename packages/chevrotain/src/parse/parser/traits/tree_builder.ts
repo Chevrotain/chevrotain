@@ -56,7 +56,17 @@ export class TreeBuilder {
                     this.getLastExplicitRuleShortName()
                 ) + nestedName,
             children: {},
+            // TODO: lets only assign needed values depending on the config option
+            //       chosen in "NodeLocationTracking" this will save memory.
             location: {
+                // TODO: I am not yet sure about which initial values should be used
+                //   For Invalid Nodes we currently use NaN
+                //   -  https://github.com/SAP/chevrotain/blob/fb714a7650dbff3b3342448fd284365384c85880/packages/chevrotain/src/parse/parser/parser.ts#L45-L54
+                //  But this would make the conditions more complicated (and slower?)
+                //  Number.MAX_VALUE is bad because it is a valid value theoretically so it cannot be distinguished
+                //  from a Node with invalid location info (e.g recovered node)
+                //  Perhaps we should use +/- Infinity
+                //  But If we can use NaN and still keep things fast that would see the best for me.
                 startOffset: Number.MAX_VALUE,
                 startLine: Number.MAX_VALUE,
                 startColumn: Number.MAX_VALUE,
@@ -118,6 +128,8 @@ export class TreeBuilder {
             ruleCstResult
         )
         this.setNodeLocation(
+            // TODO: why are we accessing 'this.CST_STACK[this.CST_STACK.length - 1],'
+            //   twice? lets extract this value at the start of the function
             this.CST_STACK[this.CST_STACK.length - 1],
             ruleCstResult.location
         )

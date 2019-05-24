@@ -1682,9 +1682,9 @@ export interface IParserConfig {
      */
     outputCst?: boolean
     /**
-     * Enable computation of nodes location
+     * Enable computation of CST nodes location
      */
-    nodePositionTracking?: string
+    nodePositionTracking?: "full" | "onlyStart" | "onlyOffset"
     /**
      * A custom error message provider.
      * Can be used to override the default error messages.

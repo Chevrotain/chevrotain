@@ -183,6 +183,9 @@ It is important to note that:
 
 ## Minor Optimizations
 
+// TODO: we should document the performance cost of CSTNodeLocation tracking in this guide
+// I am not sure this is Minor or Major section yet (lets see how fast we can get it first)
+
 These are only required if you are trying to squeeze every tiny bit of performance out of your parser.
 
 1.  **Reduce the amount of Token position tracking** the lexer performs.

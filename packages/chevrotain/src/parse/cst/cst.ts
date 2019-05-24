@@ -47,6 +47,7 @@ export function setNodeLocationOnlyStart(
 ): void {
     setNodeLocationOnlyOffset(node, locationInformation)
 
+    // TODO: performance optimize - reduce if conditions See Comment in: 'setNodeLocationFull'
     if (
         // isNaN(node.location.startLine) ||
         node.location.startLine > locationInformation.startLine
@@ -68,6 +69,14 @@ export function setNodeLocationFull(
 ): void {
     setNodeLocationOnlyStart(node, locationInformation)
 
+    // TODO: we could avoid some IF conditions here, may provide performance boost
+    // e.g IF endLine changes than we know endColumn and endOffset MUST have changed too,
+    //     So no need to re-ask the IF condition we can directly assign the new value.
+    // Similarly if end Column changed than the endOffset must have also changed.
+    // ---------------------------------------------------------------------------
+    // TODO:
+    //  inspect performance optimization of not passing the node but passing the location
+    //  object only to reduce runtime object access cost.
     if (
         // isNaN(node.location.endOffset) ||
         node.location.endOffset < locationInformation.endOffset
