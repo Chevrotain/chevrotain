@@ -32,9 +32,12 @@ export class TreeBuilder {
     LAST_EXPLICIT_RULE_STACK: number[]
 
     // TODO: this method should have a better signature
-    setNodeLocation: Function
-    setInitialNodeLocation: Function
-    nodePositionTracking: "full" | "onlyStart" | "onlyOffset" | "none"
+    setNodeLocation: (
+        nodeLocation: CstNodeLocation,
+        locationInformation: any
+    ) => void
+    setInitialNodeLocation: (cstNode: CstNode) => void
+    nodePositionTracking: IParserConfig["nodePositionTracking"]
 
     initTreeBuilder(this: MixedInParser, config: IParserConfig) {
         this.LAST_EXPLICIT_RULE_STACK = []
@@ -63,9 +66,6 @@ export class TreeBuilder {
             this.atLeastOneSepFirstInternal = this.atLeastOneSepFirstInternalNoCst
         }
 
-        // TODO: case insensitive options are an awesome idea.
-        //       but we should be consistent so if we do this we should apply it at the lexer level too
-        //       or not at all.
         if (/full/i.test(this.nodePositionTracking)) {
             this.setNodeLocation = setNodeLocationFull
             this.setInitialNodeLocation = this.setInitialNodeLocationFull
