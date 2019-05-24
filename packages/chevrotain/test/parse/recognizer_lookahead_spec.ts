@@ -1656,7 +1656,7 @@ describe("lookahead Regular Tokens Mode", () => {
     })
 
     describe("Categories lookahead bug #918", () => {
-        it("Won't throw NoViableAltException when the repetition appears twice", () => {
+        it("Will take token categories into account when performing lookahead", () => {
             let A = createToken({ name: "A" })
             let B = createToken({ name: "B", categories: A })
             let C = createToken({ name: "C" })
@@ -1664,7 +1664,7 @@ describe("lookahead Regular Tokens Mode", () => {
 
             class CategoriesLookaheadBugParser extends Parser {
                 constructor() {
-                    super(ALL_TOKENS, {
+                    super([A, B, C, D], {
                         outputCst: false,
                         ignoredIssues: {
                             main: {
@@ -1683,17 +1683,17 @@ describe("lookahead Regular Tokens Mode", () => {
                 })
 
                 public alt1 = this.RULE("alt1", () => {
-                    this.CONSUME(A)
+                    this.CONSUME(B)
                     this.CONSUME(C)
                 })
 
                 public alt2 = this.RULE("alt2", () => {
-                    this.CONSUME(B)
+                    this.CONSUME(A)
                     this.CONSUME(D)
                 })
             }
 
-            let input = [createRegularToken(A), createRegularToken(D)]
+            let input = [createRegularToken(B), createRegularToken(D)]
 
             const parser = new CategoriesLookaheadBugParser()
             parser.input = input

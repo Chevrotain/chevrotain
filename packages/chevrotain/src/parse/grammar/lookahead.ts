@@ -513,11 +513,23 @@ export function lookAheadSequenceFromAlternatives(
     function isUniquePrefix<T>(arr: T[][], item: T[]): boolean {
         return (
             find(arr, currOtherPath => {
-                return every(
-                    item,
-                    (currPathTok, idx) => currPathTok === currOtherPath[idx]
-                )
+                return every(item, (currPathTok, idx) => {
+                    return possibleTokenTypeMatch(
+                        currPathTok,
+                        currOtherPath[idx]
+                    )
+                })
             }) === undefined
+        )
+    }
+
+    function possibleTokenTypeMatch(tokTypeA, tokTypeB): boolean {
+        return (
+            tokTypeA === tokTypeB ||
+            (tokTypeA &&
+                tokTypeB &&
+                (tokTypeA.categoryMatchesMap[tokTypeB.tokenTypeIdx] ||
+                    tokTypeB.categoryMatchesMap[tokTypeA.tokenTypeIdx]))
         )
     }
 
