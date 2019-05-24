@@ -427,9 +427,12 @@ export class RecognizerEngine {
         }
 
         if ((<Function>lookAheadFunc).call(this) === true) {
-            ;(<any>action).call(this)
-            while ((<Function>lookAheadFunc).call(this) === true) {
-                this.doSingleRepetition(action)
+            let notStuck = this.doSingleRepetition(action)
+            while (
+                (<Function>lookAheadFunc).call(this) === true &&
+                notStuck === true
+            ) {
+                notStuck = this.doSingleRepetition(action)
             }
         } else {
             throw this.raiseEarlyExitException(
@@ -603,8 +606,9 @@ export class RecognizerEngine {
             action = actionORMethodDef
         }
 
-        while (lookaheadFunction.call(this)) {
-            this.doSingleRepetition(action)
+        let notStuck = true
+        while (lookaheadFunction.call(this) === true && notStuck === true) {
+            notStuck = this.doSingleRepetition(action)
         }
 
         // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
@@ -735,18 +739,12 @@ export class RecognizerEngine {
 
     doSingleRepetition(this: MixedInParser, action: Function): any {
         const beforeIteration = this.getLexerPosition()
-        const result = action.call(this)
+        action.call(this)
         const afterIteration = this.getLexerPosition()
 
-        if (afterIteration === beforeIteration) {
-            throw Error(
-                "Infinite loop detected\n" +
-                    "\tSee: https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#INFINITE_LOOP\n" +
-                    "\tFor Further details."
-            )
-        }
-
-        return result
+        // This boolean will indicate if this repetition progressed
+        // or if we are "stuck" (potential infinite loop in the repetition).
+        return afterIteration > beforeIteration
     }
 
     orInternalNoCst<T>(
