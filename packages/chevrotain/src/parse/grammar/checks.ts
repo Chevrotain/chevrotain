@@ -755,7 +755,7 @@ function checkAlternativesAmbiguities(
     return currErrors
 }
 
-function checkPrefixAlternativesAmbiguities(
+export function checkPrefixAlternativesAmbiguities(
     alternatives: Alternative[],
     alternation: Alternation,
     rule: Rule,
