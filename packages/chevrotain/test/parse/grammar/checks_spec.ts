@@ -952,6 +952,7 @@ describe("The prefix ambiguity detection full flow", () => {
         )
     })
 
+    // TODO: detect these ambiguity with categories
     it("will throw an error when an an alts ambiguity is detected", () => {
         const OneTok = createToken({ name: "OneTok" })
         const TwoTok = createToken({ name: "TwoTok" })
@@ -1000,6 +1001,7 @@ describe("The prefix ambiguity detection full flow", () => {
         )
     })
 
+    // TODO: detect these ambiguity with categories
     it("will throw an error when an a common prefix ambiguity is detected - implicit occurrence idx", () => {
         class PrefixAltAmbiguity2 extends Parser {
             constructor(input: IToken[] = []) {
