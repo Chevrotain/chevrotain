@@ -1,8 +1,8 @@
 version: 2
 jobs:
-    build-node11:
+    build-node12:
         docker:
-            - image: circleci/node:11-browsers
+            - image: circleci/node:12-browsers
         working_directory: ~/repo
         steps:
             - checkout
