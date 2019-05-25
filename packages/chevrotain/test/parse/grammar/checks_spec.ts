@@ -912,10 +912,14 @@ describe("The empty alternative detection full flow", () => {
 })
 
 describe("The prefix ambiguity detection full flow", () => {
-    it("will throw an error when an a common prefix ambiguity is detected", () => {
+    it.only("will throw an error when an a common prefix ambiguity is detected - categories", () => {
+        let A = createToken({ name: "A" })
+        let B = createToken({ name: "B", categories: A })
+        let C = createToken({ name: "C" })
+
         class PrefixAltAmbiguity extends Parser {
             constructor(input: IToken[] = []) {
-                super([PlusTok, MinusTok, StarTok])
+                super([A, B, C])
                 this.input = input
 
                 this.performSelfAnalysis()
@@ -925,15 +929,15 @@ describe("The prefix ambiguity detection full flow", () => {
                 this.OR3([
                     {
                         ALT: () => {
-                            this.CONSUME1(PlusTok)
-                            this.CONSUME1(MinusTok)
+                            this.CONSUME1(B)
+                            this.CONSUME1(A)
                         }
                     },
                     {
                         ALT: () => {
-                            this.CONSUME2(PlusTok)
-                            this.CONSUME2(MinusTok)
-                            this.CONSUME1(StarTok)
+                            this.CONSUME2(A)
+                            this.CONSUME3(A)
+                            this.CONSUME1(C)
                         }
                     }
                 ])
@@ -953,6 +957,54 @@ describe("The prefix ambiguity detection full flow", () => {
     })
 
     // TODO: detect these ambiguity with categories
+    it("will throw an error when an an alts ambiguity is detected", () => {
+        const OneTok = createToken({ name: "OneTok" })
+        const TwoTok = createToken({ name: "TwoTok" })
+        const Comma = createToken({ name: "Comma" })
+
+        const ALL_TOKENS = [OneTok, TwoTok, Comma]
+
+        class AlternativesAmbiguityParser extends Parser {
+            constructor() {
+                super(ALL_TOKENS)
+                this.performSelfAnalysis()
+            }
+
+            public main = this.RULE("main", () => {
+                this.OR([
+                    { ALT: () => this.SUBRULE(this.alt1) },
+                    { ALT: () => this.SUBRULE(this.alt2) }
+                ])
+            })
+
+            public alt1 = this.RULE("alt1", () => {
+                this.MANY(() => {
+                    this.CONSUME(Comma)
+                })
+                this.CONSUME(OneTok)
+            })
+
+            public alt2 = this.RULE("alt2", () => {
+                this.MANY(() => {
+                    this.CONSUME(Comma)
+                })
+                this.CONSUME(TwoTok)
+            })
+        }
+        expect(() => new AlternativesAmbiguityParser()).to.throw(
+            "Ambiguous alternatives: <1 ,2>"
+        )
+        expect(() => new AlternativesAmbiguityParser()).to.throw(
+            "in <OR> inside <main> Rule"
+        )
+        expect(() => new AlternativesAmbiguityParser()).to.throw(
+            "Comma, Comma, Comma, Comma"
+        )
+        expect(() => new AlternativesAmbiguityParser()).to.throw(
+            "interfaces/iparserconfig.html#ignoredissues for more details\n"
+        )
+    })
+
     it("will throw an error when an an alts ambiguity is detected", () => {
         const OneTok = createToken({ name: "OneTok" })
         const TwoTok = createToken({ name: "TwoTok" })
