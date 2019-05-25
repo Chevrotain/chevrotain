@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+-   [Consider Token Categories in Lookahead Functions Calculation.](https://github.com/SAP/chevrotain/issues/962).
+
 ## 4.4.0 (5-24-2019)
 
 #### Minor Changes
