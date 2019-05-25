@@ -513,11 +513,23 @@ export function lookAheadSequenceFromAlternatives(
     function isUniquePrefix<T>(arr: T[][], item: T[]): boolean {
         return (
             find(arr, currOtherPath => {
-                return every(
-                    item,
-                    (currPathTok, idx) => currPathTok === currOtherPath[idx]
-                )
+                return every(item, (currPathTok, idx) => {
+                    return possibleTokenTypeMatch(
+                        currPathTok,
+                        currOtherPath[idx]
+                    )
+                })
             }) === undefined
+        )
+    }
+
+    function possibleTokenTypeMatch(tokTypeA, tokTypeB): boolean {
+        return (
+            tokTypeA === tokTypeB ||
+            (tokTypeA &&
+                tokTypeB &&
+                (tokTypeA.categoryMatchesMap[tokTypeB.tokenTypeIdx] ||
+                    tokTypeB.categoryMatchesMap[tokTypeA.tokenTypeIdx]))
         )
     }
 
@@ -629,7 +641,11 @@ export function containsPath(
         return (
             path.length === otherPath.length &&
             every(path, (targetItem, idx) => {
-                return targetItem === otherPath[idx]
+                // TODO: take categories into account here too?
+                return (
+                    targetItem === otherPath[idx] ||
+                    otherPath[idx].categoryMatchesMap[targetItem.tokenTypeIdx]
+                )
             })
         )
     })
@@ -643,7 +659,11 @@ export function isStrictPrefixOfPath(
     return (
         prefix.length < other.length &&
         every(prefix, (tokType, idx) => {
-            return tokType === other[idx]
+            const otherTokType = other[idx]
+            return (
+                tokType === otherTokType ||
+                otherTokType.categoryMatchesMap[tokType.tokenTypeIdx]
+            )
         })
     )
 }

@@ -61,6 +61,7 @@
             pattern: Lexer.NA
         })
         const notMatch = config.not
+        // "reject" all the none matching keywords
         const matchingKeywords = keywordTokens.filter(keywordTokType => {
             let found = false
             notMatch.forEach(notTokType => {
@@ -68,7 +69,7 @@
                     found = true
                 }
             })
-            return found
+            return !found
         })
 
         // All matching keywords now match the category of the NOT token.
