@@ -1657,21 +1657,14 @@ describe("lookahead Regular Tokens Mode", () => {
 
     describe("Categories lookahead bug #918", () => {
         it("Will take token categories into account when performing lookahead", () => {
-            let A = createToken({ name: "A" })
-            let B = createToken({ name: "B", categories: A })
-            let C = createToken({ name: "C" })
-            let D = createToken({ name: "D" })
+            const A = createToken({ name: "A" })
+            const B = createToken({ name: "B", categories: A })
+            const C = createToken({ name: "C" })
+            const D = createToken({ name: "D" })
 
             class CategoriesLookaheadBugParser extends Parser {
                 constructor() {
-                    super([A, B, C, D], {
-                        outputCst: false,
-                        ignoredIssues: {
-                            main: {
-                                OR: true
-                            }
-                        }
-                    })
+                    super([A, B, C, D])
                     this.performSelfAnalysis()
                 }
 
@@ -1693,7 +1686,7 @@ describe("lookahead Regular Tokens Mode", () => {
                 })
             }
 
-            let input = [createRegularToken(B), createRegularToken(D)]
+            const input = [createRegularToken(B), createRegularToken(D)]
 
             const parser = new CategoriesLookaheadBugParser()
             parser.input = input

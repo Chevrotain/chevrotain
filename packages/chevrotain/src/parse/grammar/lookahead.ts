@@ -642,7 +642,10 @@ export function containsPath(
             path.length === otherPath.length &&
             every(path, (targetItem, idx) => {
                 // TODO: take categories into account here too?
-                return targetItem === otherPath[idx]
+                return (
+                    targetItem === otherPath[idx] ||
+                    otherPath[idx].categoryMatchesMap[targetItem.tokenTypeIdx]
+                )
             })
         )
     })
@@ -657,7 +660,6 @@ export function isStrictPrefixOfPath(
         prefix.length < other.length &&
         every(prefix, (tokType, idx) => {
             const otherTokType = other[idx]
-            // TODO: create test for this scenario
             return (
                 tokType === otherTokType ||
                 otherTokType.categoryMatchesMap[tokType.tokenTypeIdx]

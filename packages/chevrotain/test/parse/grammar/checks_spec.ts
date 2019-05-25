@@ -912,7 +912,7 @@ describe("The empty alternative detection full flow", () => {
 })
 
 describe("The prefix ambiguity detection full flow", () => {
-    it.only("will throw an error when an a common prefix ambiguity is detected - categories", () => {
+    it("will throw an error when an a common prefix ambiguity is detected - categories", () => {
         let A = createToken({ name: "A" })
         let B = createToken({ name: "B", categories: A })
         let C = createToken({ name: "C" })
@@ -950,13 +950,12 @@ describe("The prefix ambiguity detection full flow", () => {
         expect(() => new PrefixAltAmbiguity()).to.throw(
             "due to common lookahead prefix"
         )
-        expect(() => new PrefixAltAmbiguity()).to.throw("<PlusTok, MinusTok>")
+        expect(() => new PrefixAltAmbiguity()).to.throw("<B, A>")
         expect(() => new PrefixAltAmbiguity()).to.throw(
             "https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#COMMON_PREFIX"
         )
     })
 
-    // TODO: detect these ambiguity with categories
     it("will throw an error when an an alts ambiguity is detected", () => {
         const OneTok = createToken({ name: "OneTok" })
         const TwoTok = createToken({ name: "TwoTok" })
@@ -1000,6 +999,53 @@ describe("The prefix ambiguity detection full flow", () => {
         expect(() => new AlternativesAmbiguityParser()).to.throw(
             "Comma, Comma, Comma, Comma"
         )
+        expect(() => new AlternativesAmbiguityParser()).to.throw(
+            "interfaces/iparserconfig.html#ignoredissues for more details\n"
+        )
+    })
+
+    it("will throw an error when an an alts ambiguity is detected - Categories", () => {
+        const A = createToken({ name: "A" })
+        const B = createToken({ name: "B" })
+        const C = createToken({ name: "C" })
+        const D = createToken({ name: "D", categories: C })
+
+        const ALL_TOKENS = [A, B, C, D]
+
+        class AlternativesAmbiguityParser extends Parser {
+            constructor() {
+                super(ALL_TOKENS)
+                this.performSelfAnalysis()
+            }
+
+            public main = this.RULE("main", () => {
+                this.OR([
+                    { ALT: () => this.SUBRULE(this.alt1) },
+                    { ALT: () => this.SUBRULE(this.alt2) }
+                ])
+            })
+
+            public alt1 = this.RULE("alt1", () => {
+                this.MANY(() => {
+                    this.CONSUME(D)
+                })
+                this.CONSUME(A)
+            })
+
+            public alt2 = this.RULE("alt2", () => {
+                this.MANY(() => {
+                    this.CONSUME(C)
+                })
+                this.CONSUME(B)
+            })
+        }
+        expect(() => new AlternativesAmbiguityParser()).to.throw(
+            "Ambiguous alternatives: <1 ,2>"
+        )
+        expect(() => new AlternativesAmbiguityParser()).to.throw(
+            "in <OR> inside <main> Rule"
+        )
+        expect(() => new AlternativesAmbiguityParser()).to.throw("D, D, D, D")
         expect(() => new AlternativesAmbiguityParser()).to.throw(
             "interfaces/iparserconfig.html#ignoredissues for more details\n"
         )
