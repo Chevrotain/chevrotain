@@ -898,13 +898,8 @@ export declare class Parser {
     ): (idxInCallingRule?: number, ...args: any[]) => CstNode
 
     /**
-     *
-     * @param name - The name of the rule.
-     * @param implementation - The implementation of the rule.
-     * @param [config] - The rule's optional configuration.
-     *
-     * @returns - The parsing rule which is the production implementation wrapped with the parsing logic that handles
-     *                     Parser state / error recovery&reporting/ ...
+     * @see RULE
+     * @hidden
      */
     /* protected */ RULE<T>(
         name: string,
