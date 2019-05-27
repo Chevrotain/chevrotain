@@ -891,11 +891,26 @@ export declare class Parser {
      * @returns - The parsing rule which is the production implementation wrapped with the parsing logic that handles
      *                     Parser state / error recovery&reporting/ ...
      */
+    /* protected */ RULE(
+        name: string,
+        implementation: (...implArgs: any[]) => void,
+        config?: IRuleConfig<any>
+    ): (idxInCallingRule?: number, ...args: any[]) => CstNode
+
+    /**
+     *
+     * @param name - The name of the rule.
+     * @param implementation - The implementation of the rule.
+     * @param [config] - The rule's optional configuration.
+     *
+     * @returns - The parsing rule which is the production implementation wrapped with the parsing logic that handles
+     *                     Parser state / error recovery&reporting/ ...
+     */
     /* protected */ RULE<T>(
         name: string,
         implementation: (...implArgs: any[]) => T,
         config?: IRuleConfig<T>
-    ): (idxInCallingRule?: number, ...args: any[]) => T | any
+    ): (idxInCallingRule?: number, ...args: any[]) => T
 
     /**
      * Same as {@link Parser.RULE}, but should only be used in
