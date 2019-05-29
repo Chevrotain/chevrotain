@@ -899,7 +899,6 @@ export declare class Parser {
 
     /**
      * @see RULE
-     * @hidden
      */
     /* protected */ RULE<T>(
         name: string,
