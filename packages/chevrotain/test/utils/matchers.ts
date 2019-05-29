@@ -10,11 +10,11 @@ export function createRegularToken(
     tokType,
     image = "",
     startOffset = 1,
-    startLine = 1,
-    startColumn = 1,
-    endOffset = 1,
-    endLine = 1,
-    endColumn = 1
+    startLine = undefined,
+    startColumn = undefined,
+    endOffset = undefined,
+    endLine = undefined,
+    endColumn = undefined
 ): IToken {
     return {
         image: image,

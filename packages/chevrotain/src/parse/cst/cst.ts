@@ -30,16 +30,34 @@ import {
     IToken
 } from "../../../api"
 
-export function setNodeLocationOnlyOffset(
+export function setNodeLocationFromTokenOnlyOffset(
+    nodeLocation: CstNodeLocation,
+    token: IToken
+): void {
+    if (nodeLocation.startOffset > token.startOffset) {
+        nodeLocation.startOffset = token.startOffset
+    }
+
+    const endOffset = token.startOffset + token.image.length
+    if (nodeLocation.endOffset < endOffset) {
+        nodeLocation.endOffset = endOffset
+    }
+}
+
+export function setNodeLocationFromNodeOnlyOffset(
     nodeLocation: CstNodeLocation,
     locationInformation: any
 ): void {
     if (nodeLocation.startOffset > locationInformation.startOffset) {
         nodeLocation.startOffset = locationInformation.startOffset
     }
+
+    if (nodeLocation.endOffset < locationInformation.endOffset) {
+        nodeLocation.endOffset = locationInformation.endOffset
+    }
 }
 
-export function setNodeLocationOnlyStart(
+export function setNodeLocationFull(
     nodeLocation: CstNodeLocation,
     locationInformation: any
 ): void {
@@ -48,13 +66,6 @@ export function setNodeLocationOnlyStart(
         nodeLocation.startColumn = locationInformation.startColumn
         nodeLocation.startLine = locationInformation.startLine
     }
-}
-
-export function setNodeLocationFull(
-    nodeLocation: CstNodeLocation,
-    locationInformation: any
-): void {
-    setNodeLocationOnlyStart(nodeLocation, locationInformation)
 
     if (nodeLocation.endOffset < locationInformation.endOffset) {
         nodeLocation.endOffset = locationInformation.endOffset

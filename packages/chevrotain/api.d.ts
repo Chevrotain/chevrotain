@@ -1642,6 +1642,8 @@ export declare type CstChildrenDictionary = {
 
 export declare type CstElement = IToken | CstNode
 
+export declare type NodePositionTrackingOptions = "full" | "onlyOffset" | "none"
+
 export interface IParserConfig {
     /**
      * Is the error recovery / fault tolerance of the Chevrotain Parser enabled.
@@ -1686,7 +1688,7 @@ export interface IParserConfig {
     /**
      * Enable computation of CST nodes location
      */
-    nodePositionTracking?: "full" | "onlyStart" | "onlyOffset" | "none"
+    nodePositionTracking?: NodePositionTrackingOptions
     /**
      * A custom error message provider.
      * Can be used to override the default error messages.

@@ -1,9 +1,9 @@
 import {
     addNoneTerminalToCst,
     addTerminalToCst,
+    setNodeLocationFromTokenOnlyOffset,
     setNodeLocationFull,
-    setNodeLocationOnlyOffset,
-    setNodeLocationOnlyStart
+    setNodeLocationFromNodeOnlyOffset
 } from "../../cst/cst"
 import { has, isUndefined, NOOP } from "../../../utils/utils"
 import {
@@ -15,7 +15,8 @@ import {
     CstNodeLocation,
     ICstVisitor,
     IParserConfig,
-    IToken
+    IToken,
+    NodePositionTrackingOptions
 } from "../../../../api"
 import { getKeyForAltIndex } from "../../grammar/keys"
 import { MixedInParser } from "./parser_traits"
@@ -32,12 +33,16 @@ export class TreeBuilder {
     LAST_EXPLICIT_RULE_STACK: number[]
 
     // TODO: this method should have a better signature
-    setNodeLocation: (
+    setNodeLocationFromNode: (
+        nodeLocation: CstNodeLocation,
+        locationInformation: any
+    ) => void
+    setNodeLocationFromToken: (
         nodeLocation: CstNodeLocation,
         locationInformation: any
     ) => void
     setInitialNodeLocation: (cstNode: CstNode) => void
-    nodePositionTracking: IParserConfig["nodePositionTracking"]
+    nodePositionTracking: NodePositionTrackingOptions
 
     initTreeBuilder(this: MixedInParser, config: IParserConfig) {
         this.LAST_EXPLICIT_RULE_STACK = []
@@ -67,16 +72,16 @@ export class TreeBuilder {
         }
 
         if (/full/i.test(this.nodePositionTracking)) {
-            this.setNodeLocation = setNodeLocationFull
+            this.setNodeLocationFromToken = setNodeLocationFull
+            this.setNodeLocationFromNode = setNodeLocationFull
             this.setInitialNodeLocation = this.setInitialNodeLocationFull
-        } else if (/onlyStart/i.test(this.nodePositionTracking)) {
-            this.setNodeLocation = setNodeLocationOnlyStart
-            this.setInitialNodeLocation = this.setInitialNodeLocationOnlyStart
         } else if (/onlyOffset/i.test(this.nodePositionTracking)) {
-            this.setNodeLocation = setNodeLocationOnlyOffset
+            this.setNodeLocationFromToken = setNodeLocationFromTokenOnlyOffset
+            this.setNodeLocationFromNode = setNodeLocationFromNodeOnlyOffset
             this.setInitialNodeLocation = this.setInitialNodeLocationOnlyOffset
         } else if (/none/i.test(this.nodePositionTracking)) {
-            this.setNodeLocation = NOOP
+            this.setNodeLocationFromToken = NOOP
+            this.setNodeLocationFromNode = NOOP
             this.setInitialNodeLocation = NOOP
         } else {
             throw Error(
@@ -89,15 +94,8 @@ export class TreeBuilder {
 
     setInitialNodeLocationOnlyOffset(cstNode: CstNode): void {
         cstNode.location = {
-            startOffset: Infinity
-        }
-    }
-
-    setInitialNodeLocationOnlyStart(cstNode: CstNode): void {
-        cstNode.location = {
             startOffset: Infinity,
-            startLine: Infinity,
-            startColumn: Infinity
+            endOffset: -Infinity
         }
     }
 
@@ -174,7 +172,7 @@ export class TreeBuilder {
         // TODO: would save the "current rootCST be faster than locating it for each terminal?
         let rootCst = this.CST_STACK[this.CST_STACK.length - 1]
         addTerminalToCst(rootCst, consumedToken, key)
-        this.setNodeLocation(rootCst.location, consumedToken)
+        this.setNodeLocationFromToken(rootCst.location, consumedToken)
     }
 
     cstPostNonTerminal(
@@ -185,7 +183,7 @@ export class TreeBuilder {
         let node = this.CST_STACK[this.CST_STACK.length - 1]
 
         addNoneTerminalToCst(node, ruleName, ruleCstResult)
-        this.setNodeLocation(node.location, ruleCstResult.location)
+        this.setNodeLocationFromNode(node.location, ruleCstResult.location)
     }
 
     getBaseCstVisitorConstructor(
@@ -276,7 +274,10 @@ export class TreeBuilder {
         // this return a different result than the previous invocation because "nestedRuleFinallyStateUpdate" pops the cst stack
         let parentCstNode = cstStack[cstStack.length - 1]
         addNoneTerminalToCst(parentCstNode, nestedName, nestedRuleCst)
-        this.setNodeLocation(parentCstNode.location, nestedRuleCst.location)
+        this.setNodeLocationFromNode(
+            parentCstNode.location,
+            nestedRuleCst.location
+        )
     }
 
     getLastExplicitRuleShortName(this: MixedInParser): string {

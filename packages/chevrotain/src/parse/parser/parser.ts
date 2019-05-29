@@ -14,8 +14,7 @@ import { createTokenInstance, EOF } from "../../scan/tokens_public"
 import { deserializeGrammar } from "../gast_builder"
 import {
     analyzeCst,
-    setNodeLocationOnlyOffset,
-    setNodeLocationOnlyStart,
+    setNodeLocationFromNodeOnlyOffset,
     setNodeLocationFull
 } from "../cst/cst"
 import {
@@ -34,6 +33,7 @@ import {
     IRecognitionException,
     IRuleConfig,
     IToken,
+    NodePositionTrackingOptions,
     TokenType,
     TokenVocabulary
 } from "../../../api"
@@ -72,7 +72,7 @@ export const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
     outputCst: true,
     errorMessageProvider: defaultParserErrorProvider,
     serializedGrammar: null,
-    nodePositionTracking: <IParserConfig["nodePositionTracking"]>"none"
+    nodePositionTracking: <NodePositionTrackingOptions>"none"
 })
 
 export const DEFAULT_RULE_CONFIG: IRuleConfig<any> = Object.freeze({
