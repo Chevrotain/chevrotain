@@ -38,10 +38,7 @@ export function setNodeLocationFromTokenOnlyOffset(
         nodeLocation.startOffset = token.startOffset
     }
 
-    const endOffset = token.startOffset + token.image.length
-    if (nodeLocation.endOffset < endOffset) {
-        nodeLocation.endOffset = endOffset
-    }
+    nodeLocation.endOffset = token.startOffset + token.image.length
 }
 
 export function setNodeLocationFromNodeOnlyOffset(
@@ -52,9 +49,7 @@ export function setNodeLocationFromNodeOnlyOffset(
         nodeLocation.startOffset = locationInformation.startOffset
     }
 
-    if (nodeLocation.endOffset < locationInformation.endOffset) {
-        nodeLocation.endOffset = locationInformation.endOffset
-    }
+    nodeLocation.endOffset = locationInformation.endOffset
 }
 
 export function setNodeLocationFull(
