@@ -924,8 +924,6 @@ export declare class Parser {
     ): (idxInCallingRule?: number, ...args: any[]) => CstNode
 
     /**
-     * @see OVERRIDE_RULE
-     *
      * This overloaded signature is only relevant when outputCst=false.
      * @see IParserConfig.outputCst
      */
