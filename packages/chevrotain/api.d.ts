@@ -883,6 +883,8 @@ export declare class Parser {
     ): void
 
     /**
+     * This overloaded signature is only relevant when outputCst=true.
+     * @see IParserConfig.outputCst
      *
      * @param name - The name of the rule.
      * @param implementation - The implementation of the rule.
@@ -898,7 +900,8 @@ export declare class Parser {
     ): (idxInCallingRule?: number, ...args: any[]) => CstNode
 
     /**
-     * @see RULE
+     * This overloaded signature is only relevant when outputCst=false.
+     * @see IParserConfig.outputCst
      */
     /* protected */ RULE<T>(
         name: string,
@@ -907,9 +910,24 @@ export declare class Parser {
     ): (idxInCallingRule?: number, ...args: any[]) => T
 
     /**
+     * This overloaded signature is only relevant when outputCst=true.
+     * @see IParserConfig.outputCst
+     *
      * Same as {@link Parser.RULE}, but should only be used in
      * "extending" grammars to override rules/productions from the super grammar.
      * See [Parser Inheritance Example](https://github.com/SAP/chevrotain/tree/master/examples/parser/inheritance).
+     */
+    /* protected */ OVERRIDE_RULE<T>(
+        name: string,
+        impl: (...implArgs: any[]) => void,
+        config?: IRuleConfig<T>
+    ): (idxInCallingRule?: number, ...args: any[]) => CstNode
+
+    /**
+     * @see OVERRIDE_RULE
+     *
+     * This overloaded signature is only relevant when outputCst=false.
+     * @see IParserConfig.outputCst
      */
     /* protected */ OVERRIDE_RULE<T>(
         name: string,
