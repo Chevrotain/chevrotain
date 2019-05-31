@@ -1,12 +1,4 @@
-//
-import {
-    createToken,
-    Lexer,
-    Parser,
-    IToken,
-    ILexingError,
-    IRecognitionException
-} from "chevrotain"
+import { createToken, Lexer, Parser, CSTParser } from "chevrotain"
 
 const True = createToken({ name: "True", pattern: /true/ })
 const False = createToken({ name: "False", pattern: /false/ })
@@ -47,7 +39,7 @@ const allTokens = [
 ]
 const JsonLexer = new Lexer(allTokens)
 
-class JsonParserTypeScript extends Parser {
+class JsonParserTypeScript extends CSTParser {
     constructor() {
         super(allTokens)
         this.performSelfAnalysis()

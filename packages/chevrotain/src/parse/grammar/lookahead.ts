@@ -69,7 +69,7 @@ export function buildLookaheadFuncForOr(
     hasPredicates: boolean,
     dynamicTokensEnabled: boolean,
     laFuncBuilder: Function
-): (orAlts?: IAnyOrAlt<any>[]) => number {
+): (orAlts?: IAnyOrAlt[]) => number {
     let lookAheadPaths = getLookaheadPathsForOr(occurrence, ruleGrammar, k)
 
     const tokenMatcher = areTokenCategoriesNotUsed(lookAheadPaths)
@@ -133,7 +133,7 @@ export function buildAlternativesLookAheadFunc(
     hasPredicates: boolean,
     tokenMatcher: TokenMatcher,
     dynamicTokensEnabled: boolean
-): (orAlts?: IAnyOrAlt<any>[]) => number {
+): (orAlts?: IAnyOrAlt[]) => number {
     let numOfAlts = alts.length
     let areAllOneTokenLookahead = every(alts, currAlt => {
         return every(currAlt, currPath => {
@@ -146,7 +146,7 @@ export function buildAlternativesLookAheadFunc(
         /**
          * @returns {number} - The chosen alternative index
          */
-        return function(orAlts: IAnyOrAlt<any>[]): number {
+        return function(orAlts: IAnyOrAlt[]): number {
             // unfortunately the predicates must be extracted every single time
             // as they cannot be cached due to references to parameters(vars) which are no longer valid.
             // note that in the common case of no predicates, no cpu time will be wasted on this (see else block)

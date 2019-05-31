@@ -226,7 +226,7 @@ class EcmaScriptQuirksParser extends Parser {
         hasPredicates: boolean,
         tokenMatcher: TokenMatcher,
         dynamicTokensEnabled: boolean
-    ): (orAlts?: IAnyOrAlt<any>[]) => number | undefined {
+    ): (orAlts?: IAnyOrAlt[]) => number | undefined {
         if (
             !every(alts, currPath =>
                 every(currPath, currAlt => currAlt.length === 1)

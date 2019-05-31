@@ -747,14 +747,14 @@ export class RecognizerEngine {
         return afterIteration > beforeIteration
     }
 
-    orInternalNoCst<T>(
+    orInternalNoCst(
         this: MixedInParser,
-        altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>,
+        altsOrOpts: IAnyOrAlt[] | OrMethodOpts,
         occurrence: number
-    ): T {
+    ): any {
         let alts = isArray(altsOrOpts)
-            ? (altsOrOpts as IAnyOrAlt<T>[])
-            : (altsOrOpts as OrMethodOpts<T>).DEF
+            ? (altsOrOpts as IAnyOrAlt[])
+            : (altsOrOpts as OrMethodOpts).DEF
         let laFunc = this.getLookaheadFuncForOr(occurrence, alts)
         let altIdxToTake = laFunc.call(this, alts)
         if (altIdxToTake !== undefined) {
@@ -763,25 +763,25 @@ export class RecognizerEngine {
         }
         this.raiseNoAltException(
             occurrence,
-            (altsOrOpts as OrMethodOpts<T>).ERR_MSG
+            (altsOrOpts as OrMethodOpts).ERR_MSG
         )
     }
 
     orInternal<T>(
         this: MixedInParser,
-        altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>,
+        altsOrOpts: IAnyOrAlt[] | OrMethodOpts,
         occurrence: number
     ): T {
         let laKey = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
         let nestedName = this.nestedRuleBeforeClause(
-            <OrMethodOpts<T>>altsOrOpts,
+            <OrMethodOpts>altsOrOpts,
             laKey
         )
 
         try {
             let alts = isArray(altsOrOpts)
-                ? (altsOrOpts as IAnyOrAlt<T>[])
-                : (altsOrOpts as OrMethodOpts<T>).DEF
+                ? (altsOrOpts as IAnyOrAlt[])
+                : (altsOrOpts as OrMethodOpts).DEF
 
             let laFunc = this.getLookaheadFuncForOr(occurrence, alts)
             let altIdxToTake = laFunc.call(this, alts)
@@ -806,7 +806,7 @@ export class RecognizerEngine {
             }
             this.raiseNoAltException(
                 occurrence,
-                (altsOrOpts as OrMethodOpts<T>).ERR_MSG
+                (altsOrOpts as OrMethodOpts).ERR_MSG
             )
         } finally {
             if (nestedName !== undefined) {

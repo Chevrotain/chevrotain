@@ -344,63 +344,61 @@ declare class BaseParser {
      *
      * @returns The result of invoking the chosen alternative.
      */
-    // TODO: get rid of T, this is probably ANY because it depends on alternative chosen at runtime
-    //       and each alternative may return different types
-    /* protected */ OR<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR1<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR1(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR2<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR2(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR3<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR3(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR4<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR4(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR5<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR5(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR6<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR6(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR7<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR7(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR8<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR8(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR9<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR9(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
 
     /**
      * Parsing DSL method, that indicates a repetition of zero or more.
@@ -1742,13 +1740,13 @@ export interface DSLMethodOptsWithErr<T> extends DSLMethodOpts<T> {
     ERR_MSG?: string
 }
 
-export interface OrMethodOpts<T> {
+export interface OrMethodOpts {
     NAME?: string
     /**
      * The set of alternatives,
      * See detailed description in {@link Parser.OR}
      */
-    DEF: IAnyOrAlt<T>[]
+    DEF: IAnyOrAlt[]
     /**
      * A description for the alternatives used in error messages
      * If none is provided, the error message will include the names of the expected
@@ -1807,7 +1805,7 @@ export declare type GrammarAction<OUT> = () => OUT
 
 declare interface HashTable<V> {}
 
-export declare type IAnyOrAlt<T> = IOrAlt<T> | IOrAltWithGate<T>
+export declare type IAnyOrAlt = IOrAlt | IOrAltWithGate
 
 /**
  * ```
@@ -1818,9 +1816,9 @@ export declare type IAnyOrAlt<T> = IOrAlt<T> | IOrAltWithGate<T>
  *    ])
  * ```
  */
-export interface IOrAlt<T> {
+export interface IOrAlt {
     NAME?: string
-    ALT: () => T
+    ALT: () => any
 }
 
 /**
@@ -1832,10 +1830,10 @@ export interface IOrAlt<T> {
  *  ])
  * ```
  */
-export interface IOrAltWithGate<T> extends IOrAlt<T> {
+export interface IOrAltWithGate extends IOrAlt {
     NAME?: string
     GATE: () => boolean
-    ALT: () => T
+    ALT: () => any
 }
 
 export interface ICstVisitor<IN, OUT> {
