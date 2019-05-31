@@ -1,6 +1,6 @@
 const XRegExp = require("xregexp")
 const chevrotain = require("chevrotain")
-const { Lexer, BaseParser } = chevrotain
+const { Lexer, CstParser } = chevrotain
 
 // ----------------- lexer -----------------
 // Based on the specs in:
