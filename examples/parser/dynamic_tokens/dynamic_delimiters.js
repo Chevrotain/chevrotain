@@ -11,7 +11,7 @@
  * Otherwise certain performance optimizations may break as those assume that the Token vocabulary is static.
  */
 
-const { createToken, Lexer, CstParser } = require("chevrotain")
+const { createToken, Lexer, EmbeddedActionsParser } = require("chevrotain")
 
 // ----------------- lexer -----------------
 const LSquare = createToken({ name: "LSquare", pattern: /\[/ })
@@ -44,7 +44,7 @@ const allTokens = [
 // TODO: change to ES6 classes
 function DynamicDelimiterParser() {
     // invoke super constructor
-    CstParser.call(this, allTokens, {
+    EmbeddedActionsParser.call(this, allTokens, {
         outputCst: false,
         // by default the error recovery / fault tolerance capabilities are disabled
         // use this flag to enable them
@@ -79,7 +79,9 @@ function DynamicDelimiterParser() {
 }
 
 // inheritance as implemented in javascript in the previous decade... :(
-DynamicDelimiterParser.prototype = Object.create(CstParser.prototype)
+DynamicDelimiterParser.prototype = Object.create(
+    EmbeddedActionsParser.prototype
+)
 DynamicDelimiterParser.prototype.constructor = DynamicDelimiterParser
 
 // ----------------- wrapping it all together -----------------
