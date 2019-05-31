@@ -2,7 +2,12 @@ export as namespace chevrotain
 
 export declare const VERSION: string
 
-declare class BaseParser {
+/**
+ * This class does not actually exists nor is exposed at runtime.
+ * This is just a helper to avoid duplications in the Type Definitions
+ * Of `CstParser` and `EmbeddedActionsParser`
+ */
+declare abstract class BaseParser {
     /**
      * This must be called at the end of a Parser constructor.
      * See: http://sap.github.io/chevrotain/docs/tutorial/step2_parsing.html#under-the-hood
@@ -944,7 +949,7 @@ export declare class Parser extends BaseParser {
     ): T
 }
 
-export declare class CSTParser extends BaseParser {
+export declare class CstParser extends BaseParser {
     // TODO: remove `outputCST` from the config options in the constructor
     /**
      * @deprecated use {@link Parser.performSelfAnalysis} **instance** method instead.

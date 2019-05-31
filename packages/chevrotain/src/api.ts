@@ -1,6 +1,6 @@
 import {
     Parser,
-    CSTParser,
+    CstParser,
     EmbeddedActionsParser,
     ParserDefinitionErrorType,
     EMPTY_ALT
@@ -70,7 +70,7 @@ interface CstParserConstructor {
     new (
         tokenVocabulary: defs.TokenVocabulary,
         config?: defs.IParserConfig
-    ): defs.CSTParser
+    ): defs.CstParser
 }
 
 interface EmbeddedActionsParserConstructor {
@@ -159,7 +159,7 @@ interface RuleConstructor {
 const API: {
     VERSION: typeof defs.VERSION
     Parser: ParserConstructor
-    CSTParser: CstParserConstructor
+    CstParser: CstParserConstructor
     EmbeddedActionsParser: EmbeddedActionsParserConstructor
     ParserDefinitionErrorType: typeof defs.ParserDefinitionErrorType
     Lexer: LexerConstructor
@@ -211,7 +211,7 @@ API.VERSION = VERSION
 
 // runtime API
 API.Parser = Parser as any
-API.CSTParser = CSTParser as any
+API.CstParser = CstParser as any
 API.EmbeddedActionsParser = EmbeddedActionsParser as any
 
 // TypeCheck Multi Trait Parser API against official Chevrotain API

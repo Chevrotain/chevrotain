@@ -10,7 +10,7 @@
  */
 "use strict"
 
-const { createToken, Lexer, Parser } = require("chevrotain")
+const { createToken, Lexer, CstParser } = require("chevrotain")
 
 // ----------------- lexer -----------------
 
@@ -46,7 +46,7 @@ const allTokens = [
 const HelloLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
-class HelloParser extends Parser {
+class HelloParser extends CstParser {
     constructor() {
         super(allTokens)
 

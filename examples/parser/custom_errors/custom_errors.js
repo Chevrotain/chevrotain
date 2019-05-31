@@ -7,7 +7,7 @@
 const {
     createToken,
     Lexer,
-    Parser,
+    CstParser,
     defaultParserErrorProvider,
     tokenName
 } = require("chevrotain")
@@ -58,7 +58,7 @@ const myErrorProvider = {
 }
 
 // ----------------- parser -----------------
-class CustomErrorsParser extends Parser {
+class CustomErrorsParser extends CstParser {
     constructor(input) {
         super(allTokens, {
             // passing our custom error message provider

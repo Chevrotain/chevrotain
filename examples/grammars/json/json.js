@@ -1,4 +1,4 @@
-const { Parser, Lexer, createToken } = require("chevrotain")
+const { CstParser, Lexer, createToken } = require("chevrotain")
 
 // ----------------- lexer -----------------
 const True = createToken({ name: "True", pattern: /true/ })
@@ -43,13 +43,13 @@ const JsonLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
 
-class JsonParser extends Parser {
+class JsonParser extends CstParser {
     // Unfortunately no support for class fields with initializer in ES2015, only in esNext...
     // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
     // invoking RULE(...)
     // see: https://github.com/jeffmo/es-class-fields-and-static-properties
-    constructor(config) {
-        super(allTokens, config)
+    constructor() {
+        super(allTokens)
 
         // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
         const $ = this

@@ -9,7 +9,7 @@
  * See farther details here:
  * https://github.com/SAP/chevrotain/blob/master/docs/concrete_syntax_tree.md
  */
-const { createToken, tokenMatcher, Lexer, Parser } = require("chevrotain")
+const { createToken, tokenMatcher, Lexer, CstParser } = require("chevrotain")
 
 // ----------------- lexer -----------------
 // using the NA pattern marks this Token class as 'irrelevant' for the Lexer.
@@ -81,7 +81,7 @@ const CalculatorLexer = new Lexer(allTokens)
 // ----------------- parser -----------------
 // Note that this is a Pure grammar, it only describes the grammar
 // Not any actions (semantics) to perform during parsing.
-class CalculatorPure extends Parser {
+class CalculatorPure extends CstParser {
     // Unfortunately no support for class fields with initializer in ES2015, only in esNext...
     // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
     // invoking RULE(...)

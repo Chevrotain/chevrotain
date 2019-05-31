@@ -10,7 +10,12 @@
  * for an alternative:
  * https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js
  */
-const { createToken, Lexer, Parser, tokenMatcher } = require("chevrotain")
+const {
+    createToken,
+    Lexer,
+    EmbeddedActionsParser,
+    tokenMatcher
+} = require("chevrotain")
 
 // ----------------- lexer -----------------
 // using the NA pattern marks this Token class as 'irrelevant' for the Lexer.
@@ -81,7 +86,7 @@ const allTokens = [
 const CalculatorLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
-class Calculator extends Parser {
+class Calculator extends EmbeddedActionsParser {
     // Unfortunately no support for class fields with initializer in ES2015, only in esNext...
     // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
     // invoking RULE(...)

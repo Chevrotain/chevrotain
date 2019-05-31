@@ -1,5 +1,5 @@
 "use strict"
-const { createToken, Lexer, Parser } = require("chevrotain")
+const { createToken, Lexer, CstParser } = require("chevrotain")
 
 // ----------------- lexer -----------------
 const True = createToken({ name: "True", pattern: /true/ })
@@ -46,7 +46,7 @@ const allTokens = [
 const JsonLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
-class JsonParserES6 extends Parser {
+class JsonParserES6 extends CstParser {
     constructor(input) {
         super(allTokens)
 

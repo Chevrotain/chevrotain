@@ -1,4 +1,4 @@
-const { createToken, Lexer, Parser } = require("chevrotain")
+const { createToken, Lexer, CstParser } = require("chevrotain")
 
 // ----------------- lexer -----------------
 
@@ -12,7 +12,7 @@ const SerializedLexer = new Lexer(allTokens, { positionTracking: "onlyOffset" })
 
 // ----------------- parser -----------------
 
-class SerializedParser extends Parser {
+class SerializedParser extends CstParser {
     constructor(serializedGrammar) {
         // Invoke super constructor with serialized grammar in parser config.
         // Passing in serialized grammar without passing it into the parser

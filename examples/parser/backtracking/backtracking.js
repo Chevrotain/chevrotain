@@ -4,7 +4,7 @@
 // generally one should avoid having to use backtracking, and this specific example can be resolved without backtracking
 // by factoring out the common prefix, but for the sake of the example let us assume backtracking is required...
 
-const { createToken, Lexer, Parser } = require("chevrotain")
+const { createToken, Lexer, CstParser } = require("chevrotain")
 
 const Number = createToken({ name: "Number", pattern: /\d+/ })
 const Element = createToken({ name: "Element", pattern: /element/ })
@@ -34,7 +34,7 @@ const allTokens = [
 
 const backtrackingLexer = new Lexer(allTokens)
 
-class BackTrackingParser extends Parser {
+class BackTrackingParser extends CstParser {
     constructor() {
         super(
             allTokens,

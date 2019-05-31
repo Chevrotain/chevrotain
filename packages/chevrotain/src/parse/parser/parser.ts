@@ -253,7 +253,7 @@ applyMixins(Parser, [
     ContentAssist
 ])
 
-export class CSTParser extends Parser {
+export class CstParser extends Parser {
     constructor(
         tokenVocabulary: TokenVocabulary,
         config: IParserConfig = DEFAULT_PARSER_CONFIG

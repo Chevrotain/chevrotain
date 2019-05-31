@@ -14,7 +14,7 @@
     // ----------------- lexer -----------------
     const createToken = chevrotain.createToken
     const Lexer = chevrotain.Lexer
-    const Parser = chevrotain.Parser
+    const CstParser = chevrotain.CstParser
 
     const True = createToken({ name: "True", pattern: /true/ })
     const False = createToken({ name: "False", pattern: /false/ })
@@ -59,7 +59,7 @@
 
     function JsonParser() {
         // invoke super constructor
-        Parser.call(this, allTokens)
+        CstParser.call(this, allTokens)
 
         // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
         const $ = this
@@ -122,7 +122,7 @@
     }
 
     // inheritance as implemented in javascript in the previous decade... :(
-    JsonParser.prototype = Object.create(Parser.prototype)
+    JsonParser.prototype = Object.create(CstParser.prototype)
     JsonParser.prototype.constructor = JsonParser
 
     // ----------------- wrapping it all together -----------------

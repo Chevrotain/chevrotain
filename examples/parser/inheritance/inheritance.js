@@ -7,7 +7,7 @@
  * 3. This also shows an example of using Token inheritance
  */
 
-const { createToken, Lexer, Parser } = require("chevrotain")
+const { createToken, Lexer, CstParser } = require("chevrotain")
 
 // ----------------- lexer -----------------
 const RelationWord = createToken({ name: "RelationWord", pattern: Lexer.NA })
@@ -102,8 +102,8 @@ const GermanLexer = new Lexer(germanTokens)
 
 // ----------------- parser -----------------
 
-// Extending the base chevrotain Parser class
-class AbstractCommandsParser extends Parser {
+// Extending the base chevrotain CstParser class
+class AbstractCommandsParser extends CstParser {
     constructor(tokenVocabulary) {
         // combining the token vocabularies of parent and child.
         super(abstractTokens.concat(tokenVocabulary))

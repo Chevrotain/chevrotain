@@ -1,6 +1,6 @@
 "use strict"
 const chevrotain = require("chevrotain")
-const { Parser, Lexer, createToken } = chevrotain
+const { CstParser, Lexer, createToken } = chevrotain
 const XRegExp = require("xregexp")
 
 // ----------------- lexer -----------------
@@ -143,7 +143,7 @@ const allTokens = XmlLexerDefinition.modes.INSIDE.concat(
 )
 
 // ----------------- parser -----------------
-class XmlParser extends Parser {
+class XmlParser extends CstParser {
     // Unfortunately no support for class fields with initializer in ES2015, only in ESNext...
     // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
     // invoking RULE(...)

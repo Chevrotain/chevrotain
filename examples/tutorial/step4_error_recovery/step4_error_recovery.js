@@ -5,7 +5,7 @@ const chevrotain = require("chevrotain")
 // ----------------- lexer -----------------
 const createToken = chevrotain.createToken
 const Lexer = chevrotain.Lexer
-const Parser = chevrotain.Parser
+const CstParser = chevrotain.CstParser
 
 const True = createToken({ name: "True", pattern: /true/ })
 const False = createToken({ name: "False", pattern: /false/ })
@@ -51,7 +51,7 @@ const JsonLexer = new Lexer(allTokens, {
 
 // ----------------- parser -----------------
 
-class JsonParser extends Parser {
+class JsonParser extends CstParser {
     constructor() {
         super(allTokens, {
             // by default the error recovery / fault tolerance capabilities are disabled

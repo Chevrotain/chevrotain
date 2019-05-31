@@ -1,4 +1,4 @@
-const { Lexer, Parser, createToken } = require("chevrotain")
+const { Lexer, CstParser, createToken } = require("chevrotain")
 
 // ----------------- lexer -----------------
 const LSquare = createToken({ name: "LSquare", pattern: /\[/ })
@@ -15,7 +15,7 @@ const allTokens = [WhiteSpace, LSquare, RSquare, Comma, Integer]
 const ArrayLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
-class ArrayParser extends Parser {
+class ArrayParser extends CstParser {
     constructor(input) {
         super(allTokens)
         const $ = this

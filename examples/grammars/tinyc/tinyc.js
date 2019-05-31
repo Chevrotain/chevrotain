@@ -4,7 +4,7 @@
  */
 
 const chevrotain = require("chevrotain")
-const { Lexer, Parser } = chevrotain
+const { Lexer, CstParser } = chevrotain
 
 // ----------------- lexer -----------------
 const allTokens = []
@@ -43,7 +43,7 @@ const TinyCLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
 
-class TinyCParser extends Parser {
+class TinyCParser extends CstParser {
     // Unfortunately no support for class fields with initializer in ES2015, only in esNext...
     // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
     // invoking RULE(...)

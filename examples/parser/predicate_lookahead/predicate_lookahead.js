@@ -1,4 +1,4 @@
-const { createToken, Lexer, Parser } = require("chevrotain")
+const { createToken, Lexer, EmbeddedActionsParser } = require("chevrotain")
 
 // ----------------- lexer -----------------
 const One = createToken({ name: "One", pattern: /1/ })
@@ -46,7 +46,7 @@ function isThree() {
 }
 
 // ----------------- parser -----------------
-class PredicateLookaheadParser extends Parser {
+class PredicateLookaheadParser extends EmbeddedActionsParser {
     constructor() {
         super(allTokens, { outputCst: false })
 
