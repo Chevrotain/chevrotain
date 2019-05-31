@@ -10,7 +10,7 @@
         "chevrotain": "^4.5.0"
     },
     "scripts": {
-        "bundle": "webpack",
+        "build": "webpack",
         "test": "mocha test/*_spec.js"
     }
 }

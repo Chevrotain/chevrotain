@@ -3,12 +3,12 @@
 /packages/chevrotain/coverage
 /packages/chevrotain/scripts/gh-pages
 /examples/parser/minification/gen/
-/examples/parser/webpack/gen/
+/examples/webpack/gen/
 /examples/implementation_languages/typescript/typescript_json.js
 /examples/implementation_languages/coffeescript/coffeescript_json.js
 /packages/chevrotain/docs/.vuepress/dist
 **/node_modules/
-/examples/parser/webpack/lib
+/examples/webpack/lib
 /greenkeeper.json
 .nyc_output
 

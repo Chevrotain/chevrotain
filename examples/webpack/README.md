@@ -18,5 +18,5 @@ But add a little complexity to the development flows and parsing initialization.
 to run this example:
 
 -   npm install
--   npm run bundle
+-   npm run build
 -   npm test

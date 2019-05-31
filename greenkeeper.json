@@ -7,7 +7,7 @@
         "examples/implementation_languages/package.json",
         "examples/lexer/package.json",
         "examples/parser/package.json",
-        "examples/parser/webpack/package.json",
+        "examples/webpack/package.json",
         "examples/tutorial/package.json",
         "package.json"
       ]
