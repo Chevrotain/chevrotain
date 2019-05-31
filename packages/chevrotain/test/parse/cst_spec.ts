@@ -82,7 +82,7 @@ context("CST", () => {
             createRegularToken(C)
         ]
         let parser = new CstTerminalParser2(input)
-        let cst = parser.testRule()
+        let cst: any = parser.testRule()
         expect(cst.name).to.equal("testRule")
         expect(cst.children).to.have.keys("myLabel", "B", "myOtherLabel")
         expect(tokenStructuredMatcher(cst.children.myLabel[0], A)).to.be.true
