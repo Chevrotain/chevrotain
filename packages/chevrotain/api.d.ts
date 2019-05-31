@@ -2,12 +2,7 @@ export as namespace chevrotain
 
 export declare const VERSION: string
 
-export declare class Parser {
-    /**
-     * @deprecated use {@link Parser.performSelfAnalysis} **instance** method instead.
-     */
-    /* protected */ static performSelfAnalysis(parserInstance: Parser): void
-
+declare class BaseParser {
     /**
      * This must be called at the end of a Parser constructor.
      * See: http://sap.github.io/chevrotain/docs/tutorial/step2_parsing.html#under-the-hood
@@ -21,6 +16,7 @@ export declare class Parser {
      * See: http://sap.github.io/chevrotain/docs/FAQ.html#major-performance-benefits
      *
      * @param tokenVocabulary - A data structure containing all the Tokens used by the Parser.
+     * @param config - The Parser's configuration.
      */
     constructor(tokenVocabulary: TokenVocabulary, config?: IParserConfig)
 
@@ -182,112 +178,6 @@ export declare class Parser {
     ): IToken
 
     /**
-     * The Parsing DSL Method is used by one rule to call another.
-     * It is equivalent to a non-Terminal in EBNF notation.
-     *
-     * This may seem redundant as it does not actually do much.
-     * However using it is **mandatory** for all sub rule invocations.
-     *
-     * Calling another rule without wrapping in SUBRULE(...)
-     * will cause errors/mistakes in the Parser's self analysis phase,
-     * which will lead to errors in error recovery/automatic lookahead calculation
-     * and any other functionality relying on the Parser's self analysis
-     * output.
-     *
-     * As in CONSUME the index in the method name indicates the occurrence
-     * of the sub rule invocation in its rule.
-     *
-     * @param ruleToCall - The rule to invoke.
-     * @param options - optional properties to modify the behavior of SUBRULE.
-     * @returns The result of invoking ruleToCall.
-     */
-    /* protected */ SUBRULE<T>(
-        ruleToCall: (idx: number) => T,
-        options?: SubruleMethodOpts
-    ): T
-
-    /**
-     * @see SUBRULE
-     * @hidden
-     */
-    /* protected */ SUBRULE1<T>(
-        ruleToCall: (idx: number) => T,
-        options?: SubruleMethodOpts
-    ): T
-
-    /**
-     * @see SUBRULE
-     * @hidden
-     */
-    /* protected */ SUBRULE2<T>(
-        ruleToCall: (idx: number) => T,
-        options?: SubruleMethodOpts
-    ): T
-
-    /**
-     * @see SUBRULE
-     * @hidden
-     */
-    /* protected */ SUBRULE3<T>(
-        ruleToCall: (idx: number) => T,
-        options?: SubruleMethodOpts
-    ): T
-
-    /**
-     * @see SUBRULE
-     * @hidden
-     */
-    /* protected */ SUBRULE4<T>(
-        ruleToCall: (idx: number) => T,
-        options?: SubruleMethodOpts
-    ): T
-
-    /**
-     * @see SUBRULE
-     * @hidden
-     */
-    /* protected */ SUBRULE5<T>(
-        ruleToCall: (idx: number) => T,
-        options?: SubruleMethodOpts
-    ): T
-
-    /**
-     * @see SUBRULE
-     * @hidden
-     */
-    /* protected */ SUBRULE6<T>(
-        ruleToCall: (idx: number) => T,
-        options?: SubruleMethodOpts
-    ): T
-
-    /**
-     * @see SUBRULE
-     * @hidden
-     */
-    /* protected */ SUBRULE7<T>(
-        ruleToCall: (idx: number) => T,
-        options?: SubruleMethodOpts
-    ): T
-
-    /**
-     * @see SUBRULE
-     * @hidden
-     */
-    /* protected */ SUBRULE8<T>(
-        ruleToCall: (idx: number) => T,
-        options?: SubruleMethodOpts
-    ): T
-
-    /**
-     * @see SUBRULE
-     * @hidden
-     */
-    /* protected */ SUBRULE9<T>(
-        ruleToCall: (idx: number) => T,
-        options?: SubruleMethodOpts
-    ): T
-
-    /**
      * Parsing DSL Method that Indicates an Optional production.
      * in EBNF notation this is equivalent to: "[...]".
      *
@@ -317,6 +207,7 @@ export declare class Parser {
      * @param  actionORMethodDef - The grammar action to optionally invoke once
      *                             or an "OPTIONS" object describing the grammar action and optional properties.
      */
+    // TODO: return `OUT | undefined` explicitly
     /* protected */ OPTION<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT
@@ -453,6 +344,8 @@ export declare class Parser {
      *
      * @returns The result of invoking the chosen alternative.
      */
+    // TODO: get rid of T, this is probably ANY because it depends on alternative chosen at runtime
+    //       and each alternative may return different types
     /* protected */ OR<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
 
     /**
@@ -883,32 +776,6 @@ export declare class Parser {
     ): void
 
     /**
-     *
-     * @param name - The name of the rule.
-     * @param implementation - The implementation of the rule.
-     * @param [config] - The rule's optional configuration.
-     *
-     * @returns - The parsing rule which is the production implementation wrapped with the parsing logic that handles
-     *                     Parser state / error recovery&reporting/ ...
-     */
-    /* protected */ RULE<T>(
-        name: string,
-        implementation: (...implArgs: any[]) => T,
-        config?: IRuleConfig<T>
-    ): (idxInCallingRule?: number, ...args: any[]) => T | any
-
-    /**
-     * Same as {@link Parser.RULE}, but should only be used in
-     * "extending" grammars to override rules/productions from the super grammar.
-     * See [Parser Inheritance Example](https://github.com/SAP/chevrotain/tree/master/examples/parser/inheritance).
-     */
-    /* protected */ OVERRIDE_RULE<T>(
-        name: string,
-        impl: (...implArgs: any[]) => T,
-        config?: IRuleConfig<T>
-    ): (idxInCallingRule?: number, ...args: any[]) => T
-
-    /**
      * Returns an "imaginary" Token to insert when Single Token Insertion is done
      * Override this if you require special behavior in your grammar.
      * For example if an IntegerToken is required provide one with the image '0' so it would be valid syntactically.
@@ -938,6 +805,376 @@ export declare class Parser {
     /* protected */ SKIP_TOKEN(): IToken
 
     /* protected */ LA(howMuch: number): IToken
+}
+
+export declare class Parser extends BaseParser {
+    /**
+     * @deprecated use {@link Parser.performSelfAnalysis} **instance** method instead.
+     */
+    /* protected */ static performSelfAnalysis(parserInstance: Parser): void
+
+    /**
+     *
+     * @param name - The name of the rule.
+     * @param implementation - The implementation of the rule.
+     * @param [config] - The rule's optional configuration.
+     *
+     * @returns - The parsing rule which is the production implementation wrapped with the parsing logic that handles
+     *                     Parser state / error recovery&reporting/ ...
+     */
+    /* protected */ RULE<T>(
+        name: string,
+        implementation: (...implArgs: any[]) => T,
+        config?: IRuleConfig<T>
+    ): (idxInCallingRule?: number, ...args: any[]) => T | any
+
+    /**
+     * Same as {@link Parser.RULE}, but should only be used in
+     * "extending" grammars to override rules/productions from the super grammar.
+     * See [Parser Inheritance Example](https://github.com/SAP/chevrotain/tree/master/examples/parser/inheritance).
+     */
+    /* protected */ OVERRIDE_RULE<T>(
+        name: string,
+        impl: (...implArgs: any[]) => T,
+        config?: IRuleConfig<T>
+    ): (idxInCallingRule?: number, ...args: any[]) => T | any
+
+    /**
+     * The Parsing DSL Method is used by one rule to call another.
+     * It is equivalent to a non-Terminal in EBNF notation.
+     *
+     * This may seem redundant as it does not actually do much.
+     * However using it is **mandatory** for all sub rule invocations.
+     *
+     * Calling another rule without wrapping in SUBRULE(...)
+     * will cause errors/mistakes in the Parser's self analysis phase,
+     * which will lead to errors in error recovery/automatic lookahead calculation
+     * and any other functionality relying on the Parser's self analysis
+     * output.
+     *
+     * As in CONSUME the index in the method name indicates the occurrence
+     * of the sub rule invocation in its rule.
+     *
+     * @param ruleToCall - The rule to invoke.
+     * @param options - optional properties to modify the behavior of SUBRULE.
+     * @returns The result of invoking ruleToCall.
+     */
+    /* protected */ SUBRULE<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE1<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE2<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE3<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE4<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE5<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE6<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE7<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE8<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE9<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T
+}
+
+export declare class CSTParser extends BaseParser {
+    // TODO: remove `outputCST` from the config options in the constructor
+    /**
+     * @deprecated use {@link Parser.performSelfAnalysis} **instance** method instead.
+     */
+    /* protected */ static performSelfAnalysis(parserInstance: Parser): void
+
+    /**
+     * @see Parser.RULE
+     */
+    /* protected */ RULE(
+        name: string,
+        implementation: (...implArgs: any[]) => any,
+        config?: IRuleConfig<CstNode>
+    ): (idxInCallingRule?: number, ...args: any[]) => CstNode
+
+    /**
+     * @see Parser.RULE
+     */
+    /* protected */ OVERRIDE_RULE<T>(
+        name: string,
+        implementation: (...implArgs: any[]) => any,
+        config?: IRuleConfig<CstNode>
+    ): (idxInCallingRule?: number, ...args: any[]) => CstNode
+
+    /**
+     * @see Parser.SUBRULE
+     */
+    /* protected */ SUBRULE(
+        ruleToCall: (idx: number) => CstNode,
+        options?: SubruleMethodOpts
+    ): CstNode
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE1(
+        ruleToCall: (idx: number) => CstNode,
+        options?: SubruleMethodOpts
+    ): CstNode
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE2(
+        ruleToCall: (idx: number) => CstNode,
+        options?: SubruleMethodOpts
+    ): CstNode
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE3(
+        ruleToCall: (idx: number) => CstNode,
+        options?: SubruleMethodOpts
+    ): CstNode
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE4(
+        ruleToCall: (idx: number) => CstNode,
+        options?: SubruleMethodOpts
+    ): CstNode
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE5(
+        ruleToCall: (idx: number) => CstNode,
+        options?: SubruleMethodOpts
+    ): CstNode
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE6(
+        ruleToCall: (idx: number) => CstNode,
+        options?: SubruleMethodOpts
+    ): CstNode
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE7(
+        ruleToCall: (idx: number) => CstNode,
+        options?: SubruleMethodOpts
+    ): CstNode
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE8(
+        ruleToCall: (idx: number) => CstNode,
+        options?: SubruleMethodOpts
+    ): CstNode
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE9(
+        ruleToCall: (idx: number) => CstNode,
+        options?: SubruleMethodOpts
+    ): CstNode
+}
+
+export declare class EmbeddedActionsParser extends BaseParser {
+    /**
+     * @deprecated use {@link Parser.performSelfAnalysis} **instance** method instead.
+     */
+    /* protected */ static performSelfAnalysis(parserInstance: Parser): void
+
+    // TODO: remove `outputCST` from the config options in the constructor
+
+    /**
+     * @see Parser.RULE
+     */
+    /* protected */ RULE<T>(
+        name: string,
+        implementation: (...implArgs: any[]) => T,
+        config?: IRuleConfig<T>
+    ): (idxInCallingRule?: number, ...args: any[]) => T
+
+    /**
+     * @see Parser.OVERRIDE_RULE
+     */
+    /* protected */ OVERRIDE_RULE<T>(
+        name: string,
+        impl: (...implArgs: any[]) => T,
+        config?: IRuleConfig<T>
+    ): (idxInCallingRule?: number, ...args: any[]) => T
+
+    /**
+     * @see BaseParser.SUBRULE
+     */
+    /* protected */ SUBRULE<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE1<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE2<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE3<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE4<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE5<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE6<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE7<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE8<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T
+
+    /**
+     * @see SUBRULE
+     * @hidden
+     */
+    /* protected */ SUBRULE9<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T
 }
 
 export declare enum ParserDefinitionErrorType {
