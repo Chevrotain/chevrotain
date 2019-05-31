@@ -1,6 +1,9 @@
 import { createToken } from "../../../src/scan/tokens_public"
 import { Lexer } from "../../../src/scan/lexer_public"
-import { Parser } from "../../../src/parse/parser/traits/parser_traits"
+import {
+    EmbeddedActionsParser,
+    Parser
+} from "../../../src/parse/parser/traits/parser_traits"
 
 import {
     END_OF_FILE,
@@ -64,7 +67,7 @@ if (typeof (<any>new RegExp("(?:)")).sticky === "boolean") {
 
 const ErrorToken = createToken({ name: "ErrorToken" })
 
-class EcmaScriptQuirksParser extends Parser {
+class EcmaScriptQuirksParser extends EmbeddedActionsParser {
     constructor() {
         super(allTokens, { outputCst: false })
         this.performSelfAnalysis()

@@ -5,7 +5,11 @@ import { RecognizerApi } from "./recognizer_api"
 import { RecognizerEngine } from "./recognizer_engine"
 import { Recoverable } from "./recoverable"
 import { TreeBuilder } from "./tree_builder"
-import { Parser as ParserConstructorImpel } from "../parser"
+import {
+    Parser as ParserConstructorImpel,
+    CstParser as CstParserConstructorImpel,
+    EmbeddedActionsParser as EmbeddedActionsParserConstructorImpel
+} from "../parser"
 import * as defs from "../../../../api"
 import { ContentAssist } from "./context_assist"
 
@@ -35,3 +39,25 @@ interface MixedInParserConstructor {
 }
 
 export const Parser: MixedInParserConstructor = <any>ParserConstructorImpel
+
+interface MixedInCstParserConstructor {
+    new (
+        tokenVocabulary: defs.TokenVocabulary,
+        config?: defs.IParserConfig
+    ): defs.CstParser
+}
+
+export const CstParser: MixedInCstParserConstructor = <any>(
+    CstParserConstructorImpel
+)
+
+interface MixedInEmbeddedActionsParserConstructor {
+    new (
+        tokenVocabulary: defs.TokenVocabulary,
+        config?: defs.IParserConfig
+    ): defs.CstParser
+}
+
+export const EmbeddedActionsParser: MixedInEmbeddedActionsParserConstructor = <
+    any
+>EmbeddedActionsParserConstructorImpel
