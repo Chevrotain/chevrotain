@@ -57,11 +57,9 @@ context("CST", () => {
     })
 
     it("Can output a CST with labels", () => {
-        class CstTerminalParser2 extends Parser {
+        class CstTerminalParser2 extends CstParser {
             constructor(input: IToken[] = []) {
-                super(ALL_TOKENS, {
-                    outputCst: true
-                })
+                super(ALL_TOKENS, {})
                 this.input = input
 
                 this.performSelfAnalysis()

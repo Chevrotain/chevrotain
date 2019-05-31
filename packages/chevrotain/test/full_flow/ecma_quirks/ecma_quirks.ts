@@ -69,7 +69,7 @@ const ErrorToken = createToken({ name: "ErrorToken" })
 
 class EcmaScriptQuirksParser extends EmbeddedActionsParser {
     constructor() {
-        super(allTokens, { outputCst: false })
+        super(allTokens)
         this.performSelfAnalysis()
     }
 

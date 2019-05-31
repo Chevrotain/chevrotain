@@ -28,7 +28,10 @@
  * }
  */
 
-import { Parser } from "../../../../src/parse/parser/traits/parser_traits"
+import {
+    EmbeddedActionsParser,
+    Parser
+} from "../../../../src/parse/parser/traits/parser_traits"
 import * as allTokens from "./Switchcase_recovery_tokens"
 import {
     CaseTok,
@@ -52,14 +55,13 @@ export interface RetType {
 }
 
 // DOCS: to enable error recovery functionality one must extend BaseErrorRecoveryRecognizer
-export class SwitchCaseRecoveryParser extends Parser {
+export class SwitchCaseRecoveryParser extends EmbeddedActionsParser {
     constructor(input: IToken[] = []) {
         // DOCS: note the second parameter in the super class. this is the namespace in which the token constructors are defined.
         //       it is mandatory to provide this map to be able to perform self analysis
         //       and allow the framework to "understand" the implemented grammar.
         super(<any>allTokens, {
-            recoveryEnabled: true,
-            outputCst: false
+            recoveryEnabled: true
         })
         // DOCS: The call to performSelfAnalysis needs to happen after all the RULEs have been defined
         //       The typescript compiler places the constructor body last after initializations in the class's body

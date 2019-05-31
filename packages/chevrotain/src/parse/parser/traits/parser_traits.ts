@@ -55,7 +55,7 @@ interface MixedInEmbeddedActionsParserConstructor {
     new (
         tokenVocabulary: defs.TokenVocabulary,
         config?: defs.IParserConfig
-    ): defs.CstParser
+    ): defs.EmbeddedActionsParser
 }
 
 export const EmbeddedActionsParser: MixedInEmbeddedActionsParserConstructor = <
