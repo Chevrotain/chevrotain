@@ -318,6 +318,8 @@ describe("The Code Generation capabilities", () => {
 
     describeNodeOnly("moduleGeneration", () => {
         it("Can generate a module", () => {
+            const requireFromString = require("require-from-string")
+
             const Identifier = createToken({
                 name: "Identifier",
                 pattern: /\w+/
@@ -359,9 +361,8 @@ describe("The Code Generation capabilities", () => {
                 name: "genOrParserModule",
                 rules
             })
+            const parserModule = requireFromString(parserModuleText)
 
-            // tslint:disable-next-line
-            const parserModule = eval(parserModuleText)
             const myParser = new parserModule.genOrParserModule(tokenVocabulary)
 
             myParser.input = [createRegularToken(Identifier)]
