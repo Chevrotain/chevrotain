@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+-   [Expose two base Parser classes: CstParser and EmbeddedActionsParser.](https://github.com/SAP/chevrotain/issues/967).
+
 ## 4.5.0 (5-25-2019)
 
 #### Minor Changes
