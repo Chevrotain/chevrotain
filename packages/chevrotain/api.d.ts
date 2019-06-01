@@ -810,6 +810,11 @@ declare abstract class BaseParser {
     /* protected */ LA(howMuch: number): IToken
 }
 
+/**
+ * @deprecated Soft deprecated, CstParser or EmbeddedActionsParser instead.
+ *    - @see CstParser
+ *    - @see EmbeddedActionsParser
+ */
 export declare class Parser extends BaseParser {
     /**
      * @deprecated use {@link Parser.performSelfAnalysis} **instance** method instead.
@@ -949,6 +954,13 @@ export declare class Parser extends BaseParser {
     ): T
 }
 
+/**
+ * A Parser that outputs a Concrete Syntax Tree.
+ * See:
+ *    - https://sap.github.io/chevrotain/docs/tutorial/step3_adding_actions_root.html#alternatives
+ *    - https://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html
+ * For in depth docs.
+ */
 export declare class CstParser extends BaseParser {
     // TODO: remove `outputCST` from the config options in the constructor
     /**
@@ -1064,6 +1076,12 @@ export declare class CstParser extends BaseParser {
     ): CstNode
 }
 
+/**
+ * A Parser that relies on end user's embedded actions to control its output.
+ * For more details see:
+ *   - https://sap.github.io/chevrotain/docs/tutorial/step3_adding_actions_root.html#alternatives
+ *   - https://sap.github.io/chevrotain/docs/tutorial/step3b_adding_actions_embedded.html#simple-example
+ */
 export declare class EmbeddedActionsParser extends BaseParser {
     /**
      * @deprecated use {@link Parser.performSelfAnalysis} **instance** method instead.
