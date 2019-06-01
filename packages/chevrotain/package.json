@@ -100,7 +100,6 @@
         "karma-requirejs": "^1.1.0",
         "karma-safari-launcher": "^1.0.0",
         "load-grunt-tasks": "^4.0.0",
-        "mock-require": "^3.0.1",
         "nyc": "^13.0.1",
         "requirejs": "2.3.6",
         "require-from-string": "^2.0.2",
