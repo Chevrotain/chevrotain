@@ -48,7 +48,7 @@ function isThree() {
 // ----------------- parser -----------------
 class PredicateLookaheadParser extends EmbeddedActionsParser {
     constructor() {
-        super(allTokens, { outputCst: false })
+        super(allTokens)
 
         const $ = this
 

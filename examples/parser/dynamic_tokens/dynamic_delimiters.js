@@ -45,7 +45,6 @@ const allTokens = [
 function DynamicDelimiterParser() {
     // invoke super constructor
     EmbeddedActionsParser.call(this, allTokens, {
-        outputCst: false,
         // by default the error recovery / fault tolerance capabilities are disabled
         // use this flag to enable them
         recoveryEnabled: true,

@@ -86,18 +86,15 @@ const allTokens = [
 const CalculatorLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
+// We must extend `EmbeddedActionsParser` to enable support
+// for output based on the embedded actions.
 class Calculator extends EmbeddedActionsParser {
     // Unfortunately no support for class fields with initializer in ES2015, only in esNext...
     // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
     // invoking RULE(...)
     // see: https://github.com/jeffmo/es-class-fields-and-static-properties
     constructor() {
-        super(
-            allTokens,
-            // by default a CST (Parse Tree) would be constructed
-            // We must disable this feature to use embedded actions.
-            { outputCst: false }
-        )
+        super(allTokens)
 
         const $ = this
 
