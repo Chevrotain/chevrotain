@@ -1,4 +1,4 @@
-{Token, Lexer, Parser, createToken} = require 'chevrotain'
+{Token, Lexer, CstParser, createToken} = require 'chevrotain'
 
 True = createToken {name: 'True', pattern: /true/}
 False = createToken {name: 'False', pattern: /false/}
@@ -16,7 +16,7 @@ WhiteSpace = createToken {name: 'WhiteSpace', pattern: /[ \t\n\r]+/, group: Lexe
 allTokens = [WhiteSpace, NumberLiteral, StringLiteral, LCurly, RCurly, LSquare, RSquare, Comma, Colon, True, False, Null]
 JsonLexer = new Lexer allTokens
 
-class JsonParserCoffeeScript extends Parser
+class JsonParserCoffeeScript extends CstParser
   constructor: () ->
     super allTokens
 

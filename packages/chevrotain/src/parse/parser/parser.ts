@@ -1,6 +1,7 @@
 import { classNameFromInstance } from "../../lang/lang_extensions"
 import {
     applyMixins,
+    cloneObj,
     forEach,
     has,
     isEmpty,
@@ -251,3 +252,25 @@ applyMixins(Parser, [
     ErrorHandler,
     ContentAssist
 ])
+
+export class CstParser extends Parser {
+    constructor(
+        tokenVocabulary: TokenVocabulary,
+        config: IParserConfig = DEFAULT_PARSER_CONFIG
+    ) {
+        const configClone = cloneObj(config)
+        configClone.outputCst = true
+        super(tokenVocabulary, configClone)
+    }
+}
+
+export class EmbeddedActionsParser extends Parser {
+    constructor(
+        tokenVocabulary: TokenVocabulary,
+        config: IParserConfig = DEFAULT_PARSER_CONFIG
+    ) {
+        const configClone = cloneObj(config)
+        configClone.outputCst = false
+        super(tokenVocabulary, configClone)
+    }
+}

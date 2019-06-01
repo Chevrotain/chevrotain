@@ -7,7 +7,7 @@
  * 2. Partial parsing of only the modified parts of a document in an IDE.
  */
 
-const { createToken, Lexer, Parser } = require("chevrotain")
+const { createToken, Lexer, CstParser } = require("chevrotain")
 
 // ----------------- lexer -----------------
 const Alpha = createToken({ name: "Alpha", pattern: /A/ })
@@ -30,7 +30,7 @@ const allTokens = [
 const PhoneticLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
-class MultiStartParser extends Parser {
+class MultiStartParser extends CstParser {
     constructor() {
         super(allTokens)
 

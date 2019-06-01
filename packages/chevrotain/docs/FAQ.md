@@ -96,7 +96,7 @@ Chevrotain relies on **Function.name** property and **Function.toString()**.
 This means that certain webpack optimizations (minification) can break Chevrotain grammars under
 certain conditions.
 
-See [related documentation](https://github.com/SAP/chevrotain/blob/master/examples/parser/webpack/README.md) for details & workarounds.
+See [related documentation](https://github.com/SAP/chevrotain/blob/master/examples/webpack/README.md) for details & workarounds.
 
 ## Why does my parser appear to be stuck during its initialization?
 

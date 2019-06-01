@@ -638,7 +638,7 @@ function defineRecognizerSpecs(
                     }
 
                     public or = this.RULE("or", () => {
-                        return this.OR<number | string>([
+                        return this.OR([
                             {
                                 ALT: () => {
                                     this.CONSUME1(MinusTok)

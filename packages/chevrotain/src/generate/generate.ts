@@ -61,11 +61,12 @@ return new ${options.name}(tokenVocabulary, config)
 
 export function genClass(options: { name: string; rules: Rule[] }): string {
     // TODO: how to pass the token vocabulary? Constructor? other?
-    // TODO: should outputCst be enabled by default?
     let result = `
 function ${options.name}(tokenVocabulary, config) {
     // invoke super constructor
-    chevrotain.Parser.call(this, tokenVocabulary, config)
+    // No support for embedded actions currently, so we can 'hardcode'
+    // The use of CstParser.
+    chevrotain.CstParser.call(this, tokenVocabulary, config)
 
     const $ = this
 
@@ -78,7 +79,7 @@ function ${options.name}(tokenVocabulary, config) {
 }
 
 // inheritance as implemented in javascript in the previous decade... :(
-${options.name}.prototype = Object.create(chevrotain.Parser.prototype)
+${options.name}.prototype = Object.create(chevrotain.CstParser.prototype)
 ${options.name}.prototype.constructor = ${options.name}    
     `
 

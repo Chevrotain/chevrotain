@@ -1,6 +1,6 @@
 "use strict"
 
-const { Parser, EOF, tokenMatcher } = require("chevrotain")
+const { EmbeddedActionsParser, EOF, tokenMatcher } = require("chevrotain")
 const tokens = require("./ecma5_tokens")
 // for conciseness
 const t = tokens
@@ -9,14 +9,13 @@ const ENABLE_SEMICOLON_INSERTION = true
 const DISABLE_SEMICOLON_INSERTION = false
 
 // as defined in https://www.ecma-international.org/ecma-262/5.1/index.html
-class ECMAScript5Parser extends Parser {
+class ECMAScript5Parser extends EmbeddedActionsParser {
     set orgText(newText) {
         this._orgText = newText
     }
 
     constructor() {
         super(tokens, {
-            outputCst: false,
             ignoredIssues: {
                 Statement: { OR: true },
                 SourceElements: { OR: true }

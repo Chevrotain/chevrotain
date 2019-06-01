@@ -37,16 +37,16 @@ relationalOperator
 ```
 
 A Chevrotain Parser analyses an [IToken](https://sap.github.io/chevrotain/documentation/4_5_0/interfaces/itoken.html) vector that conforms to some grammar.
-The grammar is defined using the [parsing DSL](https://sap.github.io/chevrotain/documentation/4_5_0/classes/parser.html#at_least_one), which includes the following methods.
+The grammar is defined using the [parsing DSL](https://sap.github.io/chevrotain/documentation/4_5_0/classes/cstparser.html#at_least_one), which includes the following methods.
 
--   [CONSUME](https://sap.github.io/chevrotain/documentation/4_5_0/classes/parser.html#consume1) - 'eat' a Token.
--   [SUBRULE](https://sap.github.io/chevrotain/documentation/4_5_0/classes/parser.html#subrule1) - reference to another rule.
--   [OR](https://sap.github.io/chevrotain/documentation/4_5_0/classes/parser.html#or1) - Alternation
--   [OPTION](https://sap.github.io/chevrotain/documentation/4_5_0/classes/parser.html#option1) - optional production.
--   [MANY](https://sap.github.io/chevrotain/documentation/4_5_0/classes/parser.html#many1) - repetition zero or more.
--   [AT_LEAST_ONE](https://sap.github.io/chevrotain/documentation/4_5_0/classes/parser.html#at_least_one1) - repetition one or more.
--   [MANY_SEP](https://sap.github.io/chevrotain/documentation/4_5_0/classes/parser.html#many_sep1) - repetition (zero or more) with a separator between any two items
--   [AT_LEAST_ONE_SEP](https://sap.github.io/chevrotain/documentation/4_5_0/classes/parser.html#at_least_one_sep1) - repetition (one or more) with a separator between any two items
+-   [CONSUME](https://sap.github.io/chevrotain/documentation/4_5_0/classes/cstparser.html#consume) - 'eat' a Token.
+-   [SUBRULE](https://sap.github.io/chevrotain/documentation/4_5_0/classes/cstparser.html#subrule) - reference to another rule.
+-   [OR](https://sap.github.io/chevrotain/documentation/4_5_0/classes/cstparser.html#or) - Alternation
+-   [OPTION](https://sap.github.io/chevrotain/documentation/4_5_0/classes/cstparser.html#option) - optional production.
+-   [MANY](https://sap.github.io/chevrotain/documentation/4_5_0/classes/cstparser.html#many) - repetition zero or more.
+-   [AT_LEAST_ONE](https://sap.github.io/chevrotain/documentation/4_5_0/classes/cstparser.html#at_least_one) - repetition one or more.
+-   [MANY_SEP](https://sap.github.io/chevrotain/documentation/4_5_0/classes/cstparser.html#many_sep) - repetition (zero or more) with a separator between any two items
+-   [AT_LEAST_ONE_SEP](https://sap.github.io/chevrotain/documentation/4_5_0/classes/cstparser.html#at_least_one_sep) - repetition (one or more) with a separator between any two items
 
 ## First Rule
 
@@ -76,10 +76,10 @@ Fairly straight forward translation:
 -   What is 'this' in this context?
 -   where do we write the grammar rules?
 
-Each grammar rule is a property of a class that extends chevrotain.Parser.
+Each grammar rule is a property of a class that extends chevrotain.CstParser.
 
 ```javascript
-const { Parser } = require("chevrotain")
+const { CstParser } = require("chevrotain")
 const allTokens = [
     WhiteSpace,
     Select,
@@ -92,7 +92,7 @@ const allTokens = [
     LessThan
 ]
 
-class SelectParser extends Parser {
+class SelectParser extends CstParser {
     constructor() {
         super(allTokens)
 
@@ -115,7 +115,7 @@ Important to note that:
 
 -   The **super** invocation has an array of the Tokens as the second parameter.
     This is the same array we used to define the Lexer and it is used to define the Parser's vocabulary.
--   The method **Parser.prototype.performSelfAnalysis** must be invoked at the end of the constructor.
+-   The method **performSelfAnalysis** must be invoked at the end of the constructor.
     This is where much of the 'secret sauce' happens, including creating the inner grammar representation
     and performing static checks on the grammar.
 
@@ -222,7 +222,7 @@ can be used for error messages and fault tolerance as well as deciding which pat
 Let's finish implementing the whole SelectParser:
 
 ```javascript
-const { Parser } = require("chevrotain")
+const { CstParser } = require("chevrotain")
 const allTokens = [
     WhiteSpace,
     Select,
@@ -235,7 +235,7 @@ const allTokens = [
     LessThan
 ]
 
-class SelectParser extends Parser {
+class SelectParser extends CstParser {
     constructor() {
         super(allTokens)
 

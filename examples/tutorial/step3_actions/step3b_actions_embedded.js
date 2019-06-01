@@ -10,7 +10,7 @@
 // https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step3a_actions_visitor.js
 
 const selectLexer = require("../step1_lexing/step1_lexing")
-const Parser = require("chevrotain").Parser
+const EmbeddedActionsParser = require("chevrotain").EmbeddedActionsParser
 const tokenVocabulary = selectLexer.tokenVocabulary
 
 // individual imports, prefer ES6 imports if supported in your runtime/transpiler...
@@ -24,13 +24,9 @@ const LessThan = tokenVocabulary.LessThan
 const Comma = tokenVocabulary.Comma
 
 // ----------------- parser -----------------
-class SelectParserEmbedded extends Parser {
+class SelectParserEmbedded extends EmbeddedActionsParser {
     constructor() {
-        super(
-            tokenVocabulary,
-            // we have to explicitly disable the CST building for embedded actions to work.
-            { outputCst: false }
-        )
+        super(tokenVocabulary)
         const $ = this
 
         this.selectStatement = $.RULE("selectStatement", () => {

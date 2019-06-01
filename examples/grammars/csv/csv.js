@@ -6,7 +6,7 @@
  *
  * Note that this is a pure grammar without any actions (either embedded or via a CST Visitor).
  */
-const { createToken, Lexer, Parser, EMPTY_ALT } = require("chevrotain")
+const { createToken, Lexer, CstParser, EMPTY_ALT } = require("chevrotain")
 
 // ----------------- lexer -----------------
 const Text = createToken({ name: "Text", pattern: /[^,\n\r"]+/ })
@@ -21,7 +21,7 @@ const allTokens = [Text, String, Comma, NewLine]
 const CsvLexer = new Lexer(allTokens)
 
 // Parser
-class CsvParser extends Parser {
+class CsvParser extends CstParser {
     constructor() {
         super(allTokens)
 

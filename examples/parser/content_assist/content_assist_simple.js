@@ -8,7 +8,7 @@
  * "call f" --> ["foo"] // assuming foo is in the symbol table.
  */
 const _ = require("lodash")
-const { createToken, Lexer, Parser, EMPTY_ALT } = require("chevrotain")
+const { createToken, Lexer, CstParser } = require("chevrotain")
 
 const A = createToken({ name: "A", pattern: /A/ })
 const B = createToken({ name: "B", pattern: /B/ })
@@ -24,7 +24,7 @@ const allTokens = [WhiteSpace, A, B, C]
 const StatementsLexer = new Lexer(allTokens)
 
 // A completely normal Chevrotain Parser, no changes needed to use the content assist capabilities.
-class MyParser extends Parser {
+class MyParser extends CstParser {
     constructor() {
         super(allTokens)
 

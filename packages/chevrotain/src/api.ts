@@ -1,5 +1,7 @@
 import {
     Parser,
+    CstParser,
+    EmbeddedActionsParser,
     ParserDefinitionErrorType,
     EMPTY_ALT
 } from "./parse/parser/parser"
@@ -62,6 +64,20 @@ interface ParserConstructor {
         tokenVocabulary: defs.TokenVocabulary,
         config?: defs.IParserConfig
     ): defs.Parser
+}
+
+interface CstParserConstructor {
+    new (
+        tokenVocabulary: defs.TokenVocabulary,
+        config?: defs.IParserConfig
+    ): defs.CstParser
+}
+
+interface EmbeddedActionsParserConstructor {
+    new (
+        tokenVocabulary: defs.TokenVocabulary,
+        config?: defs.IParserConfig
+    ): defs.EmbeddedActionsParser
 }
 
 interface LexerConstructor {
@@ -143,6 +159,8 @@ interface RuleConstructor {
 const API: {
     VERSION: typeof defs.VERSION
     Parser: ParserConstructor
+    CstParser: CstParserConstructor
+    EmbeddedActionsParser: EmbeddedActionsParserConstructor
     ParserDefinitionErrorType: typeof defs.ParserDefinitionErrorType
     Lexer: LexerConstructor
     LexerDefinitionErrorType: typeof defs.LexerDefinitionErrorType
@@ -193,6 +211,9 @@ API.VERSION = VERSION
 
 // runtime API
 API.Parser = Parser as any
+API.CstParser = CstParser as any
+API.EmbeddedActionsParser = EmbeddedActionsParser as any
+
 // TypeCheck Multi Trait Parser API against official Chevrotain API
 // The only thing this does not check is the constructor signature.
 const mixedDummyInstance: MixedInParser = null

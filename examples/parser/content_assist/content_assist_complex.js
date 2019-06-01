@@ -11,7 +11,7 @@ const _ = require("lodash")
 const {
     createToken,
     Lexer,
-    Parser,
+    CstParser,
     tokenMatcher,
     EMPTY_ALT
 } = require("chevrotain")
@@ -65,7 +65,7 @@ const allTokens = [
 const StatementsLexer = new Lexer(allTokens)
 
 // A completely normal Chevrotain Parser, no changes needed to use the content assist capabilities.
-class StatementsParser extends Parser {
+class StatementsParser extends CstParser {
     constructor() {
         super(allTokens)
 

@@ -2,9 +2,8 @@
     "name": "chevrotain_examples_parser",
     "version": "4.5.0",
     "scripts": {
-        "build": "npm-run-all build:minification build:webpack build:serialized-grammar",
+        "build": "npm-run-all build:minification build:serialized-grammar",
         "build:minification": "grunt --gruntfile minification/gruntfile.js",
-        "build:webpack": "cd webpack && yarn install && yarn bundle && shx rm -rf node_modules && cd ..",
         "build:serialized-grammar": "node ./serialized_grammar/gen_serialized.js",
         "test": "mocha \"!(node_modules)/**/*spec.js\""
     },

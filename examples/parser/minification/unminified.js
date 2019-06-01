@@ -13,7 +13,7 @@
     // ----------------- lexer -----------------
     var createToken = chevrotain.createToken
     var Lexer = chevrotain.Lexer
-    var Parser = chevrotain.Parser
+    var CstParser = chevrotain.CstParser
 
     var True = createToken({ name: "True", pattern: /true/ })
     var False = createToken({ name: "False", pattern: /false/ })
@@ -58,7 +58,7 @@
 
     function JsonParserToMinifiy() {
         // invoke super constructor
-        Parser.call(this, allTokens)
+        CstParser.call(this, allTokens)
 
         // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
         var $ = this
@@ -121,7 +121,7 @@
     }
 
     // inheritance as implemented in javascript in the previous decade... :(
-    JsonParserToMinifiy.prototype = Object.create(Parser.prototype)
+    JsonParserToMinifiy.prototype = Object.create(CstParser.prototype)
     JsonParserToMinifiy.prototype.constructor = JsonParserToMinifiy
 
     // ----------------- wrapping it all together -----------------

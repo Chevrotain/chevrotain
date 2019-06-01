@@ -8,7 +8,7 @@
 // Using the Token Vocabulary defined in the previous step.
 
 const selectLexer = require("../step1_lexing/step1_lexing")
-const Parser = require("chevrotain").Parser
+const CstParser = require("chevrotain").CstParser
 const tokenVocabulary = selectLexer.tokenVocabulary
 
 // individual imports, prefer ES6 imports if supported in your runtime/transpiler...
@@ -22,11 +22,9 @@ const LessThan = tokenVocabulary.LessThan
 const Comma = tokenVocabulary.Comma
 
 // ----------------- parser -----------------
-class SelectParser extends Parser {
-    // A config object as a constructor argument is normally not needed.
-    // Our tutorial scenario requires a dynamic configuration to support step3 without duplicating code.
-    constructor(config) {
-        super(tokenVocabulary, config)
+class SelectParser extends CstParser {
+    constructor() {
+        super(tokenVocabulary)
 
         // for conciseness
         const $ = this

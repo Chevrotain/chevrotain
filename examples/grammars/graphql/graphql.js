@@ -24,7 +24,7 @@
         root["graphQlGrammar"] = factory(root.chevrotain, root.XRegExp)
     }
 })(this, function(chevrotain, XRegExp) {
-    const { Parser, Lexer, createToken: orgCreateToken } = chevrotain
+    const { CstParser, Lexer, createToken: orgCreateToken } = chevrotain
 
     // ----------------- lexer -----------------
     // A little mini DSL for easier lexer definition using xRegExp.
@@ -275,7 +275,7 @@
 
     const GraphQLLexer = new Lexer(allTokens)
 
-    class GraphQLParser extends Parser {
+    class GraphQLParser extends CstParser {
         // Unfortunately no support for class fields with initializer in ES2015, only in esNext...
         // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
         // invoking RULE(...)

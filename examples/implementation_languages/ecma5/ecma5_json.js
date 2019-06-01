@@ -3,7 +3,7 @@ var chevrotain = require("chevrotain")
 // ----------------- lexer -----------------
 var createToken = chevrotain.createToken
 var Lexer = chevrotain.Lexer
-var Parser = chevrotain.Parser
+var CstParser = chevrotain.CstParser
 
 var True = createToken({ name: "True", pattern: /true/ })
 var False = createToken({ name: "False", pattern: /false/ })
@@ -47,7 +47,7 @@ var JsonLexer = new Lexer(allTokens)
 // ----------------- parser -----------------
 function JsonParserES5() {
     // invoke super constructor
-    Parser.call(this, allTokens)
+    CstParser.call(this, allTokens)
 
     // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
     var $ = this
@@ -108,7 +108,7 @@ function JsonParserES5() {
 }
 
 // Using ES5 inheritance must be implemented using prototypes semantics.
-JsonParserES5.prototype = Object.create(Parser.prototype)
+JsonParserES5.prototype = Object.create(CstParser.prototype)
 JsonParserES5.prototype.constructor = JsonParserES5
 
 // ----------------- wrapping it all together -----------------

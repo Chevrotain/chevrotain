@@ -10,7 +10,12 @@
  * for an alternative:
  * https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js
  */
-const { createToken, Lexer, Parser, tokenMatcher } = require("chevrotain")
+const {
+    createToken,
+    Lexer,
+    EmbeddedActionsParser,
+    tokenMatcher
+} = require("chevrotain")
 
 // ----------------- lexer -----------------
 // using the NA pattern marks this Token class as 'irrelevant' for the Lexer.
@@ -81,18 +86,15 @@ const allTokens = [
 const CalculatorLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
-class Calculator extends Parser {
+// We must extend `EmbeddedActionsParser` to enable support
+// for output based on the embedded actions.
+class Calculator extends EmbeddedActionsParser {
     // Unfortunately no support for class fields with initializer in ES2015, only in esNext...
     // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
     // invoking RULE(...)
     // see: https://github.com/jeffmo/es-class-fields-and-static-properties
     constructor() {
-        super(
-            allTokens,
-            // by default a CST (Parse Tree) would be constructed
-            // We must disable this feature to use embedded actions.
-            { outputCst: false }
-        )
+        super(allTokens)
 
         const $ = this
 

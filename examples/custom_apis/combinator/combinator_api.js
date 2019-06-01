@@ -116,9 +116,7 @@ function createParser(name, rules, tokenVocabulary) {
         tokenVocabulary: tokenVocabulary
     })
     // The IParserConfig is passed to the parserFactory
-    // Look for IParserConfig on the htmls docs for additional info
-    // https://sap.github.io/chevrotain/documentation/1_0_1/globals.html
-    return parserFactory({ outputCst: true })
+    return parserFactory()
 }
 
 function toDefinition(item) {

@@ -1,2 +1,3 @@
 # examples should always use latest chevrotain, we don't want to use lock files here.
 yarn.lock
+webpack/lib

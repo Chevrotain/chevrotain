@@ -13,24 +13,21 @@ result/data structure/value.
 
 This can be accomplished using two features of the Parsing DSL:
 
--   [CONSUME](https://sap.github.io/chevrotain/documentation/4_5_0/classes/parser.html#consume1) will return
+-   [CONSUME](https://sap.github.io/chevrotain/documentation/4_5_0/classes/embeddedactionsparser.html#consume) will return
     The [IToken](https://sap.github.io/chevrotain/documentation/4_5_0/interfaces/itoken.html) object consumed.
--   [SUBRULE](https://sap.github.io/chevrotain/documentation/4_5_0/classes/parser.html#subrule1) will return
+-   [SUBRULE](https://sap.github.io/chevrotain/documentation/4_5_0/classes/embeddedactionsparser.html#subrule) will return
     the result of the grammar rule invoked.
 
 ### Enabling embedded actions
 
-For embedded actions to work as expected the automatic CST creation must first be disabled.
-The CST creation is controlled by the **outputCst** flag of the parser [configuration object](https://sap.github.io/chevrotain/documentation/4_5_0/interfaces/iparserconfig.html).
+For embedded actions to work as expected we need to extend the EmbeddedActionsParser class instead of the CstParser class.
 
 ```javascript
-class SelectParserEmbedded extends Parser {
+const { EmbeddedActionsParser } = require("chevrotain")
+
+class SelectParserEmbedded extends EmbeddedActionsParser {
     constructor() {
-        super(
-            tokenVocabulary,
-            // we have to explicitly disable the CST building for embedded actions to work.
-            { outputCst: false }
-        )
+        super(tokenVocabulary)
     }
 }
 ```

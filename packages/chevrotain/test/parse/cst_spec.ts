@@ -1,9 +1,9 @@
 import { createToken } from "../../src/scan/tokens_public"
-import { Parser } from "../../src/parse/parser/traits/parser_traits"
+import { CstParser, Parser } from "../../src/parse/parser/traits/parser_traits"
 import { tokenStructuredMatcher } from "../../src/scan/tokens"
 import { createRegularToken } from "../utils/matchers"
 import { map } from "../../src/utils/utils"
-import { IToken, TokenType } from "../../api"
+import { CstNode, IToken, TokenType } from "../../api"
 
 function createTokenVector(tokTypes: TokenType[]): any[] {
     return map(tokTypes, curTokType => {
@@ -21,7 +21,7 @@ context("CST", () => {
     const ALL_TOKENS = [A, B, C, D, E]
 
     it("Can output a CST for a flat structure", () => {
-        class CstTerminalParser extends Parser {
+        class CstTerminalParser extends CstParser {
             constructor(input: IToken[] = []) {
                 super(ALL_TOKENS)
                 this.input = input
@@ -46,7 +46,7 @@ context("CST", () => {
             createRegularToken(C)
         ]
         let parser = new CstTerminalParser(input)
-        let cst = parser.testRule()
+        let cst: any = parser.testRule()
         expect(cst.name).to.equal("testRule")
         expect(cst.children).to.have.keys("A", "B", "bamba")
         expect(tokenStructuredMatcher(cst.children.A[0], A)).to.be.true
@@ -57,11 +57,9 @@ context("CST", () => {
     })
 
     it("Can output a CST with labels", () => {
-        class CstTerminalParser2 extends Parser {
+        class CstTerminalParser2 extends CstParser {
             constructor(input: IToken[] = []) {
-                super(ALL_TOKENS, {
-                    outputCst: true
-                })
+                super(ALL_TOKENS, {})
                 this.input = input
 
                 this.performSelfAnalysis()
@@ -84,7 +82,7 @@ context("CST", () => {
             createRegularToken(C)
         ]
         let parser = new CstTerminalParser2(input)
-        let cst = parser.testRule()
+        let cst: any = parser.testRule()
         expect(cst.name).to.equal("testRule")
         expect(cst.children).to.have.keys("myLabel", "B", "myOtherLabel")
         expect(tokenStructuredMatcher(cst.children.myLabel[0], A)).to.be.true

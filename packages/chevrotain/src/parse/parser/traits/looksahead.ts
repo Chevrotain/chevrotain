@@ -71,7 +71,7 @@ export class LooksAhead {
         hasPredicates: boolean,
         tokenMatcher: TokenMatcher,
         dynamicTokensEnabled: boolean
-    ): (orAlts?: IAnyOrAlt<any>[]) => number | undefined {
+    ): (orAlts?: IAnyOrAlt[]) => number | undefined {
         return buildAlternativesLookAheadFunc(
             alts,
             hasPredicates,
@@ -97,7 +97,7 @@ export class LooksAhead {
     getLookaheadFuncForOr(
         this: MixedInParser,
         occurrence: number,
-        alts: IAnyOrAlt<any>[]
+        alts: IAnyOrAlt[]
     ): () => number {
         let key = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
         let laFunc: any = this.getLaFuncFromCache(key)
@@ -106,7 +106,7 @@ export class LooksAhead {
             let ruleGrammar = this.getGAstProductions().get(ruleName)
             // note that hasPredicates is only computed once.
             let hasPredicates = some(alts, currAlt =>
-                isFunction((<IOrAltWithGate<any>>currAlt).GATE)
+                isFunction((<IOrAltWithGate>currAlt).GATE)
             )
             laFunc = buildLookaheadFuncForOr(
                 occurrence,

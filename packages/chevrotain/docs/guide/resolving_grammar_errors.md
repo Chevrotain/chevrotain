@@ -52,15 +52,15 @@ This parser
 -   The TokenType's name does not match its literal form.
 
     ```javascript
-    import { createToken, Parser } from "chevrotain"
+    import { createToken, CstParser } from "chevrotain"
 
     // note the name property "copyPastaMistake" is different that the variable name "Integer"
     const Integer = createToken({ name: "copyPastaMistake", pattern: /\d+/ })
     const allTokens = [Integer]
 
-    class MyParser extends Parser {
+    class MyParser extends CstParser {
         constructor(input, config) {
-            super(input, allTokens, config)
+            super(allTokens, config)
 
             $.RULE("MyRule", () => {
                 // Will cause "Terminal Token Name Not Found"
@@ -73,15 +73,15 @@ This parser
 -   The TokenType's was not provided to the parser in the tokenDictionary argument.
 
     ```javascript
-    import { createToken, Parser } from "chevrotain"
+    import { createToken, CstParser } from "chevrotain"
 
     const Integer = createToken({ name: "Integer", pattern: /\d+/ })
     // Opps we forgot to add the Integer Token to the TokenDictionary
     const allTokens = []
 
-    class MyParser extends Parser {
+    class MyParser extends CstParser {
         constructor(input, config) {
-            super(input, allTokens, config)
+            super(allTokens, config)
 
             $.RULE("MyRule", () => {
                 // Will cause "Terminal Token Name Not Found"
