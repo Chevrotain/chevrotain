@@ -116,7 +116,7 @@ function createParser(name, rules, tokenVocabulary) {
         tokenVocabulary: tokenVocabulary
     })
     // The IParserConfig is passed to the parserFactory
-    return parserFactory({ outputCst: true })
+    return parserFactory()
 }
 
 function toDefinition(item) {

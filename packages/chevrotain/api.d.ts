@@ -1927,6 +1927,10 @@ export interface IParserConfig {
      */
     dynamicTokensEnabled?: boolean
     /**
+     * @deprecated - extend either CstParser or EmbeddedActionsParser to control this flag instead
+     *               - @see CstParser
+     *               - @see EmbeddedActionsParser
+     *
      * Enable automatic Concrete Syntax Tree creation
      * For in-depth docs on [Concrete Syntax Trees](http://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html):
      */
