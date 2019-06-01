@@ -27,7 +27,7 @@ There are two major differences.
 
 How to enable CST output?
 
-This feature is enabled when a parser extends the [CstParser class](https://sap.github.io/chevrotain/documentation/4_5_0/classes/cstparser.html).
+This feature is enabled when a parser extends the [CstParser class](https://sap.github.io/chevrotain/documentation/4_6_0/classes/cstparser.html).
 
 ## Structure
 
