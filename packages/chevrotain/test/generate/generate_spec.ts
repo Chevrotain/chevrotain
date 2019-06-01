@@ -317,14 +317,7 @@ describe("The Code Generation capabilities", () => {
     })
 
     describeNodeOnly("moduleGeneration", () => {
-        before(() => {
-            const mock = require("mock-require")
-            mock("chevrotain", { Parser: Parser })
-        })
-
         it("Can generate a module", () => {
-            const requireFromString = require("require-from-string")
-
             const Identifier = createToken({
                 name: "Identifier",
                 pattern: /\w+/
@@ -366,7 +359,9 @@ describe("The Code Generation capabilities", () => {
                 name: "genOrParserModule",
                 rules
             })
-            const parserModule = requireFromString(parserModuleText)
+
+            // tslint:disable-next-line
+            const parserModule = eval(parserModuleText)
             const myParser = new parserModule.genOrParserModule(tokenVocabulary)
 
             myParser.input = [createRegularToken(Identifier)]
@@ -376,11 +371,6 @@ describe("The Code Generation capabilities", () => {
             myParser.input = [createRegularToken(Integer)]
             myParser.topRule()
             expect(myParser.errors).to.be.empty
-        })
-
-        after(() => {
-            const mock = require("mock-require")
-            mock.stop("chevrotain")
         })
     })
 })

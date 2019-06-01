@@ -102,7 +102,6 @@
         "load-grunt-tasks": "^4.0.0",
         "mock-require": "^3.0.1",
         "nyc": "^13.0.1",
-        "require-from-string": "^2.0.1",
         "requirejs": "2.3.6",
         "sinon": "^7.2.3",
         "sinon-chai": "^3.0.0",
