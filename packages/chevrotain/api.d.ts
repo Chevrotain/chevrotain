@@ -812,8 +812,8 @@ declare abstract class BaseParser {
 
 /**
  * @deprecated Soft deprecated, CstParser or EmbeddedActionsParser instead.
- *    - @see CstParser
- *    - @see EmbeddedActionsParser
+ *    - {@link CstParser}
+ *    - {@link EmbeddedActionsParser}
  */
 export declare class Parser extends BaseParser {
     /**

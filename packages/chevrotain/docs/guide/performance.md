@@ -30,7 +30,7 @@ many computations required for its execution, This cache is kept on the instance
 So creating a new Parser instance for each input would lose all advantages of this cache.
 
 Note that this means that if your parser "carries" additional state, that state should also be reset.
-Simply override the Parser's [reset](https://sap.github.io/chevrotain/documentation/4_5_0/classes/parser.html#reset) method
+Simply override the Parser's [reset](https://sap.github.io/chevrotain/documentation/4_5_0/classes/cstparser.html#reset) method
 to accomplish that.
 
 ## Lexer Optimizations

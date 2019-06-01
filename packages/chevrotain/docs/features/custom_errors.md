@@ -25,7 +25,7 @@ $.RULE("myStatement", () => {
 
 The **ERR_MSG** config property is available for the following DSL methods:
 
--   [CONSUME](https://sap.github.io/chevrotain/documentation/4_5_0/classes/parser.html#consume)
--   [OR](https://sap.github.io/chevrotain/documentation/4_5_0/classes/parser.html#or)
--   [AT_LEAST_ONE](https://sap.github.io/chevrotain/documentation/4_5_0/classes/parser.html#at_least_one)
--   [AT_LEAST_ONE_SEP](https://sap.github.io/chevrotain/documentation/4_5_0/classes/parser.html#at_least_one_sep)
+-   [CONSUME](https://sap.github.io/chevrotain/documentation/4_5_0/classes/cstparser.html#consume)
+-   [OR](https://sap.github.io/chevrotain/documentation/4_5_0/classes/cstparser.html#or)
+-   [AT_LEAST_ONE](https://sap.github.io/chevrotain/documentation/4_5_0/classes/cstparser.html#at_least_one)
+-   [AT_LEAST_ONE_SEP](https://sap.github.io/chevrotain/documentation/4_5_0/classes/cstparser.html#at_least_one_sep)
