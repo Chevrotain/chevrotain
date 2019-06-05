@@ -1,6 +1,6 @@
 # Position Tracking
 
-// TODO: we should document the location tracking for both Lexer and Parser in this section
+// TODO: we should document the location tracking for both Lexer and Parser in this section...
 
 Chevrotain lexers will track the full token position information by default.
 This means:
