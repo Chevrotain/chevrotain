@@ -1,10 +1,23 @@
-import { addNoneTerminalToCst, addTerminalToCst } from "../../cst/cst"
+import {
+    addNoneTerminalToCst,
+    addTerminalToCst,
+    setNodeLocationFromTokenOnlyOffset,
+    setNodeLocationFull,
+    setNodeLocationFromNodeOnlyOffset
+} from "../../cst/cst"
 import { has, isUndefined, NOOP } from "../../../utils/utils"
 import {
     createBaseSemanticVisitorConstructor,
     createBaseVisitorConstructorWithDefaults
 } from "../../cst/cst_visitor"
-import { CstNode, ICstVisitor, IParserConfig, IToken } from "../../../../api"
+import {
+    CstNode,
+    CstNodeLocation,
+    ICstVisitor,
+    IParserConfig,
+    IToken,
+    NodePositionTrackingOptions
+} from "../../../../api"
 import { getKeyForAltIndex } from "../../grammar/keys"
 import { MixedInParser } from "./parser_traits"
 import { DEFAULT_PARSER_CONFIG } from "../parser"
@@ -19,12 +32,28 @@ export class TreeBuilder {
     baseCstVisitorWithDefaultsConstructor: Function
     LAST_EXPLICIT_RULE_STACK: number[]
 
+    // TODO: this method should have a better signature
+    setNodeLocationFromNode: (
+        nodeLocation: CstNodeLocation,
+        locationInformation: any
+    ) => void
+    setNodeLocationFromToken: (
+        nodeLocation: CstNodeLocation,
+        locationInformation: any
+    ) => void
+    setInitialNodeLocation: (cstNode: CstNode) => void
+    nodePositionTracking: NodePositionTrackingOptions
+
     initTreeBuilder(this: MixedInParser, config: IParserConfig) {
         this.LAST_EXPLICIT_RULE_STACK = []
         this.CST_STACK = []
         this.outputCst = has(config, "outputCst")
             ? config.outputCst
             : DEFAULT_PARSER_CONFIG.outputCst
+
+        this.nodePositionTracking = has(config, "nodePositionTracking")
+            ? config.nodePositionTracking
+            : DEFAULT_PARSER_CONFIG.nodePositionTracking
 
         if (!this.outputCst) {
             this.cstInvocationStateUpdate = NOOP
@@ -41,6 +70,52 @@ export class TreeBuilder {
             this.manySepFirstInternal = this.manySepFirstInternalNoCst
             this.atLeastOneSepFirstInternal = this.atLeastOneSepFirstInternalNoCst
         }
+
+        if (/full/i.test(this.nodePositionTracking)) {
+            this.setNodeLocationFromToken = setNodeLocationFull
+            this.setNodeLocationFromNode = setNodeLocationFull
+            this.setInitialNodeLocation = this.setInitialNodeLocationFull
+        } else if (/onlyOffset/i.test(this.nodePositionTracking)) {
+            this.setNodeLocationFromToken = setNodeLocationFromTokenOnlyOffset
+            this.setNodeLocationFromNode = setNodeLocationFromNodeOnlyOffset
+            this.setInitialNodeLocation = this.setInitialNodeLocationOnlyOffset
+        } else if (/none/i.test(this.nodePositionTracking)) {
+            this.setNodeLocationFromToken = NOOP
+            this.setNodeLocationFromNode = NOOP
+            this.setInitialNodeLocation = NOOP
+        } else {
+            throw Error(
+                `Invalid <nodePositionTracking> config option: "${
+                    config.nodePositionTracking
+                }"`
+            )
+        }
+    }
+
+    setInitialNodeLocationOnlyOffset(cstNode: CstNode): void {
+        cstNode.location = {
+            startOffset: Infinity,
+            endOffset: -Infinity
+        }
+    }
+
+    // TODO: I am not yet sure about which initial values should be used
+    //   For Invalid Nodes we currently use NaN
+    //   -  https://github.com/SAP/chevrotain/blob/fb714a7650dbff3b3342448fd284365384c85880/packages/chevrotain/src/parse/parser/parser.ts#L45-L54
+    //  But this would make the conditions more complicated (and slower?)
+    //  Number.MAX_VALUE is bad because it is a valid value theoretically so it cannot be distinguished
+    //  from a Node with invalid location info (e.g recovered node)
+    //  Perhaps we should use +/- Infinity
+    //  But If we can use NaN and still keep things fast that would see the best for me.
+    setInitialNodeLocationFull(cstNode: CstNode): void {
+        cstNode.location = {
+            startOffset: Infinity,
+            startLine: Infinity,
+            startColumn: Infinity,
+            endOffset: -Infinity,
+            endLine: -Infinity,
+            endColumn: -Infinity
+        }
     }
 
     // CST
@@ -49,14 +124,18 @@ export class TreeBuilder {
         nestedName: string,
         shortName: string | number
     ): void {
-        this.CST_STACK.push({
+        const cstNode: CstNode = {
             name: nestedName,
             fullName:
                 this.shortRuleNameToFull.get(
                     this.getLastExplicitRuleShortName()
                 ) + nestedName,
             children: {}
-        })
+        }
+
+        this.setInitialNodeLocation(cstNode)
+
+        this.CST_STACK.push(cstNode)
     }
 
     cstInvocationStateUpdate(
@@ -65,10 +144,15 @@ export class TreeBuilder {
         shortName: string | number
     ): void {
         this.LAST_EXPLICIT_RULE_STACK.push(this.RULE_STACK.length - 1)
-        this.CST_STACK.push({
+
+        const cstNode: CstNode = {
             name: fullRuleName,
             children: {}
-        })
+        }
+
+        this.setInitialNodeLocation(cstNode)
+
+        this.CST_STACK.push(cstNode)
     }
 
     cstFinallyStateUpdate(this: MixedInParser): void {
@@ -88,6 +172,7 @@ export class TreeBuilder {
         // TODO: would save the "current rootCST be faster than locating it for each terminal?
         let rootCst = this.CST_STACK[this.CST_STACK.length - 1]
         addTerminalToCst(rootCst, consumedToken, key)
+        this.setNodeLocationFromToken(rootCst.location, consumedToken)
     }
 
     cstPostNonTerminal(
@@ -95,11 +180,10 @@ export class TreeBuilder {
         ruleCstResult: CstNode,
         ruleName: string
     ): void {
-        addNoneTerminalToCst(
-            this.CST_STACK[this.CST_STACK.length - 1],
-            ruleName,
-            ruleCstResult
-        )
+        let node = this.CST_STACK[this.CST_STACK.length - 1]
+
+        addNoneTerminalToCst(node, ruleName, ruleCstResult)
+        this.setNodeLocationFromNode(node.location, ruleCstResult.location)
     }
 
     getBaseCstVisitorConstructor(
@@ -190,6 +274,10 @@ export class TreeBuilder {
         // this return a different result than the previous invocation because "nestedRuleFinallyStateUpdate" pops the cst stack
         let parentCstNode = cstStack[cstStack.length - 1]
         addNoneTerminalToCst(parentCstNode, nestedName, nestedRuleCst)
+        this.setNodeLocationFromNode(
+            parentCstNode.location,
+            nestedRuleCst.location
+        )
     }
 
     getLastExplicitRuleShortName(this: MixedInParser): string {

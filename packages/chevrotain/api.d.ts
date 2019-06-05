@@ -1882,6 +1882,16 @@ export interface CstNode {
      * the fullName will **also** include the name of the top level rule containing this nested rule.
      */
     readonly fullName?: string
+    location?: CstNodeLocation
+}
+
+export interface CstNodeLocation {
+    startOffset?: number
+    startLine?: number
+    startColumn?: number
+    endOffset?: number
+    endLine?: number
+    endColumn?: number
 }
 
 export declare type CstChildrenDictionary = {
@@ -1889,6 +1899,8 @@ export declare type CstChildrenDictionary = {
 }
 
 export declare type CstElement = IToken | CstNode
+
+export declare type NodePositionTrackingOptions = "full" | "onlyOffset" | "none"
 
 export interface IParserConfig {
     /**
@@ -1935,6 +1947,10 @@ export interface IParserConfig {
      * For in-depth docs on [Concrete Syntax Trees](http://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html):
      */
     outputCst?: boolean
+    /**
+     * Enable computation of CST nodes location
+     */
+    nodePositionTracking?: NodePositionTrackingOptions
     /**
      * A custom error message provider.
      * Can be used to override the default error messages.

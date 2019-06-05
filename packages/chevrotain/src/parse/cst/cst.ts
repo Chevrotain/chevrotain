@@ -24,10 +24,50 @@ import { GAstVisitor } from "../grammar/gast/gast_visitor_public"
 import {
     CstChildrenDictionary,
     CstNode,
+    CstNodeLocation,
     IOptionallyNamedProduction,
     IProduction,
     IToken
 } from "../../../api"
+
+export function setNodeLocationFromTokenOnlyOffset(
+    nodeLocation: CstNodeLocation,
+    token: IToken
+): void {
+    if (nodeLocation.startOffset > token.startOffset) {
+        nodeLocation.startOffset = token.startOffset
+    }
+
+    nodeLocation.endOffset = token.startOffset + token.image.length
+}
+
+export function setNodeLocationFromNodeOnlyOffset(
+    nodeLocation: CstNodeLocation,
+    locationInformation: any
+): void {
+    if (nodeLocation.startOffset > locationInformation.startOffset) {
+        nodeLocation.startOffset = locationInformation.startOffset
+    }
+
+    nodeLocation.endOffset = locationInformation.endOffset
+}
+
+export function setNodeLocationFull(
+    nodeLocation: CstNodeLocation,
+    locationInformation: any
+): void {
+    if (nodeLocation.startOffset > locationInformation.startOffset) {
+        nodeLocation.startOffset = locationInformation.startOffset
+        nodeLocation.startColumn = locationInformation.startColumn
+        nodeLocation.startLine = locationInformation.startLine
+    }
+
+    if (nodeLocation.endOffset < locationInformation.endOffset) {
+        nodeLocation.endOffset = locationInformation.endOffset
+        nodeLocation.endColumn = locationInformation.endColumn
+        nodeLocation.endLine = locationInformation.endLine
+    }
+}
 
 export function addTerminalToCst(
     node: CstNode,

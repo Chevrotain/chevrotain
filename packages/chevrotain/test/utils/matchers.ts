@@ -6,10 +6,24 @@ export function setEquality(actual: any[], expected: any[]): void {
     expect(expected).to.have.lengthOf(actual.length)
 }
 
-export function createRegularToken(tokType, image = ""): IToken {
+export function createRegularToken(
+    tokType,
+    image = "",
+    startOffset = 1,
+    startLine = undefined,
+    startColumn = undefined,
+    endOffset = undefined,
+    endLine = undefined,
+    endColumn = undefined
+): IToken {
     return {
         image: image,
-        startOffset: 1,
+        startOffset: startOffset,
+        startLine: startLine,
+        startColumn: startColumn,
+        endOffset: endOffset,
+        endLine: endLine,
+        endColumn: endColumn,
         tokenTypeIdx: tokType.tokenTypeIdx,
         tokenType: tokType
     }

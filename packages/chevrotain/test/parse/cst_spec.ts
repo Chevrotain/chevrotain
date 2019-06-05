@@ -459,6 +459,189 @@ context("CST", () => {
         expect(tokenStructuredMatcher(cst.children.C[0], C)).to.be.true
     })
 
+    it("Can output a CST with node full location information", () => {
+        class CstTerminalParser extends Parser {
+            constructor(input: IToken[] = []) {
+                super(ALL_TOKENS, {
+                    nodePositionTracking: "full"
+                })
+                this.input = input
+
+                this.performSelfAnalysis()
+            }
+
+            public testRule = this.RULE("testRule", () => {
+                this.SUBRULE(this.first)
+                this.CONSUME(B)
+                this.CONSUME(C)
+                this.SUBRULE(this.second)
+            })
+
+            public first = this.RULE("first", () => {
+                this.CONSUME(A)
+            })
+
+            public second = this.RULE("second", () => {
+                this.CONSUME(D)
+            })
+        }
+
+        let input = [
+            createRegularToken(A, "", 1, 1, 1, 2, 1, 2),
+            createRegularToken(B, "", 12, 1, 3, 13, 1, 4),
+            createRegularToken(C, "", 15, 2, 10, 16, 3, 15),
+            createRegularToken(D, "", 17, 5, 2, 18, 5, 4)
+        ]
+        let parser = new CstTerminalParser(input)
+        let cst = parser.testRule()
+        expect(cst.name).to.equal("testRule")
+        expect(cst.children).to.have.keys("B", "C", "first", "second")
+        expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
+        expect(tokenStructuredMatcher(cst.children.C[0], C)).to.be.true
+        expect(cst.children.first[0].name).to.equal("first")
+        expect(cst.children.second[0].name).to.equal("second")
+        expect(tokenStructuredMatcher(cst.children.first[0].children.A[0], A))
+            .to.be.true
+
+        expect(cst.children.first[0].location).to.deep.equal({
+            startOffset: 1,
+            startLine: 1,
+            startColumn: 1,
+            endOffset: 2,
+            endLine: 1,
+            endColumn: 2
+        })
+
+        expect(cst.children.second[0].location).to.deep.equal({
+            startOffset: 17,
+            startLine: 5,
+            startColumn: 2,
+            endOffset: 18,
+            endLine: 5,
+            endColumn: 4
+        })
+
+        expect(cst.location).to.deep.equal({
+            startOffset: 1,
+            startLine: 1,
+            startColumn: 1,
+            endOffset: 18,
+            endLine: 5,
+            endColumn: 4
+        })
+    })
+
+    it("Can output a CST with node onlyOffset location information", () => {
+        class CstTerminalParser extends Parser {
+            constructor(input: IToken[] = []) {
+                super(ALL_TOKENS, {
+                    nodePositionTracking: "onlyOffset"
+                })
+                this.input = input
+
+                this.performSelfAnalysis()
+            }
+
+            public testRule = this.RULE("testRule", () => {
+                this.SUBRULE(this.first)
+                this.CONSUME(B)
+                this.CONSUME(C)
+                this.SUBRULE(this.second)
+            })
+
+            public first = this.RULE("first", () => {
+                this.CONSUME(A)
+            })
+
+            public second = this.RULE("second", () => {
+                this.CONSUME(D)
+            })
+        }
+
+        let input = [
+            createRegularToken(A, "1", 1),
+            createRegularToken(B, "2", 12),
+            createRegularToken(C, "3", 15),
+            createRegularToken(D, "4", 17)
+        ]
+        let parser = new CstTerminalParser(input)
+        let cst = parser.testRule()
+        expect(cst.name).to.equal("testRule")
+        expect(cst.children).to.have.keys("B", "C", "first", "second")
+        expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
+        expect(tokenStructuredMatcher(cst.children.C[0], C)).to.be.true
+        expect(cst.children.first[0].name).to.equal("first")
+        expect(cst.children.second[0].name).to.equal("second")
+        expect(tokenStructuredMatcher(cst.children.first[0].children.A[0], A))
+            .to.be.true
+
+        expect(cst.children.first[0].location).to.deep.equal({
+            startOffset: 1,
+            endOffset: 2
+        })
+
+        expect(cst.children.second[0].location).to.deep.equal({
+            startOffset: 17,
+            endOffset: 18
+        })
+
+        expect(cst.location).to.deep.equal({
+            startOffset: 1,
+            endOffset: 18
+        })
+    })
+
+    it("Can output a CST with no location information", () => {
+        class CstTerminalParser extends Parser {
+            constructor(input: IToken[] = []) {
+                super(ALL_TOKENS, {
+                    nodePositionTracking: "none"
+                })
+                this.input = input
+
+                this.performSelfAnalysis()
+            }
+
+            public testRule = this.RULE("testRule", () => {
+                this.SUBRULE(this.first)
+                this.CONSUME(B)
+                this.CONSUME(C)
+                this.SUBRULE(this.second)
+            })
+
+            public first = this.RULE("first", () => {
+                this.CONSUME(A)
+            })
+
+            public second = this.RULE("second", () => {
+                this.CONSUME(D)
+            })
+        }
+
+        let input = [
+            createRegularToken(A, "", 1, 1, 1, 2, 1, 2),
+            createRegularToken(B, "", 12, 1, 3, 13, 1, 4),
+            createRegularToken(C, "", 15, 2, 10, 16, 3, 15),
+            createRegularToken(D, "", 17, 5, 2, 18, 5, 4)
+        ]
+        let parser = new CstTerminalParser(input)
+        let cst = parser.testRule()
+        expect(cst.name).to.equal("testRule")
+        expect(cst.children).to.have.keys("B", "C", "first", "second")
+        expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
+        expect(tokenStructuredMatcher(cst.children.C[0], C)).to.be.true
+        expect(cst.children.first[0].name).to.equal("first")
+        expect(cst.children.second[0].name).to.equal("second")
+        expect(tokenStructuredMatcher(cst.children.first[0].children.A[0], A))
+            .to.be.true
+
+        expect(cst.children.first[0].location).to.be.undefined
+
+        expect(cst.children.second[0].location).to.be.undefined
+
+        expect(cst.location).to.be.undefined
+    })
+
     context("nested rules", () => {
         context("Can output cst when using OPTION", () => {
             class CstOptionalNestedTerminalParser extends Parser {
@@ -858,6 +1041,166 @@ context("CST", () => {
             expect(nestedCst.children.C).to.have.length(1)
             expect(tokenStructuredMatcher(nestedCst.children.C[0], C)).to.be
                 .true
+        })
+
+        it("Can output a CST with nested rules with node full location information", () => {
+            class CstTerminalParser extends Parser {
+                constructor(input: IToken[] = []) {
+                    super(ALL_TOKENS, {
+                        nodePositionTracking: "full"
+                    })
+                    this.input = input
+
+                    this.performSelfAnalysis()
+                }
+
+                public testRule = this.RULE("testRule", () => {
+                    this.OPTION({
+                        NAME: "$nestedOption",
+                        DEF: () => {
+                            this.CONSUME(A)
+                        }
+                    })
+                    this.CONSUME(B)
+                })
+            }
+
+            let input = [
+                createRegularToken(A, "", 1, 1, 1, 2, 1, 2),
+                createRegularToken(B, "", 12, 1, 3, 13, 2, 4)
+            ]
+            let parser = new CstTerminalParser(input)
+            let cst = parser.testRule()
+            expect(cst.name).to.equal("testRule")
+            expect(cst.children).to.have.keys("$nestedOption", "B")
+            expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
+
+            let nestedCst = cst.children.$nestedOption[0]
+            expect(nestedCst.children.A).to.have.length(1)
+            expect(tokenStructuredMatcher(nestedCst.children.A[0], A)).to.be
+                .true
+
+            expect(nestedCst.location).to.deep.equal({
+                startOffset: 1,
+                startLine: 1,
+                startColumn: 1,
+                endOffset: 2,
+                endLine: 1,
+                endColumn: 2
+            })
+
+            expect(cst.location).to.deep.equal({
+                startOffset: 1,
+                startLine: 1,
+                startColumn: 1,
+                endOffset: 13,
+                endLine: 2,
+                endColumn: 4
+            })
+        })
+
+        it("Can output a CST with nested rules with node onlyOffset location information", () => {
+            class CstTerminalParser extends Parser {
+                constructor(input: IToken[] = []) {
+                    super(ALL_TOKENS, {
+                        nodePositionTracking: "onlyOffset"
+                    })
+                    this.input = input
+
+                    this.performSelfAnalysis()
+                }
+
+                public testRule = this.RULE("testRule", () => {
+                    this.OPTION({
+                        NAME: "$nestedOption",
+                        DEF: () => {
+                            this.CONSUME(A)
+                        }
+                    })
+                    this.CONSUME(B)
+                })
+            }
+
+            let input = [
+                createRegularToken(A, "1", 1),
+                createRegularToken(B, "2", 12)
+            ]
+            let parser = new CstTerminalParser(input)
+            let cst = parser.testRule()
+            expect(cst.name).to.equal("testRule")
+            expect(cst.children).to.have.keys("$nestedOption", "B")
+            expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
+
+            let nestedCst = cst.children.$nestedOption[0]
+            expect(nestedCst.children.A).to.have.length(1)
+            expect(tokenStructuredMatcher(nestedCst.children.A[0], A)).to.be
+                .true
+
+            expect(nestedCst.location).to.deep.equal({
+                startOffset: 1,
+                endOffset: 2
+            })
+
+            expect(cst.location).to.deep.equal({
+                startOffset: 1,
+                endOffset: 13
+            })
+        })
+
+        it("Can output a CST with nested rules with no node location information", () => {
+            class CstTerminalParser extends Parser {
+                constructor(input: IToken[] = []) {
+                    super(ALL_TOKENS, {
+                        nodePositionTracking: "none"
+                    })
+                    this.input = input
+
+                    this.performSelfAnalysis()
+                }
+
+                public testRule = this.RULE("testRule", () => {
+                    this.OPTION({
+                        NAME: "$nestedOption",
+                        DEF: () => {
+                            this.CONSUME(A)
+                        }
+                    })
+                    this.CONSUME(B)
+                })
+            }
+
+            let input = [
+                createRegularToken(A, "", 1, 1, 1, 2, 1, 2),
+                createRegularToken(B, "", 12, 1, 3, 13, 2, 4)
+            ]
+            let parser = new CstTerminalParser(input)
+            let cst = parser.testRule()
+            expect(cst.name).to.equal("testRule")
+            expect(cst.children).to.have.keys("$nestedOption", "B")
+            expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
+
+            let nestedCst = cst.children.$nestedOption[0]
+            expect(nestedCst.children.A).to.have.length(1)
+            expect(tokenStructuredMatcher(nestedCst.children.A[0], A)).to.be
+                .true
+
+            expect(nestedCst.location).to.be.undefined
+
+            expect(cst.location).to.be.undefined
+        })
+
+        it("Can output a CST with nested rules with no node location information", () => {
+            class CstTerminalParser extends Parser {
+                constructor(input: IToken[] = []) {
+                    super(ALL_TOKENS, {
+                        nodePositionTracking: undefined
+                    })
+                }
+            }
+
+            expect(function() {
+                new CstTerminalParser()
+            }).to.throw()
         })
     })
 
