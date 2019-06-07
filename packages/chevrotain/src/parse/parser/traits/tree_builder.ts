@@ -1,9 +1,8 @@
 import {
     addNoneTerminalToCst,
     addTerminalToCst,
-    setNodeLocationFromTokenOnlyOffset,
     setNodeLocationFull,
-    setNodeLocationFromNodeOnlyOffset
+    setNodeLocationOnlyOffset
 } from "../../cst/cst"
 import { has, isUndefined, NOOP } from "../../../utils/utils"
 import {
@@ -32,15 +31,17 @@ export class TreeBuilder {
     baseCstVisitorWithDefaultsConstructor: Function
     LAST_EXPLICIT_RULE_STACK: number[]
 
-    // TODO: this method should have a better signature
+    // dynamically assigned Methods
     setNodeLocationFromNode: (
         nodeLocation: CstNodeLocation,
-        locationInformation: any
+        locationInformation: CstNodeLocation
     ) => void
     setNodeLocationFromToken: (
         nodeLocation: CstNodeLocation,
-        locationInformation: any
+        locationInformation: CstNodeLocation
     ) => void
+    cstPostRule: (this: MixedInParser, ruleCstNode: CstNode) => void
+
     setInitialNodeLocation: (cstNode: CstNode) => void
     nodePositionTracking: NodePositionTrackingOptions
 
@@ -60,6 +61,7 @@ export class TreeBuilder {
             this.cstFinallyStateUpdate = NOOP
             this.cstPostTerminal = NOOP
             this.cstPostNonTerminal = NOOP
+            this.cstPostRule = NOOP
             this.getLastExplicitRuleShortName = this.getLastExplicitRuleShortNameNoCst
             this.getPreviousExplicitRuleShortName = this.getPreviousExplicitRuleShortNameNoCst
             this.getLastExplicitRuleOccurrenceIndex = this.getLastExplicitRuleOccurrenceIndexNoCst
@@ -69,52 +71,101 @@ export class TreeBuilder {
             this.atLeastOneInternal = this.atLeastOneInternalNoCst
             this.manySepFirstInternal = this.manySepFirstInternalNoCst
             this.atLeastOneSepFirstInternal = this.atLeastOneSepFirstInternalNoCst
-        }
-
-        if (/full/i.test(this.nodePositionTracking)) {
-            this.setNodeLocationFromToken = setNodeLocationFull
-            this.setNodeLocationFromNode = setNodeLocationFull
-            this.setInitialNodeLocation = this.setInitialNodeLocationFull
-        } else if (/onlyOffset/i.test(this.nodePositionTracking)) {
-            this.setNodeLocationFromToken = setNodeLocationFromTokenOnlyOffset
-            this.setNodeLocationFromNode = setNodeLocationFromNodeOnlyOffset
-            this.setInitialNodeLocation = this.setInitialNodeLocationOnlyOffset
-        } else if (/none/i.test(this.nodePositionTracking)) {
-            this.setNodeLocationFromToken = NOOP
-            this.setNodeLocationFromNode = NOOP
-            this.setInitialNodeLocation = NOOP
         } else {
-            throw Error(
-                `Invalid <nodePositionTracking> config option: "${
-                    config.nodePositionTracking
-                }"`
-            )
+            if (/full/i.test(this.nodePositionTracking)) {
+                if (this.recoveryEnabled) {
+                    this.setNodeLocationFromToken = setNodeLocationFull
+                    this.setNodeLocationFromNode = setNodeLocationFull
+                    this.cstPostRule = NOOP
+                    this.setInitialNodeLocation = this.setInitialNodeLocationFullRecovery
+                } else {
+                    this.setNodeLocationFromToken = NOOP
+                    this.setNodeLocationFromNode = NOOP
+                    this.cstPostRule = this.cstPostRuleFull
+                    this.setInitialNodeLocation = this.setInitialNodeLocationFullRegular
+                }
+            } else if (/onlyOffset/i.test(this.nodePositionTracking)) {
+                if (this.recoveryEnabled) {
+                    this.setNodeLocationFromToken = setNodeLocationOnlyOffset
+                    this.setNodeLocationFromNode = setNodeLocationOnlyOffset
+                    this.cstPostRule = NOOP
+                    this.setInitialNodeLocation = this.setInitialNodeLocationOnlyOffsetRecovery
+                } else {
+                    this.setNodeLocationFromToken = NOOP
+                    this.setNodeLocationFromNode = NOOP
+                    this.cstPostRule = this.cstPostRuleOnlyOffset
+                    this.setInitialNodeLocation = this.setInitialNodeLocationOnlyOffsetRegular
+                }
+            } else if (/none/i.test(this.nodePositionTracking)) {
+                this.setNodeLocationFromToken = NOOP
+                this.setNodeLocationFromNode = NOOP
+                this.cstPostRule = NOOP
+                this.setInitialNodeLocation = NOOP
+            } else {
+                throw Error(
+                    `Invalid <nodePositionTracking> config option: "${
+                        config.nodePositionTracking
+                    }"`
+                )
+            }
         }
     }
 
-    setInitialNodeLocationOnlyOffset(cstNode: CstNode): void {
+    setInitialNodeLocationOnlyOffsetRecovery(
+        this: MixedInParser,
+        cstNode: CstNode
+    ): void {
         cstNode.location = {
-            startOffset: Infinity,
-            endOffset: -Infinity
+            startOffset: NaN,
+            endOffset: NaN
         }
     }
 
-    // TODO: I am not yet sure about which initial values should be used
-    //   For Invalid Nodes we currently use NaN
-    //   -  https://github.com/SAP/chevrotain/blob/fb714a7650dbff3b3342448fd284365384c85880/packages/chevrotain/src/parse/parser/parser.ts#L45-L54
-    //  But this would make the conditions more complicated (and slower?)
-    //  Number.MAX_VALUE is bad because it is a valid value theoretically so it cannot be distinguished
-    //  from a Node with invalid location info (e.g recovered node)
-    //  Perhaps we should use +/- Infinity
-    //  But If we can use NaN and still keep things fast that would see the best for me.
-    setInitialNodeLocationFull(cstNode: CstNode): void {
+    setInitialNodeLocationOnlyOffsetRegular(
+        this: MixedInParser,
+        cstNode: CstNode
+    ): void {
         cstNode.location = {
-            startOffset: Infinity,
-            startLine: Infinity,
-            startColumn: Infinity,
-            endOffset: -Infinity,
-            endLine: -Infinity,
-            endColumn: -Infinity
+            // without error recovery the starting Location of a new CstNode is guaranteed
+            // To be the next Token's startOffset (for valid inputs).
+            // For invalid inputs there won't be any CSTOutput so this potential
+            // inaccuracy does not matter
+            startOffset: this.LA(1).startOffset,
+            endOffset: NaN
+        }
+    }
+
+    setInitialNodeLocationFullRecovery(
+        this: MixedInParser,
+        cstNode: CstNode
+    ): void {
+        cstNode.location = {
+            startOffset: NaN,
+            startLine: NaN,
+            startColumn: NaN,
+            endOffset: NaN,
+            endLine: NaN,
+            endColumn: NaN
+        }
+    }
+
+    /**
+     *  @see setInitialNodeLocationOnlyOffsetRegular for explanation why this work
+
+     * @param cstNode
+     */
+    setInitialNodeLocationFullRegular(
+        this: MixedInParser,
+        cstNode: CstNode
+    ): void {
+        const nextToken = this.LA(1)
+        cstNode.location = {
+            startOffset: nextToken.startOffset,
+            startLine: nextToken.startLine,
+            startColumn: nextToken.startColumn,
+            endOffset: NaN,
+            endLine: NaN,
+            endColumn: NaN
         }
     }
 
@@ -134,7 +185,6 @@ export class TreeBuilder {
         }
 
         this.setInitialNodeLocation(cstNode)
-
         this.CST_STACK.push(cstNode)
     }
 
@@ -151,7 +201,6 @@ export class TreeBuilder {
         }
 
         this.setInitialNodeLocation(cstNode)
-
         this.CST_STACK.push(cstNode)
     }
 
@@ -161,7 +210,45 @@ export class TreeBuilder {
     }
 
     cstNestedFinallyStateUpdate(this: MixedInParser): void {
-        this.CST_STACK.pop()
+        const lastCstNode = this.CST_STACK.pop()
+        // TODO: the naming is bad, this should go directly to the
+        //       (correct) cstLocation update method
+        //       e.g if we put other logic in postRule...
+        this.cstPostRule(lastCstNode)
+    }
+
+    cstPostRuleFull(this: MixedInParser, ruleCstNode: CstNode): void {
+        const prevToken = this.LA(0)
+        const loc = ruleCstNode.location
+
+        // If this condition is true it means we consumed at least one Token
+        // In this CstNode or its nested children.
+        if (loc.startOffset <= prevToken.startOffset) {
+            loc.endOffset = prevToken.endOffset
+            loc.endLine = prevToken.endLine
+            loc.endColumn = prevToken.endColumn
+        }
+        // "empty" CstNode edge case
+        else {
+            loc.startOffset = NaN
+            loc.startLine = NaN
+            loc.startColumn = NaN
+        }
+    }
+
+    cstPostRuleOnlyOffset(this: MixedInParser, ruleCstNode: CstNode): void {
+        const prevToken = this.LA(0)
+        const loc = ruleCstNode.location
+
+        // If this condition is true it means we consumed at least one Token
+        // In this CstNode or its nested children.
+        if (loc.startOffset <= prevToken.startOffset) {
+            loc.endOffset = prevToken.endOffset
+        }
+        // "empty" CstNode edge case
+        else {
+            loc.startOffset = NaN
+        }
     }
 
     cstPostTerminal(
@@ -169,9 +256,9 @@ export class TreeBuilder {
         key: string,
         consumedToken: IToken
     ): void {
-        // TODO: would save the "current rootCST be faster than locating it for each terminal?
-        let rootCst = this.CST_STACK[this.CST_STACK.length - 1]
+        const rootCst = this.CST_STACK[this.CST_STACK.length - 1]
         addTerminalToCst(rootCst, consumedToken, key)
+        // This is only used when **both** error recovery and CST Output are enabled.
         this.setNodeLocationFromToken(rootCst.location, consumedToken)
     }
 
@@ -180,9 +267,11 @@ export class TreeBuilder {
         ruleCstResult: CstNode,
         ruleName: string
     ): void {
-        let node = this.CST_STACK[this.CST_STACK.length - 1]
+        const node = this.CST_STACK[this.CST_STACK.length - 1]
 
         addNoneTerminalToCst(node, ruleName, ruleCstResult)
+
+        // This is only used when **both** error recovery and CST Output are enabled.
         this.setNodeLocationFromNode(node.location, ruleCstResult.location)
     }
 

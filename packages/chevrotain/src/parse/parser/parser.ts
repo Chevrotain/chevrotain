@@ -6,18 +6,13 @@ import {
     has,
     isEmpty,
     map,
-    NOOP,
     toFastProperties,
     values
 } from "../../utils/utils"
 import { computeAllProdsFollows } from "../grammar/follow"
 import { createTokenInstance, EOF } from "../../scan/tokens_public"
 import { deserializeGrammar } from "../gast_builder"
-import {
-    analyzeCst,
-    setNodeLocationFromNodeOnlyOffset,
-    setNodeLocationFull
-} from "../cst/cst"
+import { analyzeCst } from "../cst/cst"
 import {
     defaultGrammarValidatorErrorProvider,
     defaultParserErrorProvider

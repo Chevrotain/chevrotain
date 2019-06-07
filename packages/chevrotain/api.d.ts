@@ -1949,6 +1949,8 @@ export interface IParserConfig {
     outputCst?: boolean
     /**
      * Enable computation of CST nodes location
+     * TODO: more info
+     * TODO: flag to force "dumb" mode to support "virtual tokens" (e.g python indent)
      */
     nodePositionTracking?: NodePositionTrackingOptions
     /**
