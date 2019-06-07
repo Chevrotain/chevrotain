@@ -223,7 +223,7 @@ export class TreeBuilder {
 
         // If this condition is true it means we consumed at least one Token
         // In this CstNode or its nested children.
-        if (loc.startOffset <= prevToken.startOffset) {
+        if (loc.startOffset <= prevToken.startOffset === true) {
             loc.endOffset = prevToken.endOffset
             loc.endLine = prevToken.endLine
             loc.endColumn = prevToken.endColumn
@@ -242,7 +242,7 @@ export class TreeBuilder {
 
         // If this condition is true it means we consumed at least one Token
         // In this CstNode or its nested children.
-        if (loc.startOffset <= prevToken.startOffset) {
+        if (loc.startOffset <= prevToken.startOffset === true) {
             loc.endOffset = prevToken.endOffset
         }
         // "empty" CstNode edge case

@@ -493,12 +493,15 @@ function defineTestSuit(recoveryMode) {
                     this.SUBRULE(this.first)
                     this.CONSUME(B)
                     this.CONSUME(C)
+                    this.SUBRULE(this.empty)
                     this.SUBRULE(this.second)
                 })
 
                 public first = this.RULE("first", () => {
                     this.CONSUME(A)
                 })
+
+                public empty = this.RULE("empty", () => {})
 
                 public second = this.RULE("second", () => {
                     this.CONSUME(D)
@@ -514,7 +517,13 @@ function defineTestSuit(recoveryMode) {
             const parser = new CstTerminalParser(input)
             const cst = parser.testRule()
             expect(cst.name).to.equal("testRule")
-            expect(cst.children).to.have.keys("B", "C", "first", "second")
+            expect(cst.children).to.have.keys(
+                "B",
+                "C",
+                "first",
+                "empty",
+                "second"
+            )
             expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
             expect(tokenStructuredMatcher(cst.children.C[0], C)).to.be.true
             expect(cst.children.first[0].name).to.equal("first")
@@ -530,6 +539,15 @@ function defineTestSuit(recoveryMode) {
                 endOffset: 2,
                 endLine: 1,
                 endColumn: 2
+            })
+
+            expect(cst.children.empty[0].location).to.deep.equal({
+                startOffset: NaN,
+                startLine: NaN,
+                startColumn: NaN,
+                endOffset: NaN,
+                endLine: NaN,
+                endColumn: NaN
             })
 
             expect(cst.children.second[0].location).to.deep.equal({
@@ -567,12 +585,15 @@ function defineTestSuit(recoveryMode) {
                     this.SUBRULE(this.first)
                     this.CONSUME(B)
                     this.CONSUME(C)
+                    this.SUBRULE(this.empty)
                     this.SUBRULE(this.second)
                 })
 
                 public first = this.RULE("first", () => {
                     this.CONSUME(A)
                 })
+
+                public empty = this.RULE("empty", () => {})
 
                 public second = this.RULE("second", () => {
                     this.CONSUME(D)
@@ -588,7 +609,13 @@ function defineTestSuit(recoveryMode) {
             let parser = new CstTerminalParser(input)
             let cst = parser.testRule()
             expect(cst.name).to.equal("testRule")
-            expect(cst.children).to.have.keys("B", "C", "first", "second")
+            expect(cst.children).to.have.keys(
+                "B",
+                "C",
+                "first",
+                "empty",
+                "second"
+            )
             expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
             expect(tokenStructuredMatcher(cst.children.C[0], C)).to.be.true
             expect(cst.children.first[0].name).to.equal("first")
@@ -605,6 +632,11 @@ function defineTestSuit(recoveryMode) {
             expect(cst.children.second[0].location).to.deep.equal({
                 startOffset: 17,
                 endOffset: 18
+            })
+
+            expect(cst.children.empty[0].location).to.deep.equal({
+                startOffset: NaN,
+                endOffset: NaN
             })
 
             expect(cst.location).to.deep.equal({
