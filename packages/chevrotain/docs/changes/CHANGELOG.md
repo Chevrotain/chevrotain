@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+-   [CST location information.](https://github.com/SAP/chevrotain/issues/962).
+
 ## 4.6.0 (6-1-2019)
 
 #### Minor Changes
