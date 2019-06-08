@@ -1475,6 +1475,16 @@ function defineRecognizerSpecs(
             })
 
             it("can use serialized grammar in performSelfAnalysis", () => {
+                // Attempt to reproduce
+                // https://github.com/SAP/chevrotain/issues/952
+                const PlusTok = createToken({
+                    name: "PlusTok",
+                    pattern: {
+                        exec: (text, offset) =>
+                            /\+/.exec(text.substring(offset))
+                    }
+                })
+
                 let serializedGrammar = null
                 class SerializingParser extends Parser {
                     constructor(input: IToken[] = []) {
@@ -1543,6 +1553,10 @@ function defineRecognizerSpecs(
                 let parser1 = new SerializingParser([])
                 const actual = parser1.getGAstProductions()
                 expect(expected).to.deep.equal(actual)
+
+                parser1.input = [createRegularToken(PlusTok)]
+                parser1.rule()
+                expect(parser1.errors).to.be.empty
             })
 
             it("can provide syntactic content assist suggestions", () => {
