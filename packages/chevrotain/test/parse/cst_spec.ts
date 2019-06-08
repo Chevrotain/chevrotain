@@ -481,7 +481,7 @@ function defineTestSuit(recoveryMode) {
             class CstTerminalParser extends Parser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, {
-                        nodePositionTracking: "full",
+                        nodeLocationTracking: "full",
                         recoveryEnabled: recoveryMode
                     })
                     this.input = input
@@ -573,7 +573,7 @@ function defineTestSuit(recoveryMode) {
             class CstTerminalParser extends Parser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, {
-                        nodePositionTracking: "onlyOffset",
+                        nodeLocationTracking: "onlyOffset",
                         recoveryEnabled: recoveryMode
                     })
                     this.input = input
@@ -649,7 +649,7 @@ function defineTestSuit(recoveryMode) {
             class CstTerminalParser extends Parser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, {
-                        nodePositionTracking: "none",
+                        nodeLocationTracking: "none",
                         recoveryEnabled: recoveryMode
                     })
                     this.input = input
@@ -1127,7 +1127,7 @@ function defineTestSuit(recoveryMode) {
                 class CstTerminalParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, {
-                            nodePositionTracking: "full",
+                            nodeLocationTracking: "full",
                             recoveryEnabled: recoveryMode
                         })
                         this.input = input
@@ -1184,7 +1184,7 @@ function defineTestSuit(recoveryMode) {
                 class CstTerminalParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, {
-                            nodePositionTracking: "onlyOffset",
+                            nodeLocationTracking: "onlyOffset",
                             recoveryEnabled: recoveryMode
                         })
                         this.input = input
@@ -1233,7 +1233,7 @@ function defineTestSuit(recoveryMode) {
                 class CstTerminalParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, {
-                            nodePositionTracking: "none",
+                            nodeLocationTracking: "none",
                             recoveryEnabled: recoveryMode
                         })
                         this.input = input
@@ -1276,7 +1276,7 @@ function defineTestSuit(recoveryMode) {
                 class CstTerminalParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, {
-                            nodePositionTracking: undefined,
+                            nodeLocationTracking: undefined,
                             recoveryEnabled: recoveryMode
                         })
                     }
