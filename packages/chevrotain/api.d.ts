@@ -1320,6 +1320,7 @@ export interface ILexerConfig {
      * However the difference is not large (~10% On V8), thus reduced location tracking options should only be used
      * in edge cases where every last ounce of performance is needed.
      */
+    // TODO: consider renaming this to LocationTracking to align with NodeLocationTracking option on the ParserConfig.
     positionTracking?: "full" | "onlyStart" | "onlyOffset"
 
     /**
@@ -1877,17 +1878,28 @@ export interface CstNode {
     readonly name: string
     readonly children: CstChildrenDictionary
     readonly recoveredNode?: boolean
+
+    /**
+     * Will only be present if the {@link IParserConfig.nodeLocationTracking} is
+     * **not** set to "none".
+     * See: http://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html#cstnode-location
+     * For more details.
+     */
+    readonly location?: CstNodeLocation
     /**
      * Only relevant for [in-lined](http://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html#in-lined-rules) rules.
      * the fullName will **also** include the name of the top level rule containing this nested rule.
      */
     readonly fullName?: string
-    location?: CstNodeLocation
 }
 
+/**
+ *  The Column/Line properties will only be present when
+ *  The {@link IParserConfig.nodeLocationTracking} is set to "full".
+ */
 export interface CstNodeLocation {
-    startOffset?: number
-    startLine?: number
+    startOffset: number
+    startLine: number
     startColumn?: number
     endOffset?: number
     endLine?: number
@@ -1900,7 +1912,7 @@ export declare type CstChildrenDictionary = {
 
 export declare type CstElement = IToken | CstNode
 
-export declare type NodePositionTrackingOptions = "full" | "onlyOffset" | "none"
+export declare type nodeLocationTrackingOptions = "full" | "onlyOffset" | "none"
 
 export interface IParserConfig {
     /**
@@ -1948,11 +1960,12 @@ export interface IParserConfig {
      */
     outputCst?: boolean
     /**
-     * Enable computation of CST nodes location
-     * TODO: more info
-     * TODO: flag to force "dumb" mode to support "virtual tokens" (e.g python indent)
+     * Enable computation of CST nodes location.
+     * By default this is set to "none", meaning this feature is disabled.
+     * See: http://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html#cstnode-location
+     * For more details.
      */
-    nodePositionTracking?: NodePositionTrackingOptions
+    nodeLocationTracking?: nodeLocationTrackingOptions
     /**
      * A custom error message provider.
      * Can be used to override the default error messages.

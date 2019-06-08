@@ -29,7 +29,6 @@ import {
     IRecognitionException,
     IRuleConfig,
     IToken,
-    NodePositionTrackingOptions,
     TokenType,
     TokenVocabulary
 } from "../../../api"
@@ -68,7 +67,7 @@ export const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
     outputCst: true,
     errorMessageProvider: defaultParserErrorProvider,
     serializedGrammar: null,
-    nodePositionTracking: <NodePositionTrackingOptions>"none"
+    nodeLocationTracking: "none"
 })
 
 export const DEFAULT_RULE_CONFIG: IRuleConfig<any> = Object.freeze({

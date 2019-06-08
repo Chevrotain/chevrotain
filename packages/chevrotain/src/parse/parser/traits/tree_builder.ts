@@ -15,7 +15,7 @@ import {
     ICstVisitor,
     IParserConfig,
     IToken,
-    NodePositionTrackingOptions
+    nodeLocationTrackingOptions
 } from "../../../../api"
 import { getKeyForAltIndex } from "../../grammar/keys"
 import { MixedInParser } from "./parser_traits"
@@ -43,7 +43,7 @@ export class TreeBuilder {
     cstPostRule: (this: MixedInParser, ruleCstNode: CstNode) => void
 
     setInitialNodeLocation: (cstNode: CstNode) => void
-    nodePositionTracking: NodePositionTrackingOptions
+    nodeLocationTracking: nodeLocationTrackingOptions
 
     initTreeBuilder(this: MixedInParser, config: IParserConfig) {
         this.LAST_EXPLICIT_RULE_STACK = []
@@ -52,9 +52,9 @@ export class TreeBuilder {
             ? config.outputCst
             : DEFAULT_PARSER_CONFIG.outputCst
 
-        this.nodePositionTracking = has(config, "nodePositionTracking")
-            ? config.nodePositionTracking
-            : DEFAULT_PARSER_CONFIG.nodePositionTracking
+        this.nodeLocationTracking = has(config, "nodeLocationTracking")
+            ? config.nodeLocationTracking
+            : DEFAULT_PARSER_CONFIG.nodeLocationTracking
 
         if (!this.outputCst) {
             this.cstInvocationStateUpdate = NOOP
@@ -72,7 +72,7 @@ export class TreeBuilder {
             this.manySepFirstInternal = this.manySepFirstInternalNoCst
             this.atLeastOneSepFirstInternal = this.atLeastOneSepFirstInternalNoCst
         } else {
-            if (/full/i.test(this.nodePositionTracking)) {
+            if (/full/i.test(this.nodeLocationTracking)) {
                 if (this.recoveryEnabled) {
                     this.setNodeLocationFromToken = setNodeLocationFull
                     this.setNodeLocationFromNode = setNodeLocationFull
@@ -84,10 +84,14 @@ export class TreeBuilder {
                     this.cstPostRule = this.cstPostRuleFull
                     this.setInitialNodeLocation = this.setInitialNodeLocationFullRegular
                 }
-            } else if (/onlyOffset/i.test(this.nodePositionTracking)) {
+            } else if (/onlyOffset/i.test(this.nodeLocationTracking)) {
                 if (this.recoveryEnabled) {
-                    this.setNodeLocationFromToken = setNodeLocationOnlyOffset
-                    this.setNodeLocationFromNode = setNodeLocationOnlyOffset
+                    this.setNodeLocationFromToken = <any>(
+                        setNodeLocationOnlyOffset
+                    )
+                    this.setNodeLocationFromNode = <any>(
+                        setNodeLocationOnlyOffset
+                    )
                     this.cstPostRule = NOOP
                     this.setInitialNodeLocation = this.setInitialNodeLocationOnlyOffsetRecovery
                 } else {
@@ -96,15 +100,15 @@ export class TreeBuilder {
                     this.cstPostRule = this.cstPostRuleOnlyOffset
                     this.setInitialNodeLocation = this.setInitialNodeLocationOnlyOffsetRegular
                 }
-            } else if (/none/i.test(this.nodePositionTracking)) {
+            } else if (/none/i.test(this.nodeLocationTracking)) {
                 this.setNodeLocationFromToken = NOOP
                 this.setNodeLocationFromNode = NOOP
                 this.cstPostRule = NOOP
                 this.setInitialNodeLocation = NOOP
             } else {
                 throw Error(
-                    `Invalid <nodePositionTracking> config option: "${
-                        config.nodePositionTracking
+                    `Invalid <nodeLocationTracking> config option: "${
+                        config.nodeLocationTracking
                     }"`
                 )
             }
@@ -113,7 +117,7 @@ export class TreeBuilder {
 
     setInitialNodeLocationOnlyOffsetRecovery(
         this: MixedInParser,
-        cstNode: CstNode
+        cstNode: any
     ): void {
         cstNode.location = {
             startOffset: NaN,
@@ -123,7 +127,7 @@ export class TreeBuilder {
 
     setInitialNodeLocationOnlyOffsetRegular(
         this: MixedInParser,
-        cstNode: CstNode
+        cstNode: any
     ): void {
         cstNode.location = {
             // without error recovery the starting Location of a new CstNode is guaranteed
@@ -137,7 +141,7 @@ export class TreeBuilder {
 
     setInitialNodeLocationFullRecovery(
         this: MixedInParser,
-        cstNode: CstNode
+        cstNode: any
     ): void {
         cstNode.location = {
             startOffset: NaN,
@@ -154,10 +158,7 @@ export class TreeBuilder {
 
      * @param cstNode
      */
-    setInitialNodeLocationFullRegular(
-        this: MixedInParser,
-        cstNode: CstNode
-    ): void {
+    setInitialNodeLocationFullRegular(this: MixedInParser, cstNode: any): void {
         const nextToken = this.LA(1)
         cstNode.location = {
             startOffset: nextToken.startOffset,
@@ -259,7 +260,7 @@ export class TreeBuilder {
         const rootCst = this.CST_STACK[this.CST_STACK.length - 1]
         addTerminalToCst(rootCst, consumedToken, key)
         // This is only used when **both** error recovery and CST Output are enabled.
-        this.setNodeLocationFromToken(rootCst.location, consumedToken)
+        this.setNodeLocationFromToken(rootCst.location, <any>consumedToken)
     }
 
     cstPostNonTerminal(

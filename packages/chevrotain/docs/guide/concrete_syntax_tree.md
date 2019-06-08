@@ -29,11 +29,23 @@ How to enable CST output?
 
 This feature is enabled when a parser extends the [CstParser class](https://sap.github.io/chevrotain/documentation/4_6_0/classes/cstparser.html).
 
+```typescript
+import { CstParser } from "chevrotain"
+
+class SelectParser extends CstParser {
+    constructor() {
+        super([])
+    }
+}
+```
+
 ## Structure
 
 The structure of the CST is very simple.
 
--   View it by running the CST creation example in the [**online playground**](https://sap.github.io/chevrotain/playground/?example=JSON%20grammar%20and%20automatic%20CST%20output).
+-   See the full [CstNode type signature](https://sap.github.io/chevrotain/documentation/4_6_0/interfaces/cstnode.html)
+
+-   Explore it by running the CST creation example in the [**online playground**](https://sap.github.io/chevrotain/playground/?example=JSON%20grammar%20and%20automatic%20CST%20output).
 
 -   Note that the following examples are not runnable nor contain the full information.
     These are just snippets to explain the core concepts.
@@ -290,6 +302,56 @@ Syntax Limitation:
         })
     })
     ```
+
+## CstNodes Location
+
+Sometimes the information regarding the textual location (range) of each CstNode is needed.
+This information is normally **already present** on the CstNodes **nested** children simply because the CstNode's children
+include the Tokens provided by the Lexer. However by default this information is not easily accessible
+as we would have to fully traverse a CstNode to understands its full location range information.
+
+The feature for providing CstNode location directly on the CstNodes objects is available since version 4.7.0.
+Tracking the CstNodes location is **disabled by default** and can be enabled
+by setting the IParserConfig [nodeLocationTracking](https://sap.github.io/chevrotain/documentation/4_6_0/interfaces/iparserconfig.html#nodeLocationtracking)
+to:
+
+-   "full" (start/end for **all** offset/line/column)
+-   or "onlyOffset", (start/end for **only** offsets)
+
+for example:
+
+```typescript
+import { CstParser } from "chevrotain"
+
+class SelectParser extends CstParser {
+    constructor() {
+        super([], {
+            nodeLocationTracking: "full"
+        })
+    }
+}
+```
+
+Once this feature is enabled the optional [location property](https://sap.github.io/chevrotain/documentation/4_6_0/interfaces/cstnode.html#location)
+on each CstNode would be populated with the relevant information.
+
+Caveats
+
+-   In order to track the CstNodes location **every** Token in the input Token vector must include its own location information.
+
+    -   This is enabled by default in the Chevrotain Lexer, See [ILexerConfig.positionTracking](https://sap.github.io/chevrotain/documentation/4_6_0/interfaces/ilexerconfig.html#positiontracking).
+        However, if a third party Lexer is used in conjunction with a Chevrotain Parser, the Tokens produced by such a lexer
+        must include the relevant location properties to allow the chevrotain parser to compute the CstNode locations.
+
+-   A CstNode may be empty, for example when the matching grammar rule has not matched any token.
+    In that case the default value for the location properties is NaN.
+
+-   This feature has a slight performance and memory cost,
+    this performance impact is **linear** and was measured at 5-10% for a full lexing + parsing flow.
+    In general the more complex a grammar is (in terms of more CstNodes created per N tokens)
+    the higher the impact. Additionally if the Parser has activated the error recovery capabilities
+    of Chevrotain the impact would be at the high end of the given range,
+    as the location tracking logic is more complex when some of the Tokens may be virtual/invalid.
 
 ## Fault Tolerance
 
