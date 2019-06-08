@@ -312,7 +312,7 @@ as we would have to fully traverse a CstNode to understands its full location ra
 
 The feature for providing CstNode location directly on the CstNodes objects is available since version 4.7.0.
 Tracking the CstNodes location is **disabled by default** and can be enabled
-by setting the IParserConfig [nodeLocationTracking](https://sap.github.io/chevrotain/documentation/4_7_0/interfaces/iparserconfig.html#nodeLocationtracking)
+by setting the IParserConfig [nodeLocationTracking](https://sap.github.io/chevrotain/documentation/4_7_0/interfaces/iparserconfig.html#nodelocationtracking)
 to:
 
 -   "full" (start/end for **all** offset/line/column)
