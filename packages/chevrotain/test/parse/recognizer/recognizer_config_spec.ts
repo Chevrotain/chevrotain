@@ -14,7 +14,7 @@ describe("The Recognizer's Configuration", () => {
         let parser = new EmptyConfigParser()
         expect((<any>parser).recoveryEnabled).to.be.false
         expect((<any>parser).maxLookahead).to.equal(4)
-        expect((<any>parser).nodePositionTracking).to.be.equal("none")
+        expect((<any>parser).nodeLocationTracking).to.be.equal("none")
     })
 
     it("default config values - no config", () => {
@@ -29,6 +29,6 @@ describe("The Recognizer's Configuration", () => {
         let parser = new NoConfigParser()
         expect((<any>parser).recoveryEnabled).to.be.false
         expect((<any>parser).maxLookahead).to.equal(4)
-        expect((<any>parser).nodePositionTracking).to.be.equal("none")
+        expect((<any>parser).nodeLocationTracking).to.be.equal("none")
     })
 })

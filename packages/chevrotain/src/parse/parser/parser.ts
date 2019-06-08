@@ -6,18 +6,13 @@ import {
     has,
     isEmpty,
     map,
-    NOOP,
     toFastProperties,
     values
 } from "../../utils/utils"
 import { computeAllProdsFollows } from "../grammar/follow"
 import { createTokenInstance, EOF } from "../../scan/tokens_public"
 import { deserializeGrammar } from "../gast_builder"
-import {
-    analyzeCst,
-    setNodeLocationFromNodeOnlyOffset,
-    setNodeLocationFull
-} from "../cst/cst"
+import { analyzeCst } from "../cst/cst"
 import {
     defaultGrammarValidatorErrorProvider,
     defaultParserErrorProvider
@@ -34,7 +29,6 @@ import {
     IRecognitionException,
     IRuleConfig,
     IToken,
-    NodePositionTrackingOptions,
     TokenType,
     TokenVocabulary
 } from "../../../api"
@@ -73,7 +67,7 @@ export const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
     outputCst: true,
     errorMessageProvider: defaultParserErrorProvider,
     serializedGrammar: null,
-    nodePositionTracking: <NodePositionTrackingOptions>"none"
+    nodeLocationTracking: "none"
 })
 
 export const DEFAULT_RULE_CONFIG: IRuleConfig<any> = Object.freeze({

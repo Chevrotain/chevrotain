@@ -221,7 +221,9 @@ export class RecognizerEngine {
                 // TODO: dynamically get rid of this?
                 if (this.outputCst === true) {
                     impl.apply(this, args)
-                    return this.CST_STACK[this.CST_STACK.length - 1]
+                    const cst = this.CST_STACK[this.CST_STACK.length - 1]
+                    this.cstPostRule(cst)
+                    return cst
                 } else {
                     return impl.apply(this, args)
                 }

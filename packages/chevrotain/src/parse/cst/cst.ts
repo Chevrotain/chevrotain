@@ -30,42 +30,65 @@ import {
     IToken
 } from "../../../api"
 
-export function setNodeLocationFromTokenOnlyOffset(
-    nodeLocation: CstNodeLocation,
-    token: IToken
+/**
+ * This nodeLocation tracking is not efficient and should only be used
+ * when error recovery is enabled or the Token Vector contains virtual Tokens
+ * (e.g, Python Indent/Outdent)
+ * As it executes the calculation for every single terminal/nonTerminal
+ * and does not rely on the fact the token vector is **sorted**
+ */
+export function setNodeLocationOnlyOffset(
+    currNodeLocation: CstNodeLocation,
+    newLocationInfo: IToken
 ): void {
-    if (nodeLocation.startOffset > token.startOffset) {
-        nodeLocation.startOffset = token.startOffset
+    // First (valid) update for this cst node
+    if (isNaN(currNodeLocation.startOffset) === true) {
+        // assumption1: Token location information is either NaN or a valid number
+        // assumption2: Token location information is fully valid if it exist
+        // (both start/end offsets exist and are numbers).
+        currNodeLocation.startOffset = newLocationInfo.startOffset
+        currNodeLocation.endOffset = newLocationInfo.endOffset
     }
-
-    nodeLocation.endOffset = token.startOffset + token.image.length
+    // Once the startOffset has been updated with a valid number it should never receive
+    // any farther updates as the Token vector is sorted.
+    // We still have to check this this condition for every new possible location info
+    // because with error recovery enabled we may encounter invalid tokens (NaN location props)
+    else if (currNodeLocation.endOffset < newLocationInfo.endOffset === true) {
+        currNodeLocation.endOffset = newLocationInfo.endOffset
+    }
 }
 
-export function setNodeLocationFromNodeOnlyOffset(
-    nodeLocation: CstNodeLocation,
-    locationInformation: any
-): void {
-    if (nodeLocation.startOffset > locationInformation.startOffset) {
-        nodeLocation.startOffset = locationInformation.startOffset
-    }
-
-    nodeLocation.endOffset = locationInformation.endOffset
-}
-
+/**
+ * This nodeLocation tracking is not efficient and should only be used
+ * when error recovery is enabled or the Token Vector contains virtual Tokens
+ * (e.g, Python Indent/Outdent)
+ * As it executes the calculation for every single terminal/nonTerminal
+ * and does not rely on the fact the token vector is **sorted**
+ */
 export function setNodeLocationFull(
-    nodeLocation: CstNodeLocation,
-    locationInformation: any
+    currNodeLocation: CstNodeLocation,
+    newLocationInfo: CstNodeLocation
 ): void {
-    if (nodeLocation.startOffset > locationInformation.startOffset) {
-        nodeLocation.startOffset = locationInformation.startOffset
-        nodeLocation.startColumn = locationInformation.startColumn
-        nodeLocation.startLine = locationInformation.startLine
+    // First (valid) update for this cst node
+    if (isNaN(currNodeLocation.startOffset) === true) {
+        // assumption1: Token location information is either NaN or a valid number
+        // assumption2: Token location information is fully valid if it exist
+        // (all start/end props exist and are numbers).
+        currNodeLocation.startOffset = newLocationInfo.startOffset
+        currNodeLocation.startColumn = newLocationInfo.startColumn
+        currNodeLocation.startLine = newLocationInfo.startLine
+        currNodeLocation.endOffset = newLocationInfo.endOffset
+        currNodeLocation.endColumn = newLocationInfo.endColumn
+        currNodeLocation.endLine = newLocationInfo.endLine
     }
-
-    if (nodeLocation.endOffset < locationInformation.endOffset) {
-        nodeLocation.endOffset = locationInformation.endOffset
-        nodeLocation.endColumn = locationInformation.endColumn
-        nodeLocation.endLine = locationInformation.endLine
+    // Once the start props has been updated with a valid number it should never receive
+    // any farther updates as the Token vector is sorted.
+    // We still have to check this this condition for every new possible location info
+    // because with error recovery enabled we may encounter invalid tokens (NaN location props)
+    else if (currNodeLocation.endOffset < newLocationInfo.endOffset === true) {
+        currNodeLocation.endOffset = newLocationInfo.endOffset
+        currNodeLocation.endColumn = newLocationInfo.endColumn
+        currNodeLocation.endLine = newLocationInfo.endLine
     }
 }
 
