@@ -515,7 +515,7 @@ export class Lexer {
                     )
                     if (match !== null) {
                         matchedImage = match[0]
-                        if (match.payload === true) {
+                        if (match.payload !== undefined) {
                             payload = match.payload
                         }
                     } else {
@@ -548,7 +548,7 @@ export class Lexer {
                             )
                             if (match !== null) {
                                 matchAltImage = match[0]
-                                if (match.payload === true) {
+                                if (match.payload !== undefined) {
                                     altPayload = match.payload
                                 }
                             } else {
