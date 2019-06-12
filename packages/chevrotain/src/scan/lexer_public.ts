@@ -23,7 +23,8 @@ import {
     NOOP,
     PRINT_WARNING,
     reduce,
-    reject
+    reject,
+    toFastProperties
 } from "../utils/utils"
 import { augmentTokenTypes } from "./tokens"
 import {
@@ -289,16 +290,16 @@ export class Lexer {
             this.createTokenInstance = this.createOffsetOnlyToken
         } else {
             throw Error(
-                `Invalid <positionTracking> config option: "${
-                    this.config.positionTracking
-                }"`
+                `Invalid <positionTracking> config option: "${this.config.positionTracking}"`
             )
         }
 
         if (this.hasCustom) {
             this.addToken = this.addTokenUsingPush
+            this.handlePayload = this.handlePayloadWithCustom
         } else {
             this.addToken = this.addTokenUsingMemberAccess
+            this.handlePayload = this.handlePayloadNoCustom
         }
 
         const unOptimizedModes = reduce(
@@ -321,6 +322,8 @@ export class Lexer {
                     "\t Or inspect the console log for details on how to resolve these issues."
             )
         }
+
+        toFastProperties(this)
     }
 
     public tokenize(
@@ -353,6 +356,8 @@ export class Lexer {
             matchAltImage,
             longerAltIdx,
             matchedImage,
+            payload,
+            altPayload,
             imageLength,
             group,
             tokType,
@@ -492,6 +497,7 @@ export class Lexer {
             for (i = 0; i < chosenPatternsLength; i++) {
                 currConfig = chosenPatternIdxToConfig[i]
                 let currPattern = currConfig.pattern
+                payload = null
 
                 // manually in-lined because > 600 chars won't be in-lined in V8
                 let singleCharCode = currConfig.short
@@ -507,7 +513,14 @@ export class Lexer {
                         matchedTokens,
                         groups
                     )
-                    matchedImage = match !== null ? match[0] : match
+                    if (match !== null) {
+                        matchedImage = match[0]
+                        if (match.payload === true) {
+                            payload = match.payload
+                        }
+                    } else {
+                        matchedImage = null
+                    }
                 } else {
                     this.updateLastIndex(currPattern, offset)
                     matchedImage = this.match(currPattern, text, offset)
@@ -522,6 +535,7 @@ export class Lexer {
                         // by saving/linking longerAlt on the original config?
                         let longerAltConfig = patternIdxToConfig[longerAltIdx]
                         let longerAltPattern = longerAltConfig.pattern
+                        altPayload = null
 
                         // single Char can never be a longer alt so no need to test it.
                         // manually in-lined because > 600 chars won't be in-lined in V8
@@ -532,7 +546,14 @@ export class Lexer {
                                 matchedTokens,
                                 groups
                             )
-                            matchAltImage = match !== null ? match[0] : match
+                            if (match !== null) {
+                                matchAltImage = match[0]
+                                if (match.payload === true) {
+                                    altPayload = match.payload
+                                }
+                            } else {
+                                matchAltImage = null
+                            }
                         } else {
                             this.updateLastIndex(longerAltPattern, offset)
                             matchAltImage = this.match(
@@ -547,6 +568,7 @@ export class Lexer {
                             matchAltImage.length > matchedImage.length
                         ) {
                             matchedImage = matchAltImage
+                            payload = altPayload
                             currConfig = longerAltConfig
                         }
                     }
@@ -556,7 +578,6 @@ export class Lexer {
 
             // successful match
             if (matchedImage !== null) {
-                // matchedImage = match[0]
                 imageLength = matchedImage.length
                 group = currConfig.group
                 if (group !== undefined) {
@@ -573,6 +594,9 @@ export class Lexer {
                         imageLength
                     )
 
+                    this.handlePayload(newToken, payload)
+
+                    // TODO: optimize NOOP in case there are no special groups?
                     if (group === false) {
                         matchedTokensIndex = this.addToken(
                             matchedTokens,
@@ -606,7 +630,7 @@ export class Lexer {
                                 lineTerminatorPattern.lastIndex - 1
                             numOfLTsInMatch++
                         }
-                    } while (foundTerminator)
+                    } while (foundTerminator === true)
 
                     if (numOfLTsInMatch !== 0) {
                         line = line + numOfLTsInMatch
@@ -686,6 +710,7 @@ export class Lexer {
         }
 
         // if we do have custom patterns which push directly into the
+        // TODO: custom tokens should not push directly??
         if (!this.hasCustom) {
             // if we guessed a too large size for the tokens array this will shrink it to the right size.
             matchedTokens.length = matchedTokensIndex
@@ -820,6 +845,18 @@ export class Lexer {
         tokenVector[index] = tokenToAdd
         index++
         return index
+    }
+
+    // Place holder, will be replaced by the correct variant according to the hasCustom flag option at runtime.
+    /* istanbul ignore next - place holder */
+    private handlePayload(token: IToken, payload: any): void {}
+
+    private handlePayloadNoCustom(token: IToken, payload: any): void {}
+
+    private handlePayloadWithCustom(token: IToken, payload: any): void {
+        if (payload !== null) {
+            token.payload = payload
+        }
     }
 
     /* istanbul ignore next - place holder to be replaced with chosen alternative at runtime */

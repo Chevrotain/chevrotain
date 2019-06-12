@@ -1655,6 +1655,9 @@ export interface IToken {
      * This property is very useful for debugging the Lexing and Parsing phases.
      */
     tokenType?: TokenType
+
+    // TODO: docs
+    payload?: any
 }
 
 export declare function tokenName(tokType: TokenType): string
