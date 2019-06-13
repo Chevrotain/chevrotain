@@ -1656,7 +1656,11 @@ export interface IToken {
      */
     tokenType?: TokenType
 
-    // TODO: docs
+    /**
+     * Custom Payload value, this is an optional feature of Custom Token Patterns
+     * For additional details see the docs:
+     * https://sap.github.io/chevrotain/docs/guide/custom_token_patterns.html#custom-payloads
+     */
     payload?: any
 }
 

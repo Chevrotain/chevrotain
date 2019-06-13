@@ -9,13 +9,13 @@ See: [**Runnable example**](https://github.com/SAP/chevrotain/blob/master/exampl
 Normally a Token's pattern is defined using a JavaScript regular expression:
 
 ```javascript
-let IntegerToken = createToken({ name: "IntegerToken", pattern: /\d+/ })
+const IntegerToken = createToken({ name: "IntegerToken", pattern: /\d+/ })
 ```
 
 However in some circumstances the capability to provide a custom pattern matching implementation may be required.
 There are a few use cases in which a custom pattern could be used:
 
--   The token cannot be easily (or at all) defined using pure regular expressions.
+-   The token cannot be easily (or at all) be defined using pure regular expressions.
 
     -   When context on previously lexed tokens is needed.
         For example: [Lexing Python like indentation using Chevrotain](https://github.com/SAP/chevrotain/blob/master/examples/lexer/python_indentation/python_indentation.js).
@@ -58,7 +58,7 @@ createToken({
     name: "IntegerToken",
     pattern: { exec: matchInteger },
 
-    // Optional properrty that will enable optimizations in the lexer
+    // Optional property that will enable optimizations in the lexer
     // See: https://sap.github.io/chevrotain/documentation/4_7_0/interfaces/itokenconfig.html#start_chars_hint
     start_chars_hint: ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 })
@@ -99,3 +99,12 @@ A larger and non contrived example can seen here: [Lexing Python like indentatio
 It is important to note that The matchedTokens and groups arguments match the token and groups properties of the tokenize output ([ILexingResult](https://sap.github.io/chevrotain/documentation/4_7_0/interfaces/ilexingresult.html)).
 These arguments are the current state of the lexing result so even if the lexer has performed error recovery any tokens found
 in those arguments are still guaranteed to be in the final result.
+
+## Custom Payloads
+
+Sometimes we want to collect additional properties on an IToken object, for example:
+
+-   Subsets of the matched text, e.g: strip away the quotes from string literals.
+-   Computed values from the matched text, e.g: Integer values of Date parts (day/month/year).
+
+This can be done by attaching a **payload** property to our custom token matcher returned value.
