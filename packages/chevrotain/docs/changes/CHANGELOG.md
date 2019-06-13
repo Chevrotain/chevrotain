@@ -2,7 +2,7 @@
 
 #### Minor Changes
 
--   [CST location information.](https://github.com/SAP/chevrotain/issues/962).
+-   [CST location information.](https://github.com/SAP/chevrotain/issues/932).
 
 ## 4.6.0 (6-1-2019)
 
