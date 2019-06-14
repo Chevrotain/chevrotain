@@ -73,7 +73,7 @@ const StringLiteral = createToken({
 // Now we can simply replace the regExp pattern with our custom pattern.
 const DateLiteral = createToken({
     name: "DateLiteral",
-    pattern: matchDateLiteral(),
+    pattern: matchDateLiteral,
     // custom patterns should explicitly specify the line_breaks option.
     line_breaks: false
 })
@@ -88,6 +88,7 @@ const customPatternsLexer = new Lexer([Whitespace, StringLiteral, DateLiteral])
 
 module.exports = {
     StringLiteral: StringLiteral,
+    DateLiteral: DateLiteral,
 
     tokenize: function(text) {
         const lexResult = customPatternsLexer.tokenize(text)
