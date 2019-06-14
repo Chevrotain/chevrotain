@@ -30,27 +30,34 @@ Therefor a slightly modified pattern has been used.
 
 The building blocks are as follows:
 
--   Use Intersection Types to define the complete Type (after all the mixins).
-    -   https://github.com/SAP/chevrotain/blob/8a1c3594165849c179f6c9fd67078ba96af0ea34/src/parse/parser/traits/parser_traits.ts#L20-L28
--   Specify the type of "this" context in methods as the intersected mixed Type
-    to allow "interaction" between different mixed-ins of the same class.
-    -   https://github.com/SAP/chevrotain/blob/8a1c3594165849c179f6c9fd67078ba96af0ea34/src/parse/parser/traits/lexer_adapter.ts#L45
--   Create init methods for each mixin to allow instance members initialization.
-    -   https://github.com/SAP/chevrotain/blob/8a1c3594165849c179f6c9fd67078ba96af0ea34/src/parse/parser/traits/lexer_adapter.ts#L17-L21
--   Use a type assertion in the main class constructor to enable calling this init methods.
-    -   https://github.com/SAP/chevrotain/blob/8a1c3594165849c179f6c9fd67078ba96af0ea34/src/parse/parser/parser.ts#L225-L232
--   Use A dummy assignment statement to use the TypeScript compiler to ensure the internal Parser implementation matches
-    the exposed public API of Chevrotain.
+-   **Define the full combined type**
+    -   by using Intersection Types to define the complete Type (after all the mixins).
+    -   [Source Snippet](https://github.com/SAP/chevrotain/blob/8a1c3594165849c179f6c9fd67078ba96af0ea34/src/parse/parser/traits/parser_traits.ts#L20-L28)
+-   **Make every method aware of its full execution context**
+    -   By specifying the type of "this" context in methods as the "full combined type" Type
+        to allow "interaction" between different mixed-ins of the same class.
+    -   [e.g calling a method from another trait](https://github.com/SAP/chevrotain/blob/8a1c3594165849c179f6c9fd67078ba96af0ea34/src/parse/parser/traits/recognizer_api.ts#L35-L41)
+-   **Define state initialization for each trait/mixin**?:
+    -   By defining init methods for each trait/mixin which would be called during the combined type initialization.
+    -   [A single trait's initializer definition](https://github.com/SAP/chevrotain/blob/8a1c3594165849c179f6c9fd67078ba96af0ea34/src/parse/parser/traits/lexer_adapter.ts#L17-L21)
+-   **Invoke the state initialization in the combined class**
+    -   By using a type assertion in the main class constructor to enable calling these init methods.
+    -   [Invoking the init methods](https://github.com/SAP/chevrotain/blob/8a1c3594165849c179f6c9fd67078ba96af0ea34/src/parse/parser/parser.ts#L225-L232)
+-   **Ensuring alignment with the public API**
+    -   By using a dummy assignment statement to leverge the TypeScript compiler to ensure the internal Parser implementation matches
+        the exposed public API of Chevrotain.
+    -   [Dummy assignment](https://github.com/SAP/chevrotain/blob/8a1c3594165849c179f6c9fd67078ba96af0ea34/src/api.ts#L193-L197)
+-   **Enriching the combined class's prototype**
+    -   [Invoking ApplyMixings](https://github.com/SAP/chevrotain/blob/8a1c3594165849c179f6c9fd67078ba96af0ea34/src/parse/parser/parser.ts#L240-L249)
+    -   [Upgraded ApplyMixings with setter/getter handling](https://github.com/SAP/chevrotain/blob/8a1c3594165849c179f6c9fd67078ba96af0ea34/src/utils/utils.ts#L433-L460)
 
-    -   https://github.com/SAP/chevrotain/blob/8a1c3594165849c179f6c9fd67078ba96af0ea34/src/api.ts#L193-L197
-
--   Pros
+*   Pros
 
     -   Avoid duplication.
     -   Allows splitting up large classes to multiple files if/when class composition is not appropriate.
         -   a.k.a ["partial classes"](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/partial-classes-and-methods).
 
--   Cons
+*   Cons
     -   Breaks the semantics of TypeScript a bit, What the compiler knows about "SmartObject"
         is no longer the "full story", that is why the factory is needed to create new instances.
 
@@ -61,4 +68,4 @@ The building blocks are as follows:
 
 ### To Investigate
 
-Would TypeScript 2.2 enabled a simpler & clear pattern by using its support for ["mixin classes"](https://github.com/Microsoft/TypeScript/wiki/What%27s-new-in-TypeScript#support-for-mix-in-classes)?
+Would TypeScript 2.2 enabled a simpler & clearer pattern by using its support for ["mixin classes"](https://github.com/Microsoft/TypeScript/wiki/What%27s-new-in-TypeScript#support-for-mix-in-classes)?
