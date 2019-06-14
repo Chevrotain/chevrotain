@@ -15,6 +15,10 @@ const IntegerToken = createToken({ name: "IntegerToken", pattern: /\d+/ })
 However in some circumstances the capability to provide a custom pattern matching implementation may be required.
 There are a few use cases in which a custom pattern could be used:
 
+-   We want to collect additional properties on the token objects.
+
+    -   See [Custom Payloads](#custom-payloads) section.
+
 -   The token cannot be easily (or at all) be defined using pure regular expressions.
 
     -   When context on previously lexed tokens is needed.
@@ -104,7 +108,51 @@ in those arguments are still guaranteed to be in the final result.
 
 Sometimes we want to collect additional properties on an IToken object, for example:
 
+-   Save RegExp capturing groups on the token object.
 -   Subsets of the matched text, e.g: strip away the quotes from string literals.
 -   Computed values from the matched text, e.g: Integer values of Date parts (day/month/year).
 
-This can be done by attaching a **payload** property to our custom token matcher returned value.
+This can be done by attaching a **payload** property to our custom token matcher returned value,
+for example:
+
+```javascript
+// We define the regExp only **once** (outside) to avoid performance issues.
+const stringLiteralPattern = /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/y
+function matchStringLiteral(text, startOffset) {
+    // using 'y' sticky flag (Note it is not supported on IE11...)
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/sticky
+    stringLiteralPattern.lastIndex = startOffset
+
+    // Note that just because we are using a custom token pattern
+    // Does not mean we cannot implement it using JavaScript Regular Expressions...
+    const execResult = stringLiteralPattern.exec(text)
+    if (execResult !== null) {
+        const fullMatch = execResult[0]
+        // compute the payload
+        const matchWithOutQuotes = fullMatch.substr(1, fullMatch.length - 2)
+        // attach the payload
+        execResult.payload = matchWithOutQuotes
+    }
+
+    return execResult
+}
+
+const StringLiteral = createToken({
+    name: "StringLiteral",
+    pattern: matchStringLiteral,
+    // custom patterns should explicitly specify the line_breaks option.
+    line_breaks: false
+})
+
+// When we lex a StringLiteral text a "payload" property will now exist on the resulting token object.
+```
+
+Note:
+
+-   A custom pattern may be implemented using Regular Expressions, these concepts are **not mutually exclusive**.
+-   The payload property may be **anything**:
+    -   A single value (as in the example above).
+    -   A JavaScript object with multiple properties.
+    -   The "groups" property of an regExp exec result when [Named Capturing Groups are used](https://github.com/tc39/proposal-regexp-named-groups).
+
+Additional examples can be found [here](See: [**Runnable example for custom payloads**](https://github.com/SAP/chevrotain/blob/master/examples/lexer/custom_patterns/custom_patterns_payloads.js)).
