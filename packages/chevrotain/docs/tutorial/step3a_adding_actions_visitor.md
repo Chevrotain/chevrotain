@@ -15,7 +15,7 @@ This can be accomplished using a CST (Concrete Syntax Tree) Visitor defined **ou
 
 ## Enabling CST
 
-This feature is automatically enabled when a Parser extends the Chevrotain [CstParser)[https://sap.github.io/chevrotain/documentation/4_7_0/classes/cstparser.html] class
+This feature is automatically enabled when a Parser extends the Chevrotain [CstParser)[https://sap.github.io/chevrotain/documentation/4_8_0/classes/cstparser.html] class
 
 The invocation of any grammar rule will now automatically create a CST.
 
