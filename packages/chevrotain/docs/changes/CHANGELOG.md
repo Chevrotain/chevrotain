@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+-   [Custom Token Patterns and "Custom Payloads".](https://github.com/SAP/chevrotain/issues/888).
+
 ## 4.7.0 (6-8-2019)
 
 #### Minor Changes

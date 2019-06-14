@@ -150,9 +150,10 @@ const StringLiteral = createToken({
 Note:
 
 -   A custom pattern may be implemented using Regular Expressions, these concepts are **not mutually exclusive**.
--   The payload property may be **anything**:
+-   The payload property may be **anything** e.g:
     -   A single value (as in the example above).
     -   A JavaScript object with multiple properties.
-    -   The "groups" property of an regExp exec result when [Named Capturing Groups are used](https://github.com/tc39/proposal-regexp-named-groups).
+    -   Capturing groups from a regExp exec method's results.
+    -   The "groups" property of an regExp exec method's result (If [Named Capturing Groups are used](https://github.com/tc39/proposal-regexp-named-groups)).
 
 Additional examples can be found [here](See: [**Runnable example for custom payloads**](https://github.com/SAP/chevrotain/blob/master/examples/lexer/custom_patterns/custom_patterns_payloads.js)).
