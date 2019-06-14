@@ -59,7 +59,7 @@ The building blocks are as follows:
 
 *   Cons
     -   Breaks the semantics of TypeScript a bit, What the compiler knows about "SmartObject"
-        is no longer the "full story", that is why the factory is needed to create new instances.
+        is no longer the "full story".
 
 ### References
 
