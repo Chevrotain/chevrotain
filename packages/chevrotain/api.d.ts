@@ -1400,7 +1400,7 @@ export interface ILexerErrorMessageProvider {
      * @param column - Column number where the error occured. (optional)
      *                    Will not be provided when lexer is not defined to track lines/columns
      */
-    buildUnexpectedCharactersMessage(
+    buildUnexpectedCharactersMessage?(
         fullText: string,
         startOffset: number,
         length: number,
@@ -1415,7 +1415,7 @@ export interface ILexerErrorMessageProvider {
      *
      * @param token - The Token that requested pop mode.
      */
-    buildUnableToPopLexerModeMessage(token: IToken): string
+    buildUnableToPopLexerModeMessage?(token: IToken): string
 }
 
 /**
