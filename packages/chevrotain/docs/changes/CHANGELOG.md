@@ -2,7 +2,7 @@
 
 #### Bug Fixes
 
--   [Resolved edge case in repetition error recovery which may cause "Maximum call stack size exceeded".]()
+-   [Resolved edge case in repetition error recovery which may cause "Maximum call stack size exceeded".](https://github.com/SAP/chevrotain/commit/211d410bd456934809298da791283b0723e3b22a)
 
 ## 4.8.0 (6-14-2019)
 
