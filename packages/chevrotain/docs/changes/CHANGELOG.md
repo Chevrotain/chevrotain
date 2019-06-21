@@ -1,32 +1,38 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+-   [Resolved edge case in repetition error recovery which may cause "Maximum call stack size exceeded".]()
+
 ## 4.8.0 (6-14-2019)
 
 #### Minor Changes
 
--   [Custom Token Patterns and "Custom Payloads".](https://github.com/SAP/chevrotain/issues/888).
+-   [Custom Token Patterns and "Custom Payloads".](https://github.com/SAP/chevrotain/issues/888)
 
 ## 4.7.0 (6-8-2019)
 
 #### Minor Changes
 
--   [CST location information.](https://github.com/SAP/chevrotain/issues/932).
+-   [CST location information.](https://github.com/SAP/chevrotain/issues/932)
 
 ## 4.6.0 (6-1-2019)
 
 #### Minor Changes
 
--   [Expose two base Parser classes: CstParser and EmbeddedActionsParser.](https://github.com/SAP/chevrotain/issues/967).
+-   [Expose two base Parser classes: CstParser and EmbeddedActionsParser.](https://github.com/SAP/chevrotain/issues/967)
 
 ## 4.5.0 (5-25-2019)
 
 #### Minor Changes
 
--   [Consider Token Categories in Lookahead Functions Calculation.](https://github.com/SAP/chevrotain/issues/962).
+-   [Consider Token Categories in Lookahead Functions Calculation.](https://github.com/SAP/chevrotain/issues/962)
 
 ## 4.4.0 (5-24-2019)
 
 #### Minor Changes
 
--   [Better handling of infinite loops in repetitions.](https://github.com/SAP/chevrotain/issues/958).
+-   [Better handling of infinite loops in repetitions.](https://github.com/SAP/chevrotain/issues/958)
 
 ## 4.3.3 (4-12-2019)
 

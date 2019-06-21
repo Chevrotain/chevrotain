@@ -620,7 +620,13 @@ export class RecognizerEngine {
             <any>lookaheadFunction,
             MANY_IDX,
             prodOccurrence,
-            NextTerminalAfterManyWalker
+            NextTerminalAfterManyWalker,
+            // The notStuck parameter is only relevant when "attemptInRepetitionRecovery"
+            // is invoked from manyInternal, in the MANY_SEP case and AT_LEAST_ONE[_SEP]
+            // An infinite loop cannot occur as:
+            // - Either the lookahead is guaranteed to consume something (Single Token Separator)
+            // - AT_LEAST_ONE by definition is guaranteed to consume something (or error out).
+            notStuck
         )
     }
 

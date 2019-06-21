@@ -148,9 +148,16 @@ export class Recoverable {
 
     shouldInRepetitionRecoveryBeTried(
         this: MixedInParser,
-        expectTokAfterLastMatch?: TokenType,
-        nextTokIdx?: number
+        expectTokAfterLastMatch: TokenType,
+        nextTokIdx: number,
+        notStuck: boolean | undefined
     ): boolean {
+        // Edge case of arriving from a MANY repetition which is stuck
+        // Attempting recovery in this case could cause an infinite loop
+        if (notStuck === false) {
+            return false
+        }
+
         // arguments to try and perform resync into the next iteration of the many are missing
         if (expectTokAfterLastMatch === undefined || nextTokIdx === undefined) {
             return false
@@ -383,7 +390,8 @@ export class Recoverable {
         lookaheadFunc: () => boolean,
         dslMethodIdx: number,
         prodOccurrence: number,
-        nextToksWalker: typeof AbstractNextTerminalAfterProductionWalker
+        nextToksWalker: typeof AbstractNextTerminalAfterProductionWalker,
+        notStuck?: boolean
     ): void {
         // by default this is a NO-OP
         // The actual implementation is with the function(not method) below
@@ -425,7 +433,8 @@ export function attemptInRepetitionRecovery(
     lookaheadFunc: () => boolean,
     dslMethodIdx: number,
     prodOccurrence: number,
-    nextToksWalker: typeof AbstractNextTerminalAfterProductionWalker
+    nextToksWalker: typeof AbstractNextTerminalAfterProductionWalker,
+    notStuck?: boolean
 ) {
     let key = this.getKeyForAutomaticLookahead(dslMethodIdx, prodOccurrence)
     let firstAfterRepInfo = this.firstAfterRepMap.get(<any>key)
@@ -458,7 +467,8 @@ export function attemptInRepetitionRecovery(
     if (
         this.shouldInRepetitionRecoveryBeTried(
             expectTokAfterLastMatch,
-            nextTokIdx
+            nextTokIdx,
+            notStuck
         )
     ) {
         // TODO: performance optimization: instead of passing the original args here, we modify
