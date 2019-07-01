@@ -37,7 +37,7 @@
     },
     "devDependencies": {
         "fs-extra": "^8.0.0",
-        "husky": "^2.0.0",
+        "husky": "^3.0.0",
         "lerna": "^3.13.0",
         "lint-staged": "^8.1.4",
         "lodash": "^4.17.4",
