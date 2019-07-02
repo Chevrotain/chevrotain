@@ -216,8 +216,11 @@ API.EmbeddedActionsParser = EmbeddedActionsParser as any
 
 // TypeCheck Multi Trait Parser API against official Chevrotain API
 // The only thing this does not check is the constructor signature.
-const mixedDummyInstance: MixedInParser = null
-const officalDummyInstance: defs.Parser = mixedDummyInstance
+type AssertTrue<T extends true> = T
+
+type AssertMixedInParserExtendsParser = AssertTrue<
+    MixedInParser extends defs.Parser ? true : false
+>
 
 API.ParserDefinitionErrorType = ParserDefinitionErrorType
 API.Lexer = Lexer
