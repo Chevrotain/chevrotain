@@ -1,6 +1,6 @@
-import * as apiDefs from "../api"
-import * as apiImpl from "./api"
-import { MixedInParser } from "./parse/parser/traits/parser_traits"
+import * as apiDefs from "../../lib/api"
+import * as apiImpl from "../../lib/src/api"
+import { MixedInParser } from "../../lib/src/parse/parser/traits/parser_traits"
 
 type AssertExtends<T extends R, R> = [T, R]
 
@@ -17,5 +17,10 @@ export type TypeCheckForApi = [
         },
         typeof apiDefs
     >,
-    AssertExtends<MixedInParser, apiDefs.Parser>
+    AssertExtends<
+        // after *.ts being compiled to *.d.ts,
+        // get/set property type is wrongly inferred if property setter specifies this type.
+        MixedInParser & { input: apiDefs.IToken[] },
+        apiDefs.Parser
+    >
 ]
