@@ -1,12 +1,19 @@
-import {
+// semantic version
+export { VERSION } from "./version"
+
+export {
     Parser,
     CstParser,
     EmbeddedActionsParser,
     ParserDefinitionErrorType,
     EMPTY_ALT
 } from "./parse/parser/parser"
-import { Lexer, LexerDefinitionErrorType } from "./scan/lexer_public"
-import {
+
+export { Lexer, LexerDefinitionErrorType } from "./scan/lexer_public"
+
+// Tokens utilities
+
+export {
     createToken,
     createTokenInstance,
     EOF,
@@ -14,22 +21,28 @@ import {
     tokenMatcher,
     tokenName
 } from "./scan/tokens_public"
-import {
+
+// Other Utilities
+
+export {
+    defaultGrammarResolverErrorProvider,
+    defaultGrammarValidatorErrorProvider,
+    defaultParserErrorProvider
+} from "./parse/errors_public"
+
+export {
     EarlyExitException,
     isRecognitionException,
     MismatchedTokenException,
     NotAllInputParsedException,
     NoViableAltException
 } from "./parse/exceptions_public"
-import { VERSION } from "./version"
-import {
-    defaultGrammarResolverErrorProvider,
-    defaultGrammarValidatorErrorProvider,
-    defaultParserErrorProvider
-} from "./parse/errors_public"
-import { createSyntaxDiagramsCode } from "./diagrams/render_public"
-import { GAstVisitor } from "./parse/grammar/gast/gast_visitor_public"
-import {
+
+export { defaultLexerErrorProvider } from "./scan/lexer_errors_public"
+
+// grammar reflection API
+
+export {
     Alternation,
     Flat,
     NonTerminal,
@@ -39,232 +52,26 @@ import {
     RepetitionMandatoryWithSeparator,
     RepetitionWithSeparator,
     Rule,
-    serializeGrammar,
-    serializeProduction,
     Terminal
 } from "./parse/grammar/gast/gast_public"
-import {
+
+// GAST Utilities
+
+export {
+    serializeGrammar,
+    serializeProduction
+} from "./parse/grammar/gast/gast_public"
+
+export { GAstVisitor } from "./parse/grammar/gast/gast_visitor_public"
+
+export {
     assignOccurrenceIndices,
     resolveGrammar,
     validateGrammar
 } from "./parse/grammar/gast/gast_resolver_public"
-import {
-    generateParserFactory,
-    generateParserModule
-} from "./generate/generate_public"
-
-import * as defs from "../api"
-import { IProduction } from "../api"
-import { TokenType } from "../api"
-import { MixedInParser } from "./parse/parser/traits/parser_traits"
-import { defaultLexerErrorProvider } from "./scan/lexer_errors_public"
-
-interface ParserConstructor {
-    new (
-        tokenVocabulary: defs.TokenVocabulary,
-        config?: defs.IParserConfig
-    ): defs.Parser
-}
-
-interface CstParserConstructor {
-    new (
-        tokenVocabulary: defs.TokenVocabulary,
-        config?: defs.IParserConfig
-    ): defs.CstParser
-}
-
-interface EmbeddedActionsParserConstructor {
-    new (
-        tokenVocabulary: defs.TokenVocabulary,
-        config?: defs.IParserConfig
-    ): defs.EmbeddedActionsParser
-}
-
-interface LexerConstructor {
-    new (
-        lexerDefinition: defs.TokenType[] | defs.IMultiModeLexerDefinition,
-        config: defs.ILexerConfig
-    ): defs.Lexer
-}
-
-interface FlatConstructor {
-    new (options: { definition: IProduction[]; name?: string }): defs.Flat
-}
-interface RepetitionConstructor {
-    new (options: {
-        definition: IProduction[]
-        idx?: number
-        name?: string
-    }): defs.Repetition
-}
-interface RepetitionWithSeparatorConstructor {
-    new (options: {
-        definition: IProduction[]
-        separator: TokenType
-        idx?: number
-        name?: string
-    }): defs.RepetitionWithSeparator
-}
-interface RepetitionMandatoryConstructor {
-    new (options: {
-        definition: IProduction[]
-        idx?: number
-        name?: string
-    }): defs.RepetitionMandatory
-}
-interface RepetitionMandatoryWithSeparatorConstructor {
-    new (options: {
-        definition: IProduction[]
-        separator: TokenType
-        idx?: number
-        name?: string
-    }): defs.RepetitionMandatoryWithSeparator
-}
-interface OptionConstructor {
-    new (options: {
-        definition: IProduction[]
-        idx?: number
-        name?: string
-    }): defs.Option
-}
-interface AlternationConstructor {
-    new (options: {
-        definition: IProduction[]
-        idx?: number
-        name?: string
-    }): defs.Alternation
-}
-interface NonTerminalConstructor {
-    new (options: {
-        nonTerminalName: string
-        referencedRule?: Rule
-        idx?: number
-    }): defs.NonTerminal
-}
-interface TerminalConstructor {
-    new (options: { terminalType: TokenType; idx?: number }): defs.Terminal
-}
-interface RuleConstructor {
-    new (options: {
-        name: string
-        definition: IProduction[]
-        orgText?: string
-    }): defs.Rule
-}
-
-/**
- * defines the public API of
- * changes here may require major version change. (semVer)
- */
-const API: {
-    VERSION: typeof defs.VERSION
-    Parser: ParserConstructor
-    CstParser: CstParserConstructor
-    EmbeddedActionsParser: EmbeddedActionsParserConstructor
-    ParserDefinitionErrorType: typeof defs.ParserDefinitionErrorType
-    Lexer: LexerConstructor
-    LexerDefinitionErrorType: typeof defs.LexerDefinitionErrorType
-    defaultLexerErrorProvider: typeof defs.defaultLexerErrorProvider
-    EOF: defs.TokenType
-    tokenName: typeof defs.tokenName
-    tokenLabel: typeof defs.tokenLabel
-    tokenMatcher: typeof defs.tokenMatcher
-    createToken: typeof defs.createToken
-    createTokenInstance: typeof defs.createTokenInstance
-    EMPTY_ALT: typeof defs.EMPTY_ALT
-    defaultParserErrorProvider: typeof defs.defaultParserErrorProvider
-    isRecognitionException: typeof defs.isRecognitionException
-    EarlyExitException: typeof defs.EarlyExitException
-    MismatchedTokenException: typeof defs.MismatchedTokenException
-    NotAllInputParsedException: typeof defs.NotAllInputParsedException
-    NoViableAltException: typeof defs.NoViableAltException
-    Flat: FlatConstructor
-    Repetition: RepetitionConstructor
-    RepetitionWithSeparator: RepetitionWithSeparatorConstructor
-    RepetitionMandatory: RepetitionMandatoryConstructor
-    RepetitionMandatoryWithSeparator: RepetitionMandatoryWithSeparatorConstructor
-    Option: OptionConstructor
-    Alternation: AlternationConstructor
-    NonTerminal: NonTerminalConstructor
-    Terminal: TerminalConstructor
-    Rule: RuleConstructor
-    GAstVisitor: typeof defs.GAstVisitor
-
-    serializeGrammar: typeof defs.serializeGrammar
-    serializeProduction: typeof defs.serializeProduction
-    resolveGrammar: typeof defs.resolveGrammar
-    defaultGrammarResolverErrorProvider: typeof defs.defaultGrammarResolverErrorProvider
-    validateGrammar: typeof defs.validateGrammar
-    defaultGrammarValidatorErrorProvider: typeof defs.defaultGrammarValidatorErrorProvider
-    assignOccurrenceIndices: typeof defs.assignOccurrenceIndices
-
-    clearCache: typeof defs.clearCache
-
-    createSyntaxDiagramsCode: typeof defs.createSyntaxDiagramsCode
-
-    generateParserFactory: typeof defs.generateParserFactory
-    generateParserModule: typeof defs.generateParserModule
-} = <any>{}
-
-// semantic version
-API.VERSION = VERSION
-
-// runtime API
-API.Parser = Parser as any
-API.CstParser = CstParser as any
-API.EmbeddedActionsParser = EmbeddedActionsParser as any
-
-// TypeCheck Multi Trait Parser API against official Chevrotain API
-// The only thing this does not check is the constructor signature.
-const mixedDummyInstance: MixedInParser = null
-const officalDummyInstance: defs.Parser = mixedDummyInstance
-
-API.ParserDefinitionErrorType = ParserDefinitionErrorType
-API.Lexer = Lexer
-API.LexerDefinitionErrorType = LexerDefinitionErrorType
-API.EOF = EOF
-
-// Tokens utilities
-API.tokenName = tokenName
-API.tokenLabel = tokenLabel
-API.tokenMatcher = tokenMatcher
-API.createToken = createToken
-API.createTokenInstance = createTokenInstance
-//
-// // Other Utilities
-API.EMPTY_ALT = EMPTY_ALT
-API.defaultParserErrorProvider = defaultParserErrorProvider
-API.isRecognitionException = isRecognitionException
-API.EarlyExitException = EarlyExitException
-API.MismatchedTokenException = MismatchedTokenException
-API.NotAllInputParsedException = NotAllInputParsedException
-API.NoViableAltException = NoViableAltException
-API.defaultLexerErrorProvider = defaultLexerErrorProvider
-//
-// // grammar reflection API
-API.Flat = Flat
-API.Repetition = Repetition
-API.RepetitionWithSeparator = RepetitionWithSeparator
-API.RepetitionMandatory = RepetitionMandatory
-API.RepetitionMandatoryWithSeparator = RepetitionMandatoryWithSeparator
-API.Option = Option
-API.Alternation = Alternation
-API.NonTerminal = NonTerminal
-API.Terminal = Terminal
-API.Rule = Rule
-
-// // GAST Utilities
-API.GAstVisitor = GAstVisitor
-API.serializeGrammar = serializeGrammar
-API.serializeProduction = serializeProduction
-API.resolveGrammar = resolveGrammar
-API.defaultGrammarResolverErrorProvider = defaultGrammarResolverErrorProvider
-API.validateGrammar = validateGrammar
-API.defaultGrammarValidatorErrorProvider = defaultGrammarValidatorErrorProvider
-API.assignOccurrenceIndices = assignOccurrenceIndices
 
 /* istanbul ignore next */
-API.clearCache = function() {
+export function clearCache() {
     console.warn(
         "The clearCache function was 'soft' removed from the Chevrotain API." +
             "\n\t It performs no action other than printing this message." +
@@ -272,9 +79,9 @@ API.clearCache = function() {
     )
 }
 
-API.createSyntaxDiagramsCode = createSyntaxDiagramsCode
+export { createSyntaxDiagramsCode } from "./diagrams/render_public"
 
-API.generateParserFactory = generateParserFactory
-API.generateParserModule = generateParserModule
-
-module.exports = API
+export {
+    generateParserFactory,
+    generateParserModule
+} from "./generate/generate_public"

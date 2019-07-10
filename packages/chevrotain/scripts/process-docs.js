@@ -20,3 +20,6 @@ fixedApiString = fixedApiString.replace(
 const apiDirPath = path.resolve(__dirname, "../lib")
 fs.ensureDirSync(apiDirPath)
 fs.writeFileSync(apiDirPath + "/chevrotain.d.ts", fixedApiString)
+
+// copy api.d.ts to lib/api.d.ts so that src/**/*.ts works when importing this file.
+fs.writeFileSync(apiDirPath + "/api.d.ts", apiString)
