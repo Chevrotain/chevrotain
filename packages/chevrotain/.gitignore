@@ -1,6 +1,7 @@
 /docs/.vuepress/dist/
 /dev
 /lib
+/es6
 /.nyc_output
 /coverage
 
