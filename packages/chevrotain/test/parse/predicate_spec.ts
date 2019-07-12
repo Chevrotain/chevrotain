@@ -31,8 +31,8 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
         class PredicateOptionParser extends Parser {
             constructor(input: IToken[] = [], private gate: boolean) {
                 super(ALL_TOKENS, { outputCst: false })
-                this.input = input
                 this.performSelfAnalysis()
+                this.input = input
             }
 
             public optionRule = this.RULE("optionRule", () => {
@@ -81,8 +81,8 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
         class PredicateManyParser extends Parser {
             constructor(input: IToken[] = [], private gate: boolean) {
                 super(ALL_TOKENS, { outputCst: false })
-                this.input = input
                 this.performSelfAnalysis()
+                this.input = input
             }
 
             public manyRule = this.RULE("manyRule", () => {
@@ -132,8 +132,8 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
         class PredicateAtLeastOneParser extends Parser {
             constructor(input: IToken[] = [], private gate: boolean) {
                 super(ALL_TOKENS, { outputCst: false })
-                this.input = input
                 this.performSelfAnalysis()
+                this.input = input
             }
 
             public atLeastOneRule = this.RULE("atLeastOneRule", () => {
@@ -195,8 +195,8 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
         class PredicateOrParser extends Parser {
             constructor(input: IToken[] = [], private gate: boolean) {
                 super(ALL_TOKENS, { outputCst: false })
-                this.input = input
                 this.performSelfAnalysis()
+                this.input = input
             }
 
             public orRule = this.RULE("orRule", () => {
@@ -272,8 +272,8 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
             class PredicateWithRuleOrParser extends Parser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, { outputCst: false })
-                    this.input = input
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public topRule = this.RULE("topRule", param => {
@@ -306,8 +306,8 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
             class PredicateWithRuleOptionParser extends Parser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, { outputCst: false })
-                    this.input = input
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public topRule = this.RULE("topRule", param => {
@@ -337,8 +337,8 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
             class PredicateWithRuleManyParser extends Parser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, { outputCst: false })
-                    this.input = input
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public topRule = this.RULE("topRule", param => {
@@ -374,8 +374,8 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
             class PredicateWithRuleAtLeastOneParser extends Parser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, { outputCst: false })
-                    this.input = input
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public topRule = this.RULE("topRule", param => {

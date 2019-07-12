@@ -43,8 +43,9 @@ describe("lookahead Regular Tokens Mode", () => {
 
             constructor(input: IToken[] = []) {
                 super(ALL_TOKENS, { outputCst: false })
-                this.input = input
+
                 this.performSelfAnalysis()
+                this.input = input
             }
 
             public manyOptionsRule = this.RULE(
@@ -134,8 +135,9 @@ describe("lookahead Regular Tokens Mode", () => {
 
             constructor(input: IToken[] = []) {
                 super(ALL_TOKENS, { outputCst: false })
-                this.input = input
+
                 this.performSelfAnalysis()
+                this.input = input
             }
 
             public manyRule = this.RULE("manyRule", this.parseManyRule)
@@ -279,8 +281,9 @@ describe("lookahead Regular Tokens Mode", () => {
 
             constructor(input: IToken[] = []) {
                 super(ALL_TOKENS, { outputCst: false })
-                this.input = input
+
                 this.performSelfAnalysis()
+                this.input = input
             }
 
             public manySepRule = this.RULE("manySepRule", this.parseManyRule)
@@ -459,8 +462,9 @@ describe("lookahead Regular Tokens Mode", () => {
 
             constructor(input: IToken[] = []) {
                 super(ALL_TOKENS, { outputCst: false })
-                this.input = input
+
                 this.performSelfAnalysis()
+                this.input = input
             }
 
             public atLeastOneRule = this.RULE(
@@ -576,8 +580,9 @@ describe("lookahead Regular Tokens Mode", () => {
 
             constructor(input: IToken[] = []) {
                 super(ALL_TOKENS, { outputCst: false })
-                this.input = input
+
                 this.performSelfAnalysis()
+                this.input = input
             }
 
             public atLeastOneSepRule = this.RULE(
@@ -732,8 +737,9 @@ describe("lookahead Regular Tokens Mode", () => {
 
             constructor(input: IToken[] = []) {
                 super(ALL_TOKENS, { outputCst: false })
-                this.input = input
+
                 this.performSelfAnalysis()
+                this.input = input
             }
 
             public orRule = this.RULE("orRule", this.parseOrRule, {
@@ -941,8 +947,9 @@ describe("lookahead Regular Tokens Mode", () => {
             class OrAmbiguityLookAheadParser extends Parser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, { outputCst: false })
-                    this.input = input
+
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public ambiguityRule = this.RULE(
@@ -987,8 +994,9 @@ describe("lookahead Regular Tokens Mode", () => {
             class OrAmbiguityMultiTokenLookAheadParser extends Parser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, { outputCst: false })
-                    this.input = input
+
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public ambiguityRule = this.RULE(
@@ -1054,8 +1062,9 @@ describe("lookahead Regular Tokens Mode", () => {
                         }
                     }
                 })
-                this.input = input
+
                 this.performSelfAnalysis()
+                this.input = input
             }
 
             public orRule = this.RULE("orRule", this.parseOrRule, {
@@ -1257,8 +1266,9 @@ describe("lookahead Regular Tokens Mode", () => {
             class MultiTokenLookAheadForOptionParser extends Parser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, { outputCst: false })
-                    this.input = input
+
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public rule = this.RULE("rule", () => {
@@ -1295,8 +1305,9 @@ describe("lookahead Regular Tokens Mode", () => {
             class MultiTokenLookAheadForManyParser extends Parser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, { outputCst: false })
-                    this.input = input
+
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public rule = this.RULE("orRule", () => {
@@ -1346,8 +1357,9 @@ describe("lookahead Regular Tokens Mode", () => {
             class MultiTokenLookAheadForManySepParser extends Parser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, { outputCst: false })
-                    this.input = input
+
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public rule = this.RULE("orRule", () => {
@@ -1400,8 +1412,9 @@ describe("lookahead Regular Tokens Mode", () => {
             class MultiTokenLookAheadForOrParser extends Parser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, { outputCst: false })
-                    this.input = input
+
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public orRule = this.RULE("orRule", () => {
@@ -1467,8 +1480,9 @@ describe("lookahead Regular Tokens Mode", () => {
             class MultiTokenLookAheadForAtLeastOneParser extends Parser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, { outputCst: false })
-                    this.input = input
+
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public rule = this.RULE("orRule", () => {
@@ -1534,8 +1548,9 @@ describe("lookahead Regular Tokens Mode", () => {
             class MultiTokenLookAheadForAtLeastOneSepParser extends Parser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, { outputCst: false })
-                    this.input = input
+
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public rule = this.RULE("orRule", () => {

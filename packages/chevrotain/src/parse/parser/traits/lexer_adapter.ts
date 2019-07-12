@@ -21,6 +21,11 @@ export class LexerAdapter {
     }
 
     set input(this: MixedInParser, newInput: IToken[]) {
+        if (this.selfAnalysisDone !== true) {
+            throw Error(
+                `Missing <performSelfAnalysis> invocation at the end of the Parser's constructor.`
+            )
+        }
         this.reset()
         this.tokVector = newInput
         this.tokVectorLength = newInput.length

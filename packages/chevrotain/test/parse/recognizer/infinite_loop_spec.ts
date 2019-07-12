@@ -14,8 +14,9 @@ describe("The Recognizer's capabilities for detecting infinite loops", () => {
         class InfiniteLoopParser extends Parser {
             constructor(input: IToken[] = []) {
                 super([PlusTok])
-                this.input = input
+
                 this.performSelfAnalysis()
+                this.input = input
             }
 
             public loop = this.RULE("loop", () => {

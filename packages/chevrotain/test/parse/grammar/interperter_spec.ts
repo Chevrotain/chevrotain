@@ -1722,8 +1722,8 @@ describe("issue 391 - WITH_SEP variants do not take SEP into account in lookahea
                 super(allTokens, {
                     maxLookahead: 4
                 })
-                this.input = input
                 this.performSelfAnalysis()
+                this.input = input
             }
 
             topRule = this.RULE("topRule", () => {
