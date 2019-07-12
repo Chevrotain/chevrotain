@@ -17,7 +17,7 @@
     "jison-lex": "*",
     "jsonfile": "^2.2.3",
     "lodash": "^3.10.1",
-    "nearley": "^2.15.0",
+    "nearley": "^2.16.0",
     "wrench": "^1.5.8"
   },
   "private": true
