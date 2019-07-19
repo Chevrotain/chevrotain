@@ -23,7 +23,7 @@
         "name": "Shahar Soel"
     },
     "files": [
-        "es6/src/**/*.js",
+        "esm/src/**/*.js",
         "lib/src/**/*.js",
         "lib/chevrotain.d.ts",
         "lib/chevrotain.min.js",
@@ -34,7 +34,7 @@
         "CHANGELOG.md"
     ],
     "main": "lib/src/api.js",
-    "module": "es6/src/api.js",
+    "module": "esm/src/api.js",
     "repository": {
         "type": "git",
         "url": "git://github.com/SAP/chevrotain.git"
@@ -42,8 +42,8 @@
     "homepage": "https://sap.github.io/chevrotain/docs/",
     "scripts": {
         "---------- CI FLOWS --------": "",
-        "build": "npm-run-all build:es6 clean lint compile dts api-site:build bundle",
-        "build:es6": "npm-run-all clean:es6 lint:es6 compile:es6",
+        "build": "npm-run-all build:esm clean lint compile dts api-site:build bundle",
+        "build:esm": "npm-run-all clean:esm lint:esm compile:esm",
         "test": "npm-run-all compile:def coverage check-coverage karma",
         "version": "node ./scripts/version-update.js && npm-run-all website:build",
         "postversion": "npm-run-all website:build website:upload api-site:build api-site:upload",
@@ -53,11 +53,11 @@
         "quick-build": "tsc && yarn run bundle",
         "---------- BUILD STEPS --------": "",
         "clean": "shx rm -rf coverage dev lib",
-        "clean:es6": "shx rm -rf es6",
+        "clean:esm": "shx rm -rf esm",
         "lint": "tslint --project tsconfig.json",
-        "lint:es6": "tslint --project tsconfig.es6.json",
+        "lint:esm": "tslint --project tsconfig.esm.json",
         "compile": "tsc && node ./scripts/fix-coverage-report.js",
-        "compile:es6": "tsc --project tsconfig.es6.json",
+        "compile:esm": "tsc --project tsconfig.esm.json",
         "compile:watch": "tsc -w",
         "compile:def": "npm-run-all compile-def-api compile-def-modules compile-def-namespace",
         "dts": "node scripts/process-docs.js",

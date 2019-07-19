@@ -3,7 +3,7 @@
     "compilerOptions": {
         "moduleResolution": "node",
         "module": "esnext",
-        "target": "es6",
-        "outDir": "es6"
+        "target": "es5",
+        "outDir": "esm"
     }
 }
