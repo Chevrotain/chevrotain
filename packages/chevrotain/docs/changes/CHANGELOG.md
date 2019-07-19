@@ -1,3 +1,14 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Breaking Changes
+
+-   [BREAKING_CHANGES For V5.0](https://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_5-0-0)
+
+#### Minor Changes
+
+-   [Detect missing "performSelfAnalysis" during a parser's input setter.](https://github.com/SAP/chevrotain/issues/987)
+-   [Restructure api.ts to be ESM compatible.](https://github.com/SAP/chevrotain/pull/984)
+
 ## 4.8.1 (6-21-2019)
 
 #### Bug Fixes

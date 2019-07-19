@@ -1,3 +1,8 @@
+## 5.0.0
+
+-   Setting the Parser's input **before** `this.performSelfAnalysis` is called will now throw an error.
+    This has been done to enable the automatic detection of missing `this.performSelfAnalysis` calls.
+
 ## 4.0.0
 
 -   The Parser constructor no longer accepts a token vector as an argument.
