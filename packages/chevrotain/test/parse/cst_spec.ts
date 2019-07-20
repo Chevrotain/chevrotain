@@ -25,9 +25,8 @@ function defineTestSuit(recoveryMode) {
             class CstTerminalParser extends CstParser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, { recoveryEnabled: recoveryMode })
-                    this.input = input
-
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -62,9 +61,8 @@ function defineTestSuit(recoveryMode) {
             class CstTerminalParser2 extends CstParser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, { recoveryEnabled: recoveryMode })
-                    this.input = input
-
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -106,8 +104,8 @@ function defineTestSuit(recoveryMode) {
                         outputCst: true,
                         recoveryEnabled: true
                     })
-                    this.input = input
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -141,9 +139,8 @@ function defineTestSuit(recoveryMode) {
                         outputCst: true,
                         recoveryEnabled: recoveryMode
                     })
-                    this.input = input
-
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -183,9 +180,8 @@ function defineTestSuit(recoveryMode) {
                         outputCst: true,
                         recoveryEnabled: recoveryMode
                     })
-                    this.input = input
-
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -216,9 +212,8 @@ function defineTestSuit(recoveryMode) {
                         outputCst: true,
                         recoveryEnabled: recoveryMode
                     })
-                    this.input = input
-
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -250,9 +245,8 @@ function defineTestSuit(recoveryMode) {
                         outputCst: true,
                         recoveryEnabled: recoveryMode
                     })
-                    this.input = input
-
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -305,9 +299,8 @@ function defineTestSuit(recoveryMode) {
                         outputCst: true,
                         recoveryEnabled: recoveryMode
                     })
-                    this.input = input
-
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public ruleWithOptional = this.RULE("ruleWithOptional", () => {
@@ -363,9 +356,8 @@ function defineTestSuit(recoveryMode) {
                         outputCst: true,
                         recoveryEnabled: recoveryMode
                     })
-                    this.input = input
-
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -400,9 +392,8 @@ function defineTestSuit(recoveryMode) {
                         outputCst: true,
                         recoveryEnabled: recoveryMode
                     })
-                    this.input = input
-
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -442,9 +433,8 @@ function defineTestSuit(recoveryMode) {
                         outputCst: true,
                         recoveryEnabled: recoveryMode
                     })
-                    this.input = input
-
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -484,9 +474,8 @@ function defineTestSuit(recoveryMode) {
                         nodeLocationTracking: "full",
                         recoveryEnabled: recoveryMode
                     })
-                    this.input = input
-
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -576,9 +565,8 @@ function defineTestSuit(recoveryMode) {
                         nodeLocationTracking: "onlyOffset",
                         recoveryEnabled: recoveryMode
                     })
-                    this.input = input
-
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -652,9 +640,8 @@ function defineTestSuit(recoveryMode) {
                         nodeLocationTracking: "none",
                         recoveryEnabled: recoveryMode
                     })
-                    this.input = input
-
                     this.performSelfAnalysis()
+                    this.input = input
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -706,9 +693,8 @@ function defineTestSuit(recoveryMode) {
                             outputCst: true,
                             recoveryEnabled: recoveryMode
                         })
-                        this.input = input
-
                         this.performSelfAnalysis()
+                        this.input = input
                     }
 
                     public ruleWithOptional = this.RULE(
@@ -782,9 +768,8 @@ function defineTestSuit(recoveryMode) {
                             outputCst: true,
                             recoveryEnabled: recoveryMode
                         })
-                        this.input = input
-
                         this.performSelfAnalysis()
+                        this.input = input
                     }
 
                     public testRule = this.RULE("testRule", () => {
@@ -828,9 +813,8 @@ function defineTestSuit(recoveryMode) {
                             outputCst: true,
                             recoveryEnabled: recoveryMode
                         })
-                        this.input = input
-
                         this.performSelfAnalysis()
+                        this.input = input
                     }
 
                     public testRule = this.RULE("testRule", () => {
@@ -877,9 +861,8 @@ function defineTestSuit(recoveryMode) {
                             outputCst: true,
                             recoveryEnabled: recoveryMode
                         })
-                        this.input = input
-
                         this.performSelfAnalysis()
+                        this.input = input
                     }
 
                     public testRule = this.RULE("testRule", () => {
@@ -918,9 +901,8 @@ function defineTestSuit(recoveryMode) {
                             outputCst: true,
                             recoveryEnabled: recoveryMode
                         })
-                        this.input = input
-
                         this.performSelfAnalysis()
+                        this.input = input
                     }
 
                     public testRule = this.RULE("testRule", () => {
@@ -992,9 +974,8 @@ function defineTestSuit(recoveryMode) {
                             outputCst: true,
                             recoveryEnabled: recoveryMode
                         })
-                        this.input = input
-
                         this.performSelfAnalysis()
+                        this.input = input
                     }
 
                     public testRule = this.RULE("testRule", () => {
@@ -1037,9 +1018,8 @@ function defineTestSuit(recoveryMode) {
                             outputCst: true,
                             recoveryEnabled: recoveryMode
                         })
-                        this.input = input
-
                         this.performSelfAnalysis()
+                        this.input = input
                     }
 
                     public testRule = this.RULE("testRule", () => {
@@ -1083,9 +1063,8 @@ function defineTestSuit(recoveryMode) {
                             outputCst: true,
                             recoveryEnabled: recoveryMode
                         })
-                        this.input = input
-
                         this.performSelfAnalysis()
+                        this.input = input
                     }
 
                     public testRule = this.RULE("testRule", () => {
@@ -1130,9 +1109,8 @@ function defineTestSuit(recoveryMode) {
                             nodeLocationTracking: "full",
                             recoveryEnabled: recoveryMode
                         })
-                        this.input = input
-
                         this.performSelfAnalysis()
+                        this.input = input
                     }
 
                     public testRule = this.RULE("testRule", () => {
@@ -1187,9 +1165,8 @@ function defineTestSuit(recoveryMode) {
                             nodeLocationTracking: "onlyOffset",
                             recoveryEnabled: recoveryMode
                         })
-                        this.input = input
-
                         this.performSelfAnalysis()
+                        this.input = input
                     }
 
                     public testRule = this.RULE("testRule", () => {
@@ -1236,9 +1213,8 @@ function defineTestSuit(recoveryMode) {
                             nodeLocationTracking: "none",
                             recoveryEnabled: recoveryMode
                         })
-                        this.input = input
-
                         this.performSelfAnalysis()
+                        this.input = input
                     }
 
                     public testRule = this.RULE("testRule", () => {
@@ -1296,8 +1272,8 @@ function defineTestSuit(recoveryMode) {
                             outputCst: true,
                             recoveryEnabled: true
                         })
-                        this.input = input
                         this.performSelfAnalysis()
+                        this.input = input
                     }
 
                     public root = this.RULE("root", () => {
@@ -1381,8 +1357,8 @@ function defineTestSuit(recoveryMode) {
                             outputCst: true,
                             recoveryEnabled: true
                         })
-                        this.input = input
                         this.performSelfAnalysis()
+                        this.input = input
                     }
 
                     public root = this.RULE("root", () => {
