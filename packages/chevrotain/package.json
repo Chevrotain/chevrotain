@@ -42,8 +42,8 @@
     "homepage": "https://sap.github.io/chevrotain/docs/",
     "scripts": {
         "---------- CI FLOWS --------": "",
-        "build": "npm-run-all build:esm clean lint compile dts api-site:build bundle",
-        "build:esm": "npm-run-all clean:esm lint:esm compile:esm",
+        "build": "npm-run-all clean lint compile build:esm dts api-site:build bundle",
+        "build:esm": "npm-run-all clean:esm compile:esm",
         "test": "npm-run-all compile:def coverage check-coverage karma",
         "version": "node ./scripts/version-update.js && npm-run-all website:build",
         "postversion": "npm-run-all website:build website:upload api-site:build api-site:upload",
@@ -55,7 +55,6 @@
         "clean": "shx rm -rf coverage dev lib",
         "clean:esm": "shx rm -rf esm",
         "lint": "tslint --project tsconfig.json",
-        "lint:esm": "tslint --project tsconfig.esm.json",
         "compile": "tsc && node ./scripts/fix-coverage-report.js",
         "compile:esm": "tsc --project tsconfig.esm.json",
         "compile:watch": "tsc -w",
