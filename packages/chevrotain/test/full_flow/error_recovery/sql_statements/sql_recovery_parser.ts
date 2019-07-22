@@ -42,7 +42,8 @@ import { augmentTokenTypes } from "../../../../src/scan/tokens"
 import { createRegularToken } from "../../../utils/matchers"
 import { IToken, TokenType } from "../../../../api"
 
-augmentTokenTypes(<any>allTokens)
+const allTokensToUse = { ...allTokens }
+augmentTokenTypes(<any>allTokensToUse)
 
 // DOCS: to enable error recovery functionality one must extend BaseErrorRecoveryRecognizer
 export class DDLExampleRecoveryParser extends Parser {
@@ -50,7 +51,7 @@ export class DDLExampleRecoveryParser extends Parser {
         // DOCS: note the first parameter in the super class. this is the namespace in which the token constructors are defined.
         //       it is mandatory to provide this map to be able to perform self analysis
         //       and allow the framework to "understand" the implemented grammar.
-        super(<any>allTokens, {
+        super(allTokensToUse, {
             outputCst: false,
             recoveryEnabled: isRecoveryEnabled
         })

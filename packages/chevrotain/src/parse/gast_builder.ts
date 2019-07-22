@@ -118,6 +118,12 @@ export interface ITerminalNameToConstructor {
 
 export let terminalNameToConstructor: ITerminalNameToConstructor = {}
 
+export function resetTerminalNameToConstructor(
+    newValue: ITerminalNameToConstructor = {}
+) {
+    terminalNameToConstructor = newValue
+}
+
 export function buildTopProduction(
     impelText: string,
     name: string,
