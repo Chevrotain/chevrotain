@@ -72,11 +72,11 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 Some interesting samples:
 
 -   [JHipster Domain Language][sample_jhipster]
--   [Metabase BI expression parser][sample_metabase].
+-   [Metabase BI expression Parser][sample_metabase].
 -   [Eve Programing Language][sample_eve].
--   [BioModelAnalyzer's ChatBot parser][sample_biomodel].
+-   [BioModelAnalyzer's ChatBot Parser][sample_biomodel].
 -   [Bombadil Toml Parser][sample_bombadil]
--   [BrightScript Parser][sample_bright]
+-   [Argdown Parser][sample_argdown]
 
 [benchmark]: https://sap.github.io/chevrotain/performance/
 [sample_metabase]: https://github.com/metabase/metabase/blob/136dfb17954f4e4302b3bf2fee99ff7b7b12fd7c/frontend/src/metabase/lib/expressions/parser.js
@@ -84,7 +84,7 @@ Some interesting samples:
 [sample_eve]: https://github.com/witheve/Eve/blob/master/src/parser/parser.ts
 [sample_biomodel]: https://github.com/Microsoft/BioModelAnalyzer/blob/master/ChatBot/src/NLParser/NLParser.ts
 [sample_bombadil]: https://github.com/sgarciac/bombadil/blob/master/src/parser.ts
-[sample_bright]: https://github.com/RokuRoad/bright/blob/master/src/Parser.ts
+[sample_argdown]: https://github.com/christianvoigt/argdown/blob/master/packages/argdown-core/src/parser.ts
 [languages]: https://github.com/SAP/chevrotain/tree/master/examples/implementation_languages
 [backtracking]: https://github.com/SAP/chevrotain/blob/master/examples/parser/backtracking/backtracking.js
 [custom_apis]: https://sap.github.io/chevrotain/docs/guide/custom_apis.html
