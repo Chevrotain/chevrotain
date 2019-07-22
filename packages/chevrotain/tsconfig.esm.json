@@ -4,6 +4,6 @@
         "moduleResolution": "node",
         "module": "esnext",
         "target": "es5",
-        "outDir": "esm"
+        "outDir": "lib_esm"
     }
 }
