@@ -7,6 +7,7 @@
 #### Minor Changes
 
 -   [Detect missing "performSelfAnalysis" during a parser's input setter.](https://github.com/SAP/chevrotain/issues/987)
+-   [Provide an ES6 build.](https://github.com/SAP/chevrotain/issues/976)
 -   [Restructure api.ts to be ESM compatible.](https://github.com/SAP/chevrotain/pull/984)
 
 ## 4.8.1 (6-21-2019)

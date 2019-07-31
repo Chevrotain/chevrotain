@@ -308,7 +308,7 @@ class SelectParser extends CstParser {
 
 ```javascript
 // ONLY ONCE
-const parser = new SelectParser([])
+const parser = new SelectParser()
 
 function parseInput(text) {
     const lexingResult = SelectLexer.tokenize(text)
