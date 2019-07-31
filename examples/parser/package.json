@@ -1,6 +1,6 @@
 {
     "name": "chevrotain_examples_parser",
-    "version": "4.8.1",
+    "version": "5.0.0",
     "scripts": {
         "build": "npm-run-all build:minification build:serialized-grammar",
         "build:minification": "grunt --gruntfile minification/gruntfile.js",
@@ -8,7 +8,7 @@
         "test": "mocha \"!(node_modules)/**/*spec.js\""
     },
     "dependencies": {
-        "chevrotain": "^4.8.1",
+        "chevrotain": "^5.0.0",
         "lodash": "~4.17.10"
     },
     "devDependencies": {
