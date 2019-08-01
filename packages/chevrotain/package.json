@@ -46,7 +46,7 @@
         "build:esm": "npm-run-all clean:esm compile:esm",
         "test": "npm-run-all test:esm compile:def coverage check-coverage karma",
         "test:esm": "mocha \"./lib_esm/test/**/*spec.js\" --require esm",
-        "version": "tsc ./src/version.ts --outDir lib",
+        "version": "tsc ./src/version.ts --outDir lib/src && node ./scripts/version-update.js",
         "postversion": "npm-run-all website:build website:upload api-site:build api-site:upload",
         "---------- DEV FLOWS --------": "",
         "watch": "tsc -w",

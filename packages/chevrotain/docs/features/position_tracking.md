@@ -10,7 +10,7 @@ token_skipping
 -   start and end lines.
 -   start and end columns.
 
-The level of position information tracking can be reduced by using the [**positionTracking**](https://sap.github.io/chevrotain/documentation/4_8_1/interfaces/ilexerconfig.html#positiontracking) lexer config option.
+The level of position information tracking can be reduced by using the [**positionTracking**](https://sap.github.io/chevrotain/documentation/5_0_0/interfaces/ilexerconfig.html#positiontracking) lexer config option.
 For example:
 
 ```javascript
