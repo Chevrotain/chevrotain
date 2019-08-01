@@ -2246,40 +2246,33 @@ export declare function isRecognitionException(error: Error): boolean
  * An exception of this type will be saved in {@link Parser.errors} when {@link Parser.CONSUME}
  * was called but failed to match the expected Token Type.
  */
-export declare function MismatchedTokenException(
-    message: string,
-    token: IToken,
-    previousToken: IToken
-): void
+export declare class MismatchedTokenException extends Error {
+    constructor(message: string, token: IToken, previousToken: IToken)
+}
 
 /**
  * An exception of this type will be saved in {@link Parser.errors} when {@link Parser.OR}
  * was called yet none of the possible alternatives could be matched.
  */
-export declare function NoViableAltException(
-    message: string,
-    token: IToken,
-    previousToken: IToken
-): void
+export declare class NoViableAltException extends Error {
+    constructor(message: string, token: IToken, previousToken: IToken)
+}
 
 /**
  * An exception of this type will be saved in {@link Parser.errors} when
  * the parser has finished yet there exists remaining input (tokens) that has not processed.
  */
-export declare function NotAllInputParsedException(
-    message: string,
-    token: IToken
-): void
+export declare class NotAllInputParsedException extends Error {
+    constructor(message: string, token: IToken)
+}
 
 /**
  * An exception of this type will be saved in {@link Parser.errors} when {@link Parser.AT_LEAST_ONE}
  * or {@link Parser.AT_LEAST_ONE_SEP} was called but failed to match even a single iteration.
  */
-export declare function EarlyExitException(
-    message: string,
-    token: IToken,
-    previousToken: IToken
-): void
+export declare class EarlyExitException extends Error {
+    constructor(message: string, token: IToken, previousToken: IToken)
+}
 
 export interface IOptionallyNamedProduction {
     name?: string
