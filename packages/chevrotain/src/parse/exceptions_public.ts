@@ -1,9 +1,5 @@
 import { contains } from "../utils/utils"
-import {
-    IToken,
-    IRecognizerContext,
-    MismatchedTokenException as DefMismatchedTokenException
-} from "../../api"
+import { IToken } from "../../api"
 
 const MISMATCHED_TOKEN_EXCEPTION = "MismatchedTokenException"
 const NO_VIABLE_ALT_EXCEPTION = "NoViableAltException"
@@ -25,59 +21,55 @@ export function isRecognitionException(error: Error) {
     return contains(RECOGNITION_EXCEPTION_NAMES, error.name)
 }
 
-export abstract class RecognitionExceptionBase extends Error {
-    public name: string
-
-    constructor(
-        message: string,
-        public token: IToken,
-        public resyncedTokens: IToken[] = [],
-        public context: IRecognizerContext = undefined
-    ) {
-        super(message)
-
-        // Set the prototype explicitly.
-        // https://github.com/Microsoft/TypeScript-wiki/blob/master/Breaking-Changes.md#extending-built-ins-like-error-array-and-map-may-no-longer-work
-        Object.setPrototypeOf(this, RecognitionExceptionBase.prototype)
-    }
+export function MismatchedTokenException(
+    message: string,
+    token: IToken,
+    previousToken: IToken
+) {
+    this.name = MISMATCHED_TOKEN_EXCEPTION
+    this.message = message
+    this.token = token
+    this.previousToken = previousToken
+    this.resyncedTokens = []
 }
 
-export class MismatchedTokenException extends RecognitionExceptionBase {
-    public name = MISMATCHED_TOKEN_EXCEPTION
+// must use the "Error.prototype" instead of "new Error"
+// because the stack trace points to where "new Error" was invoked"
+MismatchedTokenException.prototype = Error.prototype
 
-    constructor(message: string, token: IToken, public previousToken: IToken) {
-        super(message, token)
-
-        Object.setPrototypeOf(this, MismatchedTokenException.prototype)
-    }
+export function NoViableAltException(
+    message: string,
+    token: IToken,
+    previousToken: IToken
+) {
+    this.name = NO_VIABLE_ALT_EXCEPTION
+    this.message = message
+    this.token = token
+    this.previousToken = previousToken
+    this.resyncedTokens = []
 }
 
-export class NoViableAltException extends RecognitionExceptionBase {
-    public name = NO_VIABLE_ALT_EXCEPTION
+NoViableAltException.prototype = Error.prototype
 
-    constructor(message: string, token: IToken, public previousToken: IToken) {
-        super(message, token)
-
-        Object.setPrototypeOf(this, NoViableAltException.prototype)
-    }
+export function NotAllInputParsedException(message: string, token: IToken) {
+    this.name = NOT_ALL_INPUT_PARSED_EXCEPTION
+    this.message = message
+    this.token = token
+    this.resyncedTokens = []
 }
 
-export class NotAllInputParsedException extends RecognitionExceptionBase {
-    public name = NOT_ALL_INPUT_PARSED_EXCEPTION
+NotAllInputParsedException.prototype = Error.prototype
 
-    constructor(message: string, token: IToken) {
-        super(message, token)
-
-        Object.setPrototypeOf(this, NotAllInputParsedException.prototype)
-    }
+export function EarlyExitException(
+    message: string,
+    token: IToken,
+    previousToken: IToken
+) {
+    this.name = EARLY_EXIT_EXCEPTION
+    this.message = message
+    this.token = token
+    this.previousToken = previousToken
+    this.resyncedTokens = []
 }
 
-export class EarlyExitException extends RecognitionExceptionBase {
-    public name = EARLY_EXIT_EXCEPTION
-
-    constructor(message: string, token: IToken, public previousToken: IToken) {
-        super(message, token)
-
-        Object.setPrototypeOf(this, EarlyExitException.prototype)
-    }
-}
+EarlyExitException.prototype = Error.prototype
