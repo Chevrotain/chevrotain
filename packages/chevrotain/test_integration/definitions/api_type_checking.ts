@@ -14,6 +14,10 @@ export type TypeCheckForApi = [
             Parser: any
             CstParser: any
             EmbeddedActionsParser: any
+            MismatchedTokenException: ErrorConstructor
+            NoViableAltException: ErrorConstructor
+            NotAllInputParsedException: ErrorConstructor
+            EarlyExitException: ErrorConstructor
         },
         typeof apiDefs
     >,
