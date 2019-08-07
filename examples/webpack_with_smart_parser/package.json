@@ -1,0 +1,17 @@
+{
+    "name": "webpack-chevrotain-example-with-smart-parser",
+    "private": true,
+    "version": "5.0.0",
+    "devDependencies": {
+        "mocha": "^6.1.2",
+        "webpack": "4.35.1",
+        "webpack-cli": "^3.0.1"
+    },
+    "dependencies": {
+        "chevrotain": "^5.0.0"
+    },
+    "scripts": {
+        "build": "webpack",
+        "test": "mocha test/*_spec.js"
+    }
+}
