@@ -14,6 +14,11 @@ export type TypeCheckForApi = [
             Parser: any
             CstParser: any
             EmbeddedActionsParser: any
+
+            SmartParser: any
+            SmartCstParser: any
+            SmartEmbeddedActionsParser: any
+
             MismatchedTokenException: ErrorConstructor
             NoViableAltException: ErrorConstructor
             NotAllInputParsedException: ErrorConstructor

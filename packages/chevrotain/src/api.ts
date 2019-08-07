@@ -85,3 +85,9 @@ export {
     generateParserFactory,
     generateParserModule
 } from "./generate/generate_public"
+
+export {
+    SmartParser,
+    SmartCstParser,
+    SmartEmbeddedActionsParser
+} from "./parse/parser/smart_parser"

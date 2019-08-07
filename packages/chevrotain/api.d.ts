@@ -954,6 +954,10 @@ export declare class Parser extends BaseParser {
     ): T
 }
 
+export declare class SmartParser extends Parser {}
+export declare class SmartCstParser extends SmartParser {}
+export declare class SmartEmbeddedActionsParser extends SmartParser {}
+
 /**
  * A Parser that outputs a Concrete Syntax Tree.
  * See:
