@@ -1,4 +1,5 @@
 import { classNameFromInstance } from "../../lang/lang_extensions"
+import { deepStrictEqual } from "assert"
 import {
     applyMixins,
     cloneObj,
@@ -42,6 +43,8 @@ import { RecognizerEngine } from "./traits/recognizer_engine"
 import { ErrorHandler } from "./traits/error_handler"
 import { MixedInParser } from "./traits/parser_traits"
 import { ContentAssist } from "./traits/context_assist"
+import { expect } from "chai"
+import { GastRecorder } from "./traits/gast_recorder"
 
 export const END_OF_FILE = createTokenInstance(
     EOF,
@@ -156,6 +159,8 @@ export class Parser {
         let className = classNameFromInstance(this)
 
         let productions = this.gastProductionsCache
+
+        // TODO: Remove grammar serialization support
         if (this.serializedGrammar) {
             const rules = deserializeGrammar(
                 this.serializedGrammar,
@@ -166,7 +171,26 @@ export class Parser {
             })
         }
 
-        let resolverErrors = resolveGrammar({
+        // TODO: build GAST using GAST RecordedTrait
+        this.enableRecording()
+        forEach(this.definedRulesNames, currRuleName => {
+            const wrappedRule = this[currRuleName]
+            const originalGrammarAction = wrappedRule["originalGrammarAction"]
+            const recordedRuleGast = this.topLevelRuleRecord(
+                currRuleName,
+                originalGrammarAction
+            )
+
+            const parsedRuleGast = this.gastProductionsCache.get(currRuleName)
+            // We do not care about comparing the "orgText"
+            delete parsedRuleGast.orgText
+            delete recordedRuleGast.orgText
+            deepStrictEqual(recordedRuleGast, parsedRuleGast)
+            // expect(recordedRuleGast).to.deep.equal(parsedRuleGast);
+        })
+        this.disableRecording()
+
+        const resolverErrors = resolveGrammar({
             rules: productions.values()
         })
         this.definitionErrors.push.apply(this.definitionErrors, resolverErrors) // mutability for the win?
@@ -215,6 +239,9 @@ export class Parser {
                 )}`
             )
         }
+
+        // Avoid performance regressions in newer versions of V8
+        toFastProperties(this)
     }
 
     ignoredIssues: IgnoredParserIssues = DEFAULT_PARSER_CONFIG.ignoredIssues
@@ -233,13 +260,14 @@ export class Parser {
         that.initRecoverable(config)
         that.initTreeBuilder(config)
         that.initContentAssist()
+        that.initGastRecorder(config)
 
         this.ignoredIssues = has(config, "ignoredIssues")
             ? config.ignoredIssues
             : DEFAULT_PARSER_CONFIG.ignoredIssues
 
         // Avoid performance regressions in newer versions of V8
-        toFastProperties(this)
+        // toFastProperties(this)
     }
 }
 
@@ -251,7 +279,8 @@ applyMixins(Parser, [
     RecognizerEngine,
     RecognizerApi,
     ErrorHandler,
-    ContentAssist
+    ContentAssist,
+    GastRecorder
 ])
 
 export class CstParser extends Parser {

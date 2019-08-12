@@ -298,6 +298,8 @@ export class RecognizerEngine {
 
         let ruleNamePropName = "ruleName"
         wrappedGrammarRule[ruleNamePropName] = ruleName
+        // We need to save the original implementation to allow recording the GAST
+        wrappedGrammarRule["originalGrammarAction"] = impl
         return wrappedGrammarRule
     }
 

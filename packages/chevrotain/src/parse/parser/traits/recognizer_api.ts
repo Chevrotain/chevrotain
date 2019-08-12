@@ -578,6 +578,7 @@ export class RecognizerApi {
 
         this.definedRulesNames.push(name)
 
+        // TODO: GAST Building should be removed from here.
         // only build the gast representation once.
         if (
             !this.gastProductionsCache.containsKey(name) &&
@@ -612,6 +613,7 @@ export class RecognizerApi {
         )
         this.definitionErrors.push.apply(this.definitionErrors, ruleErrors) // mutability for the win
 
+        // TODO: Grammar Serialization should be removed
         // Avoid constructing the GAST if we have serialized it
         if (!this.serializedGrammar) {
             let gastProduction = buildTopProduction(

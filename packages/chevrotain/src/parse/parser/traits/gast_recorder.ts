@@ -40,12 +40,50 @@ const HANDLE_SEPARATOR = true
 /**
  * This trait handles the creation of the GAST structure for Chevrotain Grammars
  */
-// TODO: do we need to override any other methods here?
+// TODO: do we need to override any other methods here? (BACKTrack? LA?)
 export class GastRecorder {
     prodStack: ProdWithDef[]
+    optionInternalOrg: MixedInParser["optionInternal"]
+    atLeastOneInternalOrg: MixedInParser["atLeastOneInternal"]
+    atLeastOneSepFirstInternalOrg: MixedInParser["atLeastOneSepFirstInternal"]
+    manyInternalOrg: MixedInParser["manyInternal"]
+    manySepFirstInternalOrg: MixedInParser["manySepFirstInternal"]
+    orInternalOrg: MixedInParser["orInternal"]
+    subruleInternalOrg: MixedInParser["subruleInternal"]
+    consumeInternalOrg: MixedInParser["consumeInternal"]
 
-    initGastRecorder(config: IParserConfig) {
+    initGastRecorder(this: MixedInParser, config: IParserConfig): void {
         this.prodStack = []
+        this.optionInternalOrg = this.optionInternal
+        this.atLeastOneInternalOrg = this.atLeastOneInternal
+        this.atLeastOneSepFirstInternalOrg = this.atLeastOneSepFirstInternal
+        this.manyInternalOrg = this.manyInternal
+        this.manySepFirstInternalOrg = this.manySepFirstInternal
+        this.orInternalOrg = this.orInternal
+        this.subruleInternalOrg = this.subruleInternal
+        this.consumeInternalOrg = this.consumeInternal
+    }
+
+    enableRecording(this: MixedInParser): void {
+        this.optionInternal = this.optionInternalRecord
+        this.atLeastOneInternal = this.atLeastOneInternalRecord
+        this.atLeastOneSepFirstInternal = this.atLeastOneSepFirstInternalRecord
+        this.manyInternal = this.manyInternalRecord
+        this.manySepFirstInternal = this.manySepFirstInternalRecord
+        this.orInternal = this.orInternalRecord
+        this.subruleInternal = this.subruleInternalRecord
+        this.consumeInternal = this.consumeInternalRecord
+    }
+
+    disableRecording(this: MixedInParser) {
+        this.optionInternal = this.optionInternalOrg
+        this.atLeastOneInternal = this.atLeastOneInternalOrg
+        this.atLeastOneSepFirstInternal = this.atLeastOneSepFirstInternalOrg
+        this.manyInternal = this.manyInternalOrg
+        this.manySepFirstInternal = this.manySepFirstInternalOrg
+        this.orInternal = this.orInternalOrg
+        this.subruleInternal = this.subruleInternalOrg
+        this.consumeInternal = this.consumeInternalOrg
     }
 
     topLevelRuleRecord(name: string, def: Function): Rule {
@@ -63,7 +101,7 @@ export class GastRecorder {
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
         occurrence: number
     ): OUT {
-        return recordProd(Option, actionORMethodDef, occurrence)
+        return recordProd.call(this, Option, actionORMethodDef, occurrence)
     }
 
     atLeastOneInternalRecord<OUT>(
@@ -71,7 +109,12 @@ export class GastRecorder {
         occurrence: number,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): void {
-        recordProd(RepetitionMandatory, actionORMethodDef, occurrence)
+        recordProd.call(
+            this,
+            RepetitionMandatory,
+            actionORMethodDef,
+            occurrence
+        )
     }
 
     atLeastOneSepFirstInternalRecord<OUT>(
@@ -79,7 +122,8 @@ export class GastRecorder {
         occurrence: number,
         options: AtLeastOneSepMethodOpts<OUT>
     ): void {
-        recordProd(
+        recordProd.call(
+            this,
             RepetitionMandatoryWithSeparator,
             options,
             occurrence,
@@ -92,7 +136,7 @@ export class GastRecorder {
         occurrence: number,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): void {
-        recordProd(Repetition, actionORMethodDef, occurrence)
+        recordProd.call(this, Repetition, actionORMethodDef, occurrence)
     }
 
     manySepFirstInternalRecord<OUT>(
@@ -100,7 +144,8 @@ export class GastRecorder {
         occurrence: number,
         options: ManySepMethodOpts<OUT>
     ): void {
-        recordProd(
+        recordProd.call(
+            this,
             RepetitionWithSeparator,
             options,
             occurrence,
@@ -113,7 +158,7 @@ export class GastRecorder {
         altsOrOpts: IAnyOrAlt[] | OrMethodOpts,
         occurrence: number
     ): T {
-        return recordOrProd(Alternation, occurrence)
+        return recordOrProd.call(this, altsOrOpts, occurrence)
     }
 
     subruleInternalRecord<T>(
@@ -164,12 +209,11 @@ function recordProd(
     const grammarAction = isFunction(mainProdArg)
         ? mainProdArg
         : mainProdArg.DEF
-    const name = isFunction(mainProdArg)
-        ? undefined
-        : mainProdArg.NAME || undefined
 
     const newProd = new prodConstructor({ definition: [], idx: occurrence })
-    newProd.name = name
+    if (has(mainProdArg, "NAME")) {
+        newProd.name = mainProdArg.NAME
+    }
     if (handleSep) {
         newProd.separator = mainProdArg.SEP
     }
@@ -185,12 +229,11 @@ function recordProd(
 function recordOrProd(mainProdArg: any, occurrence: number): any {
     const prevProd: any = peek(this.prodStack)
     const alts = isArray(mainProdArg) ? mainProdArg : mainProdArg.DEF
-    const name = isFunction(mainProdArg)
-        ? undefined
-        : mainProdArg.NAME || undefined
 
     const newOrProd = new Alternation({ definition: [], idx: occurrence })
-    newOrProd.name = name
+    if (has(mainProdArg, "NAME")) {
+        newOrProd.name = mainProdArg.NAME
+    }
     prevProd.definition.push(newOrProd)
 
     forEach(alts, currAlt => {
@@ -199,8 +242,8 @@ function recordOrProd(mainProdArg: any, occurrence: number): any {
         if (has(currAlt, "NAME")) {
             currAltFlat.name = currAlt.NAME
         }
-        this.prodStack.push(newOrProd)
-        currAlt.call(this)
+        this.prodStack.push(currAltFlat)
+        currAlt.ALT.call(this)
         this.prodStack.pop()
     })
     return RECORDING_NULL_OBJECT
