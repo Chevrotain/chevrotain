@@ -569,38 +569,25 @@ describe("The duplicate occurrence validations full flow", () => {
     })
 })
 
-class InvalidRefParser extends Parser {
-    constructor(input: IToken[] = []) {
-        super([myToken, myOtherToken])
-        this.performSelfAnalysis()
-        this.input = input
-    }
-
-    public one = this.RULE("one", () => {
-        this.SUBRULE2((<any>this).oopsTypo)
-    })
-}
-
-class InvalidRefParser2 extends Parser {
-    constructor(input: IToken[] = []) {
-        super([myToken, myOtherToken])
-        this.performSelfAnalysis()
-        this.input = input
-    }
-
-    public one = this.RULE("one", () => {
-        this.SUBRULE2((<any>this).oopsTypo)
-    })
-}
-
 describe("The reference resolver validation full flow", () => {
     it("will throw an error when trying to init a parser with unresolved rule references", () => {
-        expect(() => new InvalidRefParser()).to.throw("oopsTypo")
+        class InvalidRefParser extends Parser {
+            constructor(input: IToken[] = []) {
+                super([myToken, myOtherToken])
+                this.performSelfAnalysis()
+                this.input = input
+            }
+
+            public one = this.RULE("one", () => {
+                this.SUBRULE2((<any>this).oopsTypo)
+            })
+        }
+
+        expect(() => new InvalidRefParser()).to.throw("<SUBRULE2>")
+        expect(() => new InvalidRefParser()).to.throw("argument is invalid")
+        expect(() => new InvalidRefParser()).to.throw("but got: <undefined>")
         expect(() => new InvalidRefParser()).to.throw(
-            "Parser Definition Errors detected"
-        )
-        expect(() => new InvalidRefParser()).to.throw(
-            "reference to a rule which is not defined"
+            "inside top level rule: <one>"
         )
     })
 
@@ -608,10 +595,23 @@ describe("The reference resolver validation full flow", () => {
         "won't throw an error when trying to init a parser with definition errors but with a flag active to defer handling" +
             "of definition errors",
         () => {
+            class DupConsumeParser extends Parser {
+                constructor(input: IToken[] = []) {
+                    super([myToken, myOtherToken])
+                    this.performSelfAnalysis()
+                    this.input = input
+                }
+
+                public one = this.RULE("one", () => {
+                    this.CONSUME(myToken)
+                    this.CONSUME(myToken) // duplicate consume with the same suffix.
+                })
+            }
+
             ;(Parser as any).DEFER_DEFINITION_ERRORS_HANDLING = true
-            expect(() => new InvalidRefParser2()).to.not.throw()
-            expect(() => new InvalidRefParser2()).to.not.throw()
-            expect(() => new InvalidRefParser2()).to.not.throw()
+            expect(() => new DupConsumeParser()).to.not.throw()
+            expect(() => new DupConsumeParser()).to.not.throw()
+            expect(() => new DupConsumeParser()).to.not.throw()
             ;(Parser as any).DEFER_DEFINITION_ERRORS_HANDLING = false
         }
     )
@@ -1247,23 +1247,16 @@ describe("The invalid token name validation", () => {
 })
 
 describe("The no non-empty lookahead validation", () => {
-    class EmptyLookaheadParser extends Parser {
-        constructor() {
-            super([PlusTok])
-        }
-
-        public block = this.RULE("block", () => this.CONSUME(PlusTok))
-    }
     it("will throw an error when there are no non-empty lookaheads for AT_LEAST_ONE", () => {
-        class EmptyLookaheadParserAtLeastOne extends EmptyLookaheadParser {
+        class EmptyLookaheadParserAtLeastOne extends Parser {
             constructor(input: IToken[] = []) {
-                super()
+                super([PlusTok])
                 this.performSelfAnalysis()
                 this.input = input
             }
 
             public someRule = this.RULE("someRule", () =>
-                this.AT_LEAST_ONE(this.block)
+                this.AT_LEAST_ONE(() => {})
             )
         }
         expect(() => new EmptyLookaheadParserAtLeastOne()).to.throw(
@@ -1275,9 +1268,9 @@ describe("The no non-empty lookahead validation", () => {
     })
 
     it("will throw an error when there are no non-empty lookaheads for AT_LEAST_ONE_SEP", () => {
-        class EmptyLookaheadParserAtLeastOneSep extends EmptyLookaheadParser {
+        class EmptyLookaheadParserAtLeastOneSep extends Parser {
             constructor(input: IToken[] = []) {
-                super()
+                super([PlusTok])
                 this.performSelfAnalysis()
                 this.input = input
             }
@@ -1285,7 +1278,7 @@ describe("The no non-empty lookahead validation", () => {
             public someRule = this.RULE("someRule", () =>
                 this.AT_LEAST_ONE_SEP5({
                     SEP: PlusTok,
-                    DEF: this.block
+                    DEF: () => {}
                 })
             )
         }
@@ -1298,16 +1291,14 @@ describe("The no non-empty lookahead validation", () => {
     })
 
     it("will throw an error when there are no non-empty lookaheads for MANY", () => {
-        class EmptyLookaheadParserMany extends EmptyLookaheadParser {
+        class EmptyLookaheadParserMany extends Parser {
             constructor(input: IToken[] = []) {
-                super()
+                super([PlusTok])
                 this.performSelfAnalysis()
                 this.input = input
             }
 
-            public someRule = this.RULE("someRule", () =>
-                this.MANY2(this.block)
-            )
+            public someRule = this.RULE("someRule", () => this.MANY2(() => {}))
         }
         expect(() => new EmptyLookaheadParserMany()).to.throw(
             "The repetition <MANY2>"
@@ -1318,9 +1309,9 @@ describe("The no non-empty lookahead validation", () => {
     })
 
     it("will throw an error when there are no non-empty lookaheads for MANY_SEP", () => {
-        class EmptyLookaheadParserManySep extends EmptyLookaheadParser {
+        class EmptyLookaheadParserManySep extends Parser {
             constructor(input: IToken[] = []) {
-                super()
+                super([PlusTok])
                 this.performSelfAnalysis()
                 this.input = input
             }
@@ -1328,7 +1319,7 @@ describe("The no non-empty lookahead validation", () => {
             public someRule = this.RULE("someRule", () =>
                 this.MANY_SEP3({
                     SEP: PlusTok,
-                    DEF: this.block
+                    DEF: () => {}
                 })
             )
         }

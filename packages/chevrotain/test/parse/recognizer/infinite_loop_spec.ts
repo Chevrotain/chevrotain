@@ -19,13 +19,20 @@ describe("The Recognizer's capabilities for detecting infinite loops", () => {
                 this.input = input
             }
 
+            counter = 0
             public loop = this.RULE("loop", () => {
                 this.MANY(() => {
                     // By returning without consuming any tokens we could
                     // cause an infinite loop as the looahead for re-entering the `MANY`
                     // would still be true.
-                    return
-                    // noinspection UnreachableCodeJS
+                    if (this.counter > 0) {
+                        // A bit of a hack to skip over the `return` once
+                        // So the Grammar Recording will process the grammar correctly
+                        // Otherwise a different error would occur
+                        // (detection of empty repetition at GAST level).
+                        return
+                    }
+                    this.counter++
                     this.CONSUME(PlusTok)
                 })
             })

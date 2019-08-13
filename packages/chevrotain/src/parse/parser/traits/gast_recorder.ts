@@ -16,18 +16,18 @@ import {
 import { forEach, has, isArray, isFunction, peek } from "../../../utils/utils"
 import { MixedInParser } from "./parser_traits"
 import {
-    Terminal,
+    Alternation,
+    Flat,
     NonTerminal,
     Option,
-    Rule,
+    Repetition,
     RepetitionMandatory,
     RepetitionMandatoryWithSeparator,
-    Repetition,
     RepetitionWithSeparator,
-    Alternation,
-    Flat
+    Rule,
+    Terminal
 } from "../../grammar/gast/gast_public"
-import { END_OF_FILE } from "../parser"
+import { END_OF_FILE, ParserDefinitionErrorType } from "../parser"
 
 type ProdWithDef = IProduction & { definition?: IProduction[] }
 const RECORDING_NULL_OBJECT = {
@@ -167,6 +167,21 @@ export class GastRecorder {
         occurrence: number,
         options?: SubruleMethodOpts
     ): T {
+        if (!ruleToCall || has(ruleToCall, "ruleName") === false) {
+            // TODO: add comment about user looking into the stack trace to see exactly where the issue is
+            throw new Error(
+                `<SUBRULE${
+                    occurrence !== 0 ? occurrence : ""
+                }> argument is invalid` +
+                    ` expecting a Parser method reference but got: <${JSON.stringify(
+                        ruleToCall
+                    )}>` +
+                    `\n inside top level rule: <${
+                        (<Rule>this.prodStack[0]).name
+                    }>`
+            )
+        }
+
         const prevProd: any = peek(this.prodStack)
         const ruleName = ruleToCall["ruleName"]
         const newNoneTerminal = new NonTerminal({

@@ -1,5 +1,4 @@
 import { classNameFromInstance } from "../../lang/lang_extensions"
-import { deepStrictEqual } from "assert"
 import {
     applyMixins,
     cloneObj,
@@ -43,7 +42,6 @@ import { RecognizerEngine } from "./traits/recognizer_engine"
 import { ErrorHandler } from "./traits/error_handler"
 import { MixedInParser } from "./traits/parser_traits"
 import { ContentAssist } from "./traits/context_assist"
-import { expect } from "chai"
 import { GastRecorder } from "./traits/gast_recorder"
 
 export const END_OF_FILE = createTokenInstance(
@@ -174,19 +172,28 @@ export class Parser {
         // TODO: build GAST using GAST RecordedTrait
         this.enableRecording()
         forEach(this.definedRulesNames, currRuleName => {
-            const wrappedRule = this[currRuleName]
-            const originalGrammarAction = wrappedRule["originalGrammarAction"]
-            const recordedRuleGast = this.topLevelRuleRecord(
-                currRuleName,
-                originalGrammarAction
-            )
+            try {
+                const wrappedRule = this[currRuleName]
+                const originalGrammarAction =
+                    wrappedRule["originalGrammarAction"]
+                const recordedRuleGast = this.topLevelRuleRecord(
+                    currRuleName,
+                    originalGrammarAction
+                )
 
-            const parsedRuleGast = this.gastProductionsCache.get(currRuleName)
-            // We do not care about comparing the "orgText"
-            delete parsedRuleGast.orgText
-            delete recordedRuleGast.orgText
-            deepStrictEqual(recordedRuleGast, parsedRuleGast)
-            // expect(recordedRuleGast).to.deep.equal(parsedRuleGast);
+                const parsedRuleGast = this.gastProductionsCache.get(
+                    currRuleName
+                )
+                this.gastProductionsCache.put(currRuleName, recordedRuleGast)
+                // We do not care about comparing the "orgText"
+                delete parsedRuleGast.orgText
+                delete recordedRuleGast.orgText
+                // deepStrictEqual(recordedRuleGast, parsedRuleGast)
+                // expect(recordedRuleGast).to.deep.equal(parsedRuleGast);
+            } catch (e) {
+                // TODO: different behaivor depending on which error is caught ?
+                throw e
+            }
         })
         this.disableRecording()
 

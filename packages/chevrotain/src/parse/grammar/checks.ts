@@ -282,6 +282,7 @@ export const validNestedRuleName = new RegExp(
     validTermsPattern.source.replace("^", "^\\$")
 )
 
+// TODO: remove this limitation now that we use recorders
 export function validateRuleName(
     rule: Rule,
     errMsgProvider: IGrammarValidatorErrorMessageProvider
@@ -302,6 +303,7 @@ export function validateRuleName(
     return errors
 }
 
+// TODO: did the nested rule name regExp now change?
 export function validateNestedRuleName(
     topLevel: Rule,
     nestedProd: IOptionallyNamedProduction,
@@ -325,6 +327,7 @@ export function validateNestedRuleName(
     return errors
 }
 
+// TODO: remove this limitation now that we use recorders
 export function validateTokenName(
     tokenType: TokenType,
     errMsgProvider: IGrammarValidatorErrorMessageProvider
