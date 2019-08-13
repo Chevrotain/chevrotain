@@ -28,6 +28,14 @@ declare abstract class BaseParser {
     errors: IRecognitionException[]
 
     /**
+     * Flag indicating the Parser is at the recording phase.
+     * This can be used to avoid executing certain semantic actions during
+     * Recording to avoid initialization errors.
+     * TODO: add reference to upcoming website docs.
+     */
+    RECORDING_PHASE: boolean
+
+    /**
      * Resets the parser state, should be overridden for custom parsers which "carry" additional state.
      * When overriding, remember to also invoke the super implementation!
      */

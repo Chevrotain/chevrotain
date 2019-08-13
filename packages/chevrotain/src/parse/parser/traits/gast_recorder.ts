@@ -51,6 +51,7 @@ export class GastRecorder {
     orInternalOrg: MixedInParser["orInternal"]
     subruleInternalOrg: MixedInParser["subruleInternal"]
     consumeInternalOrg: MixedInParser["consumeInternal"]
+    RECORDING_PHASE: boolean
 
     initGastRecorder(this: MixedInParser, config: IParserConfig): void {
         this.prodStack = []
@@ -62,9 +63,11 @@ export class GastRecorder {
         this.orInternalOrg = this.orInternal
         this.subruleInternalOrg = this.subruleInternal
         this.consumeInternalOrg = this.consumeInternal
+        this.RECORDING_PHASE = false
     }
 
     enableRecording(this: MixedInParser): void {
+        this.RECORDING_PHASE = true
         this.optionInternal = this.optionInternalRecord
         this.atLeastOneInternal = this.atLeastOneInternalRecord
         this.atLeastOneSepFirstInternal = this.atLeastOneSepFirstInternalRecord
@@ -76,6 +79,7 @@ export class GastRecorder {
     }
 
     disableRecording(this: MixedInParser) {
+        this.RECORDING_PHASE = false
         this.optionInternal = this.optionInternalOrg
         this.atLeastOneInternal = this.atLeastOneInternalOrg
         this.atLeastOneSepFirstInternal = this.atLeastOneSepFirstInternalOrg

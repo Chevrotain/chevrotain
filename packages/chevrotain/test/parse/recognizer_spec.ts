@@ -57,6 +57,7 @@ function defineRecognizerSpecs(
 
                     public subRule = this.RULE("subRule", () => {
                         this.CONSUME(PlusTok)
+                        // TODO: wrap with SEMANTIC ACTION WRAPPER
                         this.result += this.index++
                     })
                 }
@@ -102,6 +103,7 @@ function defineRecognizerSpecs(
                         "subRule",
                         (numFromCaller, charFromCaller) => {
                             this.CONSUME(PlusTok)
+                            // TODO: wrap with SEMANTIC ACTION WRAPPER
                             this.numbers += numFromCaller
                             this.letters += charFromCaller
                         }
@@ -111,6 +113,7 @@ function defineRecognizerSpecs(
                         "subRule2",
                         (numFromCaller, charFromCaller) => {
                             this.CONSUME(PlusTok)
+                            // TODO: wrap with SEMANTIC ACTION WRAPPER
                             this.numbers += numFromCaller
                             this.letters += charFromCaller
                         }
