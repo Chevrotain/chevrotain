@@ -57,8 +57,11 @@ function defineRecognizerSpecs(
 
                     public subRule = this.RULE("subRule", () => {
                         this.CONSUME(PlusTok)
-                        // TODO: wrap with SEMANTIC ACTION WRAPPER
-                        this.result += this.index++
+
+                        this.ACTION(() => {
+                            // side effect
+                            this.result += this.index++
+                        })
                     })
                 }
 
@@ -103,9 +106,11 @@ function defineRecognizerSpecs(
                         "subRule",
                         (numFromCaller, charFromCaller) => {
                             this.CONSUME(PlusTok)
-                            // TODO: wrap with SEMANTIC ACTION WRAPPER
-                            this.numbers += numFromCaller
-                            this.letters += charFromCaller
+                            this.ACTION(() => {
+                                // side effect
+                                this.numbers += numFromCaller
+                                this.letters += charFromCaller
+                            })
                         }
                     )
 
@@ -113,9 +118,11 @@ function defineRecognizerSpecs(
                         "subRule2",
                         (numFromCaller, charFromCaller) => {
                             this.CONSUME(PlusTok)
-                            // TODO: wrap with SEMANTIC ACTION WRAPPER
-                            this.numbers += numFromCaller
-                            this.letters += charFromCaller
+                            this.ACTION(() => {
+                                // side effect
+                                this.numbers += numFromCaller
+                                this.letters += charFromCaller
+                            })
                         }
                     )
                 }
@@ -1023,9 +1030,16 @@ function defineRecognizerSpecs(
                     }
 
                     public someRule = this.RULE("someRule", () => {
-                        expect(() =>
+                        let isThrown = false
+                        try {
                             this.SUBRULE(this.someNestedRule)
-                        ).to.throw("Expecting token of type --> DotTok <--")
+                        } catch (e) {
+                            isThrown = true
+                        } finally {
+                            if (this.RECORDING_PHASE === false) {
+                                expect(isThrown).to.be.true
+                            }
+                        }
                     })
 
                     public someNestedRule = this.RULE(

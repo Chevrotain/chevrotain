@@ -32,6 +32,10 @@ import { HashTable } from "../../../lang/lang_extensions"
  * - ...
  */
 export class RecognizerApi {
+    ACTION<T>(this: MixedInParser, impl: () => T): T {
+        return impl.call(this)
+    }
+
     CONSUME(
         this: MixedInParser,
         tokType: TokenType,

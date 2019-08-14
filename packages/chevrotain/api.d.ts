@@ -74,6 +74,11 @@ declare abstract class BaseParser {
     ): () => boolean
 
     /**
+     * TODO: Docs
+     */
+    /* protected */ ACTION<T>(impl: () => T): T
+
+    /**
      *
      * A Parsing DSL method use to consume a single Token.
      * In EBNF terms this is equivalent to a Terminal.

@@ -43,6 +43,7 @@ const HANDLE_SEPARATOR = true
 // TODO: do we need to override any other methods here? (BACKTrack? LA?)
 export class GastRecorder {
     prodStack: ProdWithDef[]
+    ACTION_ORG: MixedInParser["ACTION"]
     optionInternalOrg: MixedInParser["optionInternal"]
     atLeastOneInternalOrg: MixedInParser["atLeastOneInternal"]
     atLeastOneSepFirstInternalOrg: MixedInParser["atLeastOneSepFirstInternal"]
@@ -55,6 +56,7 @@ export class GastRecorder {
 
     initGastRecorder(this: MixedInParser, config: IParserConfig): void {
         this.prodStack = []
+        this.ACTION_ORG = this.ACTION
         this.optionInternalOrg = this.optionInternal
         this.atLeastOneInternalOrg = this.atLeastOneInternal
         this.atLeastOneSepFirstInternalOrg = this.atLeastOneSepFirstInternal
@@ -68,6 +70,7 @@ export class GastRecorder {
 
     enableRecording(this: MixedInParser): void {
         this.RECORDING_PHASE = true
+        this.ACTION = this.ACTION_RECORD
         this.optionInternal = this.optionInternalRecord
         this.atLeastOneInternal = this.atLeastOneInternalRecord
         this.atLeastOneSepFirstInternal = this.atLeastOneSepFirstInternalRecord
@@ -80,6 +83,7 @@ export class GastRecorder {
 
     disableRecording(this: MixedInParser) {
         this.RECORDING_PHASE = false
+        this.ACTION = this.ACTION_ORG
         this.optionInternal = this.optionInternalOrg
         this.atLeastOneInternal = this.atLeastOneInternalOrg
         this.atLeastOneSepFirstInternal = this.atLeastOneSepFirstInternalOrg
@@ -88,6 +92,11 @@ export class GastRecorder {
         this.orInternal = this.orInternalOrg
         this.subruleInternal = this.subruleInternalOrg
         this.consumeInternal = this.consumeInternalOrg
+    }
+
+    ACTION_RECORD<T>(this: MixedInParser, impl: () => T): T {
+        // NO-OP during recording
+        return
     }
 
     topLevelRuleRecord(name: string, def: Function): Rule {
