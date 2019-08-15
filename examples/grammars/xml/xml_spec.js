@@ -1,6 +1,6 @@
 const assert = require("assert")
 
-const parseXML = require("./xml")
+const parseXML = require("./xml_api")
 
 describe("The XML Grammar - Parser implemented using ES6 syntax", () => {
     it("can parse a simple XML without errors", () => {
