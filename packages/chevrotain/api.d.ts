@@ -74,7 +74,12 @@ declare abstract class BaseParser {
     ): () => boolean
 
     /**
-     * TODO: Docs
+     * The Semantic Actions wrapper.
+     * Should be used to wrap semantic actions that either:
+     * - May fail when executing in "recording phase".
+     * - Have global side effects that should be avoided during "recording phase".
+     *
+     * For more information see: TODO: Create WebSite docs for this.
      */
     /* protected */ ACTION<T>(impl: () => T): T
 

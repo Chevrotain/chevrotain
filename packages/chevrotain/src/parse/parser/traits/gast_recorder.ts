@@ -27,15 +27,33 @@ import {
     Rule,
     Terminal
 } from "../../grammar/gast/gast_public"
-import { END_OF_FILE, ParserDefinitionErrorType } from "../parser"
+import { Lexer } from "../../../scan/lexer_public"
+import { augmentTokenTypes } from "../../../scan/tokens"
+import { createToken, createTokenInstance } from "../../../scan/tokens_public"
+import { END_OF_FILE } from "../parser"
 
 type ProdWithDef = IProduction & { definition?: IProduction[] }
 const RECORDING_NULL_OBJECT = {
-    description: "TODO: ADD Helper docs here..."
+    description: "This Object indicates the Parser is during Recording Phase"
 }
 Object.freeze(RECORDING_NULL_OBJECT)
 
 const HANDLE_SEPARATOR = true
+const RFT = createToken({ name: "RECORDING_PHASE_TOKEN", pattern: Lexer.NA })
+augmentTokenTypes([RFT])
+const RECORDING_PHASE_TOKEN = createTokenInstance(
+    RFT,
+    "This IToken indicates the Parser is in Recording Phase",
+    // Using "-1" instead of NaN (as in EOF) because an actual number is less likely to
+    // cause errors if the output of LA or CONSUME would be (incorrectly) used during the recording phase.
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1
+)
+Object.freeze(RECORDING_PHASE_TOKEN)
 
 /**
  * This trait handles the creation of the GAST structure for Chevrotain Grammars
@@ -44,6 +62,8 @@ const HANDLE_SEPARATOR = true
 export class GastRecorder {
     prodStack: ProdWithDef[]
     ACTION_ORG: MixedInParser["ACTION"]
+    BACKTRACK_ORG: MixedInParser["BACKTRACK"]
+    LA_ORG: MixedInParser["LA"]
     optionInternalOrg: MixedInParser["optionInternal"]
     atLeastOneInternalOrg: MixedInParser["atLeastOneInternal"]
     atLeastOneSepFirstInternalOrg: MixedInParser["atLeastOneSepFirstInternal"]
@@ -54,9 +74,13 @@ export class GastRecorder {
     consumeInternalOrg: MixedInParser["consumeInternal"]
     RECORDING_PHASE: boolean
 
+    // TODO: would this break overloading scenarios?
+    //   so we should move this to enableRecording method?
     initGastRecorder(this: MixedInParser, config: IParserConfig): void {
         this.prodStack = []
         this.ACTION_ORG = this.ACTION
+        this.BACKTRACK_ORG = this.BACKTRACK
+        this.LA_ORG = this.LA
         this.optionInternalOrg = this.optionInternal
         this.atLeastOneInternalOrg = this.atLeastOneInternal
         this.atLeastOneSepFirstInternalOrg = this.atLeastOneSepFirstInternal
@@ -71,6 +95,8 @@ export class GastRecorder {
     enableRecording(this: MixedInParser): void {
         this.RECORDING_PHASE = true
         this.ACTION = this.ACTION_RECORD
+        this.BACKTRACK = this.BACKTRACK_RECORD
+        this.LA = this.LA_RECORD
         this.optionInternal = this.optionInternalRecord
         this.atLeastOneInternal = this.atLeastOneInternalRecord
         this.atLeastOneSepFirstInternal = this.atLeastOneSepFirstInternalRecord
@@ -84,6 +110,8 @@ export class GastRecorder {
     disableRecording(this: MixedInParser) {
         this.RECORDING_PHASE = false
         this.ACTION = this.ACTION_ORG
+        this.BACKTRACK = this.BACKTRACK_ORG
+        this.LA = this.LA_ORG
         this.optionInternal = this.optionInternalOrg
         this.atLeastOneInternal = this.atLeastOneInternalOrg
         this.atLeastOneSepFirstInternal = this.atLeastOneSepFirstInternalOrg
@@ -94,9 +122,26 @@ export class GastRecorder {
         this.consumeInternal = this.consumeInternalOrg
     }
 
+    // TODO: is there any way to use this method to check no
+    //   Parser methods are called inside an ACTION?
     ACTION_RECORD<T>(this: MixedInParser, impl: () => T): T {
         // NO-OP during recording
         return
+    }
+
+    // Executing backtracking logic will break our recording logic assumptions
+    BACKTRACK_RECORD<T>(
+        grammarRule: (...args: any[]) => T,
+        args?: any[]
+    ): () => boolean {
+        return () => true
+    }
+
+    // LA is part of the official API and may be used for custom lookahead logic
+    LA_RECORD(howMuch: number): IToken {
+        // We cannot use the RECORD_PHASE_TOKEN here because someone may depend
+        // On LA return EOF at the end of the input so an infinite loop may occur.
+        return END_OF_FILE
     }
 
     topLevelRuleRecord(name: string, def: Function): Rule {
@@ -223,7 +268,7 @@ export class GastRecorder {
         prevProd.definition.push(newNoneTerminal)
 
         // TODO: Custom Recording Token
-        return END_OF_FILE
+        return RECORDING_PHASE_TOKEN
     }
 }
 

@@ -169,7 +169,6 @@ export class Parser {
             })
         }
 
-        // TODO: build GAST using GAST RecordedTrait
         this.enableRecording()
         forEach(this.definedRulesNames, currRuleName => {
             try {
@@ -180,18 +179,9 @@ export class Parser {
                     currRuleName,
                     originalGrammarAction
                 )
-
-                const parsedRuleGast = this.gastProductionsCache.get(
-                    currRuleName
-                )
                 this.gastProductionsCache.put(currRuleName, recordedRuleGast)
-                // We do not care about comparing the "orgText"
-                delete parsedRuleGast.orgText
-                delete recordedRuleGast.orgText
-                // deepStrictEqual(recordedRuleGast, parsedRuleGast)
-                // expect(recordedRuleGast).to.deep.equal(parsedRuleGast);
             } catch (e) {
-                // TODO: different behaivor depending on which error is caught ?
+                // TODO: different behavior depending on which error is caught ?
                 throw e
             }
         })
