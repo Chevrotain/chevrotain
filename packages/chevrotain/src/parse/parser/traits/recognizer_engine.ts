@@ -298,6 +298,7 @@ export class RecognizerEngine {
 
         let ruleNamePropName = "ruleName"
         wrappedGrammarRule[ruleNamePropName] = ruleName
+        // TODO: does adding props on function cause a performance regression?
         // We need to save the original implementation to allow recording the GAST
         wrappedGrammarRule["originalGrammarAction"] = impl
         return wrappedGrammarRule

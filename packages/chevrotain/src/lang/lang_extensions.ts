@@ -74,10 +74,6 @@ export class HashTable<V> {
         return this._state[key]
     }
 
-    containsKey(key: string): boolean {
-        return has(this._state, key)
-    }
-
     clear(): void {
         this._state = {}
     }

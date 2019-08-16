@@ -66,7 +66,6 @@ const RECORDING_PHASE_CSTNODE: CstNode = {
 /**
  * This trait handles the creation of the GAST structure for Chevrotain Grammars
  */
-// TODO: do we need to override any other methods here? (BACKTrack? LA?)
 export class GastRecorder {
     recordingProdStack: ProdWithDef[]
     ACTION_ORG: MixedInParser["ACTION"]
@@ -163,7 +162,7 @@ export class GastRecorder {
             if (e.KNOWN_RECORDER_ERROR !== true) {
                 e.message =
                     e.message +
-                    '\n\t This error was thrown during "grammar recording phase" For more info see:\n\t' +
+                    '\n\t This error was thrown during the "grammar recording phase" For more info see:\n\t' +
                     // TODO: Docs links
                     "TBD: Doc Links"
             }

@@ -1,4 +1,4 @@
 window.globalOptions = {
-    dev: { outputCst: true, nodePositionTracking: "full" },
-    latest: { outputCst: true, nodePositionTracking: "full" }
+    dev: { outputCst: false },
+    latest: { outputCst: false }
 }
