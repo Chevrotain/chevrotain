@@ -611,6 +611,24 @@ describe("The Recorder runtime checks full flow", () => {
             "inside top level rule: <two>"
         )
     })
+
+    it("Add additional details to other runtime exceptions encountered during recording phase", () => {
+        class OtherRecordingErrorParser extends Parser {
+            constructor(input: IToken[] = []) {
+                super([myToken, myOtherToken])
+                this.performSelfAnalysis()
+                this.input = input
+            }
+
+            public one = this.RULE("two", () => {
+                throw new Error("OOPS")
+            })
+        }
+
+        expect(() => new OtherRecordingErrorParser()).to.throw(
+            'This error was thrown during the "grammar recording phase"'
+        )
+    })
 })
 
 describe("The reference resolver validation full flow", () => {

@@ -82,8 +82,6 @@ export class GastRecorder {
     consumeInternalOrg: MixedInParser["consumeInternal"]
     RECORDING_PHASE: boolean
 
-    // TODO: would this break overloading scenarios?
-    //   so we should move this to enableRecording method?
     initGastRecorder(this: MixedInParser, config: IParserConfig): void {
         this.recordingProdStack = []
     }
@@ -154,12 +152,23 @@ export class GastRecorder {
     }
 
     topLevelRuleRecord(name: string, def: Function): Rule {
-        const newTopLevelRule = new Rule({ definition: [], name: name })
-        newTopLevelRule.name = name
-        this.recordingProdStack.push(newTopLevelRule)
-        def.call(this)
-        this.recordingProdStack.pop()
-        return newTopLevelRule
+        try {
+            const newTopLevelRule = new Rule({ definition: [], name: name })
+            newTopLevelRule.name = name
+            this.recordingProdStack.push(newTopLevelRule)
+            def.call(this)
+            this.recordingProdStack.pop()
+            return newTopLevelRule
+        } catch (e) {
+            if (e.KNOWN_RECORDER_ERROR !== true) {
+                e.message =
+                    e.message +
+                    '\n\t This error was thrown during "grammar recording phase" For more info see:\n\t' +
+                    // TODO: Docs links
+                    "TBD: Doc Links"
+            }
+            throw e
+        }
     }
 
     // Implementation of parsing DSL
@@ -235,7 +244,7 @@ export class GastRecorder {
         options?: SubruleMethodOpts
     ): T | CstNode {
         if (!ruleToCall || has(ruleToCall, "ruleName") === false) {
-            throw new Error(
+            const error: any = new Error(
                 `<SUBRULE${
                     occurrence !== 0 ? occurrence : ""
                 }> argument is invalid` +
@@ -246,6 +255,8 @@ export class GastRecorder {
                         (<Rule>this.recordingProdStack[0]).name
                     }>`
             )
+            error.KNOWN_RECORDER_ERROR = true
+            throw error
         }
 
         const prevProd: any = peek(this.recordingProdStack)
@@ -270,7 +281,7 @@ export class GastRecorder {
         options: ConsumeMethodOpts
     ): IToken {
         if (!hasShortKeyProperty(tokType)) {
-            throw new Error(
+            const error: any = new Error(
                 `<CONSUME${
                     occurrence !== 0 ? occurrence : ""
                 }> argument is invalid` +
@@ -281,6 +292,8 @@ export class GastRecorder {
                         (<Rule>this.recordingProdStack[0]).name
                     }>`
             )
+            error.KNOWN_RECORDER_ERROR = true
+            throw error
         }
         const prevProd: any = peek(this.recordingProdStack)
         const newNoneTerminal = new Terminal({

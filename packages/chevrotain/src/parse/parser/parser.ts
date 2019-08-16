@@ -171,19 +171,13 @@ export class Parser {
 
         this.enableRecording()
         forEach(this.definedRulesNames, currRuleName => {
-            try {
-                const wrappedRule = this[currRuleName]
-                const originalGrammarAction =
-                    wrappedRule["originalGrammarAction"]
-                const recordedRuleGast = this.topLevelRuleRecord(
-                    currRuleName,
-                    originalGrammarAction
-                )
-                this.gastProductionsCache.put(currRuleName, recordedRuleGast)
-            } catch (e) {
-                // TODO: different behavior depending on which error is caught ?
-                throw e
-            }
+            const wrappedRule = this[currRuleName]
+            const originalGrammarAction = wrappedRule["originalGrammarAction"]
+            const recordedRuleGast = this.topLevelRuleRecord(
+                currRuleName,
+                originalGrammarAction
+            )
+            this.gastProductionsCache.put(currRuleName, recordedRuleGast)
         })
         this.disableRecording()
 
