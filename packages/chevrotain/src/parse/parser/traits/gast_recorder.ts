@@ -1,6 +1,7 @@
 import {
     AtLeastOneSepMethodOpts,
     ConsumeMethodOpts,
+    CstNode,
     DSLMethodOpts,
     DSLMethodOptsWithErr,
     GrammarAction,
@@ -28,7 +29,7 @@ import {
     Terminal
 } from "../../grammar/gast/gast_public"
 import { Lexer } from "../../../scan/lexer_public"
-import { augmentTokenTypes } from "../../../scan/tokens"
+import { augmentTokenTypes, hasShortKeyProperty } from "../../../scan/tokens"
 import { createToken, createTokenInstance } from "../../../scan/tokens_public"
 import { END_OF_FILE } from "../parser"
 
@@ -43,6 +44,7 @@ const RFT = createToken({ name: "RECORDING_PHASE_TOKEN", pattern: Lexer.NA })
 augmentTokenTypes([RFT])
 const RECORDING_PHASE_TOKEN = createTokenInstance(
     RFT,
+    // TODO: Add link to future docs.
     "This IToken indicates the Parser is in Recording Phase",
     // Using "-1" instead of NaN (as in EOF) because an actual number is less likely to
     // cause errors if the output of LA or CONSUME would be (incorrectly) used during the recording phase.
@@ -55,12 +57,18 @@ const RECORDING_PHASE_TOKEN = createTokenInstance(
 )
 Object.freeze(RECORDING_PHASE_TOKEN)
 
+const RECORDING_PHASE_CSTNODE: CstNode = {
+    // TODO: add link to future docs
+    name: "This CSTNode indicates the Parser is in Recording Phase",
+    children: {}
+}
+
 /**
  * This trait handles the creation of the GAST structure for Chevrotain Grammars
  */
 // TODO: do we need to override any other methods here? (BACKTrack? LA?)
 export class GastRecorder {
-    prodStack: ProdWithDef[]
+    recordingProdStack: ProdWithDef[]
     ACTION_ORG: MixedInParser["ACTION"]
     BACKTRACK_ORG: MixedInParser["BACKTRACK"]
     LA_ORG: MixedInParser["LA"]
@@ -77,7 +85,10 @@ export class GastRecorder {
     // TODO: would this break overloading scenarios?
     //   so we should move this to enableRecording method?
     initGastRecorder(this: MixedInParser, config: IParserConfig): void {
-        this.prodStack = []
+        this.recordingProdStack = []
+    }
+
+    enableRecording(this: MixedInParser): void {
         this.ACTION_ORG = this.ACTION
         this.BACKTRACK_ORG = this.BACKTRACK
         this.LA_ORG = this.LA
@@ -90,9 +101,7 @@ export class GastRecorder {
         this.subruleInternalOrg = this.subruleInternal
         this.consumeInternalOrg = this.consumeInternal
         this.RECORDING_PHASE = false
-    }
 
-    enableRecording(this: MixedInParser): void {
         this.RECORDING_PHASE = true
         this.ACTION = this.ACTION_RECORD
         this.BACKTRACK = this.BACKTRACK_RECORD
@@ -147,9 +156,9 @@ export class GastRecorder {
     topLevelRuleRecord(name: string, def: Function): Rule {
         const newTopLevelRule = new Rule({ definition: [], name: name })
         newTopLevelRule.name = name
-        this.prodStack.push(newTopLevelRule)
+        this.recordingProdStack.push(newTopLevelRule)
         def.call(this)
-        this.prodStack.pop()
+        this.recordingProdStack.pop()
         return newTopLevelRule
     }
 
@@ -224,9 +233,8 @@ export class GastRecorder {
         ruleToCall: (idx: number) => T,
         occurrence: number,
         options?: SubruleMethodOpts
-    ): T {
+    ): T | CstNode {
         if (!ruleToCall || has(ruleToCall, "ruleName") === false) {
-            // TODO: add comment about user looking into the stack trace to see exactly where the issue is
             throw new Error(
                 `<SUBRULE${
                     occurrence !== 0 ? occurrence : ""
@@ -235,12 +243,12 @@ export class GastRecorder {
                         ruleToCall
                     )}>` +
                     `\n inside top level rule: <${
-                        (<Rule>this.prodStack[0]).name
+                        (<Rule>this.recordingProdStack[0]).name
                     }>`
             )
         }
 
-        const prevProd: any = peek(this.prodStack)
+        const prevProd: any = peek(this.recordingProdStack)
         const ruleName = ruleToCall["ruleName"]
         const newNoneTerminal = new NonTerminal({
             idx: occurrence,
@@ -250,8 +258,9 @@ export class GastRecorder {
         })
         prevProd.definition.push(newNoneTerminal)
 
-        // TODO: do we want to return an empty CSTNOde if CST building is enabled?
-        return <any>RECORDING_NULL_OBJECT
+        return this.outputCst
+            ? RECORDING_PHASE_CSTNODE
+            : <any>RECORDING_NULL_OBJECT
     }
 
     consumeInternalRecord(
@@ -260,14 +269,26 @@ export class GastRecorder {
         occurrence: number,
         options: ConsumeMethodOpts
     ): IToken {
-        const prevProd: any = peek(this.prodStack)
+        if (!hasShortKeyProperty(tokType)) {
+            throw new Error(
+                `<CONSUME${
+                    occurrence !== 0 ? occurrence : ""
+                }> argument is invalid` +
+                    ` expecting a TokenType reference but got: <${JSON.stringify(
+                        tokType
+                    )}>` +
+                    `\n inside top level rule: <${
+                        (<Rule>this.recordingProdStack[0]).name
+                    }>`
+            )
+        }
+        const prevProd: any = peek(this.recordingProdStack)
         const newNoneTerminal = new Terminal({
             idx: occurrence,
             terminalType: tokType
         })
         prevProd.definition.push(newNoneTerminal)
 
-        // TODO: Custom Recording Token
         return RECORDING_PHASE_TOKEN
     }
 }
@@ -278,7 +299,7 @@ function recordProd(
     occurrence: number,
     handleSep: boolean = false
 ): any {
-    const prevProd: any = peek(this.prodStack)
+    const prevProd: any = peek(this.recordingProdStack)
     const grammarAction = isFunction(mainProdArg)
         ? mainProdArg
         : mainProdArg.DEF
@@ -291,16 +312,16 @@ function recordProd(
         newProd.separator = mainProdArg.SEP
     }
 
-    this.prodStack.push(newProd)
+    this.recordingProdStack.push(newProd)
     grammarAction.call(this)
     prevProd.definition.push(newProd)
-    this.prodStack.pop()
+    this.recordingProdStack.pop()
 
     return RECORDING_NULL_OBJECT
 }
 
 function recordOrProd(mainProdArg: any, occurrence: number): any {
-    const prevProd: any = peek(this.prodStack)
+    const prevProd: any = peek(this.recordingProdStack)
     const alts = isArray(mainProdArg) ? mainProdArg : mainProdArg.DEF
 
     const newOrProd = new Alternation({ definition: [], idx: occurrence })
@@ -315,9 +336,9 @@ function recordOrProd(mainProdArg: any, occurrence: number): any {
         if (has(currAlt, "NAME")) {
             currAltFlat.name = currAlt.NAME
         }
-        this.prodStack.push(currAltFlat)
+        this.recordingProdStack.push(currAltFlat)
         currAlt.ALT.call(this)
-        this.prodStack.pop()
+        this.recordingProdStack.pop()
     })
     return RECORDING_NULL_OBJECT
 }

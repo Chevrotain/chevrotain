@@ -569,7 +569,7 @@ describe("The duplicate occurrence validations full flow", () => {
     })
 })
 
-describe("The reference resolver validation full flow", () => {
+describe("The Recorder runtime checks full flow", () => {
     it("will throw an error when trying to init a parser with unresolved rule references", () => {
         class InvalidRefParser extends Parser {
             constructor(input: IToken[] = []) {
@@ -591,6 +591,29 @@ describe("The reference resolver validation full flow", () => {
         )
     })
 
+    it("will throw an error when trying to init a parser with unresolved tokenType references", () => {
+        class InvalidTokTypeParser extends Parser {
+            constructor(input: IToken[] = []) {
+                super([myToken, myOtherToken])
+                this.performSelfAnalysis()
+                this.input = input
+            }
+
+            public one = this.RULE("two", () => {
+                this.CONSUME3(null)
+            })
+        }
+
+        expect(() => new InvalidTokTypeParser()).to.throw("<CONSUME3>")
+        expect(() => new InvalidTokTypeParser()).to.throw("argument is invalid")
+        expect(() => new InvalidTokTypeParser()).to.throw("but got: <null>")
+        expect(() => new InvalidTokTypeParser()).to.throw(
+            "inside top level rule: <two>"
+        )
+    })
+})
+
+describe("The reference resolver validation full flow", () => {
     it(
         "won't throw an error when trying to init a parser with definition errors but with a flag active to defer handling" +
             "of definition errors",
