@@ -13,7 +13,10 @@ function parseBench(text, lexer, parser, rootRule, options, parserConfig) {
     // It is recommended to only initialize a Chevrotain Parser once
     // and reset it's state instead of re-initializing it
     if (parserInstance === undefined) {
+        const start = new Date().getTime()
         parserInstance = new parser(parserConfig)
+        const end = new Date().getTime()
+        console.log("init time: " + (end - start))
     }
 
     if (options.lexerOnly) {

@@ -68,64 +68,76 @@ const RECORDING_PHASE_CSTNODE: CstNode = {
  */
 export class GastRecorder {
     recordingProdStack: ProdWithDef[]
-    ACTION_ORG: MixedInParser["ACTION"]
-    BACKTRACK_ORG: MixedInParser["BACKTRACK"]
-    LA_ORG: MixedInParser["LA"]
-    optionInternalOrg: MixedInParser["optionInternal"]
-    atLeastOneInternalOrg: MixedInParser["atLeastOneInternal"]
-    atLeastOneSepFirstInternalOrg: MixedInParser["atLeastOneSepFirstInternal"]
-    manyInternalOrg: MixedInParser["manyInternal"]
-    manySepFirstInternalOrg: MixedInParser["manySepFirstInternal"]
-    orInternalOrg: MixedInParser["orInternal"]
-    subruleInternalOrg: MixedInParser["subruleInternal"]
-    consumeInternalOrg: MixedInParser["consumeInternal"]
     RECORDING_PHASE: boolean
 
     initGastRecorder(this: MixedInParser, config: IParserConfig): void {
         this.recordingProdStack = []
+        this.RECORDING_PHASE = false
     }
 
     enableRecording(this: MixedInParser): void {
-        this.ACTION_ORG = this.ACTION
-        this.BACKTRACK_ORG = this.BACKTRACK
-        this.LA_ORG = this.LA
-        this.optionInternalOrg = this.optionInternal
-        this.atLeastOneInternalOrg = this.atLeastOneInternal
-        this.atLeastOneSepFirstInternalOrg = this.atLeastOneSepFirstInternal
-        this.manyInternalOrg = this.manyInternal
-        this.manySepFirstInternalOrg = this.manySepFirstInternal
-        this.orInternalOrg = this.orInternal
-        this.subruleInternalOrg = this.subruleInternal
-        this.consumeInternalOrg = this.consumeInternal
-        this.RECORDING_PHASE = false
-
         this.RECORDING_PHASE = true
+        /**
+         * Warning Dark Voodoo Magic upcoming!
+         * We are "replacing" the public parsing DSL methods API
+         * With **new** alternative implementations on the Parser **instance**
+         *
+         * So far this is the only way I've found to avoid performance regressions during parsing time.
+         * - Approx 30% performance regression was measured on Chrome 75 Canary when attempting to replace the "internal"
+         *   implementations directly instead.
+         */
+        for (let i = 0; i < 10; i++) {
+            const idx = i > 0 ? i : ""
+            this[`CONSUME${idx}`] = function(arg1, arg2) {
+                return this.consumeInternalRecord(arg1, i, arg2)
+            }
+            this[`SUBRULE${idx}`] = function(arg1, arg2) {
+                return this.subruleInternalRecord(arg1, i, arg2)
+            }
+            this[`OPTION${idx}`] = function(arg1) {
+                this.optionInternalRecord(arg1, i)
+            }
+            this[`OR${idx}`] = function(arg1) {
+                return this.orInternalRecord(arg1, i)
+            }
+            this[`MANY${idx}`] = function(arg1) {
+                this.manyInternalRecord(i, arg1)
+            }
+            this[`MANY_SEP${idx}`] = function(arg1) {
+                this.manySepFirstInternalRecord(i, arg1)
+            }
+            this[`AT_LEAST_ONE${idx}`] = function(arg1) {
+                this.atLeastOneInternalRecord(i, arg1)
+            }
+            this[`AT_LEAST_ONE_SEP${idx}`] = function(arg1) {
+                this.atLeastOneSepFirstInternalRecord(i, arg1)
+            }
+        }
         this.ACTION = this.ACTION_RECORD
         this.BACKTRACK = this.BACKTRACK_RECORD
         this.LA = this.LA_RECORD
-        this.optionInternal = this.optionInternalRecord
-        this.atLeastOneInternal = this.atLeastOneInternalRecord
-        this.atLeastOneSepFirstInternal = this.atLeastOneSepFirstInternalRecord
-        this.manyInternal = this.manyInternalRecord
-        this.manySepFirstInternal = this.manySepFirstInternalRecord
-        this.orInternal = this.orInternalRecord
-        this.subruleInternal = this.subruleInternalRecord
-        this.consumeInternal = this.consumeInternalRecord
     }
 
     disableRecording(this: MixedInParser) {
         this.RECORDING_PHASE = false
-        this.ACTION = this.ACTION_ORG
-        this.BACKTRACK = this.BACKTRACK_ORG
-        this.LA = this.LA_ORG
-        this.optionInternal = this.optionInternalOrg
-        this.atLeastOneInternal = this.atLeastOneInternalOrg
-        this.atLeastOneSepFirstInternal = this.atLeastOneSepFirstInternalOrg
-        this.manyInternal = this.manyInternalOrg
-        this.manySepFirstInternal = this.manySepFirstInternalOrg
-        this.orInternal = this.orInternalOrg
-        this.subruleInternal = this.subruleInternalOrg
-        this.consumeInternal = this.consumeInternalOrg
+        // By deleting these **instance** properties, any future invocation
+        // will be deferred to the original methods on the **prototype** object
+        // This seems to get rid of any incorrect optimizations that V8 may
+        // do during the recording phase.
+        for (let i = 0; i < 10; i++) {
+            const idx = i > 0 ? i : ""
+            delete this[`CONSUME${idx}`]
+            delete this[`SUBRULE${idx}`]
+            delete this[`OPTION${idx}`]
+            delete this[`OR${idx}`]
+            delete this[`MANY${idx}`]
+            delete this[`MANY_SEP${idx}`]
+            delete this[`AT_LEAST_ONE${idx}`]
+            delete this[`AT_LEAST_ONE_SEP${idx}`]
+        }
+        delete this.ACTION
+        delete this.BACKTRACK
+        delete this.LA
     }
 
     // TODO: is there any way to use this method to check no
@@ -144,6 +156,7 @@ export class GastRecorder {
     }
 
     // LA is part of the official API and may be used for custom lookahead logic
+    // by end users who may forget to wrap it in ACTION or inside a GATE
     LA_RECORD(howMuch: number): IToken {
         // We cannot use the RECORD_PHASE_TOKEN here because someone may depend
         // On LA return EOF at the end of the input so an infinite loop may occur.

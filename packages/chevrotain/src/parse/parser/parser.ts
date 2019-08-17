@@ -169,17 +169,27 @@ export class Parser {
             })
         }
 
-        this.enableRecording()
-        forEach(this.definedRulesNames, currRuleName => {
-            const wrappedRule = this[currRuleName]
-            const originalGrammarAction = wrappedRule["originalGrammarAction"]
-            const recordedRuleGast = this.topLevelRuleRecord(
-                currRuleName,
-                originalGrammarAction
-            )
-            this.gastProductionsCache.put(currRuleName, recordedRuleGast)
-        })
-        this.disableRecording()
+        // Without this voodoo magic the parser would be x3-x4 slower
+        // It seems it is better ot invoke `toFastProperties` **before**
+        // Any manipulations of the `this` object done during the recording phase.
+        toFastProperties(this)
+
+        try {
+            this.enableRecording()
+            // Building the GAST
+            forEach(this.definedRulesNames, currRuleName => {
+                const wrappedRule = this[currRuleName]
+                const originalGrammarAction =
+                    wrappedRule["originalGrammarAction"]
+                const recordedRuleGast = this.topLevelRuleRecord(
+                    currRuleName,
+                    originalGrammarAction
+                )
+                this.gastProductionsCache.put(currRuleName, recordedRuleGast)
+            })
+        } finally {
+            this.disableRecording()
+        }
 
         const resolverErrors = resolveGrammar({
             rules: productions.values()
@@ -230,9 +240,6 @@ export class Parser {
                 )}`
             )
         }
-
-        // Avoid performance regressions in newer versions of V8
-        toFastProperties(this)
     }
 
     ignoredIssues: IgnoredParserIssues = DEFAULT_PARSER_CONFIG.ignoredIssues

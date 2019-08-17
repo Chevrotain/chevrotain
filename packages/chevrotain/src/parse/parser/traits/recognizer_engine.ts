@@ -218,7 +218,8 @@ export class RecognizerEngine {
 
         function invokeRuleWithTry(args: any[]) {
             try {
-                // TODO: dynamically get rid of this?
+                // TODO: dynamically get rid of this now that we have two parsing classes?
+                // TODO: evaluate performance impact first...
                 if (this.outputCst === true) {
                     impl.apply(this, args)
                     const cst = this.CST_STACK[this.CST_STACK.length - 1]
