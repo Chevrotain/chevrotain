@@ -559,8 +559,6 @@ declare abstract class BaseParser {
      * As in CONSUME the index in the method name indicates the occurrence
      * of the repetition production in it's top rule.
      *
-     * Note that due to current limitations in the implementation the "SEP" property must appear **before** the "DEF" property.
-     *
      * @param options - An object defining the grammar of each iteration and the separator between iterations
      *
      */
