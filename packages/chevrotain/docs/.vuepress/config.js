@@ -131,6 +131,7 @@ module.exports = {
                             "syntactic_content_assist",
                             "Syntactic Content Assist"
                         ],
+                        ["internals", "Internals"],
                         ["custom_apis", "Custom APIs"],
                         [
                             "resolving_grammar_errors",
