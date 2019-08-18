@@ -589,7 +589,7 @@ describe("The Recorder runtime checks full flow", () => {
     })
 
     it("won't invoke semantic actions during recording phase", () => {
-        class semanticActionsParsers extends Parser {
+        class SemanticActionsParsers extends Parser {
             counter: number
             constructor(input: IToken[] = []) {
                 super([myToken, myOtherToken])
@@ -608,7 +608,7 @@ describe("The Recorder runtime checks full flow", () => {
             })
         }
 
-        expect(() => new semanticActionsParsers()).to.not.throw()
+        expect(() => new SemanticActionsParsers()).to.not.throw()
     })
 
     it("won't execute backtracking during recording phase", () => {
