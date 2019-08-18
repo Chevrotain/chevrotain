@@ -11,7 +11,6 @@ import {
 } from "../../utils/utils"
 import { computeAllProdsFollows } from "../grammar/follow"
 import { createTokenInstance, EOF } from "../../scan/tokens_public"
-import { deserializeGrammar } from "../gast_builder"
 import { analyzeCst } from "../cst/cst"
 import {
     defaultGrammarValidatorErrorProvider,
@@ -67,7 +66,6 @@ export const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
     dynamicTokensEnabled: false,
     outputCst: true,
     errorMessageProvider: defaultParserErrorProvider,
-    serializedGrammar: null,
     nodeLocationTracking: "none"
 })
 
@@ -157,17 +155,6 @@ export class Parser {
         let className = classNameFromInstance(this)
 
         let productions = this.gastProductionsCache
-
-        // TODO: Remove grammar serialization support
-        if (this.serializedGrammar) {
-            const rules = deserializeGrammar(
-                this.serializedGrammar,
-                this.tokensMap
-            )
-            forEach(rules, rule => {
-                this.gastProductionsCache.put(rule.name, rule)
-            })
-        }
 
         // Without this voodoo magic the parser would be x3-x4 slower
         // It seems it is better ot invoke `toFastProperties` **before**

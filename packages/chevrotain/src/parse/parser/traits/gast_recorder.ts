@@ -257,9 +257,7 @@ export class GastRecorder {
     ): T | CstNode {
         if (!ruleToCall || has(ruleToCall, "ruleName") === false) {
             const error: any = new Error(
-                `<SUBRULE${
-                    occurrence !== 0 ? occurrence : ""
-                }> argument is invalid` +
+                `<SUBRULE${getIdxSuffix(occurrence)}> argument is invalid` +
                     ` expecting a Parser method reference but got: <${JSON.stringify(
                         ruleToCall
                     )}>` +
@@ -294,9 +292,7 @@ export class GastRecorder {
     ): IToken {
         if (!hasShortKeyProperty(tokType)) {
             const error: any = new Error(
-                `<CONSUME${
-                    occurrence !== 0 ? occurrence : ""
-                }> argument is invalid` +
+                `<CONSUME${getIdxSuffix(occurrence)}> argument is invalid` +
                     ` expecting a TokenType reference but got: <${JSON.stringify(
                         tokType
                     )}>` +
@@ -366,4 +362,8 @@ function recordOrProd(mainProdArg: any, occurrence: number): any {
         this.recordingProdStack.pop()
     })
     return RECORDING_NULL_OBJECT
+}
+
+function getIdxSuffix(idx: number): string {
+    return idx === 0 ? "" : `${idx}`
 }

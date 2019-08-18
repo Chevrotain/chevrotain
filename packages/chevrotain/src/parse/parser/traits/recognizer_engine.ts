@@ -7,7 +7,6 @@ import {
     IAnyOrAlt,
     IParserConfig,
     IRuleConfig,
-    ISerializedGast,
     IToken,
     ManySepMethodOpts,
     OrMethodOpts,
@@ -82,7 +81,6 @@ export class RecognizerEngine {
     tokensMap: { [fqn: string]: TokenType }
     allRuleNames: string[]
     gastProductionsCache: HashTable<Rule>
-    serializedGrammar: ISerializedGast[]
     shortRuleNameToFull: HashTable<string>
     fullRuleNameToShort: HashTable<number>
     // The shortName Index must be coded "after" the first 8bits to enable building unique lookahead keys
@@ -107,9 +105,6 @@ export class RecognizerEngine {
         this.RULE_STACK = []
         this.RULE_OCCURRENCE_STACK = []
         this.gastProductionsCache = new HashTable<Rule>()
-        this.serializedGrammar = has(config, "serializedGrammar")
-            ? config.serializedGrammar
-            : DEFAULT_PARSER_CONFIG.serializedGrammar
 
         if (isArray(tokenVocabulary)) {
             // This only checks for Token vocabularies provided as arrays.

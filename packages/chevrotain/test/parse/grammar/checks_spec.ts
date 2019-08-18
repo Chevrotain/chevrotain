@@ -1,6 +1,7 @@
 import { Parser } from "../../../src/parse/parser/traits/parser_traits"
 import {
     EMPTY_ALT,
+    END_OF_FILE,
     ParserDefinitionErrorType
 } from "../../../src/parse/parser/parser"
 import { actionDec, DotTok, IdentTok, qualifiedName } from "./samples"
@@ -570,6 +571,77 @@ describe("The duplicate occurrence validations full flow", () => {
 })
 
 describe("The Recorder runtime checks full flow", () => {
+    it("won't invoke semantic actions during recording phase", () => {
+        class LookAheadParser extends Parser {
+            constructor(input: IToken[] = []) {
+                super([myToken, myOtherToken])
+                this.performSelfAnalysis()
+                this.input = input
+            }
+
+            public one = this.RULE("one", () => {
+                expect(this.LA(0)).to.equal(END_OF_FILE)
+                this.CONSUME(myToken)
+            })
+        }
+
+        expect(() => new LookAheadParser()).to.not.throw()
+    })
+
+    it("won't invoke semantic actions during recording phase", () => {
+        class semanticActionsParsers extends Parser {
+            counter: number
+            constructor(input: IToken[] = []) {
+                super([myToken, myOtherToken])
+                this.performSelfAnalysis()
+                this.input = input
+                this.counter = 0
+            }
+
+            public one = this.RULE("one", () => {
+                this.ACTION(() => {
+                    if (this.RECORDING_PHASE) {
+                        throw Error("Should not be executed during recording")
+                    }
+                })
+                this.CONSUME(myToken)
+            })
+        }
+
+        expect(() => new semanticActionsParsers()).to.not.throw()
+    })
+
+    it("won't execute backtracking during recording phase", () => {
+        class BacktrackingRecordingParser extends Parser {
+            counter: number
+            constructor(input: IToken[] = []) {
+                super([myToken, myOtherToken])
+                this.counter = 0
+                this.performSelfAnalysis()
+                this.input = input
+            }
+
+            public one = this.RULE("one", () => {
+                const backtrackResult = this.BACKTRACK(this.two)()
+                if (this.RECORDING_PHASE) {
+                    // during recording backtracking always returns true backtracking
+                    expect(backtrackResult).to.be.true
+                }
+                this.CONSUME(myOtherToken)
+            })
+
+            public two = this.RULE("two", () => {
+                // if this is executed via backtracking the counter will increase
+                // once for recording and once for backtracking
+                this.counter++
+                this.CONSUME(myToken)
+            })
+        }
+
+        const parser = new BacktrackingRecordingParser()
+        expect(parser.counter).to.equal(1)
+    })
+
     it("will throw an error when trying to init a parser with unresolved rule references", () => {
         class InvalidRefParser extends Parser {
             constructor(input: IToken[] = []) {
@@ -579,11 +651,11 @@ describe("The Recorder runtime checks full flow", () => {
             }
 
             public one = this.RULE("one", () => {
-                this.SUBRULE2((<any>this).oopsTypo)
+                this.SUBRULE((<any>this).oopsTypo)
             })
         }
 
-        expect(() => new InvalidRefParser()).to.throw("<SUBRULE2>")
+        expect(() => new InvalidRefParser()).to.throw("<SUBRULE>")
         expect(() => new InvalidRefParser()).to.throw("argument is invalid")
         expect(() => new InvalidRefParser()).to.throw("but got: <undefined>")
         expect(() => new InvalidRefParser()).to.throw(

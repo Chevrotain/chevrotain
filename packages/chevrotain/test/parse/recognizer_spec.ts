@@ -1036,9 +1036,9 @@ function defineRecognizerSpecs(
                         } catch (e) {
                             isThrown = true
                         } finally {
-                            if (this.RECORDING_PHASE === false) {
+                            this.ACTION(() => {
                                 expect(isThrown).to.be.true
-                            }
+                            })
                         }
                     })
 
@@ -1539,92 +1539,6 @@ function defineRecognizerSpecs(
                 expect(serializedGrammar).to.have.lengthOf(2)
                 expect(serializedGrammar[0].type).to.equal("Rule")
                 expect(serializedGrammar[1].type).to.equal("Rule")
-            })
-
-            it("can use serialized grammar in performSelfAnalysis", () => {
-                // Attempt to reproduce
-                // https://github.com/SAP/chevrotain/issues/952
-                const PlusTok = createToken({
-                    name: "PlusTok",
-                    pattern: {
-                        exec: (text, offset) =>
-                            /\+/.exec(text.substring(offset))
-                    }
-                })
-
-                let serializedGrammar = null
-                class SerializingParser extends Parser {
-                    constructor(input: IToken[] = []) {
-                        super([PlusTok, MinusTok, IdentTok], {
-                            serializedGrammar
-                        })
-
-                        this.performSelfAnalysis()
-                        this.input = input
-                    }
-
-                    public rule = this.RULE("rule", () => {
-                        this.AT_LEAST_ONE_SEP({
-                            SEP: IdentTok,
-                            DEF: () => {
-                                this.SUBRULE(this.rule2)
-                            }
-                        })
-                    })
-
-                    public rule2 = this.RULE("rule2", () => {
-                        this.OR([
-                            {
-                                ALT: () => {
-                                    this.CONSUME1(MinusTok)
-                                }
-                            },
-                            {
-                                ALT: () => {
-                                    this.CONSUME1(PlusTok)
-                                }
-                            }
-                        ])
-                    })
-
-                    // @ts-ignore - To check serialization with overrides
-                    public rule2 = this.OVERRIDE_RULE("rule2", () => {
-                        this.OR([
-                            {
-                                ALT: () => {
-                                    this.CONSUME1(MinusTok)
-                                }
-                            },
-                            {
-                                ALT: () => {
-                                    this.CONSUME1(PlusTok)
-                                }
-                            }
-                        ])
-                    })
-                    // a rule to exercise certain cases in deserializeGrammar
-                    public rule3 = this.RULE("rule3", () => {
-                        this.AT_LEAST_ONE(() => {
-                            this.CONSUME1(IdentTok)
-                        })
-                        this.MANY_SEP({
-                            SEP: PlusTok,
-                            DEF: () => {
-                                this.CONSUME2(IdentTok)
-                            }
-                        })
-                    })
-                }
-                let parser = new SerializingParser([])
-                const expected = parser.getGAstProductions()
-                serializedGrammar = parser.getSerializedGastProductions()
-                let parser1 = new SerializingParser([])
-                const actual = parser1.getGAstProductions()
-                expect(expected).to.deep.equal(actual)
-
-                parser1.input = [createRegularToken(PlusTok)]
-                parser1.rule()
-                expect(parser1.errors).to.be.empty
             })
 
             it("can provide syntactic content assist suggestions", () => {

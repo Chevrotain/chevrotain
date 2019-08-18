@@ -2000,7 +2000,6 @@ export interface IParserConfig {
      *   - Providing special error messages under certain conditions, e.g: missing semicolons.
      */
     errorMessageProvider?: IParserErrorMessageProvider
-    serializedGrammar?: ISerializedGast[]
 }
 
 /**
