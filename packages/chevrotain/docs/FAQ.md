@@ -85,18 +85,21 @@ used for many things such as:
 
 ## Why does Chevrotain not work correctly after I minified my Grammar?
 
-Chevrotain relies on **Function.name** property and **Function.toString()**.
-This means that certain aggressive minification options can break Chevrotain grammars.
+~~Chevrotain relies on **Function.prototype.toString()**.
+This means that certain aggressive minification options can break Chevrotain grammars.~~
 
-See [related documentation](https://github.com/SAP/chevrotain/blob/master/examples/parser/minification/README.md) for details & workarounds.
+The dependence on `Function.prototype.toString` was removed in
+[version 6.0.0](http://sap.github.io/chevrotain/docs/changes/CHANGELOG.html#TODO-ADD-LINK) of Chevrotain.
+Special handling is no longer needed during minification scenarios.
 
 ## Why does Chevrotain not work correctly after I webpacked my Grammar?
 
-Chevrotain relies on **Function.name** property and **Function.toString()**.
-This means that certain webpack optimizations (minification) can break Chevrotain grammars under
-certain conditions.
+~~Chevrotain relies on **Function.prototype.toString()**.
+This means that certain webpack optimizations can break Chevrotain grammars.~~
 
-See [related documentation](https://github.com/SAP/chevrotain/blob/master/examples/webpack/README.md) for details & workarounds.
+The dependence on `Function.prototype.toString` was removed in
+[version 6.0.0](http://sap.github.io/chevrotain/docs/changes/CHANGELOG.html#TODO-ADD-LINK) of Chevrotain.
+Special handling is no longer needed during WebPacking scenarios.
 
 ## Why does my parser appear to be stuck during its initialization?
 
