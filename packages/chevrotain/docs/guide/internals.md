@@ -226,8 +226,72 @@ Note:
 
 ### Assumption 2 - There are no lasting side effects due to running the recording phase.
 
-If
+If there are any **lasting** side effects from executing the parsing rules then their execution
+during the grammar recording phase may break logic dependent on those side effects.
 
-#### Solution
+For example:
 
-####
+```javascript
+let ruleCounter = 0
+class SideEffectsParser extends CstParser {
+    constructor() {
+        /* ... */
+        $.RULE("myRule", () => {
+            // The counter will be incremented during the recording phase.
+            counter++
+            $.CONSUME(MyToken)
+        })
+    }
+}
+
+const parser = new SideEffectsParser()
+// We expected this to be `0`...
+console.log(counter) // -> 1
+```
+
+#### Solutions
+
+As before one of the solutions will be to wrap the relevant embedded semantic action using the
+[ACTION DSL method](https://sap.github.io/chevrotain/documentation/5_0_0/classes/baseparser.html#action).
+This is normally most suitable for handling **global state** outside the Parser's instance.
+
+```javascript
+$.RULE("myRule", () => {
+    $.ACTION(() => {
+        // This code will no longer execute during the recording phase.
+        counter++
+    })
+    $.CONSUME(MyToken)
+})
+```
+
+Because we are dealing with state here there is another option which is to override the Parser's
+[reset method](https://sap.github.io/chevrotain/documentation/5_0_0/classes/parser.html#reset).
+This is normally suitable for state that needs to be reset every time **new input** provided to the parser.
+
+```javascript
+class FixedSideEffectsParser extends CstParser {
+    constructor() {
+        //
+        this.instanceCounter = 0
+        /* ... */
+        $.RULE("myRule", () => {
+            // The counter will be incremented during the recording phase.
+            this.instanceCounter++
+            $.CONSUME(MyToken)
+        })
+    }
+
+    reset() {
+        this.instanceCounter = 0
+        super.reset()
+    }
+}
+
+const parser = new FixedSideEffectsParser()
+console.log(parser.instanceCounter) // -> 0
+```
+
+### Debugging Implications
+
+TBD: link to FAQ (and create section there)
