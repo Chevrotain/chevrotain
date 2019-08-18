@@ -1,46 +1,9 @@
 ### Minificaion of Chevrotain Grammars
 
-Chevrotain relies on **Function.prototype.toString** and **Function.name**
+~~Chevrotain relies on **Function.prototype.toString**
 to run. This means that minification of Chevrotain parsers must be done carefully, otherwise
-a minified parser may fail during initialization.
+a minified parser may fail during initialization.~~
 
-A Chevrotain grammar **may or may not** be adversely affected by minification.
-It depends on the source structure and how [Uglifyjs](https://github.com/mishoo/UglifyJS2) recognizes the Token names (public/private),
-which is in turn dependant on the source structure and Javascript module pattern used.
-Therefore **even if** a Chevrotain grammar is currently being minified successfully **without** any custom name mangling options,
-There is **no guarantee** it will continue to do so in the future (after refactoring / changes to the minifier library)
-The takeaway from this is that is is **highly recommended** to use a more **robust** minification configuration
-when minifing Chevrotain grammars.
-
-There are a several ways to solve this using [Uglifyjs's](https://github.com/mishoo/UglifyJS2) configuration options:
-
-#### Completely disable name mangling.
-
-This will **guarantee** a Chevrotain grammar will run minified
-but will also increase the size of the minified file.
-
-#### Selectively avoid the mangling of the specific's grammar Token names.
-
-This is the **recommended** approach as it will allow the maximum minification.
-
-#### Use Grammar Serialization
-
-This would indirectly solve the problem by avoiding the reliance on text analysis during the initialization of the minified parser.
-See: [Grammar Serialization Example](../serialized_grammar) for more details.
-
-#### Runnable Example
-
-The included [gruntfile.js](./gruntfile.js) implements minification of a sample Chevrotain
-Grammar: [unminified.js][./unminified.js] using both the suggested approaches.
-Additionally [unit tests](./minify_spec.js) are included to validate the minified grammars actually work.
-
-To run the minification and the tests:
-
--   only once:
-
-    -   `npm install grunt -g` (only once)
-    -   `cd ..`
-    -   `npm update` (in **chevrotain/examples/parser** directory)
-
--   every time:
-    -   `grunt build` (in **chevrotain/examples/parser/minification** directory)
+The dependence on `Function.prototype.toString` was removed in
+[version 6.0.0](http://sap.github.io/chevrotain/docs/changes/CHANGELOG.html#TODO-ADD-LINK) of Chevrotain.
+Special handling is no longer needed during minification scenarios.
