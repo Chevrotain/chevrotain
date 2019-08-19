@@ -1,9 +1,14 @@
 ## 6.0.0
 
 -   Due to the introduction of a new ["grammar recording"](../guide/internals.md#grammar-recording), certain semantics action
-    will now need to be wrapped in the new [ACTION](https://sap.github.io/chevrotain/documentation/5_0_0/classes/baseparser.html#action) Parsing
+    will now need to be wrapped in the new [ACTION](https://sap.github.io/chevrotain/documentation/6_0_0/classes/baseparser.html#action) Parsing
     DSL method. This will not affect Parsers that output a CST and only affect some of the Parsers which employ embedded semantic actions.
     The Missing `ACTION` wrappers will be automatically detected and throw a descriptive error message to ease migration.
+
+-   Grammar de-serialization support has been removed as it is now redundant as Chevrotain no longer relies on `Function.prototype.toString`.
+    And the de-serialization feature was a workaround to issues caused by `Function.prototype.toString`.
+    This means the [serializedGrammar property](https://sap.github.io/chevrotain/documentation/5_0_0/interfaces/iparserconfig.html#serializedgrammar)
+    of the Parser's configuration was removed, and using it will cause an error to be thrown during initialization.
 
 ## 5.0.0
 

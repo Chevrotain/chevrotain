@@ -722,6 +722,13 @@ function defineRecognizerSpecs(
                 )
             })
 
+            it("Cannot be initialized with a serializedGrammar property (pre v6.0 API)", () => {
+                const config: any = { serializedGrammar: {} }
+                expect(() => new Parser([], config)).to.throw(
+                    "The Parser's configuration can no longer contain a <serializedGrammar> property."
+                )
+            })
+
             it("Cannot be initialized with an empty Token vocabulary", () => {
                 expect(() => new Parser([])).to.throw(
                     "A Token Vocabulary cannot be empty"

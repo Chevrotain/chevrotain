@@ -106,6 +106,14 @@ export class RecognizerEngine {
         this.RULE_OCCURRENCE_STACK = []
         this.gastProductionsCache = new HashTable<Rule>()
 
+        if (has(config, "serializedGrammar")) {
+            throw Error(
+                "The Parser's configuration can no longer contain a <serializedGrammar> property.\n" +
+                    "\tSee: https://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_6-0-0\n" +
+                    "\tFor Further details."
+            )
+        }
+
         if (isArray(tokenVocabulary)) {
             // This only checks for Token vocabularies provided as arrays.
             // That is good enough because the main objective is to detect users of pre-V4.0 APIs
