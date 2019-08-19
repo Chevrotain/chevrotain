@@ -1,3 +1,22 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Breaking Changes
+
+-   [BREAKING_CHANGES For V6.0](https://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_6-0-0)
+
+#### Major Changes
+
+-   [Remove usage of Function.prototype.toString().](https://github.com/SAP/chevrotain/issues/998)
+
+    -   Means **no more bundling/minification/transpiling issues!** with WebPack/Babel/UglifyJS/other...
+    -   Provides a ~20% performance boost to most parsers initialization time.
+    -   These improved analysis capabilities will also enable multiple new features in future versions.
+    -   Thanks to [@EqualMa](https://github.com/EqualMa) for inspiration & proof of concept :thumbsup
+
+#### Minor Changes
+
+-   [Parsing Exceptions should be declared as classes.](https://github.com/SAP/chevrotain/issues/990)
+
 ## 5.0.0 (8-1-2019)
 
 #### Breaking Changes
