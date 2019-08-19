@@ -219,10 +219,12 @@ class SolvedSemanticChecks extends EmbeddedActionsParser {
 
 Note:
 
+-   Code wrapper by the `ACTION` wrapper **must not** include DSL methods (MANY/OR/OPTION/...) calls as that
+    would prevent those the grammar those methods represent from being recorded.
 -   Not all semantic actions require wrapping in `ACTION`, only those that would throw errors during the
     grammar recording phase.
--   Embedded actions reduce separation of concerns between parsing and semantics but we can still maintain some separation
-    by performing the Parsing bits at the beginning of the rule and the semantic actions at the end of the rule.
+-   Embedded actions reduce separation of concerns between parsing and semantics. However we can still maintain some separation
+    by performing the Parsing "part" at the beginning of the rule and the semantic actions "part" at the end of the rule.
 
 ### Assumption 2 - There are no lasting side effects due to running the recording phase.
 

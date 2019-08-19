@@ -44,8 +44,9 @@ const RFT = createToken({ name: "RECORDING_PHASE_TOKEN", pattern: Lexer.NA })
 augmentTokenTypes([RFT])
 const RECORDING_PHASE_TOKEN = createTokenInstance(
     RFT,
-    // TODO: Add link to future docs.
-    "This IToken indicates the Parser is in Recording Phase",
+    "This IToken indicates the Parser is in Recording Phase\n\t" +
+        "" +
+        "See: https://sap.github.io/chevrotain/docs/guide/internals.html#grammar-recording for details",
     // Using "-1" instead of NaN (as in EOF) because an actual number is less likely to
     // cause errors if the output of LA or CONSUME would be (incorrectly) used during the recording phase.
     -1,
@@ -58,8 +59,9 @@ const RECORDING_PHASE_TOKEN = createTokenInstance(
 Object.freeze(RECORDING_PHASE_TOKEN)
 
 const RECORDING_PHASE_CSTNODE: CstNode = {
-    // TODO: add link to future docs
-    name: "This CSTNode indicates the Parser is in Recording Phase",
+    name:
+        "This CSTNode indicates the Parser is in Recording Phase\n\t" +
+        "See: https://sap.github.io/chevrotain/docs/guide/internals.html#grammar-recording for details",
     children: {}
 }
 
@@ -142,6 +144,7 @@ export class GastRecorder {
 
     // TODO: is there any way to use this method to check no
     //   Parser methods are called inside an ACTION?
+    //   Maybe try/catch/finally on ACTIONS while disabling the recorders state changes?
     ACTION_RECORD<T>(this: MixedInParser, impl: () => T): T {
         // NO-OP during recording
         return
@@ -176,8 +179,7 @@ export class GastRecorder {
                 e.message =
                     e.message +
                     '\n\t This error was thrown during the "grammar recording phase" For more info see:\n\t' +
-                    // TODO: Docs links
-                    "TBD: Doc Links"
+                    "https://sap.github.io/chevrotain/docs/guide/internals.html#grammar-recording"
             }
             throw e
         }

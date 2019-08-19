@@ -32,7 +32,7 @@ declare abstract class BaseParser {
      * Can be used to implement methods similar to {@link BaseParser.ACTION}
      * Or any other logic to requires knowledge of the recording phase.
      * See:
-     *   - https://sap.github.io/chevrotain/docs/guide/internals.html#grammar_recording
+     *   - https://sap.github.io/chevrotain/docs/guide/internals.html#grammar-recording
      * to learn more on the recording phase and how Chevrotain works.
      */
     RECORDING_PHASE: boolean
@@ -82,7 +82,7 @@ declare abstract class BaseParser {
      * - Have global side effects that should be avoided during "recording phase".
      *
      * For more information see:
-     *   - https://sap.github.io/chevrotain/docs/guide/internals.html#grammar_recording
+     *   - https://sap.github.io/chevrotain/docs/guide/internals.html#grammar-recording
      */
     /* protected */ ACTION<T>(impl: () => T): T
 
