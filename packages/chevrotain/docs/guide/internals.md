@@ -296,4 +296,8 @@ console.log(parser.instanceCounter) // -> 0
 
 ### Debugging Implications
 
-TBD: link to FAQ (and create section there)
+Due to the execution of the Parser rules during the "recording phase".
+Some break points inside Chevrotain Parsers will be hit during the Parser's initialization.
+
+It is possible to workaround this issue by using **conditional breakpoints** that inspect that the
+[RECORDING_PHASE flag](https://sap.github.io/chevrotain/documentation/5_0_0/classes/baseparser.html#RECORDING_PHASE) is disabled.

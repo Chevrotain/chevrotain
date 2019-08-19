@@ -7,7 +7,7 @@ sidebar: auto
 -   [Why should I use a Parsing DSL instead of a Parser Generator?](#VS_GENERATORS)
 -   [What Differentiates Chevrotain from other Parsing Libraries?](#VS_OTHERS)
 -   [Why are Error Recovery / Fault Tolerant capabilities needed in a Parser?](#WHY_ERROR_RECOVERY)
--   [How do I debug my parser?](##DEBUGGING)
+-   [How do I debug my parser?](#DEBUGGING)
 -   [Why are the unique numerical suffixes (CONSUME1/CONSUME2/...) needed for the DSL Rules?](#NUMERICAL_SUFFIXES)
 -   [Why does Chevrotain not work correctly after I minified my Sources?](#MINIFIED)
 -   [Why does Chevrotain not work correctly after I webpacked my Sources?](#WEBPACK)
@@ -51,6 +51,9 @@ Some examples:
 
 Just add a breakpoint in your favorites IDE and debug, same as you would for any other JavaScript code.
 Chevrotain Grammars are **pure** javascript code. No special handling required.
+
+Note that the breakpoints may also trigger during the Parser's initialization.
+See: the [relevant section](./guide/internals.md#debugging-implications) in grammar recording phase docs.
 
 ## Why are the unique numerical suffixes (CONSUME1/CONSUME2/...) needed for the DSL Rules?
 
