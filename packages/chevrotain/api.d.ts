@@ -29,9 +29,11 @@ declare abstract class BaseParser {
 
     /**
      * Flag indicating the Parser is at the recording phase.
-     * This can be used to avoid executing certain semantic actions during
-     * Recording to avoid initialization errors.
-     * TODO: add reference to upcoming website docs.
+     * Can be used to implement methods similar to {@link BaseParser.ACTION}
+     * Or any other logic to requires knowledge of the recording phase.
+     * See:
+     *   - https://sap.github.io/chevrotain/docs/guide/internals.html#grammar_recording
+     * to learn more on the recording phase and how Chevrotain works.
      */
     RECORDING_PHASE: boolean
 
@@ -79,7 +81,8 @@ declare abstract class BaseParser {
      * - May fail when executing in "recording phase".
      * - Have global side effects that should be avoided during "recording phase".
      *
-     * For more information see: TODO: Create WebSite docs for this.
+     * For more information see:
+     *   - https://sap.github.io/chevrotain/docs/guide/internals.html#grammar_recording
      */
     /* protected */ ACTION<T>(impl: () => T): T
 
