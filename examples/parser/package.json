@@ -2,8 +2,6 @@
     "name": "chevrotain_examples_parser",
     "version": "5.0.0",
     "scripts": {
-        "build": "npm-run-all build:serialized-grammar",
-        "build:serialized-grammar": "node ./serialized_grammar/gen_serialized.js",
         "test": "mocha \"!(node_modules)/**/*spec.js\""
     },
     "dependencies": {
