@@ -2,9 +2,6 @@
     "name": "chevrotain_examples_parser",
     "version": "5.0.0",
     "scripts": {
-        "build": "npm-run-all build:minification build:serialized-grammar",
-        "build:minification": "grunt --gruntfile minification/gruntfile.js",
-        "build:serialized-grammar": "node ./serialized_grammar/gen_serialized.js",
         "test": "mocha \"!(node_modules)/**/*spec.js\""
     },
     "dependencies": {
@@ -13,12 +10,7 @@
     },
     "devDependencies": {
         "chai": "^4.1.2",
-        "grunt": "^1.0.1",
-        "grunt-cli": "~1.3.1",
-        "grunt-contrib-uglify": "^4.0.0",
-        "grunt-mocha-istanbul": "^5.0.1",
-        "mocha": "^6.1.2",
-        "shx": "^0.3.2"
+        "mocha": "^6.1.2"
     },
     "private": true
 }

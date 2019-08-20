@@ -59,6 +59,7 @@ function parser(options) {
     ChevrotainParser.call(this, jsonTokens, options)
 
     const $ = this
+    $.C1 = []
 
     $.RULE("json", function() {
         // prettier-ignore

@@ -1,5 +1,5 @@
 // Lookahead keys are 32Bit integers in the form
-// TTTTTTTTT-ZZZZZZZZZZZZZZZ-YYYY-XXXX
+// TTTTTTTT-ZZZZZZZZZZZZZZZZ-YYYY-XXXX
 // XXXX -> Occurrence Index bitmap.
 // YYYY -> DSL Method Name bitmap.
 // ZZZZZZZZZZZZZZZ -> Rule short Index bitmap.

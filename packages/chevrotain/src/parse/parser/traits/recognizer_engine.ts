@@ -7,7 +7,6 @@ import {
     IAnyOrAlt,
     IParserConfig,
     IRuleConfig,
-    ISerializedGast,
     IToken,
     ManySepMethodOpts,
     OrMethodOpts,
@@ -82,7 +81,6 @@ export class RecognizerEngine {
     tokensMap: { [fqn: string]: TokenType }
     allRuleNames: string[]
     gastProductionsCache: HashTable<Rule>
-    serializedGrammar: ISerializedGast[]
     shortRuleNameToFull: HashTable<string>
     fullRuleNameToShort: HashTable<number>
     // The shortName Index must be coded "after" the first 8bits to enable building unique lookahead keys
@@ -107,9 +105,14 @@ export class RecognizerEngine {
         this.RULE_STACK = []
         this.RULE_OCCURRENCE_STACK = []
         this.gastProductionsCache = new HashTable<Rule>()
-        this.serializedGrammar = has(config, "serializedGrammar")
-            ? config.serializedGrammar
-            : DEFAULT_PARSER_CONFIG.serializedGrammar
+
+        if (has(config, "serializedGrammar")) {
+            throw Error(
+                "The Parser's configuration can no longer contain a <serializedGrammar> property.\n" +
+                    "\tSee: https://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_6-0-0\n" +
+                    "\tFor Further details."
+            )
+        }
 
         if (isArray(tokenVocabulary)) {
             // This only checks for Token vocabularies provided as arrays.
@@ -218,7 +221,8 @@ export class RecognizerEngine {
 
         function invokeRuleWithTry(args: any[]) {
             try {
-                // TODO: dynamically get rid of this?
+                // TODO: dynamically get rid of this now that we have two parsing classes?
+                // TODO: evaluate performance impact first...
                 if (this.outputCst === true) {
                     impl.apply(this, args)
                     const cst = this.CST_STACK[this.CST_STACK.length - 1]
@@ -298,6 +302,7 @@ export class RecognizerEngine {
 
         let ruleNamePropName = "ruleName"
         wrappedGrammarRule[ruleNamePropName] = ruleName
+        wrappedGrammarRule["originalGrammarAction"] = impl
         return wrappedGrammarRule
     }
 

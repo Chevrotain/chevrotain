@@ -11,7 +11,6 @@ import {
 } from "../../utils/utils"
 import { computeAllProdsFollows } from "../grammar/follow"
 import { createTokenInstance, EOF } from "../../scan/tokens_public"
-import { deserializeGrammar } from "../gast_builder"
 import { analyzeCst } from "../cst/cst"
 import {
     defaultGrammarValidatorErrorProvider,
@@ -42,6 +41,7 @@ import { RecognizerEngine } from "./traits/recognizer_engine"
 import { ErrorHandler } from "./traits/error_handler"
 import { MixedInParser } from "./traits/parser_traits"
 import { ContentAssist } from "./traits/context_assist"
+import { GastRecorder } from "./traits/gast_recorder"
 
 export const END_OF_FILE = createTokenInstance(
     EOF,
@@ -66,7 +66,6 @@ export const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
     dynamicTokensEnabled: false,
     outputCst: true,
     errorMessageProvider: defaultParserErrorProvider,
-    serializedGrammar: null,
     nodeLocationTracking: "none"
 })
 
@@ -156,17 +155,30 @@ export class Parser {
         let className = classNameFromInstance(this)
 
         let productions = this.gastProductionsCache
-        if (this.serializedGrammar) {
-            const rules = deserializeGrammar(
-                this.serializedGrammar,
-                this.tokensMap
-            )
-            forEach(rules, rule => {
-                this.gastProductionsCache.put(rule.name, rule)
+
+        // Without this voodoo magic the parser would be x3-x4 slower
+        // It seems it is better ot invoke `toFastProperties` **before**
+        // Any manipulations of the `this` object done during the recording phase.
+        toFastProperties(this)
+
+        try {
+            this.enableRecording()
+            // Building the GAST
+            forEach(this.definedRulesNames, currRuleName => {
+                const wrappedRule = this[currRuleName]
+                const originalGrammarAction =
+                    wrappedRule["originalGrammarAction"]
+                const recordedRuleGast = this.topLevelRuleRecord(
+                    currRuleName,
+                    originalGrammarAction
+                )
+                this.gastProductionsCache.put(currRuleName, recordedRuleGast)
             })
+        } finally {
+            this.disableRecording()
         }
 
-        let resolverErrors = resolveGrammar({
+        const resolverErrors = resolveGrammar({
             rules: productions.values()
         })
         this.definitionErrors.push.apply(this.definitionErrors, resolverErrors) // mutability for the win?
@@ -233,13 +245,14 @@ export class Parser {
         that.initRecoverable(config)
         that.initTreeBuilder(config)
         that.initContentAssist()
+        that.initGastRecorder(config)
 
         this.ignoredIssues = has(config, "ignoredIssues")
             ? config.ignoredIssues
             : DEFAULT_PARSER_CONFIG.ignoredIssues
 
         // Avoid performance regressions in newer versions of V8
-        toFastProperties(this)
+        // toFastProperties(this)
     }
 }
 
@@ -251,7 +264,8 @@ applyMixins(Parser, [
     RecognizerEngine,
     RecognizerApi,
     ErrorHandler,
-    ContentAssist
+    ContentAssist,
+    GastRecorder
 ])
 
 export class CstParser extends Parser {

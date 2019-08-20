@@ -17,7 +17,6 @@ import { contains } from "../../../utils/utils"
 import { isRecognitionException } from "../../exceptions_public"
 import { DEFAULT_RULE_CONFIG, ParserDefinitionErrorType } from "../parser"
 import { defaultGrammarValidatorErrorProvider } from "../../errors_public"
-import { buildTopProduction } from "../../gast_builder"
 import { validateRuleIsOverridden } from "../../grammar/checks"
 import { MixedInParser } from "./parser_traits"
 import { Rule, serializeGrammar } from "../../grammar/gast/gast_public"
@@ -32,6 +31,10 @@ import { HashTable } from "../../../lang/lang_extensions"
  * - ...
  */
 export class RecognizerApi {
+    ACTION<T>(this: MixedInParser, impl: () => T): T {
+        return impl.call(this)
+    }
+
     CONSUME(
         this: MixedInParser,
         tokType: TokenType,
@@ -556,8 +559,6 @@ export class RecognizerApi {
         this: MixedInParser,
         name: string,
         implementation: (...implArgs: any[]) => T,
-        // TODO: how to describe the optional return type of CSTNode? T|CstNode is not good because it is not backward
-        // compatible, T|any is very general...
         config: IRuleConfig<T> = DEFAULT_RULE_CONFIG
     ): (idxInCallingRule?: number, ...args: any[]) => T | any {
         if (contains(this.definedRulesNames, name)) {
@@ -577,19 +578,6 @@ export class RecognizerApi {
         }
 
         this.definedRulesNames.push(name)
-
-        // only build the gast representation once.
-        if (
-            !this.gastProductionsCache.containsKey(name) &&
-            !this.serializedGrammar
-        ) {
-            let gastProduction = buildTopProduction(
-                implementation.toString(),
-                name,
-                this.tokensMap
-            )
-            this.gastProductionsCache.put(name, gastProduction)
-        }
 
         let ruleImplementation = this.defineRule(name, implementation, config)
         this[name] = ruleImplementation
@@ -611,16 +599,6 @@ export class RecognizerApi {
             )
         )
         this.definitionErrors.push.apply(this.definitionErrors, ruleErrors) // mutability for the win
-
-        // Avoid constructing the GAST if we have serialized it
-        if (!this.serializedGrammar) {
-            let gastProduction = buildTopProduction(
-                impl.toString(),
-                name,
-                this.tokensMap
-            )
-            this.gastProductionsCache.put(name, gastProduction)
-        }
 
         let ruleImplementation = this.defineRule(name, impl, config)
         this[name] = ruleImplementation

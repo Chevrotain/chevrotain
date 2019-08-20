@@ -28,6 +28,16 @@ declare abstract class BaseParser {
     errors: IRecognitionException[]
 
     /**
+     * Flag indicating the Parser is at the recording phase.
+     * Can be used to implement methods similar to {@link BaseParser.ACTION}
+     * Or any other logic to requires knowledge of the recording phase.
+     * See:
+     *   - https://sap.github.io/chevrotain/docs/guide/internals.html#grammar-recording
+     * to learn more on the recording phase and how Chevrotain works.
+     */
+    RECORDING_PHASE: boolean
+
+    /**
      * Resets the parser state, should be overridden for custom parsers which "carry" additional state.
      * When overriding, remember to also invoke the super implementation!
      */
@@ -64,6 +74,17 @@ declare abstract class BaseParser {
         grammarRule: (...args: any[]) => T,
         args?: any[]
     ): () => boolean
+
+    /**
+     * The Semantic Actions wrapper.
+     * Should be used to wrap semantic actions that either:
+     * - May fail when executing in "recording phase".
+     * - Have global side effects that should be avoided during "recording phase".
+     *
+     * For more information see:
+     *   - https://sap.github.io/chevrotain/docs/guide/internals.html#grammar-recording
+     */
+    /* protected */ ACTION<T>(impl: () => T): T
 
     /**
      *
@@ -540,8 +561,6 @@ declare abstract class BaseParser {
      *
      * As in CONSUME the index in the method name indicates the occurrence
      * of the repetition production in it's top rule.
-     *
-     * Note that due to current limitations in the implementation the "SEP" property must appear **before** the "DEF" property.
      *
      * @param options - An object defining the grammar of each iteration and the separator between iterations
      *
@@ -1982,7 +2001,6 @@ export interface IParserConfig {
      *   - Providing special error messages under certain conditions, e.g: missing semicolons.
      */
     errorMessageProvider?: IParserErrorMessageProvider
-    serializedGrammar?: ISerializedGast[]
 }
 
 /**

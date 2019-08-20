@@ -1,6 +1,7 @@
 import { Parser } from "../../../src/parse/parser/traits/parser_traits"
 import {
     EMPTY_ALT,
+    END_OF_FILE,
     ParserDefinitionErrorType
 } from "../../../src/parse/parser/parser"
 import { actionDec, DotTok, IdentTok, qualifiedName } from "./samples"
@@ -569,49 +570,161 @@ describe("The duplicate occurrence validations full flow", () => {
     })
 })
 
-class InvalidRefParser extends Parser {
-    constructor(input: IToken[] = []) {
-        super([myToken, myOtherToken])
-        this.performSelfAnalysis()
-        this.input = input
-    }
+describe("The Recorder runtime checks full flow", () => {
+    it("will return EOF for LA calls during recording phase", () => {
+        class LookAheadParser extends Parser {
+            constructor(input: IToken[] = []) {
+                super([myToken, myOtherToken])
+                this.performSelfAnalysis()
+                this.input = input
+            }
 
-    public one = this.RULE("one", () => {
-        this.SUBRULE2((<any>this).oopsTypo)
+            public one = this.RULE("one", () => {
+                expect(this.LA(0)).to.equal(END_OF_FILE)
+                this.CONSUME(myToken)
+            })
+        }
+
+        expect(() => new LookAheadParser()).to.not.throw()
     })
-}
 
-class InvalidRefParser2 extends Parser {
-    constructor(input: IToken[] = []) {
-        super([myToken, myOtherToken])
-        this.performSelfAnalysis()
-        this.input = input
-    }
+    it("won't invoke semantic actions during recording phase", () => {
+        class SemanticActionsParsers extends Parser {
+            counter: number
+            constructor(input: IToken[] = []) {
+                super([myToken, myOtherToken])
+                this.performSelfAnalysis()
+                this.input = input
+                this.counter = 0
+            }
 
-    public one = this.RULE("one", () => {
-        this.SUBRULE2((<any>this).oopsTypo)
+            public one = this.RULE("one", () => {
+                this.ACTION(() => {
+                    if (this.RECORDING_PHASE) {
+                        throw Error("Should not be executed during recording")
+                    }
+                })
+                this.CONSUME(myToken)
+            })
+        }
+
+        expect(() => new SemanticActionsParsers()).to.not.throw()
     })
-}
+
+    it("won't execute backtracking during recording phase", () => {
+        class BacktrackingRecordingParser extends Parser {
+            counter: number
+            constructor(input: IToken[] = []) {
+                super([myToken, myOtherToken])
+                this.counter = 0
+                this.performSelfAnalysis()
+                this.input = input
+            }
+
+            public one = this.RULE("one", () => {
+                const backtrackResult = this.BACKTRACK(this.two)()
+                if (this.RECORDING_PHASE) {
+                    // during recording backtracking always returns true backtracking
+                    expect(backtrackResult).to.be.true
+                }
+                this.CONSUME(myOtherToken)
+            })
+
+            public two = this.RULE("two", () => {
+                // if this is executed via backtracking the counter will increase
+                // once for recording and once for backtracking
+                this.counter++
+                this.CONSUME(myToken)
+            })
+        }
+
+        const parser = new BacktrackingRecordingParser()
+        expect(parser.counter).to.equal(1)
+    })
+
+    it("will throw an error when trying to init a parser with unresolved rule references", () => {
+        class InvalidRefParser extends Parser {
+            constructor(input: IToken[] = []) {
+                super([myToken, myOtherToken])
+                this.performSelfAnalysis()
+                this.input = input
+            }
+
+            public one = this.RULE("one", () => {
+                this.SUBRULE((<any>this).oopsTypo)
+            })
+        }
+
+        expect(() => new InvalidRefParser()).to.throw("<SUBRULE>")
+        expect(() => new InvalidRefParser()).to.throw("argument is invalid")
+        expect(() => new InvalidRefParser()).to.throw("but got: <undefined>")
+        expect(() => new InvalidRefParser()).to.throw(
+            "inside top level rule: <one>"
+        )
+    })
+
+    it("will throw an error when trying to init a parser with unresolved tokenType references", () => {
+        class InvalidTokTypeParser extends Parser {
+            constructor(input: IToken[] = []) {
+                super([myToken, myOtherToken])
+                this.performSelfAnalysis()
+                this.input = input
+            }
+
+            public one = this.RULE("two", () => {
+                this.CONSUME3(null)
+            })
+        }
+
+        expect(() => new InvalidTokTypeParser()).to.throw("<CONSUME3>")
+        expect(() => new InvalidTokTypeParser()).to.throw("argument is invalid")
+        expect(() => new InvalidTokTypeParser()).to.throw("but got: <null>")
+        expect(() => new InvalidTokTypeParser()).to.throw(
+            "inside top level rule: <two>"
+        )
+    })
+
+    it("will addd additional details to other runtime exceptions encountered during recording phase", () => {
+        class OtherRecordingErrorParser extends Parser {
+            constructor(input: IToken[] = []) {
+                super([myToken, myOtherToken])
+                this.performSelfAnalysis()
+                this.input = input
+            }
+
+            public one = this.RULE("two", () => {
+                throw new Error("OOPS")
+            })
+        }
+
+        expect(() => new OtherRecordingErrorParser()).to.throw(
+            'This error was thrown during the "grammar recording phase"'
+        )
+    })
+})
 
 describe("The reference resolver validation full flow", () => {
-    it("will throw an error when trying to init a parser with unresolved rule references", () => {
-        expect(() => new InvalidRefParser()).to.throw("oopsTypo")
-        expect(() => new InvalidRefParser()).to.throw(
-            "Parser Definition Errors detected"
-        )
-        expect(() => new InvalidRefParser()).to.throw(
-            "reference to a rule which is not defined"
-        )
-    })
-
     it(
         "won't throw an error when trying to init a parser with definition errors but with a flag active to defer handling" +
             "of definition errors",
         () => {
+            class DupConsumeParser extends Parser {
+                constructor(input: IToken[] = []) {
+                    super([myToken, myOtherToken])
+                    this.performSelfAnalysis()
+                    this.input = input
+                }
+
+                public one = this.RULE("one", () => {
+                    this.CONSUME(myToken)
+                    this.CONSUME(myToken) // duplicate consume with the same suffix.
+                })
+            }
+
             ;(Parser as any).DEFER_DEFINITION_ERRORS_HANDLING = true
-            expect(() => new InvalidRefParser2()).to.not.throw()
-            expect(() => new InvalidRefParser2()).to.not.throw()
-            expect(() => new InvalidRefParser2()).to.not.throw()
+            expect(() => new DupConsumeParser()).to.not.throw()
+            expect(() => new DupConsumeParser()).to.not.throw()
+            expect(() => new DupConsumeParser()).to.not.throw()
             ;(Parser as any).DEFER_DEFINITION_ERRORS_HANDLING = false
         }
     )
@@ -1247,23 +1360,16 @@ describe("The invalid token name validation", () => {
 })
 
 describe("The no non-empty lookahead validation", () => {
-    class EmptyLookaheadParser extends Parser {
-        constructor() {
-            super([PlusTok])
-        }
-
-        public block = this.RULE("block", () => this.CONSUME(PlusTok))
-    }
     it("will throw an error when there are no non-empty lookaheads for AT_LEAST_ONE", () => {
-        class EmptyLookaheadParserAtLeastOne extends EmptyLookaheadParser {
+        class EmptyLookaheadParserAtLeastOne extends Parser {
             constructor(input: IToken[] = []) {
-                super()
+                super([PlusTok])
                 this.performSelfAnalysis()
                 this.input = input
             }
 
             public someRule = this.RULE("someRule", () =>
-                this.AT_LEAST_ONE(this.block)
+                this.AT_LEAST_ONE(() => {})
             )
         }
         expect(() => new EmptyLookaheadParserAtLeastOne()).to.throw(
@@ -1275,9 +1381,9 @@ describe("The no non-empty lookahead validation", () => {
     })
 
     it("will throw an error when there are no non-empty lookaheads for AT_LEAST_ONE_SEP", () => {
-        class EmptyLookaheadParserAtLeastOneSep extends EmptyLookaheadParser {
+        class EmptyLookaheadParserAtLeastOneSep extends Parser {
             constructor(input: IToken[] = []) {
-                super()
+                super([PlusTok])
                 this.performSelfAnalysis()
                 this.input = input
             }
@@ -1285,7 +1391,7 @@ describe("The no non-empty lookahead validation", () => {
             public someRule = this.RULE("someRule", () =>
                 this.AT_LEAST_ONE_SEP5({
                     SEP: PlusTok,
-                    DEF: this.block
+                    DEF: () => {}
                 })
             )
         }
@@ -1298,16 +1404,14 @@ describe("The no non-empty lookahead validation", () => {
     })
 
     it("will throw an error when there are no non-empty lookaheads for MANY", () => {
-        class EmptyLookaheadParserMany extends EmptyLookaheadParser {
+        class EmptyLookaheadParserMany extends Parser {
             constructor(input: IToken[] = []) {
-                super()
+                super([PlusTok])
                 this.performSelfAnalysis()
                 this.input = input
             }
 
-            public someRule = this.RULE("someRule", () =>
-                this.MANY2(this.block)
-            )
+            public someRule = this.RULE("someRule", () => this.MANY2(() => {}))
         }
         expect(() => new EmptyLookaheadParserMany()).to.throw(
             "The repetition <MANY2>"
@@ -1318,9 +1422,9 @@ describe("The no non-empty lookahead validation", () => {
     })
 
     it("will throw an error when there are no non-empty lookaheads for MANY_SEP", () => {
-        class EmptyLookaheadParserManySep extends EmptyLookaheadParser {
+        class EmptyLookaheadParserManySep extends Parser {
             constructor(input: IToken[] = []) {
-                super()
+                super([PlusTok])
                 this.performSelfAnalysis()
                 this.input = input
             }
@@ -1328,7 +1432,7 @@ describe("The no non-empty lookahead validation", () => {
             public someRule = this.RULE("someRule", () =>
                 this.MANY_SEP3({
                     SEP: PlusTok,
-                    DEF: this.block
+                    DEF: () => {}
                 })
             )
         }

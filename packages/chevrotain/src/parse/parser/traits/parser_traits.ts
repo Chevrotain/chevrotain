@@ -12,6 +12,7 @@ import {
 } from "../parser"
 import * as defs from "../../../../api"
 import { ContentAssist } from "./context_assist"
+import { GastRecorder } from "./gast_recorder"
 
 /**
  * This Type combines all the Parser traits.
@@ -29,7 +30,8 @@ export type MixedInParser = ParserConstructorImpel &
     RecognizerEngine &
     Recoverable &
     TreeBuilder &
-    ContentAssist
+    ContentAssist &
+    GastRecorder
 
 interface MixedInParserConstructor {
     new (

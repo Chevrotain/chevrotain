@@ -479,3 +479,7 @@ export function toFastProperties(toBecomeFast) {
     // tslint:disable-next-line
     eval(toBecomeFast)
 }
+
+export function peek<T>(arr: T[]): T {
+    return arr[arr.length - 1]
+}

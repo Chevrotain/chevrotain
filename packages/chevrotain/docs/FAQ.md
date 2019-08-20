@@ -7,7 +7,7 @@ sidebar: auto
 -   [Why should I use a Parsing DSL instead of a Parser Generator?](#VS_GENERATORS)
 -   [What Differentiates Chevrotain from other Parsing Libraries?](#VS_OTHERS)
 -   [Why are Error Recovery / Fault Tolerant capabilities needed in a Parser?](#WHY_ERROR_RECOVERY)
--   [How do I debug my parser?](##DEBUGGING)
+-   [How do I debug my parser?](#DEBUGGING)
 -   [Why are the unique numerical suffixes (CONSUME1/CONSUME2/...) needed for the DSL Rules?](#NUMERICAL_SUFFIXES)
 -   [Why does Chevrotain not work correctly after I minified my Sources?](#MINIFIED)
 -   [Why does Chevrotain not work correctly after I webpacked my Sources?](#WEBPACK)
@@ -52,6 +52,9 @@ Some examples:
 Just add a breakpoint in your favorites IDE and debug, same as you would for any other JavaScript code.
 Chevrotain Grammars are **pure** javascript code. No special handling required.
 
+Note that the breakpoints may also trigger during the Parser's initialization.
+See: the [relevant section](./guide/internals.md#debugging-implications) in grammar recording phase docs.
+
 ## Why are the unique numerical suffixes (CONSUME1/CONSUME2/...) needed for the DSL Rules?
 
 Lets look at an example first:
@@ -85,18 +88,21 @@ used for many things such as:
 
 ## Why does Chevrotain not work correctly after I minified my Grammar?
 
-Chevrotain relies on **Function.name** property and **Function.toString()**.
-This means that certain aggressive minification options can break Chevrotain grammars.
+~~Chevrotain relies on **Function.prototype.toString()**.
+This means that certain aggressive minification options can break Chevrotain grammars.~~
 
-See [related documentation](https://github.com/SAP/chevrotain/blob/master/examples/parser/minification/README.md) for details & workarounds.
+The dependence on `Function.prototype.toString` was removed in
+[version 6.0.0](http://sap.github.io/chevrotain/docs/changes/CHANGELOG.html#_6-0-0-8-20-2019) of Chevrotain.
+Special handling is no longer needed during minification scenarios.
 
 ## Why does Chevrotain not work correctly after I webpacked my Grammar?
 
-Chevrotain relies on **Function.name** property and **Function.toString()**.
-This means that certain webpack optimizations (minification) can break Chevrotain grammars under
-certain conditions.
+~~Chevrotain relies on **Function.prototype.toString()**.
+This means that certain webpack optimizations can break Chevrotain grammars.~~
 
-See [related documentation](https://github.com/SAP/chevrotain/blob/master/examples/webpack/README.md) for details & workarounds.
+The dependence on `Function.prototype.toString` was removed in
+[version 6.0.0](http://sap.github.io/chevrotain/docs/changes/CHANGELOG.html#_6-0-0-8-20-2019) of Chevrotain.
+Special handling is no longer needed during WebPacking scenarios.
 
 ## Why does my parser appear to be stuck during its initialization?
 

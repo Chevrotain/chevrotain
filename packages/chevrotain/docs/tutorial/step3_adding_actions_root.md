@@ -43,6 +43,9 @@ but that is not the case:
 -   The Parsing step is normally just one step of a larger flow, a large performance penalty in one step
     does not equate to a large performance penalty in the whole flow...
 
+Using Embedded actions may also require a better understanding of the Chevrotain Internals.
+See: [Grammar Recording](../guide/internals.md#grammar-recording) guide.
+
 ## Summary
 
 -   It is recommended to use a CST Visitor to separate the semantics(actions) from the syntax(grammar).

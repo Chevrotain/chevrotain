@@ -793,7 +793,7 @@ class ECMAScript5Parser extends Parser {
         $.RULE("SourceElements", () => {
             $.MANY(() => {
                 // FunctionDeclaration appearing before statement implements [lookahead != {{, function}] in ExpressionStatement
-                // See Functionhttps://www.ecma-international.org/ecma-262/5.1/index.html#sec-12.4Declaration
+                // See Function  https://www.ecma-international.org/ecma-262/5.1/index.html#sec-12.4Declaration
                 $.OR([
                     { ALT: () => $.SUBRULE($.FunctionDeclaration) },
                     { ALT: () => $.SUBRULE($.Statement) }
