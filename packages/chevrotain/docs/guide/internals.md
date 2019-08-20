@@ -302,4 +302,4 @@ Due to the execution of the Parser rules during the "recording phase".
 Some break points inside Chevrotain Parsers will be hit during the Parser's initialization.
 
 It is possible to workaround this issue by using **conditional breakpoints** that inspect that the
-[RECORDING_PHASE flag](https://sap.github.io/chevrotain/documentation/6_0_0/classes/baseparser.html#RECORDING_PHASE) is disabled.
+[RECORDING_PHASE flag](https://sap.github.io/chevrotain/documentation/6_0_0/classes/baseparser.html#recording_phase) is disabled.
