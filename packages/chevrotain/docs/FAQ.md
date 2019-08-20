@@ -92,7 +92,7 @@ used for many things such as:
 This means that certain aggressive minification options can break Chevrotain grammars.~~
 
 The dependence on `Function.prototype.toString` was removed in
-[version 6.0.0](http://sap.github.io/chevrotain/docs/changes/CHANGELOG.html#TODO-ADD-LINK) of Chevrotain.
+[version 6.0.0](http://sap.github.io/chevrotain/docs/changes/CHANGELOG.html#_6-0-0-8-20-2019) of Chevrotain.
 Special handling is no longer needed during minification scenarios.
 
 ## Why does Chevrotain not work correctly after I webpacked my Grammar?
@@ -101,7 +101,7 @@ Special handling is no longer needed during minification scenarios.
 This means that certain webpack optimizations can break Chevrotain grammars.~~
 
 The dependence on `Function.prototype.toString` was removed in
-[version 6.0.0](http://sap.github.io/chevrotain/docs/changes/CHANGELOG.html#TODO-ADD-LINK) of Chevrotain.
+[version 6.0.0](http://sap.github.io/chevrotain/docs/changes/CHANGELOG.html#_6-0-0-8-20-2019) of Chevrotain.
 Special handling is no longer needed during WebPacking scenarios.
 
 ## Why does my parser appear to be stuck during its initialization?
