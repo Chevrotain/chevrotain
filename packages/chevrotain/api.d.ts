@@ -51,7 +51,7 @@ declare abstract class BaseParser {
         new (...args: any[]): ICstVisitor<any, any>
     }
 
-    getGAstProductions(): HashTable<Rule>
+    getGAstProductions(): Record<string, Rule>
 
     getSerializedGastProductions(): ISerializedGast[]
 
@@ -1852,8 +1852,6 @@ export interface SubruleMethodOpts {
 }
 
 export declare type GrammarAction<OUT> = () => OUT
-
-declare interface HashTable<V> {}
 
 export declare type IAnyOrAlt = IOrAlt | IOrAltWithGate
 

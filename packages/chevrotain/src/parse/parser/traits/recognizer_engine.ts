@@ -80,6 +80,8 @@ export class RecognizerEngine {
     definedRulesNames: string[]
     tokensMap: { [fqn: string]: TokenType }
     allRuleNames: string[]
+    // TODO: what are perf implications of using our custom HashTable?
+    //       It does not have much (if any) functional benefit
     gastProductionsCache: HashTable<Rule>
     shortRuleNameToFull: HashTable<string>
     fullRuleNameToShort: HashTable<number>

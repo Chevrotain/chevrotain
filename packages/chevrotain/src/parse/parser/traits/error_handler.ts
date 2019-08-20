@@ -67,7 +67,7 @@ export class ErrorHandler {
         userDefinedErrMsg: string
     ): void {
         let ruleName = this.getCurrRuleFullName()
-        let ruleGrammar = this.getGAstProductions().get(ruleName)
+        let ruleGrammar = this.getGAstProductions()[ruleName]
         let lookAheadPathsPerAlternative = getLookaheadPathsForOptionalProd(
             occurrence,
             ruleGrammar,
@@ -99,7 +99,7 @@ export class ErrorHandler {
         errMsgTypes: string
     ): void {
         let ruleName = this.getCurrRuleFullName()
-        let ruleGrammar = this.getGAstProductions().get(ruleName)
+        let ruleGrammar = this.getGAstProductions()[ruleName]
         // TODO: getLookaheadPathsForOr can be slow for large enough maxLookahead and certain grammars, consider caching ?
         let lookAheadPathsPerAlternative = getLookaheadPathsForOr(
             occurrence,

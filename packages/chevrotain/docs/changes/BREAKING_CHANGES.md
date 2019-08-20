@@ -10,6 +10,9 @@
     This means the [serializedGrammar property](https://sap.github.io/chevrotain/documentation/5_0_0/interfaces/iparserconfig.html#serializedgrammar)
     of the Parser's configuration was removed, and using it will cause an error to be thrown during initialization.
 
+-   The Parser's [getGAstProductions method](https://sap.github.io/chevrotain/documentation/6_0_0/classes/baseparser.html#getgastproductions)
+    now returns a plain JavaScript object representing a Map/Dictionary rather than the Chevrotain's internal HashTable implementation.
+
 ## 5.0.0
 
 -   Setting the Parser's input **before** `this.performSelfAnalysis` is called will now throw an error.

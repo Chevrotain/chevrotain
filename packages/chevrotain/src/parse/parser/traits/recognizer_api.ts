@@ -632,8 +632,9 @@ export class RecognizerApi {
     }
 
     // GAST export APIs
-    public getGAstProductions(this: MixedInParser): HashTable<Rule> {
-        return this.gastProductionsCache
+    public getGAstProductions(this: MixedInParser): Record<string, Rule> {
+        // Hack to fix external API, we should probably remove all uses of HashTable internally...
+        return (<any>this.gastProductionsCache)._state
     }
 
     public getSerializedGastProductions(

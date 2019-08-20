@@ -43,7 +43,7 @@ export class ContentAssist {
     ): TokenType[] {
         let topRuleName = first(grammarPath.ruleStack)
         let gastProductions = this.getGAstProductions()
-        let topProduction = gastProductions.get(topRuleName)
+        let topProduction = gastProductions[topRuleName]
         let nextPossibleTokenTypes = new NextAfterTokenWalker(
             topProduction,
             grammarPath

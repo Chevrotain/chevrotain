@@ -440,7 +440,7 @@ export function attemptInRepetitionRecovery(
     let firstAfterRepInfo = this.firstAfterRepMap.get(<any>key)
     if (firstAfterRepInfo === undefined) {
         let currRuleName = this.getCurrRuleFullName()
-        let ruleGrammar = this.getGAstProductions().get(currRuleName)
+        let ruleGrammar = this.getGAstProductions()[currRuleName]
         let walker: AbstractNextTerminalAfterProductionWalker = new nextToksWalker(
             ruleGrammar,
             prodOccurrence

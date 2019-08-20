@@ -103,7 +103,7 @@ export class LooksAhead {
         let laFunc: any = this.getLaFuncFromCache(key)
         if (laFunc === undefined) {
             let ruleName = this.getCurrRuleFullName()
-            let ruleGrammar = this.getGAstProductions().get(ruleName)
+            let ruleGrammar = this.getGAstProductions()[ruleName]
             // note that hasPredicates is only computed once.
             let hasPredicates = some(alts, currAlt =>
                 isFunction((<IOrAltWithGate>currAlt).GATE)
@@ -199,7 +199,7 @@ export class LooksAhead {
         let laFunc = <any>this.getLaFuncFromCache(key)
         if (laFunc === undefined) {
             let ruleName = this.getCurrRuleFullName()
-            let ruleGrammar = this.getGAstProductions().get(ruleName)
+            let ruleGrammar = this.getGAstProductions()[ruleName]
             laFunc = buildLookaheadFuncForOptionalProd(
                 occurrence,
                 ruleGrammar,
