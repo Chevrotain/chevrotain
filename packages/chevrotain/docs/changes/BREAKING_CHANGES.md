@@ -1,6 +1,6 @@
 ## 6.0.0
 
--   Due to the introduction of a new ["grammar recording"](../guide/internals.md#grammar-recording), certain semantics action
+-   Due to re-implementation of the grammar analysis via ["grammar recording"](../guide/internals.md#grammar-recording), certain semantics action
     will now need to be wrapped in the new [ACTION](https://sap.github.io/chevrotain/documentation/6_0_0/classes/baseparser.html#action) Parsing
     DSL method. This will not affect Parsers that output a CST and only affect some of the Parsers which employ embedded semantic actions.
     The Missing `ACTION` wrappers will be automatically detected and throw a descriptive error message to ease migration.
