@@ -14,7 +14,7 @@ SELECT name, age FROM persons WHERE age > 100
 ...
 ```
 
-A Lexer transforms a string input into a [Token](https://sap.github.io/chevrotain/documentation/5_0_0/interfaces/itoken.html) vector.
+A Lexer transforms a string input into a [Token](https://sap.github.io/chevrotain/documentation/6_0_0/interfaces/itoken.html) vector.
 Chevrotain has a built in Lexer engine based on Javascript Regular Expressions.
 
 ## Our First Token
@@ -28,7 +28,7 @@ const createToken = chevrotain.createToken
 const From = createToken({ name: "From", pattern: /FROM/ })
 ```
 
-There is nothing much to it. We simply use the [**createToken** API](https://sap.github.io/chevrotain/documentation/5_0_0/globals.html#createtoken)
+There is nothing much to it. We simply use the [**createToken** API](https://sap.github.io/chevrotain/documentation/6_0_0/globals.html#createtoken)
 to define the tokens, and provide it with a `name` property and a `pattern` property which is a RegExp which will be used when splitting up the input string
 into separate Tokens.
 
