@@ -571,7 +571,7 @@ describe("The duplicate occurrence validations full flow", () => {
 })
 
 describe("The Recorder runtime checks full flow", () => {
-    it("won't invoke semantic actions during recording phase", () => {
+    it("will return EOF for LA calls during recording phase", () => {
         class LookAheadParser extends Parser {
             constructor(input: IToken[] = []) {
                 super([myToken, myOtherToken])
@@ -684,7 +684,7 @@ describe("The Recorder runtime checks full flow", () => {
         )
     })
 
-    it("Add additional details to other runtime exceptions encountered during recording phase", () => {
+    it("will addd additional details to other runtime exceptions encountered during recording phase", () => {
         class OtherRecordingErrorParser extends Parser {
             constructor(input: IToken[] = []) {
                 super([myToken, myOtherToken])
