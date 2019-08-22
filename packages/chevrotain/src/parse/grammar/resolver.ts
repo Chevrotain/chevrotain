@@ -1,9 +1,8 @@
-import { HashTable } from "../../lang/lang_extensions"
 import {
     IParserUnresolvedRefDefinitionError,
     ParserDefinitionErrorType
 } from "../parser/parser"
-import { forEach } from "../../utils/utils"
+import { forEach, values } from "../../utils/utils"
 import { NonTerminal, Rule } from "./gast/gast_public"
 import { GAstVisitor } from "./gast/gast_visitor_public"
 import {
@@ -12,7 +11,7 @@ import {
 } from "../../../api"
 
 export function resolveGrammar(
-    topLevels: HashTable<Rule>,
+    topLevels: Record<string, Rule>,
     errMsgProvider: IGrammarResolverErrorMessageProvider
 ): IParserDefinitionError[] {
     let refResolver = new GastRefResolverVisitor(topLevels, errMsgProvider)
@@ -25,21 +24,21 @@ export class GastRefResolverVisitor extends GAstVisitor {
     private currTopLevel: Rule
 
     constructor(
-        private nameToTopRule: HashTable<Rule>,
+        private nameToTopRule: Record<string, Rule>,
         private errMsgProvider: IGrammarResolverErrorMessageProvider
     ) {
         super()
     }
 
     public resolveRefs(): void {
-        forEach(this.nameToTopRule.values(), prod => {
+        forEach(values(this.nameToTopRule), prod => {
             this.currTopLevel = prod
             prod.accept(this)
         })
     }
 
     public visitNonTerminal(node: NonTerminal): void {
-        let ref = this.nameToTopRule.get(node.nonTerminalName)
+        let ref = this.nameToTopRule[node.nonTerminalName]
 
         if (!ref) {
             let msg = this.errMsgProvider.buildRuleNotFoundError(

@@ -19,7 +19,7 @@ export class ContentAssist {
         startRuleName: string,
         precedingInput: IToken[]
     ): ISyntacticContentAssistPath[] {
-        let startRuleGast = this.gastProductionsCache.get(startRuleName)
+        let startRuleGast = this.gastProductionsCache[startRuleName]
 
         if (isUndefined(startRuleGast)) {
             throw Error(

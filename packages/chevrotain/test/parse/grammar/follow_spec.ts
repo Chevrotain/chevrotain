@@ -14,6 +14,7 @@ import {
 } from "../../../src/parse/grammar/follow"
 import { setEquality } from "../../utils/matchers"
 import { Rule, Terminal } from "../../../src/parse/grammar/gast/gast_public"
+import { keys } from "../../../src/utils/utils"
 
 describe("The Grammar Ast Follows model", () => {
     it("can build a followNamePrefix from a Terminal", () => {
@@ -36,25 +37,19 @@ describe("The Grammar Ast Follows model", () => {
     })
 
     it("can compute the follows for Top level production ref in ActionDec", () => {
-        let actual: any = new ResyncFollowsWalker(actionDec).startWalking()
-        let actualFollowNames = actual.keys()
+        let actual = new ResyncFollowsWalker(actionDec).startWalking()
+        let actualFollowNames = keys(actual)
         expect(actualFollowNames.length).to.equal(3)
-        expect(actual.get("paramSpec1_~IN~_actionDec").length).to.equal(2)
-        setEquality(actual.get("paramSpec1_~IN~_actionDec"), [
-            CommaTok,
-            RParenTok
-        ])
-        expect(actual.get("paramSpec2_~IN~_actionDec").length).to.equal(2)
-        setEquality(actual.get("paramSpec1_~IN~_actionDec"), [
-            CommaTok,
-            RParenTok
-        ])
-        expect(actual.get("qualifiedName1_~IN~_actionDec").length).to.equal(1)
-        setEquality(actual.get("qualifiedName1_~IN~_actionDec"), [SemicolonTok])
+        expect(actual["paramSpec1_~IN~_actionDec"].length).to.equal(2)
+        setEquality(actual["paramSpec1_~IN~_actionDec"], [CommaTok, RParenTok])
+        expect(actual["paramSpec2_~IN~_actionDec"].length).to.equal(2)
+        setEquality(actual["paramSpec1_~IN~_actionDec"], [CommaTok, RParenTok])
+        expect(actual["qualifiedName1_~IN~_actionDec"].length).to.equal(1)
+        setEquality(actual["qualifiedName1_~IN~_actionDec"], [SemicolonTok])
     })
 
     it("can compute all follows for a set of top level productions", () => {
         let actual = computeAllProdsFollows([actionDec])
-        expect(actual.keys().length).to.equal(3)
+        expect(keys(actual).length).to.equal(3)
     })
 })

@@ -50,12 +50,7 @@ import {
     NextTerminalAfterManySepWalker,
     NextTerminalAfterManyWalker
 } from "../../grammar/interpreter"
-import {
-    DEFAULT_PARSER_CONFIG,
-    DEFAULT_RULE_CONFIG,
-    IParserState,
-    TokenMatcher
-} from "../parser"
+import { DEFAULT_RULE_CONFIG, IParserState, TokenMatcher } from "../parser"
 import { IN_RULE_RECOVERY_EXCEPTION } from "./recoverable"
 import { EOF, tokenName } from "../../../scan/tokens_public"
 import { MixedInParser } from "./parser_traits"
@@ -65,7 +60,7 @@ import {
     tokenStructuredMatcher,
     tokenStructuredMatcherNoCategories
 } from "../../../scan/tokens"
-import { classNameFromInstance, HashTable } from "../../../lang/lang_extensions"
+import { classNameFromInstance } from "../../../lang/lang_extensions"
 import { Rule } from "../../grammar/gast/gast_public"
 
 /**
@@ -80,11 +75,9 @@ export class RecognizerEngine {
     definedRulesNames: string[]
     tokensMap: { [fqn: string]: TokenType }
     allRuleNames: string[]
-    // TODO: what are perf implications of using our custom HashTable?
-    //       It does not have much (if any) functional benefit
-    gastProductionsCache: HashTable<Rule>
-    shortRuleNameToFull: HashTable<string>
-    fullRuleNameToShort: HashTable<number>
+    gastProductionsCache: Record<string, Rule>
+    shortRuleNameToFull: Record<string, string>
+    fullRuleNameToShort: Record<string, number>
     // The shortName Index must be coded "after" the first 8bits to enable building unique lookahead keys
     ruleShortNameIdx: number
     tokenMatcher: TokenMatcher
@@ -95,8 +88,8 @@ export class RecognizerEngine {
     ) {
         this.className = classNameFromInstance(this)
         // TODO: would using an ES6 Map or plain object be faster (CST building scenario)
-        this.shortRuleNameToFull = new HashTable<string>()
-        this.fullRuleNameToShort = new HashTable<number>()
+        this.shortRuleNameToFull = {}
+        this.fullRuleNameToShort = {}
         this.ruleShortNameIdx = 256
         this.tokenMatcher = tokenStructuredMatcherNoCategories
 
@@ -106,7 +99,7 @@ export class RecognizerEngine {
         this.isBackTrackingStack = []
         this.RULE_STACK = []
         this.RULE_OCCURRENCE_STACK = []
-        this.gastProductionsCache = new HashTable<Rule>()
+        this.gastProductionsCache = {}
 
         if (has(config, "serializedGrammar")) {
             throw Error(
@@ -218,13 +211,11 @@ export class RecognizerEngine {
         /* tslint:enable */
 
         this.ruleShortNameIdx++
-        this.shortRuleNameToFull.put(shortName, ruleName)
-        this.fullRuleNameToShort.put(ruleName, shortName)
+        this.shortRuleNameToFull[shortName] = ruleName
+        this.fullRuleNameToShort[ruleName] = shortName
 
         function invokeRuleWithTry(args: any[]) {
             try {
-                // TODO: dynamically get rid of this now that we have two parsing classes?
-                // TODO: evaluate performance impact first...
                 if (this.outputCst === true) {
                     impl.apply(this, args)
                     const cst = this.CST_STACK[this.CST_STACK.length - 1]
@@ -234,55 +225,7 @@ export class RecognizerEngine {
                     return impl.apply(this, args)
                 }
             } catch (e) {
-                let isFirstInvokedRule = this.RULE_STACK.length === 1
-                // note the reSync is always enabled for the first rule invocation, because we must always be able to
-                // reSync with EOF and just output some INVALID ParseTree
-                // during backtracking reSync recovery is disabled, otherwise we can't be certain the backtracking
-                // path is really the most valid one
-                let reSyncEnabled =
-                    resyncEnabled &&
-                    !this.isBackTracking() &&
-                    this.recoveryEnabled
-
-                if (isRecognitionException(e)) {
-                    if (reSyncEnabled) {
-                        let reSyncTokType = this.findReSyncTokenType()
-                        if (this.isInCurrentRuleReSyncSet(reSyncTokType)) {
-                            e.resyncedTokens = this.reSyncTo(reSyncTokType)
-                            if (this.outputCst) {
-                                let partialCstResult = this.CST_STACK[
-                                    this.CST_STACK.length - 1
-                                ]
-                                partialCstResult.recoveredNode = true
-                                return partialCstResult
-                            } else {
-                                return recoveryValueFunc()
-                            }
-                        } else {
-                            if (this.outputCst) {
-                                const partialCstResult = this.CST_STACK[
-                                    this.CST_STACK.length - 1
-                                ]
-                                partialCstResult.recoveredNode = true
-                                e.partialCstResult = partialCstResult
-                            }
-                            // to be handled Further up the call stack
-                            throw e
-                        }
-                    } else if (isFirstInvokedRule) {
-                        // otherwise a Redundant input error will be created as well and we cannot guarantee that this is indeed the case
-                        this.moveToTerminatedState()
-                        // the parser should never throw one of its own errors outside its flow.
-                        // even if error recovery is disabled
-                        return recoveryValueFunc()
-                    } else {
-                        // to be handled Further up the call stack
-                        throw e
-                    }
-                } else {
-                    // some other Error type which we don't know how to handle (for example a built in JavaScript Error)
-                    throw e
-                }
+                return this.invokeRuleCatch(e, resyncEnabled, recoveryValueFunc)
             } finally {
                 this.ruleFinallyStateUpdate()
             }
@@ -306,6 +249,64 @@ export class RecognizerEngine {
         wrappedGrammarRule[ruleNamePropName] = ruleName
         wrappedGrammarRule["originalGrammarAction"] = impl
         return wrappedGrammarRule
+    }
+
+    invokeRuleCatch(
+        this: MixedInParser,
+        e: Error,
+        resyncEnabledConfig: boolean,
+        recoveryValueFunc: Function
+    ): void {
+        let isFirstInvokedRule = this.RULE_STACK.length === 1
+        // note the reSync is always enabled for the first rule invocation, because we must always be able to
+        // reSync with EOF and just output some INVALID ParseTree
+        // during backtracking reSync recovery is disabled, otherwise we can't be certain the backtracking
+        // path is really the most valid one
+        let reSyncEnabled =
+            resyncEnabledConfig &&
+            !this.isBackTracking() &&
+            this.recoveryEnabled
+
+        if (isRecognitionException(e)) {
+            const recogError: any = e
+            if (reSyncEnabled) {
+                let reSyncTokType = this.findReSyncTokenType()
+                if (this.isInCurrentRuleReSyncSet(reSyncTokType)) {
+                    recogError.resyncedTokens = this.reSyncTo(reSyncTokType)
+                    if (this.outputCst) {
+                        let partialCstResult: any = this.CST_STACK[
+                            this.CST_STACK.length - 1
+                        ]
+                        partialCstResult.recoveredNode = true
+                        return partialCstResult
+                    } else {
+                        return recoveryValueFunc()
+                    }
+                } else {
+                    if (this.outputCst) {
+                        const partialCstResult: any = this.CST_STACK[
+                            this.CST_STACK.length - 1
+                        ]
+                        partialCstResult.recoveredNode = true
+                        recogError.partialCstResult = partialCstResult
+                    }
+                    // to be handled Further up the call stack
+                    throw recogError
+                }
+            } else if (isFirstInvokedRule) {
+                // otherwise a Redundant input error will be created as well and we cannot guarantee that this is indeed the case
+                this.moveToTerminatedState()
+                // the parser should never throw one of its own errors outside its flow.
+                // even if error recovery is disabled
+                return recoveryValueFunc()
+            } else {
+                // to be recovered Further up the call stack
+                throw recogError
+            }
+        } else {
+            // some other Error type which we don't know how to handle (for example a built in JavaScript Error)
+            throw e
+        }
     }
 
     // Implementation of parsing DSL
@@ -992,11 +993,11 @@ export class RecognizerEngine {
 
     getCurrRuleFullName(this: MixedInParser): string {
         let shortName = this.getLastExplicitRuleShortName()
-        return this.shortRuleNameToFull.get(shortName)
+        return this.shortRuleNameToFull[shortName]
     }
 
     shortRuleNameToFullName(this: MixedInParser, shortName: string) {
-        return this.shortRuleNameToFull.get(shortName)
+        return this.shortRuleNameToFull[shortName]
     }
 
     public isAtEndOfInput(this: MixedInParser): boolean {

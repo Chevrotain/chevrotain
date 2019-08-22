@@ -1,5 +1,4 @@
 import { forEach, isUndefined } from "../../utils/utils"
-import { HashTable } from "../../lang/lang_extensions"
 import {
     AT_LEAST_ONE_IDX,
     AT_LEAST_ONE_SEP_IDX,
@@ -233,17 +232,16 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
 
 export function analyzeCst(
     topRules: Rule[],
-    fullToShortName: HashTable<number>
+    fullToShortName: Record<string, number>
 ): {
     allRuleNames: string[]
 } {
     let result = {
-        dictDef: new HashTable<CstChildrenDictionary>(),
         allRuleNames: []
     }
 
     forEach(topRules, currTopRule => {
-        let currTopRuleShortName = fullToShortName.get(currTopRule.name)
+        let currTopRuleShortName = fullToShortName[currTopRule.name]
         result.allRuleNames.push(currTopRule.name)
 
         let namedCollectorVisitor = new NamedDSLMethodsCollectorVisitor(

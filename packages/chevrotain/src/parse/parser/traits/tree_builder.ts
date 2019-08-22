@@ -107,9 +107,7 @@ export class TreeBuilder {
                 this.setInitialNodeLocation = NOOP
             } else {
                 throw Error(
-                    `Invalid <nodeLocationTracking> config option: "${
-                        config.nodeLocationTracking
-                    }"`
+                    `Invalid <nodeLocationTracking> config option: "${config.nodeLocationTracking}"`
                 )
             }
         }
@@ -179,9 +177,8 @@ export class TreeBuilder {
         const cstNode: CstNode = {
             name: nestedName,
             fullName:
-                this.shortRuleNameToFull.get(
-                    this.getLastExplicitRuleShortName()
-                ) + nestedName,
+                this.shortRuleNameToFull[this.getLastExplicitRuleShortName()] +
+                nestedName,
             children: {}
         }
 

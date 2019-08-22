@@ -1,7 +1,6 @@
 import { Rule } from "./gast_public"
 
 import { defaults, forEach } from "../../../utils/utils"
-import { HashTable } from "../../../lang/lang_extensions"
 import { resolveGrammar as orgResolveGrammar } from "../resolver"
 import { validateGrammar as orgValidateGrammar } from "../checks"
 import {
@@ -26,9 +25,9 @@ export function resolveGrammar(options: {
         errMsgProvider: defaultGrammarResolverErrorProvider
     })
 
-    const topRulesTable = new HashTable<Rule>()
+    const topRulesTable = {}
     forEach(options.rules, rule => {
-        topRulesTable.put(rule.name, rule)
+        topRulesTable[rule.name] = rule
     })
     return orgResolveGrammar(topRulesTable, options.errMsgProvider)
 }

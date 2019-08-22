@@ -1,7 +1,6 @@
 import { RestWalker } from "./rest"
-import { HashTable } from "../../lang/lang_extensions"
 import { first } from "./first"
-import { forEach } from "../../utils/utils"
+import { assign, forEach } from "../../utils/utils"
 import { IN } from "../constants"
 import { tokenName } from "../../scan/tokens_public"
 import { Flat, NonTerminal, Rule, Terminal } from "./gast/gast_public"
@@ -10,13 +9,13 @@ import { IProduction, TokenType } from "../../../api"
 // This ResyncFollowsWalker computes all of the follows required for RESYNC
 // (skipping reference production).
 export class ResyncFollowsWalker extends RestWalker {
-    public follows = new HashTable<TokenType[]>()
+    public follows = {}
 
     constructor(private topProd: Rule) {
         super()
     }
 
-    startWalking(): HashTable<TokenType[]> {
+    startWalking(): Record<string, TokenType[]> {
         this.walk(this.topProd)
         return this.follows
     }
@@ -40,18 +39,18 @@ export class ResyncFollowsWalker extends RestWalker {
         let fullRest: IProduction[] = currRest.concat(prevRest)
         let restProd = new Flat({ definition: fullRest })
         let t_in_topProd_follows = first(restProd)
-        this.follows.put(followName, t_in_topProd_follows)
+        this.follows[followName] = t_in_topProd_follows
     }
 }
 
 export function computeAllProdsFollows(
     topProductions: Rule[]
-): HashTable<TokenType[]> {
-    let reSyncFollows = new HashTable<TokenType[]>()
+): Record<string, TokenType[]> {
+    let reSyncFollows = {}
 
     forEach(topProductions, topProd => {
         let currRefsFollow = new ResyncFollowsWalker(topProd).startWalking()
-        reSyncFollows.putAll(currRefsFollow)
+        assign(reSyncFollows, currRefsFollow)
     })
     return reSyncFollows
 }

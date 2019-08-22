@@ -22,7 +22,6 @@ import {
 import { MismatchedTokenException } from "../../exceptions_public"
 import { IN } from "../../constants"
 import { MixedInParser } from "./parser_traits"
-import { HashTable } from "../../../lang/lang_extensions"
 import { DEFAULT_PARSER_CONFIG } from "../parser"
 
 export const EOF_FOLLOW_KEY: any = {}
@@ -47,12 +46,12 @@ InRuleRecoveryException.prototype = Error.prototype
  */
 export class Recoverable {
     recoveryEnabled: boolean
-    firstAfterRepMap: HashTable<IFirstAfterRepetition>
-    resyncFollows: HashTable<TokenType[]>
+    firstAfterRepMap: Record<string, IFirstAfterRepetition>
+    resyncFollows: Record<string, TokenType[]>
 
     initRecoverable(config: IParserConfig) {
-        this.firstAfterRepMap = new HashTable<IFirstAfterRepetition>()
-        this.resyncFollows = new HashTable<TokenType[]>()
+        this.firstAfterRepMap = {}
+        this.resyncFollows = {}
 
         this.recoveryEnabled = has(config, "recoveryEnabled")
             ? config.recoveryEnabled
@@ -356,7 +355,7 @@ export class Recoverable {
             IN +
             followKey.inRule
 
-        return this.resyncFollows.get(followName)
+        return this.resyncFollows[followName]
     }
 
     // It does not make any sense to include a virtual EOF token in the list of resynced tokens
@@ -437,7 +436,7 @@ export function attemptInRepetitionRecovery(
     notStuck?: boolean
 ) {
     let key = this.getKeyForAutomaticLookahead(dslMethodIdx, prodOccurrence)
-    let firstAfterRepInfo = this.firstAfterRepMap.get(<any>key)
+    let firstAfterRepInfo = this.firstAfterRepMap[key]
     if (firstAfterRepInfo === undefined) {
         let currRuleName = this.getCurrRuleFullName()
         let ruleGrammar = this.getGAstProductions()[currRuleName]
@@ -446,7 +445,7 @@ export function attemptInRepetitionRecovery(
             prodOccurrence
         )
         firstAfterRepInfo = walker.startWalking()
-        this.firstAfterRepMap.put(key, firstAfterRepInfo)
+        this.firstAfterRepMap[key] = firstAfterRepInfo
     }
 
     let expectTokAfterLastMatch = firstAfterRepInfo.token

@@ -42,39 +42,3 @@ export function defineNameProp(obj, nameValue): boolean {
     /* istanbul ignore next -> will only run in old versions of node.js */
     return false
 }
-
-/**
- * simple Hashtable between a string and some generic value
- * this should be removed once typescript supports ES6 style Hashtable
- */
-export class HashTable<V> {
-    private _state = {}
-
-    keys(): string[] {
-        return keys(this._state)
-    }
-
-    values(): V[] {
-        return <any>values(this._state)
-    }
-
-    put(key: string | number, value: V): void {
-        this._state[key] = value
-    }
-
-    putAll(other: HashTable<V>): void {
-        this._state = assign(this._state, other._state)
-    }
-
-    get(key: string): V {
-        // To avoid edge case with a key called "hasOwnProperty" we need to perform the commented out check below
-        // -> if (Object.prototype.hasOwnProperty.call(this._state, key)) { ... } <-
-        // however this costs nearly 25% of the parser's runtime.
-        // if someone decides to name their Parser class "hasOwnProperty" they deserve what they will get :)
-        return this._state[key]
-    }
-
-    clear(): void {
-        this._state = {}
-    }
-}

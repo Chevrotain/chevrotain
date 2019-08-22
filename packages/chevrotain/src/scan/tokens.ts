@@ -10,7 +10,6 @@ import {
     isEmpty,
     map
 } from "../utils/utils"
-import { HashTable } from "../lang/lang_extensions"
 import { tokenName } from "./tokens_public"
 import { TokenType } from "../../api"
 
@@ -33,7 +32,7 @@ export function tokenStructuredMatcherNoCategories(token, tokType) {
 }
 
 export let tokenShortNameIdx = 1
-export const tokenIdxToClass = new HashTable<TokenType>()
+export const tokenIdxToClass = {}
 
 export function augmentTokenTypes(tokenTypes: TokenType[]): void {
     // collect the parent Token Types as well.
@@ -77,7 +76,7 @@ export function expandCategories(tokenTypes: TokenType[]): TokenType[] {
 export function assignTokenDefaultProps(tokenTypes: TokenType[]): void {
     forEach(tokenTypes, currTokType => {
         if (!hasShortKeyProperty(currTokType)) {
-            tokenIdxToClass.put(tokenShortNameIdx, currTokType)
+            tokenIdxToClass[tokenShortNameIdx] = currTokType
             ;(<any>currTokType).tokenTypeIdx = tokenShortNameIdx++
         }
 
@@ -115,9 +114,7 @@ export function assignCategoriesTokensProp(tokenTypes: TokenType[]): void {
         // avoid duplications
         currTokType.categoryMatches = []
         forEach(currTokType.categoryMatchesMap, (val, key) => {
-            currTokType.categoryMatches.push(
-                tokenIdxToClass.get(key).tokenTypeIdx
-            )
+            currTokType.categoryMatches.push(tokenIdxToClass[key].tokenTypeIdx)
         })
     })
 }

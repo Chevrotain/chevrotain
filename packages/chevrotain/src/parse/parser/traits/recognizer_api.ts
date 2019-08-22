@@ -13,14 +13,13 @@ import {
     SubruleMethodOpts,
     TokenType
 } from "../../../../api"
-import { contains } from "../../../utils/utils"
+import { contains, values } from "../../../utils/utils"
 import { isRecognitionException } from "../../exceptions_public"
 import { DEFAULT_RULE_CONFIG, ParserDefinitionErrorType } from "../parser"
 import { defaultGrammarValidatorErrorProvider } from "../../errors_public"
 import { validateRuleIsOverridden } from "../../grammar/checks"
 import { MixedInParser } from "./parser_traits"
 import { Rule, serializeGrammar } from "../../grammar/gast/gast_public"
-import { HashTable } from "../../../lang/lang_extensions"
 
 /**
  * This trait is responsible for implementing the offical API
@@ -633,13 +632,12 @@ export class RecognizerApi {
 
     // GAST export APIs
     public getGAstProductions(this: MixedInParser): Record<string, Rule> {
-        // Hack to fix external API, we should probably remove all uses of HashTable internally...
-        return (<any>this.gastProductionsCache)._state
+        return this.gastProductionsCache
     }
 
     public getSerializedGastProductions(
         this: MixedInParser
     ): ISerializedGast[] {
-        return serializeGrammar(this.gastProductionsCache.values())
+        return serializeGrammar(values(this.gastProductionsCache))
     }
 }

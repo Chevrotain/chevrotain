@@ -152,9 +152,7 @@ export class Parser {
         let defErrorsMsgs
 
         this.selfAnalysisDone = true
-        let className = classNameFromInstance(this)
-
-        let productions = this.gastProductionsCache
+        let className = this.className
 
         // Without this voodoo magic the parser would be x3-x4 slower
         // It seems it is better ot invoke `toFastProperties` **before**
@@ -172,14 +170,14 @@ export class Parser {
                     currRuleName,
                     originalGrammarAction
                 )
-                this.gastProductionsCache.put(currRuleName, recordedRuleGast)
+                this.gastProductionsCache[currRuleName] = recordedRuleGast
             })
         } finally {
             this.disableRecording()
         }
 
         const resolverErrors = resolveGrammar({
-            rules: productions.values()
+            rules: values(this.gastProductionsCache)
         })
         this.definitionErrors.push.apply(this.definitionErrors, resolverErrors) // mutability for the win?
 
@@ -187,7 +185,7 @@ export class Parser {
         // as unresolved grammar may lead to unhandled runtime exceptions in the follow up validations.
         if (isEmpty(resolverErrors)) {
             let validationErrors = validateGrammar({
-                rules: productions.values(),
+                rules: values(this.gastProductionsCache),
                 maxLookahead: this.maxLookahead,
                 tokenTypes: values(this.tokensMap),
                 ignoredIssues: this.ignoredIssues,
@@ -203,12 +201,14 @@ export class Parser {
 
         if (isEmpty(this.definitionErrors)) {
             // this analysis may fail if the grammar is not perfectly valid
-            let allFollows = computeAllProdsFollows(productions.values())
+            let allFollows = computeAllProdsFollows(
+                values(this.gastProductionsCache)
+            )
             this.resyncFollows = allFollows
         }
 
         let cstAnalysisResult = analyzeCst(
-            productions.values(),
+            values(this.gastProductionsCache),
             this.fullRuleNameToShort
         )
         this.allRuleNames = cstAnalysisResult.allRuleNames
