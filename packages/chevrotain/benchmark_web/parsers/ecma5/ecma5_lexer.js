@@ -316,4 +316,4 @@ function tokenize(str) {
     return { tokens: result, errors: [] }
 }
 
-self.lexer = { tokenize }
+self.customLexer = { tokenize }

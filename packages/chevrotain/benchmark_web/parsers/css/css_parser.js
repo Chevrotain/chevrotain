@@ -239,7 +239,7 @@ var Ident = createToken({
 
 var Minus = createToken({ name: "Minus", pattern: /-/ })
 
-var lexer = new Lexer(cssTokens)
+var lexerDefinition = cssTokens
 
 // ----------------- parser -----------------
 

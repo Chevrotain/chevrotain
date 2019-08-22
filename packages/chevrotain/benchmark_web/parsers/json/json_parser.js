@@ -44,10 +44,8 @@ var jsonTokens = [
     False,
     Null
 ]
-// Tracking only the offset provides a small speed boost.
-var lexer = new ChevrotainLexer(jsonTokens, {
-    positionTracking: "onlyOffset"
-})
+
+var lexerDefinition = jsonTokens
 
 // ----------------- parser -----------------
 

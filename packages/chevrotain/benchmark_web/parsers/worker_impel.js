@@ -23,7 +23,15 @@ onmessage = function(event) {
         var options = event.data[0]
 
         try {
-            parseBench(sample, lexer, parser, startRule, options, parserConfig)
+            parseBench(
+                sample,
+                self.lexerDefinition || undefined,
+                self.customLexer || undefined,
+                parser,
+                startRule,
+                options,
+                parserConfig
+            )
             postMessage(0)
         } catch (e) {
             console.error(e.message)

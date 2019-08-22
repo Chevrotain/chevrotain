@@ -1,10 +1,33 @@
 // ----------------- wrapping it all together -----------------
 var parserInstance
+var lexerInstance
 var lexResult
 
-function parseBench(text, lexer, parser, rootRule, options, parserConfig) {
+function parseBench(
+    text,
+    lexerDefinition,
+    customLexer,
+    parser,
+    rootRule,
+    options,
+    parserConfig
+) {
+    if (lexerInstance === undefined) {
+        if (customLexer !== undefined) {
+            lexerInstance = customLexer
+        } else {
+            var start = new Date().getTime()
+            lexerInstance = new chevrotain.Lexer(lexerDefinition, {
+                // TODO: extract lexer options to global config
+                positionTracking: "onlyOffset"
+            })
+            var end = new Date().getTime()
+            console.log("Lexer init time: " + (end - start))
+        }
+    }
+
     if (lexResult === undefined || options.lexerOnly) {
-        lexResult = lexer.tokenize(text)
+        lexResult = lexerInstance.tokenize(text)
         if (lexResult.errors.length > 0) {
             throw Error("Lexing errors detected")
         }
@@ -13,10 +36,10 @@ function parseBench(text, lexer, parser, rootRule, options, parserConfig) {
     // It is recommended to only initialize a Chevrotain Parser once
     // and reset it's state instead of re-initializing it
     if (parserInstance === undefined) {
-        const start = new Date().getTime()
+        var start = new Date().getTime()
         parserInstance = new parser(parserConfig)
-        const end = new Date().getTime()
-        console.log("init time: " + (end - start))
+        var end = new Date().getTime()
+        console.log("Parser init time: " + (end - start))
     }
 
     if (options.lexerOnly) {
