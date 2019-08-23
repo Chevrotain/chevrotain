@@ -838,7 +838,7 @@ export class RecognizerEngine {
         // NOOP when cst is disabled
         this.cstFinallyStateUpdate()
 
-        if (this.RULE_STACK.length === 0 && !this.isAtEndOfInput()) {
+        if (this.RULE_STACK.length === 0 && this.isAtEndOfInput() === false) {
             let firstRedundantTok = this.LA(1)
             let errMsg = this.errorMessageProvider.buildNotAllInputParsedMessage(
                 {
