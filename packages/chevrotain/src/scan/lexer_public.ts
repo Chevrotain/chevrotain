@@ -1,5 +1,6 @@
 import {
     analyzeTokenTypes,
+    charCodeToOptimizedIndex,
     cloneEmptyGroups,
     DEFAULT_MODE,
     LineTerminatorOptimizedTester,
@@ -37,6 +38,7 @@ import {
     TokenType
 } from "../../api"
 import { defaultLexerErrorProvider } from "../scan/lexer_errors_public"
+import { clearRegExpParserCache } from "./reg_exp_parser"
 
 export interface ILexingResult {
     tokens: IToken[]
@@ -323,6 +325,7 @@ export class Lexer {
             )
         }
 
+        clearRegExpParserCache()
         toFastProperties(this)
     }
 
@@ -395,6 +398,21 @@ export class Lexer {
         Object.freeze(emptyArray)
         let getPossiblePatterns = undefined
 
+        function getPossiblePatternsSlow() {
+            return patternIdxToConfig
+        }
+
+        function getPossiblePatternsOptimized(charCode) {
+            const optimizedCharIdx = charCodeToOptimizedIndex(charCode)
+            const possiblePatterns =
+                currCharCodeToPatternIdxToConfig[optimizedCharIdx]
+            if (possiblePatterns === undefined) {
+                return emptyArray
+            } else {
+                return possiblePatterns
+            }
+        }
+
         let pop_mode = popToken => {
             // TODO: perhaps avoid this error in the edge case there is no more input?
             if (
@@ -434,19 +452,9 @@ export class Lexer {
                     this.config.safeMode === false
 
                 if (currCharCodeToPatternIdxToConfig && modeCanBeOptimized) {
-                    getPossiblePatterns = function(charCode) {
-                        const possiblePatterns =
-                            currCharCodeToPatternIdxToConfig[charCode]
-                        if (possiblePatterns === undefined) {
-                            return emptyArray
-                        } else {
-                            return possiblePatterns
-                        }
-                    }
+                    getPossiblePatterns = getPossiblePatternsOptimized
                 } else {
-                    getPossiblePatterns = function() {
-                        return patternIdxToConfig
-                    }
+                    getPossiblePatterns = getPossiblePatternsSlow
                 }
             }
         }
@@ -465,19 +473,9 @@ export class Lexer {
                 this.config.safeMode === false
 
             if (currCharCodeToPatternIdxToConfig && modeCanBeOptimized) {
-                getPossiblePatterns = function(charCode) {
-                    const possiblePatterns =
-                        currCharCodeToPatternIdxToConfig[charCode]
-                    if (possiblePatterns === undefined) {
-                        return emptyArray
-                    } else {
-                        return possiblePatterns
-                    }
-                }
+                getPossiblePatterns = getPossiblePatternsOptimized
             } else {
-                getPossiblePatterns = function() {
-                    return patternIdxToConfig
-                }
+                getPossiblePatterns = getPossiblePatternsSlow
             }
         }
 

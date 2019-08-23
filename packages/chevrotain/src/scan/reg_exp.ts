@@ -1,4 +1,4 @@
-import { RegExpParser, VERSION, BaseRegExpVisitor } from "regexp-to-ast"
+import { VERSION, BaseRegExpVisitor } from "regexp-to-ast"
 import {
     flatten,
     map,
@@ -10,8 +10,8 @@ import {
     isArray,
     every
 } from "../utils/utils"
+import { getRegExpAst } from "./reg_exp_parser"
 
-const regExpParser = new RegExpParser()
 const complementErrorMessage =
     "Complement Sets are not supported for first char optimization"
 export const failedOptimizationPrefixMsg =
@@ -22,7 +22,7 @@ export function getStartCodes(
     ensureOptimizations = false
 ): number[] {
     try {
-        const ast = regExpParser.pattern(regExp.toString())
+        const ast = getRegExpAst(regExp)
         let firstChars = firstChar(ast.value)
         if (ast.flags.ignoreCase) {
             firstChars = applyIgnoreCase(firstChars)
@@ -248,7 +248,7 @@ export function canMatchCharCode(
     pattern: RegExp | string
 ) {
     if (pattern instanceof RegExp) {
-        const ast = regExpParser.pattern(pattern.toString())
+        const ast = getRegExpAst(pattern)
         const charCodeFinder = new CharCodeFinder(charCodes)
         charCodeFinder.visit(ast)
         return charCodeFinder.found
