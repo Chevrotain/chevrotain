@@ -63,9 +63,14 @@ export function getStartCodes(
     return []
 }
 
+// TODO:
+//  1. Try to use some map to collect data
+//  2. Do we have duplicates here which will affect runtime performance?
+//  3. Try to use a Set in ES6 if we are running in a relevant runtime?
 export function firstChar(ast): number[] {
     switch (ast.type) {
         case "Disjunction":
+            // TODO: Avoid flatten it is resource intensive
             return flatten(map(ast.value, firstChar))
         case "Alternative":
             const startChars = []
