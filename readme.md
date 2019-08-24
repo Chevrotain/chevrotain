@@ -71,12 +71,14 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
 Some interesting samples:
 
+-   [Prettier Java Plugin Parser][sample_prettier_java]
 -   [JHipster Domain Language][sample_jhipster]
 -   [Metabase BI expression Parser][sample_metabase].
--   [Eve Programing Language][sample_eve].
--   [BioModelAnalyzer's ChatBot Parser][sample_biomodel].
--   [Bombadil Toml Parser][sample_bombadil]
+-   [Three.js VRML Parser][sample_threejs]
 -   [Argdown Parser][sample_argdown]
+-   [Bombadil Toml Parser][sample_bombadil]
+-   [Eve Interactive Programing Language Parser][sample_eve].
+-   [BioModelAnalyzer's ChatBot Parser][sample_biomodel].
 
 [benchmark]: https://sap.github.io/chevrotain/performance/
 [sample_metabase]: https://github.com/metabase/metabase/blob/136dfb17954f4e4302b3bf2fee99ff7b7b12fd7c/frontend/src/metabase/lib/expressions/parser.js
@@ -85,6 +87,8 @@ Some interesting samples:
 [sample_biomodel]: https://github.com/Microsoft/BioModelAnalyzer/blob/master/ChatBot/src/NLParser/NLParser.ts
 [sample_bombadil]: https://github.com/sgarciac/bombadil/blob/master/src/parser.ts
 [sample_argdown]: https://github.com/christianvoigt/argdown/blob/master/packages/argdown-core/src/parser.ts
+[sample_threejs]: https://github.com/mrdoob/three.js/blob/dev/examples/js/loaders/VRMLLoader.js
+[sample_prettier_java]: https://github.com/jhipster/prettier-java/tree/master/packages/java-parser/src/productions
 [languages]: https://github.com/SAP/chevrotain/tree/master/examples/implementation_languages
 [backtracking]: https://github.com/SAP/chevrotain/blob/master/examples/parser/backtracking/backtracking.js
 [custom_apis]: https://sap.github.io/chevrotain/docs/guide/custom_apis.html
