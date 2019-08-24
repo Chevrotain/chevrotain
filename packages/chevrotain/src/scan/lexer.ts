@@ -30,7 +30,7 @@ import {
 import {
     canMatchCharCode,
     failedOptimizationPrefixMsg,
-    getStartCodes
+    getOptimizedStartCodesIndices
 } from "./reg_exp"
 import {
     ILexerDefinitionError,
@@ -314,34 +314,26 @@ export function analyzeTokenTypes(
                             )
                         }
                     } else {
-                        // TODO: optimize me - much of the work is done here...
-                        let startCodes = getStartCodes(
+                        let optimizedCodes = getOptimizedStartCodesIndices(
                             currTokType.PATTERN,
                             options.ensureOptimizations
                         )
                         /* istanbul ignore if */
                         // start code will only be empty given an empty regExp or failure of regexp-to-ast library
                         // the first should be a different validation and the second cannot be tested.
-                        if (isEmpty(startCodes)) {
+                        if (isEmpty(optimizedCodes)) {
                             // we cannot understand what codes may start possible matches
                             // The optimization correctness requires knowing start codes for ALL patterns.
                             // Not actually sure this is an error, no debug message
                             canBeOptimized = false
                         }
-                        let lastOptimizedIdx
-                        forEach(startCodes, code => {
-                            const currOptimizedIdx = charCodeToOptimizedIndex(
-                                code
+                        forEach(optimizedCodes, code => {
+                            addToMapOfArrays(
+                                result,
+                                code,
+                                patternIdxToConfig[idx]
                             )
-                            // Avoid adding the config multiple times
-                            if (lastOptimizedIdx !== currOptimizedIdx) {
-                                lastOptimizedIdx = currOptimizedIdx
-                                addToMapOfArrays(
-                                    result,
-                                    currOptimizedIdx,
-                                    patternIdxToConfig[idx]
-                                )
-                            }
+                            // }
                         })
                     }
                 } else {
@@ -1134,6 +1126,8 @@ export function charCodeToOptimizedIndex(charCode) {
  * Creating this array takes ~3ms on a modern machine,
  * But if we perform the computation at runtime as needed the CSS Lexer benchmark
  * performance degrades by ~10%
+ *
+ * TODO: Perhaps it should be lazy initialized only if a charCode > 255 is used.
  */
 let charCodeToOptimizedIdxMap = []
 function initCharCodeToOptimizedIndexMap() {

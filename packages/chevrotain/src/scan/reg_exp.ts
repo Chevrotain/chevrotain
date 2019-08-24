@@ -8,25 +8,28 @@ import {
     PRINT_WARNING,
     find,
     isArray,
-    every
+    every,
+    values
 } from "../utils/utils"
 import { getRegExpAst } from "./reg_exp_parser"
+import { charCodeToOptimizedIndex } from "./lexer"
 
 const complementErrorMessage =
     "Complement Sets are not supported for first char optimization"
 export const failedOptimizationPrefixMsg =
     'Unable to use "first char" lexer optimizations:\n'
 
-export function getStartCodes(
+export function getOptimizedStartCodesIndices(
     regExp: RegExp,
     ensureOptimizations = false
 ): number[] {
     try {
         const ast = getRegExpAst(regExp)
-        let firstChars = firstChar(ast.value)
-        if (ast.flags.ignoreCase) {
-            firstChars = applyIgnoreCase(firstChars)
-        }
+        const firstChars = firstCharOptimizedIndices(
+            ast.value,
+            {},
+            ast.flags.ignoreCase
+        )
 
         return firstChars
     } catch (e) {
@@ -63,17 +66,14 @@ export function getStartCodes(
     return []
 }
 
-// TODO:
-//  1. Try to use some map to collect data
-//  2. Do we have duplicates here which will affect runtime performance?
-//  3. Try to use a Set in ES6 if we are running in a relevant runtime?
-export function firstChar(ast): number[] {
+export function firstCharOptimizedIndices(ast, result, ignoreCase): number[] {
     switch (ast.type) {
         case "Disjunction":
-            // TODO: Avoid flatten it is resource intensive
-            return flatten(map(ast.value, firstChar))
+            forEach(ast.value, subAst =>
+                firstCharOptimizedIndices(subAst, result, ignoreCase)
+            )
+            break
         case "Alternative":
-            const startChars = []
             const terms = ast.value
             for (let i = 0; i < terms.length; i++) {
                 const term = terms[i]
@@ -102,33 +102,50 @@ export function firstChar(ast): number[] {
                 const atom = term
                 switch (atom.type) {
                     case "Character":
-                        startChars.push(atom.value)
+                        addOptimizedIdxToResult(atom.value, result, ignoreCase)
                         break
                     case "Set":
                         if (atom.complement === true) {
                             throw Error(complementErrorMessage)
                         }
-
-                        // TODO: this may still be slow when there are many codes
                         forEach(atom.value, code => {
                             if (typeof code === "number") {
-                                startChars.push(code)
+                                addOptimizedIdxToResult(
+                                    code,
+                                    result,
+                                    ignoreCase
+                                )
                             } else {
-                                //range
+                                // range
                                 const range = code
                                 for (
                                     let rangeCode = range.from;
                                     rangeCode <= range.to;
                                     rangeCode++
                                 ) {
-                                    startChars.push(rangeCode)
+                                    // TODO: this could potentially be optimized
+                                    //       to traverse the range in jumps the size of the optimizedIndices buckets
+                                    //       However there are too many edge cases for such an optimization...
+                                    //       and it needs a grammar to have **many** different tokens
+                                    //       starting with **very wide** range of charCodes
+                                    //       in order to gain a **small** benefit during initialization...
+                                    //       Also the init time boost could also be accomplished directly by the end user
+                                    //       By providing the startCharHints, so handling it is not worth it.
+                                    addOptimizedIdxToResult(
+                                        rangeCode,
+                                        result,
+                                        ignoreCase
+                                    )
                                 }
                             }
                         })
                         break
                     case "Group":
-                        const groupCodes = firstChar(atom.value)
-                        forEach(groupCodes, code => startChars.push(code))
+                        firstCharOptimizedIndices(
+                            atom.value,
+                            result,
+                            ignoreCase
+                        )
                         break
                     /* istanbul ignore next */
                     default:
@@ -150,29 +167,47 @@ export function firstChar(ast): number[] {
                     break
                 }
             }
-
-            return startChars
+            break
         /* istanbul ignore next */
         default:
             throw Error("non exhaustive match!")
     }
+
+    // console.log(Object.keys(result).length)
+    return values(result)
 }
 
-export function applyIgnoreCase(firstChars: number[]): number[] {
-    const firstCharsCase = []
-    forEach(firstChars, charCode => {
-        firstCharsCase.push(charCode)
+function addOptimizedIdxToResult(
+    code: number,
+    result: number[],
+    ignoreCase: boolean
+) {
+    const optimizedCharIdx = charCodeToOptimizedIndex(code)
+    result[optimizedCharIdx] = optimizedCharIdx
 
-        const char = String.fromCharCode(charCode)
-        /* istanbul ignore else */
-        if (char.toUpperCase() !== char) {
-            firstCharsCase.push(char.toUpperCase().charCodeAt(0))
-        } else if (char.toLowerCase() !== char) {
-            firstCharsCase.push(char.toLowerCase().charCodeAt(0))
+    if (ignoreCase === true) {
+        handleIgnoreCase(code, result)
+    }
+}
+
+function handleIgnoreCase(code: number, result: number[]) {
+    const char = String.fromCharCode(code)
+    const upperChar = char.toUpperCase()
+    /* istanbul ignore else */
+    if (upperChar !== char) {
+        const optimizedCharIdx = charCodeToOptimizedIndex(
+            upperChar.charCodeAt(0)
+        )
+        result[optimizedCharIdx] = optimizedCharIdx
+    } else {
+        const lowerChar = char.toLowerCase()
+        if (lowerChar !== char) {
+            const optimizedCharIdx = charCodeToOptimizedIndex(
+                lowerChar.charCodeAt(0)
+            )
+            result[optimizedCharIdx] = optimizedCharIdx
         }
-    })
-
-    return firstCharsCase
+    }
 }
 
 function findCode(setNode, targetCharCodes) {
@@ -215,6 +250,11 @@ class CharCodeFinder extends BaseRegExpVisitor {
     }
 
     visitChildren(node) {
+        // No need to keep looking...
+        if (this.found === true) {
+            return
+        }
+
         // switch lookaheads as they do not actually consume any characters thus
         // finding a charCode at lookahead context does not mean that regexp can actually contain it in a match.
         switch (node.type) {
