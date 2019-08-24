@@ -2045,35 +2045,6 @@ skipOnBrowser("debugging and messages and optimizations", () => {
         )
     })
 
-    it("won't pack first char optimizations array for too large arrays", () => {
-        // without hints we expect the lexer
-        const PileOfPooNoHints = createToken({
-            name: "PileOfPoo",
-            pattern: /💩/
-        })
-        const pooLexerNoHints = new Lexer([PileOfPooNoHints], {
-            positionTracking: "onlyOffset"
-        })
-        expect(
-            keys(
-                (<any>pooLexerNoHints).charCodeToPatternIdxToConfig.defaultMode
-            ).length
-        ).to.equal("💩".charCodeAt(0) + 1)
-
-        const PileOfPoo = createToken({
-            name: "PileOfPoo",
-            pattern: /💩/,
-            start_chars_hint: [100000]
-        })
-        const pooLexer = new Lexer([PileOfPoo], {
-            positionTracking: "onlyOffset"
-        })
-        expect(
-            keys((<any>pooLexer).charCodeToPatternIdxToConfig.defaultMode)
-                .length
-        ).to.equal(1)
-    })
-
     it("won't optimize with safe mode enabled", () => {
         const Alpha = createToken({
             name: "A",

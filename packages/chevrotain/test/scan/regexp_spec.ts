@@ -1,6 +1,9 @@
 import { createToken } from "../../src/scan/tokens_public"
 import { Lexer } from "../../src/scan/lexer_public"
-import { canMatchCharCode, getStartCodes } from "../../src/scan/reg_exp"
+import {
+    canMatchCharCode,
+    getOptimizedStartCodesIndices
+} from "../../src/scan/reg_exp"
 
 describe("The Chevrotain regexp analysis", () => {
     it("Will re-attempt none 'optimized' patterns if the optimization failed", () => {
@@ -35,44 +38,68 @@ describe("the regExp analysis", () => {
     context("first codes", () => {
         it("can compute for string literal", () => {
             expect(
-                getStartCodes(
+                getOptimizedStartCodesIndices(
                     /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
                 )
             ).to.deep.equal([34])
         })
 
         it("can compute with assertions", () => {
-            expect(getStartCodes(/^$\b\Ba/)).to.deep.equal([97])
+            expect(getOptimizedStartCodesIndices(/^$\b\Ba/)).to.deep.equal([97])
         })
 
         it("can compute ranges", () => {
-            expect(getStartCodes(/[\n-\r]/)).to.deep.equal([10, 11, 12, 13])
+            expect(getOptimizedStartCodesIndices(/[\n-\r]/)).to.deep.equal([
+                10,
+                11,
+                12,
+                13
+            ])
         })
 
         it("can compute with optional quantifiers", () => {
-            expect(getStartCodes(/b*a/)).to.deep.equal([98, 97])
+            expect(getOptimizedStartCodesIndices(/b*a/)).to.deep.equal([97, 98])
         })
 
         it("will not compute when using complements", () => {
-            expect(getStartCodes(/\D/)).to.be.empty
+            expect(getOptimizedStartCodesIndices(/\D/)).to.be.empty
         })
 
         it("Can compute for ignore case", () => {
-            expect(getStartCodes(/w|A/i)).to.deep.equal([119, 87, 65, 97])
+            expect(getOptimizedStartCodesIndices(/w|A/i)).to.deep.equal([
+                65,
+                87,
+                97,
+                119
+            ])
         })
 
         it("will not compute when using complements #2", () => {
-            expect(getStartCodes(/[^a-z]/, true)).to.be.empty
+            expect(getOptimizedStartCodesIndices(/[^a-z]/, true)).to.be.empty
         })
 
         it("correctly handles nested groups with and without quantifiers", () => {
-            expect(getStartCodes(/(?:)c/)).to.deep.equal([99])
-            expect(getStartCodes(/((ab)?)c/)).to.deep.equal([97, 99])
-            expect(getStartCodes(/((ab))(c)/)).to.deep.equal([97])
-            expect(getStartCodes(/((ab))?c/)).to.deep.equal([97, 99])
-            expect(getStartCodes(/((a?((b?))))?c/)).to.deep.equal([97, 98, 99])
-            expect(getStartCodes(/((a?((b))))c/)).to.deep.equal([97, 98])
-            expect(getStartCodes(/((a+((b))))c/)).to.deep.equal([97])
+            expect(getOptimizedStartCodesIndices(/(?:)c/)).to.deep.equal([99])
+            expect(getOptimizedStartCodesIndices(/((ab)?)c/)).to.deep.equal([
+                97,
+                99
+            ])
+            expect(getOptimizedStartCodesIndices(/((ab))(c)/)).to.deep.equal([
+                97
+            ])
+            expect(getOptimizedStartCodesIndices(/((ab))?c/)).to.deep.equal([
+                97,
+                99
+            ])
+            expect(
+                getOptimizedStartCodesIndices(/((a?((b?))))?c/)
+            ).to.deep.equal([97, 98, 99])
+            expect(getOptimizedStartCodesIndices(/((a?((b))))c/)).to.deep.equal(
+                [97, 98]
+            )
+            expect(getOptimizedStartCodesIndices(/((a+((b))))c/)).to.deep.equal(
+                [97]
+            )
         })
     })
 

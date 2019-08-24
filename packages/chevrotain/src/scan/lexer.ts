@@ -1,4 +1,4 @@
-import { BaseRegExpVisitor, RegExpParser } from "regexp-to-ast"
+import { BaseRegExpVisitor } from "regexp-to-ast"
 import { tokenName } from "./tokens_public"
 import { IRegExpExec, Lexer, LexerDefinitionErrorType } from "./lexer_public"
 import {
@@ -30,7 +30,7 @@ import {
 import {
     canMatchCharCode,
     failedOptimizationPrefixMsg,
-    getStartCodes
+    getOptimizedStartCodesIndices
 } from "./reg_exp"
 import {
     ILexerDefinitionError,
@@ -39,8 +39,7 @@ import {
     IToken,
     TokenType
 } from "../../api"
-
-const regExpParser = new RegExpParser()
+import { getRegExpAst } from "./reg_exp_parser"
 
 const PATTERN = "PATTERN"
 export const DEFAULT_MODE = "defaultMode"
@@ -94,6 +93,8 @@ export function analyzeTokenTypes(
         positionTracking: "full",
         lineTerminatorCharacters: ["\r", "\n"]
     })
+
+    initCharCodeToOptimizedIndexMap()
 
     let onlyRelevantTypes = reject(tokenTypes, currType => {
         return currType[PATTERN] === Lexer.NA
@@ -158,7 +159,6 @@ export function analyzeTokenTypes(
             // ICustomPattern
             return currPattern
         } else if (typeof currPattern === "string") {
-            // IGNORE ABOVE ELSE
             if (currPattern.length === 1) {
                 return currPattern
             } else {
@@ -266,13 +266,6 @@ export function analyzeTokenTypes(
         }
     })
 
-    function addToMapOfArrays(map, key, value) {
-        if (map[key] === undefined) {
-            map[key] = []
-        }
-        map[key].push(value)
-    }
-
     let canBeOptimized = true
     let charCodeToPatternIdxToConfig = []
 
@@ -281,15 +274,32 @@ export function analyzeTokenTypes(
             onlyRelevantTypes,
             (result, currTokType, idx) => {
                 if (typeof currTokType.PATTERN === "string") {
-                    const key = currTokType.PATTERN.charCodeAt(0)
-                    addToMapOfArrays(result, key, patternIdxToConfig[idx])
+                    const charCode = currTokType.PATTERN.charCodeAt(0)
+                    const optimizedIdx = charCodeToOptimizedIndex(charCode)
+                    addToMapOfArrays(
+                        result,
+                        optimizedIdx,
+                        patternIdxToConfig[idx]
+                    )
                 } else if (isArray(currTokType.START_CHARS_HINT)) {
+                    let lastOptimizedIdx
                     forEach(currTokType.START_CHARS_HINT, charOrInt => {
-                        const key =
+                        const charCode =
                             typeof charOrInt === "string"
                                 ? charOrInt.charCodeAt(0)
                                 : charOrInt
-                        addToMapOfArrays(result, key, patternIdxToConfig[idx])
+                        const currOptimizedIdx = charCodeToOptimizedIndex(
+                            charCode
+                        )
+                        // Avoid adding the config multiple times
+                        if (lastOptimizedIdx !== currOptimizedIdx) {
+                            lastOptimizedIdx = currOptimizedIdx
+                            addToMapOfArrays(
+                                result,
+                                currOptimizedIdx,
+                                patternIdxToConfig[idx]
+                            )
+                        }
                     })
                 } else if (isRegExp(currTokType.PATTERN)) {
                     if (currTokType.PATTERN.unicode) {
@@ -304,26 +314,26 @@ export function analyzeTokenTypes(
                             )
                         }
                     } else {
-                        const startCodes = getStartCodes(
+                        let optimizedCodes = getOptimizedStartCodesIndices(
                             currTokType.PATTERN,
                             options.ensureOptimizations
                         )
-
                         /* istanbul ignore if */
                         // start code will only be empty given an empty regExp or failure of regexp-to-ast library
                         // the first should be a different validation and the second cannot be tested.
-                        if (isEmpty(startCodes)) {
+                        if (isEmpty(optimizedCodes)) {
                             // we cannot understand what codes may start possible matches
                             // The optimization correctness requires knowing start codes for ALL patterns.
                             // Not actually sure this is an error, no debug message
                             canBeOptimized = false
                         }
-                        forEach(startCodes, code => {
+                        forEach(optimizedCodes, code => {
                             addToMapOfArrays(
                                 result,
                                 code,
                                 patternIdxToConfig[idx]
                             )
+                            // }
                         })
                     }
                 } else {
@@ -346,9 +356,7 @@ export function analyzeTokenTypes(
         )
     }
 
-    if (canBeOptimized && charCodeToPatternIdxToConfig.length < 65536) {
-        charCodeToPatternIdxToConfig = packArray(charCodeToPatternIdxToConfig)
-    }
+    charCodeToPatternIdxToConfig = packArray(charCodeToPatternIdxToConfig)
 
     return {
         emptyGroups: emptyGroups,
@@ -479,7 +487,7 @@ export function findEndOfInputAnchor(
         const pattern = currType[PATTERN]
 
         try {
-            const regexpAst = regExpParser.pattern(pattern.toString())
+            const regexpAst = getRegExpAst(pattern)
             const endAnchorVisitor = new EndAnchorFinder()
             endAnchorVisitor.visit(regexpAst)
 
@@ -546,7 +554,7 @@ export function findStartOfInputAnchor(
     let invalidRegex = filter(tokenTypes, currType => {
         const pattern = currType[PATTERN]
         try {
-            const regexpAst = regExpParser.pattern(pattern.toString())
+            const regexpAst = getRegExpAst(pattern)
             const startAnchorVisitor = new StartAnchorFinder()
             startAnchorVisitor.visit(regexpAst)
 
@@ -845,9 +853,8 @@ export function performRuntimeChecks(
     ) {
         errors.push({
             message:
-                `A MultiMode Lexer cannot be initialized with a ${DEFAULT_MODE}: <${
-                    lexerDefinition.defaultMode
-                }>` + `which does not exist\n`,
+                `A MultiMode Lexer cannot be initialized with a ${DEFAULT_MODE}: <${lexerDefinition.defaultMode}>` +
+                `which does not exist\n`,
             type:
                 LexerDefinitionErrorType.MULTI_MODE_LEXER_DEFAULT_MODE_VALUE_DOES_NOT_EXIST
         })
@@ -1085,4 +1092,51 @@ function getCharCodes(charsOrCodes: (number | string)[]): number[] {
     })
 
     return charCodes
+}
+
+function addToMapOfArrays(map, key, value): void {
+    if (map[key] === undefined) {
+        map[key] = [value]
+    } else {
+        map[key].push(value)
+    }
+}
+
+/**
+ * We ae mapping charCode above ASCI (256) into buckets each in the size of 256.
+ * This is because ASCI are the most common start chars so each one of those will get its own
+ * possible token configs vector.
+ *
+ * Tokens starting with charCodes "above" ASCI are uncommon, so we can "afford"
+ * to place these into buckets of possible token configs, What we gain from
+ * this is avoiding the case of creating an optimization 'charCodeToPatternIdxToConfig'
+ * which would contain 10,000+ arrays of small size (e.g unicode Identifiers scenario).
+ * Our 'charCodeToPatternIdxToConfig' max size will now be:
+ * 256 + (2^16 / 2^8) - 1 === 511
+ *
+ * note the hack for fast division integer part extraction
+ * See: https://stackoverflow.com/a/4228528
+ */
+export function charCodeToOptimizedIndex(charCode) {
+    return charCode < 256 ? charCode : charCodeToOptimizedIdxMap[charCode]
+}
+
+/**
+ * This is a compromise between cold start / hot running performance
+ * Creating this array takes ~3ms on a modern machine,
+ * But if we perform the computation at runtime as needed the CSS Lexer benchmark
+ * performance degrades by ~10%
+ *
+ * TODO: Perhaps it should be lazy initialized only if a charCode > 255 is used.
+ */
+let charCodeToOptimizedIdxMap = []
+function initCharCodeToOptimizedIndexMap() {
+    if (isEmpty(charCodeToOptimizedIdxMap)) {
+        charCodeToOptimizedIdxMap = new Array(65536)
+        for (let i = 0; i < 65536; i++) {
+            /* tslint:disable */
+            charCodeToOptimizedIdxMap[i] = i > 255 ? 255 + ~~(i / 255) : i
+            /* tslint:enable */
+        }
+    }
 }
