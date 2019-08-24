@@ -826,6 +826,19 @@ declare abstract class BaseParser {
 
     /* protected */ SKIP_TOKEN(): IToken
 
+    /**
+     * Look-Ahead for the Token Vector
+     * LA(1) is the next Token ahead.
+     * LA(n) is the nth Token ahead.
+     * LA(0) is the previously consumed Token.
+     *
+     * Looking beyond the end of the Token Vector or before its begining
+     * will return in an IToken of type EOF {@link EOF}.
+     * This behavior can be used to avoid infinite loops.
+     *
+     * This is often used to implement custom lookahead logic for GATES.
+     * https://sap.github.io/chevrotain/docs/features/gates.html
+     */
     /* protected */ LA(howMuch: number): IToken
 }
 

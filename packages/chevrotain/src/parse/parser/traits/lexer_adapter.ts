@@ -48,14 +48,11 @@ export class LexerAdapter {
     // Lexer (accessing Token vector) related methods which can be overridden to implement lazy lexers
     // or lexers dependent on parser context.
     LA(this: MixedInParser, howMuch: number): IToken {
-        // does: is this optimization (saving tokVectorLength benefits?)
-        if (
-            this.currIdx + howMuch < 0 ||
-            this.tokVectorLength <= this.currIdx + howMuch
-        ) {
+        const soughtIdx = this.currIdx + howMuch
+        if (soughtIdx < 0 || this.tokVectorLength <= soughtIdx) {
             return END_OF_FILE
         } else {
-            return this.tokVector[this.currIdx + howMuch]
+            return this.tokVector[soughtIdx]
         }
     }
 
