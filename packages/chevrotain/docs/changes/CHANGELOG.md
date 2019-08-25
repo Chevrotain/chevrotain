@@ -1,3 +1,22 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+-   [Improve Complex Lexers initialization time.](https://github.com/SAP/chevrotain/issues/1005)
+
+#### Performance
+
+-   A resolved performance related bug and a couple of new micro optimizations have produced
+    minor performance improvements in the JSON(5%) and CSS(15%) benchmarks.
+
+#### Documentation
+
+-   [Document the Parser.LA method.](https://github.com/SAP/chevrotain/issues/996)
+
+#### Dev-Ops
+
+-   [Create Cold Start Performance benchmark.](https://github.com/SAP/chevrotain/issues/907)
+
 ## 6.0.0 (8-20-2019)
 
 #### Breaking Changes
