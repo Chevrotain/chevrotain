@@ -66,12 +66,19 @@ export class Rule extends AbstractProduction {
     }
 }
 
+// TODO: is this only used in an Alternation?
+//       Perhaps `Flat` should be renamed to `Alternative`?
 export class Flat extends AbstractProduction
     implements IOptionallyNamedProduction {
     public name: string
+    public ignoreAmbiguities: boolean = false
 
     // A named Flat production is used to indicate a Nested Rule in an alternation
-    constructor(options: { definition: IProduction[]; name?: string }) {
+    constructor(options: {
+        definition: IProduction[]
+        name?: string
+        ignoreAmbiguities?: boolean
+    }) {
         super(options.definition)
         assign(this, pick(options, v => v !== undefined))
     }
@@ -161,11 +168,13 @@ export class Alternation extends AbstractProduction
     implements IProductionWithOccurrence, IOptionallyNamedProduction {
     public idx: number = 1
     public name: string
+    public ignoreAmbiguities: boolean = false
 
     constructor(options: {
-        definition: IProduction[]
+        definition: Flat[]
         idx?: number
         name?: string
+        ignoreAmbiguities?: boolean
     }) {
         super(options.definition)
         assign(this, pick(options, v => v !== undefined))

@@ -733,6 +733,8 @@ function checkAlternativesAmbiguities(
         []
     )
 
+    // TODO: filter out ignored ambiguities here
+
     let currErrors = utils.map(identicalAmbiguities, currAmbDescriptor => {
         let ambgIndices = map(
             currAmbDescriptor.alts,
@@ -794,6 +796,8 @@ export function checkPrefixAlternativesAmbiguities(
                 )
             }
         )
+
+        // TODO: Filter out ignored ambiguities here
 
         let currPathPrefixErrors = map(
             prefixAmbiguitiesPathsAndIndices,

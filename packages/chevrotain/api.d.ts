@@ -1816,6 +1816,19 @@ export interface OrMethodOpts {
      * Tokens sequences which may start each alternative.
      */
     ERR_MSG?: string
+
+    /**
+     * A Flag indicating that all ambiguities in this alternation should
+     * be ignored, e.g:
+     *   -  Identical lookahead to choose between two alternatives.
+     *
+     * This flag should only be used in rare circumstances, normally alternation
+     * ambiguities should be resolved in other way:
+     * - Re-ordering the alternatives.
+     * - Re-factoring the grammar to extract common prefixes before alternation.
+     * - Using gates {@link IAnyOrAlt.GATE} to implement custom lookahead logic.
+     */
+    IGNORE_AMBIGUITIES?: boolean
 }
 
 export interface ManySepMethodOpts<T> {
@@ -1866,20 +1879,23 @@ export interface SubruleMethodOpts {
 
 export declare type GrammarAction<OUT> = () => OUT
 
+// TODO: deprecate this, we do not need multiple types for the OrOptions
+//   Can we deprecate these redundant types now because TypeScript uses structured Types?
+//   But it may still be a breaking change... maybe an issue need to be created to list all upcoming breaking changes for new major version.
 export declare type IAnyOrAlt = IOrAlt | IOrAltWithGate
 
-/**
- * ```
- *    $.OR([
- *      {ALT:XXX },
- *      {ALT:YYY },
- *      {ALT:ZZZ }
- *    ])
- * ```
- */
 export interface IOrAlt {
     NAME?: string
+    GATE: () => boolean
     ALT: () => any
+    /**
+     * A Flag indicating that any ambiguities involving this specific alternative
+     * Should be ignored.
+     *
+     * This flag would be implicitly enabled if a GATE is used
+     * as the assumption is that a GATE is used to resolve an ambiguity.
+     */
+    IGNORE_AMBIGUITIES?: boolean
 }
 
 /**
@@ -1892,9 +1908,7 @@ export interface IOrAlt {
  * ```
  */
 export interface IOrAltWithGate extends IOrAlt {
-    NAME?: string
-    GATE: () => boolean
-    ALT: () => any
+    // TODO: deprecate this interface
 }
 
 export interface ICstVisitor<IN, OUT> {

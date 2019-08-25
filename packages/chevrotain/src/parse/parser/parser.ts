@@ -247,12 +247,10 @@ export class Parser {
         that.initContentAssist()
         that.initGastRecorder(config)
 
+        // TODO: Perhaps print a warning that this is now deprecated?
         this.ignoredIssues = has(config, "ignoredIssues")
             ? config.ignoredIssues
             : DEFAULT_PARSER_CONFIG.ignoredIssues
-
-        // Avoid performance regressions in newer versions of V8
-        // toFastProperties(this)
     }
 }
 
