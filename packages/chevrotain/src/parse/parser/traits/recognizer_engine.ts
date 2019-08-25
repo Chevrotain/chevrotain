@@ -870,18 +870,27 @@ export class RecognizerEngine {
             )
             return ruleResult
         } catch (e) {
-            if (isRecognitionException(e) && e.partialCstResult !== undefined) {
-                this.cstPostNonTerminal(
-                    e.partialCstResult,
-                    options !== undefined && options.LABEL !== undefined
-                        ? options.LABEL
-                        : (<any>ruleToCall).ruleName
-                )
-
-                delete e.partialCstResult
-            }
-            throw e
+            this.subruleInternalError(e, options, (<any>ruleToCall).ruleName)
         }
+    }
+
+    subruleInternalError(
+        this: MixedInParser,
+        e: any,
+        options: SubruleMethodOpts,
+        ruleName: string
+    ): void {
+        if (isRecognitionException(e) && e.partialCstResult !== undefined) {
+            this.cstPostNonTerminal(
+                e.partialCstResult,
+                options !== undefined && options.LABEL !== undefined
+                    ? options.LABEL
+                    : ruleName
+            )
+
+            delete e.partialCstResult
+        }
+        throw e
     }
 
     consumeInternal(
@@ -897,54 +906,14 @@ export class RecognizerEngine {
                 this.consumeToken()
                 consumedToken = nextToken
             } else {
-                let msg
-                let previousToken = this.LA(0)
-                if (options !== undefined && options.ERR_MSG) {
-                    msg = options.ERR_MSG
-                } else {
-                    msg = this.errorMessageProvider.buildMismatchTokenMessage({
-                        expected: tokType,
-                        actual: nextToken,
-                        previous: previousToken,
-                        ruleName: this.getCurrRuleFullName()
-                    })
-                }
-                throw this.SAVE_ERROR(
-                    new MismatchedTokenException(msg, nextToken, previousToken)
-                )
+                this.consumeInternalError(tokType, nextToken, options)
             }
         } catch (eFromConsumption) {
-            // no recovery allowed during backtracking, otherwise backtracking may recover invalid syntax and accept it
-            // but the original syntax could have been parsed successfully without any backtracking + recovery
-            if (
-                this.recoveryEnabled &&
-                // TODO: more robust checking of the exception type. Perhaps Typescript extending expressions?
-                eFromConsumption.name === "MismatchedTokenException" &&
-                !this.isBackTracking()
-            ) {
-                let follows = this.getFollowsForInRuleRecovery(
-                    <any>tokType,
-                    idx
-                )
-                try {
-                    consumedToken = this.tryInRuleRecovery(
-                        <any>tokType,
-                        follows
-                    )
-                } catch (eFromInRuleRecovery) {
-                    if (
-                        eFromInRuleRecovery.name === IN_RULE_RECOVERY_EXCEPTION
-                    ) {
-                        // failed in RuleRecovery.
-                        // throw the original error in order to trigger reSync error recovery
-                        throw eFromConsumption
-                    } else {
-                        throw eFromInRuleRecovery
-                    }
-                }
-            } else {
-                throw eFromConsumption
-            }
+            consumedToken = this.consumeInternalRecovery(
+                tokType,
+                idx,
+                eFromConsumption
+            )
         }
 
         this.cstPostTerminal(
@@ -954,6 +923,60 @@ export class RecognizerEngine {
             consumedToken
         )
         return consumedToken
+    }
+
+    consumeInternalError(
+        this: MixedInParser,
+        tokType: TokenType,
+        nextToken: IToken,
+        options: ConsumeMethodOpts
+    ): void {
+        let msg
+        let previousToken = this.LA(0)
+        if (options !== undefined && options.ERR_MSG) {
+            msg = options.ERR_MSG
+        } else {
+            msg = this.errorMessageProvider.buildMismatchTokenMessage({
+                expected: tokType,
+                actual: nextToken,
+                previous: previousToken,
+                ruleName: this.getCurrRuleFullName()
+            })
+        }
+        throw this.SAVE_ERROR(
+            new MismatchedTokenException(msg, nextToken, previousToken)
+        )
+    }
+
+    consumeInternalRecovery(
+        this: MixedInParser,
+        tokType: TokenType,
+        idx: number,
+        eFromConsumption: Error
+    ): IToken {
+        // no recovery allowed during backtracking, otherwise backtracking may recover invalid syntax and accept it
+        // but the original syntax could have been parsed successfully without any backtracking + recovery
+        if (
+            this.recoveryEnabled &&
+            // TODO: more robust checking of the exception type. Perhaps Typescript extending expressions?
+            eFromConsumption.name === "MismatchedTokenException" &&
+            !this.isBackTracking()
+        ) {
+            let follows = this.getFollowsForInRuleRecovery(<any>tokType, idx)
+            try {
+                return this.tryInRuleRecovery(<any>tokType, follows)
+            } catch (eFromInRuleRecovery) {
+                if (eFromInRuleRecovery.name === IN_RULE_RECOVERY_EXCEPTION) {
+                    // failed in RuleRecovery.
+                    // throw the original error in order to trigger reSync error recovery
+                    throw eFromConsumption
+                } else {
+                    throw eFromInRuleRecovery
+                }
+            }
+        } else {
+            throw eFromConsumption
+        }
     }
 
     saveRecogState(this: MixedInParser): IParserState {
