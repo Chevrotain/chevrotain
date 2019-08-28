@@ -370,61 +370,61 @@ declare abstract class BaseParser {
      *
      * @returns The result of invoking the chosen alternative.
      */
-    /* protected */ OR(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
+    /* protected */ OR(altsOrOpts: IOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR1(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
+    /* protected */ OR1(altsOrOpts: IOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR2(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
+    /* protected */ OR2(altsOrOpts: IOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR3(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
+    /* protected */ OR3(altsOrOpts: IOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR4(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
+    /* protected */ OR4(altsOrOpts: IOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR5(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
+    /* protected */ OR5(altsOrOpts: IOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR6(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
+    /* protected */ OR6(altsOrOpts: IOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR7(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
+    /* protected */ OR7(altsOrOpts: IOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR8(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
+    /* protected */ OR8(altsOrOpts: IOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR9(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
+    /* protected */ OR9(altsOrOpts: IOrAlt[] | OrMethodOpts): any
 
     /**
      * Parsing DSL method, that indicates a repetition of zero or more.
@@ -1809,7 +1809,7 @@ export interface OrMethodOpts {
      * The set of alternatives,
      * See detailed description in {@link Parser.OR}
      */
-    DEF: IAnyOrAlt[]
+    DEF: IOrAlt[]
     /**
      * A description for the alternatives used in error messages
      * If none is provided, the error message will include the names of the expected
@@ -1818,15 +1818,15 @@ export interface OrMethodOpts {
     ERR_MSG?: string
 
     /**
-     * A Flag indicating that all ambiguities in this alternation should
-     * be ignored, e.g:
-     *   -  Identical lookahead to choose between two alternatives.
+     * A Flag indicating that **all** ambiguities in this alternation should
+     * be ignored.
      *
-     * This flag should only be used in rare circumstances, normally alternation
-     * ambiguities should be resolved in other way:
+     * This flag should only be used in rare circumstances,
+     * As normally alternation ambiguities should be resolved in other ways:
      * - Re-ordering the alternatives.
      * - Re-factoring the grammar to extract common prefixes before alternation.
-     * - Using gates {@link IAnyOrAlt.GATE} to implement custom lookahead logic.
+     * - Using gates {@link IOrAlt.GATE} to implement custom lookahead logic.
+     * - Using the more granular {@link IOrAlt.IGNORE_AMBIGUITIES} on a **specific** alternative.
      */
     IGNORE_AMBIGUITIES?: boolean
 }
@@ -1879,34 +1879,26 @@ export interface SubruleMethodOpts {
 
 export declare type GrammarAction<OUT> = () => OUT
 
-// TODO: deprecate this, we do not need multiple types for the OrOptions
-//   Can we deprecate these redundant types now because TypeScript uses structured Types?
-//   But it may still be a breaking change... maybe an issue need to be created to list all upcoming breaking changes for new major version.
-export declare type IAnyOrAlt = IOrAlt | IOrAltWithGate
+/**
+ * TODO: remove this in next major version this `IOrAlt` is enough
+ * @deprecated
+ */
+export declare type IAnyOrAlt = any
 
 export interface IOrAlt {
     NAME?: string
     GATE: () => boolean
     ALT: () => any
     /**
-     * A Flag indicating that any ambiguities involving this specific alternative
-     * Should be ignored.
+     * A Flag indicating that any ambiguities involving this
+     * specific alternative Should be ignored.
      *
-     * This flag would be implicitly enabled if a GATE is used
-     * as the assumption is that a GATE is used to resolve an ambiguity.
+     * This flag will be **implicitly** enabled if a GATE is used
+     * as the assumption is that the GATE is used to resolve an ambiguity.
      */
     IGNORE_AMBIGUITIES?: boolean
 }
 
-/**
- * ```
- *  $.OR([
- *    { GATE:condition1, ALT:XXX },
- *    { GATE:condition2, ALT:YYY },
- *    { GATE:condition3, ALT:ZZZ }
- *  ])
- * ```
- */
 export interface IOrAltWithGate extends IOrAlt {
     // TODO: deprecate this interface
 }
