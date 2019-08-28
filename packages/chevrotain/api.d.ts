@@ -1617,11 +1617,11 @@ export declare type CustomPatternMatcherFunc = (
     /**
      * Previously scanned Tokens
      */
-    tokens?: IToken[],
+    tokens: IToken[],
     /**
      * Token Groups
      */
-    groups?: {
+    groups: {
         [groupName: string]: IToken[]
     }
 ) => RegExpExecArray | null
