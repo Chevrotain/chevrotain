@@ -346,7 +346,7 @@ function recordProd(
 function recordOrProd(mainProdArg: any, occurrence: number): any {
     const prevProd: any = peek(this.recordingProdStack)
     // Only an array of alternatives
-    const hasOptions = isArray(mainProdArg)
+    const hasOptions = isArray(mainProdArg) === false
     const alts = hasOptions === false ? mainProdArg : mainProdArg.DEF
 
     const newOrProd = new Alternation({
@@ -367,6 +367,10 @@ function recordOrProd(mainProdArg: any, occurrence: number): any {
         }
         if (has(currAlt, "IGNORE_AMBIGUITIES")) {
             currAltFlat.ignoreAmbiguities = currAlt.IGNORE_AMBIGUITIES
+        }
+        // **implicit** ignoreAmbiguities due to usage of gate
+        else if (has(currAlt, "GATE")) {
+            currAltFlat.ignoreAmbiguities = true
         }
         this.recordingProdStack.push(currAltFlat)
         currAlt.ALT.call(this)
