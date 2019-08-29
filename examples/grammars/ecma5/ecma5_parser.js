@@ -358,7 +358,13 @@ class ECMAScript5Parser extends EmbeddedActionsParser {
                         { ALT: () => $.SUBRULE($.EmptyStatement) },
                         // "LabelledStatement" must appear before "ExpressionStatement" due to common lookahead prefix ("inner :" vs "inner")
                         { ALT: () => $.SUBRULE($.LabelledStatement) },
-                        { ALT: () => $.SUBRULE($.ExpressionStatement) },
+                        // The ambiguity is resolved by the ordering of the alternatives
+                        // See: https://ecma-international.org/ecma-262/5.1/#sec-12.4
+                        //   - [lookahead ∉ {{, function}]
+                        {
+                            ALT: () => $.SUBRULE($.ExpressionStatement),
+                            IGNORE_AMBIGUITIES: true
+                        },
                         { ALT: () => $.SUBRULE($.IfStatement) },
                         { ALT: () => $.SUBRULE($.IterationStatement) },
                         { ALT: () => $.SUBRULE($.ContinueStatement) },
@@ -782,10 +788,13 @@ class ECMAScript5Parser extends EmbeddedActionsParser {
         // this inlines SourceElementRule rule from the spec
         $.RULE("SourceElements", () => {
             $.MANY(() => {
-                // FunctionDeclaration appearing before statement implements [lookahead != {{, function}] in ExpressionStatement
-                // See https://www.ecma-international.org/ecma-262/5.1/index.html#sec-12.4Declaration
                 $.OR([
-                    { ALT: () => $.SUBRULE($.FunctionDeclaration) },
+                    // FunctionDeclaration appearing before statement implements [lookahead != {{, function}] in ExpressionStatement
+                    // See https://www.ecma-international.org/ecma-262/5.1/index.html#sec-12.4Declaration
+                    {
+                        ALT: () => $.SUBRULE($.FunctionDeclaration),
+                        IGNORE_AMBIGUITIES: true
+                    },
                     { ALT: () => $.SUBRULE($.Statement) }
                 ])
             })
