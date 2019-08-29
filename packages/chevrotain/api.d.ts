@@ -1609,7 +1609,7 @@ export declare type CustomPatternMatcherFunc = (
     /**
      * The full input string.
      */
-    test: string,
+    text: string,
     /**
      * The offset at which to attempt a match
      */
