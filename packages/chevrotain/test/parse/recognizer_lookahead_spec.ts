@@ -985,7 +985,7 @@ describe("lookahead Regular Tokens Mode", () => {
             }
 
             expect(() => new OrAmbiguityLookAheadParser()).to.throw(
-                "Ambiguous alternatives"
+                "Ambiguous Alternatives Detected:"
             )
             expect(() => new OrAmbiguityLookAheadParser()).to.throw("OneTok")
         })
@@ -1029,7 +1029,7 @@ describe("lookahead Regular Tokens Mode", () => {
                 }
             }
             expect(() => new OrAmbiguityMultiTokenLookAheadParser()).to.throw(
-                "Ambiguous alternatives"
+                "Ambiguous Alternatives Detected:"
             )
             expect(() => new OrAmbiguityMultiTokenLookAheadParser()).to.throw(
                 "TwoTok, ThreeTok, FourTok"
