@@ -1967,6 +1967,10 @@ export interface IParserConfig {
      */
     maxLookahead?: number
     /**
+     * @deprecated - use the IGNORE_AMBIGUITIES flag on the relevant DSL method instead
+     *               - {@link IOrAlt.IGNORE_AMBIGUITIES}
+     *               - {@link OrMethodOpts.IGNORE_AMBIGUITIES}
+     *
      * Used to mark parser definition errors that should be ignored.
      * For example:
      *
