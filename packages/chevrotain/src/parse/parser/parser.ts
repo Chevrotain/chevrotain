@@ -249,7 +249,10 @@ export class Parser {
         that.initGastRecorder(config)
 
         /* istanbul ignore if - complete over-kill to test this, we should only add a test when we actually hard deprecate it and throw an error... */
-        if (has(config, "ignoredIssues")) {
+        if (
+            has(config, "ignoredIssues") &&
+            config.ignoredIssues !== DEFAULT_PARSER_CONFIG.ignoredIssues
+        ) {
             PRINT_WARNING(
                 "The <ignoredIssues> IParserConfig property is soft-deprecated and will be removed in future versions.\n\t" +
                     "Please use the <IGNORE_AMBIGUITIES> flag on the relevant DSL method instead."

@@ -806,6 +806,9 @@ export function checkPrefixAlternativesAmbiguities(
             searchPathAndIdx => {
                 // prefix ambiguity can only be created from lower idx (higher priority) path
                 return (
+                    // ignore (skip) ambiguities with this "other" alternative
+                    alternation.definition[searchPathAndIdx.idx]
+                        .ignoreAmbiguities !== true &&
                     searchPathAndIdx.idx < targetIdx &&
                     // checking for strict prefix because identical lookaheads
                     // will be be detected using a different validation.
