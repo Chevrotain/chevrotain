@@ -1624,7 +1624,9 @@ export declare type CustomPatternMatcherFunc = (
     groups: {
         [groupName: string]: IToken[]
     }
-) => RegExpExecArray | null
+) => CustomPatternMatcherReturn | RegExpExecArray | null // RegExpExecArray included for legacy reasons
+
+export type CustomPatternMatcherReturn = [string] & { payload?: any }
 
 export interface TokenType {
     name: string
