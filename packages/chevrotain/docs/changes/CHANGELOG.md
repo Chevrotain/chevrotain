@@ -1,3 +1,18 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+-   [Improved handling of alternation ambiguities](https://github.com/SAP/chevrotain/issues/869)
+
+#### Documentation
+
+-   [Documentation for ambiguous alternatives](https://github.com/SAP/chevrotain/issues/853)
+
+-   Several TypeScript API fixes for [CustomPatternMatcherFunc](https://sap.github.io/chevrotain/documentation/6_2_0/globals.html#custompatternmatcherfunc)
+    -   [1](https://github.com/SAP/chevrotain/pull/1018)
+    -   [2](https://github.com/SAP/chevrotain/pull/1015)
+    -   Thanks to [@HoldYourWaffle](https://github.com/HoldYourWaffle) :thumbsup
+
 ## 6.1.0 (8-25-2019)
 
 #### Minor Changes
