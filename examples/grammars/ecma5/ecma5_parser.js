@@ -15,12 +15,7 @@ class ECMAScript5Parser extends EmbeddedActionsParser {
     }
 
     constructor() {
-        super(tokens, {
-            ignoredIssues: {
-                Statement: { OR: true },
-                SourceElements: { OR: true }
-            }
-        })
+        super(tokens)
 
         // Optimization to avoid traversing the prototype chain at hotspots.
         this.SUPER_CONSUME = super.CONSUME

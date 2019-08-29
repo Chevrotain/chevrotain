@@ -254,11 +254,7 @@ class CssParser extends CstParser {
     // invoking RULE(...)
     // see: https://github.com/jeffmo/es-class-fields-and-static-properties
     constructor() {
-        super(cssTokens, {
-            ignoredIssues: {
-                selector: { OR: true }
-            }
-        })
+        super(cssTokens)
 
         const $ = this
 

@@ -36,16 +36,7 @@ const backtrackingLexer = new Lexer(allTokens)
 
 class BackTrackingParser extends CstParser {
     constructor() {
-        super(
-            allTokens,
-            // We have to tell Chevrotain to ignore the ambiguity in the statement rule
-            // As Chevrotain is unable to "understand" we are using a GATE to resolve the ambiguity (at design time).
-            {
-                ignoredIssues: {
-                    statement: { OR: true }
-                }
-            }
-        )
+        super(allTokens)
 
         const $ = this
 
