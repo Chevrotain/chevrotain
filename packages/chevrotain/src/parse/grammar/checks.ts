@@ -558,6 +558,8 @@ export function validateAmbiguousAlternationAlternatives(
     topLevelRule.accept(orCollector)
     let ors = orCollector.alternations
 
+    // TODO: this filtering should be deprecated once we remove the ignoredIssues
+    //  IParserConfig property
     let ignoredIssuesForCurrentRule = ignoredIssues[topLevelRule.name]
     if (ignoredIssuesForCurrentRule) {
         ors = reject(
@@ -569,6 +571,10 @@ export function validateAmbiguousAlternationAlternatives(
                 ]
         )
     }
+
+    // New Handling of ignoring ambiguities
+    // - https://github.com/SAP/chevrotain/issues/869
+    ors = reject(ors, currOr => currOr.ignoreAmbiguities === true)
 
     let errors = utils.reduce(
         ors,
@@ -706,12 +712,20 @@ function checkAlternativesAmbiguities(
     let identicalAmbiguities = reduce(
         alternatives,
         (result, currAlt, currAltIdx) => {
+            // ignore (skip) ambiguities with this alternative
+            if (alternation.definition[currAltIdx].ignoreAmbiguities === true) {
+                return result
+            }
+
             forEach(currAlt, currPath => {
                 let altsCurrPathAppearsIn = [currAltIdx]
                 forEach(alternatives, (currOtherAlt, currOtherAltIdx) => {
                     if (
                         currAltIdx !== currOtherAltIdx &&
-                        containsPath(currOtherAlt, currPath)
+                        containsPath(currOtherAlt, currPath) &&
+                        // ignore (skip) ambiguities with this "other" alternative
+                        alternation.definition[currOtherAltIdx]
+                            .ignoreAmbiguities !== true
                     ) {
                         altsCurrPathAppearsIn.push(currOtherAltIdx)
                     }
@@ -779,6 +793,11 @@ export function checkPrefixAlternativesAmbiguities(
     )
 
     forEach(pathsAndIndices, currPathAndIdx => {
+        const alternativeGast = alternation.definition[currPathAndIdx.idx]
+        // ignore (skip) ambiguities with this alternative
+        if (alternativeGast.ignoreAmbiguities === true) {
+            return
+        }
         let targetIdx = currPathAndIdx.idx
         let targetPath = currPathAndIdx.path
 

@@ -1,6 +1,7 @@
 # Resolving Grammar Errors
 
 -   [Common Prefix Ambiguities.](#COMMON_PREFIX)
+-   [Ambiguous Alternatives Detected.](#AMBIGUOUS_ALTERNATIVES)
 -   [Terminal Token Name Not Found.](#TERMINAL_NAME_NOT_FOUND)
 -   [Infinite Loop Detected.](#INFINITE_LOOP)
 
@@ -39,6 +40,69 @@ There are two ways to resolve this:
       myRule:
         "A" "B" ("C")?
     ```
+
+## Ambiguous Alternatives Detected
+
+An Ambiguous Alternatives Error occurs when Chevrotain cannot decide between two alternatives in
+an alternation (OR DSL method).
+
+Chevrotain "looks ahead" at most [K (4 by default)][maxlookahead]
+tokens to determine which alternative to pick. An Ambiguous Alternatives Error indicates
+that more than K tokens lookahead is needed.
+
+Lets consider a more concrete example:
+
+```antlr
+fiveTokensLookahead:
+  "A" "B" "C" "D" "1" |
+  "A" "B" "C" "D" "2"
+```
+
+In order to decide between these two alternatives, Chevrotain must "look ahead" **five** tokens as the
+disambiguating tokens are "1" and "2".
+Five is a larger than the default [maxLookahead][maxlookahead] of four, so an error will be raised.
+
+We could solve this case by increasing the [maxLookahead][maxlookahead] to 5, however this is **not** recommended
+due to performance and grammar complexity reasons.
+From a performance perspective this is particularly problematic as some analysis
+done on the grammar (during initialization) may become **exponentially** more complex as the maxLookahead grows.
+
+**_The recommended solution in this case would be to refactor the grammar to require a smaller lookahead_**.
+In our trivial example the grammar can be refactored to be LL(1), meaning only one token of lookahead is needed.
+The needed change is a simple **extraction of the common prefix before the alternation**.
+
+```antlr
+oneTokenLookahead:
+  "A" "B" "C" "D"
+  (
+    "1" |
+    "2"
+  )
+```
+
+Note that the number of lookahead tokens needed to choose between alternatives may in fact be **infinite**, for example:
+
+```antlr
+infiniteTokensLookahead:
+  ("A")* "1"  |
+  ("A")* "2"
+```
+
+No matter how large a maxLookahead we choose, the sequence of "A"s could always (potentially) be longer...
+The solution in this case is the same as before, **extraction of the common prefix before the alternation**, for example:
+
+```antlr
+oneTokenLookahead:
+  ("A")*
+  (
+    "1" |
+    "2"
+  )
+```
+
+In some rare cases refactoring the grammar is not possible, in those cases it is still possible to resolve the
+ambiguity using the [backtracking feature](../features/backtracking.md)
+Although this is **strongly** discouraged due to performance and complexity reasons...
 
 ## Terminal Token Name Not Found
 
@@ -163,7 +227,9 @@ For example the above example should be written as:
 ```javascript
 $.MANY(() => {
     $.OPTION(() => {
-      $.CONSUME(Plus)
-    )
+        $.CONSUME(Plus)
+    })
 })
 ```
+
+[maxlookahead]: https://sap.github.io/chevrotain/documentation/6_1_0/interfaces/iparserconfig.html#maxlookahead

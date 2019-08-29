@@ -963,13 +963,85 @@ describe("The empty alternative detection full flow", () => {
             })
         }
         expect(() => new AltAmbiguityParserImplicitOccurence()).to.throw(
-            "Ambiguous alternative"
+            "Ambiguous Alternatives Detected"
         )
         expect(() => new AltAmbiguityParserImplicitOccurence()).to.throw("1")
         expect(() => new AltAmbiguityParserImplicitOccurence()).to.throw("2")
         expect(() => new AltAmbiguityParserImplicitOccurence()).to.throw(
             "<PlusTok, StarTok> may appears as a prefix path"
         )
+    })
+
+    context("IGNORE_AMBIGUITIES flag", () => {
+        it("will ignore specific alternative ambiguity", () => {
+            class IgnoreAlternativeAmbiguitiesFlagParser extends Parser {
+                constructor(input: IToken[] = []) {
+                    super([PlusTok, StarTok])
+                    this.performSelfAnalysis()
+                    this.input = input
+                }
+
+                public noneLastEmpty = this.RULE("noneLastEmpty", () => {
+                    this.OR([
+                        {
+                            IGNORE_AMBIGUITIES: true,
+                            ALT: () => {
+                                this.CONSUME1(PlusTok)
+                                this.CONSUME1(StarTok)
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME2(PlusTok)
+                                this.CONSUME2(StarTok)
+                            }
+                        }
+                    ])
+                })
+            }
+            expect(
+                () => new IgnoreAlternativeAmbiguitiesFlagParser()
+            ).to.not.throw()
+        })
+
+        it("will ignore all alternation ambiguities", () => {
+            class IgnoreAlternationAmbiguitiesFlagParser extends Parser {
+                constructor(input: IToken[] = []) {
+                    super([PlusTok, StarTok])
+                    this.performSelfAnalysis()
+                    this.input = input
+                }
+
+                public noneLastEmpty = this.RULE("noneLastEmpty", () => {
+                    this.OR({
+                        IGNORE_AMBIGUITIES: true,
+                        DEF: [
+                            {
+                                ALT: () => {
+                                    this.CONSUME1(PlusTok)
+                                    this.CONSUME1(StarTok)
+                                }
+                            },
+                            {
+                                ALT: () => {
+                                    this.CONSUME2(PlusTok)
+                                    this.CONSUME2(StarTok)
+                                }
+                            },
+                            {
+                                ALT: () => {
+                                    this.CONSUME3(PlusTok)
+                                    this.CONSUME3(StarTok)
+                                }
+                            }
+                        ]
+                    })
+                })
+            }
+            expect(
+                () => new IgnoreAlternationAmbiguitiesFlagParser()
+            ).to.not.throw()
+        })
     })
 
     it("will throw an error when an empty alternative is not the last alternative #2", () => {
@@ -1089,7 +1161,7 @@ describe("The prefix ambiguity detection full flow", () => {
             })
         }
         expect(() => new AlternativesAmbiguityParser()).to.throw(
-            "Ambiguous alternatives: <1 ,2>"
+            "Ambiguous Alternatives Detected: <1 ,2>"
         )
         expect(() => new AlternativesAmbiguityParser()).to.throw(
             "in <OR> inside <main> Rule"
@@ -1098,7 +1170,7 @@ describe("The prefix ambiguity detection full flow", () => {
             "Comma, Comma, Comma, Comma"
         )
         expect(() => new AlternativesAmbiguityParser()).to.throw(
-            "interfaces/iparserconfig.html#ignoredissues for more details\n"
+            "https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES"
         )
     })
 
@@ -1138,62 +1210,14 @@ describe("The prefix ambiguity detection full flow", () => {
             })
         }
         expect(() => new AlternativesAmbiguityParser()).to.throw(
-            "Ambiguous alternatives: <1 ,2>"
+            "Ambiguous Alternatives Detected: <1 ,2>"
         )
         expect(() => new AlternativesAmbiguityParser()).to.throw(
             "in <OR> inside <main> Rule"
         )
         expect(() => new AlternativesAmbiguityParser()).to.throw("D, D, D, D")
         expect(() => new AlternativesAmbiguityParser()).to.throw(
-            "interfaces/iparserconfig.html#ignoredissues for more details\n"
-        )
-    })
-
-    it("will throw an error when an an alts ambiguity is detected", () => {
-        const OneTok = createToken({ name: "OneTok" })
-        const TwoTok = createToken({ name: "TwoTok" })
-        const Comma = createToken({ name: "Comma" })
-
-        const ALL_TOKENS = [OneTok, TwoTok, Comma]
-
-        class AlternativesAmbiguityParser extends Parser {
-            constructor() {
-                super(ALL_TOKENS)
-                this.performSelfAnalysis()
-            }
-
-            public main = this.RULE("main", () => {
-                this.OR([
-                    { ALT: () => this.SUBRULE(this.alt1) },
-                    { ALT: () => this.SUBRULE(this.alt2) }
-                ])
-            })
-
-            public alt1 = this.RULE("alt1", () => {
-                this.MANY(() => {
-                    this.CONSUME(Comma)
-                })
-                this.CONSUME(OneTok)
-            })
-
-            public alt2 = this.RULE("alt2", () => {
-                this.MANY(() => {
-                    this.CONSUME(Comma)
-                })
-                this.CONSUME(TwoTok)
-            })
-        }
-        expect(() => new AlternativesAmbiguityParser()).to.throw(
-            "Ambiguous alternatives: <1 ,2>"
-        )
-        expect(() => new AlternativesAmbiguityParser()).to.throw(
-            "in <OR> inside <main> Rule"
-        )
-        expect(() => new AlternativesAmbiguityParser()).to.throw(
-            "Comma, Comma, Comma, Comma"
-        )
-        expect(() => new AlternativesAmbiguityParser()).to.throw(
-            "interfaces/iparserconfig.html#ignoredissues for more details\n"
+            "https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES"
         )
     })
 

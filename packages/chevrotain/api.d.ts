@@ -370,61 +370,61 @@ declare abstract class BaseParser {
      *
      * @returns The result of invoking the chosen alternative.
      */
-    /* protected */ OR(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
+    /* protected */ OR(altsOrOpts: IOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR1(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
+    /* protected */ OR1(altsOrOpts: IOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR2(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
+    /* protected */ OR2(altsOrOpts: IOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR3(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
+    /* protected */ OR3(altsOrOpts: IOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR4(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
+    /* protected */ OR4(altsOrOpts: IOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR5(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
+    /* protected */ OR5(altsOrOpts: IOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR6(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
+    /* protected */ OR6(altsOrOpts: IOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR7(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
+    /* protected */ OR7(altsOrOpts: IOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR8(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
+    /* protected */ OR8(altsOrOpts: IOrAlt[] | OrMethodOpts): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR9(altsOrOpts: IAnyOrAlt[] | OrMethodOpts): any
+    /* protected */ OR9(altsOrOpts: IOrAlt[] | OrMethodOpts): any
 
     /**
      * Parsing DSL method, that indicates a repetition of zero or more.
@@ -1811,13 +1811,26 @@ export interface OrMethodOpts {
      * The set of alternatives,
      * See detailed description in {@link Parser.OR}
      */
-    DEF: IAnyOrAlt[]
+    DEF: IOrAlt[]
     /**
      * A description for the alternatives used in error messages
      * If none is provided, the error message will include the names of the expected
      * Tokens sequences which may start each alternative.
      */
     ERR_MSG?: string
+
+    /**
+     * A Flag indicating that **all** ambiguities in this alternation should
+     * be ignored.
+     *
+     * This flag should only be used in rare circumstances,
+     * As normally alternation ambiguities should be resolved in other ways:
+     * - Re-ordering the alternatives.
+     * - Re-factoring the grammar to extract common prefixes before alternation.
+     * - Using gates {@link IOrAlt.GATE} to implement custom lookahead logic.
+     * - Using the more granular {@link IOrAlt.IGNORE_AMBIGUITIES} on a **specific** alternative.
+     */
+    IGNORE_AMBIGUITIES?: boolean
 }
 
 export interface ManySepMethodOpts<T> {
@@ -1868,35 +1881,28 @@ export interface SubruleMethodOpts {
 
 export declare type GrammarAction<OUT> = () => OUT
 
-export declare type IAnyOrAlt = IOrAlt | IOrAltWithGate
-
 /**
- * ```
- *    $.OR([
- *      {ALT:XXX },
- *      {ALT:YYY },
- *      {ALT:ZZZ }
- *    ])
- * ```
+ * TODO: remove this in next major version this `IOrAlt` is enough
+ * @deprecated
  */
+export declare type IAnyOrAlt = any
+
 export interface IOrAlt {
     NAME?: string
+    GATE?: () => boolean
     ALT: () => any
+    /**
+     * A Flag indicating that any ambiguities involving this
+     * specific alternative Should be ignored.
+     *
+     * This flag will be **implicitly** enabled if a GATE is used
+     * as the assumption is that the GATE is used to resolve an ambiguity.
+     */
+    IGNORE_AMBIGUITIES?: boolean
 }
 
-/**
- * ```
- *  $.OR([
- *    { GATE:condition1, ALT:XXX },
- *    { GATE:condition2, ALT:YYY },
- *    { GATE:condition3, ALT:ZZZ }
- *  ])
- * ```
- */
 export interface IOrAltWithGate extends IOrAlt {
-    NAME?: string
-    GATE: () => boolean
-    ALT: () => any
+    // TODO: deprecate this interface
 }
 
 export interface ICstVisitor<IN, OUT> {
@@ -1963,6 +1969,10 @@ export interface IParserConfig {
      */
     maxLookahead?: number
     /**
+     * @deprecated - use the IGNORE_AMBIGUITIES flag on the relevant DSL method instead
+     *               - {@link IOrAlt.IGNORE_AMBIGUITIES}
+     *               - {@link OrMethodOpts.IGNORE_AMBIGUITIES}
+     *
      * Used to mark parser definition errors that should be ignored.
      * For example:
      *
