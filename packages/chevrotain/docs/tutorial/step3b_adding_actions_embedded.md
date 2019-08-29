@@ -13,9 +13,9 @@ result/data structure/value.
 
 This can be accomplished using two features of the Parsing DSL:
 
--   [CONSUME](https://sap.github.io/chevrotain/documentation/6_1_0/classes/embeddedactionsparser.html#consume) will return
-    The [IToken](https://sap.github.io/chevrotain/documentation/6_1_0/interfaces/itoken.html) object consumed.
--   [SUBRULE](https://sap.github.io/chevrotain/documentation/6_1_0/classes/embeddedactionsparser.html#subrule) will return
+-   [CONSUME](https://sap.github.io/chevrotain/documentation/6_2_0/classes/embeddedactionsparser.html#consume) will return
+    The [IToken](https://sap.github.io/chevrotain/documentation/6_2_0/interfaces/itoken.html) object consumed.
+-   [SUBRULE](https://sap.github.io/chevrotain/documentation/6_2_0/classes/embeddedactionsparser.html#subrule) will return
     the result of the grammar rule invoked.
 
 ### Enabling embedded actions

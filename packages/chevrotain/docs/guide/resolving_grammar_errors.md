@@ -232,4 +232,4 @@ $.MANY(() => {
 })
 ```
 
-[maxlookahead]: https://sap.github.io/chevrotain/documentation/6_1_0/interfaces/iparserconfig.html#maxlookahead
+[maxlookahead]: https://sap.github.io/chevrotain/documentation/6_2_0/interfaces/iparserconfig.html#maxlookahead
