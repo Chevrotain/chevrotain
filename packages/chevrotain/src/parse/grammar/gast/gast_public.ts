@@ -169,6 +169,7 @@ export class Alternation extends AbstractProduction
     public idx: number = 1
     public name: string
     public ignoreAmbiguities: boolean = false
+    public definition: Flat[]
 
     constructor(options: {
         definition: Flat[]

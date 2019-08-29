@@ -184,9 +184,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
         nestedProd: IOptionallyNamedProduction
     ): string {
         const msg =
-            `Invalid nested rule name: ->${nestedProd.name}<- inside rule: ->${
-                topLevelRule.name
-            }<-\n` +
+            `Invalid nested rule name: ->${nestedProd.name}<- inside rule: ->${topLevelRule.name}<-\n` +
             `it must match the pattern: ->${validNestedRuleName.toString()}<-.\n` +
             `Note that this means a nested rule name must start with the '$'(dollar) sign.`
 
@@ -199,9 +197,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
     ): string {
         const duplicateName = first(nestedProd).name
         const errMsg =
-            `Duplicate nested rule name: ->${duplicateName}<- inside rule: ->${
-                topLevelRule.name
-            }<-\n` +
+            `Duplicate nested rule name: ->${duplicateName}<- inside rule: ->${topLevelRule.name}<-\n` +
             `A nested name must be unique in the scope of a top level grammar rule.`
 
         return errMsg
@@ -210,9 +206,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
     buildNamespaceConflictError(rule: Rule): string {
         const errMsg =
             `Namespace conflict found in grammar.\n` +
-            `The grammar has both a Terminal(Token) and a Non-Terminal(Rule) named: <${
-                rule.name
-            }>.\n` +
+            `The grammar has both a Terminal(Token) and a Non-Terminal(Rule) named: <${rule.name}>.\n` +
             `To resolve this make sure each Terminal and Non-Terminal names are unique\n` +
             `This is easy to accomplish by using the convention that Terminal names start with an uppercase letter\n` +
             `and Non-Terminal names start with a lower case letter.`
@@ -235,11 +229,9 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
             `Ambiguous alternatives: <${options.ambiguityIndices.join(
                 " ,"
             )}> due to common lookahead prefix\n` +
-            `in <OR${occurrence}> inside <${
-                options.topLevelRule.name
-            }> Rule,\n` +
+            `in <OR${occurrence}> inside <${options.topLevelRule.name}> Rule,\n` +
             `<${pathMsg}> may appears as a prefix path in all these alternatives.\n` +
-            `https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#COMMON_PREFIX\n` +
+            `See: https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#COMMON_PREFIX\n` +
             `For Further details.`
 
         return errMsg
@@ -257,26 +249,16 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
         let occurrence =
             options.alternation.idx === 0 ? "" : options.alternation.idx
         let currMessage =
-            `Ambiguous alternatives: <${options.ambiguityIndices.join(
+            `Ambiguous Alternatives Detected: <${options.ambiguityIndices.join(
                 " ,"
             )}> in <OR${occurrence}>` +
             ` inside <${options.topLevelRule.name}> Rule,\n` +
             `<${pathMsg}> may appears as a prefix path in all these alternatives.\n`
 
-        let docs_version = VERSION.replace(/\./g, "_")
-        // Should this information be on the error message or in some common errors docs?
         currMessage =
             currMessage +
-            "To Resolve this, try one of of the following: \n" +
-            `1. Refactor your grammar to be LL(K) for the current value of k (by default k=${
-                DEFAULT_PARSER_CONFIG.maxLookahead
-            }})\n` +
-            "2. Increase the value of K for your grammar by providing a larger 'maxLookahead' value in the parser's config\n" +
-            "3. This issue can be ignored (if you know what you are doing...), see" +
-            " https://sap.github.io/chevrotain/documentation/" +
-            docs_version +
-            "/interfaces/iparserconfig.html#ignoredissues for more" +
-            " details\n"
+            `See: https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES\n` +
+            `For Further details.`
         return currMessage
     },
 
@@ -290,9 +272,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
         }
 
         const errMsg =
-            `The repetition <${dslName}> within Rule <${
-                options.topLevelRule.name
-            }> can never consume any tokens.\n` +
+            `The repetition <${dslName}> within Rule <${options.topLevelRule.name}> can never consume any tokens.\n` +
             `This could lead to an infinite loop.`
 
         return errMsg
@@ -314,9 +294,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
     }): string {
         const errMsg =
             `Ambiguous empty alternative: <${options.emptyChoiceIdx + 1}>` +
-            ` in <OR${options.alternation.idx}> inside <${
-                options.topLevelRule.name
-            }> Rule.\n` +
+            ` in <OR${options.alternation.idx}> inside <${options.topLevelRule.name}> Rule.\n` +
             `Only the last alternative may be an empty alternative.`
 
         return errMsg
@@ -379,9 +357,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
             ruleName = options.topLevelRule
         }
 
-        const errMsg = `Duplicate definition, rule: ->${ruleName}<- is already defined in the grammar: ->${
-            options.grammarName
-        }<-`
+        const errMsg = `Duplicate definition, rule: ->${ruleName}<- is already defined in the grammar: ->${options.grammarName}<-`
 
         return errMsg
     }

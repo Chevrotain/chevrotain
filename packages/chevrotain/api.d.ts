@@ -1887,7 +1887,7 @@ export declare type IAnyOrAlt = any
 
 export interface IOrAlt {
     NAME?: string
-    GATE: () => boolean
+    GATE?: () => boolean
     ALT: () => any
     /**
      * A Flag indicating that any ambiguities involving this
