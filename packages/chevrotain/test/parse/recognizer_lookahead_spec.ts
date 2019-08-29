@@ -1621,21 +1621,19 @@ describe("lookahead Regular Tokens Mode", () => {
         class ManyInOrBugParser extends Parser {
             constructor() {
                 super(ALL_TOKENS, {
-                    outputCst: false,
-                    ignoredIssues: {
-                        main: {
-                            OR: true
-                        }
-                    }
+                    outputCst: false
                 })
                 this.performSelfAnalysis()
             }
 
             public main = this.RULE("main", () => {
-                this.OR([
-                    { ALT: () => this.SUBRULE(this.alt1) },
-                    { ALT: () => this.SUBRULE(this.alt2) }
-                ])
+                this.OR({
+                    DEF: [
+                        { ALT: () => this.SUBRULE(this.alt1) },
+                        { ALT: () => this.SUBRULE(this.alt2) }
+                    ],
+                    IGNORE_AMBIGUITIES: true
+                })
             })
 
             public alt1 = this.RULE("alt1", () => {

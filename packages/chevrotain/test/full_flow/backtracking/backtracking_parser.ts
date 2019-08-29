@@ -43,10 +43,7 @@ export class IdentTok {
 }
 
 const configuration: IParserConfig = {
-    outputCst: false,
-    ignoredIssues: {
-        statement: { OR: true }
-    }
+    outputCst: false
 }
 
 // extending the BaseErrorRecoveryRecognizer in this example because it too has logic related to backtracking

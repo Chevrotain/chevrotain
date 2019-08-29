@@ -972,6 +972,78 @@ describe("The empty alternative detection full flow", () => {
         )
     })
 
+    context("IGNORE_AMBIGUITIES flag", () => {
+        it("will ignore specific alternative ambiguity", () => {
+            class IgnoreAlternativeAmbiguitiesFlagParser extends Parser {
+                constructor(input: IToken[] = []) {
+                    super([PlusTok, StarTok])
+                    this.performSelfAnalysis()
+                    this.input = input
+                }
+
+                public noneLastEmpty = this.RULE("noneLastEmpty", () => {
+                    this.OR([
+                        {
+                            IGNORE_AMBIGUITIES: true,
+                            ALT: () => {
+                                this.CONSUME1(PlusTok)
+                                this.CONSUME1(StarTok)
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME2(PlusTok)
+                                this.CONSUME2(StarTok)
+                            }
+                        }
+                    ])
+                })
+            }
+            expect(
+                () => new IgnoreAlternativeAmbiguitiesFlagParser()
+            ).to.not.throw()
+        })
+
+        it("will ignore all alternation ambiguities", () => {
+            class IgnoreAlternationAmbiguitiesFlagParser extends Parser {
+                constructor(input: IToken[] = []) {
+                    super([PlusTok, StarTok])
+                    this.performSelfAnalysis()
+                    this.input = input
+                }
+
+                public noneLastEmpty = this.RULE("noneLastEmpty", () => {
+                    this.OR({
+                        IGNORE_AMBIGUITIES: true,
+                        DEF: [
+                            {
+                                ALT: () => {
+                                    this.CONSUME1(PlusTok)
+                                    this.CONSUME1(StarTok)
+                                }
+                            },
+                            {
+                                ALT: () => {
+                                    this.CONSUME2(PlusTok)
+                                    this.CONSUME2(StarTok)
+                                }
+                            },
+                            {
+                                ALT: () => {
+                                    this.CONSUME3(PlusTok)
+                                    this.CONSUME3(StarTok)
+                                }
+                            }
+                        ]
+                    })
+                })
+            }
+            expect(
+                () => new IgnoreAlternationAmbiguitiesFlagParser()
+            ).to.not.throw()
+        })
+    })
+
     it("will throw an error when an empty alternative is not the last alternative #2", () => {
         class EmptyAltAmbiguityParser2 extends Parser {
             constructor(input: IToken[] = []) {
