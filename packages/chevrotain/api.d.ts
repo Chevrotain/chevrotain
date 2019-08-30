@@ -1477,6 +1477,8 @@ export interface ILineTerminatorsTester {
     lastIndex: number
 }
 
+export type TokenPattern = RegExp | string | CustomPatternMatcherFunc | ICustomPattern
+
 export interface ITokenConfig {
     name: string
 
@@ -1505,7 +1507,7 @@ export interface ITokenConfig {
      *
      * For Custom Patterns see: http://sap.github.io/chevrotain/docs/guide/custom_token_patterns.html
      */
-    pattern?: RegExp | string | CustomPatternMatcherFunc | ICustomPattern
+    pattern?: TokenPattern
 
     /**
      * The group property will cause the lexer to collect
@@ -1631,7 +1633,7 @@ export type CustomPatternMatcherReturn = [string] & { payload?: any }
 export interface TokenType {
     name: string
     GROUP?: string
-    PATTERN?: RegExp | string
+    PATTERN?: TokenPattern
     LABEL?: string
     LONGER_ALT?: TokenType
     POP_MODE?: boolean
