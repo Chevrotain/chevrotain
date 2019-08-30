@@ -214,6 +214,9 @@ export class Parser {
         )
         this.allRuleNames = cstAnalysisResult.allRuleNames
 
+        // Compute lookahead here
+        this.preComputeLookaheadFunctions(values(this.gastProductionsCache))
+
         if (
             !Parser.DEFER_DEFINITION_ERRORS_HANDLING &&
             !isEmpty(this.definitionErrors)

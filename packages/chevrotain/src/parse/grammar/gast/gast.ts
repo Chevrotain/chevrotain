@@ -106,6 +106,17 @@ export class DslMethodsCollectorVisitor extends GAstVisitor {
         repetitionMandatoryWithSeparator: []
     }
 
+    reset() {
+        this.dslMethods = {
+            option: [],
+            alternation: [],
+            repetition: [],
+            repetitionWithSeparator: [],
+            repetitionMandatory: [],
+            repetitionMandatoryWithSeparator: []
+        }
+    }
+
     public visitTerminal(terminal: Terminal): void {
         const key =
             tokenName(terminal.terminalType) + this.separator + "Terminal"
@@ -150,4 +161,23 @@ export class DslMethodsCollectorVisitor extends GAstVisitor {
     public visitAlternation(or: Alternation): void {
         this.dslMethods.alternation.push(or)
     }
+}
+
+const collectorVisitor = new DslMethodsCollectorVisitor()
+export function collectMethods(
+    rule: Rule
+): {
+    option: Option[]
+    alternation: Alternation[]
+    repetition: Repetition[]
+    repetitionWithSeparator: RepetitionWithSeparator[]
+    repetitionMandatory: RepetitionMandatory[]
+    repetitionMandatoryWithSeparator: RepetitionMandatoryWithSeparator
+} {
+    collectorVisitor.reset()
+    rule.accept(collectorVisitor)
+    const dslMethods = collectorVisitor.dslMethods
+    // avoid uncleaned references
+    collectorVisitor.reset()
+    return <any>dslMethods
 }

@@ -6,6 +6,7 @@ import {
     DSLMethodOptsWithErr,
     GrammarAction,
     IAnyOrAlt,
+    IOrAltWithGate,
     IParserConfig,
     IProduction,
     IToken,
@@ -14,7 +15,14 @@ import {
     SubruleMethodOpts,
     TokenType
 } from "../../../../api"
-import { forEach, has, isArray, isFunction, peek } from "../../../utils/utils"
+import {
+    forEach,
+    has,
+    isArray,
+    isFunction,
+    peek,
+    some
+} from "../../../utils/utils"
 import { MixedInParser } from "./parser_traits"
 import {
     Alternation,
@@ -357,6 +365,10 @@ function recordOrProd(mainProdArg: any, occurrence: number): any {
     if (has(mainProdArg, "NAME")) {
         newOrProd.name = mainProdArg.NAME
     }
+
+    const hasPredicates = some(alts, (currAlt: any) => isFunction(currAlt.GATE))
+    newOrProd.hasPredicates = hasPredicates
+
     prevProd.definition.push(newOrProd)
 
     forEach(alts, currAlt => {
