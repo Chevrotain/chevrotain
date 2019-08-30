@@ -1631,7 +1631,7 @@ export type CustomPatternMatcherReturn = [string] & { payload?: any }
 export interface TokenType {
     name: string
     GROUP?: string
-    PATTERN?: RegExp | string
+    PATTERN?: RegExp | string | CustomPatternMatcherFunc | ICustomPattern
     LABEL?: string
     LONGER_ALT?: TokenType
     POP_MODE?: boolean
