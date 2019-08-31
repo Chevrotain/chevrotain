@@ -1690,7 +1690,7 @@ export interface IToken {
      * This is the same Object returned by the "createToken" API.
      * This property is very useful for debugging the Lexing and Parsing phases.
      */
-    tokenType?: TokenType
+    tokenType: TokenType
 
     /**
      * Custom Payload value, this is an optional feature of Custom Token Patterns
