@@ -1684,7 +1684,7 @@ export interface IToken {
     /** this marks if a Token does not really exist and has been inserted "artificially" during parsing in rule error recovery. */
     isInsertedInRecovery?: boolean
     /** An number index representing the type of the Token use <getTokenConstructor> to get the Token Type from a token "instance"  */
-    tokenTypeIdx?: number
+    tokenTypeIdx: number
     /**
      * The actual Token Type of this Token "instance"
      * This is the same Object returned by the "createToken" API.
