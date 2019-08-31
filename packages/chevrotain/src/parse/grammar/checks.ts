@@ -712,8 +712,13 @@ function checkAlternativesAmbiguities(
     let identicalAmbiguities = reduce(
         alternatives,
         (result, currAlt, currAltIdx) => {
+            // Safety Check to avoid errors with invalid GAST models (e.g wrong DSL method suffixes)
+            const hasDef = alternation.definition[currAltIdx]
             // ignore (skip) ambiguities with this alternative
-            if (alternation.definition[currAltIdx].ignoreAmbiguities === true) {
+            if (
+                hasDef &&
+                alternation.definition[currAltIdx].ignoreAmbiguities === true
+            ) {
                 return result
             }
 
@@ -723,6 +728,8 @@ function checkAlternativesAmbiguities(
                     if (
                         currAltIdx !== currOtherAltIdx &&
                         containsPath(currOtherAlt, currPath) &&
+                        // Safety Check to avoid errors with invalid GAST models (e.g wrong DSL method suffixes)
+                        alternation.definition[currOtherAltIdx] &&
                         // ignore (skip) ambiguities with this "other" alternative
                         alternation.definition[currOtherAltIdx]
                             .ignoreAmbiguities !== true
@@ -793,9 +800,10 @@ export function checkPrefixAlternativesAmbiguities(
     )
 
     forEach(pathsAndIndices, currPathAndIdx => {
+        // Safety Check to avoid errors with invalid GAST models (e.g wrong DSL method suffixes)
         const alternativeGast = alternation.definition[currPathAndIdx.idx]
-        // ignore (skip) ambiguities with this alternative
-        if (alternativeGast.ignoreAmbiguities === true) {
+        if (alternativeGast && alternativeGast.ignoreAmbiguities === true) {
+            // ignore (skip) ambiguities with this alternative
             return
         }
         let targetIdx = currPathAndIdx.idx
@@ -806,6 +814,8 @@ export function checkPrefixAlternativesAmbiguities(
             searchPathAndIdx => {
                 // prefix ambiguity can only be created from lower idx (higher priority) path
                 return (
+                    // Safety Check to avoid errors with invalid GAST models (e.g wrong DSL method suffixes)
+                    alternation.definition[searchPathAndIdx.idx] &&
                     // ignore (skip) ambiguities with this "other" alternative
                     alternation.definition[searchPathAndIdx.idx]
                         .ignoreAmbiguities !== true &&
