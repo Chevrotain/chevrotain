@@ -1,4 +1,4 @@
 window.globalOptions = {
-    dev: { outputCst: false },
-    latest: { outputCst: false }
+    dev: { outputCst: false, maxLookahead: 4 },
+    latest: { outputCst: false, maxLookahead: 4 }
 }

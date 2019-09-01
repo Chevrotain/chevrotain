@@ -10,7 +10,8 @@ import {
     has,
     isES2015MapSupported,
     isFunction,
-    some
+    some,
+    timer
 } from "../../../utils/utils"
 import {
     DEFAULT_PARSER_CONFIG,
@@ -67,10 +68,6 @@ export class LooksAhead {
     }
 
     preComputeLookaheadFunctions(this: MixedInParser, rules: Rule[]): void {
-        // 0. enrich gast (predicates)
-        // 1. collect relevant GAST parts
-        // 2.
-
         forEach(rules, currRule => {
             const {
                 alternation,
@@ -82,21 +79,27 @@ export class LooksAhead {
             } = collectMethods(currRule)
 
             forEach(alternation, currProd => {
-                const laFunc = buildLookaheadFuncForOr(
-                    currProd.idx,
-                    currRule,
-                    this.maxLookahead,
-                    currProd.hasPredicates,
-                    this.dynamicTokensEnabled,
-                    this.lookAheadBuilderForAlternatives
-                )
+                const time = timer(() => {
+                    const laFunc = buildLookaheadFuncForOr(
+                        currProd.idx,
+                        currRule,
+                        this.maxLookahead,
+                        currProd.hasPredicates,
+                        this.dynamicTokensEnabled,
+                        this.lookAheadBuilderForAlternatives
+                    )
 
-                const key = getKeyForAutomaticLookahead(
-                    this.fullRuleNameToShort[currRule.name],
-                    OR_IDX,
-                    currProd.idx
-                )
-                this.setLaFuncCache(key, laFunc)
+                    const key = getKeyForAutomaticLookahead(
+                        this.fullRuleNameToShort[currRule.name],
+                        OR_IDX,
+                        currProd.idx
+                    )
+                    this.setLaFuncCache(key, laFunc)
+                })
+
+                if (time > 10) {
+                    console.log("oops")
+                }
             })
 
             forEach(repetition, currProd => {
@@ -153,20 +156,22 @@ export class LooksAhead {
         prodKey: number,
         prodType: PROD_TYPE
     ): void {
-        const laFunc = buildLookaheadFuncForOptionalProd(
-            prodOccurrence,
-            rule,
-            this.maxLookahead,
-            this.dynamicTokensEnabled,
-            prodType,
-            this.lookAheadBuilderForOptional
-        )
-        const key = getKeyForAutomaticLookahead(
-            this.fullRuleNameToShort[rule.name],
-            prodKey,
-            prodOccurrence
-        )
-        this.setLaFuncCache(key, laFunc)
+        timer(() => {
+            const laFunc = buildLookaheadFuncForOptionalProd(
+                prodOccurrence,
+                rule,
+                this.maxLookahead,
+                this.dynamicTokensEnabled,
+                prodType,
+                this.lookAheadBuilderForOptional
+            )
+            const key = getKeyForAutomaticLookahead(
+                this.fullRuleNameToShort[rule.name],
+                prodKey,
+                prodOccurrence
+            )
+            this.setLaFuncCache(key, laFunc)
+        })
     }
 
     lookAheadBuilderForOptional(

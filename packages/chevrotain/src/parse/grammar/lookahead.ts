@@ -8,7 +8,7 @@ import {
     forEach,
     has
 } from "../../utils/utils"
-import { possiblePathsFrom } from "./interpreter"
+import { PartialPathAndSuffixes, possiblePathsFrom } from "./interpreter"
 import { RestWalker } from "./rest"
 import { Predicate, TokenMatcher, lookAheadSequence } from "../parser/parser"
 import {
@@ -33,6 +33,7 @@ import {
     IProductionWithOccurrence,
     TokenType
 } from "../../../api"
+import { lookAheadPathFromAltsSmart } from "./lookaheadSmart"
 
 export enum PROD_TYPE {
     OPTION,
@@ -489,72 +490,106 @@ class InsideDefinitionFinderVisitor extends GAstVisitor {
     }
 }
 
+function getOtherPaths(pathsAndSuffixes, filterIdx): TokenType[][] {
+    return reduce(
+        pathsAndSuffixes,
+        (result, currPathsAndSuffixes, currIdx) => {
+            if (currIdx !== filterIdx) {
+                let currPartialPaths = map(
+                    currPathsAndSuffixes,
+                    singlePathAndSuffix => singlePathAndSuffix.partialPath
+                )
+                return result.concat(currPartialPaths)
+            }
+            return result
+        },
+        []
+    )
+}
+
+function isUniquePrefix<T>(arr: T[][], item: T[]): boolean {
+    return (
+        find(arr, currOtherPath => {
+            return every(item, (currPathTok, idx) => {
+                return possibleTokenTypeMatch(currPathTok, currOtherPath[idx])
+            })
+        }) === undefined
+    )
+}
+
+function fastIsUniquePrefix(
+    searchPath: TokenType[],
+    dataSet: PartialPathAndSuffixes[][],
+    currAltIdx: number
+): boolean {
+    for (let i = 0; i < dataSet.length; i++) {
+        if (i === currAltIdx) {
+            // ignore own alternative paths
+            continue
+        }
+        const otherPathsData = dataSet[i]
+        nextOther: for (let j = 0; j < otherPathsData.length; j++) {
+            const otherPath = otherPathsData[j].partialPath
+            // longer path is always unique
+            if (searchPath.length > otherPath.length) {
+                continue
+            }
+            for (let t = 0; t < searchPath.length; t++) {
+                const searchPathTokType = searchPath[t]
+                const otherPathTokType = otherPath[t]
+                const currPosMatch = possibleTokenTypeMatch(
+                    searchPathTokType,
+                    otherPathTokType
+                )
+                if (currPosMatch === false) {
+                    continue nextOther
+                }
+            }
+            // we found a matching path in one of the other alternative
+            return false
+        }
+    }
+    return true
+}
+
+function possibleTokenTypeMatch(tokTypeA, tokTypeB): boolean {
+    return (
+        tokTypeA === tokTypeB ||
+        (tokTypeA &&
+            tokTypeB &&
+            (tokTypeA.categoryMatchesMap[tokTypeB.tokenTypeIdx] ||
+                tokTypeB.categoryMatchesMap[tokTypeA.tokenTypeIdx])) === true
+    )
+}
+
+function initializeArrayOfArrays(size): any[][] {
+    let result = new Array(size)
+    for (let i = 0; i < size; i++) {
+        result[i] = []
+    }
+    return result
+}
+
+// TODO: this need to be made faster and smarter
+// TODO: this seems to be called multiple times, can we cache result?
 export function lookAheadSequenceFromAlternatives(
     altsDefs: IProduction[],
     k: number
 ): lookAheadSequence[] {
-    function getOtherPaths(pathsAndSuffixes, filterIdx): TokenType[][] {
-        return reduce(
-            pathsAndSuffixes,
-            (result, currPathsAndSuffixes, currIdx) => {
-                if (currIdx !== filterIdx) {
-                    let currPartialPaths = map(
-                        currPathsAndSuffixes,
-                        singlePathAndSuffix => singlePathAndSuffix.partialPath
-                    )
-                    return result.concat(currPartialPaths)
-                }
-                return result
-            },
-            []
-        )
-    }
-
-    function isUniquePrefix<T>(arr: T[][], item: T[]): boolean {
-        return (
-            find(arr, currOtherPath => {
-                return every(item, (currPathTok, idx) => {
-                    return possibleTokenTypeMatch(
-                        currPathTok,
-                        currOtherPath[idx]
-                    )
-                })
-            }) === undefined
-        )
-    }
-
-    function possibleTokenTypeMatch(tokTypeA, tokTypeB): boolean {
-        return (
-            tokTypeA === tokTypeB ||
-            (tokTypeA &&
-                tokTypeB &&
-                (tokTypeA.categoryMatchesMap[tokTypeB.tokenTypeIdx] ||
-                    tokTypeB.categoryMatchesMap[tokTypeA.tokenTypeIdx]))
-        )
-    }
-
-    function initializeArrayOfArrays(size): any[][] {
-        let result = []
-        for (let i = 0; i < size; i++) {
-            result.push([])
-        }
-        return result
-    }
-
     let partialAlts = map(altsDefs, currAlt => possiblePathsFrom([currAlt], 1))
     let finalResult = initializeArrayOfArrays(partialAlts.length)
     let newData = partialAlts
 
     // maxLookahead loop
     for (let pathLength = 1; pathLength <= k; pathLength++) {
+        // TODO early exit condition???? all paths unique?
+        // Or maybe simplified edge case optimization
         let currDataset = newData
         newData = initializeArrayOfArrays(currDataset.length)
 
         // alternatives loop
-        for (let resultIdx = 0; resultIdx < currDataset.length; resultIdx++) {
-            let currAltPathsAndSuffixes = currDataset[resultIdx]
-            let otherPaths = getOtherPaths(currDataset, resultIdx)
-
+        for (let altIdx = 0; altIdx < currDataset.length; altIdx++) {
+            let currAltPathsAndSuffixes = currDataset[altIdx]
             // paths in current alternative loop
             for (
                 let currPathIdx = 0;
@@ -564,8 +599,12 @@ export function lookAheadSequenceFromAlternatives(
                 let currPathPrefix =
                     currAltPathsAndSuffixes[currPathIdx].partialPath
                 let suffixDef = currAltPathsAndSuffixes[currPathIdx].suffixDef
-                let isUnique = isUniquePrefix(otherPaths, currPathPrefix)
-
+                // TODO: a dictionary approach could also be used here.
+                let isUnique = fastIsUniquePrefix(
+                    currPathPrefix,
+                    currDataset,
+                    altIdx
+                )
                 // even if a path is not unique, but there are no longer alternatives to try
                 // or if we have reached the maximum lookahead (k) permitted.
                 if (
@@ -573,17 +612,20 @@ export function lookAheadSequenceFromAlternatives(
                     isEmpty(suffixDef) ||
                     currPathPrefix.length === k
                 ) {
-                    let currAltResult = finalResult[resultIdx]
-                    if (!containsPath(currAltResult, currPathPrefix)) {
+                    let currAltResult = finalResult[altIdx]
+                    // TODO: Can we implement a containsPath using Maps/Dictionaries?
+                    if (containsPath(currAltResult, currPathPrefix) === false) {
                         currAltResult.push(currPathPrefix)
                     }
-                } else {
+                }
+                // Expand longer paths
+                else {
                     let newPartialPathsAndSuffixes = possiblePathsFrom(
                         suffixDef,
                         pathLength + 1,
                         currPathPrefix
                     )
-                    newData[resultIdx] = newData[resultIdx].concat(
+                    newData[altIdx] = newData[altIdx].concat(
                         newPartialPathsAndSuffixes
                     )
                 }
@@ -613,6 +655,7 @@ export function getLookaheadPathsForOptionalProd(
     prodType: PROD_TYPE,
     k: number
 ): lookAheadSequence[] {
+    // TODO: Reuse this class instance for performance?
     let insideDefVisitor = new InsideDefinitionFinderVisitor(
         occurrence,
         prodType
@@ -620,6 +663,7 @@ export function getLookaheadPathsForOptionalProd(
     ruleGrammar.accept(insideDefVisitor)
     let insideDef = insideDefVisitor.result
 
+    // TODO: reuse this class instance for performance?
     let afterDefWalker = new RestDefinitionFinderWalker(
         ruleGrammar,
         occurrence,
@@ -630,26 +674,51 @@ export function getLookaheadPathsForOptionalProd(
     let insideFlat = new Flat({ definition: insideDef })
     let afterFlat = new Flat({ definition: afterDef })
 
+    // TODO: when is the afterFlat taken into account?
+    lookAheadPathFromAltsSmart([insideFlat, afterFlat], k)
     return lookAheadSequenceFromAlternatives([insideFlat, afterFlat], k)
 }
 
+// TODO: implement this in an imperative manner for more speed?
+// TODO: scan in reverse?
 export function containsPath(
     alternative: Alternative,
-    path: TokenType[]
+    searchPath: TokenType[]
 ): boolean {
-    let found = find(alternative, otherPath => {
-        return (
-            path.length === otherPath.length &&
-            every(path, (targetItem, idx) => {
-                // TODO: take categories into account here too?
-                return (
-                    targetItem === otherPath[idx] ||
-                    otherPath[idx].categoryMatchesMap[targetItem.tokenTypeIdx]
-                )
-            })
-        )
-    })
-    return found !== undefined
+    compareOtherPath: for (let i = 0; i < alternative.length; i++) {
+        const otherPath = alternative[i]
+        if (otherPath.length !== searchPath.length) {
+            continue
+        }
+        for (let j = 0; j < otherPath.length; j++) {
+            const searchTok = searchPath[j]
+            const otherTok = otherPath[j]
+
+            const matchingTokens =
+                searchTok === otherTok ||
+                otherTok.categoryMatchesMap[searchTok.tokenTypeIdx] !==
+                    undefined
+            if (matchingTokens === false) {
+                continue compareOtherPath
+            }
+        }
+        return true
+    }
+
+    return false
+
+    // let found = find(alternative, otherPath => {
+    //     return (
+    //         searchPath.length === otherPath.length &&
+    //         every(searchPath, (targetItem, idx) => {
+    //             return (
+    //                 targetItem === otherPath[idx] ||
+    //                 otherPath[idx].categoryMatchesMap[targetItem.tokenTypeIdx]
+    //             )
+    //         })
+    //     )
+    // })
+    // return found !== undefined
 }
 
 export function isStrictPrefixOfPath(

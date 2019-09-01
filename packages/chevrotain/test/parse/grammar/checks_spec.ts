@@ -852,7 +852,7 @@ describe("The left recursion detection full flow", () => {
         expect(() => new InDirectlyLeftRecursive()).to.throw("A --> B --> A")
     })
 
-    it("will throw an error when trying to init a parser with indirect left recursion", () => {
+    it("will throw an error when trying to init a parser with indirect left recursion - complex", () => {
         expect(() => new ComplexInDirectlyLeftRecursive()).to.throw(
             "Left Recursion found in grammar"
         )

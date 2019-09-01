@@ -206,6 +206,8 @@ export class Parser {
                 values(this.gastProductionsCache)
             )
             this.resyncFollows = allFollows
+
+            this.preComputeLookaheadFunctions(values(this.gastProductionsCache))
         }
 
         let cstAnalysisResult = analyzeCst(
@@ -213,9 +215,6 @@ export class Parser {
             this.fullRuleNameToShort
         )
         this.allRuleNames = cstAnalysisResult.allRuleNames
-
-        // Compute lookahead here
-        this.preComputeLookaheadFunctions(values(this.gastProductionsCache))
 
         if (
             !Parser.DEFER_DEFINITION_ERRORS_HANDLING &&

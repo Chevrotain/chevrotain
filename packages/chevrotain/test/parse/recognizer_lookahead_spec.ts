@@ -85,11 +85,6 @@ describe("lookahead Regular Tokens Mode", () => {
             }
         }
 
-        it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", () => {
-            let parser = new OptionsImplicitLookAheadParser([])
-            expect(parser.getLookAheadCacheSize()).to.equal(0)
-        })
-
         it("can automatically compute lookahead for OPTION1", () => {
             let input = [createRegularToken(OneTok)]
             let parser = new OptionsImplicitLookAheadParser(input)
@@ -193,11 +188,6 @@ describe("lookahead Regular Tokens Mode", () => {
                 return total
             }
         }
-
-        it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", () => {
-            let parser = new ManyImplicitLookAheadParser()
-            expect(parser.getLookAheadCacheSize()).to.equal(0)
-        })
 
         it("can automatically compute lookahead for MANY1", () => {
             let input = [createRegularToken(OneTok)]
@@ -371,11 +361,6 @@ describe("lookahead Regular Tokens Mode", () => {
             }
         }
 
-        it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", () => {
-            let parser = new ManySepImplicitLookAheadParser()
-            expect(parser.getLookAheadCacheSize()).to.equal(0)
-        })
-
         it("can automatically compute lookahead for MANY_SEP1", () => {
             let input = [createRegularToken(OneTok)]
             let parser = new ManySepImplicitLookAheadParser(input)
@@ -529,11 +514,6 @@ describe("lookahead Regular Tokens Mode", () => {
             }
         }
 
-        it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", () => {
-            let parser = new AtLeastOneImplicitLookAheadParser()
-            expect(parser.getLookAheadCacheSize()).to.equal(0)
-        })
-
         it("can accept lookahead function param for AT_LEAST_ONE", () => {
             let input = [
                 createRegularToken(OneTok),
@@ -680,11 +660,6 @@ describe("lookahead Regular Tokens Mode", () => {
                 }
             }
         }
-
-        it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", () => {
-            let parser = new AtLeastOneSepImplicitLookAheadParser()
-            expect(parser.getLookAheadCacheSize()).to.equal(0)
-        })
 
         it("can accept lookahead function param for AT_LEAST_ONE_SEP", () => {
             let input = [
@@ -917,11 +892,6 @@ describe("lookahead Regular Tokens Mode", () => {
                 return total
             }
         }
-
-        it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", () => {
-            let parser = new OrImplicitLookAheadParser()
-            expect(parser.getLookAheadCacheSize()).to.equal(0)
-        })
 
         it("can compute the lookahead automatically for OR", () => {
             let input = [
@@ -1236,11 +1206,6 @@ describe("lookahead Regular Tokens Mode", () => {
                 return total
             }
         }
-
-        it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", () => {
-            let parser = new OrImplicitLookAheadParserIgnoreAmbiguities()
-            expect(parser.getLookAheadCacheSize()).to.equal(0)
-        })
 
         it("can compute the lookahead automatically for OR", () => {
             let input = [

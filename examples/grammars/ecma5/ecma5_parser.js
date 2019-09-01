@@ -15,7 +15,9 @@ class ECMAScript5Parser extends EmbeddedActionsParser {
     }
 
     constructor() {
-        super(tokens)
+        super(tokens, {
+            maxLookahead: 4
+        })
 
         // Optimization to avoid traversing the prototype chain at hotspots.
         this.SUPER_CONSUME = super.CONSUME
