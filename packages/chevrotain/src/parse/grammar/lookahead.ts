@@ -33,7 +33,6 @@ import {
     IProductionWithOccurrence,
     TokenType
 } from "../../../api"
-import { lookAheadPathFromAltsSmart } from "./lookaheadSmart"
 
 export enum PROD_TYPE {
     OPTION,
