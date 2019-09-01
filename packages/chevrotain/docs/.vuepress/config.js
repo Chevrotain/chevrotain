@@ -65,7 +65,7 @@ module.exports = {
     },
     themeConfig: {
         repo: "SAP/chevrotain",
-        docsDir: "docs",
+        docsDir: "packages/chevrotain/docs",
         docsBranch: "master",
         editLinks: true,
         editLinkText: "Edit this page on GitHub",
