@@ -673,8 +673,6 @@ export function getLookaheadPathsForOptionalProd(
     let insideFlat = new Flat({ definition: insideDef })
     let afterFlat = new Flat({ definition: afterDef })
 
-    // TODO: when is the afterFlat taken into account?
-    lookAheadPathFromAltsSmart([insideFlat, afterFlat], k)
     return lookAheadSequenceFromAlternatives([insideFlat, afterFlat], k)
 }
 
