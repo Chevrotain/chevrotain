@@ -215,7 +215,7 @@ export class RecognizerApi {
         return this.optionInternal(actionORMethodDef, 2)
     }
 
-    OPTION3<OUT>(
+    OPTION33<OUT>(
         this: MixedInParser,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
