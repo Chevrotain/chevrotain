@@ -79,27 +79,21 @@ export class LooksAhead {
             } = collectMethods(currRule)
 
             forEach(alternation, currProd => {
-                const time = timer(() => {
-                    const laFunc = buildLookaheadFuncForOr(
-                        currProd.idx,
-                        currRule,
-                        this.maxLookahead,
-                        currProd.hasPredicates,
-                        this.dynamicTokensEnabled,
-                        this.lookAheadBuilderForAlternatives
-                    )
+                const laFunc = buildLookaheadFuncForOr(
+                    currProd.idx,
+                    currRule,
+                    this.maxLookahead,
+                    currProd.hasPredicates,
+                    this.dynamicTokensEnabled,
+                    this.lookAheadBuilderForAlternatives
+                )
 
-                    const key = getKeyForAutomaticLookahead(
-                        this.fullRuleNameToShort[currRule.name],
-                        OR_IDX,
-                        currProd.idx
-                    )
-                    this.setLaFuncCache(key, laFunc)
-                })
-
-                if (time > 10) {
-                    console.log("oops")
-                }
+                const key = getKeyForAutomaticLookahead(
+                    this.fullRuleNameToShort[currRule.name],
+                    OR_IDX,
+                    currProd.idx
+                )
+                this.setLaFuncCache(key, laFunc)
             })
 
             forEach(repetition, currProd => {
@@ -156,22 +150,20 @@ export class LooksAhead {
         prodKey: number,
         prodType: PROD_TYPE
     ): void {
-        timer(() => {
-            const laFunc = buildLookaheadFuncForOptionalProd(
-                prodOccurrence,
-                rule,
-                this.maxLookahead,
-                this.dynamicTokensEnabled,
-                prodType,
-                this.lookAheadBuilderForOptional
-            )
-            const key = getKeyForAutomaticLookahead(
-                this.fullRuleNameToShort[rule.name],
-                prodKey,
-                prodOccurrence
-            )
-            this.setLaFuncCache(key, laFunc)
-        })
+        const laFunc = buildLookaheadFuncForOptionalProd(
+            prodOccurrence,
+            rule,
+            this.maxLookahead,
+            this.dynamicTokensEnabled,
+            prodType,
+            this.lookAheadBuilderForOptional
+        )
+        const key = getKeyForAutomaticLookahead(
+            this.fullRuleNameToShort[rule.name],
+            prodKey,
+            prodOccurrence
+        )
+        this.setLaFuncCache(key, laFunc)
     }
 
     lookAheadBuilderForOptional(

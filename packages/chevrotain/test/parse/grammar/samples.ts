@@ -10,6 +10,8 @@ import {
 import { Alternation } from "../../../src/parse/grammar/gast/gast_public"
 import { Flat } from "../../../src/parse/grammar/gast/gast_public"
 import { RepetitionWithSeparator } from "../../../src/parse/grammar/gast/gast_public"
+import { filter, values } from "../../../src/utils/utils"
+import { augmentTokenTypes } from "../../../src/scan/tokens"
 
 export class IdentTok {
     static PATTERN = /NA/
@@ -74,6 +76,13 @@ export class KeyTok {
 export class ElementTok {
     static PATTERN = /NA/
 }
+
+// Hack to support legacy tokenTypes as classes in this test (too lazy to convert them to createToken :-)  ...
+const tokenTypes: any = filter(
+    values(module.exports),
+    item => item.PATTERN !== undefined
+)
+augmentTokenTypes(tokenTypes)
 
 export let atLeastOneRule = new Rule({
     name: "atLeastOneRule",

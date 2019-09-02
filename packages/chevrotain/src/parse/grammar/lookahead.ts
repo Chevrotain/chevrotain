@@ -569,6 +569,45 @@ function initializeArrayOfArrays(size): any[][] {
     return result
 }
 
+// TODO: handle categories too.
+function pathToHashKeys(path: TokenType[]): string[] {
+    let keys = [""]
+    for (let i = 0; i < path.length; i++) {
+        const tokType = path[i]
+        let longerKeys = []
+        for (let j = 0; j < keys.length; j++) {
+            const currShorterKey = keys[j]
+            longerKeys.push(currShorterKey + "_" + tokType.tokenTypeIdx)
+            for (let t = 0; t < tokType.categoryMatches.length; t++) {
+                const categoriesKeySuffix = "_" + tokType.categoryMatches[t]
+                longerKeys.push(currShorterKey + categoriesKeySuffix)
+            }
+        }
+        keys = longerKeys
+    }
+    return keys
+}
+
+function isUniquePrefixHash(
+    maps: Record<string, boolean>[],
+    keys: string[],
+    idx: number
+): boolean {
+    for (let i = 0; i < maps.length; i++) {
+        if (i === idx) {
+            continue
+        }
+        const currMap = maps[i]
+        for (let j = 0; j < keys.length; j++) {
+            const currKey = keys[j]
+            if (currMap[currKey] === true) {
+                return false
+            }
+        }
+    }
+    return true
+}
+
 // TODO: this need to be made faster and smarter
 // TODO: this seems to be called multiple times, can we cache result?
 export function lookAheadSequenceFromAlternatives(
@@ -577,6 +616,16 @@ export function lookAheadSequenceFromAlternatives(
 ): lookAheadSequence[] {
     let partialAlts = map(altsDefs, currAlt => possiblePathsFrom([currAlt], 1))
     let finalResult = initializeArrayOfArrays(partialAlts.length)
+    const altsHashes = map(partialAlts, currAltPaths => {
+        const dict = {}
+        forEach(currAltPaths, item => {
+            const keys = pathToHashKeys(item.partialPath)
+            forEach(keys, currKey => {
+                dict[currKey] = true
+            })
+        })
+        return dict
+    })
     let newData = partialAlts
 
     // maxLookahead loop
@@ -598,12 +647,21 @@ export function lookAheadSequenceFromAlternatives(
                 let currPathPrefix =
                     currAltPathsAndSuffixes[currPathIdx].partialPath
                 let suffixDef = currAltPathsAndSuffixes[currPathIdx].suffixDef
+                const prefixKeys = pathToHashKeys(currPathPrefix)
                 // TODO: a dictionary approach could also be used here.
-                let isUnique = fastIsUniquePrefix(
-                    currPathPrefix,
-                    currDataset,
+                let isUnique = isUniquePrefixHash(
+                    altsHashes,
+                    prefixKeys,
                     altIdx
                 )
+                // let isUniqueOld = fastIsUniquePrefix(
+                //     currPathPrefix,
+                //     currDataset,
+                //     altIdx
+                // )
+                // if (isUniqueOld !== isUnique) {
+                //     var x = 5
+                // }
                 // even if a path is not unique, but there are no longer alternatives to try
                 // or if we have reached the maximum lookahead (k) permitted.
                 if (
@@ -615,6 +673,10 @@ export function lookAheadSequenceFromAlternatives(
                     // TODO: Can we implement a containsPath using Maps/Dictionaries?
                     if (containsPath(currAltResult, currPathPrefix) === false) {
                         currAltResult.push(currPathPrefix)
+                        for (let j = 0; j < prefixKeys.length; j++) {
+                            const currKey = prefixKeys[j]
+                            altsHashes[altIdx][currKey] = true
+                        }
                     }
                 }
                 // Expand longer paths
@@ -627,6 +689,13 @@ export function lookAheadSequenceFromAlternatives(
                     newData[altIdx] = newData[altIdx].concat(
                         newPartialPathsAndSuffixes
                     )
+
+                    forEach(newPartialPathsAndSuffixes, item => {
+                        const prefixKeys = pathToHashKeys(item.partialPath)
+                        forEach(prefixKeys, key => {
+                            altsHashes[altIdx][key] = true
+                        })
+                    })
                 }
             }
         }
