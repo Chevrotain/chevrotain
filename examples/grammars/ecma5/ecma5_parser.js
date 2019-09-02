@@ -15,7 +15,11 @@ class ECMAScript5Parser extends EmbeddedActionsParser {
     }
 
     constructor() {
-        super(tokens)
+        super(tokens, {
+            // Reduces Parser Initialization time and this grammar does not need
+            // a larger lookahead.
+            maxLookahead: 2
+        })
 
         // Optimization to avoid traversing the prototype chain at hotspots.
         this.SUPER_CONSUME = super.CONSUME

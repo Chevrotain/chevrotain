@@ -206,6 +206,8 @@ export class Parser {
                 values(this.gastProductionsCache)
             )
             this.resyncFollows = allFollows
+
+            this.preComputeLookaheadFunctions(values(this.gastProductionsCache))
         }
 
         let cstAnalysisResult = analyzeCst(

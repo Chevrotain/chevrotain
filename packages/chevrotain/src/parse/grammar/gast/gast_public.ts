@@ -170,12 +170,14 @@ export class Alternation extends AbstractProduction
     public name: string
     public ignoreAmbiguities: boolean = false
     public definition: Flat[]
+    public hasPredicates: boolean = false
 
     constructor(options: {
         definition: Flat[]
         idx?: number
         name?: string
         ignoreAmbiguities?: boolean
+        hasPredicates?: boolean
     }) {
         super(options.definition)
         assign(this, pick(options, v => v !== undefined))

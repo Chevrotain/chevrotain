@@ -344,7 +344,7 @@ export class RecognizerEngine {
         occurrence: number,
         key: number
     ): OUT {
-        let lookAheadFunc = this.getLookaheadFuncForOption(key, occurrence)
+        let lookAheadFunc = this.getLaFuncFromCache(key)
         let action
         let predicate
         if ((<DSLMethodOpts<OUT>>actionORMethodDef).DEF !== undefined) {
@@ -413,10 +413,7 @@ export class RecognizerEngine {
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
         key: number
     ): void {
-        let lookAheadFunc = this.getLookaheadFuncForAtLeastOne(
-            key,
-            prodOccurrence
-        )
+        let lookAheadFunc = this.getLaFuncFromCache(key)
 
         let action
         let predicate
@@ -507,10 +504,7 @@ export class RecognizerEngine {
         let action = options.DEF
         let separator = options.SEP
 
-        let firstIterationLookaheadFunc = this.getLookaheadFuncForAtLeastOneSep(
-            key,
-            prodOccurrence
-        )
+        let firstIterationLookaheadFunc = this.getLaFuncFromCache(key)
 
         // 1st iteration
         if (firstIterationLookaheadFunc.call(this) === true) {
@@ -593,10 +587,7 @@ export class RecognizerEngine {
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
         key: number
     ) {
-        let lookaheadFunction = this.getLookaheadFuncForMany(
-            key,
-            prodOccurrence
-        )
+        let lookaheadFunction = this.getLaFuncFromCache(key)
 
         let action
         let predicate
@@ -677,11 +668,8 @@ export class RecognizerEngine {
     ): void {
         let action = options.DEF
         let separator = options.SEP
+        let firstIterationLaFunc = this.getLaFuncFromCache(key)
 
-        let firstIterationLaFunc = this.getLookaheadFuncForManySep(
-            key,
-            prodOccurrence
-        )
         // 1st iteration
         if (firstIterationLaFunc.call(this) === true) {
             action.call(this)
@@ -771,7 +759,9 @@ export class RecognizerEngine {
         let alts = isArray(altsOrOpts)
             ? (altsOrOpts as IAnyOrAlt[])
             : (altsOrOpts as OrMethodOpts).DEF
-        let laFunc = this.getLookaheadFuncForOr(occurrence, alts)
+
+        const laKey = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
+        const laFunc = this.getLaFuncFromCache(laKey)
         let altIdxToTake = laFunc.call(this, alts)
         if (altIdxToTake !== undefined) {
             let chosenAlternative: any = alts[altIdxToTake]
@@ -799,7 +789,7 @@ export class RecognizerEngine {
                 ? (altsOrOpts as IAnyOrAlt[])
                 : (altsOrOpts as OrMethodOpts).DEF
 
-            let laFunc = this.getLookaheadFuncForOr(occurrence, alts)
+            const laFunc = this.getLaFuncFromCache(laKey)
             let altIdxToTake = laFunc.call(this, alts)
             if (altIdxToTake !== undefined) {
                 let chosenAlternative: any = alts[altIdxToTake]

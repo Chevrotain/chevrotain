@@ -6,19 +6,39 @@ import {
     PROD_TYPE
 } from "../../grammar/lookahead"
 import {
+    forEach,
     has,
     isES2015MapSupported,
     isFunction,
-    some
+    some,
+    timer
 } from "../../../utils/utils"
 import {
     DEFAULT_PARSER_CONFIG,
     lookAheadSequence,
     TokenMatcher
 } from "../parser"
-import { IAnyOrAlt, IOrAltWithGate, IParserConfig } from "../../../../api"
-import { getKeyForAutomaticLookahead, OR_IDX } from "../../grammar/keys"
+import {
+    IAnyOrAlt,
+    IOrAlt,
+    IOrAltWithGate,
+    IParserConfig
+} from "../../../../api"
+import {
+    AT_LEAST_ONE_IDX,
+    AT_LEAST_ONE_SEP_IDX,
+    getKeyForAutomaticLookahead,
+    MANY_IDX,
+    MANY_SEP_IDX,
+    OPTION_IDX,
+    OR_IDX
+} from "../../grammar/keys"
 import { MixedInParser } from "./parser_traits"
+import { Rule } from "../../grammar/gast/gast_public"
+import {
+    collectMethods,
+    DslMethodsCollectorVisitor
+} from "../../grammar/gast/gast"
 
 /**
  * Trait responsible for the lookahead related utilities and optimizations.
@@ -50,6 +70,105 @@ export class LooksAhead {
             this.getLaFuncFromCache = this.getLaFuncFromObj
             this.setLaFuncCache = this.setLaFuncUsingObj
         }
+    }
+
+    preComputeLookaheadFunctions(this: MixedInParser, rules: Rule[]): void {
+        forEach(rules, currRule => {
+            const {
+                alternation,
+                repetition,
+                option,
+                repetitionMandatory,
+                repetitionMandatoryWithSeparator,
+                repetitionWithSeparator
+            } = collectMethods(currRule)
+
+            forEach(alternation, currProd => {
+                const laFunc = buildLookaheadFuncForOr(
+                    currProd.idx,
+                    currRule,
+                    this.maxLookahead,
+                    currProd.hasPredicates,
+                    this.dynamicTokensEnabled,
+                    this.lookAheadBuilderForAlternatives
+                )
+
+                const key = getKeyForAutomaticLookahead(
+                    this.fullRuleNameToShort[currRule.name],
+                    OR_IDX,
+                    currProd.idx
+                )
+                this.setLaFuncCache(key, laFunc)
+            })
+
+            forEach(repetition, currProd => {
+                this.computeLookaheadFunc(
+                    currRule,
+                    currProd.idx,
+                    MANY_IDX,
+                    PROD_TYPE.REPETITION
+                )
+            })
+
+            forEach(option, currProd => {
+                this.computeLookaheadFunc(
+                    currRule,
+                    currProd.idx,
+                    OPTION_IDX,
+                    PROD_TYPE.OPTION
+                )
+            })
+
+            forEach(repetitionMandatory, currProd => {
+                this.computeLookaheadFunc(
+                    currRule,
+                    currProd.idx,
+                    AT_LEAST_ONE_IDX,
+                    PROD_TYPE.REPETITION_MANDATORY
+                )
+            })
+
+            forEach(repetitionMandatoryWithSeparator, currProd => {
+                this.computeLookaheadFunc(
+                    currRule,
+                    currProd.idx,
+                    AT_LEAST_ONE_SEP_IDX,
+                    PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR
+                )
+            })
+
+            forEach(repetitionWithSeparator, currProd => {
+                this.computeLookaheadFunc(
+                    currRule,
+                    currProd.idx,
+                    MANY_SEP_IDX,
+                    PROD_TYPE.REPETITION_WITH_SEPARATOR
+                )
+            })
+        })
+    }
+
+    computeLookaheadFunc(
+        this: MixedInParser,
+        rule: Rule,
+        prodOccurrence: number,
+        prodKey: number,
+        prodType: PROD_TYPE
+    ): void {
+        const laFunc = buildLookaheadFuncForOptionalProd(
+            prodOccurrence,
+            rule,
+            this.maxLookahead,
+            this.dynamicTokensEnabled,
+            prodType,
+            this.lookAheadBuilderForOptional
+        )
+        const key = getKeyForAutomaticLookahead(
+            this.fullRuleNameToShort[rule.name],
+            prodKey,
+            prodOccurrence
+        )
+        this.setLaFuncCache(key, laFunc)
     }
 
     lookAheadBuilderForOptional(
@@ -92,127 +211,6 @@ export class LooksAhead {
             dslMethodIdx,
             occurrence
         )
-    }
-
-    getLookaheadFuncForOr(
-        this: MixedInParser,
-        occurrence: number,
-        alts: IAnyOrAlt[]
-    ): () => number {
-        let key = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
-        let laFunc: any = this.getLaFuncFromCache(key)
-        if (laFunc === undefined) {
-            let ruleName = this.getCurrRuleFullName()
-            let ruleGrammar = this.getGAstProductions()[ruleName]
-            // note that hasPredicates is only computed once.
-            let hasPredicates = some(alts, currAlt =>
-                isFunction((<IOrAltWithGate>currAlt).GATE)
-            )
-            laFunc = buildLookaheadFuncForOr(
-                occurrence,
-                ruleGrammar,
-                this.maxLookahead,
-                hasPredicates,
-                this.dynamicTokensEnabled,
-                this.lookAheadBuilderForAlternatives
-            )
-            this.setLaFuncCache(key, laFunc)
-            return laFunc
-        } else {
-            return laFunc
-        }
-    }
-
-    // Automatic lookahead calculation
-    getLookaheadFuncForOption(
-        this: MixedInParser,
-        key: number,
-        occurrence: number
-    ): () => boolean {
-        return this.getLookaheadFuncFor(
-            key,
-            occurrence,
-            this.maxLookahead,
-            PROD_TYPE.OPTION
-        )
-    }
-
-    getLookaheadFuncForMany(
-        this: MixedInParser,
-        key: number,
-        occurrence: number
-    ): () => boolean {
-        return this.getLookaheadFuncFor(
-            key,
-            occurrence,
-            this.maxLookahead,
-            PROD_TYPE.REPETITION
-        )
-    }
-
-    getLookaheadFuncForManySep(
-        this: MixedInParser,
-        key: number,
-        occurrence: number
-    ): () => boolean {
-        return this.getLookaheadFuncFor(
-            key,
-            occurrence,
-            this.maxLookahead,
-            PROD_TYPE.REPETITION_WITH_SEPARATOR
-        )
-    }
-
-    getLookaheadFuncForAtLeastOne(
-        this: MixedInParser,
-        key: number,
-        occurrence: number
-    ): () => boolean {
-        return this.getLookaheadFuncFor(
-            key,
-            occurrence,
-            this.maxLookahead,
-            PROD_TYPE.REPETITION_MANDATORY
-        )
-    }
-
-    getLookaheadFuncForAtLeastOneSep(
-        this: MixedInParser,
-        key: number,
-        occurrence: number
-    ): () => boolean {
-        return this.getLookaheadFuncFor(
-            key,
-            occurrence,
-            this.maxLookahead,
-            PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR
-        )
-    }
-
-    getLookaheadFuncFor(
-        this: MixedInParser,
-        key: number,
-        occurrence: number,
-        maxLookahead: number,
-        prodType
-    ): () => boolean {
-        let laFunc = <any>this.getLaFuncFromCache(key)
-        if (laFunc === undefined) {
-            let ruleName = this.getCurrRuleFullName()
-            let ruleGrammar = this.getGAstProductions()[ruleName]
-            laFunc = buildLookaheadFuncForOptionalProd(
-                occurrence,
-                ruleGrammar,
-                maxLookahead,
-                this.dynamicTokensEnabled,
-                prodType,
-                this.lookAheadBuilderForOptional
-            )
-            this.setLaFuncCache(key, laFunc)
-            return laFunc
-        } else {
-            return laFunc
-        }
     }
 
     /* istanbul ignore next */

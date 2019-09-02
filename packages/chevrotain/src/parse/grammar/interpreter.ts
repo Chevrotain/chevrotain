@@ -260,10 +260,12 @@ export function possiblePathsFrom(
     let result = []
     let i = 0
 
+    // TODO: avoid inner funcs
     function remainingPathWith(nextDef: IProduction[]) {
         return nextDef.concat(drop(targetDef, i + 1))
     }
 
+    // TODO: avoid inner funcs
     function getAlternativesForProd(definition: IProduction[]) {
         let alternatives = possiblePathsFrom(
             remainingPathWith(definition),

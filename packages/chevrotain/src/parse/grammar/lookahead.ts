@@ -8,7 +8,7 @@ import {
     forEach,
     has
 } from "../../utils/utils"
-import { possiblePathsFrom } from "./interpreter"
+import { PartialPathAndSuffixes, possiblePathsFrom } from "./interpreter"
 import { RestWalker } from "./rest"
 import { Predicate, TokenMatcher, lookAheadSequence } from "../parser/parser"
 import {
@@ -491,60 +491,86 @@ class InsideDefinitionFinderVisitor extends GAstVisitor {
     }
 }
 
+function initializeArrayOfArrays(size): any[][] {
+    let result = new Array(size)
+    for (let i = 0; i < size; i++) {
+        result[i] = []
+    }
+    return result
+}
+
+/**
+ * A sort of hash function between a Path in the grammar and a string.
+ * Note that this returns multiple "hashes" to support the scenario of token categories.
+ * -  A single path with categories may match multiple **actual** paths.
+ */
+function pathToHashKeys(path: TokenType[]): string[] {
+    let keys = [""]
+    for (let i = 0; i < path.length; i++) {
+        const tokType = path[i]
+        let longerKeys = []
+        for (let j = 0; j < keys.length; j++) {
+            const currShorterKey = keys[j]
+            longerKeys.push(currShorterKey + "_" + tokType.tokenTypeIdx)
+            for (let t = 0; t < tokType.categoryMatches.length; t++) {
+                const categoriesKeySuffix = "_" + tokType.categoryMatches[t]
+                longerKeys.push(currShorterKey + categoriesKeySuffix)
+            }
+        }
+        keys = longerKeys
+    }
+    return keys
+}
+
+/**
+ * Imperative style due to being called from a hot spot
+ */
+function isUniquePrefixHash(
+    altKnownPathsKeys: Record<string, boolean>[],
+    searchPathKeys: string[],
+    idx: number
+): boolean {
+    for (
+        let currAltIdx = 0;
+        currAltIdx < altKnownPathsKeys.length;
+        currAltIdx++
+    ) {
+        // We only want to test vs the other alternatives
+        if (currAltIdx === idx) {
+            continue
+        }
+        const otherAltKnownPathsKeys = altKnownPathsKeys[currAltIdx]
+        for (
+            let searchIdx = 0;
+            searchIdx < searchPathKeys.length;
+            searchIdx++
+        ) {
+            const searchKey = searchPathKeys[searchIdx]
+            if (otherAltKnownPathsKeys[searchKey] === true) {
+                return false
+            }
+        }
+    }
+    // None of the SearchPathKeys were found in any of the other alternatives
+    return true
+}
+
 export function lookAheadSequenceFromAlternatives(
     altsDefs: IProduction[],
     k: number
 ): lookAheadSequence[] {
-    function getOtherPaths(pathsAndSuffixes, filterIdx): TokenType[][] {
-        return reduce(
-            pathsAndSuffixes,
-            (result, currPathsAndSuffixes, currIdx) => {
-                if (currIdx !== filterIdx) {
-                    let currPartialPaths = map(
-                        currPathsAndSuffixes,
-                        singlePathAndSuffix => singlePathAndSuffix.partialPath
-                    )
-                    return result.concat(currPartialPaths)
-                }
-                return result
-            },
-            []
-        )
-    }
-
-    function isUniquePrefix<T>(arr: T[][], item: T[]): boolean {
-        return (
-            find(arr, currOtherPath => {
-                return every(item, (currPathTok, idx) => {
-                    return possibleTokenTypeMatch(
-                        currPathTok,
-                        currOtherPath[idx]
-                    )
-                })
-            }) === undefined
-        )
-    }
-
-    function possibleTokenTypeMatch(tokTypeA, tokTypeB): boolean {
-        return (
-            tokTypeA === tokTypeB ||
-            (tokTypeA &&
-                tokTypeB &&
-                (tokTypeA.categoryMatchesMap[tokTypeB.tokenTypeIdx] ||
-                    tokTypeB.categoryMatchesMap[tokTypeA.tokenTypeIdx]))
-        )
-    }
-
-    function initializeArrayOfArrays(size): any[][] {
-        let result = []
-        for (let i = 0; i < size; i++) {
-            result.push([])
-        }
-        return result
-    }
-
     let partialAlts = map(altsDefs, currAlt => possiblePathsFrom([currAlt], 1))
     let finalResult = initializeArrayOfArrays(partialAlts.length)
+    const altsHashes = map(partialAlts, currAltPaths => {
+        const dict = {}
+        forEach(currAltPaths, item => {
+            const keys = pathToHashKeys(item.partialPath)
+            forEach(keys, currKey => {
+                dict[currKey] = true
+            })
+        })
+        return dict
+    })
     let newData = partialAlts
 
     // maxLookahead loop
@@ -553,10 +579,8 @@ export function lookAheadSequenceFromAlternatives(
         newData = initializeArrayOfArrays(currDataset.length)
 
         // alternatives loop
-        for (let resultIdx = 0; resultIdx < currDataset.length; resultIdx++) {
-            let currAltPathsAndSuffixes = currDataset[resultIdx]
-            let otherPaths = getOtherPaths(currDataset, resultIdx)
-
+        for (let altIdx = 0; altIdx < currDataset.length; altIdx++) {
+            let currAltPathsAndSuffixes = currDataset[altIdx]
             // paths in current alternative loop
             for (
                 let currPathIdx = 0;
@@ -566,28 +590,47 @@ export function lookAheadSequenceFromAlternatives(
                 let currPathPrefix =
                     currAltPathsAndSuffixes[currPathIdx].partialPath
                 let suffixDef = currAltPathsAndSuffixes[currPathIdx].suffixDef
-                let isUnique = isUniquePrefix(otherPaths, currPathPrefix)
-
-                // even if a path is not unique, but there are no longer alternatives to try
-                // or if we have reached the maximum lookahead (k) permitted.
+                const prefixKeys = pathToHashKeys(currPathPrefix)
+                let isUnique = isUniquePrefixHash(
+                    altsHashes,
+                    prefixKeys,
+                    altIdx
+                )
+                // End of the line for this path.
                 if (
                     isUnique ||
                     isEmpty(suffixDef) ||
                     currPathPrefix.length === k
                 ) {
-                    let currAltResult = finalResult[resultIdx]
-                    if (!containsPath(currAltResult, currPathPrefix)) {
+                    let currAltResult = finalResult[altIdx]
+                    // TODO: Can we implement a containsPath using Maps/Dictionaries?
+                    if (containsPath(currAltResult, currPathPrefix) === false) {
                         currAltResult.push(currPathPrefix)
+                        // Update all new  keys for the current path.
+                        for (let j = 0; j < prefixKeys.length; j++) {
+                            const currKey = prefixKeys[j]
+                            altsHashes[altIdx][currKey] = true
+                        }
                     }
-                } else {
+                }
+                // Expand longer paths
+                else {
                     let newPartialPathsAndSuffixes = possiblePathsFrom(
                         suffixDef,
                         pathLength + 1,
                         currPathPrefix
                     )
-                    newData[resultIdx] = newData[resultIdx].concat(
+                    newData[altIdx] = newData[altIdx].concat(
                         newPartialPathsAndSuffixes
                     )
+
+                    // Update keys for new known paths
+                    forEach(newPartialPathsAndSuffixes, item => {
+                        const prefixKeys = pathToHashKeys(item.partialPath)
+                        forEach(prefixKeys, key => {
+                            altsHashes[altIdx][key] = true
+                        })
+                    })
                 }
             }
         }
@@ -639,21 +682,29 @@ export function getLookaheadPathsForOptionalProd(
 
 export function containsPath(
     alternative: Alternative,
-    path: TokenType[]
+    searchPath: TokenType[]
 ): boolean {
-    let found = find(alternative, otherPath => {
-        return (
-            path.length === otherPath.length &&
-            every(path, (targetItem, idx) => {
-                // TODO: take categories into account here too?
-                return (
-                    targetItem === otherPath[idx] ||
-                    otherPath[idx].categoryMatchesMap[targetItem.tokenTypeIdx]
-                )
-            })
-        )
-    })
-    return found !== undefined
+    compareOtherPath: for (let i = 0; i < alternative.length; i++) {
+        const otherPath = alternative[i]
+        if (otherPath.length !== searchPath.length) {
+            continue
+        }
+        for (let j = 0; j < otherPath.length; j++) {
+            const searchTok = searchPath[j]
+            const otherTok = otherPath[j]
+
+            const matchingTokens =
+                searchTok === otherTok ||
+                otherTok.categoryMatchesMap[searchTok.tokenTypeIdx] !==
+                    undefined
+            if (matchingTokens === false) {
+                continue compareOtherPath
+            }
+        }
+        return true
+    }
+
+    return false
 }
 
 export function isStrictPrefixOfPath(

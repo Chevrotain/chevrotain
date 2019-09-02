@@ -483,3 +483,12 @@ export function toFastProperties(toBecomeFast) {
 export function peek<T>(arr: T[]): T {
     return arr[arr.length - 1]
 }
+
+/* istanbul ignore next - for performance tracing*/
+export function timer(func: Function) {
+    const start = new Date().getTime()
+    func()
+    const end = new Date().getTime()
+    const total = end - start
+    return total
+}
