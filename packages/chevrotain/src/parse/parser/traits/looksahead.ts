@@ -18,7 +18,12 @@ import {
     lookAheadSequence,
     TokenMatcher
 } from "../parser"
-import { IAnyOrAlt, IOrAltWithGate, IParserConfig } from "../../../../api"
+import {
+    IAnyOrAlt,
+    IOrAlt,
+    IOrAltWithGate,
+    IParserConfig
+} from "../../../../api"
 import {
     AT_LEAST_ONE_IDX,
     AT_LEAST_ONE_SEP_IDX,
@@ -206,35 +211,6 @@ export class LooksAhead {
             dslMethodIdx,
             occurrence
         )
-    }
-
-    getLookaheadFuncForOr(
-        this: MixedInParser,
-        occurrence: number,
-        alts: IAnyOrAlt[]
-    ): () => number {
-        let key = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
-        let laFunc: any = this.getLaFuncFromCache(key)
-        if (laFunc === undefined) {
-            let ruleName = this.getCurrRuleFullName()
-            let ruleGrammar = this.getGAstProductions()[ruleName]
-            // note that hasPredicates is only computed once.
-            let hasPredicates = some(alts, currAlt =>
-                isFunction((<IOrAltWithGate>currAlt).GATE)
-            )
-            laFunc = buildLookaheadFuncForOr(
-                occurrence,
-                ruleGrammar,
-                this.maxLookahead,
-                hasPredicates,
-                this.dynamicTokensEnabled,
-                this.lookAheadBuilderForAlternatives
-            )
-            this.setLaFuncCache(key, laFunc)
-            return laFunc
-        } else {
-            return laFunc
-        }
     }
 
     /* istanbul ignore next */

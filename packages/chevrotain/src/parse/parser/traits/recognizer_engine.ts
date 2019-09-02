@@ -759,7 +759,9 @@ export class RecognizerEngine {
         let alts = isArray(altsOrOpts)
             ? (altsOrOpts as IAnyOrAlt[])
             : (altsOrOpts as OrMethodOpts).DEF
-        let laFunc = this.getLookaheadFuncForOr(occurrence, alts)
+
+        const laKey = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
+        const laFunc = this.getLaFuncFromCache(laKey)
         let altIdxToTake = laFunc.call(this, alts)
         if (altIdxToTake !== undefined) {
             let chosenAlternative: any = alts[altIdxToTake]
@@ -787,7 +789,7 @@ export class RecognizerEngine {
                 ? (altsOrOpts as IAnyOrAlt[])
                 : (altsOrOpts as OrMethodOpts).DEF
 
-            let laFunc = this.getLookaheadFuncForOr(occurrence, alts)
+            const laFunc = this.getLaFuncFromCache(laKey)
             let altIdxToTake = laFunc.call(this, alts)
             if (altIdxToTake !== undefined) {
                 let chosenAlternative: any = alts[altIdxToTake]
