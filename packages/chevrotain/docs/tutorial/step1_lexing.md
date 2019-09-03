@@ -123,7 +123,7 @@ Note that:
 
     -   See how to resolve [Keywords vs Identifiers](https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js).
 
--   The lexer is **stateless**, thus only a **single one per grammar** should ever be created.
+-   The lexer's `Tokenize` method is a **pure function**, thus only a **single Lexer** (per grammar) is needed.
 
 -   The lexer is **context unaware**, it lexes each token (pattern) individually.
 
