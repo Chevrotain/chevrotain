@@ -584,7 +584,8 @@ export function validateAmbiguousAlternationAlternatives(
             let alternatives = getLookaheadPathsForOr(
                 currOccurrence,
                 topLevelRule,
-                actualMaxLookahead
+                actualMaxLookahead,
+                currOr
             )
             let altsAmbiguityErrors = checkAlternativesAmbiguities(
                 alternatives,
