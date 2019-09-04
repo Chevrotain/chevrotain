@@ -342,6 +342,9 @@ function recordProd(
     if (handleSep) {
         newProd.separator = mainProdArg.SEP
     }
+    if (has(mainProdArg, "MAX_LOOKAHEAD")) {
+        newProd.maxLookahead = mainProdArg.MAX_LOOKAHEAD
+    }
 
     this.recordingProdStack.push(newProd)
     grammarAction.call(this)
@@ -364,6 +367,9 @@ function recordOrProd(mainProdArg: any, occurrence: number): any {
     })
     if (has(mainProdArg, "NAME")) {
         newOrProd.name = mainProdArg.NAME
+    }
+    if (has(mainProdArg, "MAX_LOOKAHEAD")) {
+        newOrProd.maxLookahead = mainProdArg.MAX_LOOKAHEAD
     }
 
     const hasPredicates = some(alts, (currAlt: any) => isFunction(currAlt.GATE))

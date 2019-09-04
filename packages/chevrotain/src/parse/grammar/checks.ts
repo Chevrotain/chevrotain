@@ -550,7 +550,7 @@ export function validateEmptyOrAlternative(
 
 export function validateAmbiguousAlternationAlternatives(
     topLevelRule: Rule,
-    maxLookahead: number,
+    globalMaxLookahead: number,
     ignoredIssues: IgnoredParserIssues,
     errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserAmbiguousAlternativesDefinitionError[] {
@@ -580,10 +580,11 @@ export function validateAmbiguousAlternationAlternatives(
         ors,
         (result, currOr: Alternation) => {
             let currOccurrence = currOr.idx
+            const actualMaxLookahead = currOr.maxLookahead || globalMaxLookahead
             let alternatives = getLookaheadPathsForOr(
                 currOccurrence,
                 topLevelRule,
-                maxLookahead
+                actualMaxLookahead
             )
             let altsAmbiguityErrors = checkAlternativesAmbiguities(
                 alternatives,
@@ -672,12 +673,13 @@ export function validateSomeNonEmptyLookaheadPath(
         let allRuleProductions = collectorVisitor.allProductions
         forEach(allRuleProductions, currProd => {
             let prodType = getProdType(currProd)
+            const actualMaxLookahead = currProd.maxLookahead || maxLookahead
             let currOccurrence = currProd.idx
             let paths = getLookaheadPathsForOptionalProd(
                 currOccurrence,
                 currTopRule,
                 prodType,
-                maxLookahead
+                actualMaxLookahead
             )
             let pathsInsideProduction = paths[0]
             if (isEmpty(flatten(pathsInsideProduction))) {

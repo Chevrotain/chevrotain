@@ -65,12 +65,16 @@ export function getProdType(prod: IProduction): PROD_TYPE {
 export function buildLookaheadFuncForOr(
     occurrence: number,
     ruleGrammar: Rule,
-    k: number,
+    maxLookahead: number,
     hasPredicates: boolean,
     dynamicTokensEnabled: boolean,
     laFuncBuilder: Function
 ): (orAlts?: IAnyOrAlt[]) => number {
-    let lookAheadPaths = getLookaheadPathsForOr(occurrence, ruleGrammar, k)
+    let lookAheadPaths = getLookaheadPathsForOr(
+        occurrence,
+        ruleGrammar,
+        maxLookahead
+    )
 
     const tokenMatcher = areTokenCategoriesNotUsed(lookAheadPaths)
         ? tokenStructuredMatcherNoCategories
