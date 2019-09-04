@@ -1477,7 +1477,11 @@ export interface ILineTerminatorsTester {
     lastIndex: number
 }
 
-export type TokenPattern = RegExp | string | CustomPatternMatcherFunc | ICustomPattern
+export type TokenPattern =
+    | RegExp
+    | string
+    | CustomPatternMatcherFunc
+    | ICustomPattern
 
 export interface ITokenConfig {
     name: string
@@ -1795,6 +1799,18 @@ export interface DSLMethodOpts<T> {
      * For farther details.
      */
     GATE?: () => boolean
+
+    /**
+     * Maximum number of "following tokens" which would be used to
+     * Choose between the alternatives.
+     *
+     * By default this value is determined by the {@link IParserConfig.maxLookahead} value.
+     * A Higher value may be used for a specific DSL method to resolve ambiguities
+     * And a lower value may be used to resolve slow initialization times issues.
+     *
+     * TODO: create full docs and link
+     */
+    MAX_LOOKAHEAD?: number
 }
 
 export interface DSLMethodOptsWithErr<T> extends DSLMethodOpts<T> {
@@ -1833,6 +1849,18 @@ export interface OrMethodOpts {
      * - Using the more granular {@link IOrAlt.IGNORE_AMBIGUITIES} on a **specific** alternative.
      */
     IGNORE_AMBIGUITIES?: boolean
+
+    /**
+     * Maximum number of "following tokens" which would be used to
+     * Choose between the alternatives.
+     *
+     * By default this value is determined by the {@link IParserConfig.maxLookahead} value.
+     * A Higher value may be used for a specific DSL method to resolve ambiguities
+     * And a lower value may be used to resolve slow initialization times issues.
+     *
+     * TODO: create full docs and link
+     */
+    MAX_LOOKAHEAD?: number
 }
 
 export interface ManySepMethodOpts<T> {
@@ -1845,6 +1873,11 @@ export interface ManySepMethodOpts<T> {
      * The separator between each iteration.
      */
     SEP: TokenType
+
+    /**
+     * @see DSLMethodOpts.MAX_LOOKAHEAD
+     */
+    MAX_LOOKAHEAD?: number
 }
 
 export interface AtLeastOneSepMethodOpts<T> extends ManySepMethodOpts<T> {

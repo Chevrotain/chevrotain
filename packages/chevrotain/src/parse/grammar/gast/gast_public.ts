@@ -88,11 +88,13 @@ export class Option extends AbstractProduction
     implements IProductionWithOccurrence, IOptionallyNamedProduction {
     public idx: number = 1
     public name?: string
+    public maxLookahead?: number
 
     constructor(options: {
         definition: IProduction[]
         idx?: number
         name?: string
+        maxLookahead?: number
     }) {
         super(options.definition)
         assign(this, pick(options, v => v !== undefined))
@@ -103,11 +105,13 @@ export class RepetitionMandatory extends AbstractProduction
     implements IProductionWithOccurrence, IOptionallyNamedProduction {
     public name: string
     public idx: number = 1
+    public maxLookahead?: number
 
     constructor(options: {
         definition: IProduction[]
         idx?: number
         name?: string
+        maxLookahead?: number
     }) {
         super(options.definition)
         assign(this, pick(options, v => v !== undefined))
@@ -136,11 +140,13 @@ export class Repetition extends AbstractProduction
     public separator: TokenType
     public idx: number = 1
     public name: string
+    public maxLookahead?: number
 
     constructor(options: {
         definition: IProduction[]
         idx?: number
         name?: string
+        maxLookahead?: number
     }) {
         super(options.definition)
         assign(this, pick(options, v => v !== undefined))
@@ -171,6 +177,7 @@ export class Alternation extends AbstractProduction
     public ignoreAmbiguities: boolean = false
     public definition: Flat[]
     public hasPredicates: boolean = false
+    public maxLookahead?: number
 
     constructor(options: {
         definition: Flat[]
@@ -178,6 +185,7 @@ export class Alternation extends AbstractProduction
         name?: string
         ignoreAmbiguities?: boolean
         hasPredicates?: boolean
+        maxLookahead?: number
     }) {
         super(options.definition)
         assign(this, pick(options, v => v !== undefined))

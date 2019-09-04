@@ -21,7 +21,7 @@ describe("The Chevrotain default lexer error message provider", () => {
         const popToken: IToken = {
             image: "EXIT_NUMBERS",
             startOffset: 3
-        } as IToken; // the token type is not relevant for this test
+        } as IToken // the token type is not relevant for this test
 
         const msg = defaultLexerErrorProvider.buildUnableToPopLexerModeMessage(
             popToken

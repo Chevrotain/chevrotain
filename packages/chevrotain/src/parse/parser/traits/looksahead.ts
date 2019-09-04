@@ -87,7 +87,7 @@ export class LooksAhead {
                 const laFunc = buildLookaheadFuncForOr(
                     currProd.idx,
                     currRule,
-                    this.maxLookahead,
+                    currProd.maxLookahead || this.maxLookahead,
                     currProd.hasPredicates,
                     this.dynamicTokensEnabled,
                     this.lookAheadBuilderForAlternatives
@@ -106,7 +106,8 @@ export class LooksAhead {
                     currRule,
                     currProd.idx,
                     MANY_IDX,
-                    PROD_TYPE.REPETITION
+                    PROD_TYPE.REPETITION,
+                    currProd.maxLookahead
                 )
             })
 
@@ -115,7 +116,8 @@ export class LooksAhead {
                     currRule,
                     currProd.idx,
                     OPTION_IDX,
-                    PROD_TYPE.OPTION
+                    PROD_TYPE.OPTION,
+                    currProd.maxLookahead
                 )
             })
 
@@ -124,7 +126,8 @@ export class LooksAhead {
                     currRule,
                     currProd.idx,
                     AT_LEAST_ONE_IDX,
-                    PROD_TYPE.REPETITION_MANDATORY
+                    PROD_TYPE.REPETITION_MANDATORY,
+                    currProd.maxLookahead
                 )
             })
 
@@ -133,7 +136,8 @@ export class LooksAhead {
                     currRule,
                     currProd.idx,
                     AT_LEAST_ONE_SEP_IDX,
-                    PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR
+                    PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR,
+                    currProd.maxLookahead
                 )
             })
 
@@ -142,7 +146,8 @@ export class LooksAhead {
                     currRule,
                     currProd.idx,
                     MANY_SEP_IDX,
-                    PROD_TYPE.REPETITION_WITH_SEPARATOR
+                    PROD_TYPE.REPETITION_WITH_SEPARATOR,
+                    currProd.maxLookahead
                 )
             })
         })
@@ -153,12 +158,13 @@ export class LooksAhead {
         rule: Rule,
         prodOccurrence: number,
         prodKey: number,
-        prodType: PROD_TYPE
+        prodType: PROD_TYPE,
+        prodMaxLookahead: number = undefined
     ): void {
         const laFunc = buildLookaheadFuncForOptionalProd(
             prodOccurrence,
             rule,
-            this.maxLookahead,
+            prodMaxLookahead || this.maxLookahead,
             this.dynamicTokensEnabled,
             prodType,
             this.lookAheadBuilderForOptional

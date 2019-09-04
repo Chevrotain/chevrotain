@@ -1582,6 +1582,383 @@ describe("lookahead Regular Tokens Mode", () => {
         })
     })
 
+    describe("The support for MultiToken (K>1) EXPLICIT lookahead capabilities in DSL Production:", () => {
+        it("OPTION", () => {
+            class MultiTokenLookAheadForOptionParser extends Parser {
+                constructor(input: IToken[] = []) {
+                    super(ALL_TOKENS, { outputCst: false })
+
+                    this.performSelfAnalysis()
+                    this.input = input
+                }
+
+                public rule = this.RULE("rule", () => {
+                    let result = "OPTION Not Taken"
+                    this.OPTION2({
+                        // will only consider the OneTok when evaluating entering the OPTION
+                        MAX_LOOKAHEAD: 1,
+                        DEF: () => {
+                            this.CONSUME1(OneTok)
+                            this.CONSUME1(ThreeTok)
+                            result = "OPTION Taken"
+                        }
+                    })
+                    this.CONSUME2(OneTok)
+                    this.CONSUME2(TwoTok)
+                    return result
+                })
+            }
+
+            let parser = new MultiTokenLookAheadForOptionParser([
+                createRegularToken(OneTok),
+                createRegularToken(TwoTok)
+            ])
+            const parseResult = parser.rule()
+            expect(parseResult).to.be.undefined
+            expect(parser.errors.length).to.eql(1)
+            // wrong path chosen due to low explicit lookahead
+            expect(parser.errors[0].message).to.include(
+                "Expecting token of type --> ThreeTok <--"
+            )
+        })
+
+        it("MANY", () => {
+            class MultiTokenLookAheadForManyParser extends Parser {
+                constructor(input: IToken[] = []) {
+                    super(ALL_TOKENS, {
+                        outputCst: false,
+                        // Global Low maxLookahead
+                        maxLookahead: 1
+                    })
+
+                    this.performSelfAnalysis()
+                    this.input = input
+                }
+
+                public rule = this.RULE("orRule", () => {
+                    let numOfIterations = 0
+                    this.MANY({
+                        // Increase lookahead for this specific DSL method
+                        MAX_LOOKAHEAD: 3,
+                        DEF: () => {
+                            this.CONSUME1(OneTok)
+                            this.CONSUME1(TwoTok)
+                            this.CONSUME1(ThreeTok)
+                            numOfIterations++
+                        }
+                    })
+                    this.CONSUME2(OneTok)
+                    this.CONSUME2(TwoTok)
+                    return numOfIterations
+                })
+            }
+
+            let parser = new MultiTokenLookAheadForManyParser([
+                createRegularToken(OneTok),
+                createRegularToken(TwoTok)
+            ])
+            expect(parser.rule()).to.equal(0)
+
+            let oneIterationParser = new MultiTokenLookAheadForManyParser([
+                createRegularToken(OneTok),
+                createRegularToken(TwoTok),
+                createRegularToken(ThreeTok),
+                createRegularToken(OneTok),
+                createRegularToken(TwoTok)
+            ])
+            expect(oneIterationParser.rule()).to.equal(1)
+
+            let twoIterationsParser = new MultiTokenLookAheadForManyParser([
+                createRegularToken(OneTok),
+                createRegularToken(TwoTok),
+                createRegularToken(ThreeTok),
+                createRegularToken(OneTok),
+                createRegularToken(TwoTok),
+                createRegularToken(ThreeTok),
+                createRegularToken(OneTok),
+                createRegularToken(TwoTok)
+            ])
+
+            expect(twoIterationsParser.rule()).to.equal(2)
+        })
+
+        it("MANY_SEP", () => {
+            class MultiTokenLookAheadForManySepParser extends Parser {
+                constructor(input: IToken[] = []) {
+                    super(ALL_TOKENS, { maxLookahead: 1, outputCst: false })
+
+                    this.performSelfAnalysis()
+                    this.input = input
+                }
+
+                public rule = this.RULE("orRule", () => {
+                    let numOfIterations = 0
+                    this.MANY_SEP({
+                        MAX_LOOKAHEAD: 3,
+                        SEP: Comma,
+                        DEF: () => {
+                            this.CONSUME1(OneTok)
+                            this.CONSUME1(TwoTok)
+                            this.CONSUME1(ThreeTok)
+                            numOfIterations++
+                        }
+                    })
+                    this.CONSUME2(OneTok)
+                    this.CONSUME2(TwoTok)
+                    return numOfIterations
+                })
+            }
+
+            let parser = new MultiTokenLookAheadForManySepParser([
+                createRegularToken(OneTok),
+                createRegularToken(TwoTok)
+            ])
+            expect(parser.rule()).to.equal(0)
+
+            let oneIterationParser = new MultiTokenLookAheadForManySepParser([
+                createRegularToken(OneTok),
+                createRegularToken(TwoTok),
+                createRegularToken(ThreeTok),
+                createRegularToken(OneTok),
+                createRegularToken(TwoTok)
+            ])
+            expect(oneIterationParser.rule()).to.equal(1)
+
+            let twoIterationsParser = new MultiTokenLookAheadForManySepParser([
+                createRegularToken(OneTok),
+                createRegularToken(TwoTok),
+                createRegularToken(ThreeTok),
+                createRegularToken(Comma),
+                createRegularToken(OneTok),
+                createRegularToken(TwoTok),
+                createRegularToken(ThreeTok),
+                createRegularToken(OneTok),
+                createRegularToken(TwoTok)
+            ])
+            expect(twoIterationsParser.rule()).to.equal(2)
+        })
+
+        it("OR", () => {
+            class MultiTokenLookAheadForOrParser extends Parser {
+                constructor(input: IToken[] = []) {
+                    super(ALL_TOKENS, {
+                        // Global low maxLookahead should cause ambiguities in this grammar
+                        maxLookahead: 1,
+                        outputCst: false
+                    })
+
+                    this.performSelfAnalysis()
+                    this.input = input
+                }
+
+                public orRule = this.RULE("orRule", () => {
+                    return this.OR({
+                        // explicit higher maxLookahead is used to resolve the ambiguities
+                        MAX_LOOKAHEAD: 3,
+                        DEF: [
+                            {
+                                ALT: () => {
+                                    this.CONSUME1(OneTok)
+                                    this.CONSUME2(OneTok)
+                                    return "alt1 Taken"
+                                }
+                            },
+                            {
+                                ALT: () => {
+                                    this.CONSUME3(OneTok)
+                                    this.CONSUME1(TwoTok)
+                                    this.CONSUME1(ThreeTok)
+                                    return "alt2 Taken"
+                                }
+                            },
+                            {
+                                ALT: () => {
+                                    this.CONSUME4(OneTok)
+                                    this.CONSUME2(TwoTok)
+                                    return "alt3 Taken"
+                                }
+                            },
+                            {
+                                ALT: () => {
+                                    this.CONSUME1(FourTok)
+                                    return "alt4 Taken"
+                                }
+                            }
+                        ]
+                    })
+                })
+            }
+
+            // let alt1Parser = new MultiTokenLookAheadForOrParser([
+            //     createRegularToken(OneTok),
+            //     createRegularToken(OneTok)
+            // ])
+            // expect(alt1Parser.orRule()).to.equal("alt1 Taken")
+
+            let alt2Parser = new MultiTokenLookAheadForOrParser([
+                createRegularToken(OneTok),
+                createRegularToken(TwoTok),
+                createRegularToken(ThreeTok)
+            ])
+            expect(alt2Parser.orRule()).to.equal("alt2 Taken")
+
+            let alt3Parser = new MultiTokenLookAheadForOrParser([
+                createRegularToken(OneTok),
+                createRegularToken(TwoTok)
+            ])
+            expect(alt3Parser.orRule()).to.equal("alt3 Taken")
+
+            let alt4Parser = new MultiTokenLookAheadForOrParser([
+                createRegularToken(FourTok)
+            ])
+            expect(alt4Parser.orRule()).to.equal("alt4 Taken")
+        })
+
+        it("AT_LEAST_ONE", () => {
+            class MultiTokenLookAheadForAtLeastOneParser extends Parser {
+                constructor(input: IToken[] = []) {
+                    super(ALL_TOKENS, { maxLookahead: 1, outputCst: false })
+
+                    this.performSelfAnalysis()
+                    this.input = input
+                }
+
+                public rule = this.RULE("orRule", () => {
+                    let numOfIterations = 0
+                    this.AT_LEAST_ONE({
+                        MAX_LOOKAHEAD: 3,
+                        DEF: () => {
+                            this.CONSUME1(OneTok)
+                            this.CONSUME1(TwoTok)
+                            this.CONSUME1(ThreeTok)
+                            numOfIterations++
+                        }
+                    })
+                    this.CONSUME2(OneTok)
+                    this.CONSUME2(TwoTok)
+                    return numOfIterations
+                })
+            }
+
+            let oneIterationParser = new MultiTokenLookAheadForAtLeastOneParser(
+                [
+                    createRegularToken(OneTok),
+                    createRegularToken(TwoTok),
+                    createRegularToken(ThreeTok),
+                    createRegularToken(OneTok),
+                    createRegularToken(TwoTok)
+                ]
+            )
+            expect(oneIterationParser.rule()).to.equal(1)
+
+            let twoIterationsParser = new MultiTokenLookAheadForAtLeastOneParser(
+                [
+                    createRegularToken(OneTok),
+                    createRegularToken(TwoTok),
+                    createRegularToken(ThreeTok),
+                    createRegularToken(OneTok),
+                    createRegularToken(TwoTok),
+                    createRegularToken(ThreeTok),
+                    createRegularToken(OneTok),
+                    createRegularToken(TwoTok)
+                ]
+            )
+
+            expect(twoIterationsParser.rule()).to.equal(2)
+
+            let threeIterationsParser = new MultiTokenLookAheadForAtLeastOneParser(
+                [
+                    createRegularToken(OneTok),
+                    createRegularToken(TwoTok),
+                    createRegularToken(ThreeTok),
+                    createRegularToken(OneTok),
+                    createRegularToken(TwoTok),
+                    createRegularToken(ThreeTok),
+                    createRegularToken(OneTok),
+                    createRegularToken(TwoTok),
+                    createRegularToken(ThreeTok),
+                    createRegularToken(OneTok),
+                    createRegularToken(TwoTok)
+                ]
+            )
+
+            expect(threeIterationsParser.rule()).to.equal(3)
+        })
+
+        it("AT_LEAST_ONE_SEP", () => {
+            class MultiTokenLookAheadForAtLeastOneSepParser extends Parser {
+                constructor(input: IToken[] = []) {
+                    super(ALL_TOKENS, { maxLookahead: 1, outputCst: false })
+
+                    this.performSelfAnalysis()
+                    this.input = input
+                }
+
+                public rule = this.RULE("orRule", () => {
+                    let numOfIterations = 0
+                    this.AT_LEAST_ONE_SEP({
+                        MAX_LOOKAHEAD: 3,
+                        SEP: Comma,
+                        DEF: () => {
+                            this.CONSUME1(OneTok)
+                            this.CONSUME1(TwoTok)
+                            this.CONSUME1(ThreeTok)
+                            numOfIterations++
+                        }
+                    })
+                    this.CONSUME2(OneTok)
+                    this.CONSUME2(TwoTok)
+                    return numOfIterations
+                })
+            }
+
+            let oneIterationParser = new MultiTokenLookAheadForAtLeastOneSepParser(
+                [
+                    createRegularToken(OneTok),
+                    createRegularToken(TwoTok),
+                    createRegularToken(ThreeTok),
+                    createRegularToken(OneTok),
+                    createRegularToken(TwoTok)
+                ]
+            )
+            expect(oneIterationParser.rule()).to.equal(1)
+
+            let twoIterationsParser = new MultiTokenLookAheadForAtLeastOneSepParser(
+                [
+                    createRegularToken(OneTok),
+                    createRegularToken(TwoTok),
+                    createRegularToken(ThreeTok),
+                    createRegularToken(Comma),
+                    createRegularToken(OneTok),
+                    createRegularToken(TwoTok),
+                    createRegularToken(ThreeTok),
+                    createRegularToken(OneTok),
+                    createRegularToken(TwoTok)
+                ]
+            )
+            expect(twoIterationsParser.rule()).to.equal(2)
+
+            let threeIterationsParser = new MultiTokenLookAheadForAtLeastOneSepParser(
+                [
+                    createRegularToken(OneTok),
+                    createRegularToken(TwoTok),
+                    createRegularToken(ThreeTok),
+                    createRegularToken(Comma),
+                    createRegularToken(OneTok),
+                    createRegularToken(TwoTok),
+                    createRegularToken(ThreeTok),
+                    createRegularToken(Comma),
+                    createRegularToken(OneTok),
+                    createRegularToken(TwoTok),
+                    createRegularToken(ThreeTok),
+                    createRegularToken(OneTok),
+                    createRegularToken(TwoTok)
+                ]
+            )
+            expect(threeIterationsParser.rule()).to.equal(3)
+        })
+    })
+
     describe("Lookahead bug: MANY in OR", () => {
         class ManyInOrBugParser extends Parser {
             constructor() {

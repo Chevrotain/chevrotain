@@ -972,6 +972,47 @@ describe("The empty alternative detection full flow", () => {
         )
     })
 
+    it("will detect alternative ambiguity with identical lookahead - custom maxLookAhead", () => {
+        class AltAmbiguityParserImplicitOccurrence extends Parser {
+            constructor(input: IToken[] = []) {
+                super([PlusTok, StarTok])
+                this.performSelfAnalysis()
+                this.input = input
+            }
+
+            public noneLastEmpty = this.RULE(
+                "AmbiguityDueToExplicitLowLookahead",
+                () => {
+                    this.OR({
+                        MAX_LOOKAHEAD: 1,
+                        DEF: [
+                            {
+                                ALT: () => {
+                                    this.CONSUME1(PlusTok)
+                                    this.CONSUME1(PlusTok)
+                                }
+                            },
+                            {
+                                ALT: () => {
+                                    this.CONSUME2(PlusTok)
+                                    this.CONSUME2(StarTok)
+                                }
+                            }
+                        ]
+                    })
+                }
+            )
+        }
+        expect(() => new AltAmbiguityParserImplicitOccurrence()).to.throw(
+            "Ambiguous Alternatives Detected"
+        )
+        expect(() => new AltAmbiguityParserImplicitOccurrence()).to.throw("1")
+        expect(() => new AltAmbiguityParserImplicitOccurrence()).to.throw("2")
+        expect(() => new AltAmbiguityParserImplicitOccurrence()).to.throw(
+            "<PlusTok> may appears as a prefix path"
+        )
+    })
+
     context("IGNORE_AMBIGUITIES flag", () => {
         it("will ignore specific alternative ambiguity", () => {
             class IgnoreAlternativeAmbiguitiesFlagParser extends Parser {
