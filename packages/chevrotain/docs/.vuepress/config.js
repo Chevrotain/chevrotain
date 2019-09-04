@@ -67,6 +67,10 @@ module.exports = {
         repo: "SAP/chevrotain",
         docsDir: "packages/chevrotain/docs",
         docsBranch: "master",
+        algolia: {
+            apiKey: "3f49ee33a1bc4d674ff8c03ab99c3c1e",
+            indexName: "sap_chevrotain"
+        },
         editLinks: true,
         editLinkText: "Edit this page on GitHub",
         nav: [
