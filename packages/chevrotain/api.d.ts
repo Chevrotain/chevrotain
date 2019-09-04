@@ -1477,6 +1477,12 @@ export interface ILineTerminatorsTester {
     lastIndex: number
 }
 
+export type TokenPattern =
+    | RegExp
+    | string
+    | CustomPatternMatcherFunc
+    | ICustomPattern
+
 export interface ITokenConfig {
     name: string
 
@@ -1505,7 +1511,7 @@ export interface ITokenConfig {
      *
      * For Custom Patterns see: http://sap.github.io/chevrotain/docs/guide/custom_token_patterns.html
      */
-    pattern?: RegExp | string | CustomPatternMatcherFunc | ICustomPattern
+    pattern?: TokenPattern
 
     /**
      * The group property will cause the lexer to collect
@@ -1631,7 +1637,7 @@ export type CustomPatternMatcherReturn = [string] & { payload?: any }
 export interface TokenType {
     name: string
     GROUP?: string
-    PATTERN?: RegExp | string
+    PATTERN?: TokenPattern
     LABEL?: string
     LONGER_ALT?: TokenType
     POP_MODE?: boolean
@@ -1682,13 +1688,13 @@ export interface IToken {
     /** this marks if a Token does not really exist and has been inserted "artificially" during parsing in rule error recovery. */
     isInsertedInRecovery?: boolean
     /** An number index representing the type of the Token use <getTokenConstructor> to get the Token Type from a token "instance"  */
-    tokenTypeIdx?: number
+    tokenTypeIdx: number
     /**
      * The actual Token Type of this Token "instance"
      * This is the same Object returned by the "createToken" API.
      * This property is very useful for debugging the Lexing and Parsing phases.
      */
-    tokenType?: TokenType
+    tokenType: TokenType
 
     /**
      * Custom Payload value, this is an optional feature of Custom Token Patterns

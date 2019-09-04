@@ -121,9 +121,15 @@ Note that:
 -   The **order** of Token definitions passed to the Lexer is **important**.
     The first PATTERN to match will be chosen not the longest.
 
-    -   See how to resolve [Keywords vs Identifiers](https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js)
+    -   See how to resolve [Keywords vs Identifiers](https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js).
 
--   The Chevrotain Lexer is **stateless**, thus only a **single one per grammar** should ever be created.
+-   The lexer's `Tokenize` method is a **pure function**, thus only a **single Lexer** (per grammar) is needed.
+
+-   The lexer is **context unaware**, it lexes each token (pattern) individually.
+
+    -   If you need to distinguish between different contexts during the lexing phase, take a look at [Lexer Modes](../features/lexer_modes.md).
+
+-   For more patterns requiring more complex constraints than a regular expression, take a look at [Custom Token Patterns](../features/custom_token_patterns.md).
 
 ## Using The Lexer
 

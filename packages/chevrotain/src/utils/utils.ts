@@ -251,15 +251,15 @@ export function partial(func: Function, ...restArgs: any[]): Function {
     return Function.bind.apply(func, allArgs)
 }
 
-export function isArray(obj: any): boolean {
+export function isArray(obj: any): obj is any[] {
     return Array.isArray(obj)
 }
 
-export function isRegExp(obj: any): boolean {
+export function isRegExp(obj: any): obj is RegExp {
     return obj instanceof RegExp
 }
 
-export function isObject(obj: any): boolean {
+export function isObject(obj: any): obj is Object {
     return obj instanceof Object
 }
 

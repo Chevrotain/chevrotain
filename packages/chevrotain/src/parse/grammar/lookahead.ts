@@ -449,7 +449,8 @@ class InsideDefinitionFinderVisitor extends GAstVisitor {
 
     constructor(
         private targetOccurrence: number,
-        private targetProdType: PROD_TYPE
+        private targetProdType: PROD_TYPE,
+        private targetRef?: any
     ) {
         super()
     }
@@ -460,7 +461,8 @@ class InsideDefinitionFinderVisitor extends GAstVisitor {
     ): void {
         if (
             node.idx === this.targetOccurrence &&
-            this.targetProdType === expectedProdName
+            this.targetProdType === expectedProdName &&
+            (this.targetRef === undefined || node === this.targetRef)
         ) {
             this.result = node.definition
         }
@@ -644,11 +646,13 @@ export function lookAheadSequenceFromAlternatives(
 export function getLookaheadPathsForOr(
     occurrence: number,
     ruleGrammar: Rule,
-    k: number
+    k: number,
+    orProd?: Alternation
 ): lookAheadSequence[] {
-    let visitor = new InsideDefinitionFinderVisitor(
+    const visitor = new InsideDefinitionFinderVisitor(
         occurrence,
-        PROD_TYPE.ALTERNATION
+        PROD_TYPE.ALTERNATION,
+        orProd
     )
     ruleGrammar.accept(visitor)
     return lookAheadSequenceFromAlternatives(visitor.result, k)
