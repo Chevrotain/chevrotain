@@ -76,6 +76,7 @@ Some interesting samples:
 -   [Metabase BI expression Parser][sample_metabase].
 -   [Three.js VRML Parser][sample_threejs]
 -   [Argdown Parser][sample_argdown]
+-   [Stardog Union Parsers (GraphQL/SPARQL/and more...)][sample_stardog]
 -   [Bombadil Toml Parser][sample_bombadil]
 -   [Eve Interactive Programing Language Parser][sample_eve].
 -   [BioModelAnalyzer's ChatBot Parser][sample_biomodel].
@@ -89,6 +90,7 @@ Some interesting samples:
 [sample_argdown]: https://github.com/christianvoigt/argdown/blob/master/packages/argdown-core/src/parser.ts
 [sample_threejs]: https://github.com/mrdoob/three.js/blob/dev/examples/js/loaders/VRMLLoader.js
 [sample_prettier_java]: https://github.com/jhipster/prettier-java/tree/master/packages/java-parser/src/productions
+[sample_stardog]: https://github.com/stardog-union/millan/tree/master/src
 [languages]: https://github.com/SAP/chevrotain/tree/master/examples/implementation_languages
 [backtracking]: https://github.com/SAP/chevrotain/blob/master/examples/parser/backtracking/backtracking.js
 [custom_apis]: https://sap.github.io/chevrotain/docs/guide/custom_apis.html
