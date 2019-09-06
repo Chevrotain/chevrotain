@@ -36,6 +36,7 @@ export abstract class GAstVisitor {
                 return this.visitTerminal(nodeAny)
             case Rule:
                 return this.visitRule(nodeAny)
+            /* istanbul ignore next */
             default:
                 throw Error("non exhaustive match")
         }

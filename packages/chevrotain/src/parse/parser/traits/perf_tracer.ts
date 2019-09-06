@@ -25,9 +25,7 @@ export class PerformanceTracer {
             this.traceInitMaxIdent = 0
             this.traceInitPerf = DEFAULT_PARSER_CONFIG.traceInitPerf
         }
-        this.traceInitPerf = has(config, "traceInitPerf")
-            ? config.traceInitPerf
-            : DEFAULT_PARSER_CONFIG.traceInitPerf
+
         this.traceInitIndent = -1
     }
 
@@ -41,10 +39,15 @@ export class PerformanceTracer {
         if (this.traceInitPerf === true) {
             this.traceInitIndent++
             const indent = new Array(this.traceInitIndent + 1).join("\t")
-            console.log(`${indent}--> <${phaseDesc}>`)
+            if (this.traceInitIndent < this.traceInitMaxIdent) {
+                console.log(`${indent}--> <${phaseDesc}>`)
+            }
             const { time, value } = timer(phaseImpl)
+            /* istanbul ignore next - Difficult to reproduce specific performance behavior (>10ms) in tests */
             const traceMethod = time > 10 ? console.warn : console.log
-            traceMethod(`${indent}<-- <${phaseDesc}> time: ${time}ms`)
+            if (this.traceInitIndent < this.traceInitMaxIdent) {
+                traceMethod(`${indent}<-- <${phaseDesc}> time: ${time}ms`)
+            }
             this.traceInitIndent--
             return value
         } else {
