@@ -1,4 +1,3 @@
-import { classNameFromInstance } from "../../lang/lang_extensions"
 import {
     applyMixins,
     cloneObj,
@@ -12,7 +11,7 @@ import {
 } from "../../utils/utils"
 import { computeAllProdsFollows } from "../grammar/follow"
 import { createTokenInstance, EOF } from "../../scan/tokens_public"
-import { analyzeCst } from "../cst/cst"
+import { expandAllNestedRuleNames } from "../cst/cst"
 import {
     defaultGrammarValidatorErrorProvider,
     defaultParserErrorProvider
@@ -43,6 +42,7 @@ import { ErrorHandler } from "./traits/error_handler"
 import { MixedInParser } from "./traits/parser_traits"
 import { ContentAssist } from "./traits/context_assist"
 import { GastRecorder } from "./traits/gast_recorder"
+import { PerformanceTracer } from "./traits/perf_tracer"
 
 export const END_OF_FILE = createTokenInstance(
     EOF,
@@ -67,7 +67,8 @@ export const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
     dynamicTokensEnabled: false,
     outputCst: true,
     errorMessageProvider: defaultParserErrorProvider,
-    nodeLocationTracking: "none"
+    nodeLocationTracking: "none",
+    traceInitPerf: false
 })
 
 export const DEFAULT_RULE_CONFIG: IRuleConfig<any> = Object.freeze({
@@ -150,86 +151,117 @@ export class Parser {
     }
 
     public performSelfAnalysis(this: MixedInParser): void {
-        let defErrorsMsgs
+        this.TRACE_INIT("performSelfAnalysis", () => {
+            let defErrorsMsgs
 
-        this.selfAnalysisDone = true
-        let className = this.className
+            this.selfAnalysisDone = true
+            let className = this.className
 
-        // Without this voodoo magic the parser would be x3-x4 slower
-        // It seems it is better ot invoke `toFastProperties` **before**
-        // Any manipulations of the `this` object done during the recording phase.
-        toFastProperties(this)
-
-        try {
-            this.enableRecording()
-            // Building the GAST
-            forEach(this.definedRulesNames, currRuleName => {
-                const wrappedRule = this[currRuleName]
-                const originalGrammarAction =
-                    wrappedRule["originalGrammarAction"]
-                const recordedRuleGast = this.topLevelRuleRecord(
-                    currRuleName,
-                    originalGrammarAction
-                )
-                this.gastProductionsCache[currRuleName] = recordedRuleGast
-            })
-        } finally {
-            this.disableRecording()
-        }
-
-        const resolverErrors = resolveGrammar({
-            rules: values(this.gastProductionsCache)
-        })
-        this.definitionErrors.push.apply(this.definitionErrors, resolverErrors) // mutability for the win?
-
-        // only perform additional grammar validations IFF no resolving errors have occurred.
-        // as unresolved grammar may lead to unhandled runtime exceptions in the follow up validations.
-        if (isEmpty(resolverErrors)) {
-            let validationErrors = validateGrammar({
-                rules: values(this.gastProductionsCache),
-                maxLookahead: this.maxLookahead,
-                tokenTypes: values(this.tokensMap),
-                ignoredIssues: this.ignoredIssues,
-                errMsgProvider: defaultGrammarValidatorErrorProvider,
-                grammarName: className
+            this.TRACE_INIT("toFastProps", () => {
+                // Without this voodoo magic the parser would be x3-x4 slower
+                // It seems it is better to invoke `toFastProperties` **before**
+                // Any manipulations of the `this` object done during the recording phase.
+                toFastProperties(this)
             })
 
-            this.definitionErrors.push.apply(
-                this.definitionErrors,
-                validationErrors
-            ) // mutability for the win?
-        }
+            this.TRACE_INIT("Grammar Recording", () => {
+                try {
+                    this.enableRecording()
+                    // Building the GAST
+                    forEach(this.definedRulesNames, currRuleName => {
+                        const wrappedRule = this[currRuleName]
+                        const originalGrammarAction =
+                            wrappedRule["originalGrammarAction"]
+                        let recordedRuleGast = undefined
+                        this.TRACE_INIT(`${currRuleName} Rule`, () => {
+                            recordedRuleGast = this.topLevelRuleRecord(
+                                currRuleName,
+                                originalGrammarAction
+                            )
+                        })
+                        this.gastProductionsCache[
+                            currRuleName
+                        ] = recordedRuleGast
+                    })
+                } finally {
+                    this.disableRecording()
+                }
+            })
 
-        if (isEmpty(this.definitionErrors)) {
+            let resolverErrors = []
+            this.TRACE_INIT("Grammar Resolving", () => {
+                resolverErrors = resolveGrammar({
+                    rules: values(this.gastProductionsCache)
+                })
+                this.definitionErrors.push.apply(
+                    this.definitionErrors,
+                    resolverErrors
+                ) // mutability for the win?
+            })
+
+            this.TRACE_INIT("Grammar Validation", () => {
+                // only perform additional grammar validations IFF no resolving errors have occurred.
+                // as unresolved grammar may lead to unhandled runtime exceptions in the follow up validations.
+                if (isEmpty(resolverErrors)) {
+                    let validationErrors = validateGrammar({
+                        rules: values(this.gastProductionsCache),
+                        maxLookahead: this.maxLookahead,
+                        tokenTypes: values(this.tokensMap),
+                        ignoredIssues: this.ignoredIssues,
+                        errMsgProvider: defaultGrammarValidatorErrorProvider,
+                        grammarName: className
+                    })
+
+                    this.definitionErrors.push.apply(
+                        this.definitionErrors,
+                        validationErrors
+                    ) // mutability for the win?
+                }
+            })
+
             // this analysis may fail if the grammar is not perfectly valid
-            let allFollows = computeAllProdsFollows(
-                values(this.gastProductionsCache)
-            )
-            this.resyncFollows = allFollows
+            if (isEmpty(this.definitionErrors)) {
+                // The results of these computations are not needed unless error recovery is enabled.
+                if (this.recoveryEnabled) {
+                    this.TRACE_INIT("computeAllProdsFollows", () => {
+                        let allFollows = computeAllProdsFollows(
+                            values(this.gastProductionsCache)
+                        )
+                        this.resyncFollows = allFollows
+                    })
+                }
 
-            this.preComputeLookaheadFunctions(values(this.gastProductionsCache))
-        }
+                this.TRACE_INIT("ComputeLookaheadFunctions", () => {
+                    this.preComputeLookaheadFunctions(
+                        values(this.gastProductionsCache)
+                    )
+                })
+            }
 
-        let cstAnalysisResult = analyzeCst(
-            values(this.gastProductionsCache),
-            this.fullRuleNameToShort
-        )
-        this.allRuleNames = cstAnalysisResult.allRuleNames
+            this.TRACE_INIT("expandAllNestedRuleNames", () => {
+                // TODO: is this needed for EmbeddedActionsParser?
+                let cstAnalysisResult = expandAllNestedRuleNames(
+                    values(this.gastProductionsCache),
+                    this.fullRuleNameToShort
+                )
+                this.allRuleNames = cstAnalysisResult.allRuleNames
+            })
 
-        if (
-            !Parser.DEFER_DEFINITION_ERRORS_HANDLING &&
-            !isEmpty(this.definitionErrors)
-        ) {
-            defErrorsMsgs = map(
-                this.definitionErrors,
-                defError => defError.message
-            )
-            throw new Error(
-                `Parser Definition Errors detected:\n ${defErrorsMsgs.join(
-                    "\n-------------------------------\n"
-                )}`
-            )
-        }
+            if (
+                !Parser.DEFER_DEFINITION_ERRORS_HANDLING &&
+                !isEmpty(this.definitionErrors)
+            ) {
+                defErrorsMsgs = map(
+                    this.definitionErrors,
+                    defError => defError.message
+                )
+                throw new Error(
+                    `Parser Definition Errors detected:\n ${defErrorsMsgs.join(
+                        "\n-------------------------------\n"
+                    )}`
+                )
+            }
+        })
     }
 
     ignoredIssues: IgnoredParserIssues = DEFAULT_PARSER_CONFIG.ignoredIssues
@@ -249,6 +281,7 @@ export class Parser {
         that.initTreeBuilder(config)
         that.initContentAssist()
         that.initGastRecorder(config)
+        that.initPerformanceTracer(config)
 
         /* istanbul ignore if - complete over-kill to test this, we should only add a test when we actually hard deprecate it and throw an error... */
         if (
@@ -275,7 +308,8 @@ applyMixins(Parser, [
     RecognizerApi,
     ErrorHandler,
     ContentAssist,
-    GastRecorder
+    GastRecorder,
+    PerformanceTracer
 ])
 
 export class CstParser extends Parser {

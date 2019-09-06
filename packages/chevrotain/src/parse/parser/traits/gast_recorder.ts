@@ -87,45 +87,48 @@ export class GastRecorder {
 
     enableRecording(this: MixedInParser): void {
         this.RECORDING_PHASE = true
-        /**
-         * Warning Dark Voodoo Magic upcoming!
-         * We are "replacing" the public parsing DSL methods API
-         * With **new** alternative implementations on the Parser **instance**
-         *
-         * So far this is the only way I've found to avoid performance regressions during parsing time.
-         * - Approx 30% performance regression was measured on Chrome 75 Canary when attempting to replace the "internal"
-         *   implementations directly instead.
-         */
-        for (let i = 0; i < 10; i++) {
-            const idx = i > 0 ? i : ""
-            this[`CONSUME${idx}`] = function(arg1, arg2) {
-                return this.consumeInternalRecord(arg1, i, arg2)
+
+        this.TRACE_INIT("Enable Recording", () => {
+            /**
+             * Warning Dark Voodoo Magic upcoming!
+             * We are "replacing" the public parsing DSL methods API
+             * With **new** alternative implementations on the Parser **instance**
+             *
+             * So far this is the only way I've found to avoid performance regressions during parsing time.
+             * - Approx 30% performance regression was measured on Chrome 75 Canary when attempting to replace the "internal"
+             *   implementations directly instead.
+             */
+            for (let i = 0; i < 10; i++) {
+                const idx = i > 0 ? i : ""
+                this[`CONSUME${idx}`] = function(arg1, arg2) {
+                    return this.consumeInternalRecord(arg1, i, arg2)
+                }
+                this[`SUBRULE${idx}`] = function(arg1, arg2) {
+                    return this.subruleInternalRecord(arg1, i, arg2)
+                }
+                this[`OPTION${idx}`] = function(arg1) {
+                    this.optionInternalRecord(arg1, i)
+                }
+                this[`OR${idx}`] = function(arg1) {
+                    return this.orInternalRecord(arg1, i)
+                }
+                this[`MANY${idx}`] = function(arg1) {
+                    this.manyInternalRecord(i, arg1)
+                }
+                this[`MANY_SEP${idx}`] = function(arg1) {
+                    this.manySepFirstInternalRecord(i, arg1)
+                }
+                this[`AT_LEAST_ONE${idx}`] = function(arg1) {
+                    this.atLeastOneInternalRecord(i, arg1)
+                }
+                this[`AT_LEAST_ONE_SEP${idx}`] = function(arg1) {
+                    this.atLeastOneSepFirstInternalRecord(i, arg1)
+                }
             }
-            this[`SUBRULE${idx}`] = function(arg1, arg2) {
-                return this.subruleInternalRecord(arg1, i, arg2)
-            }
-            this[`OPTION${idx}`] = function(arg1) {
-                this.optionInternalRecord(arg1, i)
-            }
-            this[`OR${idx}`] = function(arg1) {
-                return this.orInternalRecord(arg1, i)
-            }
-            this[`MANY${idx}`] = function(arg1) {
-                this.manyInternalRecord(i, arg1)
-            }
-            this[`MANY_SEP${idx}`] = function(arg1) {
-                this.manySepFirstInternalRecord(i, arg1)
-            }
-            this[`AT_LEAST_ONE${idx}`] = function(arg1) {
-                this.atLeastOneInternalRecord(i, arg1)
-            }
-            this[`AT_LEAST_ONE_SEP${idx}`] = function(arg1) {
-                this.atLeastOneSepFirstInternalRecord(i, arg1)
-            }
-        }
-        this.ACTION = this.ACTION_RECORD
-        this.BACKTRACK = this.BACKTRACK_RECORD
-        this.LA = this.LA_RECORD
+            this.ACTION = this.ACTION_RECORD
+            this.BACKTRACK = this.BACKTRACK_RECORD
+            this.LA = this.LA_RECORD
+        })
     }
 
     disableRecording(this: MixedInParser) {
@@ -134,20 +137,22 @@ export class GastRecorder {
         // will be deferred to the original methods on the **prototype** object
         // This seems to get rid of any incorrect optimizations that V8 may
         // do during the recording phase.
-        for (let i = 0; i < 10; i++) {
-            const idx = i > 0 ? i : ""
-            delete this[`CONSUME${idx}`]
-            delete this[`SUBRULE${idx}`]
-            delete this[`OPTION${idx}`]
-            delete this[`OR${idx}`]
-            delete this[`MANY${idx}`]
-            delete this[`MANY_SEP${idx}`]
-            delete this[`AT_LEAST_ONE${idx}`]
-            delete this[`AT_LEAST_ONE_SEP${idx}`]
-        }
-        delete this.ACTION
-        delete this.BACKTRACK
-        delete this.LA
+        this.TRACE_INIT("Deleting Recording methods", () => {
+            for (let i = 0; i < 10; i++) {
+                const idx = i > 0 ? i : ""
+                delete this[`CONSUME${idx}`]
+                delete this[`SUBRULE${idx}`]
+                delete this[`OPTION${idx}`]
+                delete this[`OR${idx}`]
+                delete this[`MANY${idx}`]
+                delete this[`MANY_SEP${idx}`]
+                delete this[`AT_LEAST_ONE${idx}`]
+                delete this[`AT_LEAST_ONE_SEP${idx}`]
+            }
+            delete this.ACTION
+            delete this.BACKTRACK
+            delete this.LA
+        })
     }
 
     // TODO: is there any way to use this method to check no

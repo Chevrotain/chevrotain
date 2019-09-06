@@ -1,0 +1,54 @@
+import { IParserConfig } from "../../../../api"
+import { has, timer } from "../../../utils/utils"
+import { MixedInParser } from "./parser_traits"
+import { DEFAULT_PARSER_CONFIG } from "../parser"
+
+/**
+ * Trait responsible for runtime parsing errors.
+ */
+export class PerformanceTracer {
+    traceInitPerf: boolean | number
+    traceInitMaxIdent: number
+    traceInitIndent: number
+
+    initPerformanceTracer(config: IParserConfig) {
+        if (has(config, "traceInitPerf")) {
+            const userTraceInitPerf = config.traceInitPerf
+            const traceIsNumber = typeof userTraceInitPerf === "number"
+            this.traceInitMaxIdent = traceIsNumber
+                ? <number>userTraceInitPerf
+                : Infinity
+            this.traceInitPerf = traceIsNumber
+                ? userTraceInitPerf > 0
+                : userTraceInitPerf
+        } else {
+            this.traceInitMaxIdent = 0
+            this.traceInitPerf = DEFAULT_PARSER_CONFIG.traceInitPerf
+        }
+        this.traceInitPerf = has(config, "traceInitPerf")
+            ? config.traceInitPerf
+            : DEFAULT_PARSER_CONFIG.traceInitPerf
+        this.traceInitIndent = -1
+    }
+
+    TRACE_INIT<T>(
+        this: MixedInParser,
+        phaseDesc: string,
+        phaseImpl: () => T
+    ): T {
+        // No need to optimize this using NOOP pattern because
+        // It is not called in a hot spot...
+        if (this.traceInitPerf === true) {
+            this.traceInitIndent++
+            const indent = new Array(this.traceInitIndent + 1).join("\t")
+            console.log(`${indent}--> <${phaseDesc}>`)
+            const { time, value } = timer(phaseImpl)
+            const traceMethod = time > 10 ? console.warn : console.log
+            traceMethod(`${indent}<-- <${phaseDesc}> time: ${time}ms`)
+            this.traceInitIndent--
+            return value
+        } else {
+            return phaseImpl()
+        }
+    }
+}
