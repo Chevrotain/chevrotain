@@ -1,7 +1,12 @@
 import { createToken } from "../../../src/scan/tokens_public"
 import { Parser } from "../../../src/parse/parser/traits/parser_traits"
 
-describe("Chevrotain's Init Performance Tracing", () => {
+let skipOnBrowser = describe
+if (typeof window !== "undefined") {
+    skipOnBrowser = <any>describe.skip
+}
+
+skipOnBrowser("Chevrotain's Init Performance Tracing", () => {
     let consoleLogSpy
 
     beforeEach(() => {
