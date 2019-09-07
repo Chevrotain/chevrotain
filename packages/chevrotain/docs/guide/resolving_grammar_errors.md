@@ -62,10 +62,13 @@ In order to decide between these two alternatives, Chevrotain must "look ahead" 
 disambiguating tokens are "1" and "2".
 Five is a larger than the default [maxLookahead][maxlookahead] of four, so an error will be raised.
 
-We could solve this case by increasing the [maxLookahead][maxlookahead] to 5, however this is **not** recommended
+We could solve this case by increasing the global [maxLookahead][maxlookahead] to 5, however this is **not** recommended
 due to performance and grammar complexity reasons.
 From a performance perspective this is particularly problematic as some analysis
 done on the grammar (during initialization) may become **exponentially** more complex as the maxLookahead grows.
+
+We could also specify the [MAX_LOOKAHEAD](https://sap.github.io/chevrotain/documentation/6_2_0/interfaces/ormethodopts.html#ignore_ambiguities)
+config on the **specific** DSL method invocation where the problem occurs, This is still not the optimal solution in this case.
 
 **_The recommended solution in this case would be to refactor the grammar to require a smaller lookahead_**.
 In our trivial example the grammar can be refactored to be LL(1), meaning only one token of lookahead is needed.
@@ -106,76 +109,9 @@ Although this is **strongly** discouraged due to performance and complexity reas
 
 ## Terminal Token Name Not Found
 
-This error occurs when Chevrotain cannot find a TokenType used in a CONSUME call.
-Note that Chevrotain identifies the TokenType **literally** that is to say
-Chevrotain **reads** the parser's source code (static analysis) not the value at runtime.
-
-Keeping this property in mind lets look at a few common causes of such an error
-This parser
-
--   The TokenType's name does not match its literal form.
-
-    ```javascript
-    import { createToken, CstParser } from "chevrotain"
-
-    // note the name property "copyPastaMistake" is different that the variable name "Integer"
-    const Integer = createToken({ name: "copyPastaMistake", pattern: /\d+/ })
-    const allTokens = [Integer]
-
-    class MyParser extends CstParser {
-        constructor(input, config) {
-            super(allTokens, config)
-
-            $.RULE("MyRule", () => {
-                // Will cause "Terminal Token Name Not Found"
-                this.CONSUME(Integer)
-            })
-        }
-    }
-    ```
-
--   The TokenType's was not provided to the parser in the tokenDictionary argument.
-
-    ```javascript
-    import { createToken, CstParser } from "chevrotain"
-
-    const Integer = createToken({ name: "Integer", pattern: /\d+/ })
-    // Opps we forgot to add the Integer Token to the TokenDictionary
-    const allTokens = []
-
-    class MyParser extends CstParser {
-        constructor(input, config) {
-            super(allTokens, config)
-
-            $.RULE("MyRule", () => {
-                // Will cause "Terminal Token Name Not Found"
-                this.CONSUME(Integer)
-            })
-        }
-    }
-    ```
-
--   This error may also occur due to source code transformations of the parser.
-    See: [Minification](https://sap.github.io/chevrotain/docs/FAQ.html#MINIFIED)
-    and [Webpack](https://sap.github.io/chevrotain/docs/FAQ.html#WEBPACK) FAQ sections.
-
-    Basically if a code snippet such as:
-
-    ```javascript
-    const Integer = createToken({ name: "Integer", pattern: /\d+/ })
-    // ...
-    this.CONSUME(Integer)
-    ```
-
-    gets transformed to something like
-
-    ```javascript
-    const v14 = createToken({ name: "Integer", pattern: /\d+/ })
-    // ...
-    this.CONSUME(v14)
-    ```
-
-    Then the literal form no longer matches the name property...
+This problem can no longer occur in versions of Chevrotain after (and including) 6.0.0.
+See [V5 of these Docs](https://github.com/SAP/chevrotain/blob/v5.0.0/packages/chevrotain/docs/guide/resolving_grammar_errors.md#terminal-token-name-not-found)
+if you have not yet upgraded.
 
 ## Infinite Loop Detected
 

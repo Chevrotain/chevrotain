@@ -2001,6 +2001,8 @@ export interface IParserConfig {
     recoveryEnabled?: boolean
     /**
      * Maximum number of tokens the parser will use to choose between alternatives.
+     * By default this value is `4`.
+     * In the future it may be reduced to `3` due to performance considerations.
      */
     maxLookahead?: number
     /**

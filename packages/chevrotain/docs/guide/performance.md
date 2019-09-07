@@ -1,6 +1,6 @@
-# Optimizing a Parser for Performance
+# Optimizing Runtime Performance
 
-## Singleton Parser
+## Using a Singleton Parser
 
 Do not create a new Parser instance for each new input
 Instead re-use a single instance and reset its state between iterations. For example:
@@ -25,15 +25,14 @@ module.exports = function(text) {
 }
 ```
 
-Avoiding creating new instances is imperative because Chevrotain lazy evaluates and caches
-many computations required for its execution, This cache is kept on the instance level
-So creating a new Parser instance for each input would lose all advantages of this cache.
+Avoiding the creation of new instances is important to avoid re-paying the Parser's initialization costs
+Additionally, re-using the same instance may leverage hot-spot optimizations of the respective JavaScript engine.
 
 Note that this means that if your parser "carries" additional state, that state should also be reset.
 Simply override the Parser's [reset](https://sap.github.io/chevrotain/documentation/6_2_0/classes/cstparser.html#reset) method
 to accomplish that.
 
-## Lexer Optimizations
+## Ensuring Lexer Optimizations
 
 Ensure that the lexer's optimizations are enabled.
 The Chevrotain Lexer performs optimizations by filtering the potential token matchs
@@ -62,7 +61,7 @@ const myLexer = new Lexer(
 With the "ensureOptimizations" flag enabled the Lexer will also print error messages
 to the console with details on how to resolve optimiations errors.
 
-## Arrays of Alternatives
+## Caching Arrays of Alternatives
 
 The syntax for alternatives (OR) requires creating an array on every **single** invocation.
 For large enough arrays and in rules which are called often this can cause quite a large performance penalty.
@@ -151,25 +150,6 @@ It is important to note that:
 
     -   Note that gates often use vars from closures.
 
--   Due to the way Chevrotain is built, the text of the alternatives cannot be completely extracted from the grammar rule
-
-    ```javascript
-    // defined outside the rule
-    const myAlts = [
-        {
-            ALT: () => {
-                return $.CONSUME(StringLiteral)
-            }
-        }
-    ]
-
-    // Won't work
-    $.RULE("value", function() {
-        // Chevrotain won't be able to analyze this grammar rule as it relies on Function.prototype.toString
-        result = $.OR(myAlts)
-    })
-    ```
-
 -   Avoid dynamically changing the parser instance. The line:
 
     > "$.c1 || ($.c1 = ..." (\$ is 'this')
@@ -181,10 +161,7 @@ It is important to note that:
     To avoid this, simply define these "cache properties" in the constructor.
     See an example in the [ECMAScript5 grammar's constructor](https://github.com/SAP/chevrotain/blob/ac21570b97a8de0d6b91f29979aed8041455cacd/examples/grammars/ecma5/ecma5_parser.js#L37-L43).
 
-## Minor Optimizations
-
-// TODO: we should document the performance cost of CSTNodeLocation tracking in this guide
-// I am not sure this is Minor or Major section yet (lets see how fast we can get it first)
+## Minor Runtime Optimizations
 
 These are only required if you are trying to squeeze every tiny bit of performance out of your parser.
 
@@ -210,41 +187,124 @@ These are only required if you are trying to squeeze every tiny bit of performan
     The \*\_SEP DSL methods also collect the separator Tokens parsed. Creating these arrays has a small overhead (several percentage).
     Which is a complete waste in most cases where those separators tokens are not needed for any output data structure.
 
-4.  **Use the returned values of iteration DSL methods (MANY/MANY_SEP/AT_LEAST_ONE/AT_LEAST_ONE_SEP).**
+# Cold Start Optimizations
 
-    Consider the following grammar rule:
+Chevrotain is (mostly) a runtime tool (No code generation).
+This means there is a fair bit of logic happening every time a Chevrotain Parser is initialized.
+In some use cases this overhead may need to be reduced as much as possible.
 
-    ```javascript
-    this.RULE("array", function() {
-        let myArr = []
-        $.CONSUME(LSquare)
-        values.push($.SUBRULE($.value))
-        $.MANY(() => {
-            $.CONSUME(Comma)
-            values.push($.SUBRULE2($.value))
-        })
-        $.CONSUME(RSquare)
-    })
-    ```
+Measuring a Parser's cold start performance can be done by enabling the [`traceInitPerf`](https://sap.github.io/chevrotain/documentation/6_2_0/interfaces/iparserconfig.html#traceinitperf)
+flag. For example:
 
-    The values of the array are manually collected inside the "myArr" array.
-    However another result array is already created by invoking the iteration DSL method "MANY"
-    This is obviously a waste of cpu cycles...
-
-    A slightly more efficient (but syntactically ugly) alternative would be:
-
-    ```javascript
-    this.RULE("array", function() {
-        let myArr = []
-        $.CONSUME(LSquare)
-        values.push($.SUBRULE($.value))
-
-        let iterationResult = $.MANY(() => {
-            $.CONSUME(Comma)
-            return $.SUBRULE2($.value)
+```javascript
+class InitTracingParser extends CstParser {
+    constructor() {
+        super([], {
+            // Note `traceInitPerf` may also accept numerical values
+            traceInitPerf: true
         })
 
-        myArr = myArr.concat(iterationResult)
-        $.CONSUME(RSquare)
-    })
-    ```
+        this.performSelfAnalysis()
+    }
+}
+
+new InitTracingParser() // Will print tracing info to the console.
+```
+
+## Use a smaller Global maxLookahead
+
+Chevrotain is a K tokens lookahead Parser, this means it peeks ahead (at most) K Tokens to
+determine the alternative to pick whenever it encounters a "branching" in the grammar.
+
+During initialization Chevrotain pre-computes and caches lookahead functions that would
+later be used at runtime. The global [maxLookahead](https://sap.github.io/chevrotain/documentation/6_2_0/interfaces/iparserconfig.html#maxlookahead)
+setting can significantly affect the performance of this pre-computation due to the fact the number of possible "paths"
+in the grammar can grow **exponentially** as the max length of the possible paths increases.
+
+Example:
+
+```javascript
+class LowLookaheadParser extends CstParser {
+    constructor() {
+        super([], {
+            // By default this value is 4
+            maxLookahead: 2
+        })
+
+        this.performSelfAnalysis()
+    }
+}
+```
+
+Note that the global maxLookahead can be overridden for **individual** DSL methods(OR/OPTION/MANY/...) invocations, For example:
+
+```javascript
+class LowLookaheadParser extends CstParser {
+    constructor() {
+        super([], {
+            // Globally **only one** token lookahead.
+            maxLookahead: 1
+        })
+
+        $.RULE("value", () => {
+            $.OR({
+                // We need **two** tokens lookahead to distinguish between these two alternatives
+                MAX_LOOKAHEAD: 2,
+                DEF: [
+                    {
+                        ALT: () => {
+                            $.CONSUME(A)
+                            $.CONSUME(B)
+                        }
+                    },
+                    {
+                        ALT: () => {
+                            $.CONSUME(A)
+                            $.CONSUME(C)
+                        }
+                    }
+                ]
+            })
+        })
+
+        this.performSelfAnalysis()
+    }
+}
+```
+
+## Disabling Grammar Validations
+
+Chevrotain performs many validations during Parser initialization, however those are not really relevant
+when the Parser is valid, they validations are a **development time** tool, and not really needed during productive flows.
+
+The [skipValidations](https://sap.github.io/chevrotain/documentation/6_2_0/interfaces/iparserconfig.html#skipvalidations)
+config property can be used to avoid running these validations.
+
+```javascript
+class NaiveSkippedValidationsParser extends CstParser {
+    constructor() {
+        super([], {
+            // This could reduce 30-50% of the initialization time
+            skipValidations: true
+        })
+
+        this.performSelfAnalysis()
+    }
+}
+```
+
+The example above is a little naive, as the validations are **always** skipped, while we only need to skip
+them under specific conditions, for example:
+
+```javascript
+class RealisticSkippedValidationsParser extends CstParser {
+    constructor() {
+        super([], {
+            // only run the validations when a certain env variable is set.
+            skipValidations: process.env["IN_MY_PACKAGE_LOCAL_TESTING"] !== true
+        })
+
+        this.performSelfAnalysis()
+    }
+}
+```
