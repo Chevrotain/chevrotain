@@ -12,9 +12,8 @@
 -   [Deprecate: "Terminal Token Name Not Found" Error](https://github.com/SAP/chevrotain/issues/1017)
 -   [Update Performance Guide](https://github.com/SAP/chevrotain/issues/1038)
 -   [Incorrect Perf Docs](https://github.com/SAP/chevrotain/issues/885)
-
 -   Several TypeScript API fixes for [IToken](https://sap.github.io/chevrotain/documentation/6_3_0/interfaces/itoken.html)
-    and [TokenType](https://sap.github.io/chevrotain/documentation/6_2_0/interfaces/tokentype.html)
+    and [TokenType](https://sap.github.io/chevrotain/documentation/6_3_0/interfaces/tokentype.html)
     -   [1](https://github.com/SAP/chevrotain/pull/1021)
     -   [2](https://github.com/SAP/chevrotain/pull/1024)
     -   Thanks to [@HoldYourWaffle](https://github.com/HoldYourWaffle) :thumbsup
