@@ -1,3 +1,28 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+-   [Improved Lookahead functions and maxLookahead handling](https://github.com/SAP/chevrotain/issues/1012)
+-   [Parser Initialization Performance Tracing](https://github.com/SAP/chevrotain/issues/1035)
+-   [Ability to Optionally Skip Grammar Validations in Production](https://github.com/SAP/chevrotain/issues/1036)
+
+#### Documentation
+
+-   [Cold Start Performance Guide](https://github.com/SAP/chevrotain/issues/1037)
+-   [Deprecate: "Terminal Token Name Not Found" Error](https://github.com/SAP/chevrotain/issues/1017)
+-   [Update Performance Guide](https://github.com/SAP/chevrotain/issues/1038)
+-   [Incorrect Perf Docs](https://github.com/SAP/chevrotain/issues/885)
+
+-   Several TypeScript API fixes for [IToken](https://sap.github.io/chevrotain/documentation/6_3_0/interfaces/itoken.html)
+    and [TokenType](https://sap.github.io/chevrotain/documentation/6_2_0/interfaces/tokentype.html)
+    -   [1](https://github.com/SAP/chevrotain/pull/1021)
+    -   [2](https://github.com/SAP/chevrotain/pull/1024)
+    -   Thanks to [@HoldYourWaffle](https://github.com/HoldYourWaffle) :thumbsup
+
+#### Dev-Ops
+
+-   [Integrate Algolia Search in the docs website](https://github.com/SAP/chevrotain/issues/1031)
+
 ## 6.2.0 (8-30-2019)
 
 #### Minor Changes
