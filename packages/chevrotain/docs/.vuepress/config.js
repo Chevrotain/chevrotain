@@ -128,7 +128,11 @@ module.exports = {
                     collapsable: false,
                     children: [
                         ["introduction", "Introduction"],
-                        ["performance", "Performance"],
+                        ["performance", "Runtime Performance"],
+                        [
+                            "initialization_performance",
+                            "Initialization Performance"
+                        ],
                         ["concrete_syntax_tree", "CST"],
                         ["generating_syntax_diagrams", "Syntax Diagrams"],
                         ["custom_token_patterns", "Custom Token Patterns"],
