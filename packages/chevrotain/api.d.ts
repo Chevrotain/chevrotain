@@ -2059,6 +2059,21 @@ export interface IParserConfig {
      *   - Providing special error messages under certain conditions, e.g: missing semicolons.
      */
     errorMessageProvider?: IParserErrorMessageProvider
+    /**
+     * Enabling this flag will print performance tracing logs during parser
+     * Initialization (constructor invocation), this is useful to narrow down the cause
+     * of the initialization performance problem.
+     *
+     * You can also pass a numerical value which affects the verbosity
+     * of the traces, this number is the maximum nesting level of the traces, e.g:
+     * 0: Traces disabled === 'false'
+     * 1: Top Level traces only.
+     * 2: One level of nested inner traces.
+     * ...
+     *
+     * Note that passing the boolean `true` is identical to passing the numerical value `infinity`
+     */
+    traceInitPerf?: boolean | number
 }
 
 /**

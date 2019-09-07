@@ -485,10 +485,10 @@ export function peek<T>(arr: T[]): T {
 }
 
 /* istanbul ignore next - for performance tracing*/
-export function timer(func: Function) {
+export function timer<T>(func: () => T): { time: number; value: T } {
     const start = new Date().getTime()
-    func()
+    const val = func()
     const end = new Date().getTime()
     const total = end - start
-    return total
+    return { time: total, value: val }
 }

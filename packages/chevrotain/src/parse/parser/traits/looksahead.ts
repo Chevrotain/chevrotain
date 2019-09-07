@@ -5,25 +5,13 @@ import {
     buildSingleAlternativeLookaheadFunction,
     PROD_TYPE
 } from "../../grammar/lookahead"
-import {
-    forEach,
-    has,
-    isES2015MapSupported,
-    isFunction,
-    some,
-    timer
-} from "../../../utils/utils"
+import { forEach, has, isES2015MapSupported } from "../../../utils/utils"
 import {
     DEFAULT_PARSER_CONFIG,
     lookAheadSequence,
     TokenMatcher
 } from "../parser"
-import {
-    IAnyOrAlt,
-    IOrAlt,
-    IOrAltWithGate,
-    IParserConfig
-} from "../../../../api"
+import { IAnyOrAlt, IParserConfig } from "../../../../api"
 import {
     AT_LEAST_ONE_IDX,
     AT_LEAST_ONE_SEP_IDX,
@@ -35,10 +23,7 @@ import {
 } from "../../grammar/keys"
 import { MixedInParser } from "./parser_traits"
 import { Rule } from "../../grammar/gast/gast_public"
-import {
-    collectMethods,
-    DslMethodsCollectorVisitor
-} from "../../grammar/gast/gast"
+import { collectMethods, getProductionDslName } from "../../grammar/gast/gast"
 
 /**
  * Trait responsible for the lookahead related utilities and optimizations.
@@ -74,81 +59,94 @@ export class LooksAhead {
 
     preComputeLookaheadFunctions(this: MixedInParser, rules: Rule[]): void {
         forEach(rules, currRule => {
-            const {
-                alternation,
-                repetition,
-                option,
-                repetitionMandatory,
-                repetitionMandatoryWithSeparator,
-                repetitionWithSeparator
-            } = collectMethods(currRule)
+            this.TRACE_INIT(`${currRule.name} Rule Lookahead`, () => {
+                const {
+                    alternation,
+                    repetition,
+                    option,
+                    repetitionMandatory,
+                    repetitionMandatoryWithSeparator,
+                    repetitionWithSeparator
+                } = collectMethods(currRule)
 
-            forEach(alternation, currProd => {
-                const laFunc = buildLookaheadFuncForOr(
-                    currProd.idx,
-                    currRule,
-                    currProd.maxLookahead || this.maxLookahead,
-                    currProd.hasPredicates,
-                    this.dynamicTokensEnabled,
-                    this.lookAheadBuilderForAlternatives
-                )
+                forEach(alternation, currProd => {
+                    const prodIdx = currProd.idx === 0 ? "" : currProd.idx
+                    this.TRACE_INIT(
+                        `${getProductionDslName(currProd)}${prodIdx}`,
+                        () => {
+                            const laFunc = buildLookaheadFuncForOr(
+                                currProd.idx,
+                                currRule,
+                                currProd.maxLookahead || this.maxLookahead,
+                                currProd.hasPredicates,
+                                this.dynamicTokensEnabled,
+                                this.lookAheadBuilderForAlternatives
+                            )
 
-                const key = getKeyForAutomaticLookahead(
-                    this.fullRuleNameToShort[currRule.name],
-                    OR_IDX,
-                    currProd.idx
-                )
-                this.setLaFuncCache(key, laFunc)
-            })
+                            const key = getKeyForAutomaticLookahead(
+                                this.fullRuleNameToShort[currRule.name],
+                                OR_IDX,
+                                currProd.idx
+                            )
+                            this.setLaFuncCache(key, laFunc)
+                        }
+                    )
+                })
 
-            forEach(repetition, currProd => {
-                this.computeLookaheadFunc(
-                    currRule,
-                    currProd.idx,
-                    MANY_IDX,
-                    PROD_TYPE.REPETITION,
-                    currProd.maxLookahead
-                )
-            })
+                forEach(repetition, currProd => {
+                    this.computeLookaheadFunc(
+                        currRule,
+                        currProd.idx,
+                        MANY_IDX,
+                        PROD_TYPE.REPETITION,
+                        currProd.maxLookahead,
+                        getProductionDslName(currProd)
+                    )
+                })
 
-            forEach(option, currProd => {
-                this.computeLookaheadFunc(
-                    currRule,
-                    currProd.idx,
-                    OPTION_IDX,
-                    PROD_TYPE.OPTION,
-                    currProd.maxLookahead
-                )
-            })
+                forEach(option, currProd => {
+                    this.computeLookaheadFunc(
+                        currRule,
+                        currProd.idx,
+                        OPTION_IDX,
+                        PROD_TYPE.OPTION,
+                        currProd.maxLookahead,
+                        getProductionDslName(currProd)
+                    )
+                })
 
-            forEach(repetitionMandatory, currProd => {
-                this.computeLookaheadFunc(
-                    currRule,
-                    currProd.idx,
-                    AT_LEAST_ONE_IDX,
-                    PROD_TYPE.REPETITION_MANDATORY,
-                    currProd.maxLookahead
-                )
-            })
+                forEach(repetitionMandatory, currProd => {
+                    this.computeLookaheadFunc(
+                        currRule,
+                        currProd.idx,
+                        AT_LEAST_ONE_IDX,
+                        PROD_TYPE.REPETITION_MANDATORY,
+                        currProd.maxLookahead,
+                        getProductionDslName(currProd)
+                    )
+                })
 
-            forEach(repetitionMandatoryWithSeparator, currProd => {
-                this.computeLookaheadFunc(
-                    currRule,
-                    currProd.idx,
-                    AT_LEAST_ONE_SEP_IDX,
-                    PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR,
-                    currProd.maxLookahead
-                )
-            })
+                forEach(repetitionMandatoryWithSeparator, currProd => {
+                    this.computeLookaheadFunc(
+                        currRule,
+                        currProd.idx,
+                        AT_LEAST_ONE_SEP_IDX,
+                        PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR,
+                        currProd.maxLookahead,
+                        getProductionDslName(currProd)
+                    )
+                })
 
-            forEach(repetitionWithSeparator, currProd => {
-                this.computeLookaheadFunc(
-                    currRule,
-                    currProd.idx,
-                    MANY_SEP_IDX,
-                    PROD_TYPE.REPETITION_WITH_SEPARATOR,
-                    currProd.maxLookahead
-                )
+                forEach(repetitionWithSeparator, currProd => {
+                    this.computeLookaheadFunc(
+                        currRule,
+                        currProd.idx,
+                        MANY_SEP_IDX,
+                        PROD_TYPE.REPETITION_WITH_SEPARATOR,
+                        currProd.maxLookahead,
+                        getProductionDslName(currProd)
+                    )
+                })
             })
         })
     }
@@ -159,22 +157,28 @@ export class LooksAhead {
         prodOccurrence: number,
         prodKey: number,
         prodType: PROD_TYPE,
-        prodMaxLookahead: number = undefined
+        prodMaxLookahead: number,
+        dslMethodName: string
     ): void {
-        const laFunc = buildLookaheadFuncForOptionalProd(
-            prodOccurrence,
-            rule,
-            prodMaxLookahead || this.maxLookahead,
-            this.dynamicTokensEnabled,
-            prodType,
-            this.lookAheadBuilderForOptional
+        this.TRACE_INIT(
+            `${dslMethodName}${prodOccurrence === 0 ? "" : prodOccurrence}`,
+            () => {
+                const laFunc = buildLookaheadFuncForOptionalProd(
+                    prodOccurrence,
+                    rule,
+                    prodMaxLookahead || this.maxLookahead,
+                    this.dynamicTokensEnabled,
+                    prodType,
+                    this.lookAheadBuilderForOptional
+                )
+                const key = getKeyForAutomaticLookahead(
+                    this.fullRuleNameToShort[rule.name],
+                    prodKey,
+                    prodOccurrence
+                )
+                this.setLaFuncCache(key, laFunc)
+            }
         )
-        const key = getKeyForAutomaticLookahead(
-            this.fullRuleNameToShort[rule.name],
-            prodKey,
-            prodOccurrence
-        )
-        this.setLaFuncCache(key, laFunc)
     }
 
     lookAheadBuilderForOptional(

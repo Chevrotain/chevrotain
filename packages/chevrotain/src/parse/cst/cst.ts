@@ -230,7 +230,7 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
     }
 }
 
-export function analyzeCst(
+export function expandAllNestedRuleNames(
     topRules: Rule[],
     fullToShortName: Record<string, number>
 ): {

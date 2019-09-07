@@ -14,29 +14,31 @@ import { IProduction } from "../../../../api"
 
 export abstract class GAstVisitor {
     public visit(node: IProduction): any {
-        /* istanbul ignore next */
-        if (node instanceof NonTerminal) {
-            return this.visitNonTerminal(node)
-        } else if (node instanceof Flat) {
-            return this.visitFlat(node)
-        } else if (node instanceof Option) {
-            return this.visitOption(node)
-        } else if (node instanceof RepetitionMandatory) {
-            return this.visitRepetitionMandatory(node)
-        } else if (node instanceof RepetitionMandatoryWithSeparator) {
-            return this.visitRepetitionMandatoryWithSeparator(node)
-        } else if (node instanceof RepetitionWithSeparator) {
-            return this.visitRepetitionWithSeparator(node)
-        } else if (node instanceof Repetition) {
-            return this.visitRepetition(node)
-        } else if (node instanceof Alternation) {
-            return this.visitAlternation(node)
-        } else if (node instanceof Terminal) {
-            return this.visitTerminal(node)
-        } else if (node instanceof Rule) {
-            return this.visitRule(node)
-        } else {
-            throw Error("non exhaustive match")
+        const nodeAny: any = node
+        switch (nodeAny.constructor) {
+            case NonTerminal:
+                return this.visitNonTerminal(nodeAny)
+            case Flat:
+                return this.visitFlat(nodeAny)
+            case Option:
+                return this.visitOption(nodeAny)
+            case RepetitionMandatory:
+                return this.visitRepetitionMandatory(nodeAny)
+            case RepetitionMandatoryWithSeparator:
+                return this.visitRepetitionMandatoryWithSeparator(nodeAny)
+            case RepetitionWithSeparator:
+                return this.visitRepetitionWithSeparator(nodeAny)
+            case Repetition:
+                return this.visitRepetition(nodeAny)
+            case Alternation:
+                return this.visitAlternation(nodeAny)
+            case Terminal:
+                return this.visitTerminal(nodeAny)
+            case Rule:
+                return this.visitRule(nodeAny)
+            /* istanbul ignore next */
+            default:
+                throw Error("non exhaustive match")
         }
     }
 
