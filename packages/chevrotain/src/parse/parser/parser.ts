@@ -68,7 +68,8 @@ export const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
     outputCst: true,
     errorMessageProvider: defaultParserErrorProvider,
     nodeLocationTracking: "none",
-    traceInitPerf: false
+    traceInitPerf: false,
+    skipValidations: false
 })
 
 export const DEFAULT_RULE_CONFIG: IRuleConfig<any> = Object.freeze({
@@ -199,10 +200,10 @@ export class Parser {
                 ) // mutability for the win?
             })
 
-            this.TRACE_INIT("Grammar Validation", () => {
+            this.TRACE_INIT("Grammar Validations", () => {
                 // only perform additional grammar validations IFF no resolving errors have occurred.
                 // as unresolved grammar may lead to unhandled runtime exceptions in the follow up validations.
-                if (isEmpty(resolverErrors)) {
+                if (isEmpty(resolverErrors) && this.skipValidations === false) {
                     let validationErrors = validateGrammar({
                         rules: values(this.gastProductionsCache),
                         maxLookahead: this.maxLookahead,
@@ -267,6 +268,7 @@ export class Parser {
     ignoredIssues: IgnoredParserIssues = DEFAULT_PARSER_CONFIG.ignoredIssues
     definitionErrors: IParserDefinitionError[] = []
     selfAnalysisDone = false
+    protected skipValidations: boolean
 
     constructor(
         tokenVocabulary: TokenVocabulary,
@@ -296,6 +298,10 @@ export class Parser {
         this.ignoredIssues = has(config, "ignoredIssues")
             ? config.ignoredIssues
             : DEFAULT_PARSER_CONFIG.ignoredIssues
+
+        this.skipValidations = has(config, "skipValidations")
+            ? config.skipValidations
+            : DEFAULT_PARSER_CONFIG.skipValidations
     }
 }
 

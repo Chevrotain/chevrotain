@@ -735,6 +735,29 @@ function defineRecognizerSpecs(
                 )
             })
 
+            it("Can skip Grammar Validations during initialization", () => {
+                class SkipValidationsParser extends Parser {
+                    constructor(skipValidationsValue) {
+                        super(ALL_TOKENS, {
+                            skipValidations: skipValidationsValue
+                        })
+
+                        this.RULE("goodRule", () => {
+                            this.CONSUME(IntTok)
+                            // Duplicate CONSUME Idx error
+                            this.CONSUME(IntTok)
+                        })
+                        // old deprecated static api
+                        ;(Parser as any).performSelfAnalysis(this)
+                    }
+                }
+
+                expect(() => new SkipValidationsParser(true)).to.not.throw()
+                expect(() => new SkipValidationsParser(false)).to.throw(
+                    "Parser Definition Errors detected:"
+                )
+            })
+
             it("can only SAVE_ERROR for recognition exceptions", () => {
                 let parser: any = new Parser([IntTok])
                 expect(() =>
@@ -902,21 +925,6 @@ function defineRecognizerSpecs(
                 expect(() => new WrongOrderOfSelfAnalysisParser()).to.throw(
                     "Grammar rule <badRule> may not be defined after the 'performSelfAnalysis' method has been called"
                 )
-            })
-
-            describe("Parser Level Validations", () => {
-                before(() => {
-                    class MyNoneUniqueSpecialParser extends Parser {
-                        constructor(input: IToken[] = []) {
-                            super(ALL_TOKENS)
-
-                            this.performSelfAnalysis()
-                            this.input = input
-                        }
-                    }
-                    // init the first parser
-                    new MyNoneUniqueSpecialParser([])
-                })
             })
 
             it("can be initialized with a vector of Tokens", () => {

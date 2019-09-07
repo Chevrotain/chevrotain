@@ -2074,6 +2074,19 @@ export interface IParserConfig {
      * Note that passing the boolean `true` is identical to passing the numerical value `infinity`
      */
     traceInitPerf?: boolean | number
+
+    /**
+     * This flag will avoid running the grammar validations during Parser initialization.
+     *
+     * This can substantially improve the Parser's initialization (constructor) time.
+     * @see IParserConfig.traceInitPerf to measure the grammar validations cost for your parser.
+     *
+     * Note that the grammar validations are **extremely useful** during development time,
+     * e.g: detecting ambiguities / left recursion.
+     * So they should not be skipped during development flows.
+     *   - For example: via a conditional that checks an env variable.
+     */
+    skipValidations?: boolean
 }
 
 /**

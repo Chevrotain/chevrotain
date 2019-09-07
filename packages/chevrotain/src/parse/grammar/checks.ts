@@ -56,7 +56,7 @@ import {
 
 export function validateGrammar(
     topLevels: Rule[],
-    maxLookahead: number,
+    globalMaxLookahead: number,
     tokenTypes: TokenType[],
     ignoredIssues: IgnoredParserIssues,
     errMsgProvider: IGrammarValidatorErrorMessageProvider,
@@ -82,7 +82,7 @@ export function validateGrammar(
         ambiguousAltsErrors = map(topLevels, currTopRule =>
             validateAmbiguousAlternationAlternatives(
                 currTopRule,
-                maxLookahead,
+                globalMaxLookahead,
                 ignoredIssues,
                 errMsgProvider
             )
@@ -90,7 +90,7 @@ export function validateGrammar(
 
         emptyRepetitionErrors = validateSomeNonEmptyLookaheadPath(
             topLevels,
-            maxLookahead,
+            globalMaxLookahead,
             errMsgProvider
         )
     }
