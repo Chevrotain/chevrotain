@@ -1,5 +1,4 @@
 import { BaseRegExpVisitor } from "regexp-to-ast"
-import { tokenName } from "./tokens_public"
 import { IRegExpExec, Lexer, LexerDefinitionErrorType } from "./lexer_public"
 import {
     compact,
@@ -340,9 +339,7 @@ export function analyzeTokenTypes(
                     if (options.ensureOptimizations) {
                         PRINT_ERROR(
                             `${failedOptimizationPrefixMsg}` +
-                                `\tTokenType: <${tokenName(
-                                    currTokType
-                                )}> is using a custom token pattern without providing <start_chars_hint> parameter.\n` +
+                                `\tTokenType: <${currTokType.name}> is using a custom token pattern without providing <start_chars_hint> parameter.\n` +
                                 "\tThis will disable the lexer's first char optimizations.\n" +
                                 "\tFor details See: https://sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#CUSTOM_OPTIMIZE"
                         )
@@ -430,7 +427,7 @@ export function findMissingPatterns(
         return {
             message:
                 "Token Type: ->" +
-                tokenName(currType) +
+                currType.name +
                 "<- missing static 'PATTERN' property",
             type: LexerDefinitionErrorType.MISSING_PATTERN,
             tokenTypes: [currType]
@@ -458,7 +455,7 @@ export function findInvalidPatterns(
         return {
             message:
                 "Token Type: ->" +
-                tokenName(currType) +
+                currType.name +
                 "<- static 'PATTERN' can only be a RegExp, a" +
                 " Function matching the {CustomPatternMatcherFunc} type or an Object matching the {ICustomPattern} interface.",
             type: LexerDefinitionErrorType.INVALID_PATTERN,
@@ -504,7 +501,7 @@ export function findEndOfInputAnchor(
             message:
                 "Unexpected RegExp Anchor Error:\n" +
                 "\tToken Type: ->" +
-                tokenName(currType) +
+                currType.name +
                 "<- static 'PATTERN' cannot contain end of input anchor '$'\n" +
                 "\tSee sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#ANCHORS" +
                 "\tfor details.",
@@ -528,7 +525,7 @@ export function findEmptyMatchRegExps(
         return {
             message:
                 "Token Type: ->" +
-                tokenName(currType) +
+                currType.name +
                 "<- static 'PATTERN' must not match an empty string",
             type: LexerDefinitionErrorType.EMPTY_MATCH_PATTERN,
             tokenTypes: [currType]
@@ -571,7 +568,7 @@ export function findStartOfInputAnchor(
             message:
                 "Unexpected RegExp Anchor Error:\n" +
                 "\tToken Type: ->" +
-                tokenName(currType) +
+                currType.name +
                 "<- static 'PATTERN' cannot contain start of input anchor '^'\n" +
                 "\tSee https://sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#ANCHORS" +
                 "\tfor details.",
@@ -597,7 +594,7 @@ export function findUnsupportedFlags(
         return {
             message:
                 "Token Type: ->" +
-                tokenName(currType) +
+                currType.name +
                 "<- static 'PATTERN' may NOT contain global('g') or multiline('m')",
             type: LexerDefinitionErrorType.UNSUPPORTED_FLAGS_FOUND,
             tokenTypes: [currType]
@@ -641,7 +638,7 @@ export function findDuplicatePatterns(
 
     let errors = map(duplicatePatterns, (setOfIdentical: any) => {
         let tokenTypeNames = map(setOfIdentical, (currType: any) => {
-            return tokenName(currType)
+            return currType.name
         })
 
         let dupPatternSrc = (<any>first(setOfIdentical)).PATTERN
@@ -675,7 +672,7 @@ export function findInvalidGroupType(
         return {
             message:
                 "Token Type: ->" +
-                tokenName(currType) +
+                currType.name +
                 "<- static 'GROUP' can only be Lexer.SKIPPED/Lexer.NA/A String",
             type: LexerDefinitionErrorType.INVALID_GROUP_TYPE_FOUND,
             tokenTypes: [currType]
@@ -696,17 +693,14 @@ export function findModesThatDoNotExist(
         )
     })
 
-    let errors = map(invalidModes, clazz => {
+    let errors = map(invalidModes, tokType => {
         let msg =
-            `Token Type: ->${tokenName(
-                clazz
-            )}<- static 'PUSH_MODE' value cannot refer to a Lexer Mode ->${
-                clazz.PUSH_MODE
-            }<-` + `which does not exist`
+            `Token Type: ->${tokType.name}<- static 'PUSH_MODE' value cannot refer to a Lexer Mode ->${tokType.PUSH_MODE}<-` +
+            `which does not exist`
         return {
             message: msg,
             type: LexerDefinitionErrorType.PUSH_MODE_DOES_NOT_EXIST,
-            tokenTypes: [clazz]
+            tokenTypes: [tokType]
         }
     })
 
@@ -743,12 +737,8 @@ export function findUnreachablePatterns(
         forEach(canBeTested, ({ str, idx, tokenType }) => {
             if (testIdx < idx && testTokenType(str, tokType.PATTERN)) {
                 let msg =
-                    `Token: ->${tokenName(
-                        tokenType
-                    )}<- can never be matched.\n` +
-                    `Because it appears AFTER the Token Type ->${tokenName(
-                        tokType
-                    )}<-` +
+                    `Token: ->${tokenType.name}<- can never be matched.\n` +
+                    `Because it appears AFTER the Token Type ->${tokType.name}<-` +
                     `in the lexer's definition.\n` +
                     `See https://sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#UNREACHABLE`
                 errors.push({

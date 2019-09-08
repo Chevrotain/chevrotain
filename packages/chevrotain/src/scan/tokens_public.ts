@@ -1,35 +1,22 @@
-import { has, isObject, isString, isUndefined } from "../utils/utils"
-import { defineNameProp, functionName } from "../lang/lang_extensions"
+import { has, isString, isUndefined } from "../utils/utils"
 import { Lexer } from "./lexer_public"
 import { augmentTokenTypes, tokenStructuredMatcher } from "./tokens"
 import { IToken, ITokenConfig, TokenType } from "../../api"
 
-export function tokenLabel(clazz: TokenType): string {
-    if (hasTokenLabel(clazz)) {
-        return (<any>clazz).LABEL
+export function tokenLabel(tokType: TokenType): string {
+    if (hasTokenLabel(tokType)) {
+        return tokType.LABEL
     } else {
-        return tokenName(clazz)
+        return tokType.name
     }
+}
+
+export function tokenName(tokType: TokenType): string {
+    return tokType.name
 }
 
 export function hasTokenLabel(obj: TokenType): boolean {
     return isString((<any>obj).LABEL) && (<any>obj).LABEL !== ""
-}
-
-export function tokenName(obj: TokenType | Function): string {
-    // The tokenName property is needed under some old versions of node.js (0.10/0.12)
-    // where the Function.prototype.name property is not defined as a 'configurable' property
-    // enable producing readable error messages.
-    /* istanbul ignore if -> will only run in old versions of node.js */
-    if (
-        isObject(obj) &&
-        obj.hasOwnProperty("tokenName") &&
-        isString((<any>obj).tokenName)
-    ) {
-        return (<any>obj).tokenName
-    } else {
-        return functionName(obj as TokenType)
-    }
 }
 
 const PARENT = "parent"
@@ -47,18 +34,10 @@ export function createToken(config: ITokenConfig): TokenType {
 }
 
 function createTokenInternal(config: ITokenConfig): TokenType {
-    let tokenName = config.name
     let pattern = config.pattern
 
-    let tokenType: any = {}
-    // can be overwritten according to:
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/
-    // name?redirectlocale=en-US&redirectslug=JavaScript%2FReference%2FGlobal_Objects%2FFunction%2Fname
-    /* istanbul ignore if -> will only run in old versions of node.js */
-    if (!defineNameProp(tokenType, tokenName)) {
-        // hack to save the tokenName in situations where the constructor's name property cannot be reconfigured
-        tokenType.tokenName = tokenName
-    }
+    let tokenType: TokenType = <any>{}
+    tokenType.name = config.name
 
     if (!isUndefined(pattern)) {
         tokenType.PATTERN = pattern
@@ -70,7 +49,8 @@ function createTokenInternal(config: ITokenConfig): TokenType {
     }
 
     if (has(config, CATEGORIES)) {
-        tokenType.CATEGORIES = config[CATEGORIES]
+        // casting to ANY as this will be fixed inside `augmentTokenTypes``
+        tokenType.CATEGORIES = <any>config[CATEGORIES]
     }
 
     augmentTokenTypes([tokenType])

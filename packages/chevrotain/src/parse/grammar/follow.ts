@@ -2,7 +2,6 @@ import { RestWalker } from "./rest"
 import { first } from "./first"
 import { assign, forEach } from "../../utils/utils"
 import { IN } from "../constants"
-import { tokenName } from "../../scan/tokens_public"
 import { Flat, NonTerminal, Rule, Terminal } from "./gast/gast_public"
 import { IProduction, TokenType } from "../../../api"
 
@@ -63,6 +62,6 @@ export function buildBetweenProdsFollowPrefix(
 }
 
 export function buildInProdFollowPrefix(terminal: Terminal): string {
-    let terminalName = tokenName(terminal.terminalType)
+    let terminalName = terminal.terminalType.name
     return terminalName + terminal.idx + IN
 }

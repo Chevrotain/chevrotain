@@ -1644,13 +1644,13 @@ export interface TokenType {
     PUSH_MODE?: string
     LINE_BREAKS?: boolean
     CATEGORIES?: TokenType[]
-    tokenName?: string
     tokenTypeIdx?: number
     categoryMatches?: number[]
     categoryMatchesMap?: {
         [tokType: number]: boolean
     }
     isParent?: boolean
+    START_CHARS_HINT?: (string | number)[]
 }
 
 /**

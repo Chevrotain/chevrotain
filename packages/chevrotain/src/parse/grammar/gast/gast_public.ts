@@ -1,5 +1,5 @@
 import { assign, forEach, isRegExp, map, pick } from "../../../utils/utils"
-import { tokenLabel, tokenName } from "../../../scan/tokens_public"
+import { tokenLabel } from "../../../scan/tokens_public"
 import {
     IGASTVisitor,
     IOptionallyNamedProduction,
@@ -324,7 +324,7 @@ export function serializeProduction(node: IProduction): ISerializedGast {
     } else if (node instanceof Terminal) {
         let serializedTerminal = <ISerializedTerminal>{
             type: "Terminal",
-            name: tokenName(node.terminalType),
+            name: node.terminalType.name,
             label: tokenLabel(node.terminalType),
             idx: node.idx
         }

@@ -13,7 +13,6 @@ import {
     Terminal
 } from "./gast_public"
 import { GAstVisitor } from "./gast_visitor_public"
-import { tokenName } from "../../../scan/tokens_public"
 import { IProduction, IProductionWithOccurrence } from "../../../../api"
 
 export function isSequenceProd(prod: IProduction): boolean {
@@ -118,8 +117,7 @@ export class DslMethodsCollectorVisitor extends GAstVisitor {
     }
 
     public visitTerminal(terminal: Terminal): void {
-        const key =
-            tokenName(terminal.terminalType) + this.separator + "Terminal"
+        const key = terminal.terminalType.name + this.separator + "Terminal"
         if (!has(this.dslMethods, key)) {
             this.dslMethods[key] = []
         }

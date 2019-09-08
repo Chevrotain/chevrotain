@@ -8,7 +8,6 @@ import {
     isEmpty,
     last
 } from "../../utils/utils"
-import { tokenName } from "../../scan/tokens_public"
 import { first } from "./first"
 import { TokenMatcher } from "../parser/parser"
 import {
@@ -112,7 +111,7 @@ export class NextAfterTokenWalker extends AbstractNextPossibleTokensWalker {
 
     constructor(topProd: Rule, protected path: ITokenGrammarPath) {
         super(topProd, path)
-        this.nextTerminalName = tokenName(this.path.lastTok)
+        this.nextTerminalName = this.path.lastTok.name
         this.nextTerminalOccurrence = this.path.lastTokOccurrence
     }
 
@@ -123,7 +122,7 @@ export class NextAfterTokenWalker extends AbstractNextPossibleTokensWalker {
     ): void {
         if (
             this.isAtEndOfPath &&
-            tokenName(terminal.terminalType) === this.nextTerminalName &&
+            terminal.terminalType.name === this.nextTerminalName &&
             terminal.idx === this.nextTerminalOccurrence &&
             !this.found
         ) {
