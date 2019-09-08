@@ -684,22 +684,41 @@ describe("The Recorder runtime checks full flow", () => {
         )
     })
 
-    it("will addd additional details to other runtime exceptions encountered during recording phase", () => {
-        class OtherRecordingErrorParser extends Parser {
-            constructor(input: IToken[] = []) {
-                super([myToken, myOtherToken])
-                this.performSelfAnalysis()
-                this.input = input
+    context("augmenting error messages", () => {
+        it("will add additional details to other runtime exceptions encountered during recording phase", () => {
+            class OtherRecordingErrorParser extends Parser {
+                constructor(input: IToken[] = []) {
+                    super([myToken, myOtherToken])
+                    this.performSelfAnalysis()
+                    this.input = input
+                }
+
+                public one = this.RULE("two", () => {
+                    throw new Error("OOPS")
+                })
             }
 
-            public one = this.RULE("two", () => {
-                throw new Error("OOPS")
-            })
-        }
+            expect(() => new OtherRecordingErrorParser()).to.throw(
+                'This error was thrown during the "grammar recording phase"'
+            )
+        })
 
-        expect(() => new OtherRecordingErrorParser()).to.throw(
-            'This error was thrown during the "grammar recording phase"'
-        )
+        it("will not fail when the original error is immutable", () => {
+            class OtherRecordingErrorParser extends Parser {
+                constructor(input: IToken[] = []) {
+                    super([myToken, myOtherToken])
+                    this.performSelfAnalysis()
+                    this.input = input
+                }
+
+                public one = this.RULE("two", () => {
+                    // We cannot mutate a string object
+                    throw "Oops"
+                })
+            }
+
+            expect(() => new OtherRecordingErrorParser()).to.throw("Oops")
+        })
     })
 })
 

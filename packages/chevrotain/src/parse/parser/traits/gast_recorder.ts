@@ -187,14 +187,19 @@ export class GastRecorder {
             def.call(this)
             this.recordingProdStack.pop()
             return newTopLevelRule
-        } catch (e) {
-            if (e.KNOWN_RECORDER_ERROR !== true) {
-                e.message =
-                    e.message +
-                    '\n\t This error was thrown during the "grammar recording phase" For more info see:\n\t' +
-                    "https://sap.github.io/chevrotain/docs/guide/internals.html#grammar-recording"
+        } catch (originalError) {
+            if (originalError.KNOWN_RECORDER_ERROR !== true) {
+                try {
+                    originalError.message =
+                        originalError.message +
+                        '\n\t This error was thrown during the "grammar recording phase" For more info see:\n\t' +
+                        "https://sap.github.io/chevrotain/docs/guide/internals.html#grammar-recording"
+                } catch (mutabilityError) {
+                    // We may not be able to modify the original error object
+                    throw originalError
+                }
             }
-            throw e
+            throw originalError
         }
     }
 
