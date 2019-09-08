@@ -1,7 +1,8 @@
 import {
     createToken,
     tokenLabel,
-    tokenMatcher
+    tokenMatcher,
+    tokenName
 } from "../../src/scan/tokens_public"
 import { Lexer } from "../../src/scan/lexer_public"
 import { createTokenInstance } from "../../src/scan/tokens_public"
@@ -17,6 +18,7 @@ describe("The Chevrotain Tokens namespace", () => {
             // should still work correctly on it if the 'tokenName' property has been set on its constructor.
             expect(FalseLiteral.name).to.equal("FalseLiteral")
             expect(TrueLiteral.name).to.equal("TrueLiteral")
+            expect(tokenName(TrueLiteral)).to.equal("TrueLiteral")
         })
 
         let A = createToken({ name: "A" })
