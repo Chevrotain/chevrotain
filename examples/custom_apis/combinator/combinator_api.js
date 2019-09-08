@@ -120,7 +120,7 @@ function createParser(name, rules, tokenVocabulary) {
 }
 
 function toDefinition(item) {
-    if (_.has(item, "tokenName")) {
+    if (_.has(item, "CATEGORIES")) {
         return [new Terminal({ terminalType: item })]
     } else if (item instanceof Rule) {
         return [
@@ -146,8 +146,8 @@ function toDefinition(item) {
  * for better error message purposes.
  */
 function toOriginalText(item) {
-    if (_.has(item, "tokenName")) {
-        return item.tokenName
+    if (_.has(item, "CATEGORIES")) {
+        return item.name
     } else if (item instanceof Rule) {
         return item.name
     } else if (_.isString(item)) {

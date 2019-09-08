@@ -52,7 +52,7 @@ import {
 } from "../../grammar/interpreter"
 import { DEFAULT_RULE_CONFIG, IParserState, TokenMatcher } from "../parser"
 import { IN_RULE_RECOVERY_EXCEPTION } from "./recoverable"
-import { EOF, tokenName } from "../../../scan/tokens_public"
+import { EOF } from "../../../scan/tokens_public"
 import { MixedInParser } from "./parser_traits"
 import {
     augmentTokenTypes,
@@ -133,8 +133,8 @@ export class RecognizerEngine {
         if (isArray(tokenVocabulary)) {
             this.tokensMap = <any>reduce(
                 <any>tokenVocabulary,
-                (acc, tokenClazz: TokenType) => {
-                    acc[tokenName(tokenClazz)] = tokenClazz
+                (acc, tokType: TokenType) => {
+                    acc[tokType.name] = tokType
                     return acc
                 },
                 {}
@@ -147,8 +147,8 @@ export class RecognizerEngine {
             let uniqueTokens = uniq(allTokenTypes)
             this.tokensMap = <any>reduce(
                 uniqueTokens,
-                (acc, tokenClazz: TokenType) => {
-                    acc[tokenName(tokenClazz)] = tokenClazz
+                (acc, tokType: TokenType) => {
+                    acc[tokType.name] = tokType
                     return acc
                 },
                 {}
@@ -909,7 +909,7 @@ export class RecognizerEngine {
         this.cstPostTerminal(
             options !== undefined && options.LABEL !== undefined
                 ? options.LABEL
-                : tokType.tokenName,
+                : tokType.name,
             consumedToken
         )
         return consumedToken

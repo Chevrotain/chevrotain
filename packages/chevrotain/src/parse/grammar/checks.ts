@@ -20,7 +20,6 @@ import {
     ParserDefinitionErrorType
 } from "../parser/parser"
 import { getProductionDslName, isOptionalProd } from "./gast/gast"
-import { tokenName } from "../../scan/tokens_public"
 import {
     Alternative,
     containsPath,
@@ -229,7 +228,7 @@ export function identifyProductionForDuplicates(
 
 function getExtraProductionArgument(prod: IProductionWithOccurrence): string {
     if (prod instanceof Terminal) {
-        return tokenName(prod.terminalType)
+        return prod.terminalType.name
     } else if (prod instanceof NonTerminal) {
         return prod.nonTerminalName
     } else {
@@ -333,7 +332,7 @@ export function validateTokenName(
     errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserDefinitionError[] {
     const errors = []
-    const tokTypeName = tokenName(tokenType)
+    const tokTypeName = tokenType.name
 
     if (!tokTypeName.match(validTermsPattern)) {
         errors.push({
@@ -856,7 +855,7 @@ function checkTerminalAndNoneTerminalsNameSpace(
 ): IParserDefinitionError[] {
     let errors = []
 
-    let tokenNames = map(tokenTypes, currToken => tokenName(currToken))
+    let tokenNames = map(tokenTypes, currToken => currToken.name)
 
     forEach(topLevels, currRule => {
         const currRuleName = currRule.name

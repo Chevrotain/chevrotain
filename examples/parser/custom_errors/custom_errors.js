@@ -8,8 +8,7 @@ const {
     createToken,
     Lexer,
     CstParser,
-    defaultParserErrorProvider,
-    tokenName
+    defaultParserErrorProvider
 } = require("chevrotain")
 
 // ----------------- lexer -----------------
@@ -41,9 +40,7 @@ const myErrorProvider = {
     },
     buildNotAllInputParsedMessage: function(options) {
         // changing the template of the error message #1
-        return `very bad dog! you still have some input remaining at offset:${
-            options.firstRedundant.startOffset
-        }`
+        return `very bad dog! you still have some input remaining at offset:${options.firstRedundant.startOffset}`
     },
     // we are not overriding "buildNoViableAltMessage"
     // the default implementation will be automatically used instead.
@@ -51,9 +48,7 @@ const myErrorProvider = {
 
     buildEarlyExitMessage: function(options) {
         // translating the error message to Spanish
-        return `Esperando por lo menos una iteración de: ${tokenName(
-            options.expectedIterationPaths[0][0]
-        )}`
+        return `Esperando por lo menos una iteración de: ${options.expectedIterationPaths[0][0].name}`
     }
 }
 

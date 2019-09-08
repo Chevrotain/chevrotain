@@ -1,5 +1,4 @@
 import { forEach, map } from "../utils/utils"
-import { tokenName } from "../scan/tokens_public"
 import {
     RepetitionMandatory,
     Option,
@@ -102,7 +101,7 @@ export function genRule(prod: Rule, n: number): string {
 }
 
 export function genTerminal(prod: Terminal, n: number): string {
-    const name = tokenName(prod.terminalType)
+    const name = prod.terminalType.name
     // TODO: potential performance optimization, avoid tokenMap Dictionary access
     return indent(n, `$.CONSUME${prod.idx}(this.tokensMap.${name})` + NL)
 }
@@ -177,10 +176,7 @@ function genDSLRule(
         }
         if (prod.separator) {
             result +=
-                indent(
-                    n + 1,
-                    `SEP: this.tokensMap.${tokenName(prod.separator)}`
-                ) +
+                indent(n + 1, `SEP: this.tokensMap.${prod.separator.name}`) +
                 "," +
                 NL
         }

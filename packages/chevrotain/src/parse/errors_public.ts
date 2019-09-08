@@ -1,4 +1,4 @@
-import { hasTokenLabel, tokenLabel, tokenName } from "../scan/tokens_public"
+import { hasTokenLabel, tokenLabel } from "../scan/tokens_public"
 import * as utils from "../utils/utils"
 import { first, map, reduce } from "../utils/utils"
 import {
@@ -30,7 +30,7 @@ export const defaultParserErrorProvider: IParserErrorMessageProvider = {
         let hasLabel = hasTokenLabel(expected)
         let expectedMsg = hasLabel
             ? `--> ${tokenLabel(expected)} <--`
-            : `token of type --> ${tokenName(expected)} <--`
+            : `token of type --> ${expected.name} <--`
 
         let msg = `Expecting ${expectedMsg} but found --> '${actual.image}' <--`
 
@@ -139,7 +139,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
             prod: IProductionWithOccurrence
         ): string {
             if (prod instanceof Terminal) {
-                return tokenName(prod.terminalType)
+                return prod.terminalType.name
             } else if (prod instanceof NonTerminal) {
                 return prod.nonTerminalName
             } else {
@@ -282,7 +282,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
         tokenType: TokenType
         expectedPattern: RegExp
     }): string {
-        const tokTypeName = tokenName(options.tokenType)
+        const tokTypeName = options.tokenType.name
         const errMsg = `Invalid Grammar Token name: ->${tokTypeName}<- it must match the pattern: ->${options.expectedPattern.toString()}<-`
         return errMsg
     },

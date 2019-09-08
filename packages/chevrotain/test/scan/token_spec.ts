@@ -1,8 +1,7 @@
 import {
     createToken,
     tokenLabel,
-    tokenMatcher,
-    tokenName
+    tokenMatcher
 } from "../../src/scan/tokens_public"
 import { Lexer } from "../../src/scan/lexer_public"
 import { createTokenInstance } from "../../src/scan/tokens_public"
@@ -13,11 +12,11 @@ describe("The Chevrotain Tokens namespace", () => {
         let TrueLiteral = createToken({ name: "TrueLiteral" })
         class FalseLiteral {}
 
-        it("exports a utility function that returns a token's name", () => {
+        it("assigns `name` property to tokenTypes", () => {
             // FalseLiteral was created with an anonymous function as its constructor yet tokenName(...)
             // should still work correctly on it if the 'tokenName' property has been set on its constructor.
-            expect(tokenName(FalseLiteral)).to.equal("FalseLiteral")
-            expect(tokenName(TrueLiteral)).to.equal("TrueLiteral")
+            expect(FalseLiteral.name).to.equal("FalseLiteral")
+            expect(TrueLiteral.name).to.equal("TrueLiteral")
         })
 
         let A = createToken({ name: "A" })

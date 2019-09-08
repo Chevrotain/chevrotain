@@ -42,7 +42,7 @@ class JsonParserWithComments extends JsonParser {
         // After every Token (terminal) is successfully consumed
         // We will add all the comment that appeared before it to the CST (Parse Tree)
         while (tokenMatcher(prevToken, Comment)) {
-            super.cstPostTerminal(Comment.tokenName, prevToken)
+            super.cstPostTerminal(Comment.name, prevToken)
             lookBehindIdx--
             prevToken = super.LA(lookBehindIdx)
         }

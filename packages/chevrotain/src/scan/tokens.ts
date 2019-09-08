@@ -10,7 +10,6 @@ import {
     isEmpty,
     map
 } from "../utils/utils"
-import { tokenName } from "./tokens_public"
 import { TokenType } from "../../api"
 
 export function tokenStructuredMatcher(tokInstance, tokConstructor) {
@@ -101,11 +100,6 @@ export function assignTokenDefaultProps(tokenTypes: TokenType[]): void {
         if (!hasExtendingTokensTypesMapProperty(currTokType)) {
             currTokType.categoryMatchesMap = {}
         }
-
-        if (!hasTokenNameProperty(currTokType)) {
-            // saved for fast access during CST building.
-            currTokType.tokenName = tokenName(currTokType)
-        }
     })
 }
 
@@ -158,10 +152,6 @@ export function hasExtendingTokensTypesMapProperty(
     tokType: TokenType
 ): boolean {
     return has(tokType, "categoryMatchesMap")
-}
-
-export function hasTokenNameProperty(tokType: TokenType): boolean {
-    return has(tokType, "tokenName")
 }
 
 export function isTokenType(tokType: TokenType): boolean {
