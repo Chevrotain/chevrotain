@@ -2,7 +2,7 @@
 
 #### Bug Fixes
 
--   [Runtime Error thrown when trying to build an Early Exit Parsing Error with maxLookahead 1](TBD)
+-   [Runtime Error thrown when trying to build an Early Exit Parsing Error with maxLookahead 1](https://github.com/SAP/chevrotain/commit/e044b8f9bc6acc58bfe2f238c6fc224b263547c4)
 
 ## 6.3.0 (9-8-2019)
 
