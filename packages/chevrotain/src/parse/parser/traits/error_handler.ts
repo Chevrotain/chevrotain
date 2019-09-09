@@ -76,7 +76,7 @@ export class ErrorHandler {
         )
         let insideProdPaths = lookAheadPathsPerAlternative[0]
         let actualTokens = []
-        for (let i = 1; i < this.maxLookahead; i++) {
+        for (let i = 1; i <= this.maxLookahead; i++) {
             actualTokens.push(this.LA(i))
         }
         let msg = this.errorMessageProvider.buildEarlyExitMessage({

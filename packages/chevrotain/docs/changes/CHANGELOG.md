@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+-   [Runtime Error thrown when trying to build an Early Exit Parsing Error with maxLookahead 1](TBD)
+
 ## 6.3.0 (9-8-2019)
 
 #### Minor Changes
