@@ -6,7 +6,7 @@ In some use cases this overhead may need to be reduced as much as possible.
 
 ## Enabling Initialization Performance Tracing
 
-Measuring a Parser's cold start performance can be done by enabling the [`traceInitPerf`](https://sap.github.io/chevrotain/documentation/6_3_0/interfaces/iparserconfig.html#traceinitperf)
+Measuring a Parser's cold start performance can be done by enabling the [`traceInitPerf`](https://sap.github.io/chevrotain/documentation/6_3_1/interfaces/iparserconfig.html#traceinitperf)
 flag. For example:
 
 ```javascript
@@ -30,7 +30,7 @@ Chevrotain is a K tokens lookahead Parser, this means it peeks ahead (at most) K
 determine the alternative to pick whenever it encounters a "branching" in the grammar.
 
 During initialization Chevrotain pre-computes and caches lookahead functions that would
-later be used at runtime. The global [maxLookahead](https://sap.github.io/chevrotain/documentation/6_3_0/interfaces/iparserconfig.html#maxlookahead)
+later be used at runtime. The global [maxLookahead](https://sap.github.io/chevrotain/documentation/6_3_1/interfaces/iparserconfig.html#maxlookahead)
 setting can significantly affect the performance of this pre-computation due to the fact the number of possible "paths"
 in the grammar can grow **exponentially** as the max length of the possible paths increases.
 
@@ -90,7 +90,7 @@ class LowLookaheadParser extends CstParser {
 Chevrotain performs many validations during Parser initialization, however those are not really relevant
 when the Parser is valid, they validations are a **development time** tool, and not really needed during productive flows.
 
-The [skipValidations](https://sap.github.io/chevrotain/documentation/6_3_0/interfaces/iparserconfig.html#skipvalidations)
+The [skipValidations](https://sap.github.io/chevrotain/documentation/6_3_1/interfaces/iparserconfig.html#skipvalidations)
 config property can be used to avoid running these validations.
 
 ```javascript
