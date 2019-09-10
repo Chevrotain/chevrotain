@@ -60,26 +60,29 @@ See: the [relevant section](./guide/internals.md#debugging-implications) in gram
 Lets look at an example first:
 
 ```javascript
-this.RULE("someRule", function() {
-    $.OPTION(function() {
+this.RULE("someRule", () => {
+    $.OPTION(() => {
         $.CONSUME(MyToken)
     })
 
-    $.OPTION2(function() {
+    $.OPTION1(() => {
+        // A different suffix is not needed because the argument is different!
         $.CONSUME(MyOtherToken)
     })
 
-    $.OPTION3(function() {
+    // OPTION has no "named" argument so a different suffix is **always** needed
+    // within the same top level rule.
+    $.OPTION2(() => {
         $.CONSUME2(MyToken)
     })
 })
 ```
 
-As you can see this example uses three different variations of OPTION(1|2|3) and two variations of CONSUME(1|2).
-This is because during parsing runtime Chevrotain must be able to **distinguish** between the variations of the **same** Parsing rule.
+This snippet uses three different variations of OPTION(""|1|2) and two variations of CONSUME(""|2).
+This is because during the parsing runtime Chevrotain must be able to **distinguish** between the variations of the **same** Parsing rule.
 
 The combination of the DSL Rule(OPTION/MANY/CONSUME), the DSL Rule's optional numerical suffix and the DSL rule's parameter (if available)
-defines a **unique** key which Chevrotain uses to **figure out** the current location in the grammar. This location information is then
+are mapped to a **unique** key which Chevrotain uses to **figure out** the current location in the grammar. This location information is then
 used for many things such as:
 
 -   Computing the lookahead function which decides if a DSL rule should be entered or which alternatives should be taken.
@@ -113,3 +116,5 @@ and there are many (thousands) of ambiguous paths.
 
 To resolve this try reducing the maxLookahead and inspect the ambiguity errors to fix
 the grammar ambiguity which is the root cause of the problem.
+
+Also have a look at the [Initialization Performance Guide](./guide/initialization_performance.md)

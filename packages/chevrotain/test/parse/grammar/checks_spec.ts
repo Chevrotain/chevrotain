@@ -460,23 +460,6 @@ export class StarTok {
     static PATTERN = /NA/
 }
 
-class ErroneousOccurrenceNumUsageParser1 extends Parser {
-    constructor(input: IToken[] = []) {
-        super([PlusTok])
-        this.performSelfAnalysis()
-        this.input = input
-    }
-
-    public duplicateRef = this.RULE("duplicateRef", () => {
-        this.SUBRULE1(this.anotherRule)
-        this.SUBRULE1(this.anotherRule)
-    })
-
-    public anotherRule = this.RULE("anotherRule", () => {
-        this.CONSUME(PlusTok)
-    })
-}
-
 class ErroneousOccurrenceNumUsageParser2 extends Parser {
     constructor(input: IToken[] = []) {
         super([PlusTok])
@@ -487,23 +470,6 @@ class ErroneousOccurrenceNumUsageParser2 extends Parser {
     public duplicateTerminal = this.RULE("duplicateTerminal", () => {
         this.CONSUME3(PlusTok)
         this.CONSUME3(PlusTok)
-    })
-}
-
-class ErroneousOccurrenceNumUsageParser3 extends Parser {
-    constructor(input: IToken[] = []) {
-        super([PlusTok, MinusTok])
-        this.performSelfAnalysis()
-        this.input = input
-    }
-
-    public duplicateMany = this.RULE("duplicateMany", () => {
-        this.MANY(() => {
-            this.CONSUME1(MinusTok)
-            this.MANY(() => {
-                this.CONSUME1(PlusTok)
-            })
-        })
     })
 }
 
@@ -525,18 +491,28 @@ class ValidOccurrenceNumUsageParser extends Parser {
 
 describe("The duplicate occurrence validations full flow", () => {
     it("will throw errors on duplicate Terminals consumption in the same top level rule", () => {
+        class ErroneousOccurrenceNumUsageParser1 extends Parser {
+            constructor(input: IToken[] = []) {
+                super([PlusTok])
+                this.performSelfAnalysis()
+                this.input = input
+            }
+
+            public duplicateRef = this.RULE("duplicateRef", () => {
+                this.SUBRULE1(this.anotherRule)
+                this.SUBRULE1(this.anotherRule)
+            })
+
+            public anotherRule = this.RULE("anotherRule", () => {
+                this.CONSUME(PlusTok)
+            })
+        }
+
         expect(() => new ErroneousOccurrenceNumUsageParser1()).to.throw(
-            "SUBRULE"
+            "->SUBRULE1<- with argument: ->anotherRule<-"
         )
-        expect(() => new ErroneousOccurrenceNumUsageParser1()).to.throw("1")
         expect(() => new ErroneousOccurrenceNumUsageParser1()).to.throw(
-            "duplicateRef"
-        )
-        expect(() => new ErroneousOccurrenceNumUsageParser1()).to.throw(
-            "anotherRule"
-        )
-        expect(() => new ErroneousOccurrenceNumUsageParser1()).to.throw(
-            "with numerical suffix: ->1<-"
+            "appears more than once (2 times) in the top level rule: ->duplicateRef<-"
         )
     })
 
@@ -554,13 +530,31 @@ describe("The duplicate occurrence validations full flow", () => {
     })
 
     it("will throw errors on duplicate MANY productions in the same top level rule", () => {
-        expect(() => new ErroneousOccurrenceNumUsageParser3()).to.throw("MANY")
-        expect(() => new ErroneousOccurrenceNumUsageParser3()).to.throw("0")
+        class ErroneousOccurrenceNumUsageParser3 extends Parser {
+            constructor(input: IToken[] = []) {
+                super([PlusTok, MinusTok])
+                this.performSelfAnalysis()
+                this.input = input
+            }
+
+            public duplicateMany = this.RULE("duplicateMany", () => {
+                this.MANY(() => {
+                    this.CONSUME1(MinusTok)
+                    this.MANY(() => {
+                        this.CONSUME1(PlusTok)
+                    })
+                })
+            })
+        }
+
         expect(() => new ErroneousOccurrenceNumUsageParser3()).to.throw(
-            "duplicateMany"
+            "->MANY<-"
         )
         expect(() => new ErroneousOccurrenceNumUsageParser3()).to.throw(
-            "appears more than once (2 times)"
+            "appears more than once (2 times) in the top level rule: ->duplicateMany<-"
+        )
+        expect(() => new ErroneousOccurrenceNumUsageParser3()).to.throw(
+            "https://sap.github.io/chevrotain/docs/FAQ.html#NUMERICAL_SUFFIXES"
         )
     })
 

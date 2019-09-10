@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+-   [Improve duplicate DSL methods suffix error message](https://github.com/SAP/chevrotain/issues/1020)
+
 ## 6.3.1 (9-10-2019)
 
 #### Bug Fixes

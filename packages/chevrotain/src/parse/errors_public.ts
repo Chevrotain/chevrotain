@@ -153,22 +153,13 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
         const dslName = getProductionDslName(duplicateProd)
         let extraArgument = getExtraProductionArgument(duplicateProd)
 
-        let msg = `->${dslName}<- with numerical suffix: ->${index}<-
-                  ${extraArgument ? `and argument: ->${extraArgument}<-` : ""}
+        const hasExplicitIndex = index > 0
+        let msg = `->${dslName}${hasExplicitIndex ? index : ""}<- ${
+            extraArgument ? `with argument: ->${extraArgument}<-` : ""
+        }
                   appears more than once (${
                       duplicateProds.length
-                  } times) in the top level rule: ->${topLevelName}<-.
-                  ${
-                      index === 0
-                          ? `Also note that numerical suffix 0 means ${dslName} without any suffix.`
-                          : ""
-                  }
-                  To fix this make sure each usage of ${dslName} ${
-            extraArgument ? `with the argument: ->${extraArgument}<-` : ""
-        }
-                  in the rule ->${topLevelName}<- has a different occurrence index (0-5), as that combination acts as a unique
-                  position key in the grammar, which is needed by the parsing engine.
-                  
+                  } times) in the top level rule: ->${topLevelName}<-.                  
                   For further details see: https://sap.github.io/chevrotain/docs/FAQ.html#NUMERICAL_SUFFIXES 
                   `
 
