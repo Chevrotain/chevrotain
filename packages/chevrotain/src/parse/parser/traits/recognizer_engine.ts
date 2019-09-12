@@ -1001,7 +1001,7 @@ export class RecognizerEngine {
     }
 
     isBackTracking(this: MixedInParser): boolean {
-        return !isEmpty(this.isBackTrackingStack)
+        return this.isBackTrackingStack.length !== 0
     }
 
     getCurrRuleFullName(this: MixedInParser): string {

@@ -4,6 +4,10 @@
 
 -   [Improve duplicate DSL methods suffix error message](https://github.com/SAP/chevrotain/issues/1020)
 
+#### Bug Fixes
+
+-   [Unexpected Side Effects When backtracking in a CstParser](https://github.com/SAP/chevrotain/issues/789)
+
 ## 6.3.1 (9-10-2019)
 
 #### Bug Fixes
