@@ -5,6 +5,7 @@ import {
     DSLMethodOptsWithErr,
     GrammarAction,
     IAnyOrAlt,
+    IOrAlt,
     IRuleConfig,
     ISerializedGast,
     IToken,
@@ -22,7 +23,7 @@ import { MixedInParser } from "./parser_traits"
 import { Rule, serializeGrammar } from "../../grammar/gast/gast_public"
 
 /**
- * This trait is responsible for implementing the offical API
+ * This trait is responsible for implementing the public API
  * for defining Chevrotain parsers, i.e:
  * - CONSUME
  * - RULE
@@ -32,6 +33,56 @@ import { Rule, serializeGrammar } from "../../grammar/gast/gast_public"
 export class RecognizerApi {
     ACTION<T>(this: MixedInParser, impl: () => T): T {
         return impl.call(this)
+    }
+
+    consume(
+        this: MixedInParser,
+        idx: number,
+        tokType: TokenType,
+        options?: ConsumeMethodOpts
+    ): IToken {
+        return this.consumeInternal(tokType, idx, options)
+    }
+
+    subrule<T>(
+        this: MixedInParser,
+        idx: number,
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T {
+        return this.subruleInternal(ruleToCall, idx, options)
+    }
+
+    option<OUT>(
+        this: MixedInParser,
+        idx: number,
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): OUT {
+        return this.optionInternal(actionORMethodDef, idx)
+    }
+
+    or(
+        this: MixedInParser,
+        idx: number,
+        altsOrOpts: IOrAlt[] | OrMethodOpts
+    ): any {
+        return this.orInternal(altsOrOpts, idx)
+    }
+
+    many(
+        this: MixedInParser,
+        idx: number,
+        actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>
+    ): void {
+        return this.manyInternal(idx, actionORMethodDef)
+    }
+
+    atLeastOne(
+        this: MixedInParser,
+        idx: number,
+        actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>
+    ): void {
+        return this.atLeastOneInternal(idx, actionORMethodDef)
     }
 
     CONSUME(
