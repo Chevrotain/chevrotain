@@ -370,61 +370,71 @@ declare abstract class BaseParser {
      *
      * @returns The result of invoking the chosen alternative.
      */
-    /* protected */ OR(altsOrOpts: IOrAlt[] | OrMethodOpts): any
+    /* protected */ OR<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR1(altsOrOpts: IOrAlt[] | OrMethodOpts): any
+    /* protected */ OR1<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR1(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR2(altsOrOpts: IOrAlt[] | OrMethodOpts): any
+    /* protected */ OR2<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR2(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR3(altsOrOpts: IOrAlt[] | OrMethodOpts): any
+    /* protected */ OR3<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR3(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR4(altsOrOpts: IOrAlt[] | OrMethodOpts): any
+    /* protected */ OR4<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR4(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR5(altsOrOpts: IOrAlt[] | OrMethodOpts): any
+    /* protected */ OR5<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR5(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR6(altsOrOpts: IOrAlt[] | OrMethodOpts): any
+    /* protected */ OR6<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR6(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR7(altsOrOpts: IOrAlt[] | OrMethodOpts): any
+    /* protected */ OR7<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR7(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR8(altsOrOpts: IOrAlt[] | OrMethodOpts): any
+    /* protected */ OR8<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR8(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any
 
     /**
      * @see OR
      * @hidden
      */
-    /* protected */ OR9(altsOrOpts: IOrAlt[] | OrMethodOpts): any
+    /* protected */ OR9<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR9(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any
 
     /**
      * Parsing DSL method, that indicates a repetition of zero or more.
@@ -866,7 +876,7 @@ export declare class Parser extends BaseParser {
         name: string,
         implementation: (...implArgs: any[]) => T,
         config?: IRuleConfig<T>
-    ): (idxInCallingRule?: number, ...args: any[]) => T | any
+    ): (idxInCallingRule?: number, ...args: any[]) => T
 
     /**
      * Same as {@link Parser.RULE}, but should only be used in
@@ -877,7 +887,7 @@ export declare class Parser extends BaseParser {
         name: string,
         impl: (...implArgs: any[]) => T,
         config?: IRuleConfig<T>
-    ): (idxInCallingRule?: number, ...args: any[]) => T | any
+    ): (idxInCallingRule?: number, ...args: any[]) => T
 
     /**
      * The Parsing DSL Method is used by one rule to call another.
@@ -1823,13 +1833,13 @@ export interface DSLMethodOptsWithErr<T> extends DSLMethodOpts<T> {
     ERR_MSG?: string
 }
 
-export interface OrMethodOpts {
+export interface OrMethodOpts<T> {
     NAME?: string
     /**
      * The set of alternatives,
      * See detailed description in {@link Parser.OR}
      */
-    DEF: IOrAlt[]
+    DEF: IOrAlt<T>[]
     /**
      * A description for the alternatives used in error messages
      * If none is provided, the error message will include the names of the expected
@@ -1922,10 +1932,10 @@ export declare type GrammarAction<OUT> = () => OUT
  */
 export declare type IAnyOrAlt = any
 
-export interface IOrAlt {
+export interface IOrAlt<T> {
     NAME?: string
     GATE?: () => boolean
-    ALT: () => any
+    ALT: () => T
     /**
      * A Flag indicating that any ambiguities involving this
      * specific alternative Should be ignored.
@@ -1936,7 +1946,7 @@ export interface IOrAlt {
     IGNORE_AMBIGUITIES?: boolean
 }
 
-export interface IOrAltWithGate extends IOrAlt {
+export interface IOrAltWithGate<T> extends IOrAlt<T> {
     // TODO: deprecate this interface
 }
 
