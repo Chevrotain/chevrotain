@@ -107,7 +107,7 @@ export class GastRecorder {
                     return this.subruleInternalRecord(arg1, i, arg2)
                 }
                 this[`OPTION${idx}`] = function(arg1) {
-                    this.optionInternalRecord(arg1, i)
+                    return this.optionInternalRecord(arg1, i)
                 }
                 this[`OR${idx}`] = function(arg1) {
                     return this.orInternalRecord(arg1, i)
@@ -125,6 +125,27 @@ export class GastRecorder {
                     this.atLeastOneSepFirstInternalRecord(i, arg1)
                 }
             }
+
+            // DSL methods with the idx(suffix) as an argument
+            this[`consume`] = function(idx, arg1, arg2) {
+                return this.consumeInternalRecord(arg1, idx, arg2)
+            }
+            this[`subrule`] = <any>function(idx, arg1, arg2) {
+                return this.subruleInternalRecord(arg1, idx, arg2)
+            }
+            this[`option`] = function(idx, arg1) {
+                return this.optionInternalRecord(arg1, idx)
+            }
+            this[`or`] = function(idx, arg1) {
+                return this.orInternalRecord(arg1, idx)
+            }
+            this[`many`] = function(idx, arg1) {
+                this.manyInternalRecord(idx, arg1)
+            }
+            this[`atLeastOne`] = function(idx, arg1) {
+                this.atLeastOneInternalRecord(idx, arg1)
+            }
+
             this.ACTION = this.ACTION_RECORD
             this.BACKTRACK = this.BACKTRACK_RECORD
             this.LA = this.LA_RECORD
@@ -149,6 +170,14 @@ export class GastRecorder {
                 delete this[`AT_LEAST_ONE${idx}`]
                 delete this[`AT_LEAST_ONE_SEP${idx}`]
             }
+
+            delete this[`consume`]
+            delete this[`subrule`]
+            delete this[`option`]
+            delete this[`or`]
+            delete this[`many`]
+            delete this[`atLeastOne`]
+
             delete this.ACTION
             delete this.BACKTRACK
             delete this.LA

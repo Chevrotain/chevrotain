@@ -30,7 +30,7 @@ import {
 import {
     AT_LEAST_ONE_IDX,
     AT_LEAST_ONE_SEP_IDX,
-    BITS_FOR_METHOD_IDX,
+    BITS_FOR_METHOD_TYPE,
     BITS_FOR_OCCURRENCE_IDX,
     MANY_IDX,
     MANY_SEP_IDX,
@@ -207,7 +207,7 @@ export class RecognizerEngine {
         /* tslint:disable */
         let shortName =
             this.ruleShortNameIdx <<
-            (BITS_FOR_METHOD_IDX + BITS_FOR_OCCURRENCE_IDX)
+            (BITS_FOR_METHOD_TYPE + BITS_FOR_OCCURRENCE_IDX)
         /* tslint:enable */
 
         this.ruleShortNameIdx++

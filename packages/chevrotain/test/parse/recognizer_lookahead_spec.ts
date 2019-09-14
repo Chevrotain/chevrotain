@@ -14,6 +14,7 @@ describe("lookahead Regular Tokens Mode", () => {
     let SevenTok = createToken({ name: "SevenTok" })
     let EightTok = createToken({ name: "EightTok" })
     let NineTok = createToken({ name: "NineTok" })
+    let TenTok = createToken({ name: "TenTok" })
     let Comma = createToken({ name: "Comma" })
 
     const ALL_TOKENS = [
@@ -81,6 +82,11 @@ describe("lookahead Regular Tokens Mode", () => {
                     total += "5"
                 })
 
+                this.option(20, () => {
+                    this.CONSUME1(SixTok)
+                    total += "6"
+                })
+
                 return total
             }
         }
@@ -113,6 +119,12 @@ describe("lookahead Regular Tokens Mode", () => {
             let input = [createRegularToken(FiveTok)]
             let parser = new OptionsImplicitLookAheadParser(input)
             expect(parser.manyOptionsRule()).to.equal("5")
+        })
+
+        it("can automatically compute lookahead for option(idx, ...)", () => {
+            let input = [createRegularToken(SixTok)]
+            let parser = new OptionsImplicitLookAheadParser(input)
+            expect(parser.manyOptionsRule()).to.equal("6")
         })
     })
 
@@ -185,6 +197,11 @@ describe("lookahead Regular Tokens Mode", () => {
                     total += "9"
                 })
 
+                this.many(20, () => {
+                    this.CONSUME1(TenTok)
+                    total += "10"
+                })
+
                 return total
             }
         }
@@ -241,6 +258,12 @@ describe("lookahead Regular Tokens Mode", () => {
             let input = [createRegularToken(NineTok)]
             let parser = new ManyImplicitLookAheadParser(input)
             expect(parser.manyRule()).to.equal("9")
+        })
+
+        it("can automatically compute lookahead for many(idx, ...)", () => {
+            let input = [createRegularToken(TenTok)]
+            let parser = new ManyImplicitLookAheadParser(input)
+            expect(parser.manyRule()).to.equal("10")
         })
 
         it("can accept lookahead function param for flow mixing several MANYs", () => {
@@ -510,6 +533,11 @@ describe("lookahead Regular Tokens Mode", () => {
                     total += "9"
                 })
 
+                this.atLeastOne(32, () => {
+                    this.CONSUME1(TenTok)
+                    total += "10"
+                })
+
                 return total
             }
         }
@@ -528,10 +556,11 @@ describe("lookahead Regular Tokens Mode", () => {
                 createRegularToken(EightTok),
                 createRegularToken(EightTok),
                 createRegularToken(EightTok),
-                createRegularToken(NineTok)
+                createRegularToken(NineTok),
+                createRegularToken(TenTok)
             ]
             let parser = new AtLeastOneImplicitLookAheadParser(input)
-            expect(parser.atLeastOneRule()).to.equal("1223445678889")
+            expect(parser.atLeastOneRule()).to.equal("122344567888910")
         })
 
         it("will fail when zero occurrences of AT_LEAST_ONE in input", () => {
@@ -617,7 +646,7 @@ describe("lookahead Regular Tokens Mode", () => {
                 this.AT_LEAST_ONE_SEP5({
                     SEP: Comma,
                     DEF: () => {
-                        this.CONSUME1(FiveTok)
+                        this.consume(72, FiveTok)
                         total += "5"
                     }
                 })
@@ -889,6 +918,39 @@ describe("lookahead Regular Tokens Mode", () => {
                     }
                 ])
 
+                this.or(45, [
+                    {
+                        ALT: () => {
+                            this.CONSUME6(TwoTok)
+                            total += "F2"
+                        }
+                    },
+                    {
+                        ALT: () => {
+                            this.CONSUME6(OneTok)
+                            total += "F1"
+                        }
+                    },
+                    {
+                        ALT: () => {
+                            this.CONSUME6(ThreeTok)
+                            total += "F3"
+                        }
+                    },
+                    {
+                        ALT: () => {
+                            this.CONSUME6(FourTok)
+                            total += "F4"
+                        }
+                    },
+                    {
+                        ALT: () => {
+                            this.consume(66, FiveTok)
+                            total += "F5"
+                        }
+                    }
+                ])
+
                 return total
             }
         }
@@ -899,10 +961,11 @@ describe("lookahead Regular Tokens Mode", () => {
                 createRegularToken(TwoTok),
                 createRegularToken(ThreeTok),
                 createRegularToken(FourTok),
-                createRegularToken(FiveTok)
+                createRegularToken(FiveTok),
+                createRegularToken(ThreeTok)
             ]
             let parser = new OrImplicitLookAheadParser(input)
-            expect(parser.orRule()).to.equal("A1B2C3D4E5")
+            expect(parser.orRule()).to.equal("A1B2C3D4E5F3")
         })
 
         it("will fail when none of the alternatives match", () => {

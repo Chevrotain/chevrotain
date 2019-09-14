@@ -1071,6 +1071,7 @@ export declare class CstParser extends BaseParser {
      * @see SUBRULE
      */
     /* protected */ subrule(
+        idx: number,
         ruleToCall: (idx: number) => CstNode,
         options?: SubruleMethodOpts
     ): CstNode
@@ -1221,6 +1222,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
      * @see SUBRULE
      */
     /* protected */ subrule<T>(
+        idx: number,
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T
