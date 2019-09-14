@@ -1,4 +1,7 @@
-import { Parser } from "../../../src/parse/parser/traits/parser_traits"
+import {
+    CstParser,
+    Parser
+} from "../../../src/parse/parser/traits/parser_traits"
 import {
     EMPTY_ALT,
     END_OF_FILE,
@@ -677,6 +680,153 @@ describe("The Recorder runtime checks full flow", () => {
             "inside top level rule: <two>"
         )
     })
+
+    context(
+        "will throw an error when trying to init a parser with an invalid method idx",
+        () => {
+            it("consume", () => {
+                class InvalidIdxParser extends Parser {
+                    constructor(input: IToken[] = []) {
+                        super([myToken, myOtherToken])
+                        this.performSelfAnalysis()
+                        this.input = input
+                    }
+
+                    public one = this.RULE("one", () => {
+                        this.consume(256, myToken)
+                    })
+                }
+
+                expect(() => new InvalidIdxParser()).to.throw(
+                    "Invalid DSL Method idx value: <256>"
+                )
+                expect(() => new InvalidIdxParser()).to.throw(
+                    "Idx value must be a none negative value smaller than 256"
+                )
+            })
+
+            it("subrule", () => {
+                class InvalidIdxParser extends CstParser {
+                    constructor(input: IToken[] = []) {
+                        super([myToken, myOtherToken])
+                        this.performSelfAnalysis()
+                        this.input = input
+                    }
+
+                    public one = this.RULE("one", () => {
+                        this.subrule(-1, this.two)
+                    })
+
+                    public two = this.RULE("two", () => {
+                        this.consume(1, null)
+                    })
+                }
+
+                expect(() => new InvalidIdxParser()).to.throw(
+                    "Invalid DSL Method idx value: <-1>"
+                )
+                expect(() => new InvalidIdxParser()).to.throw(
+                    "Idx value must be a none negative value smaller than 256"
+                )
+            })
+
+            it("option", () => {
+                class InvalidIdxParser extends Parser {
+                    constructor(input: IToken[] = []) {
+                        super([myToken, myOtherToken])
+                        this.performSelfAnalysis()
+                        this.input = input
+                    }
+
+                    public one = this.RULE("one", () => {
+                        this.option(666, () => {
+                            this.consume(1, myToken)
+                        })
+                    })
+                }
+
+                expect(() => new InvalidIdxParser()).to.throw(
+                    "Invalid DSL Method idx value: <666>"
+                )
+                expect(() => new InvalidIdxParser()).to.throw(
+                    "Idx value must be a none negative value smaller than 256"
+                )
+            })
+
+            it("many", () => {
+                class InvalidIdxParser extends Parser {
+                    constructor(input: IToken[] = []) {
+                        super([myToken, myOtherToken])
+                        this.performSelfAnalysis()
+                        this.input = input
+                    }
+
+                    public one = this.RULE("one", () => {
+                        this.many(-333, () => {
+                            this.consume(1, myToken)
+                        })
+                    })
+                }
+
+                expect(() => new InvalidIdxParser()).to.throw(
+                    "Invalid DSL Method idx value: <-333>"
+                )
+                expect(() => new InvalidIdxParser()).to.throw(
+                    "Idx value must be a none negative value smaller than 256"
+                )
+            })
+
+            it("atLeastOne", () => {
+                class InvalidIdxParser extends Parser {
+                    constructor(input: IToken[] = []) {
+                        super([myToken, myOtherToken])
+                        this.performSelfAnalysis()
+                        this.input = input
+                    }
+
+                    public one = this.RULE("one", () => {
+                        this.atLeastOne(1999, () => {
+                            this.consume(1, myToken)
+                        })
+                    })
+                }
+
+                expect(() => new InvalidIdxParser()).to.throw(
+                    "Invalid DSL Method idx value: <1999>"
+                )
+                expect(() => new InvalidIdxParser()).to.throw(
+                    "Idx value must be a none negative value smaller than 256"
+                )
+            })
+
+            it("or", () => {
+                class InvalidIdxParser extends Parser {
+                    constructor(input: IToken[] = []) {
+                        super([myToken, myOtherToken])
+                        this.performSelfAnalysis()
+                        this.input = input
+                    }
+
+                    public one = this.RULE("one", () => {
+                        this.or(543, [
+                            {
+                                ALT: () => {
+                                    this.consume(1, myToken)
+                                }
+                            }
+                        ])
+                    })
+                }
+
+                expect(() => new InvalidIdxParser()).to.throw(
+                    "Invalid DSL Method idx value: <543>"
+                )
+                expect(() => new InvalidIdxParser()).to.throw(
+                    "Idx value must be a none negative value smaller than 256"
+                )
+            })
+        }
+    )
 
     context("augmenting error messages", () => {
         it("will add additional details to other runtime exceptions encountered during recording phase", () => {
