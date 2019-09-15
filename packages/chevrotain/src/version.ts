@@ -1,4 +1,4 @@
 // needs a separate module as this is required inside chevrotain productive code
 // and also in the entry point for webpack(api.ts).
 // A separate file avoids cyclic dependencies and webpack errors.
-export const VERSION = "6.3.1"
+export const VERSION = "6.4.0"
