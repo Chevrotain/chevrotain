@@ -87,6 +87,69 @@ declare abstract class BaseParser {
     /* protected */ ACTION<T>(impl: () => T): T
 
     /**
+     * Like `CONSUME` with the numerical suffix as a parameter, e.g:
+     * consume(0, X) === CONSUME(X)
+     * consume(1, X) === CONSUME1(X)
+     * consume(2, X) === CONSUME2(X)
+     * ...
+     * @see CONSUME
+     */
+    /* protected */ consume(
+        idx: number,
+        tokType: TokenType,
+        options?: ConsumeMethodOpts
+    ): IToken
+
+    /**
+     * Like `OPTION` with the numerical suffix as a parameter, e.g:
+     * option(0, X) === OPTION(X)
+     * option(1, X) === OPTION1(X)
+     * option(2, X) === OPTION2(X)
+     * ...
+     * @see SUBRULE
+     */
+    /* protected */ option<OUT>(
+        idx: number,
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): OUT
+
+    /**
+     * Like `OR` with the numerical suffix as a parameter, e.g:
+     * or(0, X) === OR(X)
+     * or(1, X) === OR1(X)
+     * or(2, X) === OR2(X)
+     * ...
+     * @see OR
+     */
+    /* protected */ or(idx: number, altsOrOpts: IOrAlt[] | OrMethodOpts): any
+
+    /**
+     * Like `MANY` with the numerical suffix as a parameter, e.g:
+     * many(0, X) === MANY(X)
+     * many(1, X) === MANY1(X)
+     * many(2, X) === MANY2(X)
+     * ...
+     * @see MANY
+     */
+    /* protected */ many(
+        idx: number,
+        actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>
+    ): void
+
+    /**
+     * Like `AT_LEAST_ONE` with the numerical suffix as a parameter, e.g:
+     * atLeastOne(0, X) === AT_LEAST_ONE(X)
+     * atLeastOne(1, X) === AT_LEAST_ONE1(X)
+     * atLeastOne(2, X) === AT_LEAST_ONE2(X)
+     * ...
+     * @see AT_LEAST_ONE
+     */
+    /* protected */ atLeastOne(
+        idx: number,
+        actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>
+    ): void
+
+    /**
      *
      * A Parsing DSL method use to consume a single Token.
      * In EBNF terms this is equivalent to a Terminal.
@@ -879,26 +942,6 @@ export declare class Parser extends BaseParser {
         config?: IRuleConfig<T>
     ): (idxInCallingRule?: number, ...args: any[]) => T | any
 
-    /**
-     * The Parsing DSL Method is used by one rule to call another.
-     * It is equivalent to a non-Terminal in EBNF notation.
-     *
-     * This may seem redundant as it does not actually do much.
-     * However using it is **mandatory** for all sub rule invocations.
-     *
-     * Calling another rule without wrapping in SUBRULE(...)
-     * will cause errors/mistakes in the Parser's self analysis phase,
-     * which will lead to errors in error recovery/automatic lookahead calculation
-     * and any other functionality relying on the Parser's self analysis
-     * output.
-     *
-     * As in CONSUME the index in the method name indicates the occurrence
-     * of the sub rule invocation in its rule.
-     *
-     * @param ruleToCall - The rule to invoke.
-     * @param options - optional properties to modify the behavior of SUBRULE.
-     * @returns The result of invoking ruleToCall.
-     */
     /* protected */ SUBRULE<T>(
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
@@ -1001,7 +1044,7 @@ export declare class CstParser extends BaseParser {
     /* protected */ static performSelfAnalysis(parserInstance: Parser): void
 
     /**
-     * @see Parser.RULE
+     * Creates a Grammar Rule
      */
     /* protected */ RULE(
         name: string,
@@ -1010,7 +1053,8 @@ export declare class CstParser extends BaseParser {
     ): (idxInCallingRule?: number, ...args: any[]) => CstNode
 
     /**
-     * @see Parser.RULE
+     * Overrides a Grammar Rule
+     * See usage example in: https://github.com/SAP/chevrotain/blob/master/examples/parser/versioning/versioning.js
      */
     /* protected */ OVERRIDE_RULE<T>(
         name: string,
@@ -1019,7 +1063,35 @@ export declare class CstParser extends BaseParser {
     ): (idxInCallingRule?: number, ...args: any[]) => CstNode
 
     /**
-     * @see Parser.SUBRULE
+     * Like `SUBRULE` with the numerical suffix as a parameter, e.g:
+     * subrule(0, X) === SUBRULE(X)
+     * subrule(1, X) === SUBRULE1(X)
+     * subrule(2, X) === SUBRULE2(X)
+     * ...
+     * @see SUBRULE
+     */
+    /* protected */ subrule(
+        idx: number,
+        ruleToCall: (idx: number) => CstNode,
+        options?: SubruleMethodOpts
+    ): CstNode
+
+    /**
+     * The Parsing DSL Method is used by one rule to call another.
+     * It is equivalent to a non-Terminal in EBNF notation.
+     *
+     * This may seem redundant as it does not actually do much.
+     * However using it is **mandatory** for all sub rule invocations.
+     *
+     * Calling another rule without wrapping in SUBRULE(...)
+     * will cause errors/mistakes in the Parser's self analysis phase,
+     * which will lead to errors in error recovery/automatic lookahead calculation
+     * and any other functionality relying on the Parser's self analysis
+     * output.
+     *
+     * As in CONSUME the index in the method name indicates the occurrence
+     * of the sub rule invocation in its rule.
+     *
      */
     /* protected */ SUBRULE(
         ruleToCall: (idx: number) => CstNode,
@@ -1123,7 +1195,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
     // TODO: remove `outputCST` from the config options in the constructor
 
     /**
-     * @see Parser.RULE
+     * Creates a Grammar Rule
      */
     /* protected */ RULE<T>(
         name: string,
@@ -1132,7 +1204,8 @@ export declare class EmbeddedActionsParser extends BaseParser {
     ): (idxInCallingRule?: number, ...args: any[]) => T
 
     /**
-     * @see Parser.OVERRIDE_RULE
+     * Overrides a Grammar Rule
+     * See usage example in: https://github.com/SAP/chevrotain/blob/master/examples/parser/versioning/versioning.js
      */
     /* protected */ OVERRIDE_RULE<T>(
         name: string,
@@ -1141,7 +1214,35 @@ export declare class EmbeddedActionsParser extends BaseParser {
     ): (idxInCallingRule?: number, ...args: any[]) => T
 
     /**
-     * @see BaseParser.SUBRULE
+     * Like `SUBRULE` with the numerical suffix as a parameter, e.g:
+     * subrule(0, X) === SUBRULE(X)
+     * subrule(1, X) === SUBRULE1(X)
+     * subrule(2, X) === SUBRULE2(X)
+     * ...
+     * @see SUBRULE
+     */
+    /* protected */ subrule<T>(
+        idx: number,
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T
+
+    /**
+     * The Parsing DSL Method is used by one rule to call another.
+     * It is equivalent to a non-Terminal in EBNF notation.
+     *
+     * This may seem redundant as it does not actually do much.
+     * However using it is **mandatory** for all sub rule invocations.
+     *
+     * Calling another rule without wrapping in SUBRULE(...)
+     * will cause errors/mistakes in the Parser's self analysis phase,
+     * which will lead to errors in error recovery/automatic lookahead calculation
+     * and any other functionality relying on the Parser's self analysis
+     * output.
+     *
+     * As in CONSUME the index in the method name indicates the occurrence
+     * of the sub rule invocation in its rule.
+     *
      */
     /* protected */ SUBRULE<T>(
         ruleToCall: (idx: number) => T,

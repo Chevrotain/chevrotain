@@ -1,6 +1,9 @@
 import { EOF, createToken } from "../../src/scan/tokens_public"
 import { Lexer } from "../../src/scan/lexer_public"
-import { Parser } from "../../src/parse/parser/traits/parser_traits"
+import {
+    EmbeddedActionsParser,
+    Parser
+} from "../../src/parse/parser/traits/parser_traits"
 import { EMPTY_ALT } from "../../src/parse/parser/parser"
 
 import {
@@ -35,7 +38,7 @@ function defineRecognizerSpecs(
 
         describe("The Parsing DSL", () => {
             it("provides a production SUBRULE1-5 that invokes another rule", () => {
-                class SubRuleTestParser extends Parser {
+                class SubRuleTestParser extends EmbeddedActionsParser {
                     private result = ""
                     private index = 1
 
@@ -50,7 +53,7 @@ function defineRecognizerSpecs(
                         this.SUBRULE1(this.subRule)
                         this.SUBRULE2(this.subRule)
                         this.SUBRULE3(this.subRule)
-                        this.SUBRULE4(this.subRule)
+                        this.subrule(66, this.subRule)
                         this.SUBRULE5(this.subRule)
                         return this.result
                     })
@@ -659,7 +662,7 @@ function defineRecognizerSpecs(
                         this.input = input
                     }
 
-                    public or = this.RULE("or", () => {
+                    public orRule = this.RULE("orRule", () => {
                         return this.OR([
                             {
                                 ALT: () => {
@@ -680,10 +683,10 @@ function defineRecognizerSpecs(
                 let parser = new OrExpressionParser([])
 
                 parser.input = [createTokenInstance(MinusTok)]
-                expect(parser.or()).to.equal(666)
+                expect(parser.orRule()).to.equal(666)
 
                 parser.input = [createTokenInstance(PlusTok)]
-                expect(parser.or()).to.equal("bamba")
+                expect(parser.orRule()).to.equal("bamba")
             })
 
             it("OPTION will return the grammar action value or undefined if the option was not taken", () => {
@@ -695,7 +698,7 @@ function defineRecognizerSpecs(
                         this.input = input
                     }
 
-                    public option = this.RULE("option", () => {
+                    public optionRule = this.RULE("optionRule", () => {
                         return this.OPTION(() => {
                             this.CONSUME(IdentTok)
                             return "bamba"
@@ -706,10 +709,10 @@ function defineRecognizerSpecs(
                 let parser = new OptionExpressionParser([])
 
                 parser.input = [createTokenInstance(IdentTok)]
-                expect(parser.option()).to.equal("bamba")
+                expect(parser.optionRule()).to.equal("bamba")
 
                 parser.input = [createTokenInstance(IntTok)]
-                expect(parser.option()).to.be.undefined
+                expect(parser.optionRule()).to.be.undefined
             })
         })
 

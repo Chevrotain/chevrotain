@@ -40,6 +40,7 @@ import { Lexer } from "../../../scan/lexer_public"
 import { augmentTokenTypes, hasShortKeyProperty } from "../../../scan/tokens"
 import { createToken, createTokenInstance } from "../../../scan/tokens_public"
 import { END_OF_FILE } from "../parser"
+import { BITS_FOR_OCCURRENCE_IDX } from "../../grammar/keys"
 
 type ProdWithDef = IProduction & { definition?: IProduction[] }
 const RECORDING_NULL_OBJECT = {
@@ -48,6 +49,8 @@ const RECORDING_NULL_OBJECT = {
 Object.freeze(RECORDING_NULL_OBJECT)
 
 const HANDLE_SEPARATOR = true
+const MAX_METHOD_IDX = Math.pow(2, BITS_FOR_OCCURRENCE_IDX) - 1
+
 const RFT = createToken({ name: "RECORDING_PHASE_TOKEN", pattern: Lexer.NA })
 augmentTokenTypes([RFT])
 const RECORDING_PHASE_TOKEN = createTokenInstance(
@@ -107,7 +110,7 @@ export class GastRecorder {
                     return this.subruleInternalRecord(arg1, i, arg2)
                 }
                 this[`OPTION${idx}`] = function(arg1) {
-                    this.optionInternalRecord(arg1, i)
+                    return this.optionInternalRecord(arg1, i)
                 }
                 this[`OR${idx}`] = function(arg1) {
                     return this.orInternalRecord(arg1, i)
@@ -125,6 +128,27 @@ export class GastRecorder {
                     this.atLeastOneSepFirstInternalRecord(i, arg1)
                 }
             }
+
+            // DSL methods with the idx(suffix) as an argument
+            this[`consume`] = function(idx, arg1, arg2) {
+                return this.consumeInternalRecord(arg1, idx, arg2)
+            }
+            this[`subrule`] = <any>function(idx, arg1, arg2) {
+                return this.subruleInternalRecord(arg1, idx, arg2)
+            }
+            this[`option`] = function(idx, arg1) {
+                return this.optionInternalRecord(arg1, idx)
+            }
+            this[`or`] = function(idx, arg1) {
+                return this.orInternalRecord(arg1, idx)
+            }
+            this[`many`] = function(idx, arg1) {
+                this.manyInternalRecord(idx, arg1)
+            }
+            this[`atLeastOne`] = function(idx, arg1) {
+                this.atLeastOneInternalRecord(idx, arg1)
+            }
+
             this.ACTION = this.ACTION_RECORD
             this.BACKTRACK = this.BACKTRACK_RECORD
             this.LA = this.LA_RECORD
@@ -149,6 +173,14 @@ export class GastRecorder {
                 delete this[`AT_LEAST_ONE${idx}`]
                 delete this[`AT_LEAST_ONE_SEP${idx}`]
             }
+
+            delete this[`consume`]
+            delete this[`subrule`]
+            delete this[`option`]
+            delete this[`or`]
+            delete this[`many`]
+            delete this[`atLeastOne`]
+
             delete this.ACTION
             delete this.BACKTRACK
             delete this.LA
@@ -275,6 +307,7 @@ export class GastRecorder {
         occurrence: number,
         options?: SubruleMethodOpts
     ): T | CstNode {
+        assertMethodIdxIsValid(occurrence)
         if (!ruleToCall || has(ruleToCall, "ruleName") === false) {
             const error: any = new Error(
                 `<SUBRULE${getIdxSuffix(occurrence)}> argument is invalid` +
@@ -310,6 +343,7 @@ export class GastRecorder {
         occurrence: number,
         options: ConsumeMethodOpts
     ): IToken {
+        assertMethodIdxIsValid(occurrence)
         if (!hasShortKeyProperty(tokType)) {
             const error: any = new Error(
                 `<CONSUME${getIdxSuffix(occurrence)}> argument is invalid` +
@@ -340,6 +374,7 @@ function recordProd(
     occurrence: number,
     handleSep: boolean = false
 ): any {
+    assertMethodIdxIsValid(occurrence)
     const prevProd: any = peek(this.recordingProdStack)
     const grammarAction = isFunction(mainProdArg)
         ? mainProdArg
@@ -365,6 +400,7 @@ function recordProd(
 }
 
 function recordOrProd(mainProdArg: any, occurrence: number): any {
+    assertMethodIdxIsValid(occurrence)
     const prevProd: any = peek(this.recordingProdStack)
     // Only an array of alternatives
     const hasOptions = isArray(mainProdArg) === false
@@ -409,4 +445,17 @@ function recordOrProd(mainProdArg: any, occurrence: number): any {
 
 function getIdxSuffix(idx: number): string {
     return idx === 0 ? "" : `${idx}`
+}
+
+function assertMethodIdxIsValid(idx): void {
+    if (idx < 0 || idx > MAX_METHOD_IDX) {
+        const error: any = new Error(
+            // The stack trace will contain all the needed details
+            `Invalid DSL Method idx value: <${idx}>\n\t` +
+                `Idx value must be a none negative value smaller than ${MAX_METHOD_IDX +
+                    1}`
+        )
+        error.KNOWN_RECORDER_ERROR = true
+        throw error
+    }
 }

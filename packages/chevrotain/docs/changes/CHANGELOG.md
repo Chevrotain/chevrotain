@@ -2,6 +2,7 @@
 
 #### Minor Changes
 
+-   [Larger Max numerical suffix/idx for the DSL Methods](https://github.com/SAP/chevrotain/issues/802)
 -   [Improve duplicate DSL methods suffix error message](https://github.com/SAP/chevrotain/issues/1020)
 
 #### Bug Fixes
