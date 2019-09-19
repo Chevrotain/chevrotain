@@ -79,6 +79,7 @@ export function firstCharOptimizedIndices(ast, result, ignoreCase): number[] {
 
                 // skip terms that cannot effect the first char results
                 switch (term.type) {
+                    case "EndAnchor":
                     // A group back reference cannot affect potential starting char.
                     // because if a back reference is the first production than automatically
                     // the group being referenced has had to come BEFORE so its codes have already been added
@@ -87,7 +88,6 @@ export function firstCharOptimizedIndices(ast, result, ignoreCase): number[] {
                     case "Lookahead":
                     case "NegativeLookahead":
                     case "StartAnchor":
-                    case "EndAnchor":
                     case "WordBoundary":
                     case "NonWordBoundary":
                         continue
