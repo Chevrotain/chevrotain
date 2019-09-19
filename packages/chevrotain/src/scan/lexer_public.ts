@@ -25,6 +25,7 @@ import {
     PRINT_WARNING,
     reduce,
     reject,
+    timer,
     toFastProperties
 } from "../utils/utils"
 import { augmentTokenTypes } from "./tokens"
@@ -77,7 +78,8 @@ const DEFAULT_LEXER_CONFIG: ILexerConfig = {
     lineTerminatorCharacters: ["\n", "\r"],
     ensureOptimizations: false,
     safeMode: false,
-    errorMessageProvider: defaultLexerErrorProvider
+    errorMessageProvider: defaultLexerErrorProvider,
+    traceInitPerf: false
 }
 
 Object.freeze(DEFAULT_LEXER_CONFIG)
@@ -104,6 +106,10 @@ export class Lexer {
     private hasCustom: boolean = false
     private canModeBeOptimized: any = {}
 
+    private traceInitPerf: boolean | number
+    private traceInitMaxIdent: number
+    private traceInitIndent: number
+
     constructor(
         protected lexerDefinition: TokenType[] | IMultiModeLexerDefinition,
         config: ILexerConfig = DEFAULT_LEXER_CONFIG
@@ -118,215 +124,259 @@ export class Lexer {
         // todo: defaults func?
         this.config = merge(DEFAULT_LEXER_CONFIG, config)
 
-        if (
-            this.config.lineTerminatorsPattern ===
-            DEFAULT_LEXER_CONFIG.lineTerminatorsPattern
-        ) {
-            // optimized built-in implementation for the defaults definition of lineTerminators
-            this.config.lineTerminatorsPattern = LineTerminatorOptimizedTester
-        } else {
-            if (
-                this.config.lineTerminatorCharacters ===
-                DEFAULT_LEXER_CONFIG.lineTerminatorCharacters
-            ) {
-                throw Error(
-                    "Error: Missing <lineTerminatorCharacters> property on the Lexer config.\n" +
-                        "\tFor details See: https://sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#MISSING_LINE_TERM_CHARS"
-                )
-            }
+        const traceInitVal = this.config.traceInitPerf
+        if (traceInitVal === true) {
+            this.traceInitMaxIdent = Infinity
+            this.traceInitPerf = true
+        } else if (typeof traceInitVal === "number") {
+            this.traceInitMaxIdent = traceInitVal
+            this.traceInitPerf = true
         }
+        this.traceInitIndent = -1
 
-        if (config.safeMode && config.ensureOptimizations) {
-            throw Error(
-                '"safeMode" and "ensureOptimizations" flags are mutually exclusive.'
-            )
-        }
+        this.TRACE_INIT("Lexer Constructor", () => {
+            let actualDefinition: IMultiModeLexerDefinition
+            let hasOnlySingleMode = true
+            this.TRACE_INIT("Lexer Config handling", () => {
+                if (
+                    this.config.lineTerminatorsPattern ===
+                    DEFAULT_LEXER_CONFIG.lineTerminatorsPattern
+                ) {
+                    // optimized built-in implementation for the defaults definition of lineTerminators
+                    this.config.lineTerminatorsPattern = LineTerminatorOptimizedTester
+                } else {
+                    if (
+                        this.config.lineTerminatorCharacters ===
+                        DEFAULT_LEXER_CONFIG.lineTerminatorCharacters
+                    ) {
+                        throw Error(
+                            "Error: Missing <lineTerminatorCharacters> property on the Lexer config.\n" +
+                                "\tFor details See: https://sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#MISSING_LINE_TERM_CHARS"
+                        )
+                    }
+                }
 
-        this.trackStartLines = /full|onlyStart/i.test(
-            this.config.positionTracking
-        )
-        this.trackEndLines = /full/i.test(this.config.positionTracking)
-
-        let hasOnlySingleMode = true
-        let actualDefinition: IMultiModeLexerDefinition
-
-        // Convert SingleModeLexerDefinition into a IMultiModeLexerDefinition.
-        if (isArray(lexerDefinition)) {
-            actualDefinition = <any>{ modes: {} }
-            actualDefinition.modes[DEFAULT_MODE] = cloneArr(<TokenType[]>(
-                lexerDefinition
-            ))
-            actualDefinition[DEFAULT_MODE] = DEFAULT_MODE
-        } else {
-            // no conversion needed, input should already be a IMultiModeLexerDefinition
-            hasOnlySingleMode = false
-            actualDefinition = cloneObj(<IMultiModeLexerDefinition>(
-                lexerDefinition
-            ))
-        }
-
-        this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(
-            performRuntimeChecks(
-                actualDefinition,
-                this.trackStartLines,
-                this.config.lineTerminatorCharacters
-            )
-        )
-
-        this.lexerDefinitionWarning = this.lexerDefinitionWarning.concat(
-            performWarningRuntimeChecks(
-                actualDefinition,
-                this.trackStartLines,
-                this.config.lineTerminatorCharacters
-            )
-        )
-
-        // for extra robustness to avoid throwing an none informative error message
-        actualDefinition.modes = actualDefinition.modes
-            ? actualDefinition.modes
-            : {}
-
-        // an error of undefined TokenTypes will be detected in "performRuntimeChecks" above.
-        // this transformation is to increase robustness in the case of partially invalid lexer definition.
-        forEach(actualDefinition.modes, (currModeValue, currModeName) => {
-            actualDefinition.modes[currModeName] = reject<TokenType>(
-                currModeValue,
-                currTokType => isUndefined(currTokType)
-            )
-        })
-
-        let allModeNames = keys(actualDefinition.modes)
-
-        forEach(
-            actualDefinition.modes,
-            (currModDef: TokenType[], currModName) => {
-                this.modes.push(currModName)
-                this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(
-                    validatePatterns(<TokenType[]>currModDef, allModeNames)
-                )
-
-                // If definition errors were encountered, the analysis phase may fail unexpectedly/
-                // Considering a lexer with definition errors may never be used, there is no point
-                // to performing the analysis anyhow...
-                if (isEmpty(this.lexerDefinitionErrors)) {
-                    augmentTokenTypes(currModDef)
-                    let currAnalyzeResult = analyzeTokenTypes(currModDef, {
-                        lineTerminatorCharacters: this.config
-                            .lineTerminatorCharacters,
-                        positionTracking: config.positionTracking,
-                        ensureOptimizations: config.ensureOptimizations,
-                        safeMode: config.safeMode
-                    })
-
-                    this.patternIdxToConfig[currModName] =
-                        currAnalyzeResult.patternIdxToConfig
-
-                    this.charCodeToPatternIdxToConfig[currModName] =
-                        currAnalyzeResult.charCodeToPatternIdxToConfig
-
-                    this.emptyGroups = merge(
-                        this.emptyGroups,
-                        currAnalyzeResult.emptyGroups
+                if (config.safeMode && config.ensureOptimizations) {
+                    throw Error(
+                        '"safeMode" and "ensureOptimizations" flags are mutually exclusive.'
                     )
-
-                    this.hasCustom =
-                        currAnalyzeResult.hasCustom || this.hasCustom
-
-                    this.canModeBeOptimized[currModName] =
-                        currAnalyzeResult.canBeOptimized
                 }
-            }
-        )
 
-        this.defaultMode = actualDefinition.defaultMode
+                this.trackStartLines = /full|onlyStart/i.test(
+                    this.config.positionTracking
+                )
+                this.trackEndLines = /full/i.test(this.config.positionTracking)
 
-        if (
-            !isEmpty(this.lexerDefinitionErrors) &&
-            !this.config.deferDefinitionErrorsHandling
-        ) {
-            let allErrMessages = map(this.lexerDefinitionErrors, error => {
-                return error.message
+                // Convert SingleModeLexerDefinition into a IMultiModeLexerDefinition.
+                if (isArray(lexerDefinition)) {
+                    actualDefinition = <any>{ modes: {} }
+                    actualDefinition.modes[DEFAULT_MODE] = cloneArr(<
+                        TokenType[]
+                    >lexerDefinition)
+                    actualDefinition[DEFAULT_MODE] = DEFAULT_MODE
+                } else {
+                    // no conversion needed, input should already be a IMultiModeLexerDefinition
+                    hasOnlySingleMode = false
+                    actualDefinition = cloneObj(<IMultiModeLexerDefinition>(
+                        lexerDefinition
+                    ))
+                }
             })
-            let allErrMessagesString = allErrMessages.join(
-                "-----------------------\n"
-            )
-            throw new Error(
-                "Errors detected in definition of Lexer:\n" +
-                    allErrMessagesString
-            )
-        }
 
-        // Only print warning if there are no errors, This will avoid pl
-        forEach(this.lexerDefinitionWarning, warningDescriptor => {
-            PRINT_WARNING(warningDescriptor.message)
-        })
+            this.TRACE_INIT("performRuntimeChecks", () => {
+                this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(
+                    performRuntimeChecks(
+                        actualDefinition,
+                        this.trackStartLines,
+                        this.config.lineTerminatorCharacters
+                    )
+                )
+            })
 
-        // Choose the relevant internal implementations for this specific parser.
-        // These implementations should be in-lined by the JavaScript engine
-        // to provide optimal performance in each scenario.
-        if (SUPPORT_STICKY) {
-            this.chopInput = <any>IDENTITY
-            this.match = this.matchWithTest
-        } else {
-            this.updateLastIndex = NOOP
-            this.match = this.matchWithExec
-        }
+            this.TRACE_INIT("performWarningRuntimeChecks", () => {
+                this.lexerDefinitionWarning = this.lexerDefinitionWarning.concat(
+                    performWarningRuntimeChecks(
+                        actualDefinition,
+                        this.trackStartLines,
+                        this.config.lineTerminatorCharacters
+                    )
+                )
+            })
 
-        if (hasOnlySingleMode) {
-            this.handleModes = NOOP
-        }
+            // for extra robustness to avoid throwing an none informative error message
+            actualDefinition.modes = actualDefinition.modes
+                ? actualDefinition.modes
+                : {}
 
-        if (this.trackStartLines === false) {
-            this.computeNewColumn = IDENTITY
-        }
+            // an error of undefined TokenTypes will be detected in "performRuntimeChecks" above.
+            // this transformation is to increase robustness in the case of partially invalid lexer definition.
+            forEach(actualDefinition.modes, (currModeValue, currModeName) => {
+                actualDefinition.modes[currModeName] = reject<TokenType>(
+                    currModeValue,
+                    currTokType => isUndefined(currTokType)
+                )
+            })
 
-        if (this.trackEndLines === false) {
-            this.updateTokenEndLineColumnLocation = NOOP
-        }
+            let allModeNames = keys(actualDefinition.modes)
 
-        if (/full/i.test(this.config.positionTracking)) {
-            this.createTokenInstance = this.createFullToken
-        } else if (/onlyStart/i.test(this.config.positionTracking)) {
-            this.createTokenInstance = this.createStartOnlyToken
-        } else if (/onlyOffset/i.test(this.config.positionTracking)) {
-            this.createTokenInstance = this.createOffsetOnlyToken
-        } else {
-            throw Error(
-                `Invalid <positionTracking> config option: "${this.config.positionTracking}"`
-            )
-        }
+            forEach(
+                actualDefinition.modes,
+                (currModDef: TokenType[], currModName) => {
+                    this.TRACE_INIT(`Mode: <${currModName}> processing`, () => {
+                        this.modes.push(currModName)
 
-        if (this.hasCustom) {
-            this.addToken = this.addTokenUsingPush
-            this.handlePayload = this.handlePayloadWithCustom
-        } else {
-            this.addToken = this.addTokenUsingMemberAccess
-            this.handlePayload = this.handlePayloadNoCustom
-        }
+                        this.TRACE_INIT(`validatePatterns`, () => {
+                            this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(
+                                validatePatterns(
+                                    <TokenType[]>currModDef,
+                                    allModeNames
+                                )
+                            )
+                        })
 
-        const unOptimizedModes = reduce(
-            this.canModeBeOptimized,
-            (cannotBeOptimized, canBeOptimized, modeName) => {
-                if (canBeOptimized === false) {
-                    cannotBeOptimized.push(modeName)
+                        // If definition errors were encountered, the analysis phase may fail unexpectedly/
+                        // Considering a lexer with definition errors may never be used, there is no point
+                        // to performing the analysis anyhow...
+                        if (isEmpty(this.lexerDefinitionErrors)) {
+                            augmentTokenTypes(currModDef)
+
+                            let currAnalyzeResult
+                            this.TRACE_INIT(`analyzeTokenTypes`, () => {
+                                currAnalyzeResult = analyzeTokenTypes(
+                                    currModDef,
+                                    {
+                                        lineTerminatorCharacters: this.config
+                                            .lineTerminatorCharacters,
+                                        positionTracking:
+                                            config.positionTracking,
+                                        ensureOptimizations:
+                                            config.ensureOptimizations,
+                                        safeMode: config.safeMode,
+                                        tracer: this.TRACE_INIT.bind(this)
+                                    }
+                                )
+                            })
+
+                            this.patternIdxToConfig[currModName] =
+                                currAnalyzeResult.patternIdxToConfig
+
+                            this.charCodeToPatternIdxToConfig[currModName] =
+                                currAnalyzeResult.charCodeToPatternIdxToConfig
+
+                            this.emptyGroups = merge(
+                                this.emptyGroups,
+                                currAnalyzeResult.emptyGroups
+                            )
+
+                            this.hasCustom =
+                                currAnalyzeResult.hasCustom || this.hasCustom
+
+                            this.canModeBeOptimized[currModName] =
+                                currAnalyzeResult.canBeOptimized
+                        }
+                    })
                 }
-                return cannotBeOptimized
-            },
-            []
-        )
-
-        if (config.ensureOptimizations && !isEmpty(unOptimizedModes)) {
-            throw Error(
-                `Lexer Modes: < ${unOptimizedModes.join(
-                    ", "
-                )} > cannot be optimized.\n` +
-                    '\t Disable the "ensureOptimizations" lexer config flag to silently ignore this and run the lexer in an un-optimized mode.\n' +
-                    "\t Or inspect the console log for details on how to resolve these issues."
             )
-        }
 
-        clearRegExpParserCache()
-        toFastProperties(this)
+            this.defaultMode = actualDefinition.defaultMode
+
+            if (
+                !isEmpty(this.lexerDefinitionErrors) &&
+                !this.config.deferDefinitionErrorsHandling
+            ) {
+                let allErrMessages = map(this.lexerDefinitionErrors, error => {
+                    return error.message
+                })
+                let allErrMessagesString = allErrMessages.join(
+                    "-----------------------\n"
+                )
+                throw new Error(
+                    "Errors detected in definition of Lexer:\n" +
+                        allErrMessagesString
+                )
+            }
+
+            // Only print warning if there are no errors, This will avoid pl
+            forEach(this.lexerDefinitionWarning, warningDescriptor => {
+                PRINT_WARNING(warningDescriptor.message)
+            })
+
+            this.TRACE_INIT("Choosing sub-methods implementations", () => {
+                // Choose the relevant internal implementations for this specific parser.
+                // These implementations should be in-lined by the JavaScript engine
+                // to provide optimal performance in each scenario.
+                if (SUPPORT_STICKY) {
+                    this.chopInput = <any>IDENTITY
+                    this.match = this.matchWithTest
+                } else {
+                    this.updateLastIndex = NOOP
+                    this.match = this.matchWithExec
+                }
+
+                if (hasOnlySingleMode) {
+                    this.handleModes = NOOP
+                }
+
+                if (this.trackStartLines === false) {
+                    this.computeNewColumn = IDENTITY
+                }
+
+                if (this.trackEndLines === false) {
+                    this.updateTokenEndLineColumnLocation = NOOP
+                }
+
+                if (/full/i.test(this.config.positionTracking)) {
+                    this.createTokenInstance = this.createFullToken
+                } else if (/onlyStart/i.test(this.config.positionTracking)) {
+                    this.createTokenInstance = this.createStartOnlyToken
+                } else if (/onlyOffset/i.test(this.config.positionTracking)) {
+                    this.createTokenInstance = this.createOffsetOnlyToken
+                } else {
+                    throw Error(
+                        `Invalid <positionTracking> config option: "${this.config.positionTracking}"`
+                    )
+                }
+
+                if (this.hasCustom) {
+                    this.addToken = this.addTokenUsingPush
+                    this.handlePayload = this.handlePayloadWithCustom
+                } else {
+                    this.addToken = this.addTokenUsingMemberAccess
+                    this.handlePayload = this.handlePayloadNoCustom
+                }
+            })
+
+            this.TRACE_INIT("Failed Optimization Warnings", () => {
+                const unOptimizedModes = reduce(
+                    this.canModeBeOptimized,
+                    (cannotBeOptimized, canBeOptimized, modeName) => {
+                        if (canBeOptimized === false) {
+                            cannotBeOptimized.push(modeName)
+                        }
+                        return cannotBeOptimized
+                    },
+                    []
+                )
+
+                if (config.ensureOptimizations && !isEmpty(unOptimizedModes)) {
+                    throw Error(
+                        `Lexer Modes: < ${unOptimizedModes.join(
+                            ", "
+                        )} > cannot be optimized.\n` +
+                            '\t Disable the "ensureOptimizations" lexer config flag to silently ignore this and run the lexer in an un-optimized mode.\n' +
+                            "\t Or inspect the console log for details on how to resolve these issues."
+                    )
+                }
+            })
+
+            this.TRACE_INIT("clearRegExpParserCache", () => {
+                clearRegExpParserCache()
+            })
+
+            this.TRACE_INIT("toFastProperties", () => {
+                toFastProperties(this)
+            })
+        })
     }
 
     public tokenize(
@@ -877,5 +927,29 @@ export class Lexer {
     private matchWithExec(pattern, text): string {
         let regExpArray = pattern.exec(text)
         return regExpArray !== null ? regExpArray[0] : regExpArray
+    }
+
+    // Duplicated from the parser's perf trace trait to allow future extraction
+    // of the lexer to a separate package.
+    TRACE_INIT<T>(phaseDesc: string, phaseImpl: () => T): T {
+        // No need to optimize this using NOOP pattern because
+        // It is not called in a hot spot...
+        if (this.traceInitPerf === true) {
+            this.traceInitIndent++
+            const indent = new Array(this.traceInitIndent + 1).join("\t")
+            if (this.traceInitIndent < this.traceInitMaxIdent) {
+                console.log(`${indent}--> <${phaseDesc}>`)
+            }
+            const { time, value } = timer(phaseImpl)
+            /* istanbul ignore next - Difficult to reproduce specific performance behavior (>10ms) in tests */
+            const traceMethod = time > 10 ? console.warn : console.log
+            if (this.traceInitIndent < this.traceInitMaxIdent) {
+                traceMethod(`${indent}<-- <${phaseDesc}> time: ${time}ms`)
+            }
+            this.traceInitIndent--
+            return value
+        } else {
+            return phaseImpl()
+        }
     }
 }
