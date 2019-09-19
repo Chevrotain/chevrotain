@@ -12,7 +12,7 @@ import {
     values
 } from "../utils/utils"
 import { getRegExpAst } from "./reg_exp_parser"
-import { charCodeToOptimizedIndex } from "./lexer"
+import { charCodeToOptimizedIndex, minOptimizationVal } from "./lexer"
 
 const complementErrorMessage =
     "Complement Sets are not supported for first char optimization"
@@ -30,7 +30,6 @@ export function getOptimizedStartCodesIndices(
             {},
             ast.flags.ignoreCase
         )
-
         return firstChars
     } catch (e) {
         /* istanbul ignore next */
@@ -69,34 +68,29 @@ export function getOptimizedStartCodesIndices(
 export function firstCharOptimizedIndices(ast, result, ignoreCase): number[] {
     switch (ast.type) {
         case "Disjunction":
-            forEach(ast.value, subAst =>
-                firstCharOptimizedIndices(subAst, result, ignoreCase)
-            )
+            for (let i = 0; i < ast.value.length; i++) {
+                firstCharOptimizedIndices(ast.value[i], result, ignoreCase)
+            }
             break
         case "Alternative":
             const terms = ast.value
             for (let i = 0; i < terms.length; i++) {
                 const term = terms[i]
 
-                if (
-                    contains(
-                        [
-                            // A group back reference cannot affect potential starting char.
-                            // because if a back reference is the first production than automatically
-                            // the group being referenced has had to come BEFORE so its codes have already been added
-                            "GroupBackReference",
-                            // assertions do not affect potential starting codes
-                            "Lookahead",
-                            "NegativeLookahead",
-                            "StartAnchor",
-                            "EndAnchor",
-                            "WordBoundary",
-                            "NonWordBoundary"
-                        ],
-                        term.type
-                    )
-                ) {
-                    continue
+                // skip terms that cannot effect the first char results
+                switch (term.type) {
+                    case "EndAnchor":
+                    // A group back reference cannot affect potential starting char.
+                    // because if a back reference is the first production than automatically
+                    // the group being referenced has had to come BEFORE so its codes have already been added
+                    case "GroupBackReference":
+                    // assertions do not affect potential starting codes
+                    case "Lookahead":
+                    case "NegativeLookahead":
+                    case "StartAnchor":
+                    case "WordBoundary":
+                    case "NonWordBoundary":
+                        continue
                 }
 
                 const atom = term
@@ -118,24 +112,58 @@ export function firstCharOptimizedIndices(ast, result, ignoreCase): number[] {
                             } else {
                                 // range
                                 const range = code
-                                for (
-                                    let rangeCode = range.from;
-                                    rangeCode <= range.to;
-                                    rangeCode++
-                                ) {
-                                    // TODO: this could potentially be optimized
-                                    //       to traverse the range in jumps the size of the optimizedIndices buckets
-                                    //       However there are too many edge cases for such an optimization...
-                                    //       and it needs a grammar to have **many** different tokens
-                                    //       starting with **very wide** range of charCodes
-                                    //       in order to gain a **small** benefit during initialization...
-                                    //       Also the init time boost could also be accomplished directly by the end user
-                                    //       By providing the startCharHints, so handling it is not worth it.
-                                    addOptimizedIdxToResult(
-                                        rangeCode,
-                                        result,
-                                        ignoreCase
-                                    )
+                                // cannot optimize when ignoreCase is
+                                if (ignoreCase === true) {
+                                    for (
+                                        let rangeCode = range.from;
+                                        rangeCode <= range.to;
+                                        rangeCode++
+                                    ) {
+                                        addOptimizedIdxToResult(
+                                            rangeCode,
+                                            result,
+                                            ignoreCase
+                                        )
+                                    }
+                                }
+                                // Optimization (2 orders of magnitude less work for very large ranges)
+                                else {
+                                    // handle unoptimized values
+                                    for (
+                                        let rangeCode = range.from;
+                                        rangeCode <= range.to &&
+                                        rangeCode < minOptimizationVal;
+                                        rangeCode++
+                                    ) {
+                                        addOptimizedIdxToResult(
+                                            rangeCode,
+                                            result,
+                                            ignoreCase
+                                        )
+                                    }
+
+                                    // Less common charCode where we optimize for faster init time, by using larger "buckets"
+                                    if (range.to >= minOptimizationVal) {
+                                        const minUnOptVal =
+                                            range.from >= minOptimizationVal
+                                                ? range.from
+                                                : minOptimizationVal
+                                        const maxUnOptVal = range.to
+                                        const minOptIdx = charCodeToOptimizedIndex(
+                                            minUnOptVal
+                                        )
+                                        const maxOptIdx = charCodeToOptimizedIndex(
+                                            maxUnOptVal
+                                        )
+
+                                        for (
+                                            let currOptIdx = minOptIdx;
+                                            currOptIdx <= maxOptIdx;
+                                            currOptIdx++
+                                        ) {
+                                            result[currOptIdx] = currOptIdx
+                                        }
+                                    }
                                 }
                             }
                         })

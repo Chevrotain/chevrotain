@@ -81,8 +81,10 @@ export function analyzeTokenTypes(
         positionTracking?: "full" | "onlyStart" | "onlyOffset"
         ensureOptimizations?: boolean
         lineTerminatorCharacters?: (number | string)[]
+        // TODO: should `useSticky` be an argument here?
         useSticky?: boolean
         safeMode?: boolean
+        tracer?: (msg: string, action: Function) => void
     }
 ): IAnalyzeResult {
     options = defaults(options, {
@@ -90,270 +92,301 @@ export function analyzeTokenTypes(
         debug: false,
         safeMode: false,
         positionTracking: "full",
-        lineTerminatorCharacters: ["\r", "\n"]
+        lineTerminatorCharacters: ["\r", "\n"],
+        tracer: (msg, action) => action()
     })
 
-    initCharCodeToOptimizedIndexMap()
+    const tracer = options.tracer
 
-    let onlyRelevantTypes = reject(tokenTypes, currType => {
-        return currType[PATTERN] === Lexer.NA
+    tracer("initCharCodeToOptimizedIndexMap", () => {
+        initCharCodeToOptimizedIndexMap()
+    })
+
+    let onlyRelevantTypes
+    tracer("Reject Lexer.NA", () => {
+        onlyRelevantTypes = reject(tokenTypes, currType => {
+            return currType[PATTERN] === Lexer.NA
+        })
     })
 
     let hasCustom = false
-    let allTransformedPatterns = map(onlyRelevantTypes, currType => {
-        let currPattern = currType[PATTERN]
+    let allTransformedPatterns
+    tracer("Transform Patterns", () => {
+        hasCustom = false
+        allTransformedPatterns = map(onlyRelevantTypes, currType => {
+            let currPattern = currType[PATTERN]
 
-        /* istanbul ignore else */
-        if (isRegExp(currPattern)) {
-            let regExpSource = currPattern.source
-            if (
-                regExpSource.length === 1 &&
-                // only these regExp meta characters which can appear in a length one regExp
-                regExpSource !== "^" &&
-                regExpSource !== "$" &&
-                regExpSource !== "."
-            ) {
-                return regExpSource
-            } else if (
-                regExpSource.length === 2 &&
-                regExpSource[0] === "\\" &&
-                // not a meta character
-                !contains(
-                    [
-                        "d",
-                        "D",
-                        "s",
-                        "S",
-                        "t",
-                        "r",
-                        "n",
-                        "t",
-                        "0",
-                        "c",
-                        "b",
-                        "B",
-                        "f",
-                        "v",
-                        "w",
-                        "W"
-                    ],
-                    regExpSource[1]
-                )
-            ) {
-                // escaped meta Characters: /\+/ /\[/
-                // or redundant escaping: /\a/
-                // without the escaping "\"
-                return regExpSource[1]
-            } else {
-                return options.useSticky
-                    ? addStickyFlag(currPattern)
-                    : addStartOfInput(currPattern)
-            }
-        } else if (isFunction(currPattern)) {
-            hasCustom = true
-            // CustomPatternMatcherFunc - custom patterns do not require any transformations, only wrapping in a RegExp Like object
-            return { exec: currPattern }
-        } else if (has(currPattern, "exec")) {
-            hasCustom = true
-            // ICustomPattern
-            return currPattern
-        } else if (typeof currPattern === "string") {
-            if (currPattern.length === 1) {
-                return currPattern
-            } else {
-                let escapedRegExpString = currPattern.replace(
-                    /[\\^$.*+?()[\]{}|]/g,
-                    "\\$&"
-                )
-                let wrappedRegExp = new RegExp(escapedRegExpString)
-                return options.useSticky
-                    ? addStickyFlag(wrappedRegExp)
-                    : addStartOfInput(wrappedRegExp)
-            }
-        } else {
-            throw Error("non exhaustive match")
-        }
-    })
-
-    let patternIdxToType = map(
-        onlyRelevantTypes,
-        currType => currType.tokenTypeIdx
-    )
-
-    let patternIdxToGroup = map(onlyRelevantTypes, (clazz: any) => {
-        let groupName = clazz.GROUP
-        /* istanbul ignore next */
-        if (groupName === Lexer.SKIPPED) {
-            return undefined
-        } else if (isString(groupName)) {
-            return groupName
-        } else if (isUndefined(groupName)) {
-            return false
-        } else {
-            throw Error("non exhaustive match")
-        }
-    })
-
-    let patternIdxToLongerAltIdx: any = map(onlyRelevantTypes, (clazz: any) => {
-        let longerAltType = clazz.LONGER_ALT
-
-        if (longerAltType) {
-            let longerAltIdx = indexOf(onlyRelevantTypes, longerAltType)
-            return longerAltIdx
-        }
-    })
-
-    let patternIdxToPushMode = map(
-        onlyRelevantTypes,
-        (clazz: any) => clazz.PUSH_MODE
-    )
-
-    let patternIdxToPopMode = map(onlyRelevantTypes, (clazz: any) =>
-        has(clazz, "POP_MODE")
-    )
-
-    const lineTerminatorCharCodes = getCharCodes(
-        options.lineTerminatorCharacters
-    )
-
-    let patternIdxToCanLineTerminator = map(onlyRelevantTypes, tokType => false)
-    if (options.positionTracking !== "onlyOffset") {
-        patternIdxToCanLineTerminator = map(onlyRelevantTypes, tokType => {
-            if (has(tokType, "LINE_BREAKS")) {
-                return tokType.LINE_BREAKS
-            } else {
+            /* istanbul ignore else */
+            if (isRegExp(currPattern)) {
+                let regExpSource = currPattern.source
                 if (
-                    checkLineBreaksIssues(tokType, lineTerminatorCharCodes) ===
-                    false
+                    regExpSource.length === 1 &&
+                    // only these regExp meta characters which can appear in a length one regExp
+                    regExpSource !== "^" &&
+                    regExpSource !== "$" &&
+                    regExpSource !== "."
                 ) {
-                    return canMatchCharCode(
-                        lineTerminatorCharCodes,
-                        tokType.PATTERN
+                    return regExpSource
+                } else if (
+                    regExpSource.length === 2 &&
+                    regExpSource[0] === "\\" &&
+                    // not a meta character
+                    !contains(
+                        [
+                            "d",
+                            "D",
+                            "s",
+                            "S",
+                            "t",
+                            "r",
+                            "n",
+                            "t",
+                            "0",
+                            "c",
+                            "b",
+                            "B",
+                            "f",
+                            "v",
+                            "w",
+                            "W"
+                        ],
+                        regExpSource[1]
                     )
+                ) {
+                    // escaped meta Characters: /\+/ /\[/
+                    // or redundant escaping: /\a/
+                    // without the escaping "\"
+                    return regExpSource[1]
+                } else {
+                    return options.useSticky
+                        ? addStickyFlag(currPattern)
+                        : addStartOfInput(currPattern)
                 }
+            } else if (isFunction(currPattern)) {
+                hasCustom = true
+                // CustomPatternMatcherFunc - custom patterns do not require any transformations, only wrapping in a RegExp Like object
+                return { exec: currPattern }
+            } else if (has(currPattern, "exec")) {
+                hasCustom = true
+                // ICustomPattern
+                return currPattern
+            } else if (typeof currPattern === "string") {
+                if (currPattern.length === 1) {
+                    return currPattern
+                } else {
+                    let escapedRegExpString = currPattern.replace(
+                        /[\\^$.*+?()[\]{}|]/g,
+                        "\\$&"
+                    )
+                    let wrappedRegExp = new RegExp(escapedRegExpString)
+                    return options.useSticky
+                        ? addStickyFlag(wrappedRegExp)
+                        : addStartOfInput(wrappedRegExp)
+                }
+            } else {
+                throw Error("non exhaustive match")
             }
         })
-    }
+    })
 
-    let patternIdxToIsCustom = map(onlyRelevantTypes, isCustomPattern)
-    let patternIdxToShort = map(allTransformedPatterns, isShortPattern)
+    let patternIdxToType
+    let patternIdxToGroup
+    let patternIdxToLongerAltIdx
+    let patternIdxToPushMode
+    let patternIdxToPopMode
+    tracer("misc mapping", () => {
+        patternIdxToType = map(
+            onlyRelevantTypes,
+            currType => currType.tokenTypeIdx
+        )
 
-    let emptyGroups = reduce(
-        onlyRelevantTypes,
-        (acc, clazz: any) => {
+        patternIdxToGroup = map(onlyRelevantTypes, (clazz: any) => {
             let groupName = clazz.GROUP
-            if (isString(groupName) && !(groupName === Lexer.SKIPPED)) {
-                acc[groupName] = []
+            /* istanbul ignore next */
+            if (groupName === Lexer.SKIPPED) {
+                return undefined
+            } else if (isString(groupName)) {
+                return groupName
+            } else if (isUndefined(groupName)) {
+                return false
+            } else {
+                throw Error("non exhaustive match")
             }
-            return acc
-        },
-        {}
-    )
+        })
 
-    let patternIdxToConfig = map(allTransformedPatterns, (x, idx) => {
-        return {
-            pattern: allTransformedPatterns[idx],
-            longerAlt: patternIdxToLongerAltIdx[idx],
-            canLineTerminator: patternIdxToCanLineTerminator[idx],
-            isCustom: patternIdxToIsCustom[idx],
-            short: patternIdxToShort[idx],
-            group: patternIdxToGroup[idx],
-            push: patternIdxToPushMode[idx],
-            pop: patternIdxToPopMode[idx],
-            tokenTypeIdx: patternIdxToType[idx],
-            tokenType: onlyRelevantTypes[idx]
+        patternIdxToLongerAltIdx = map(onlyRelevantTypes, (clazz: any) => {
+            let longerAltType = clazz.LONGER_ALT
+
+            if (longerAltType) {
+                let longerAltIdx = indexOf(onlyRelevantTypes, longerAltType)
+                return longerAltIdx
+            }
+        })
+
+        patternIdxToPushMode = map(
+            onlyRelevantTypes,
+            (clazz: any) => clazz.PUSH_MODE
+        )
+
+        patternIdxToPopMode = map(onlyRelevantTypes, (clazz: any) =>
+            has(clazz, "POP_MODE")
+        )
+    })
+
+    let patternIdxToCanLineTerminator
+    tracer("Line Terminator Handling", () => {
+        const lineTerminatorCharCodes = getCharCodes(
+            options.lineTerminatorCharacters
+        )
+        patternIdxToCanLineTerminator = map(onlyRelevantTypes, tokType => false)
+        if (options.positionTracking !== "onlyOffset") {
+            patternIdxToCanLineTerminator = map(onlyRelevantTypes, tokType => {
+                if (has(tokType, "LINE_BREAKS")) {
+                    return tokType.LINE_BREAKS
+                } else {
+                    if (
+                        checkLineBreaksIssues(
+                            tokType,
+                            lineTerminatorCharCodes
+                        ) === false
+                    ) {
+                        return canMatchCharCode(
+                            lineTerminatorCharCodes,
+                            tokType.PATTERN
+                        )
+                    }
+                }
+            })
         }
+    })
+
+    let patternIdxToIsCustom
+    let patternIdxToShort
+    let emptyGroups
+    let patternIdxToConfig
+    tracer("Misc Mapping #2", () => {
+        patternIdxToIsCustom = map(onlyRelevantTypes, isCustomPattern)
+        patternIdxToShort = map(allTransformedPatterns, isShortPattern)
+
+        emptyGroups = reduce(
+            onlyRelevantTypes,
+            (acc, clazz: any) => {
+                let groupName = clazz.GROUP
+                if (isString(groupName) && !(groupName === Lexer.SKIPPED)) {
+                    acc[groupName] = []
+                }
+                return acc
+            },
+            {}
+        )
+
+        patternIdxToConfig = map(allTransformedPatterns, (x, idx) => {
+            return {
+                pattern: allTransformedPatterns[idx],
+                longerAlt: patternIdxToLongerAltIdx[idx],
+                canLineTerminator: patternIdxToCanLineTerminator[idx],
+                isCustom: patternIdxToIsCustom[idx],
+                short: patternIdxToShort[idx],
+                group: patternIdxToGroup[idx],
+                push: patternIdxToPushMode[idx],
+                pop: patternIdxToPopMode[idx],
+                tokenTypeIdx: patternIdxToType[idx],
+                tokenType: onlyRelevantTypes[idx]
+            }
+        })
     })
 
     let canBeOptimized = true
     let charCodeToPatternIdxToConfig = []
 
     if (!options.safeMode) {
-        charCodeToPatternIdxToConfig = reduce(
-            onlyRelevantTypes,
-            (result, currTokType, idx) => {
-                if (typeof currTokType.PATTERN === "string") {
-                    const charCode = currTokType.PATTERN.charCodeAt(0)
-                    const optimizedIdx = charCodeToOptimizedIndex(charCode)
-                    addToMapOfArrays(
-                        result,
-                        optimizedIdx,
-                        patternIdxToConfig[idx]
-                    )
-                } else if (isArray(currTokType.START_CHARS_HINT)) {
-                    let lastOptimizedIdx
-                    forEach(currTokType.START_CHARS_HINT, charOrInt => {
-                        const charCode =
-                            typeof charOrInt === "string"
-                                ? charOrInt.charCodeAt(0)
-                                : charOrInt
-                        const currOptimizedIdx = charCodeToOptimizedIndex(
-                            charCode
+        tracer("First Char Optimization", () => {
+            charCodeToPatternIdxToConfig = reduce(
+                onlyRelevantTypes,
+                (result, currTokType, idx) => {
+                    if (typeof currTokType.PATTERN === "string") {
+                        const charCode = currTokType.PATTERN.charCodeAt(0)
+                        const optimizedIdx = charCodeToOptimizedIndex(charCode)
+                        addToMapOfArrays(
+                            result,
+                            optimizedIdx,
+                            patternIdxToConfig[idx]
                         )
-                        // Avoid adding the config multiple times
-                        if (lastOptimizedIdx !== currOptimizedIdx) {
-                            lastOptimizedIdx = currOptimizedIdx
-                            addToMapOfArrays(
-                                result,
-                                currOptimizedIdx,
-                                patternIdxToConfig[idx]
+                    } else if (isArray(currTokType.START_CHARS_HINT)) {
+                        let lastOptimizedIdx
+                        forEach(currTokType.START_CHARS_HINT, charOrInt => {
+                            const charCode =
+                                typeof charOrInt === "string"
+                                    ? charOrInt.charCodeAt(0)
+                                    : charOrInt
+                            const currOptimizedIdx = charCodeToOptimizedIndex(
+                                charCode
                             )
+                            // Avoid adding the config multiple times
+                            if (lastOptimizedIdx !== currOptimizedIdx) {
+                                lastOptimizedIdx = currOptimizedIdx
+                                addToMapOfArrays(
+                                    result,
+                                    currOptimizedIdx,
+                                    patternIdxToConfig[idx]
+                                )
+                            }
+                        })
+                    } else if (isRegExp(currTokType.PATTERN)) {
+                        if (currTokType.PATTERN.unicode) {
+                            canBeOptimized = false
+                            if (options.ensureOptimizations) {
+                                PRINT_ERROR(
+                                    `${failedOptimizationPrefixMsg}` +
+                                        `\tUnable to analyze < ${currTokType.PATTERN.toString()} > pattern.\n` +
+                                        "\tThe regexp unicode flag is not currently supported by the regexp-to-ast library.\n" +
+                                        "\tThis will disable the lexer's first char optimizations.\n" +
+                                        "\tFor details See: https://sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#UNICODE_OPTIMIZE"
+                                )
+                            }
+                        } else {
+                            let optimizedCodes = getOptimizedStartCodesIndices(
+                                currTokType.PATTERN,
+                                options.ensureOptimizations
+                            )
+                            /* istanbul ignore if */
+                            // start code will only be empty given an empty regExp or failure of regexp-to-ast library
+                            // the first should be a different validation and the second cannot be tested.
+                            if (isEmpty(optimizedCodes)) {
+                                // we cannot understand what codes may start possible matches
+                                // The optimization correctness requires knowing start codes for ALL patterns.
+                                // Not actually sure this is an error, no debug message
+                                canBeOptimized = false
+                            }
+                            forEach(optimizedCodes, code => {
+                                addToMapOfArrays(
+                                    result,
+                                    code,
+                                    patternIdxToConfig[idx]
+                                )
+                            })
                         }
-                    })
-                } else if (isRegExp(currTokType.PATTERN)) {
-                    if (currTokType.PATTERN.unicode) {
-                        canBeOptimized = false
+                    } else {
                         if (options.ensureOptimizations) {
                             PRINT_ERROR(
                                 `${failedOptimizationPrefixMsg}` +
-                                    `\tUnable to analyze < ${currTokType.PATTERN.toString()} > pattern.\n` +
-                                    "\tThe regexp unicode flag is not currently supported by the regexp-to-ast library.\n" +
+                                    `\tTokenType: <${currTokType.name}> is using a custom token pattern without providing <start_chars_hint> parameter.\n` +
                                     "\tThis will disable the lexer's first char optimizations.\n" +
-                                    "\tFor details See: https://sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#UNICODE_OPTIMIZE"
+                                    "\tFor details See: https://sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#CUSTOM_OPTIMIZE"
                             )
                         }
-                    } else {
-                        let optimizedCodes = getOptimizedStartCodesIndices(
-                            currTokType.PATTERN,
-                            options.ensureOptimizations
-                        )
-                        /* istanbul ignore if */
-                        // start code will only be empty given an empty regExp or failure of regexp-to-ast library
-                        // the first should be a different validation and the second cannot be tested.
-                        if (isEmpty(optimizedCodes)) {
-                            // we cannot understand what codes may start possible matches
-                            // The optimization correctness requires knowing start codes for ALL patterns.
-                            // Not actually sure this is an error, no debug message
-                            canBeOptimized = false
-                        }
-                        forEach(optimizedCodes, code => {
-                            addToMapOfArrays(
-                                result,
-                                code,
-                                patternIdxToConfig[idx]
-                            )
-                            // }
-                        })
+                        canBeOptimized = false
                     }
-                } else {
-                    if (options.ensureOptimizations) {
-                        PRINT_ERROR(
-                            `${failedOptimizationPrefixMsg}` +
-                                `\tTokenType: <${currTokType.name}> is using a custom token pattern without providing <start_chars_hint> parameter.\n` +
-                                "\tThis will disable the lexer's first char optimizations.\n" +
-                                "\tFor details See: https://sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#CUSTOM_OPTIMIZE"
-                        )
-                    }
-                    canBeOptimized = false
-                }
 
-                return result
-            },
-            []
-        )
+                    return result
+                },
+                []
+            )
+        })
     }
-
-    charCodeToPatternIdxToConfig = packArray(charCodeToPatternIdxToConfig)
+    tracer("ArrayPacking", () => {
+        charCodeToPatternIdxToConfig = packArray(charCodeToPatternIdxToConfig)
+    })
 
     return {
         emptyGroups: emptyGroups,
@@ -1092,6 +1125,8 @@ function addToMapOfArrays(map, key, value): void {
     }
 }
 
+export const minOptimizationVal = 256
+
 /**
  * We ae mapping charCode above ASCI (256) into buckets each in the size of 256.
  * This is because ASCI are the most common start chars so each one of those will get its own
@@ -1108,7 +1143,9 @@ function addToMapOfArrays(map, key, value): void {
  * See: https://stackoverflow.com/a/4228528
  */
 export function charCodeToOptimizedIndex(charCode) {
-    return charCode < 256 ? charCode : charCodeToOptimizedIdxMap[charCode]
+    return charCode < minOptimizationVal
+        ? charCode
+        : charCodeToOptimizedIdxMap[charCode]
 }
 
 /**
