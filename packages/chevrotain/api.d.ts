@@ -1530,6 +1530,19 @@ export interface ILexerConfig {
      * Note that passing the boolean `true` is identical to passing the numerical value `infinity`
      */
     traceInitPerf?: boolean | number
+
+    /**
+     * This flag will avoid running the Lexer validations during Lexer initialization.
+     *
+     * This can substantially improve the Lexer's initialization (constructor) time.
+     * @see ILexerConfig.traceInitPerf to measure the Lexer validations cost for your Lexer.
+     *
+     * Note that the Lexer validations are **extremely useful** during development time,
+     * e.g: Detecting empty/invalid regExp Patterns.
+     * So they should not be skipped during development flows.
+     *   - For example: via a conditional that checks an env variable.
+     */
+    skipValidations?: boolean
 }
 
 export interface ILexerErrorMessageProvider {

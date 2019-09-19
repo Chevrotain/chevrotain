@@ -79,7 +79,8 @@ const DEFAULT_LEXER_CONFIG: ILexerConfig = {
     ensureOptimizations: false,
     safeMode: false,
     errorMessageProvider: defaultLexerErrorProvider,
-    traceInitPerf: false
+    traceInitPerf: false,
+    skipValidations: false
 }
 
 Object.freeze(DEFAULT_LEXER_CONFIG)
@@ -183,25 +184,27 @@ export class Lexer {
                 }
             })
 
-            this.TRACE_INIT("performRuntimeChecks", () => {
-                this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(
-                    performRuntimeChecks(
-                        actualDefinition,
-                        this.trackStartLines,
-                        this.config.lineTerminatorCharacters
+            if (this.config.skipValidations === false) {
+                this.TRACE_INIT("performRuntimeChecks", () => {
+                    this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(
+                        performRuntimeChecks(
+                            actualDefinition,
+                            this.trackStartLines,
+                            this.config.lineTerminatorCharacters
+                        )
                     )
-                )
-            })
+                })
 
-            this.TRACE_INIT("performWarningRuntimeChecks", () => {
-                this.lexerDefinitionWarning = this.lexerDefinitionWarning.concat(
-                    performWarningRuntimeChecks(
-                        actualDefinition,
-                        this.trackStartLines,
-                        this.config.lineTerminatorCharacters
+                this.TRACE_INIT("performWarningRuntimeChecks", () => {
+                    this.lexerDefinitionWarning = this.lexerDefinitionWarning.concat(
+                        performWarningRuntimeChecks(
+                            actualDefinition,
+                            this.trackStartLines,
+                            this.config.lineTerminatorCharacters
+                        )
                     )
-                )
-            })
+                })
+            }
 
             // for extra robustness to avoid throwing an none informative error message
             actualDefinition.modes = actualDefinition.modes
@@ -225,14 +228,16 @@ export class Lexer {
                     this.TRACE_INIT(`Mode: <${currModName}> processing`, () => {
                         this.modes.push(currModName)
 
-                        this.TRACE_INIT(`validatePatterns`, () => {
-                            this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(
-                                validatePatterns(
-                                    <TokenType[]>currModDef,
-                                    allModeNames
+                        if (this.config.skipValidations === false) {
+                            this.TRACE_INIT(`validatePatterns`, () => {
+                                this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(
+                                    validatePatterns(
+                                        <TokenType[]>currModDef,
+                                        allModeNames
+                                    )
                                 )
-                            )
-                        })
+                            })
+                        }
 
                         // If definition errors were encountered, the analysis phase may fail unexpectedly/
                         // Considering a lexer with definition errors may never be used, there is no point

@@ -2,6 +2,7 @@
 
 -   [Optimize Certain Complex Lexers Initialization Performance](https://github.com/SAP/chevrotain/commit/e25222dcd2ce29f2c5352599dd55f3432a145316)
 -   [Lexer Initialization Performance Tracing](https://github.com/SAP/chevrotain/issues/1045)
+-   [Lexer Initialization: Optionally Skip Validations](https://github.com/SAP/chevrotain/issues/1048)
 
 ## 6.4.0 (9-15-2019)
 
