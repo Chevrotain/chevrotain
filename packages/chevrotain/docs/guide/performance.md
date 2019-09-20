@@ -29,7 +29,7 @@ Avoiding the creation of new instances is important to avoid re-paying the Parse
 Additionally, re-using the same instance may leverage hot-spot optimizations of the respective JavaScript engine.
 
 Note that this means that if your parser "carries" additional state, that state should also be reset.
-Simply override the Parser's [reset](https://sap.github.io/chevrotain/documentation/6_4_0/classes/cstparser.html#reset) method
+Simply override the Parser's [reset](https://sap.github.io/chevrotain/documentation/6_5_0/classes/cstparser.html#reset) method
 to accomplish that.
 
 ## Ensuring Lexer Optimizations
@@ -166,7 +166,7 @@ It is important to note that:
 These are only required if you are trying to squeeze every tiny bit of performance out of your parser.
 
 1.  **Reduce the amount of Token position tracking** the lexer performs.
-    See The [ILexerConfig.positionTracking](https://sap.github.io/chevrotain/documentation/6_4_0/interfaces/ilexerconfig.html) property.
+    See The [ILexerConfig.positionTracking](https://sap.github.io/chevrotain/documentation/6_5_0/interfaces/ilexerconfig.html) property.
 
 2.  **Avoid creating parsing rules which only parse a single Terminal.**
 

@@ -67,7 +67,7 @@ due to performance and grammar complexity reasons.
 From a performance perspective this is particularly problematic as some analysis
 done on the grammar (during initialization) may become **exponentially** more complex as the maxLookahead grows.
 
-We could also specify the [MAX_LOOKAHEAD](https://sap.github.io/chevrotain/documentation/6_4_0/interfaces/ormethodopts.html#ignore_ambiguities)
+We could also specify the [MAX_LOOKAHEAD](https://sap.github.io/chevrotain/documentation/6_5_0/interfaces/ormethodopts.html#ignore_ambiguities)
 config on the **specific** DSL method invocation where the problem occurs, This is still not the optimal solution in this case.
 
 **_The recommended solution in this case would be to refactor the grammar to require a smaller lookahead_**.
@@ -168,4 +168,4 @@ $.MANY(() => {
 })
 ```
 
-[maxlookahead]: https://sap.github.io/chevrotain/documentation/6_4_0/interfaces/iparserconfig.html#maxlookahead
+[maxlookahead]: https://sap.github.io/chevrotain/documentation/6_5_0/interfaces/iparserconfig.html#maxlookahead

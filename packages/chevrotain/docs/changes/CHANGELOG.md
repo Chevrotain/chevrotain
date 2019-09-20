@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 6.5.0 (9-20-2019)
 
 -   [Optimize Certain Complex Lexers Initialization Performance](https://github.com/SAP/chevrotain/commit/e25222dcd2ce29f2c5352599dd55f3432a145316)
 -   [Lexer Initialization Performance Tracing](https://github.com/SAP/chevrotain/issues/1045)
