@@ -178,12 +178,12 @@ createToken({
 
 ## Complement Sets cannot be automatically optimized
 
-The Chevrotain Lexer performs optimizations by filtering the potential token matchs
-using the next [charCode][mdn_char_code] to be consumed.
-To apply this optimization the first possible charCodes for **every** TokenType must be identified.
+The Chevrotain Lexer performs optimizations by filtering the potential token matches
+using the next [charCode][mdn_char_code] about to be consumed.
+To apply this optimization the first possible charCodes for **every** TokenType must be known in advance.
 
-When a TokenType pattern uses a regExp complement Set as a potential **first** character
-the optimization is skipped as translating a complement set to a regular set requires too many cpu cycles
+When a TokenType pattern uses a regExp complement set as a potential **first** character
+the optimization is skipped as translating a complement set to a regular set is fairly costly
 during the Lexer's initialization.
 
 For example an XML Text is defined by **everything** except a closing tag.
@@ -198,8 +198,8 @@ const XMLText = createToken({
 This means that there are **65533** (65535 - 2) possible starting charCodes
 For an XMLText token.
 
-If the use of these optimizations is desired and the startup resources cost is acceptable
-It is possilbe to enable the optimizations by explicitly providing a "[start_chars_hint][start_chars_hint]" property.
+If the use of these runtime optimizations is needed and the startup resources cost is acceptable
+It is possible to enable the optimizations by explicitly providing a "[start_chars_hint][start_chars_hint]" property.
 e.g:
 
 ```javascript
@@ -220,7 +220,24 @@ const XMLText = createToken({
 
 Please Note that filling such an array [can take over 1ms][fill_16_bits] on a modern machine.
 So if you are only parsing small inputs and/or starting a new process for each
-parser invocation the added initilization cost may be counter productive.
+parser invocation the added initialization cost may be counter productive.
+
+Another solution to this problem is to re-define the Token pattern without using a complement.
+For example: the XMLText pattern above could be re-defined as:
+
+```javascript
+const XMLText = createToken({
+    name: "XMLText",
+    // Equivalent to: /[^<&]+/ but a-lot less clear :(
+    // Note that:
+    //   - "\u0026" === "&"
+    //   - "\u003C" === "<"
+    pattern: /[\u0000-\u0025\u0027-\u003B\u003D-\uFFFF]+/
+})
+```
+
+Note that internally Chevrotain avoids creating a 16bits large data structure
+so this method would be the most optimized both in terms of runtime and initialization time.
 
 # Errors
 
