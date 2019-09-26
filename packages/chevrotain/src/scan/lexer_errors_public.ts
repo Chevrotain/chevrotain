@@ -2,9 +2,7 @@ import { ILexerErrorMessageProvider, IToken } from "../../api"
 
 export const defaultLexerErrorProvider: ILexerErrorMessageProvider = {
     buildUnableToPopLexerModeMessage(token: IToken): string {
-        return `Unable to pop Lexer Mode after encountering Token ->${
-            token.image
-        }<- The Mode Stack is empty`
+        return `Unable to pop Lexer Mode after encountering Token ->${token.image}<- The Mode Stack is empty`
     },
 
     buildUnexpectedCharactersMessage(

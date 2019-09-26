@@ -183,9 +183,7 @@ export function validateRedundantMethods(
                         any
                     >visitorInstance.constructor)} CST Visitor\n` +
                     `There is no Grammar Rule corresponding to this method's name.\n` +
-                    `For utility methods on visitor classes use methods names that do not match /${
-                        validTermsPattern.source
-                    }/.`,
+                    `For utility methods on visitor classes use methods names that do not match /${validTermsPattern.source}/.`,
                 type: CstVisitorDefinitionError.REDUNDANT_METHOD,
                 methodName: prop
             })

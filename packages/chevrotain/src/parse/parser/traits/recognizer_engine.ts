@@ -753,12 +753,12 @@ export class RecognizerEngine {
 
     orInternalNoCst(
         this: MixedInParser,
-        altsOrOpts: IAnyOrAlt[] | OrMethodOpts,
+        altsOrOpts: IAnyOrAlt[] | OrMethodOpts<unknown>,
         occurrence: number
     ): any {
         let alts = isArray(altsOrOpts)
             ? (altsOrOpts as IAnyOrAlt[])
-            : (altsOrOpts as OrMethodOpts).DEF
+            : (altsOrOpts as OrMethodOpts<unknown>).DEF
 
         const laKey = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
         const laFunc = this.getLaFuncFromCache(laKey)
@@ -769,25 +769,25 @@ export class RecognizerEngine {
         }
         this.raiseNoAltException(
             occurrence,
-            (altsOrOpts as OrMethodOpts).ERR_MSG
+            (altsOrOpts as OrMethodOpts<unknown>).ERR_MSG
         )
     }
 
     orInternal<T>(
         this: MixedInParser,
-        altsOrOpts: IAnyOrAlt[] | OrMethodOpts,
+        altsOrOpts: IAnyOrAlt[] | OrMethodOpts<unknown>,
         occurrence: number
     ): T {
         let laKey = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
         let nestedName = this.nestedRuleBeforeClause(
-            <OrMethodOpts>altsOrOpts,
+            <OrMethodOpts<unknown>>altsOrOpts,
             laKey
         )
 
         try {
             let alts = isArray(altsOrOpts)
                 ? (altsOrOpts as IAnyOrAlt[])
-                : (altsOrOpts as OrMethodOpts).DEF
+                : (altsOrOpts as OrMethodOpts<unknown>).DEF
 
             const laFunc = this.getLaFuncFromCache(laKey)
             let altIdxToTake = laFunc.call(this, alts)
@@ -812,7 +812,7 @@ export class RecognizerEngine {
             }
             this.raiseNoAltException(
                 occurrence,
-                (altsOrOpts as OrMethodOpts).ERR_MSG
+                (altsOrOpts as OrMethodOpts<unknown>).ERR_MSG
             )
         } finally {
             if (nestedName !== undefined) {
