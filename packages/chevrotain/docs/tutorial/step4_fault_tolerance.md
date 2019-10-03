@@ -243,7 +243,7 @@ case of re-sync recovery.
 
 ## Types Of Recovery Strategies
 
--   Single Token insertion/deletion and repetiton re-sync are "in rule" recovery strategies.
+-   Single Token insertion/deletion and repetition re-sync are "in rule" recovery strategies.
 -   General re-sync Recovery is a "between rules" recovery strategy.
 
 The main difference is that "in-rule" recovery fixes the problem in the scope of a single rule

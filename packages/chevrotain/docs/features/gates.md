@@ -20,5 +20,23 @@ $.RULE("Value", isConst => {
 })
 ```
 
+Using the [Look Ahead](https://sap.github.io/chevrotain/documentation/6_5_0/classes/cstparser.html#la) method is often helpful with the use of Gates to determine if a path should be followed or not, for example:
+
+```javascript
+// SELECT LIMIT.ID FROM USER_LIMIT LIMIT
+// SELECT ID, NAME FROM USER_LIMIT LIMIT 1
+$.RULE("FromClause", () => {
+    $.CONSUME(From)
+    $.CONSUME(Identifier)
+
+    $.OPTION({
+        GATE: () => $.LA(2).tokenType !== UnsignedInteger,
+        DEF: () => $.CONSUME1(Identifier, { LABEL: "alias" })
+    })
+})
+```
+
+If **LIMIT** is an identifier or a keyword based on the surrounding tokens, looking ahead at subsequent tokens is required to know if the token should be consumed as an identifer or should be skipped to be parsed up by a subsequent rule.
+
 See [executable example](https://github.com/SAP/chevrotain/tree/master/examples/parser/predicate_lookahead)
 for further details.

@@ -35,14 +35,16 @@ to accomplish that.
 ## Ensuring Lexer Optimizations
 
 Ensure that the lexer's optimizations are enabled.
-The Chevrotain Lexer performs optimizations by filtering the potential token matchs
+The Chevrotain Lexer performs optimizations by filtering the potential token matches
 using the next [charCode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/charCodeAt) to be consumed.
-These optimizattions can provide anywhere from a **30% boost** for small lexers
-to **several multipiles** improvment in large Lexers with many TokenTypes.
+These optimizations can provide anywhere from a **30% boost** for small lexers
+to **several multiples** improvement in large Lexers with many TokenTypes.
 
 To apply this optimization the first possible charCodes for **every** TokenType must be identified.
 Sometimes a TokenType's first charCodes cannot be automatically identified.
-In that case the lexer will **silently** revert to using the unoptimized algorithims.
+In that case the lexer will **silently** revert to using the unoptimized algorithms.
+
+If the TokenType's first charCodes cannot be automatically identified, you can set the [`start_chars_hint`](https://sap.github.io/chevrotain/documentation/6_5_0/interfaces/itokenconfig.html#start_chars_hint) property when calling `createToken()`. If you define a custom [pattern](https://sap.github.io/chevrotain/documentation/6_5_0/interfaces/itokenconfig.html#pattern) for your token, then you should set `start_chars_hint` manually for optimal performance.
 
 It it possible to configure the Lexer **throw** an error
 in case the optimizations cannot be enabled by turning on the
@@ -59,7 +61,7 @@ const myLexer = new Lexer(
 ```
 
 With the "ensureOptimizations" flag enabled the Lexer will also print error messages
-to the console with details on how to resolve optimiations errors.
+to the console with details on how to resolve optimizations errors.
 
 ## Caching Arrays of Alternatives
 
@@ -85,7 +87,7 @@ A simple JavaScript pattern can avoid this costly re-initialization:
 
 ```javascript
 $.RULE("value", function() {
-    // c1 is used as a cache, the short circute "||" will ensure only a single initialization
+    // c1 is used as a cache, the short circuit "||" will ensure only a single initialization
     $.OR(
         $.c1 ||
             ($.c1 = [
