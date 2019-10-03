@@ -72,7 +72,7 @@ Lets put this in perspective for relevant use cases:
 
 -   **Less work**: The ~x10 performance difference was measured when comparing pure grammars without any semantics.
     In a **real world** scenario the difference will be smaller as the regular parser will have semantics (CST creation / embedded actions).
-    Thoses semantics have their own runtime cost while the content assist parser will **always** remain a pure grammar.
+    Those semantics have their own runtime cost while the content assist parser will **always** remain a pure grammar.
 
 -   **Smart beats fast**: Content Assist is normally used in a code editor. A code editor should be by definition
     **incremental** as it does not matter how smart the error recovery is or how fast the parser, re-parsing a whole

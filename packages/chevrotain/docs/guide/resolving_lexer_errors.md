@@ -140,7 +140,7 @@ const Integer = createToken({
 
 ## The regexp unicode flag is not currently supported by the regexp-to-ast library
 
-The Chevrotain Lexer performs optimizations by filtering the potential token matchs
+The Chevrotain Lexer performs optimizations by filtering the potential token matches
 using the next [charCode][mdn_char_code] to be consumed.
 To apply this optimization the first possible charCodes for **every** TokenType must be identified.
 
@@ -318,7 +318,7 @@ as demonstrated in the [keywords vs identifiers example][keywords_idents]
 
 ## TokenType <...> is using a custom token pattern without providing <char_start_hint> parameter
 
-The Chevrotain Lexer performs optimizations by filtering the potential token matchs
+The Chevrotain Lexer performs optimizations by filtering the potential token matches
 using the next [charCode][mdn_char_code] to be consumed.
 To apply this optimization the first possible charCodes for **every** TokenType must be identified.
 

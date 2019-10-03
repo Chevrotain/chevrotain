@@ -105,7 +105,7 @@ $.RULE("selectStatement", () => {
 Three of those properties (selectClause / fromClause / whereClause) are the results of invoking
 other parser rules.
 
-Lets look at the "selectClause" rule implemntaiton:
+Lets look at the "selectClause" rule implementation:
 
 ```javascript
 $.RULE("selectClause", () => {
