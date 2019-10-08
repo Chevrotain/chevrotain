@@ -1,5 +1,5 @@
 import { createToken } from "../../src/scan/tokens_public"
-import { Parser } from "../../src/parse/parser/traits/parser_traits"
+import { CstParser } from "../../src/parse/parser/traits/parser_traits"
 import { createRegularToken } from "../utils/matchers"
 import { keys } from "../../src/utils/utils"
 import { IToken } from "../../api"
@@ -11,7 +11,7 @@ describe("The CSTVisitor", () => {
 
     const ALL_TOKENS = [A, B, C]
 
-    class CstTerminalParserReturnVisitor extends Parser {
+    class CstTerminalParserReturnVisitor extends CstParser {
         constructor(input: IToken[] = []) {
             super(ALL_TOKENS, { outputCst: true })
             this.performSelfAnalysis()

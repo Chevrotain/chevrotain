@@ -295,7 +295,7 @@ export class GastRecorder {
 
     orInternalRecord<T>(
         this: MixedInParser,
-        altsOrOpts: IAnyOrAlt[] | OrMethodOpts,
+        altsOrOpts: IAnyOrAlt[] | OrMethodOpts<unknown>,
         occurrence: number
     ): T {
         return recordOrProd.call(this, altsOrOpts, occurrence)

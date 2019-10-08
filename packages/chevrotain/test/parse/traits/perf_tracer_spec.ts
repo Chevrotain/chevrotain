@@ -1,5 +1,5 @@
 import { createToken } from "../../../src/scan/tokens_public"
-import { Parser } from "../../../src/parse/parser/traits/parser_traits"
+import { CstParser } from "../../../src/parse/parser/traits/parser_traits"
 
 let skipOnBrowser = describe
 if (typeof window !== "undefined") {
@@ -21,7 +21,7 @@ skipOnBrowser("Chevrotain's Init Performance Tracing", () => {
 
     const PlusTok = createToken({ name: "PlusTok" })
 
-    class TraceParser extends Parser {
+    class TraceParser extends CstParser {
         constructor(traceInitVal) {
             super([PlusTok], {
                 outputCst: false,

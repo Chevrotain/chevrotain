@@ -98,7 +98,7 @@ function defineTestSuit(recoveryMode) {
         })
 
         it("Can output a CST with labels in recovery", () => {
-            class CstTerminalParserWithLabels extends Parser {
+            class CstTerminalParserWithLabels extends CstParser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, {
                         outputCst: true,
@@ -128,12 +128,14 @@ function defineTestSuit(recoveryMode) {
             expect(tokenStructuredMatcher(cst.children.myLabel[0], A)).to.be
                 .true
             expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
-            expect(cst.children.myOtherLabel[0].name).to.equal("bamba")
-            expect(cst.children.myOtherLabel[0].recoveredNode).to.be.true
+
+            const bamba = cst.children.myOtherLabel[0] as CstNode
+            expect(bamba.name).to.equal("bamba")
+            expect(bamba.recoveredNode).to.be.true
         })
 
         it("Can output a CST for a Terminal - alternations", () => {
-            class CstTerminalAlternationParser extends Parser {
+            class CstTerminalAlternationParser extends CstParser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, {
                         outputCst: true,
@@ -174,7 +176,7 @@ function defineTestSuit(recoveryMode) {
         })
 
         it("Can output a CST for a Terminal - alternations - single", () => {
-            class CstTerminalAlternationSingleAltParser extends Parser {
+            class CstTerminalAlternationSingleAltParser extends CstParser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, {
                         outputCst: true,
@@ -206,7 +208,7 @@ function defineTestSuit(recoveryMode) {
         })
 
         it("Can output a CST for a Terminal with multiple occurrences", () => {
-            class CstMultiTerminalParser extends Parser {
+            class CstMultiTerminalParser extends CstParser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, {
                         outputCst: true,
@@ -239,7 +241,7 @@ function defineTestSuit(recoveryMode) {
         })
 
         it("Can output a CST for a Terminal with multiple occurrences - iteration", () => {
-            class CstMultiTerminalWithManyParser extends Parser {
+            class CstMultiTerminalWithManyParser extends CstParser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, {
                         outputCst: true,
@@ -281,19 +283,18 @@ function defineTestSuit(recoveryMode) {
             expect(tokenStructuredMatcher(cst.children.A[2], A)).to.be.true
             expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
             expect(cst.children.bamba).to.have.length(3)
-            expect(
-                tokenStructuredMatcher(cst.children.bamba[0].children.C[0], C)
-            ).to.be.true
-            expect(
-                tokenStructuredMatcher(cst.children.bamba[1].children.C[0], C)
-            ).to.be.true
-            expect(
-                tokenStructuredMatcher(cst.children.bamba[2].children.C[0], C)
-            ).to.be.true
+
+            const children = cst.children.bamba as CstNode[]
+            expect(tokenStructuredMatcher(children[0].children.C[0], C)).to.be
+                .true
+            expect(tokenStructuredMatcher(children[1].children.C[0], C)).to.be
+                .true
+            expect(tokenStructuredMatcher(children[2].children.C[0], C)).to.be
+                .true
         })
 
         context("Can output a CST for an optional terminal", () => {
-            class CstOptionalTerminalParser extends Parser {
+            class CstOptionalTerminalParser extends CstParser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, {
                         outputCst: true,
@@ -327,13 +328,11 @@ function defineTestSuit(recoveryMode) {
                 expect(cst.name).to.equal("ruleWithOptional")
                 expect(cst.children).to.have.keys("A", "B", "bamba")
                 expect(tokenStructuredMatcher(cst.children.A[0], A)).to.be.true
-                expect(cst.children.bamba[0].name).to.equal("bamba")
-                expect(
-                    tokenStructuredMatcher(
-                        cst.children.bamba[0].children.C[0],
-                        C
-                    )
-                ).to.be.true
+
+                const bamba = cst.children.bamba[0] as CstNode
+                expect(bamba.name).to.equal("bamba")
+                expect(tokenStructuredMatcher(bamba.children.C[0], C)).to.be
+                    .true
                 expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
             })
 
@@ -350,7 +349,7 @@ function defineTestSuit(recoveryMode) {
         })
 
         it("Can output a CST for a Terminal with multiple occurrences - iteration mandatory", () => {
-            class CstMultiTerminalWithAtLeastOneParser extends Parser {
+            class CstMultiTerminalWithAtLeastOneParser extends CstParser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, {
                         outputCst: true,
@@ -386,7 +385,7 @@ function defineTestSuit(recoveryMode) {
         })
 
         it("Can output a CST for a Terminal with multiple occurrences - iteration SEP", () => {
-            class CstMultiTerminalWithManySepParser extends Parser {
+            class CstMultiTerminalWithManySepParser extends CstParser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, {
                         outputCst: true,
@@ -427,7 +426,7 @@ function defineTestSuit(recoveryMode) {
         })
 
         it("Can output a CST for a Terminal with multiple occurrences - iteration SEP mandatory", () => {
-            class CstMultiTerminalWithAtLeastOneSepParser extends Parser {
+            class CstMultiTerminalWithAtLeastOneSepParser extends CstParser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, {
                         outputCst: true,
@@ -468,7 +467,7 @@ function defineTestSuit(recoveryMode) {
         })
 
         it("Can output a CST with node full location information", () => {
-            class CstTerminalParser extends Parser {
+            class CstTerminalParser extends CstParser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, {
                         nodeLocationTracking: "full",
@@ -515,13 +514,11 @@ function defineTestSuit(recoveryMode) {
             )
             expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
             expect(tokenStructuredMatcher(cst.children.C[0], C)).to.be.true
-            expect(cst.children.first[0].name).to.equal("first")
-            expect(cst.children.second[0].name).to.equal("second")
-            expect(
-                tokenStructuredMatcher(cst.children.first[0].children.A[0], A)
-            ).to.be.true
 
-            expect(cst.children.first[0].location).to.deep.equal({
+            const first = cst.children.first[0] as CstNode
+            expect(first.name).to.equal("first")
+            expect(tokenStructuredMatcher(first.children.A[0], A)).to.be.true
+            expect(first.location).to.deep.equal({
                 startOffset: 1,
                 startLine: 1,
                 startColumn: 1,
@@ -530,22 +527,24 @@ function defineTestSuit(recoveryMode) {
                 endColumn: 2
             })
 
-            expect(cst.children.empty[0].location).to.deep.equal({
-                startOffset: NaN,
-                startLine: NaN,
-                startColumn: NaN,
-                endOffset: NaN,
-                endLine: NaN,
-                endColumn: NaN
-            })
-
-            expect(cst.children.second[0].location).to.deep.equal({
+            const second = cst.children.second[0] as CstNode
+            expect(second.name).to.equal("second")
+            expect(second.location).to.deep.equal({
                 startOffset: 17,
                 startLine: 5,
                 startColumn: 2,
                 endOffset: 18,
                 endLine: 5,
                 endColumn: 4
+            })
+
+            expect((cst.children.empty[0] as CstNode).location).to.deep.equal({
+                startOffset: NaN,
+                startLine: NaN,
+                startColumn: NaN,
+                endOffset: NaN,
+                endLine: NaN,
+                endColumn: NaN
             })
 
             expect(cst.location).to.deep.equal({
@@ -559,7 +558,7 @@ function defineTestSuit(recoveryMode) {
         })
 
         it("Can output a CST with node onlyOffset location information", () => {
-            class CstTerminalParser extends Parser {
+            class CstTerminalParser extends CstParser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, {
                         nodeLocationTracking: "onlyOffset",
@@ -606,23 +605,23 @@ function defineTestSuit(recoveryMode) {
             )
             expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
             expect(tokenStructuredMatcher(cst.children.C[0], C)).to.be.true
-            expect(cst.children.first[0].name).to.equal("first")
-            expect(cst.children.second[0].name).to.equal("second")
-            expect(
-                tokenStructuredMatcher(cst.children.first[0].children.A[0], A)
-            ).to.be.true
 
-            expect(cst.children.first[0].location).to.deep.equal({
+            const first = cst.children.first[0] as CstNode
+            expect(first.name).to.equal("first")
+            expect(tokenStructuredMatcher(first.children.A[0], A)).to.be.true
+            expect(first.location).to.deep.equal({
                 startOffset: 1,
                 endOffset: 2
             })
 
-            expect(cst.children.second[0].location).to.deep.equal({
+            const second = cst.children.second[0] as CstNode
+            expect(second.name).to.equal("second")
+            expect(second.location).to.deep.equal({
                 startOffset: 17,
                 endOffset: 18
             })
 
-            expect(cst.children.empty[0].location).to.deep.equal({
+            expect((cst.children.empty[0] as CstNode).location).to.deep.equal({
                 startOffset: NaN,
                 endOffset: NaN
             })
@@ -634,7 +633,7 @@ function defineTestSuit(recoveryMode) {
         })
 
         it("Can output a CST with no location information", () => {
-            class CstTerminalParser extends Parser {
+            class CstTerminalParser extends CstParser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, {
                         nodeLocationTracking: "none",
@@ -672,22 +671,23 @@ function defineTestSuit(recoveryMode) {
             expect(cst.children).to.have.keys("B", "C", "first", "second")
             expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
             expect(tokenStructuredMatcher(cst.children.C[0], C)).to.be.true
-            expect(cst.children.first[0].name).to.equal("first")
-            expect(cst.children.second[0].name).to.equal("second")
-            expect(
-                tokenStructuredMatcher(cst.children.first[0].children.A[0], A)
-            ).to.be.true
 
-            expect(cst.children.first[0].location).to.be.undefined
+            const first = cst.children.first[0] as CstNode
+            expect(first.name).to.equal("first")
+            expect(tokenStructuredMatcher(first.children.A[0], A)).to.be.true
 
-            expect(cst.children.second[0].location).to.be.undefined
+            expect(first.location).to.be.undefined
+
+            const second = cst.children.second[0] as CstNode
+            expect(second.name).to.equal("second")
+            expect(second.location).to.be.undefined
 
             expect(cst.location).to.be.undefined
         })
 
         context("nested rules", () => {
             context("Can output cst when using OPTION", () => {
-                class CstOptionalNestedTerminalParser extends Parser {
+                class CstOptionalNestedTerminalParser extends CstParser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, {
                             outputCst: true,
@@ -726,22 +726,19 @@ function defineTestSuit(recoveryMode) {
                     let cst = parser.ruleWithOptional()
                     expect(cst.name).to.equal("ruleWithOptional")
                     expect(cst.children).to.have.keys("$nestedOption", "B")
-                    let $nestedOptionCst = cst.children.$nestedOption[0]
+                    let $nestedOptionCst = cst.children
+                        .$nestedOption[0] as CstNode
                     expect(
                         tokenStructuredMatcher(
                             $nestedOptionCst.children.A[0],
                             A
                         )
                     ).to.be.true
-                    expect($nestedOptionCst.children.bamba[0].name).to.equal(
-                        "bamba"
-                    )
-                    expect(
-                        tokenStructuredMatcher(
-                            $nestedOptionCst.children.bamba[0].children.C[0],
-                            C
-                        )
-                    ).to.be.true
+
+                    const bamba = $nestedOptionCst.children.bamba[0] as CstNode
+                    expect(bamba.name).to.equal("bamba")
+                    expect(tokenStructuredMatcher(bamba.children.C[0], C)).to.be
+                        .true
                     expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be
                         .true
                 })
@@ -753,7 +750,8 @@ function defineTestSuit(recoveryMode) {
                     expect(cst.name).to.equal("ruleWithOptional")
                     // nested rule is equivalent to an optionally empty rule call
                     expect(cst.children).to.have.keys("B", "$nestedOption")
-                    let $nestedOptionCst = cst.children.$nestedOption[0]
+                    let $nestedOptionCst = cst.children
+                        .$nestedOption[0] as CstNode
                     expect($nestedOptionCst.children.A).to.be.undefined
                     expect($nestedOptionCst.children.bamba).to.be.undefined
                     expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be
@@ -762,7 +760,7 @@ function defineTestSuit(recoveryMode) {
             })
 
             it("Can output a CST when using OR with nested named Alternatives", () => {
-                class CstAlternationNestedAltParser extends Parser {
+                class CstAlternationNestedAltParser extends CstParser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, {
                             outputCst: true,
@@ -799,7 +797,7 @@ function defineTestSuit(recoveryMode) {
                 let cst = parser.testRule()
                 expect(cst.name).to.equal("testRule")
                 expect(cst.children).to.have.keys("$first_alternative")
-                let firstAltCst = cst.children.$first_alternative[0]
+                let firstAltCst = cst.children.$first_alternative[0] as CstNode
                 expect(tokenStructuredMatcher(firstAltCst.children.A[0], A)).to
                     .be.true
                 expect(cst.children.bamba).to.be.undefined
@@ -807,7 +805,7 @@ function defineTestSuit(recoveryMode) {
             })
 
             it("Can output a CST when using OR", () => {
-                class CstAlternationNestedParser extends Parser {
+                class CstAlternationNestedParser extends CstParser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, {
                             outputCst: true,
@@ -846,7 +844,7 @@ function defineTestSuit(recoveryMode) {
                 let cst = parser.testRule()
                 expect(cst.name).to.equal("testRule")
                 expect(cst.children).to.have.keys("$nestedOr")
-                let orCst = cst.children.$nestedOr[0]
+                let orCst = cst.children.$nestedOr[0] as CstNode
                 expect(orCst.children).to.have.keys("A")
                 expect(tokenStructuredMatcher(orCst.children.A[0], A)).to.be
                     .true
@@ -855,7 +853,7 @@ function defineTestSuit(recoveryMode) {
             })
 
             it("Can output a CST when using OR - single Alt", () => {
-                class CstAlternationNestedAltSingleParser extends Parser {
+                class CstAlternationNestedAltSingleParser extends CstParser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, {
                             outputCst: true,
@@ -887,15 +885,17 @@ function defineTestSuit(recoveryMode) {
                 let cst = parser.testRule()
                 expect(cst.name).to.equal("testRule")
                 expect(cst.children).to.have.keys("$nestedAlt")
-                let altCst = cst.children.$nestedAlt[0]
+                let altCst = cst.children.$nestedAlt[0] as CstNode
                 expect(altCst.children).to.have.keys("B", "bamba")
                 expect(tokenStructuredMatcher(altCst.children.B[0], B)).to.be
                     .true
-                expect(altCst.children.bamba[0].children).to.have.keys("C")
+                expect(
+                    (altCst.children.bamba[0] as CstNode).children
+                ).to.have.keys("C")
             })
 
             it("Can output a CST using Repetitions", () => {
-                class CstMultiTerminalWithManyNestedParser extends Parser {
+                class CstMultiTerminalWithManyNestedParser extends CstParser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, {
                             outputCst: true,
@@ -935,7 +935,7 @@ function defineTestSuit(recoveryMode) {
                 expect(cst.name).to.equal("testRule")
                 expect(cst.children).to.have.keys("B", "$nestedMany")
                 expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
-                let nestedManyCst = cst.children.$nestedMany[0]
+                let nestedManyCst = cst.children.$nestedMany[0] as CstNode
                 expect(nestedManyCst.children).to.have.keys("A", "bamba")
 
                 expect(nestedManyCst.children.A).to.have.length(3)
@@ -946,29 +946,18 @@ function defineTestSuit(recoveryMode) {
                 expect(tokenStructuredMatcher(nestedManyCst.children.A[2], A))
                     .to.be.true
 
-                expect(nestedManyCst.children.bamba).to.have.length(3)
-                expect(
-                    tokenStructuredMatcher(
-                        nestedManyCst.children.bamba[0].children.C[0],
-                        C
-                    )
-                ).to.be.true
-                expect(
-                    tokenStructuredMatcher(
-                        nestedManyCst.children.bamba[1].children.C[0],
-                        C
-                    )
-                ).to.be.true
-                expect(
-                    tokenStructuredMatcher(
-                        nestedManyCst.children.bamba[2].children.C[0],
-                        C
-                    )
-                ).to.be.true
+                const bamba = nestedManyCst.children.bamba as CstNode[]
+                expect(bamba).to.have.length(3)
+                expect(tokenStructuredMatcher(bamba[0].children.C[0], C)).to.be
+                    .true
+                expect(tokenStructuredMatcher(bamba[1].children.C[0], C)).to.be
+                    .true
+                expect(tokenStructuredMatcher(bamba[2].children.C[0], C)).to.be
+                    .true
             })
 
             it("Can output a CST using mandatory Repetitions", () => {
-                class CstAtLeastOneNestedParser extends Parser {
+                class CstAtLeastOneNestedParser extends CstParser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, {
                             outputCst: true,
@@ -1000,7 +989,7 @@ function defineTestSuit(recoveryMode) {
                 expect(cst.name).to.equal("testRule")
                 expect(cst.children).to.have.keys("$oops", "B")
                 expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
-                let oopsCst = cst.children.$oops[0]
+                let oopsCst = cst.children.$oops[0] as CstNode
                 expect(oopsCst.children).to.have.keys("A")
                 expect(oopsCst.children.A).to.have.length(3)
                 expect(tokenStructuredMatcher(oopsCst.children.A[0], A)).to.be
@@ -1012,7 +1001,7 @@ function defineTestSuit(recoveryMode) {
             })
 
             it("Can output a CST using Repetitions with separator", () => {
-                class CstNestedRuleWithManySepParser extends Parser {
+                class CstNestedRuleWithManySepParser extends CstParser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, {
                             outputCst: true,
@@ -1045,7 +1034,7 @@ function defineTestSuit(recoveryMode) {
                 expect(cst.name).to.equal("testRule")
                 expect(cst.children).to.have.keys("$pizza", "B")
                 expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
-                let pizzaCst = cst.children.$pizza[0]
+                let pizzaCst = cst.children.$pizza[0] as CstNode
                 expect(pizzaCst.children.A).to.have.length(2)
                 expect(tokenStructuredMatcher(pizzaCst.children.A[0], A)).to.be
                     .true
@@ -1057,7 +1046,7 @@ function defineTestSuit(recoveryMode) {
             })
 
             it("Can output a CST using Repetitions with separator - mandatory", () => {
-                class CstAtLeastOneSepNestedParser extends Parser {
+                class CstAtLeastOneSepNestedParser extends CstParser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, {
                             outputCst: true,
@@ -1091,7 +1080,7 @@ function defineTestSuit(recoveryMode) {
                 expect(cst.children).to.have.keys("$nestedName", "B")
                 expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
 
-                let nestedCst = cst.children.$nestedName[0]
+                let nestedCst = cst.children.$nestedName[0] as CstNode
                 expect(nestedCst.children.A).to.have.length(2)
                 expect(tokenStructuredMatcher(nestedCst.children.A[0], A)).to.be
                     .true
@@ -1103,7 +1092,7 @@ function defineTestSuit(recoveryMode) {
             })
 
             it("Can output a CST with nested rules with node full location information", () => {
-                class CstTerminalParser extends Parser {
+                class CstTerminalParser extends CstParser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, {
                             nodeLocationTracking: "full",
@@ -1134,7 +1123,7 @@ function defineTestSuit(recoveryMode) {
                 expect(cst.children).to.have.keys("$nestedOption", "B")
                 expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
 
-                let nestedCst = cst.children.$nestedOption[0]
+                let nestedCst = cst.children.$nestedOption[0] as CstNode
                 expect(nestedCst.children.A).to.have.length(1)
                 expect(tokenStructuredMatcher(nestedCst.children.A[0], A)).to.be
                     .true
@@ -1159,7 +1148,7 @@ function defineTestSuit(recoveryMode) {
             })
 
             it("Can output a CST with nested rules with node onlyOffset location information", () => {
-                class CstTerminalParser extends Parser {
+                class CstTerminalParser extends CstParser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, {
                             nodeLocationTracking: "onlyOffset",
@@ -1190,7 +1179,7 @@ function defineTestSuit(recoveryMode) {
                 expect(cst.children).to.have.keys("$nestedOption", "B")
                 expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
 
-                let nestedCst = cst.children.$nestedOption[0]
+                let nestedCst = cst.children.$nestedOption[0] as CstNode
                 expect(nestedCst.children.A).to.have.length(1)
                 expect(tokenStructuredMatcher(nestedCst.children.A[0], A)).to.be
                     .true
@@ -1207,7 +1196,7 @@ function defineTestSuit(recoveryMode) {
             })
 
             it("Can output a CST with nested rules with no node location information", () => {
-                class CstTerminalParser extends Parser {
+                class CstTerminalParser extends CstParser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, {
                             nodeLocationTracking: "none",
@@ -1238,7 +1227,7 @@ function defineTestSuit(recoveryMode) {
                 expect(cst.children).to.have.keys("$nestedOption", "B")
                 expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
 
-                let nestedCst = cst.children.$nestedOption[0]
+                let nestedCst = cst.children.$nestedOption[0] as CstNode
                 expect(nestedCst.children.A).to.have.length(1)
                 expect(tokenStructuredMatcher(nestedCst.children.A[0], A)).to.be
                     .true
@@ -1249,7 +1238,7 @@ function defineTestSuit(recoveryMode) {
             })
 
             it("Can output a CST with nested rules with no node location information", () => {
-                class CstTerminalParser extends Parser {
+                class CstTerminalParser extends CstParser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, {
                             nodeLocationTracking: undefined,
@@ -1266,7 +1255,7 @@ function defineTestSuit(recoveryMode) {
 
         context("Error Recovery", () => {
             it("re-sync recovery", () => {
-                class CstRecoveryParserReSync extends Parser {
+                class CstRecoveryParserReSync extends CstParser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, {
                             outputCst: true,
@@ -1332,7 +1321,7 @@ function defineTestSuit(recoveryMode) {
 
                 let firstCollection = cst.children.first
                 expect(firstCollection).to.have.lengthOf(1)
-                let first = firstCollection[0]
+                let first = firstCollection[0] as CstNode
                 expect(first.recoveredNode).to.be.true
                 expect(first.children).to.have.keys("A")
                 expect(tokenStructuredMatcher(first.children.A[0], A)).to.be
@@ -1341,7 +1330,7 @@ function defineTestSuit(recoveryMode) {
 
                 let secondCollection = cst.children.second
                 expect(secondCollection).to.have.lengthOf(1)
-                let second = secondCollection[0]
+                let second = secondCollection[0] as CstNode
                 expect(second.recoveredNode).to.be.undefined
                 expect(second.children).to.have.keys("C", "D")
                 expect(tokenStructuredMatcher(second.children.C[0], C)).to.be
@@ -1351,7 +1340,7 @@ function defineTestSuit(recoveryMode) {
             })
 
             it("re-sync recovery nested", () => {
-                class CstRecoveryParserReSyncNested extends Parser {
+                class CstRecoveryParserReSyncNested extends CstParser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, {
                             outputCst: true,
@@ -1420,10 +1409,10 @@ function defineTestSuit(recoveryMode) {
 
                 let firstRootCollection = cst.children.first_root
                 expect(firstRootCollection).to.have.lengthOf(1)
-                let firstRoot = firstRootCollection[0]
+                let firstRoot = firstRootCollection[0] as CstNode
                 expect(firstRoot.children).to.have.keys("first")
 
-                let first = firstRoot.children.first[0]
+                let first = firstRoot.children.first[0] as CstNode
                 expect(first.recoveredNode).to.be.true
                 expect(first.children).to.have.keys("A")
                 expect(tokenStructuredMatcher(first.children.A[0], A)).to.be
@@ -1432,7 +1421,7 @@ function defineTestSuit(recoveryMode) {
 
                 let secondCollection = cst.children.second
                 expect(secondCollection).to.have.lengthOf(1)
-                let second = secondCollection[0]
+                let second = secondCollection[0] as CstNode
                 expect(second.recoveredNode).to.be.undefined
                 expect(second.children).to.have.keys("C", "D")
                 expect(tokenStructuredMatcher(second.children.C[0], C)).to.be
