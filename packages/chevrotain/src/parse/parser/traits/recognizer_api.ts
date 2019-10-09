@@ -64,7 +64,7 @@ export class RecognizerApi {
     or(
         this: MixedInParser,
         idx: number,
-        altsOrOpts: IOrAlt[] | OrMethodOpts
+        altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>
     ): any {
         return this.orInternal(altsOrOpts, idx)
     }

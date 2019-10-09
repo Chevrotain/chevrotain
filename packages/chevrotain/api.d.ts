@@ -121,7 +121,14 @@ declare abstract class BaseParser {
      * ...
      * @see OR
      */
-    /* protected */ or(idx: number, altsOrOpts: IOrAlt[] | OrMethodOpts): any
+    /* protected */ or(
+        idx: number,
+        altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>
+    ): any
+    /* protected */ or<T>(
+        idx: number,
+        altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>
+    ): T
 
     /**
      * Like `MANY` with the numerical suffix as a parameter, e.g:
