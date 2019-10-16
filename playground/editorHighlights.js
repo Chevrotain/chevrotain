@@ -64,7 +64,7 @@ function getMatchingNonTerminalPositionsInText(textNode) {
     var ruleName = textNode.innerHTML
     var occurrenceIdx = textNode.getAttribute("occurrenceidx")
     var topRuleName = textNode.getAttribute("toprulename")
-    var topRuleText = parser.getGAstProductions().get(topRuleName).orgText
+    var topRuleText = parser[topRuleName].originalGrammarAction.toString()
 
     var positions = locateSubruleRef(javaScriptEditor.getValue(), ruleName, javaScriptEditor, topRuleText, occurrenceIdx)
 
@@ -77,7 +77,7 @@ function getMatchingTerminalPositionsInText(textNode) {
     var occurrenceIdx = textNode.getAttribute("occurrenceidx")
     var dslRule = textNode.getAttribute("dslrulename")
     var topRuleName = textNode.getAttribute("toprulename")
-    var topRuleText = parser.getGAstProductions().get(topRuleName).orgText
+    var topRuleText = parser[topRuleName].originalGrammarAction.toString()
 
     var positions
     switch (dslRule) {

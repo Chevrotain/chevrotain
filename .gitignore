@@ -10,5 +10,6 @@ coverage/
 .baseDir.ts
 /lib
 /dev
+/packages
 
 

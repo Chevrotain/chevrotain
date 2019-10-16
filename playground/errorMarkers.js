@@ -83,7 +83,7 @@ function markParserDefinitionErrors(parser) {
     parserErrorsMarkers = []
 
     _.forEach(parser.definitionErrors, function (currParserDefError) {
-        errPositions = getParserErrorStartStopPos(currParserDefError, javaScriptEditor.getValue(), parser.getGAstProductions(), javaScriptEditor)
+        errPositions = getParserErrorStartStopPos(currParserDefError, javaScriptEditor.getValue(), parser, javaScriptEditor)
         _.forEach(errPositions, function (currPos) {
             marker = javaScriptEditor.markText(currPos.start, currPos.end, {
                 className: "markTextError",
@@ -203,32 +203,31 @@ function locateClosingParenthesis(startOffset, text) {
 /**
  * @param {chevrotain.IParserDefinitionError} parseErr
  * @param {string} parserImplText
- * @param {lang.HashTable<gast.Rule>} gAstProductions
  * @param {{posFromIndex:{Function(Number):{line:number, ch:number}}}} positionHelper
  *
  * @return {{start:{line:number, column:number},
  *             end:{line:number, column:number}[]}
  */
-function getParserErrorStartStopPos(parseErr, parserImplText, gAstProductions, positionHelper) {
+function getParserErrorStartStopPos(parseErr, parserImplText, parser, positionHelper) {
     var ruleText
     switch (parseErr.type) {
         case chevrotain.ParserDefinitionErrorType.DUPLICATE_PRODUCTIONS:
-            ruleText = gAstProductions.get(parseErr.ruleName).orgText
+            ruleText = parser[parseErr.ruleName].originalGrammarAction.toString()
             return locateProduction(parserImplText, ruleText, parseErr.dslName, parseErr.occurrence, positionHelper, parseErr.parameter)
         case chevrotain.ParserDefinitionErrorType.DUPLICATE_RULE_NAME:
         case chevrotain.ParserDefinitionErrorType.INVALID_RULE_NAME:
             return locateRuleDefinition(parseErr.ruleName, parserImplText, positionHelper)
         case chevrotain.ParserDefinitionErrorType.UNRESOLVED_SUBRULE_REF:
-            ruleText = gAstProductions.get(parseErr.ruleName).orgText
+            ruleText = parser[parseErr.ruleName].originalGrammarAction.toString()
             //noinspection JSUnresolvedVariable
             return locateSubruleRef(parserImplText, parseErr.unresolvedRefName, positionHelper, ruleText)
         case chevrotain.ParserDefinitionErrorType.LEFT_RECURSION:
             return locateRuleDefinition(parseErr.ruleName, parserImplText, positionHelper)
         case chevrotain.ParserDefinitionErrorType.NONE_LAST_EMPTY_ALT:
-            ruleText = gAstProductions.get(parseErr.ruleName).orgText
+            ruleText = parser[parseErr.ruleName].originalGrammarAction.toString()
             return locateProduction(parserImplText, ruleText, "OR", parseErr.occurrence, positionHelper)
         case chevrotain.ParserDefinitionErrorType.AMBIGUOUS_ALTS:
-            ruleText = gAstProductions.get(parseErr.ruleName).orgText
+            ruleText = parser[parseErr.ruleName].originalGrammarAction.toString()
             return locateProduction(parserImplText, ruleText, "OR", parseErr.occurrence, positionHelper)
         default: {
             console.log("unknown parser error type ->" + parseErr.type + "<-")
@@ -355,7 +354,7 @@ function locateProduction(fullText, ruleText, dslName, occurrence, positionHelpe
     }
 
     var ruleTextStartOffset = fullText.indexOf(ruleText)
-    var dslNameWithOccurrence = dslName + ( occurrence === 1 ? '(?:|' + occurrence + ')' : occurrence)
+    var dslNameWithOccurrence = dslName + ( occurrence === 0 ? '(?:|' + occurrence + ')' : occurrence)
     var parameterPart = parameter ? '\\s*\\(\\s*.*' + parameter + '\\s*\\)' : ''
 
     var soughtPattern = dslNameWithOccurrence + parameterPart
