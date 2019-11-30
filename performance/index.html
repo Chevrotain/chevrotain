@@ -226,6 +226,20 @@
 
                     </div>
 
+                    <div class="dataRow Cursornext">
+
+                        <div class="benchName"><a rel="nofollow"
+                                                    href="https://github.com/clitetailor/cursornext">Cursornext</a>
+                        </div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                    </div>
+
                     <div class="dataRow Parsimmon">
 
                         <div class="benchName"><a rel="nofollow" href="https://github.com/jneen/parsimmon">Parsimmon</a>
@@ -387,6 +401,7 @@
     var chevrotainFrame_cst = includeTestIFrame("chevrotain_cst", "./jsonParsers/chevrotain/chevrotain_cst.html")
     var antlrFrame = includeTestIFrame("antlr", "./jsonParsers/antlr/antlr.html")
     var antlrPtFrame = includeTestIFrame("antlr-PT", "./jsonParsers/antlr/antlr_pt.html")
+    var cursornextFrame = includeTestIFrame("cursornext", "./jsonParsers/cursornext/cursornext.html")
     var jisonFrame = includeTestIFrame("jison", "./jsonParsers/jison/jison.html")
     var mynaFrame = includeTestIFrame("myna", "./jsonParsers/myna/myna.html")
     var nearleyFrame = includeTestIFrame("nearley", "./jsonParsers/nearley/nearley.html")
@@ -523,6 +538,10 @@
 
         "Chevrotain-PT": function (suite) {
             addTest(suite, 'Chevrotain-PT', chevrotainFrame_cst.parse)
+        },
+
+        Cursornext: function(suite) {
+            addTest(suite, 'Cursornext', cursornextFrame.parse)
         },
 
         Jsonify: function (suite) {
