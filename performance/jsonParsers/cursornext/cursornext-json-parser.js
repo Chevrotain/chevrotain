@@ -51,6 +51,7 @@ function parseObject(cursor) {
 
   skipWhitespace(cursor);
 
+  var fields = [];
   while (!cursor.startsWith("}") && !cursor.isEof()) {
     skipWhitespace(cursor);
 
@@ -87,6 +88,12 @@ function parseObject(cursor) {
       }
     }
 
+    fields.push({
+      type: "Field",
+      key: key,
+      value: value
+    });
+
     skipWhitespace(cursor);
   }
 
@@ -98,8 +105,7 @@ function parseObject(cursor) {
 
   return {
     type: "Object",
-    key: key,
-    value: value
+    fields: fields
   };
 }
 
@@ -195,7 +201,7 @@ function parseBoolean(cursor) {
 function parseString(cursor) {
   var marker = cursor.clone();
 
-  if (!marker.startsWith('"')) {
+  if (!cursor.startsWith('"')) {
     return;
   }
   cursor.next(1);
@@ -204,10 +210,6 @@ function parseString(cursor) {
 
   while (!cursor.startsWith('"') && !cursor.isEof()) {
     if (cursor.startsWith("\\")) {
-      if (!cursor.exec(/\\[bfnrtv"\\]/y)) {
-        cursor.moveTo(marker);
-        return;
-      }
       cursor.next(2);
     } else {
       cursor.next(1);
@@ -216,7 +218,7 @@ function parseString(cursor) {
 
   var value = start.takeUntil(cursor);
 
-  if (!marker.startsWith('"')) {
+  if (!cursor.startsWith('"')) {
     cursor.moveTo(marker);
     return;
   }
