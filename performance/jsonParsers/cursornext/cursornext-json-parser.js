@@ -6,9 +6,10 @@ function parse(source) {
   return parseJson(cursor);
 }
 
-function skipWhitespace(cursor) {
-  var execArr = cursor.exec(/[ \t\n\r]+/y);
+var wsRegexp = /[ \t\n\r]+/gy;
 
+function skipWhitespace(cursor) {
+  var execArr = cursor.exec(wsRegexp);
   if (execArr) {
     cursor.next(execArr[0].length);
   }
@@ -58,6 +59,7 @@ function parseObject(cursor) {
     var key = parseKey(cursor);
     if (!key) {
       cursor.moveTo(marker);
+      delete marker;
       return;
     }
 
@@ -65,6 +67,7 @@ function parseObject(cursor) {
 
     if (!cursor.startsWith(":")) {
       cursor.moveTo(marker);
+      delete marker;
       return;
     }
     cursor.next(1);
@@ -74,6 +77,7 @@ function parseObject(cursor) {
     var value = parseValue(cursor);
     if (!value) {
       cursor.moveTo(marker);
+      delete marker;
       return;
     }
 
@@ -84,6 +88,7 @@ function parseObject(cursor) {
 
       if (cursor.startsWith("}")) {
         cursor.moveTo(marker);
+        delete marker;
         return;
       }
     }
@@ -99,9 +104,11 @@ function parseObject(cursor) {
 
   if (!cursor.startsWith("}")) {
     cursor.moveTo(marker);
+    delete marker;
     return;
   }
   cursor.next(1);
+  delete marker;
 
   return {
     type: "Object",
@@ -136,6 +143,7 @@ function parseArray(cursor) {
     var item = parseValue(cursor);
     if (!item) {
       cursor.moveTo(marker);
+      delete marker;
       return;
     }
     value.push(item);
@@ -147,6 +155,7 @@ function parseArray(cursor) {
 
       if (cursor.startsWith("]")) {
         cursor.moveTo(marker);
+        delete marker;
         return;
       }
     }
@@ -154,9 +163,11 @@ function parseArray(cursor) {
 
   if (!cursor.startsWith("]")) {
     cursor.moveTo(marker);
+    delete marker;
     return;
   }
   cursor.next(1);
+  delete marker;
 
   return {
     type: "Array",
@@ -164,8 +175,10 @@ function parseArray(cursor) {
   };
 }
 
+var numberRegexp = /-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/gy;
+
 function parseNumber(cursor) {
-  var execArr = cursor.exec(/-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/y);
+  var execArr = cursor.exec(numberRegexp);
   if (execArr) {
     cursor.next(execArr[0].length);
 
@@ -176,8 +189,10 @@ function parseNumber(cursor) {
   }
 }
 
+var nullRegexp = /null/gy;
+
 function parseNull(cursor) {
-  if (cursor.startsWith("null")) {
+  if (cursor.exec(nullRegexp)) {
     cursor.next(4);
 
     return {
@@ -186,8 +201,10 @@ function parseNull(cursor) {
   }
 }
 
+var booleanRegexp = /true|false/gy;
+
 function parseBoolean(cursor) {
-  var execArr = cursor.exec(/true|false/y);
+  var execArr = cursor.exec(booleanRegexp);
   if (execArr) {
     cursor.next(execArr[0].length);
 
@@ -198,34 +215,17 @@ function parseBoolean(cursor) {
   }
 }
 
+var stringRegexp = /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/gy;
+
 function parseString(cursor) {
-  var marker = cursor.clone();
+  var execArr = cursor.exec(stringRegexp);
 
-  if (!cursor.startsWith('"')) {
-    return;
+  if (execArr) {
+    cursor.next(execArr[0].length);
+
+    return {
+      type: "String",
+      value: execArr[0]
+    };
   }
-  cursor.next(1);
-
-  var start = cursor.clone();
-
-  while (!cursor.startsWith('"') && !cursor.isEof()) {
-    if (cursor.startsWith("\\")) {
-      cursor.next(2);
-    } else {
-      cursor.next(1);
-    }
-  }
-
-  var value = start.takeUntil(cursor);
-
-  if (!cursor.startsWith('"')) {
-    cursor.moveTo(marker);
-    return;
-  }
-  cursor.next(1);
-
-  return {
-    type: "String",
-    value: value
-  };
 }
