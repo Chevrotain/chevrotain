@@ -1,3 +1,18 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Breaking Changes
+
+-   [BREAKING_CHANGES For V7.0](https://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_7-0-0)
+
+#### Minor Changes
+
+-   [Improved Type Signature for 'OR' method](https://github.com/SAP/chevrotain/issues/970)
+    -   Thanks to [@OmarTawfik](https://github.com/OmarTawfik) :thumbsup
+
+#### Documentation
+
+-   [Clarify Lexer Limitation: "Complement Sets cannot be automatically optimized" Docs.](https://github.com/SAP/chevrotain/issues/1044)
+
 ## 6.5.0 (9-20-2019)
 
 -   [Optimize Certain Complex Lexers Initialization Performance](https://github.com/SAP/chevrotain/commit/e25222dcd2ce29f2c5352599dd55f3432a145316)

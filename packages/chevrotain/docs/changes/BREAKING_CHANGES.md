@@ -1,3 +1,11 @@
+## 7.0.0
+
+-   Reducing the usage of 'any' in the 'OR' method type signature may cause existing code to fail compilation.
+    In such a case an explicit usage of a generic `any` type will resolve the problem.
+    ```typescript
+    this.OR<any>(/* ... */)
+    ```
+
 ## 6.0.0
 
 -   Due to re-implementation of the grammar analysis via ["grammar recording"](../guide/internals.md#grammar-recording), certain semantics action
