@@ -1,6 +1,23 @@
 ## 7.0.0
 
--   Reducing the usage of 'any' in the 'OR' method type signature may cause existing code to fail compilation.
+-   The Parser's default `maxLookahead` was reduced to 3. This could cause ambiguity issues in existing
+    Parsers. The pre 7.0.0 behavior can be reproduced by passing an explicit `maxLookahead`
+
+    ```javascript
+    class MoreLookaheadParser extends CstParser {
+        constructor() {
+            super([], {
+                maxLookahead: 4
+            })
+            // ...
+        }
+    }
+    ```
+
+    It is also possible (and recommended) to increase the maxLookahead for a specific method rather thn globally.
+    See [relevant issue](https://github.com/SAP/chevrotain/issues/1012).
+
+*   Reducing the usage of 'any' in the 'OR' method type signature may cause existing code to fail compilation.
     In such a case an explicit usage of a generic `any` type will resolve the problem.
     ```typescript
     this.OR<any>(/* ... */)

@@ -53,7 +53,7 @@ Example:
 class LowLookaheadParser extends CstParser {
     constructor() {
         super([], {
-            // By default this value is 4
+            // By default this value is 3
             maxLookahead: 2
         })
 

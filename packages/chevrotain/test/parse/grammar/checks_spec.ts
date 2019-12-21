@@ -1339,7 +1339,9 @@ describe("The prefix ambiguity detection full flow", () => {
 
         class AlternativesAmbiguityParser extends Parser {
             constructor() {
-                super(ALL_TOKENS)
+                super(ALL_TOKENS, {
+                    maxLookahead: 4
+                })
                 this.performSelfAnalysis()
             }
 
@@ -1388,7 +1390,9 @@ describe("The prefix ambiguity detection full flow", () => {
 
         class AlternativesAmbiguityParser extends Parser {
             constructor() {
-                super(ALL_TOKENS)
+                super(ALL_TOKENS, {
+                    maxLookahead: 4
+                })
                 this.performSelfAnalysis()
             }
 

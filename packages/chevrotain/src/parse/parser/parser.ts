@@ -62,7 +62,7 @@ export type lookAheadSequence = TokenType[][]
 
 export const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
     recoveryEnabled: false,
-    maxLookahead: 4,
+    maxLookahead: 3,
     ignoredIssues: <any>{},
     dynamicTokensEnabled: false,
     outputCst: true,
