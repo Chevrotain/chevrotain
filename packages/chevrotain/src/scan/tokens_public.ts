@@ -83,6 +83,21 @@ function createTokenInternal(config: ITokenConfig): TokenType {
         tokenType.START_CHARS_HINT = config[START_CHARS_HINT]
     }
 
+    Object.defineProperty(tokenType, "tokenName", {
+        get() {
+            throw Error(
+                "TokenName property has been deprecated, use the `name` property instead."
+            )
+        },
+        set(newVal) {
+            throw Error(
+                "TokenName property has been deprecated, use the `name` property instead."
+            )
+        },
+        enumerable: false,
+        configurable: false
+    })
+
     return tokenType
 }
 

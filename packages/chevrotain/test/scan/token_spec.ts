@@ -171,5 +171,17 @@ describe("The Chevrotain Tokens namespace", () => {
             const B = createToken({ name: "B", categories: [A] })
             singleAssignCategoriesToksMap([A], B)
         })
+
+        it("Will throw when reading the deprecated tokenName flag", () => {
+            expect(() => (TrueLiteral as any).tokenName).to.throw(
+                "TokenName property has been deprecated, use the `name` property instead"
+            )
+        })
+
+        it("Will throw when writing the deprecated tokenName flag", () => {
+            expect(() => ((TrueLiteral as any).tokenName = "foo")).to.throw(
+                "TokenName property has been deprecated, use the `name` property instead"
+            )
+        })
     })
 })
