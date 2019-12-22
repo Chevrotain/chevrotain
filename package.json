@@ -17,8 +17,8 @@
     "ci": "npm-run-all format:validate build test",
     "build": "lerna run build",
     "test": "lerna run test",
-    "format:fix": "prettier --write \"**/*.@(ts|js|json|md)\"",
-    "format:validate": "prettier --list-different \"**/*.@(ts|js|json|md)\""
+    "format:fix": "prettier --write \"**/*.@(ts|js|json|md|yml)\"",
+    "format:validate": "prettier --list-different \"**/*.@(ts|js|json|md|yml)\""
   },
   "prettier": {
     "semi": false
