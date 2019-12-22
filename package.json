@@ -1,49 +1,48 @@
 {
-    "name": "root",
-    "private": true,
-    "workspaces": {
-        "packages": [
-            "packages/*",
-            "examples/*"
-        ],
-        "nohoist": [
-            "**/grunt-**",
-            "**/karma-**"
-        ]
-    },
-    "scripts": {
-        "lerna:version": "lerna version",
-        "lerna:publish": "lerna publish from-git --yes",
-        "ci": "npm-run-all format:validate build test",
-        "build": "lerna run build",
-        "test": "lerna run test",
-        "format:fix": "prettier --write \"**/*.@(ts|js|json|md)\"",
-        "format:validate": "prettier --list-different \"**/*.@(ts|js|json|md)\""
-    },
-    "prettier": {
-        "semi": false,
-        "tabWidth": 4
-    },
-    "husky": {
-        "hooks": {
-            "pre-commit": "lint-staged"
-        }
-    },
-    "lint-staged": {
-        "*.{ts,js,json,md}": [
-            "prettier --write",
-            "git add"
-        ]
-    },
-    "devDependencies": {
-        "fs-extra": "^8.1.0",
-        "husky": "^3.0.0",
-        "lerna": "^3.15.0",
-        "lint-staged": "^9.2.0",
-        "lodash": "^4.17.14",
-        "mocha": "^6.1.4",
-        "npm-run-all": "^4.1.5",
-        "prettier": "1.19.0",
-        "shx": "^0.3.2"
+  "name": "root",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "packages/*",
+      "examples/*"
+    ],
+    "nohoist": [
+      "**/grunt-**",
+      "**/karma-**"
+    ]
+  },
+  "scripts": {
+    "lerna:version": "lerna version",
+    "lerna:publish": "lerna publish from-git --yes",
+    "ci": "npm-run-all format:validate build test",
+    "build": "lerna run build",
+    "test": "lerna run test",
+    "format:fix": "prettier --write \"**/*.@(ts|js|json|md)\"",
+    "format:validate": "prettier --list-different \"**/*.@(ts|js|json|md)\""
+  },
+  "prettier": {
+    "semi": false
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
     }
+  },
+  "lint-staged": {
+    "*.{ts,js,json,md}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "devDependencies": {
+    "fs-extra": "^8.1.0",
+    "husky": "^3.0.0",
+    "lerna": "^3.15.0",
+    "lint-staged": "^9.2.0",
+    "lodash": "^4.17.14",
+    "mocha": "^6.1.4",
+    "npm-run-all": "^4.1.5",
+    "prettier": "1.19.0",
+    "shx": "^0.3.2"
+  }
 }

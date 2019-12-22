@@ -2,8 +2,8 @@ const { expect } = require("chai")
 const parse = require("./json_with_comments")
 
 describe("The JSON Grammar with comments", () => {
-    it("can parse a simple Json without errors", () => {
-        const inputText = `
+  it("can parse a simple Json without errors", () => {
+    const inputText = `
         // To Level Comment
         { 
            // nested inner comment
@@ -16,20 +16,20 @@ describe("The JSON Grammar with comments", () => {
                     "num":666
                   }
         }`
-        const parseResult = parse(inputText)
+    const parseResult = parse(inputText)
 
-        expect(parseResult.lexErrors).to.be.empty
-        expect(parseResult.parseErrors).to.be.empty
+    expect(parseResult.lexErrors).to.be.empty
+    expect(parseResult.parseErrors).to.be.empty
 
-        const cst = parseResult.cst
+    const cst = parseResult.cst
 
-        // The top level comment was added to the top level Object CST.
-        const topLevelComment = cst.children.object[0].children.Comment[0]
-        expect(topLevelComment.image).to.eql("// To Level Comment")
+    // The top level comment was added to the top level Object CST.
+    const topLevelComment = cst.children.object[0].children.Comment[0]
+    expect(topLevelComment.image).to.eql("// To Level Comment")
 
-        // The nested comment was added to the CST of the matching objectItem (key:value pair)
-        const nestedComment =
-            cst.children.object[0].children.objectItem[0].children.Comment[0]
-        expect(nestedComment.image).to.eql("// nested inner comment")
-    })
+    // The nested comment was added to the CST of the matching objectItem (key:value pair)
+    const nestedComment =
+      cst.children.object[0].children.objectItem[0].children.Comment[0]
+    expect(nestedComment.image).to.eql("// nested inner comment")
+  })
 })

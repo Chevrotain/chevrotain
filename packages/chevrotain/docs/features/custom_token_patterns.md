@@ -6,27 +6,27 @@ Tokens can also be defined using arbitrary JavaScript code, for example:
 ```javascript
 // our custom matcher
 function matchInteger(text, startOffset) {
-    let endOffset = startOffset
-    let charCode = text.charCodeAt(endOffset)
-    // 0-9 digits
-    while (charCode >= 48 && charCode <= 57) {
-        endOffset++
-        charCode = text.charCodeAt(endOffset)
-    }
+  let endOffset = startOffset
+  let charCode = text.charCodeAt(endOffset)
+  // 0-9 digits
+  while (charCode >= 48 && charCode <= 57) {
+    endOffset++
+    charCode = text.charCodeAt(endOffset)
+  }
 
-    // No match, must return null to conform with the RegExp.prototype.exec signature
-    if (endOffset === startOffset) {
-        return null
-    } else {
-        let matchedString = text.substring(startOffset, endOffset)
-        // according to the RegExp.prototype.exec API the first item in the returned array must be the whole matched string.
-        return [matchedString]
-    }
+  // No match, must return null to conform with the RegExp.prototype.exec signature
+  if (endOffset === startOffset) {
+    return null
+  } else {
+    let matchedString = text.substring(startOffset, endOffset)
+    // according to the RegExp.prototype.exec API the first item in the returned array must be the whole matched string.
+    return [matchedString]
+  }
 }
 
 const IntegerToken = createToken({
-    name: "IntegerToken",
-    pattern: matchInteger
+  name: "IntegerToken",
+  pattern: matchInteger
 })
 ```
 

@@ -8,9 +8,9 @@ For example:
 
 ```javascript
 const Comment = createToken({
-    name: "Comment",
-    pattern: /\/\/.+/,
-    group: "comments"
+  name: "Comment",
+  pattern: /\/\/.+/,
+  group: "comments"
 })
 ```
 

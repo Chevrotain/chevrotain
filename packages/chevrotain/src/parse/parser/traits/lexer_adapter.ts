@@ -10,73 +10,73 @@ import { MixedInParser } from "./parser_traits"
  * - Streaming Lexer.
  */
 export class LexerAdapter {
-    tokVector: IToken[]
-    tokVectorLength
-    currIdx: number
+  tokVector: IToken[]
+  tokVectorLength
+  currIdx: number
 
-    initLexerAdapter() {
-        this.tokVector = []
-        this.tokVectorLength = 0
-        this.currIdx = -1
-    }
+  initLexerAdapter() {
+    this.tokVector = []
+    this.tokVectorLength = 0
+    this.currIdx = -1
+  }
 
-    set input(this: MixedInParser, newInput: IToken[]) {
-        if (this.selfAnalysisDone !== true) {
-            throw Error(
-                `Missing <performSelfAnalysis> invocation at the end of the Parser's constructor.`
-            )
-        }
-        this.reset()
-        this.tokVector = newInput
-        this.tokVectorLength = newInput.length
+  set input(this: MixedInParser, newInput: IToken[]) {
+    if (this.selfAnalysisDone !== true) {
+      throw Error(
+        `Missing <performSelfAnalysis> invocation at the end of the Parser's constructor.`
+      )
     }
+    this.reset()
+    this.tokVector = newInput
+    this.tokVectorLength = newInput.length
+  }
 
-    get input(this: MixedInParser): IToken[] {
-        return this.tokVector
-    }
+  get input(this: MixedInParser): IToken[] {
+    return this.tokVector
+  }
 
-    // skips a token and returns the next token
-    SKIP_TOKEN(this: MixedInParser): IToken {
-        if (this.currIdx <= this.tokVector.length - 2) {
-            this.consumeToken()
-            return this.LA(1)
-        } else {
-            return END_OF_FILE
-        }
+  // skips a token and returns the next token
+  SKIP_TOKEN(this: MixedInParser): IToken {
+    if (this.currIdx <= this.tokVector.length - 2) {
+      this.consumeToken()
+      return this.LA(1)
+    } else {
+      return END_OF_FILE
     }
+  }
 
-    // Lexer (accessing Token vector) related methods which can be overridden to implement lazy lexers
-    // or lexers dependent on parser context.
-    LA(this: MixedInParser, howMuch: number): IToken {
-        const soughtIdx = this.currIdx + howMuch
-        if (soughtIdx < 0 || this.tokVectorLength <= soughtIdx) {
-            return END_OF_FILE
-        } else {
-            return this.tokVector[soughtIdx]
-        }
+  // Lexer (accessing Token vector) related methods which can be overridden to implement lazy lexers
+  // or lexers dependent on parser context.
+  LA(this: MixedInParser, howMuch: number): IToken {
+    const soughtIdx = this.currIdx + howMuch
+    if (soughtIdx < 0 || this.tokVectorLength <= soughtIdx) {
+      return END_OF_FILE
+    } else {
+      return this.tokVector[soughtIdx]
     }
+  }
 
-    consumeToken(this: MixedInParser) {
-        this.currIdx++
-    }
+  consumeToken(this: MixedInParser) {
+    this.currIdx++
+  }
 
-    exportLexerState(this: MixedInParser): number {
-        return this.currIdx
-    }
+  exportLexerState(this: MixedInParser): number {
+    return this.currIdx
+  }
 
-    importLexerState(this: MixedInParser, newState: number) {
-        this.currIdx = newState
-    }
+  importLexerState(this: MixedInParser, newState: number) {
+    this.currIdx = newState
+  }
 
-    resetLexerState(this: MixedInParser): void {
-        this.currIdx = -1
-    }
+  resetLexerState(this: MixedInParser): void {
+    this.currIdx = -1
+  }
 
-    moveToTerminatedState(this: MixedInParser): void {
-        this.currIdx = this.tokVector.length - 1
-    }
+  moveToTerminatedState(this: MixedInParser): void {
+    this.currIdx = this.tokVector.length - 1
+  }
 
-    getLexerPosition(this: MixedInParser): number {
-        return this.exportLexerState()
-    }
+  getLexerPosition(this: MixedInParser): number {
+    return this.exportLexerState()
+  }
 }

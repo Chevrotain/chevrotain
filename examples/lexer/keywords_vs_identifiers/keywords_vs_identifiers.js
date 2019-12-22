@@ -18,51 +18,51 @@ const { createToken, Lexer } = require("chevrotain")
 const Identifier = createToken({ name: "Identifier", pattern: /[a-zA-z]\w+/ })
 
 const While = createToken({
-    name: "While",
-    pattern: /while/,
-    longer_alt: Identifier
+  name: "While",
+  pattern: /while/,
+  longer_alt: Identifier
 })
 
 const For = createToken({
-    name: "For",
-    pattern: /for/,
-    longer_alt: Identifier
+  name: "For",
+  pattern: /for/,
+  longer_alt: Identifier
 })
 const Do = createToken({
-    name: "Do",
-    pattern: /do/,
-    longer_alt: Identifier
+  name: "Do",
+  pattern: /do/,
+  longer_alt: Identifier
 })
 const Whitespace = createToken({
-    name: "Whitespace",
-    pattern: /\s+/,
-    group: Lexer.SKIPPED
+  name: "Whitespace",
+  pattern: /\s+/,
+  group: Lexer.SKIPPED
 })
 
 keywordsVsIdentifiersLexer = new Lexer([
-    Whitespace, // Whitespace is very common in most languages so placing it first generally speeds up the lexing.
+  Whitespace, // Whitespace is very common in most languages so placing it first generally speeds up the lexing.
 
-    While, // the actual keywords (While/For/Do) must appear BEFORE the Identifier Token as they are all a valid prefix of it's PATTERN.
-    For, // However the edge case of an Identifier with a prefix which is a valid keyword must still be handled, for example:
-    Do, // 'do' vs 'done' or 'for' vs 'forEach'. This is solved by defining 'Keyword.LONGER_ALT = Identifier'/
-    // thus each time a Keyword is detected the Lexer will also try to match a LONGER Identifier..
+  While, // the actual keywords (While/For/Do) must appear BEFORE the Identifier Token as they are all a valid prefix of it's PATTERN.
+  For, // However the edge case of an Identifier with a prefix which is a valid keyword must still be handled, for example:
+  Do, // 'do' vs 'done' or 'for' vs 'forEach'. This is solved by defining 'Keyword.LONGER_ALT = Identifier'/
+  // thus each time a Keyword is detected the Lexer will also try to match a LONGER Identifier..
 
-    Identifier // As mentioned above, the Identifier Token must appear after ALL the Keyword Tokens
+  Identifier // As mentioned above, the Identifier Token must appear after ALL the Keyword Tokens
 ])
 
 module.exports = {
-    Identifier: Identifier,
-    While: While,
-    For: For,
-    Do: Do,
-    Whitespace: Whitespace,
+  Identifier: Identifier,
+  While: While,
+  For: For,
+  Do: Do,
+  Whitespace: Whitespace,
 
-    tokenize: function(text) {
-        const lexResult = keywordsVsIdentifiersLexer.tokenize(text)
+  tokenize: function(text) {
+    const lexResult = keywordsVsIdentifiersLexer.tokenize(text)
 
-        if (lexResult.errors.length > 0) {
-            throw new Error("sad sad panda lexing errors detected")
-        }
-        return lexResult
+    if (lexResult.errors.length > 0) {
+      throw new Error("sad sad panda lexing errors detected")
     }
+    return lexResult
+  }
 }

@@ -10,32 +10,32 @@ console.log("updating api docs re-direct")
 const version = pkg.version
 const noDotsVersion = version.replace(/\./g, "_")
 const newVersionApiDocsDir = path.join(
-    __dirname,
-    "../gh-pages/documentation/" + noDotsVersion
+  __dirname,
+  "../gh-pages/documentation/" + noDotsVersion
 )
 
 try {
-    stats = fs.lstatSync(newVersionApiDocsDir)
+  stats = fs.lstatSync(newVersionApiDocsDir)
 
-    if (stats.isDirectory()) {
-        console.error("docs directory for " + noDotsVersion + " already exists")
-        process.exit(-1)
-    }
+  if (stats.isDirectory()) {
+    console.error("docs directory for " + noDotsVersion + " already exists")
+    process.exit(-1)
+  }
 } catch (e) {
-    // no issues it does not exist
+  // no issues it does not exist
 }
 
 // Update redirect to latest docs
 const docsIndexHtmlPath = path.join(
-    __dirname,
-    "../gh-pages/documentation/index.html"
+  __dirname,
+  "../gh-pages/documentation/index.html"
 )
 const docsIndexHtmlString = fs
-    .readFileSync(docsIndexHtmlPath, "utf8")
-    .toString()
+  .readFileSync(docsIndexHtmlPath, "utf8")
+  .toString()
 const bumpedDocsIndexHtmlString = docsIndexHtmlString.replace(
-    /\d+_\d+_\d+/,
-    noDotsVersion
+  /\d+_\d+_\d+/,
+  noDotsVersion
 )
 fs.writeFileSync(docsIndexHtmlPath, bumpedDocsIndexHtmlString)
 

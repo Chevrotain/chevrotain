@@ -2,8 +2,8 @@ const { expect } = require("chai")
 const { parse } = require("./graphql")
 
 describe("The GraphQL Grammar", () => {
-    it("can parse a simple GraphQL without errors", () => {
-        const input = `
+  it("can parse a simple GraphQL without errors", () => {
+    const input = `
 {
   hero {
     name
@@ -14,13 +14,13 @@ describe("The GraphQL Grammar", () => {
   }
 }
 `
-        const parseResult = parse(input)
-        expect(parseResult.lexErrors).to.be.empty
-        expect(parseResult.parseErrors).to.be.empty
-    })
+    const parseResult = parse(input)
+    expect(parseResult.lexErrors).to.be.empty
+    expect(parseResult.parseErrors).to.be.empty
+  })
 
-    it("can parse a simple GraphQL without errors #2", () => {
-        const input = `
+  it("can parse a simple GraphQL without errors #2", () => {
+    const input = `
 {
     human(id: "1000") {
     name
@@ -28,13 +28,13 @@ describe("The GraphQL Grammar", () => {
 }
 }
 `
-        const parseResult = parse(input)
-        expect(parseResult.lexErrors).to.be.empty
-        expect(parseResult.parseErrors).to.be.empty
-    })
+    const parseResult = parse(input)
+    expect(parseResult.lexErrors).to.be.empty
+    expect(parseResult.parseErrors).to.be.empty
+  })
 
-    it("can parse a simple GraphQL without errors #3", () => {
-        const input = `
+  it("can parse a simple GraphQL without errors #3", () => {
+    const input = `
 type Human implements Character {
   id: ID!
   name: String!
@@ -52,8 +52,8 @@ type Droid implements Character {
   primaryFunction: String
 }
 `
-        const parseResult = parse(input)
-        expect(parseResult.lexErrors).to.be.empty
-        expect(parseResult.parseErrors).to.be.empty
-    })
+    const parseResult = parse(input)
+    expect(parseResult.lexErrors).to.be.empty
+    expect(parseResult.parseErrors).to.be.empty
+  })
 })

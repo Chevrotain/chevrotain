@@ -1,9 +1,9 @@
 # Resolving Grammar Errors
 
--   [Common Prefix Ambiguities.](#COMMON_PREFIX)
--   [Ambiguous Alternatives Detected.](#AMBIGUOUS_ALTERNATIVES)
--   [Terminal Token Name Not Found.](#TERMINAL_NAME_NOT_FOUND)
--   [Infinite Loop Detected.](#INFINITE_LOOP)
+- [Common Prefix Ambiguities.](#COMMON_PREFIX)
+- [Ambiguous Alternatives Detected.](#AMBIGUOUS_ALTERNATIVES)
+- [Terminal Token Name Not Found.](#TERMINAL_NAME_NOT_FOUND)
+- [Infinite Loop Detected.](#INFINITE_LOOP)
 
 ## Common Prefix Ambiguities
 
@@ -25,21 +25,21 @@ as alternation matches are attempted **in order**.
 
 There are two ways to resolve this:
 
--   Reorder the alternatives so that shorter common prefix lookahead
-    paths appears after the longer ones.
+- Reorder the alternatives so that shorter common prefix lookahead
+  paths appears after the longer ones.
 
-    ```antlr
+  ```antlr
+  myRule:
+    "A" "B" "C" |
+    "A" "B"
+  ```
+
+- Refactor the grammar to extract common prefixes.
+
+  ```antlr
     myRule:
-      "A" "B" "C" |
-      "A" "B"
-    ```
-
--   Refactor the grammar to extract common prefixes.
-
-    ```antlr
-      myRule:
-        "A" "B" ("C")?
-    ```
+      "A" "B" ("C")?
+  ```
 
 ## Ambiguous Alternatives Detected
 
@@ -115,8 +115,8 @@ if you have not yet upgraded.
 
 ## Infinite Loop Detected
 
--   Note **This error is only relevant in versions prior to 4.4.0**
-    See: https://github.com/SAP/chevrotain/issues/958
+- Note **This error is only relevant in versions prior to 4.4.0**
+  See: https://github.com/SAP/chevrotain/issues/958
 
 A repetition must consume at least one token in each iteration.
 Entering an iteration while failing to do so would cause an **infinite loop** because
@@ -126,7 +126,7 @@ not been changed. essentially this creates a flow that looks like:
 ```javascript
 // iteration lookahead condition (always true)
 while (true) {
-    // single iteration grammar
+  // single iteration grammar
 }
 ```
 
@@ -134,9 +134,9 @@ Lets look at a few real examples that can cause this error
 
 ```javascript
 $.MANY(() => {
-    return
-    // unreachable code
-    $.CONSUME(Plus)
+  return
+  // unreachable code
+  $.CONSUME(Plus)
 })
 ```
 
@@ -146,10 +146,10 @@ The condition (nextToken === Plus) would still be true.
 
 ```javascript
 $.MANY(() => {
-    // Never wrap Chevrotain grammar in JavaScript control flow constructs.
-    if (condition) {
-        $.CONSUME(Plus)
-    }
+  // Never wrap Chevrotain grammar in JavaScript control flow constructs.
+  if (condition) {
+    $.CONSUME(Plus)
+  }
 })
 ```
 
@@ -162,9 +162,9 @@ For example the above example should be written as:
 
 ```javascript
 $.MANY(() => {
-    $.OPTION(() => {
-        $.CONSUME(Plus)
-    })
+  $.OPTION(() => {
+    $.CONSUME(Plus)
+  })
 })
 ```
 

@@ -1,21 +1,21 @@
 import { ILexerErrorMessageProvider, IToken } from "../../api"
 
 export const defaultLexerErrorProvider: ILexerErrorMessageProvider = {
-    buildUnableToPopLexerModeMessage(token: IToken): string {
-        return `Unable to pop Lexer Mode after encountering Token ->${token.image}<- The Mode Stack is empty`
-    },
+  buildUnableToPopLexerModeMessage(token: IToken): string {
+    return `Unable to pop Lexer Mode after encountering Token ->${token.image}<- The Mode Stack is empty`
+  },
 
-    buildUnexpectedCharactersMessage(
-        fullText: string,
-        startOffset: number,
-        length: number,
-        line?: number,
-        column?: number
-    ): string {
-        return (
-            `unexpected character: ->${fullText.charAt(
-                startOffset
-            )}<- at offset: ${startOffset},` + ` skipped ${length} characters.`
-        )
-    }
+  buildUnexpectedCharactersMessage(
+    fullText: string,
+    startOffset: number,
+    length: number,
+    line?: number,
+    column?: number
+  ): string {
+    return (
+      `unexpected character: ->${fullText.charAt(
+        startOffset
+      )}<- at offset: ${startOffset},` + ` skipped ${length} characters.`
+    )
+  }
 }

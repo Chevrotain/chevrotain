@@ -5,5 +5,5 @@ See: [detailed documentation](https://sap.github.io/chevrotain/docs/guide/custom
 
 To run the tests for all the tutorial parts:
 
--   `npm install` (only once)
--   `npm test`
+- `npm install` (only once)
+- `npm test`

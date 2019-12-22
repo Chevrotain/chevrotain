@@ -1,15 +1,15 @@
 import { forEach, map } from "../utils/utils"
 import {
-    RepetitionMandatory,
-    Option,
-    RepetitionMandatoryWithSeparator,
-    RepetitionWithSeparator,
-    Rule,
-    Terminal,
-    NonTerminal,
-    Alternation,
-    Flat,
-    Repetition
+  RepetitionMandatory,
+  Option,
+  RepetitionMandatoryWithSeparator,
+  RepetitionWithSeparator,
+  Rule,
+  Terminal,
+  NonTerminal,
+  Alternation,
+  Flat,
+  Repetition
 } from "../parse/grammar/gast/gast_public"
 import { IProduction, TokenType } from "../../api"
 
@@ -23,7 +23,7 @@ import { IProduction, TokenType } from "../../api"
 const NL = "\n"
 
 export function genUmdModule(options: { name: string; rules: Rule[] }): string {
-    return `
+  return `
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
@@ -49,18 +49,18 @@ return {
 }
 
 export function genWrapperFunction(options: {
-    name: string
-    rules: Rule[]
+  name: string
+  rules: Rule[]
 }): string {
-    return `    
+  return `    
 ${genClass(options)}
 return new ${options.name}(tokenVocabulary, config)    
 `
 }
 
 export function genClass(options: { name: string; rules: Rule[] }): string {
-    // TODO: how to pass the token vocabulary? Constructor? other?
-    let result = `
+  // TODO: how to pass the token vocabulary? Constructor? other?
+  let result = `
 function ${options.name}(tokenVocabulary, config) {
     // invoke super constructor
     // No support for embedded actions currently, so we can 'hardcode'
@@ -82,130 +82,128 @@ ${options.name}.prototype = Object.create(chevrotain.CstParser.prototype)
 ${options.name}.prototype.constructor = ${options.name}    
     `
 
-    return result
+  return result
 }
 
 export function genAllRules(rules: Rule[]): string {
-    let rulesText = map(rules, currRule => {
-        return genRule(currRule, 1)
-    })
+  let rulesText = map(rules, currRule => {
+    return genRule(currRule, 1)
+  })
 
-    return rulesText.join("\n")
+  return rulesText.join("\n")
 }
 
 export function genRule(prod: Rule, n: number): string {
-    let result = indent(n, `$.RULE("${prod.name}", function() {`) + NL
-    result += genDefinition(prod.definition, n + 1)
-    result += indent(n + 1, `})`) + NL
-    return result
+  let result = indent(n, `$.RULE("${prod.name}", function() {`) + NL
+  result += genDefinition(prod.definition, n + 1)
+  result += indent(n + 1, `})`) + NL
+  return result
 }
 
 export function genTerminal(prod: Terminal, n: number): string {
-    const name = prod.terminalType.name
-    // TODO: potential performance optimization, avoid tokenMap Dictionary access
-    return indent(n, `$.CONSUME${prod.idx}(this.tokensMap.${name})` + NL)
+  const name = prod.terminalType.name
+  // TODO: potential performance optimization, avoid tokenMap Dictionary access
+  return indent(n, `$.CONSUME${prod.idx}(this.tokensMap.${name})` + NL)
 }
 
 export function genNonTerminal(prod: NonTerminal, n: number): string {
-    return indent(n, `$.SUBRULE${prod.idx}($.${prod.nonTerminalName})` + NL)
+  return indent(n, `$.SUBRULE${prod.idx}($.${prod.nonTerminalName})` + NL)
 }
 
 export function genAlternation(prod: Alternation, n: number): string {
-    let result = indent(n, `$.OR${prod.idx}([`) + NL
-    const alts = map(prod.definition, altDef => genSingleAlt(altDef, n + 1))
-    result += alts.join("," + NL)
-    result += NL + indent(n, `])` + NL)
-    return result
+  let result = indent(n, `$.OR${prod.idx}([`) + NL
+  const alts = map(prod.definition, altDef => genSingleAlt(altDef, n + 1))
+  result += alts.join("," + NL)
+  result += NL + indent(n, `])` + NL)
+  return result
 }
 
 export function genSingleAlt(prod: Flat, n: number): string {
-    let result = indent(n, `{`) + NL
+  let result = indent(n, `{`) + NL
 
-    if (prod.name) {
-        result += indent(n + 1, `NAME: "${prod.name}",`) + NL
-    }
-    result += indent(n + 1, "ALT: function() {") + NL
-    result += genDefinition(prod.definition, n + 1)
-    result += indent(n + 1, `}`) + NL
-    result += indent(n, `}`)
+  if (prod.name) {
+    result += indent(n + 1, `NAME: "${prod.name}",`) + NL
+  }
+  result += indent(n + 1, "ALT: function() {") + NL
+  result += genDefinition(prod.definition, n + 1)
+  result += indent(n + 1, `}`) + NL
+  result += indent(n, `}`)
 
-    return result
+  return result
 }
 
 function genProd(prod: IProduction, n: number): string {
-    /* istanbul ignore else */
-    if (prod instanceof NonTerminal) {
-        return genNonTerminal(prod, n)
-    } else if (prod instanceof Option) {
-        return genDSLRule("OPTION", prod, n)
-    } else if (prod instanceof RepetitionMandatory) {
-        return genDSLRule("AT_LEAST_ONE", prod, n)
-    } else if (prod instanceof RepetitionMandatoryWithSeparator) {
-        return genDSLRule("AT_LEAST_ONE_SEP", prod, n)
-    } else if (prod instanceof RepetitionWithSeparator) {
-        return genDSLRule("MANY_SEP", prod, n)
-    } else if (prod instanceof Repetition) {
-        return genDSLRule("MANY", prod, n)
-    } else if (prod instanceof Alternation) {
-        return genAlternation(prod, n)
-    } else if (prod instanceof Terminal) {
-        return genTerminal(prod, n)
-    } else if (prod instanceof Flat) {
-        return genDefinition(prod.definition, n)
-    } else {
-        throw Error("non exhaustive match")
-    }
+  /* istanbul ignore else */
+  if (prod instanceof NonTerminal) {
+    return genNonTerminal(prod, n)
+  } else if (prod instanceof Option) {
+    return genDSLRule("OPTION", prod, n)
+  } else if (prod instanceof RepetitionMandatory) {
+    return genDSLRule("AT_LEAST_ONE", prod, n)
+  } else if (prod instanceof RepetitionMandatoryWithSeparator) {
+    return genDSLRule("AT_LEAST_ONE_SEP", prod, n)
+  } else if (prod instanceof RepetitionWithSeparator) {
+    return genDSLRule("MANY_SEP", prod, n)
+  } else if (prod instanceof Repetition) {
+    return genDSLRule("MANY", prod, n)
+  } else if (prod instanceof Alternation) {
+    return genAlternation(prod, n)
+  } else if (prod instanceof Terminal) {
+    return genTerminal(prod, n)
+  } else if (prod instanceof Flat) {
+    return genDefinition(prod.definition, n)
+  } else {
+    throw Error("non exhaustive match")
+  }
 }
 
 function genDSLRule(
-    dslName,
-    prod: {
-        definition: IProduction[]
-        idx: number
-        name?: string
-        separator?: TokenType
-    },
-    n: number
+  dslName,
+  prod: {
+    definition: IProduction[]
+    idx: number
+    name?: string
+    separator?: TokenType
+  },
+  n: number
 ): string {
-    let result = indent(n, `$.${dslName + prod.idx}(`)
+  let result = indent(n, `$.${dslName + prod.idx}(`)
 
-    if (prod.name || prod.separator) {
-        result += "{" + NL
-        if (prod.name) {
-            result += indent(n + 1, `NAME: "${prod.name}"`) + "," + NL
-        }
-        if (prod.separator) {
-            result +=
-                indent(n + 1, `SEP: this.tokensMap.${prod.separator.name}`) +
-                "," +
-                NL
-        }
-        result += `DEF: ${genDefFunction(prod.definition, n + 2)}` + NL
-        result += indent(n, "}") + NL
-    } else {
-        result += genDefFunction(prod.definition, n + 1)
+  if (prod.name || prod.separator) {
+    result += "{" + NL
+    if (prod.name) {
+      result += indent(n + 1, `NAME: "${prod.name}"`) + "," + NL
     }
+    if (prod.separator) {
+      result +=
+        indent(n + 1, `SEP: this.tokensMap.${prod.separator.name}`) + "," + NL
+    }
+    result += `DEF: ${genDefFunction(prod.definition, n + 2)}` + NL
+    result += indent(n, "}") + NL
+  } else {
+    result += genDefFunction(prod.definition, n + 1)
+  }
 
-    result += indent(n, `)`) + NL
-    return result
+  result += indent(n, `)`) + NL
+  return result
 }
 
 function genDefFunction(definition: IProduction[], n: number): string {
-    let def = "function() {" + NL
-    def += genDefinition(definition, n)
-    def += indent(n, `}`) + NL
-    return def
+  let def = "function() {" + NL
+  def += genDefinition(definition, n)
+  def += indent(n, `}`) + NL
+  return def
 }
 
 function genDefinition(def: IProduction[], n: number): string {
-    let result = ""
-    forEach(def, prod => {
-        result += genProd(prod, n + 1)
-    })
-    return result
+  let result = ""
+  forEach(def, prod => {
+    result += genProd(prod, n + 1)
+  })
+  return result
 }
 
 function indent(howMuch: number, text: string): string {
-    const spaces = Array(howMuch * 4 + 1).join(" ")
-    return spaces + text
+  const spaces = Array(howMuch * 4 + 1).join(" ")
+  return spaces + text
 }

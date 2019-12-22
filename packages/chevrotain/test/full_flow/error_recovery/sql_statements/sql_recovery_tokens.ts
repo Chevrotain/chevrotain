@@ -1,14 +1,14 @@
 export class VirtualToken {
-    static PATTERN = /NA/
+  static PATTERN = /NA/
 }
 
 export class IdentTok {
-    static PATTERN = /NA/
+  static PATTERN = /NA/
 }
 
 // DOCS: once again an example of Token types hierarchies
 export class LiteralTok {
-    static PATTERN = /NA/
+  static PATTERN = /NA/
 }
 export class StringTok extends LiteralTok {}
 export class IntTok extends LiteralTok {}
@@ -16,7 +16,7 @@ export class IntTok extends LiteralTok {}
 export class BigIntTok extends IntTok {}
 
 export class Keyword {
-    static PATTERN = /NA/
+  static PATTERN = /NA/
 }
 
 export class CreateTok extends Keyword {}
@@ -32,23 +32,23 @@ export class DeleteTok extends Keyword {}
 export class FromTok extends Keyword {}
 
 export class LParenTok {
-    static PATTERN = /NA/
+  static PATTERN = /NA/
 }
 
 export class RParenTok {
-    static PATTERN = /NA/
+  static PATTERN = /NA/
 }
 
 export class CommaTok {
-    static PATTERN = /NA/
+  static PATTERN = /NA/
 }
 
 export class SemiColonTok {
-    static PATTERN = /NA/
+  static PATTERN = /NA/
 }
 
 export class DotTok {
-    static PATTERN = /NA/
+  static PATTERN = /NA/
 }
 
 /* tslint:disable:class-name */

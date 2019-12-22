@@ -26,7 +26,7 @@ See some [existing examples][examples] to get started.
 
 Details:
 
--   An Example **must** include some tests with a **\_spec.js** suffix.
+- An Example **must** include some tests with a **\_spec.js** suffix.
 
 #### Contributing To Chevrotain's Runtime Source code.
 
@@ -34,8 +34,8 @@ This can be more complex as more in-depth knowledge of chevrotain internals may 
 
 Details:
 
--   ~100% test coverage is **required**.
-    -   It is possible to disable coverage for specific code, but there must be a very good reason to do so.
+- ~100% test coverage is **required**.
+  - It is possible to disable coverage for specific code, but there must be a very good reason to do so.
 
 ## Development Environment
 
@@ -49,20 +49,20 @@ Examine the interal [packages/chevrotain/package.json][package] scripts for all 
 
 In the root of this Repo:
 
--   `yarn`
--   `yarn build`
+- `yarn`
+- `yarn build`
 
 #### Some basic dev flows to get started
 
 Chevrotain is written using Typescript, so compilation to JavaScript is needed.
 
--   `cd packages/chevrotain`
--   `yarn compile`
+- `cd packages/chevrotain`
+- `yarn compile`
 
 Alternatively during development one would want to recompile on file changes.
 
--   `cd packages/chevrotain`
--   `yarn compile:watch`
+- `cd packages/chevrotain`
+- `yarn compile:watch`
 
 The compilation result will appear in the **lib** folder.
 
@@ -79,48 +79,48 @@ Chevrotain uses several different types of tests to promote high quality.
 
 The most basic ones are the **mocha unit tests**, which are also often the most relevant ones.
 
--   `cd packages/chevrotain`
--   `yarn coverage`
+- `cd packages/chevrotain`
+- `yarn coverage`
 
 You can run the whole test suite by running:
 
--   `cd packages/chevrotain`
--   `yarn test`
+- `cd packages/chevrotain`
+- `yarn test`
 
 Additionally **integration tests** are used to test Chevrotain as an end user via the examples packages
 tests.
 
--   In this repo's root
--   `yarn test`
+- In this repo's root
+- `yarn test`
 
 #### Running the central CI flow locally.
 
 This is just another yarn task which performs the whole flow
 including linting / doc generation / d.ts API creation / ...
 
--   `yarn run ci_full_build`
-    -   Node > 4 is required to pass the coverage checks.
+- `yarn run ci_full_build`
+  - Node > 4 is required to pass the coverage checks.
 
 #### Release Process
 
 The release process **requires push permissions to master**.
 
--   Update the [CHANGELOG](./packages/chevrotain/docs/changes/CHANGELOG.md).
-    -   The header must be `## X.Y.Z (INSERT_DATE_HERE)` (**literally**).
--   Update the [BREAKING_CHANGES.md](./packages/chevrotain/docs/changes/BREAKING_CHANGES.md).
-    -   Only for major versions...
--   Push the changes related updates to master.
--   execute `yarn run lerna:version` and follow the instructions.
-    -   This will update version related files and push a new version **tag** to github.
-    -   Circle-CI will execute a deployment to npmjs.com due to this new tag.
-    -   Additionally new website contents will be pushed to the gh-pages branch.
--   Check that the release was successful.
+- Update the [CHANGELOG](./packages/chevrotain/docs/changes/CHANGELOG.md).
+  - The header must be `## X.Y.Z (INSERT_DATE_HERE)` (**literally**).
+- Update the [BREAKING_CHANGES.md](./packages/chevrotain/docs/changes/BREAKING_CHANGES.md).
+  - Only for major versions...
+- Push the changes related updates to master.
+- execute `yarn run lerna:version` and follow the instructions.
+  - This will update version related files and push a new version **tag** to github.
+  - Circle-CI will execute a deployment to npmjs.com due to this new tag.
+  - Additionally new website contents will be pushed to the gh-pages branch.
+- Check that the release was successful.
 
-    -   On [circle-ci](https://circleci.com/gh/SAP/chevrotain)
-    -   On [npmjs.com](https://www.npmjs.com/package/chevrotain)
-    -   On [The website](https://sap.github.io/chevrotain/docs/changes/CHANGELOG.html)
-    -   On [The APIs webpage](https://sap.github.io/chevrotain/documentation/)
-        -   The URL being redirected to should include the latest version number.
+  - On [circle-ci](https://circleci.com/gh/SAP/chevrotain)
+  - On [npmjs.com](https://www.npmjs.com/package/chevrotain)
+  - On [The website](https://sap.github.io/chevrotain/docs/changes/CHANGELOG.html)
+  - On [The APIs webpage](https://sap.github.io/chevrotain/documentation/)
+    - The URL being redirected to should include the latest version number.
 
 #### Legal
 

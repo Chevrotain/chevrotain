@@ -26,77 +26,77 @@ const Wonderful = createToken({ name: "Wonderful", pattern: /wonderful/ })
 const Amazing = createToken({ name: "Amazing", pattern: /amazing/ })
 
 const WhiteSpace = createToken({
-    name: "WhiteSpace",
-    pattern: /\s+/,
-    group: Lexer.SKIPPED
+  name: "WhiteSpace",
+  pattern: /\s+/,
+  group: Lexer.SKIPPED
 })
 
 const allTokens = [
-    WhiteSpace,
-    Hello,
-    World,
-    Cruel,
-    Bad,
-    Evil,
-    Good,
-    Wonderful,
-    Amazing
+  WhiteSpace,
+  Hello,
+  World,
+  Cruel,
+  Bad,
+  Evil,
+  Good,
+  Wonderful,
+  Amazing
 ]
 
 const HelloLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
 class HelloParser extends CstParser {
-    constructor() {
-        super(allTokens)
+  constructor() {
+    super(allTokens)
 
-        const $ = this
+    const $ = this
 
-        $.RULE("topRule", mood => {
-            // Passing arguments via a SUBRULE is done using a config object
-            $.SUBRULE($.hello, { ARGS: [mood] })
-        })
+    $.RULE("topRule", mood => {
+      // Passing arguments via a SUBRULE is done using a config object
+      $.SUBRULE($.hello, { ARGS: [mood] })
+    })
 
-        // the <hello> rule's implementation is defined with a <mood> parameter
-        $.RULE("hello", mood => {
-            $.CONSUME(Hello)
+    // the <hello> rule's implementation is defined with a <mood> parameter
+    $.RULE("hello", mood => {
+      $.CONSUME(Hello)
 
-            // The mood parameter is used to determine which path to take
-            $.OR([
-                {
-                    GATE: () => mood === "positive",
-                    ALT: () => $.SUBRULE($.positive)
-                },
-                {
-                    GATE: () => mood === "negative",
-                    ALT: () => $.SUBRULE($.negative)
-                }
-            ])
+      // The mood parameter is used to determine which path to take
+      $.OR([
+        {
+          GATE: () => mood === "positive",
+          ALT: () => $.SUBRULE($.positive)
+        },
+        {
+          GATE: () => mood === "negative",
+          ALT: () => $.SUBRULE($.negative)
+        }
+      ])
 
-            $.CONSUME(World)
-        })
+      $.CONSUME(World)
+    })
 
-        $.RULE("negative", () => {
-            $.OR([
-                { ALT: () => $.CONSUME(Cruel) },
-                { ALT: () => $.CONSUME(Bad) },
-                { ALT: () => $.CONSUME(Evil) }
-            ])
-        })
+    $.RULE("negative", () => {
+      $.OR([
+        { ALT: () => $.CONSUME(Cruel) },
+        { ALT: () => $.CONSUME(Bad) },
+        { ALT: () => $.CONSUME(Evil) }
+      ])
+    })
 
-        $.RULE("positive", () => {
-            $.OR([
-                { ALT: () => $.CONSUME(Good) },
-                { ALT: () => $.CONSUME(Wonderful) },
-                { ALT: () => $.CONSUME(Amazing) }
-            ])
-        })
+    $.RULE("positive", () => {
+      $.OR([
+        { ALT: () => $.CONSUME(Good) },
+        { ALT: () => $.CONSUME(Wonderful) },
+        { ALT: () => $.CONSUME(Amazing) }
+      ])
+    })
 
-        // very important to call this after all the rules have been defined.
-        // otherwise the parser may not work correctly as it will lack information
-        // derived during the self analysis phase.
-        this.performSelfAnalysis()
-    }
+    // very important to call this after all the rules have been defined.
+    // otherwise the parser may not work correctly as it will lack information
+    // derived during the self analysis phase.
+    this.performSelfAnalysis()
+  }
 }
 
 // ----------------- wrapping it all together -----------------
@@ -105,20 +105,20 @@ class HelloParser extends CstParser {
 const parser = new HelloParser()
 
 module.exports = function(text, mood) {
-    const lexResult = HelloLexer.tokenize(text)
+  const lexResult = HelloLexer.tokenize(text)
 
-    // setting a new input will RESET the parser instance's state.
-    parser.input = lexResult.tokens
+  // setting a new input will RESET the parser instance's state.
+  parser.input = lexResult.tokens
 
-    // Passing the argument to the top rule.
-    // note that because we are invoking a "start rule" we must provide the arguments as the second parameter.
-    // with the first parameter provided the value <1>
-    // also note that the arguments are passed as an array
-    const cst = parser.topRule(1, [mood])
+  // Passing the argument to the top rule.
+  // note that because we are invoking a "start rule" we must provide the arguments as the second parameter.
+  // with the first parameter provided the value <1>
+  // also note that the arguments are passed as an array
+  const cst = parser.topRule(1, [mood])
 
-    return {
-        cst: cst,
-        lexErrors: lexResult.errors,
-        parseErrors: parser.errors
-    }
+  return {
+    cst: cst,
+    lexErrors: lexResult.errors,
+    parseErrors: parser.errors
+  }
 }

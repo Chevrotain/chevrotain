@@ -1,18 +1,18 @@
 # Resolving Lexer Errors
 
--   **Warnings**
-    -   [No LINE_BREAKS Found.](#LINE_BREAKS)
-    -   [Unable to identify line terminator usage in pattern.](#IDENTIFY_TERMINATOR)
-    -   [A Custom Token Pattern should specify the <line_breaks> option.](#CUSTOM_LINE_BREAK)
-    -   [Failed parsing < /.../ > Using the regexp-to-ast library.](#REGEXP_PARSING)
-    -   [The regexp unicode flag is not currently supported by the regexp-to-ast library.](#UNICODE_OPTIMIZE)
-    -   [Complement Sets cannot be automatically optimized.](#COMPLEMENT)
+- **Warnings**
+  - [No LINE_BREAKS Found.](#LINE_BREAKS)
+  - [Unable to identify line terminator usage in pattern.](#IDENTIFY_TERMINATOR)
+  - [A Custom Token Pattern should specify the <line_breaks> option.](#CUSTOM_LINE_BREAK)
+  - [Failed parsing < /.../ > Using the regexp-to-ast library.](#REGEXP_PARSING)
+  - [The regexp unicode flag is not currently supported by the regexp-to-ast library.](#UNICODE_OPTIMIZE)
+  - [Complement Sets cannot be automatically optimized.](#COMPLEMENT)
 
-*   **Errors**
-    -   [Unexpected RegExp Anchor Error.](#ANCHORS)
-    -   [Token Can Never Be Matched.](#UNREACHABLE)
-    -   [TokenType <...> is using a custom token pattern without providing <char_start_hint> parameter](#CUSTOM_OPTIMIZE)
-    -   [Missing \<lineTerminatorCharacters\> property on the Lexer config.](#MISSING_LINE_TERM_CHARS)
+* **Errors**
+  - [Unexpected RegExp Anchor Error.](#ANCHORS)
+  - [Token Can Never Be Matched.](#UNREACHABLE)
+  - [TokenType <...> is using a custom token pattern without providing <char_start_hint> parameter](#CUSTOM_OPTIMIZE)
+  - [Missing \<lineTerminatorCharacters\> property on the Lexer config.](#MISSING_LINE_TERM_CHARS)
 
 # Warnings
 
@@ -34,7 +34,7 @@ To resolve this choose one of the following:
     ```javascript
     const myTokens = [IntegerLiteral, StringLiteral, WhiteSpace /*, ... */]
     const myLexer = new chevrotain.Lexer([myTokens], {
-        positionTracking: "onlyOffset"
+      positionTracking: "onlyOffset"
     })
     ```
 
@@ -44,10 +44,10 @@ To resolve this choose one of the following:
     const createToken = chevrotain.createToken
 
     const Whitespace = createToken({
-        name: "Whitespace",
-        pattern: /\s+/,
-        // This is normally computed automatically...
-        line_breaks: true
+      name: "Whitespace",
+      pattern: /\s+/,
+      // This is normally computed automatically...
+      line_breaks: true
     })
 
     const myTokens = [IntegerLiteral, StringLiteral, WhiteSpace /*, ... */]
@@ -55,11 +55,11 @@ To resolve this choose one of the following:
     const myLexer = new chevrotain.Lexer([myTokens])
     ```
 
-    -   Note that the definition of what constitutes a line terminator is controlled by the
-        [lineTerminatorsPattern][line_terminator_docs] lexer configuration property.
+    - Note that the definition of what constitutes a line terminator is controlled by the
+      [lineTerminatorsPattern][line_terminator_docs] lexer configuration property.
 
-    -   Also note that multi-line tokens such as some types of comments and string literals tokens may contain
-        line terminators.
+    - Also note that multi-line tokens such as some types of comments and string literals tokens may contain
+      line terminators.
 
 ## Unable to identify line terminator usage in pattern
 
@@ -73,14 +73,14 @@ To resolve this warning, **explicitly** specify the line_breaks option in the of
 
 ```javascript
 const MyToken = createToken({
-    name: "MyToken",
-    pattern: /abc/,
-    line_breaks: false
+  name: "MyToken",
+  pattern: /abc/,
+  line_breaks: false
 })
 const MultiLineStringLiteral = createToken({
-    name: "MultiLineStringLiteral",
-    pattern: /`[^`]*`/,
-    line_breaks: true
+  name: "MultiLineStringLiteral",
+  pattern: /`[^`]*`/,
+  line_breaks: true
 })
 ```
 
@@ -96,14 +96,14 @@ a TokenType:
 
 ```javascript
 const MyCustomToken = createToken({
-    name: "MyCustomToken",
-    pattern: { exec: matchFunction },
-    line_breaks: false
+  name: "MyCustomToken",
+  pattern: { exec: matchFunction },
+  line_breaks: false
 })
 const MyCustomMultiLineToken = createToken({
-    name: "MyCustomMultiLineToken",
-    pattern: { exec: matchFunction2 },
-    line_breaks: true
+  name: "MyCustomMultiLineToken",
+  pattern: { exec: matchFunction2 },
+  line_breaks: true
 })
 ```
 
@@ -128,13 +128,13 @@ This issue can be **worked around** by explicitly providing a "[start_chars_hint
 
 ```javascript
 const Integer = createToken({
-    name: "Integer",
-    // lets assume that this pattern caused an error in regexp-to-ast
-    pattern: /[1-9]\d*/,
-    // by explicitly providing the first possible characters of this pattern
-    // the analysis by the regexp-to-ast library will be skipped
-    // and the optimization can be enabled.
-    start_chars_hint: ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+  name: "Integer",
+  // lets assume that this pattern caused an error in regexp-to-ast
+  pattern: /[1-9]\d*/,
+  // by explicitly providing the first possible characters of this pattern
+  // the analysis by the regexp-to-ast library will be skipped
+  // and the optimization can be enabled.
+  start_chars_hint: ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 })
 ```
 
@@ -154,12 +154,12 @@ This issue can be **worked around** by explicitly providing a "[start_chars_hint
 ```javascript
 // '💩' character
 createToken({
-    name: "PileOfPoo",
-    // \u{xxxxx} 32bit unicode escape can only be used with the /u flag enabled.
-    pattern: /\u{1F4A9}/u,
-    // The '💩' character is represented by surrogate pairs: '\uD83D\uDCA9'
-    // the start_chars_hint should only be provided the first of the pair.
-    start_chars_hint: [55357]
+  name: "PileOfPoo",
+  // \u{xxxxx} 32bit unicode escape can only be used with the /u flag enabled.
+  pattern: /\u{1F4A9}/u,
+  // The '💩' character is represented by surrogate pairs: '\uD83D\uDCA9'
+  // the start_chars_hint should only be provided the first of the pair.
+  start_chars_hint: [55357]
 })
 ```
 
@@ -170,9 +170,9 @@ For example:
 
 ```javascript
 createToken({
-    name: "LCurley",
-    // note that the pattern is a string literal, not a regExp literal.
-    pattern: "{"
+  name: "LCurley",
+  // note that the pattern is a string literal, not a regExp literal.
+  pattern: "{"
 })
 ```
 
@@ -190,8 +190,8 @@ For example an XML Text is defined by **everything** except a closing tag.
 
 ```javascript
 const XMLText = createToken({
-    name: "XMLText",
-    pattern: /[^<&]+/
+  name: "XMLText",
+  pattern: /[^<&]+/
 })
 ```
 
@@ -205,16 +205,16 @@ e.g:
 ```javascript
 const hints = []
 for (let i = 0; i <= 65535; i++) {
-    // 38 is '<' and 60 is '&'
-    if (i !== 38 || i !== 60) {
-        hints.push(i)
-    }
+  // 38 is '<' and 60 is '&'
+  if (i !== 38 || i !== 60) {
+    hints.push(i)
+  }
 }
 
 const XMLText = createToken({
-    name: "XMLText",
-    pattern: /[^<&]+/,
-    start_chars_hint: hints
+  name: "XMLText",
+  pattern: /[^<&]+/,
+  start_chars_hint: hints
 })
 ```
 
@@ -227,12 +227,12 @@ For example: the XMLText pattern above could be re-defined as:
 
 ```javascript
 const XMLText = createToken({
-    name: "XMLText",
-    // Equivalent to: /[^<&]+/ but a-lot less clear :(
-    // Note that:
-    //   - "\u0026" === "&"
-    //   - "\u003C" === "<"
-    pattern: /[\u0000-\u0025\u0027-\u003B\u003D-\uFFFF]+/
+  name: "XMLText",
+  // Equivalent to: /[^<&]+/ but a-lot less clear :(
+  // Note that:
+  //   - "\u0026" === "&"
+  //   - "\u003C" === "<"
+  pattern: /[\u0000-\u0025\u0027-\u003B\u003D-\uFFFF]+/
 })
 ```
 
@@ -250,9 +250,9 @@ const createToken = chevrotain.createToken
 
 // Using createToken API
 const Whitespace = createToken({
-    name: "Integer",
-    // invalid pattern using both anchors
-    pattern: /^\d+$/
+  name: "Integer",
+  // invalid pattern using both anchors
+  pattern: /^\d+$/
 })
 
 // will throw an error
@@ -272,13 +272,13 @@ For example:
 
 ```javascript
 const ForKeyword = createToken({
-    name: "ForKeyword",
-    pattern: /for/
+  name: "ForKeyword",
+  pattern: /for/
 })
 
 const Identifier = createToken({
-    name: "Identifier",
-    pattern: /[a-zA-z]+/
+  name: "Identifier",
+  pattern: /[a-zA-z]+/
 })
 
 // Will throw Token <ForKeyword> can never be matched...
@@ -287,9 +287,9 @@ const Identifier = createToken({
 const myLexer = new chevrotain.Lexer([Identifier, ForKeyword])
 ```
 
--   Note that this validation is limited to simple patterns such as keywords
-    The more general case of any pattern being a strict subset of a preceding pattern
-    will require much more in depth RegExp analysis capabilities.
+- Note that this validation is limited to simple patterns such as keywords
+  The more general case of any pattern being a strict subset of a preceding pattern
+  will require much more in depth RegExp analysis capabilities.
 
 To resolve this simply re-arrange the order of Token types in the lexer
 definition such that the more specific Token types will be listed first.
@@ -329,13 +329,13 @@ For example:
 
 ```javascript
 const IntegerToken = createToken({
-    name: "IntegerToken",
-    pattern: {
-        exec: (text, offset) => {
-            /* ... */
-        }
-    },
-    start_chars_hint: ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+  name: "IntegerToken",
+  pattern: {
+    exec: (text, offset) => {
+      /* ... */
+    }
+  },
+  start_chars_hint: ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 })
 ```
 
@@ -353,10 +353,10 @@ Example:
 
 ```javascript
 const myLexer = new chevrotain.Lexer([], {
-    // For our lexer only "\n" is a counted as a line terminator
-    lineTerminatorsPattern: /\n/,
-    // Duplicate information, "\n".charCodeAt(0) === 10
-    lineTerminatorCharacters: [10]
+  // For our lexer only "\n" is a counted as a line terminator
+  lineTerminatorsPattern: /\n/,
+  // Duplicate information, "\n".charCodeAt(0) === 10
+  lineTerminatorCharacters: [10]
 })
 ```
 

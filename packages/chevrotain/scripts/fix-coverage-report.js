@@ -9,19 +9,19 @@ const fs = require("fs-extra")
 const path = require("path")
 
 const interPath = path.resolve(
-    __dirname,
-    "../lib/src/parse/grammar/interpreter.js"
+  __dirname,
+  "../lib/src/parse/grammar/interpreter.js"
 )
 
 const interString = fs.readFileSync(interPath, "utf8").toString()
 let fixedInterString = interString.replace(
-    "var __extends =",
-    "/* istanbul ignore next */ var __extends ="
+  "var __extends =",
+  "/* istanbul ignore next */ var __extends ="
 )
 
 fixedInterString = fixedInterString.replace(
-    /\|\| this/g,
-    "/* istanbul ignore next */ || this"
+  /\|\| this/g,
+  "/* istanbul ignore next */ || this"
 )
 
 fs.writeFileSync(interPath, fixedInterString)

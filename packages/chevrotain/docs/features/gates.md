@@ -10,13 +10,13 @@ For example:
 ```javascript
 // isConst is a parameter passed from another rule.
 $.RULE("Value", isConst => {
-    $.OR([
-        // the Variable alternative is only possible when "isConst" is Falsey
-        { GATE: () => !isConst, ALT: () => $.SUBRULE($.Variable) },
-        { ALT: () => $.CONSUME(IntValue) },
-        { ALT: () => $.CONSUME(FloatValue) },
-        { ALT: () => $.CONSUME(StringValue) }
-    ])
+  $.OR([
+    // the Variable alternative is only possible when "isConst" is Falsey
+    { GATE: () => !isConst, ALT: () => $.SUBRULE($.Variable) },
+    { ALT: () => $.CONSUME(IntValue) },
+    { ALT: () => $.CONSUME(FloatValue) },
+    { ALT: () => $.CONSUME(StringValue) }
+  ])
 })
 ```
 
@@ -26,13 +26,13 @@ Using the [Look Ahead](https://sap.github.io/chevrotain/documentation/6_5_0/clas
 // SELECT LIMIT.ID FROM USER_LIMIT LIMIT
 // SELECT ID, NAME FROM USER_LIMIT LIMIT 1
 $.RULE("FromClause", () => {
-    $.CONSUME(From)
-    $.CONSUME(Identifier)
+  $.CONSUME(From)
+  $.CONSUME(Identifier)
 
-    $.OPTION({
-        GATE: () => $.LA(2).tokenType !== UnsignedInteger,
-        DEF: () => $.CONSUME1(Identifier, { LABEL: "alias" })
-    })
+  $.OPTION({
+    GATE: () => $.LA(2).tokenType !== UnsignedInteger,
+    DEF: () => $.CONSUME1(Identifier, { LABEL: "alias" })
+  })
 })
 ```
 

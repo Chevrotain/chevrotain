@@ -10,7 +10,7 @@ let astFromEmbedded = toAstEmbedded(inputText)
 console.log(JSON.stringify(astFromVisitor, null, "\t"))
 
 assert.deepEqual(
-    astFromVisitor,
-    astFromEmbedded,
-    "Both ASTs should be identical"
+  astFromVisitor,
+  astFromEmbedded,
+  "Both ASTs should be identical"
 )

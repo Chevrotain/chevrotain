@@ -9,14 +9,14 @@ For example:
 import { createToken } from "chevrotain"
 
 const Identifier = createToken({
-    name: "Identifier",
-    pattern: /[a-zA-Z][\w+]/
+  name: "Identifier",
+  pattern: /[a-zA-Z][\w+]/
 })
 
 const ClassKeyword = createToken({
-    name: "ClassKeyword",
-    pattern: /class/,
-    longer_alt: Identifier
+  name: "ClassKeyword",
+  pattern: /class/,
+  longer_alt: Identifier
 })
 ```
 

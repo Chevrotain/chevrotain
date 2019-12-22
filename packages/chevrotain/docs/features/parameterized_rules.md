@@ -10,21 +10,21 @@ For example:
 
 ```javascript
 $.RULE("ArgumentInConst", () => {
-    $.CONSUME(Name)
-    $.CONSUME(Colon)
-    // passing the argument using the "ARGS" property
-    $.SUBRULE($.Value, { ARGS: [true] })
+  $.CONSUME(Name)
+  $.CONSUME(Colon)
+  // passing the argument using the "ARGS" property
+  $.SUBRULE($.Value, { ARGS: [true] })
 })
 
 // isConst is a parameter passed from another rule.
 $.RULE("Value", isConst => {
-    $.OR([
-        // the Variable alternative is only possible when "isConst" is Falsey
-        { GATE: () => !isConst, ALT: () => $.SUBRULE($.Variable) },
-        { ALT: () => $.CONSUME(IntValue) },
-        { ALT: () => $.CONSUME(FloatValue) },
-        { ALT: () => $.CONSUME(StringValue) }
-    ])
+  $.OR([
+    // the Variable alternative is only possible when "isConst" is Falsey
+    { GATE: () => !isConst, ALT: () => $.SUBRULE($.Variable) },
+    { ALT: () => $.CONSUME(IntValue) },
+    { ALT: () => $.CONSUME(FloatValue) },
+    { ALT: () => $.CONSUME(StringValue) }
+  ])
 })
 ```
 

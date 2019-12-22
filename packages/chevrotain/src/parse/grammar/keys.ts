@@ -25,28 +25,28 @@ export const AT_LEAST_ONE_SEP_IDX = 6 << BITS_FOR_OCCURRENCE_IDX
 
 // this actually returns a number, but it is always used as a string (object prop key)
 export function getKeyForAutomaticLookahead(
-    ruleIdx: number,
-    dslMethodIdx: number,
-    occurrence: number
+  ruleIdx: number,
+  dslMethodIdx: number,
+  occurrence: number
 ): number {
-    /* tslint:disable */
-    return occurrence | dslMethodIdx | ruleIdx
-    /* tslint:enable */
+  /* tslint:disable */
+  return occurrence | dslMethodIdx | ruleIdx
+  /* tslint:enable */
 }
 
 const BITS_START_FOR_ALT_IDX = 32 - BITS_FOR_ALT_IDX
 export function getKeyForAltIndex(
-    ruleIdx: number,
-    dslMethodIdx: number,
-    occurrence: number,
-    altIdx: number
+  ruleIdx: number,
+  dslMethodIdx: number,
+  occurrence: number,
+  altIdx: number
 ): number {
-    /* tslint:disable */
-    // alternative indices are zero based, thus must always add one (turn on one bit) to guarantee uniqueness.
-    let altIdxBitMap = (altIdx + 1) << BITS_START_FOR_ALT_IDX
-    return (
-        getKeyForAutomaticLookahead(ruleIdx, dslMethodIdx, occurrence) |
-        altIdxBitMap
-    )
-    /* tslint:enable */
+  /* tslint:disable */
+  // alternative indices are zero based, thus must always add one (turn on one bit) to guarantee uniqueness.
+  let altIdxBitMap = (altIdx + 1) << BITS_START_FOR_ALT_IDX
+  return (
+    getKeyForAutomaticLookahead(ruleIdx, dslMethodIdx, occurrence) |
+    altIdxBitMap
+  )
+  /* tslint:enable */
 }

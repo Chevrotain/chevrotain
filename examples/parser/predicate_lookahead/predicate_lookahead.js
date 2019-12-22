@@ -6,17 +6,17 @@ const Two = createToken({ name: "Two", pattern: /2/ })
 const Three = createToken({ name: "Three", pattern: /3/ })
 
 const WhiteSpace = createToken({
-    name: "WhiteSpace",
-    pattern: /\s+/,
-    group: Lexer.SKIPPED
+  name: "WhiteSpace",
+  pattern: /\s+/,
+  group: Lexer.SKIPPED
 })
 
 const allTokens = [
-    // whitespace is normally very common so it should be placed first to speed up the lexer's performance
-    WhiteSpace,
-    One,
-    Two,
-    Three
+  // whitespace is normally very common so it should be placed first to speed up the lexer's performance
+  WhiteSpace,
+  One,
+  Two,
+  Three
 ]
 
 const PredicateLookaheadLexer = new Lexer(allTokens)
@@ -34,59 +34,59 @@ const PredicateLookaheadLexer = new Lexer(allTokens)
 let maxNumberAllowed = 3
 
 function isOne() {
-    return maxNumberAllowed >= 1
+  return maxNumberAllowed >= 1
 }
 
 function isTwo() {
-    return maxNumberAllowed >= 2
+  return maxNumberAllowed >= 2
 }
 
 function isThree() {
-    return maxNumberAllowed >= 3
+  return maxNumberAllowed >= 3
 }
 
 // ----------------- parser -----------------
 class PredicateLookaheadParser extends EmbeddedActionsParser {
-    constructor() {
-        super(allTokens)
+  constructor() {
+    super(allTokens)
 
-        const $ = this
+    const $ = this
 
-        $.RULE("customPredicateRule", () => {
-            return $.OR([
-                // In this example we disable some of the alternatives depending on the value of the
-                // "maxNumberAllowed" flag. For each alternative a custom Predicate / Gate function is provided
-                // A Predicate / Gate function may also be provided for other grammar DSL rules.
-                // (OPTION/MANY/AT_LEAST_ONE/...)
-                {
-                    GATE: isOne,
-                    ALT: () => {
-                        $.CONSUME(One)
-                        return 1
-                    }
-                },
-                {
-                    GATE: isTwo,
-                    ALT: () => {
-                        $.CONSUME(Two)
-                        return 2
-                    }
-                },
-                {
-                    GATE: isThree,
-                    ALT: () => {
-                        $.CONSUME(Three)
-                        return 3
-                    }
-                }
-            ])
-        })
+    $.RULE("customPredicateRule", () => {
+      return $.OR([
+        // In this example we disable some of the alternatives depending on the value of the
+        // "maxNumberAllowed" flag. For each alternative a custom Predicate / Gate function is provided
+        // A Predicate / Gate function may also be provided for other grammar DSL rules.
+        // (OPTION/MANY/AT_LEAST_ONE/...)
+        {
+          GATE: isOne,
+          ALT: () => {
+            $.CONSUME(One)
+            return 1
+          }
+        },
+        {
+          GATE: isTwo,
+          ALT: () => {
+            $.CONSUME(Two)
+            return 2
+          }
+        },
+        {
+          GATE: isThree,
+          ALT: () => {
+            $.CONSUME(Three)
+            return 3
+          }
+        }
+      ])
+    })
 
-        // very important to call this after all the rules have been defined.
-        // otherwise the parser may not work correctly as it will lack information
-        // derived during the self analysis phase.
-        this.performSelfAnalysis()
-    }
+    // very important to call this after all the rules have been defined.
+    // otherwise the parser may not work correctly as it will lack information
+    // derived during the self analysis phase.
+    this.performSelfAnalysis()
+  }
 }
 
 // ----------------- wrapping it all together -----------------
@@ -95,21 +95,21 @@ class PredicateLookaheadParser extends EmbeddedActionsParser {
 const parser = new PredicateLookaheadParser()
 
 module.exports = {
-    parse: function(text) {
-        const lexResult = PredicateLookaheadLexer.tokenize(text)
-        // setting a new input will RESET the parser instance's state.
-        parser.input = lexResult.tokens
-        // any top level rule may be used as an entry point
-        const value = parser.customPredicateRule()
+  parse: function(text) {
+    const lexResult = PredicateLookaheadLexer.tokenize(text)
+    // setting a new input will RESET the parser instance's state.
+    parser.input = lexResult.tokens
+    // any top level rule may be used as an entry point
+    const value = parser.customPredicateRule()
 
-        return {
-            value: value,
-            lexErrors: lexResult.errors,
-            parseErrors: parser.errors
-        }
-    },
-
-    setMaxAllowed: function(newMaxAllowed) {
-        maxNumberAllowed = newMaxAllowed
+    return {
+      value: value,
+      lexErrors: lexResult.errors,
+      parseErrors: parser.errors
     }
+  },
+
+  setMaxAllowed: function(newMaxAllowed) {
+    maxNumberAllowed = newMaxAllowed
+  }
 }

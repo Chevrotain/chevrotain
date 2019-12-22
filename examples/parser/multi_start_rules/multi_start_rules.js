@@ -15,52 +15,52 @@ const Bravo = createToken({ name: "Bravo", pattern: /B/ })
 const Charlie = createToken({ name: "Charlie", pattern: /C/ })
 
 const WhiteSpace = createToken({
-    name: "WhiteSpace",
-    pattern: /\s+/,
-    group: Lexer.SKIPPED
+  name: "WhiteSpace",
+  pattern: /\s+/,
+  group: Lexer.SKIPPED
 })
 
 const allTokens = [
-    WhiteSpace, // whitespace is normally very common so it should be placed first to speed up the lexer's performance
-    Alpha,
-    Bravo,
-    Charlie
+  WhiteSpace, // whitespace is normally very common so it should be placed first to speed up the lexer's performance
+  Alpha,
+  Bravo,
+  Charlie
 ]
 
 const PhoneticLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
 class MultiStartParser extends CstParser {
-    constructor() {
-        super(allTokens)
+  constructor() {
+    super(allTokens)
 
-        const $ = this
+    const $ = this
 
-        $.RULE("firstRule", () => {
-            $.CONSUME(Alpha)
+    $.RULE("firstRule", () => {
+      $.CONSUME(Alpha)
 
-            $.OPTION(() => {
-                $.SUBRULE($.secondRule)
-            })
-        })
+      $.OPTION(() => {
+        $.SUBRULE($.secondRule)
+      })
+    })
 
-        $.RULE("secondRule", () => {
-            $.CONSUME(Bravo)
+    $.RULE("secondRule", () => {
+      $.CONSUME(Bravo)
 
-            $.OPTION(() => {
-                $.SUBRULE($.thirdRule)
-            })
-        })
+      $.OPTION(() => {
+        $.SUBRULE($.thirdRule)
+      })
+    })
 
-        $.RULE("thirdRule", () => {
-            $.CONSUME(Charlie)
-        })
+    $.RULE("thirdRule", () => {
+      $.CONSUME(Charlie)
+    })
 
-        // very important to call this after all the rules have been defined.
-        // otherwise the parser may not work correctly as it will lack information
-        // derived during the self analysis phase.
-        this.performSelfAnalysis()
-    }
+    // very important to call this after all the rules have been defined.
+    // otherwise the parser may not work correctly as it will lack information
+    // derived during the self analysis phase.
+    this.performSelfAnalysis()
+  }
 }
 
 // ----------------- wrapping it all together -----------------
@@ -69,23 +69,23 @@ class MultiStartParser extends CstParser {
 const parser = new MultiStartParser()
 
 function parseStartingWithRule(ruleName) {
-    return function(text) {
-        const lexResult = PhoneticLexer.tokenize(text)
-        // setting a new input will RESET the parser instance's state.
-        parser.input = lexResult.tokens
-        // just invoke which ever rule you want as the start rule. its all just plain javascript...
-        const cst = parser[ruleName]()
+  return function(text) {
+    const lexResult = PhoneticLexer.tokenize(text)
+    // setting a new input will RESET the parser instance's state.
+    parser.input = lexResult.tokens
+    // just invoke which ever rule you want as the start rule. its all just plain javascript...
+    const cst = parser[ruleName]()
 
-        return {
-            cst: cst,
-            lexErrors: lexResult.errors,
-            parseErrors: parser.errors
-        }
+    return {
+      cst: cst,
+      lexErrors: lexResult.errors,
+      parseErrors: parser.errors
     }
+  }
 }
 
 module.exports = {
-    parseFirst: parseStartingWithRule("firstRule"),
-    parseSecond: parseStartingWithRule("secondRule"),
-    parseThird: parseStartingWithRule("thirdRule")
+  parseFirst: parseStartingWithRule("firstRule"),
+  parseSecond: parseStartingWithRule("secondRule"),
+  parseThird: parseStartingWithRule("thirdRule")
 }

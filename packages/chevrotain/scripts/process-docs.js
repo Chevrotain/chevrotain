@@ -13,8 +13,8 @@ const apiString = fs.readFileSync(apiPath, "utf8").toString()
 
 let fixedApiString = apiString.replace(/\/\* protected \*\//g, "protected")
 fixedApiString = fixedApiString.replace(
-    /\/\* protected \* static\//g,
-    "protected static"
+  /\/\* protected \* static\//g,
+  "protected static"
 )
 
 const apiDirPath = path.resolve(__dirname, "../lib")

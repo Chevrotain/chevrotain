@@ -19,36 +19,36 @@ as any other pure code without requiring any new tools or processes.
 
 ## TLDR
 
--   [**Online Playground**](https://sap.github.io/chevrotain/playground/)
--   **[Getting Started Tutorial](https://sap.github.io/chevrotain/docs/tutorial/step0_introduction.html)**
--   [**Performance benchmark**][benchmark]
+- [**Online Playground**](https://sap.github.io/chevrotain/playground/)
+- **[Getting Started Tutorial](https://sap.github.io/chevrotain/docs/tutorial/step0_introduction.html)**
+- [**Performance benchmark**][benchmark]
 
 ## Installation
 
--   **npm**: `npm install chevrotain`
--   **Browser**:
-    The npm package contains Chevrotain as concatenated and minified files ready for use in a browser.
-    These can also be accessed directly via [UNPKG](https://unpkg.com/) in a script tag.
-    -   Latest:
-        -   `https://unpkg.com/chevrotain/lib/chevrotain.js`
-        -   `https://unpkg.com/chevrotain/lib/chevrotain.min.js`
-    -   Explicit version number:
-        -   `https://unpkg.com/chevrotain@6.5.0/lib/chevrotain.js`
-        -   `https://unpkg.com/chevrotain@6.5.0/lib/chevrotain.min.js`
+- **npm**: `npm install chevrotain`
+- **Browser**:
+  The npm package contains Chevrotain as concatenated and minified files ready for use in a browser.
+  These can also be accessed directly via [UNPKG](https://unpkg.com/) in a script tag.
+  - Latest:
+    - `https://unpkg.com/chevrotain/lib/chevrotain.js`
+    - `https://unpkg.com/chevrotain/lib/chevrotain.min.js`
+  - Explicit version number:
+    - `https://unpkg.com/chevrotain@6.5.0/lib/chevrotain.js`
+    - `https://unpkg.com/chevrotain@6.5.0/lib/chevrotain.min.js`
 
 ## Documentation & Resources
 
--   **[Getting Started Tutorial](https://sap.github.io/chevrotain/docs/tutorial/step1_lexing.html)**.
+- **[Getting Started Tutorial](https://sap.github.io/chevrotain/docs/tutorial/step1_lexing.html)**.
 
--   **[Sample Grammars](https://github.com/SAP/chevrotain/blob/master/examples/grammars)**.
+- **[Sample Grammars](https://github.com/SAP/chevrotain/blob/master/examples/grammars)**.
 
--   **[FAQ](https://sap.github.io/chevrotain/docs/FAQ.html).**
+- **[FAQ](https://sap.github.io/chevrotain/docs/FAQ.html).**
 
--   **[Other Examples](https://github.com/SAP/chevrotain/blob/master/examples)**.
+- **[Other Examples](https://github.com/SAP/chevrotain/blob/master/examples)**.
 
--   **[HTML API docs](https://sap.github.io/chevrotain/documentation).**
+- **[HTML API docs](https://sap.github.io/chevrotain/documentation).**
 
-    -   [The Parsing DSL Docs](https://sap.github.io/chevrotain/documentation/6_5_0/classes/parser.html#at_least_one).
+  - [The Parsing DSL Docs](https://sap.github.io/chevrotain/documentation/6_5_0/classes/parser.html#at_least_one).
 
 ## Dependencies
 
@@ -60,7 +60,7 @@ This dependency is included in the bundled artifacts, for ease of consumption in
 Chevrotain runs on any modern JavaScript ES5.1 runtime.
 That includes any modern nodejs version, modern browsers and even IE11.
 
--   Uses [UMD](https://github.com/umdjs/umd) to work with common module loaders (browser global / amd / commonjs).
+- Uses [UMD](https://github.com/umdjs/umd) to work with common module loaders (browser global / amd / commonjs).
 
 ## Contributions
 
@@ -71,15 +71,15 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
 Some interesting samples:
 
--   [Prettier Java Plugin Parser][sample_prettier_java]
--   [JHipster Domain Language][sample_jhipster]
--   [Metabase BI expression Parser][sample_metabase].
--   [Three.js VRML Parser][sample_threejs]
--   [Argdown Parser][sample_argdown]
--   [Stardog Union Parsers (GraphQL/SPARQL/and more...)][sample_stardog]
--   [Bombadil Toml Parser][sample_bombadil]
--   [Eve Interactive Programing Language Parser][sample_eve].
--   [BioModelAnalyzer's ChatBot Parser][sample_biomodel].
+- [Prettier Java Plugin Parser][sample_prettier_java]
+- [JHipster Domain Language][sample_jhipster]
+- [Metabase BI expression Parser][sample_metabase].
+- [Three.js VRML Parser][sample_threejs]
+- [Argdown Parser][sample_argdown]
+- [Stardog Union Parsers (GraphQL/SPARQL/and more...)][sample_stardog]
+- [Bombadil Toml Parser][sample_bombadil]
+- [Eve Interactive Programing Language Parser][sample_eve].
+- [BioModelAnalyzer's ChatBot Parser][sample_biomodel].
 
 [benchmark]: https://sap.github.io/chevrotain/performance/
 [sample_metabase]: https://github.com/metabase/metabase/blob/136dfb17954f4e4302b3bf2fee99ff7b7b12fd7c/frontend/src/metabase/lib/expressions/parser.js

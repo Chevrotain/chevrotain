@@ -49,9 +49,9 @@ accomplished by marking them with the SKIP group.
 
 ```javascript
 const WhiteSpace = createToken({
-    name: "WhiteSpace",
-    pattern: /\s+/,
-    group: chevrotain.Lexer.SKIPPED
+  name: "WhiteSpace",
+  pattern: /\s+/,
+  group: chevrotain.Lexer.SKIPPED
 })
 ```
 
@@ -64,19 +64,19 @@ const Identifier = createToken({ name: "Identifier", pattern: /[a-zA-Z]\w*/ })
 // We specify the "longer_alt" property to resolve keywords vs identifiers ambiguity.
 // See: https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js
 const Select = createToken({
-    name: "Select",
-    pattern: /SELECT/,
-    longer_alt: Identifier
+  name: "Select",
+  pattern: /SELECT/,
+  longer_alt: Identifier
 })
 const From = createToken({
-    name: "From",
-    pattern: /FROM/,
-    longer_alt: Identifier
+  name: "From",
+  pattern: /FROM/,
+  longer_alt: Identifier
 })
 const Where = createToken({
-    name: "Where",
-    pattern: /WHERE/,
-    longer_alt: Identifier
+  name: "Where",
+  pattern: /WHERE/,
+  longer_alt: Identifier
 })
 
 const Comma = createToken({ name: "Comma", pattern: /,/ })
@@ -88,9 +88,9 @@ const GreaterThan = createToken({ name: "GreaterThan", pattern: />/ })
 const LessThan = createToken({ name: "LessThan", pattern: /</ })
 
 const WhiteSpace = createToken({
-    name: "WhiteSpace",
-    pattern: /\s+/,
-    group: chevrotain.Lexer.SKIPPED
+  name: "WhiteSpace",
+  pattern: /\s+/,
+  group: chevrotain.Lexer.SKIPPED
 })
 ```
 
@@ -101,35 +101,35 @@ We now have Token definitions, but how do we create a Lexer from these?
 ```javascript
 // note we are placing WhiteSpace first as it is very common thus it will speed up the lexer.
 let allTokens = [
-    WhiteSpace,
-    // "keywords" appear before the Identifier
-    Select,
-    From,
-    Where,
-    Comma,
-    // The Identifier must appear after the keywords because all keywords are valid identifiers.
-    Identifier,
-    Integer,
-    GreaterThan,
-    LessThan
+  WhiteSpace,
+  // "keywords" appear before the Identifier
+  Select,
+  From,
+  Where,
+  Comma,
+  // The Identifier must appear after the keywords because all keywords are valid identifiers.
+  Identifier,
+  Integer,
+  GreaterThan,
+  LessThan
 ]
 let SelectLexer = new Lexer(allTokens)
 ```
 
 Note that:
 
--   The **order** of Token definitions passed to the Lexer is **important**.
-    The first PATTERN to match will be chosen not the longest.
+- The **order** of Token definitions passed to the Lexer is **important**.
+  The first PATTERN to match will be chosen not the longest.
 
-    -   See how to resolve [Keywords vs Identifiers](https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js).
+  - See how to resolve [Keywords vs Identifiers](https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js).
 
--   The lexer's `Tokenize` method is a **pure function**, thus only a **single Lexer** (per grammar) is needed.
+- The lexer's `Tokenize` method is a **pure function**, thus only a **single Lexer** (per grammar) is needed.
 
--   The lexer is **context unaware**, it lexes each token (pattern) individually.
+- The lexer is **context unaware**, it lexes each token (pattern) individually.
 
-    -   If you need to distinguish between different contexts during the lexing phase, take a look at [Lexer Modes](../features/lexer_modes.md).
+  - If you need to distinguish between different contexts during the lexing phase, take a look at [Lexer Modes](../features/lexer_modes.md).
 
--   For more patterns requiring more complex constraints than a regular expression, take a look at [Custom Token Patterns](../features/custom_token_patterns.md).
+- For more patterns requiring more complex constraints than a regular expression, take a look at [Custom Token Patterns](../features/custom_token_patterns.md).
 
 ## Using The Lexer
 

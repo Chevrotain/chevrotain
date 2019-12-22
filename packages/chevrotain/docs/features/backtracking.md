@@ -30,16 +30,16 @@ the alternatives (in order) instead of trying to choose one using a limited toke
 
 ```javascript
 $.RULE("statement", () => {
-    $.OR([
-        {
-            GATE: $.BACKTRACK($.longRule1),
-            ALT: () => $.SUBRULE($.longRule1)
-        },
-        {
-            GATE: $.BACKTRACK($.longRule2),
-            ALT: () => $.SUBRULE($.longRule2)
-        }
-    ])
+  $.OR([
+    {
+      GATE: $.BACKTRACK($.longRule1),
+      ALT: () => $.SUBRULE($.longRule1)
+    },
+    {
+      GATE: $.BACKTRACK($.longRule2),
+      ALT: () => $.SUBRULE($.longRule2)
+    }
+  ])
 })
 ```
 

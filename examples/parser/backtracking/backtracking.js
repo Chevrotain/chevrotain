@@ -15,102 +15,102 @@ const Equals = createToken({ name: "Equals", pattern: /=/ })
 const SemiColon = createToken({ name: "SemiColon", pattern: /;/ })
 const Ident = createToken({ name: "Ident", pattern: /[a-z]+/ })
 const WhiteSpace = createToken({
-    name: "WhiteSpace",
-    pattern: /\s+/,
-    group: Lexer.SKIPPED
+  name: "WhiteSpace",
+  pattern: /\s+/,
+  group: Lexer.SKIPPED
 })
 
 const allTokens = [
-    WhiteSpace,
-    Number,
-    Element,
-    Default,
-    Dot,
-    Colon,
-    Equals,
-    SemiColon,
-    Ident
+  WhiteSpace,
+  Number,
+  Element,
+  Default,
+  Dot,
+  Colon,
+  Equals,
+  SemiColon,
+  Ident
 ]
 
 const backtrackingLexer = new Lexer(allTokens)
 
 class BackTrackingParser extends CstParser {
-    constructor() {
-        super(allTokens)
+  constructor() {
+    super(allTokens)
 
-        const $ = this
+    const $ = this
 
-        this.RULE("statement", () => {
-            $.OR([
-                // both statements have the same prefix which may be of "infinite" length, this means there is no K for which
-                // we can build an LL(K) parser that can distinguish the two alternatives.
-                {
-                    GATE: $.BACKTRACK($.withEqualsStatement),
-                    ALT: () => {
-                        $.SUBRULE($.withEqualsStatement)
-                    }
-                },
-                {
-                    GATE: $.BACKTRACK($.withDefaultStatement),
-                    ALT: () => {
-                        $.SUBRULE($.withDefaultStatement)
-                    }
-                }
-            ])
-        })
+    this.RULE("statement", () => {
+      $.OR([
+        // both statements have the same prefix which may be of "infinite" length, this means there is no K for which
+        // we can build an LL(K) parser that can distinguish the two alternatives.
+        {
+          GATE: $.BACKTRACK($.withEqualsStatement),
+          ALT: () => {
+            $.SUBRULE($.withEqualsStatement)
+          }
+        },
+        {
+          GATE: $.BACKTRACK($.withDefaultStatement),
+          ALT: () => {
+            $.SUBRULE($.withDefaultStatement)
+          }
+        }
+      ])
+    })
 
-        this.RULE("withEqualsStatement", () => {
-            this.CONSUME(Element)
-            this.CONSUME(Ident)
-            this.CONSUME(Colon)
-            // qualifiedName is of possibly infinite length so no fixed lookahead can be used to disambiguate.
-            this.SUBRULE($.qualifiedName)
-            // The "Equals" Token is the first token we can be used to distinguish between the two statement rules.
-            this.CONSUME(Equals)
-            this.CONSUME(Number)
-            this.CONSUME(SemiColon)
-        })
+    this.RULE("withEqualsStatement", () => {
+      this.CONSUME(Element)
+      this.CONSUME(Ident)
+      this.CONSUME(Colon)
+      // qualifiedName is of possibly infinite length so no fixed lookahead can be used to disambiguate.
+      this.SUBRULE($.qualifiedName)
+      // The "Equals" Token is the first token we can be used to distinguish between the two statement rules.
+      this.CONSUME(Equals)
+      this.CONSUME(Number)
+      this.CONSUME(SemiColon)
+    })
 
-        $.RULE("withDefaultStatement", () => {
-            $.CONSUME(Element)
-            $.CONSUME(Ident)
-            $.CONSUME(Colon)
-            // qualifiedName is of possibly infinite length so no fixed lookahead can be used to disambiguate.
-            $.SUBRULE($.qualifiedName)
-            // The "Default" Token is the first token we can be used to distinguish between the two statement rules.
-            $.CONSUME(Default)
-            $.CONSUME(Number)
-            $.CONSUME(SemiColon)
-        })
+    $.RULE("withDefaultStatement", () => {
+      $.CONSUME(Element)
+      $.CONSUME(Ident)
+      $.CONSUME(Colon)
+      // qualifiedName is of possibly infinite length so no fixed lookahead can be used to disambiguate.
+      $.SUBRULE($.qualifiedName)
+      // The "Default" Token is the first token we can be used to distinguish between the two statement rules.
+      $.CONSUME(Default)
+      $.CONSUME(Number)
+      $.CONSUME(SemiColon)
+    })
 
-        $.RULE("qualifiedName", () => {
-            $.CONSUME(Ident)
-            $.MANY(() => {
-                $.CONSUME(Dot)
-                $.CONSUME2(Ident)
-            })
-        })
+    $.RULE("qualifiedName", () => {
+      $.CONSUME(Ident)
+      $.MANY(() => {
+        $.CONSUME(Dot)
+        $.CONSUME2(Ident)
+      })
+    })
 
-        // DOCS: The call to performSelfAnalysis must happen after all the RULEs have been defined.
-        this.performSelfAnalysis()
-    }
+    // DOCS: The call to performSelfAnalysis must happen after all the RULEs have been defined.
+    this.performSelfAnalysis()
+  }
 }
 
 // reuse the same parser instance.
 const parser = new BackTrackingParser()
 
 module.exports = function(text) {
-    const lexResult = backtrackingLexer.tokenize(text)
+  const lexResult = backtrackingLexer.tokenize(text)
 
-    // setting a new input will RESET the parser instance's state.
-    parser.input = lexResult.tokens
+  // setting a new input will RESET the parser instance's state.
+  parser.input = lexResult.tokens
 
-    // any top level rule may be used as an entry point
-    const cst = parser.statement()
+  // any top level rule may be used as an entry point
+  const cst = parser.statement()
 
-    return {
-        cst: cst,
-        lexErrors: lexResult.errors,
-        parseErrors: parser.errors
-    }
+  return {
+    cst: cst,
+    lexErrors: lexResult.errors,
+    parseErrors: parser.errors
+  }
 }

@@ -2,5 +2,5 @@
 
 To run the tests for all the grammars
 
--   `npm install` (only once)
--   `npm test`
+- `npm install` (only once)
+- `npm test`

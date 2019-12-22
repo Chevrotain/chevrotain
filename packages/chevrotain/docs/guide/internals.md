@@ -21,18 +21,18 @@ must be known **in advance**.
 
 ```javascript
 $.RULE("value", () => {
-    // The choice of which alternative to pick
-    // is done by the "OR" (alternation) method, by **looking ahead** in the token vector.
-    // But making this choice requires **knowing** in advance the full structure of the grammar.
-    $.OR([
-        { ALT: () => $.CONSUME(StringLiteral) },
-        { ALT: () => $.CONSUME(NumberLiteral) },
-        { ALT: () => $.SUBRULE($.object) },
-        { ALT: () => $.SUBRULE($.array) },
-        { ALT: () => $.CONSUME(True) },
-        { ALT: () => $.CONSUME(False) },
-        { ALT: () => $.CONSUME(Null) }
-    ])
+  // The choice of which alternative to pick
+  // is done by the "OR" (alternation) method, by **looking ahead** in the token vector.
+  // But making this choice requires **knowing** in advance the full structure of the grammar.
+  $.OR([
+    { ALT: () => $.CONSUME(StringLiteral) },
+    { ALT: () => $.CONSUME(NumberLiteral) },
+    { ALT: () => $.SUBRULE($.object) },
+    { ALT: () => $.SUBRULE($.array) },
+    { ALT: () => $.CONSUME(True) },
+    { ALT: () => $.CONSUME(False) },
+    { ALT: () => $.CONSUME(Null) }
+  ])
 })
 ```
 
@@ -55,29 +55,29 @@ Lets first consider an example that will **not** cause an error.
 
 ```javascript
 class SafeEmbeddedActionsExample extends EmbeddedActionsParser {
-    constructor() {
-        /* ... */
-        $.RULE("objectItem", () => {
-            // Usage of the Parsing DSL methods is always safe, otherwise the whole concept of "grammar recording" would not work...
-            const keyTok = $.CONSUME(StringLiteral)
-            $.CONSUME(Colon)
-            const valAst = $.SUBRULE($.value)
+  constructor() {
+    /* ... */
+    $.RULE("objectItem", () => {
+      // Usage of the Parsing DSL methods is always safe, otherwise the whole concept of "grammar recording" would not work...
+      const keyTok = $.CONSUME(StringLiteral)
+      $.CONSUME(Colon)
+      const valAst = $.SUBRULE($.value)
 
-            // strip away the quotes from the string literal
-            // Note that even during the "recording phase" the CONSUME method will return an object that matches the IToken interface
-            // to reduce potential runtime errors, so this is safe.
-            const keyName = keyTok.image.substring(1, keyTok.image.length - 1)
+      // strip away the quotes from the string literal
+      // Note that even during the "recording phase" the CONSUME method will return an object that matches the IToken interface
+      // to reduce potential runtime errors, so this is safe.
+      const keyName = keyTok.image.substring(1, keyTok.image.length - 1)
 
-            // Assembling this JS object literal won't cause any issues because
-            // we are not actually doing anything with the returned values.
-            // Only assigning them to properties in a new object (which is always safe)
-            return {
-                type: "keyValuePair",
-                key: keyName,
-                value: valAst
-            }
-        })
-    }
+      // Assembling this JS object literal won't cause any issues because
+      // we are not actually doing anything with the returned values.
+      // Only assigning them to properties in a new object (which is always safe)
+      return {
+        type: "keyValuePair",
+        key: keyName,
+        value: valAst
+      }
+    })
+  }
 }
 ```
 
@@ -88,28 +88,28 @@ Let's consider some situations that will actually cause errors.
 
 ```javascript
 class ErrorEmbeddedActions1 extends EmbeddedActionsParser {
-    constructor() {
-        /* ... */
-        $.RULE("topRule", () => {
-            // During the recording phase `SUBRULE` will return a "dummy" value
-            // Which would not match the structure `otherRule` normally returns.
-            const otherRuleVal = $.SUBRULE($.otherRule)
+  constructor() {
+    /* ... */
+    $.RULE("topRule", () => {
+      // During the recording phase `SUBRULE` will return a "dummy" value
+      // Which would not match the structure `otherRule` normally returns.
+      const otherRuleVal = $.SUBRULE($.otherRule)
 
-            // Will cause "undefined is not an object" runtime error
-            // because during the recording phase `SUBRULE` will not returned the expected value.
-            return otherRuleVal.foo.bar
-        })
+      // Will cause "undefined is not an object" runtime error
+      // because during the recording phase `SUBRULE` will not returned the expected value.
+      return otherRuleVal.foo.bar
+    })
 
-        $.RULE("otherRule", () => {
-            const myTok = $.CONSUME(MyTok)
+    $.RULE("otherRule", () => {
+      const myTok = $.CONSUME(MyTok)
 
-            return {
-                foo: {
-                    bar: myTok.image
-                }
-            }
-        })
-    }
+      return {
+        foo: {
+          bar: myTok.image
+        }
+      }
+    })
+  }
 }
 ```
 
@@ -117,23 +117,23 @@ class ErrorEmbeddedActions1 extends EmbeddedActionsParser {
 
 ```javascript
 class ErrorSemanticChecks extends EmbeddedActionsParser {
-    constructor() {
-        /* ... */
-        $.RULE("semanticCheckRule", () => {
-            // During the recording phase `CONSUME` will return a "dummy" IToken value.
-            const myNumTok = $.CONSUME(NumberTok)
-            // The "dummy" IToken `image` is not a number so this will evaluate to NaN.
-            const numValue = parseInt(myNumTok.image)
+  constructor() {
+    /* ... */
+    $.RULE("semanticCheckRule", () => {
+      // During the recording phase `CONSUME` will return a "dummy" IToken value.
+      const myNumTok = $.CONSUME(NumberTok)
+      // The "dummy" IToken `image` is not a number so this will evaluate to NaN.
+      const numValue = parseInt(myNumTok.image)
 
-            // Our embedded semantic check will **always** throw during the recording phase because
-            // the "mocked" IToken returned by `CONSUME` would never be a valid integer.
-            if (isNaN(numValue)) {
-                throw Error("Unexpected Number Value!")
-            }
+      // Our embedded semantic check will **always** throw during the recording phase because
+      // the "mocked" IToken returned by `CONSUME` would never be a valid integer.
+      if (isNaN(numValue)) {
+        throw Error("Unexpected Number Value!")
+      }
 
-            return numValue
-        })
-    }
+      return numValue
+    })
+  }
 }
 ```
 
@@ -147,16 +147,16 @@ Thus it is a lot less likely that a CSTParser would raise errors during the reco
 
 ```javascript
 class JsonParser extends CstParser {
-    constructor() {
-        /* ... */
-        // This Grammar rule has no custom user semantic actions
-        // So it would not throw an unexpected exception during the recording phase...
-        $.RULE("objectItem", () => {
-            $.CONSUME(StringLiteral)
-            $.CONSUME(Colon)
-            $.SUBRULE($.value)
-        })
-    }
+  constructor() {
+    /* ... */
+    // This Grammar rule has no custom user semantic actions
+    // So it would not throw an unexpected exception during the recording phase...
+    $.RULE("objectItem", () => {
+      $.CONSUME(StringLiteral)
+      $.CONSUME(Colon)
+      $.SUBRULE($.value)
+    })
+  }
 }
 ```
 
@@ -168,65 +168,65 @@ for example lets resolve the two scenarios shown above:
 
 ```javascript
 class SolvedEmbeddedActions1 extends EmbeddedActionsParser {
-    constructor() {
-        /* ... */
-        $.RULE("topRule", () => {
-            // During the recording phase `SUBRULE` will return a "dummy" value
-            // Which would not match the structure `otherRule` normally returns.
-            const otherRuleVal = $.SUBRULE($.otherRule)
+  constructor() {
+    /* ... */
+    $.RULE("topRule", () => {
+      // During the recording phase `SUBRULE` will return a "dummy" value
+      // Which would not match the structure `otherRule` normally returns.
+      const otherRuleVal = $.SUBRULE($.otherRule)
 
-            return $.ACTION(() => {
-                // Code inside `ACTION` will not be executed during the grammar recording phase.
-                // Therefore an error will **not** be thrown...
-                otherRuleVal.foo.bar
-            })
-        })
+      return $.ACTION(() => {
+        // Code inside `ACTION` will not be executed during the grammar recording phase.
+        // Therefore an error will **not** be thrown...
+        otherRuleVal.foo.bar
+      })
+    })
 
-        $.RULE("otherRule", () => {
-            const myTok = $.CONSUME(MyTok)
+    $.RULE("otherRule", () => {
+      const myTok = $.CONSUME(MyTok)
 
-            return {
-                foo: {
-                    bar: myTok.image
-                }
-            }
-        })
-    }
+      return {
+        foo: {
+          bar: myTok.image
+        }
+      }
+    })
+  }
 }
 ```
 
 ```javascript
 class SolvedSemanticChecks extends EmbeddedActionsParser {
-    constructor() {
-        /* ... */
-        $.RULE("semanticCheckRule", () => {
-            // During the recording phase `CONSUME` will return a "dummy" IToken value.
-            const myNumTok = $.CONSUME(NumberTok)
-            // The "dummy" IToken `image` is not a number so this will evaluate to NaN.
-            const numValue = parseInt(myNumTok.image)
+  constructor() {
+    /* ... */
+    $.RULE("semanticCheckRule", () => {
+      // During the recording phase `CONSUME` will return a "dummy" IToken value.
+      const myNumTok = $.CONSUME(NumberTok)
+      // The "dummy" IToken `image` is not a number so this will evaluate to NaN.
+      const numValue = parseInt(myNumTok.image)
 
-            $.ACTION(() => {
-                // Code inside `ACTION` will not be executed during the grammar recording phase.
-                // Therefore an error will **not** be thrown...
-                if (isNaN(numValue)) {
-                    throw Error("Unexpected Number Value!")
-                }
-            })
+      $.ACTION(() => {
+        // Code inside `ACTION` will not be executed during the grammar recording phase.
+        // Therefore an error will **not** be thrown...
+        if (isNaN(numValue)) {
+          throw Error("Unexpected Number Value!")
+        }
+      })
 
-            return numValue
-        })
-    }
+      return numValue
+    })
+  }
 }
 ```
 
 Note:
 
--   Code wrapper by the `ACTION` wrapper **must not** include DSL methods (MANY/OR/OPTION/...) calls as this
-    would prevent those the grammar those methods represent from being recorded.
--   Not all semantic actions require wrapping in `ACTION`, only those that would throw errors during the
-    grammar recording phase.
--   Embedded actions reduce separation of concerns between parsing and semantics. However we can still maintain some of this separation
-    by performing the Parsing "part" at the beginning of the rule and the semantic actions "part" at the end of the rule.
+- Code wrapper by the `ACTION` wrapper **must not** include DSL methods (MANY/OR/OPTION/...) calls as this
+  would prevent those the grammar those methods represent from being recorded.
+- Not all semantic actions require wrapping in `ACTION`, only those that would throw errors during the
+  grammar recording phase.
+- Embedded actions reduce separation of concerns between parsing and semantics. However we can still maintain some of this separation
+  by performing the Parsing "part" at the beginning of the rule and the semantic actions "part" at the end of the rule.
 
 ### Assumption 2 - There are no lasting side effects due to running the recording phase.
 
@@ -238,14 +238,14 @@ For example:
 ```javascript
 let ruleCounter = 0
 class SideEffectsParser extends CstParser {
-    constructor() {
-        /* ... */
-        $.RULE("myRule", () => {
-            // The counter will be incremented during the recording phase.
-            counter++
-            $.CONSUME(MyToken)
-        })
-    }
+  constructor() {
+    /* ... */
+    $.RULE("myRule", () => {
+      // The counter will be incremented during the recording phase.
+      counter++
+      $.CONSUME(MyToken)
+    })
+  }
 }
 
 const parser = new SideEffectsParser()
@@ -261,11 +261,11 @@ This is normally most suitable for handling **global state** outside the Parser'
 
 ```javascript
 $.RULE("myRule", () => {
-    $.ACTION(() => {
-        // This code will no longer execute during the recording phase.
-        counter++
-    })
-    $.CONSUME(MyToken)
+  $.ACTION(() => {
+    // This code will no longer execute during the recording phase.
+    counter++
+  })
+  $.CONSUME(MyToken)
 })
 ```
 
@@ -275,21 +275,21 @@ This is normally suitable for state that needs to be reset every time **new inpu
 
 ```javascript
 class FixedSideEffectsParser extends CstParser {
-    constructor() {
-        //
-        this.instanceCounter = 0
-        /* ... */
-        $.RULE("myRule", () => {
-            // The counter will be incremented during the recording phase.
-            this.instanceCounter++
-            $.CONSUME(MyToken)
-        })
-    }
+  constructor() {
+    //
+    this.instanceCounter = 0
+    /* ... */
+    $.RULE("myRule", () => {
+      // The counter will be incremented during the recording phase.
+      this.instanceCounter++
+      $.CONSUME(MyToken)
+    })
+  }
 
-    reset() {
-        this.instanceCounter = 0
-        super.reset()
-    }
+  reset() {
+    this.instanceCounter = 0
+    super.reset()
+  }
 }
 
 const parser = new FixedSideEffectsParser()

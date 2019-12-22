@@ -10,8 +10,8 @@ For example:
 ```javascript
 import { createToken, Lexer } from "chevrotain"
 const WhiteSpace = createToken({
-    name: "WhiteSpace",
-    pattern: /\s+/,
-    group: Lexer.SKIPPED
+  name: "WhiteSpace",
+  pattern: /\s+/,
+  group: Lexer.SKIPPED
 })
 ```

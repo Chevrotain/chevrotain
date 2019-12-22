@@ -8,36 +8,36 @@ for example by using the awesome [xRegExp library](https://github.com/slevithan/
 
 ```javascript
 $.RULE("statement", () => {
-    const fragments = {}
+  const fragments = {}
 
-    // A utility to create re-usable fragments using xRegExp
-    function FRAGMENT(name, def) {
-        fragments[name] = XRegExp.build(def, fragments)
-    }
+  // A utility to create re-usable fragments using xRegExp
+  function FRAGMENT(name, def) {
+    fragments[name] = XRegExp.build(def, fragments)
+  }
 
-    // a utility to create a pattern using previously defined fragments
-    function MAKE_PATTERN(def, flags) {
-        return XRegExp.build(def, fragments, flags)
-    }
+  // a utility to create a pattern using previously defined fragments
+  function MAKE_PATTERN(def, flags) {
+    return XRegExp.build(def, fragments, flags)
+  }
 
-    // define fragments
-    FRAGMENT("IntegerPart", "-?(0|[1-9][0-9]*)")
-    FRAGMENT("FractionalPart", "\\.[0-9]+")
-    FRAGMENT("ExponentPart", "[eE][+-]?[0-9]+")
+  // define fragments
+  FRAGMENT("IntegerPart", "-?(0|[1-9][0-9]*)")
+  FRAGMENT("FractionalPart", "\\.[0-9]+")
+  FRAGMENT("ExponentPart", "[eE][+-]?[0-9]+")
 
-    const IntValue = createToken({
-        name: "IntValue",
-        // Simple use case, not really needed in this case except for avoiding duplication.
-        pattern: MAKE_PATTERN("{{IntegerPart}}")
-    })
+  const IntValue = createToken({
+    name: "IntValue",
+    // Simple use case, not really needed in this case except for avoiding duplication.
+    pattern: MAKE_PATTERN("{{IntegerPart}}")
+  })
 
-    const FloatValue = createToken({
-        name: "FloatValue",
-        pattern: MAKE_PATTERN(
-            // This regExp would be very hard to read without "named fragments"
-            "{{IntegerPart}}{{FractionalPart}}({{ExponentPart}})?|{{IntegerPart}}{{ExponentPart}}"
-        )
-    })
+  const FloatValue = createToken({
+    name: "FloatValue",
+    pattern: MAKE_PATTERN(
+      // This regExp would be very hard to read without "named fragments"
+      "{{IntegerPart}}{{FractionalPart}}({{ExponentPart}})?|{{IntegerPart}}{{ExponentPart}}"
+    )
+  })
 })
 ```
 

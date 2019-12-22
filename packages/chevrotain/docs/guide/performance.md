@@ -10,18 +10,18 @@ Instead re-use a single instance and reset its state between iterations. For exa
 const parser = new JsonParser([])
 
 module.exports = function(text) {
-    const lexResult = JsonLexer.tokenize(text)
+  const lexResult = JsonLexer.tokenize(text)
 
-    // setting a new input will RESET the parser instance's state.
-    parser.input = lexResult.tokens
+  // setting a new input will RESET the parser instance's state.
+  parser.input = lexResult.tokens
 
-    const value = parser.json()
+  const value = parser.json()
 
-    return {
-        value: value,
-        lexErrors: lexResult.errors,
-        parseErrors: parser.errors
-    }
+  return {
+    value: value,
+    lexErrors: lexResult.errors,
+    parseErrors: parser.errors
+  }
 }
 ```
 
@@ -53,10 +53,10 @@ in case the optimizations cannot be enabled by turning on the
 ```javascript
 const { Lexer } = require("chevrotain")
 const myLexer = new Lexer(
-    [
-        /* tokens */
-    ],
-    { ensureOptimizations: true }
+  [
+    /* tokens */
+  ],
+  { ensureOptimizations: true }
 )
 ```
 
@@ -70,16 +70,16 @@ For large enough arrays and in rules which are called often this can cause quite
 
 ```javascript
 $.RULE("value", () => {
-    $.OR([
-        // an array with seven alternatives
-        { ALT: () => $.CONSUME(StringLiteral) },
-        { ALT: () => $.CONSUME(NumberLiteral) },
-        { ALT: () => $.SUBRULE($.object) },
-        { ALT: () => $.SUBRULE($.array) },
-        { ALT: () => $.CONSUME(True) },
-        { ALT: () => $.CONSUME(False) },
-        { ALT: () => $.CONSUME(Null) }
-    ])
+  $.OR([
+    // an array with seven alternatives
+    { ALT: () => $.CONSUME(StringLiteral) },
+    { ALT: () => $.CONSUME(NumberLiteral) },
+    { ALT: () => $.SUBRULE($.object) },
+    { ALT: () => $.SUBRULE($.array) },
+    { ALT: () => $.CONSUME(True) },
+    { ALT: () => $.CONSUME(False) },
+    { ALT: () => $.CONSUME(Null) }
+  ])
 })
 ```
 
@@ -87,19 +87,19 @@ A simple JavaScript pattern can avoid this costly re-initialization:
 
 ```javascript
 $.RULE("value", function() {
-    // c1 is used as a cache, the short circuit "||" will ensure only a single initialization
-    $.OR(
-        $.c1 ||
-            ($.c1 = [
-                { ALT: () => $.CONSUME(StringLiteral) },
-                { ALT: () => $.CONSUME(NumberLiteral) },
-                { ALT: () => $.SUBRULE($.object) },
-                { ALT: () => $.SUBRULE($.array) },
-                { ALT: () => $.CONSUME(True) },
-                { ALT: () => $.CONSUME(False) },
-                { ALT: () => $.CONSUME(Null) }
-            ])
-    )
+  // c1 is used as a cache, the short circuit "||" will ensure only a single initialization
+  $.OR(
+    $.c1 ||
+      ($.c1 = [
+        { ALT: () => $.CONSUME(StringLiteral) },
+        { ALT: () => $.CONSUME(NumberLiteral) },
+        { ALT: () => $.SUBRULE($.object) },
+        { ALT: () => $.SUBRULE($.array) },
+        { ALT: () => $.CONSUME(True) },
+        { ALT: () => $.CONSUME(False) },
+        { ALT: () => $.CONSUME(Null) }
+      ])
+  )
 })
 ```
 
@@ -108,60 +108,60 @@ Applying this pattern (in just a single location) on a JSON grammar provided 25-
 
 It is important to note that:
 
--   This pattern should only be applied on largish number of alternatives, testing on node.js 8.0 showed
-    it was only useful when there are at least four alternatives. In cases with fewer alternatives this pattern
-    would actually be **slower**!
+- This pattern should only be applied on largish number of alternatives, testing on node.js 8.0 showed
+  it was only useful when there are at least four alternatives. In cases with fewer alternatives this pattern
+  would actually be **slower**!
 
--   This pattern can only be applied if there are no vars which can be accessed via closures.
-    Example:
+- This pattern can only be applied if there are no vars which can be accessed via closures.
+  Example:
 
-    ```javascript
-    // BAD
-    $.RULE("value", function() {
-        let result
-        // We reference the "result" variable via a closure.
-        // So a new function is needed each time this grammar rule is invoked.
-        $.OR(
-            $.c1 ||
-                ($.c1 = [
-                    {
-                        ALT: () => {
-                            result = $.CONSUME(StringLiteral)
-                        }
-                    }
-                ])
-        )
-    })
+  ```javascript
+  // BAD
+  $.RULE("value", function() {
+    let result
+    // We reference the "result" variable via a closure.
+    // So a new function is needed each time this grammar rule is invoked.
+    $.OR(
+      $.c1 ||
+        ($.c1 = [
+          {
+            ALT: () => {
+              result = $.CONSUME(StringLiteral)
+            }
+          }
+        ])
+    )
+  })
 
-    // GOOD
-    $.RULE("value", function() {
-        let result
-        // no closure for the result variable, we use the returned value of the OR instead.
-        result = $.OR(
-            $.c1 ||
-                ($.c1 = [
-                    {
-                        ALT: () => {
-                            return $.CONSUME(StringLiteral)
-                        }
-                    }
-                ])
-        )
-    })
-    ```
+  // GOOD
+  $.RULE("value", function() {
+    let result
+    // no closure for the result variable, we use the returned value of the OR instead.
+    result = $.OR(
+      $.c1 ||
+        ($.c1 = [
+          {
+            ALT: () => {
+              return $.CONSUME(StringLiteral)
+            }
+          }
+        ])
+    )
+  })
+  ```
 
-    -   Note that gates often use vars from closures.
+  - Note that gates often use vars from closures.
 
--   Avoid dynamically changing the parser instance. The line:
+- Avoid dynamically changing the parser instance. The line:
 
-    > "$.c1 || ($.c1 = ..." (\$ is 'this')
+  > "$.c1 || ($.c1 = ..." (\$ is 'this')
 
-    Will cause a 'c1' property to be assigned to the parser instance.
-    This may seem innocent but if enough properties are added dynamically to an instance
-    its V8 hidden class will change which could cause a severe performance reduction.
+  Will cause a 'c1' property to be assigned to the parser instance.
+  This may seem innocent but if enough properties are added dynamically to an instance
+  its V8 hidden class will change which could cause a severe performance reduction.
 
-    To avoid this, simply define these "cache properties" in the constructor.
-    See an example in the [ECMAScript5 grammar's constructor](https://github.com/SAP/chevrotain/blob/ac21570b97a8de0d6b91f29979aed8041455cacd/examples/grammars/ecma5/ecma5_parser.js#L37-L43).
+  To avoid this, simply define these "cache properties" in the constructor.
+  See an example in the [ECMAScript5 grammar's constructor](https://github.com/SAP/chevrotain/blob/ac21570b97a8de0d6b91f29979aed8041455cacd/examples/grammars/ecma5/ecma5_parser.js#L37-L43).
 
 ## Minor Runtime Optimizations
 
@@ -178,7 +178,7 @@ These are only required if you are trying to squeeze every tiny bit of performan
 
     ```javascript
     this.myRedundantRule = this.RULE("myRedundantRule", function() {
-        $.CONSUME(StringLiteral)
+      $.CONSUME(StringLiteral)
     })
     ```
 

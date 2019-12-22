@@ -2,16 +2,16 @@ import { VERSION } from "../version"
 import { ISerializedGast } from "../../api"
 
 export function createSyntaxDiagramsCode(
-    grammar: ISerializedGast[],
-    {
-        resourceBase = `https://unpkg.com/chevrotain@${VERSION}/diagrams/`,
-        css = `https://unpkg.com/chevrotain@${VERSION}/diagrams/diagrams.css`
-    }: {
-        resourceBase?: string
-        css?: string
-    } = {}
+  grammar: ISerializedGast[],
+  {
+    resourceBase = `https://unpkg.com/chevrotain@${VERSION}/diagrams/`,
+    css = `https://unpkg.com/chevrotain@${VERSION}/diagrams/diagrams.css`
+  }: {
+    resourceBase?: string
+    css?: string
+  } = {}
 ) {
-    const header = `
+  const header = `
 <!-- This is a generated file -->
 <!DOCTYPE html>
 <meta charset="utf-8">
@@ -22,32 +22,32 @@ export function createSyntaxDiagramsCode(
 </style>
 
 `
-    const cssHtml = `
+  const cssHtml = `
 <link rel='stylesheet' href='${css}'>
 `
 
-    const scripts = `
+  const scripts = `
 <script src='${resourceBase}vendor/railroad-diagrams.js'></script>
 <script src='${resourceBase}src/diagrams_builder.js'></script>
 <script src='${resourceBase}src/diagrams_behavior.js'></script>
 <script src='${resourceBase}src/main.js'></script>
 `
-    const diagramsDiv = `
+  const diagramsDiv = `
 <div id="diagrams" align="center"></div>    
 `
-    const serializedGrammar = `
+  const serializedGrammar = `
 <script>
     window.serializedGrammar = ${JSON.stringify(grammar, null, "  ")};
 </script>
 `
 
-    const initLogic = `
+  const initLogic = `
 <script>
     var diagramsDiv = document.getElementById("diagrams");
     main.drawDiagramsFromSerializedGrammar(serializedGrammar, diagramsDiv);
 </script>
 `
-    return (
-        header + cssHtml + scripts + diagramsDiv + serializedGrammar + initLogic
-    )
+  return (
+    header + cssHtml + scripts + diagramsDiv + serializedGrammar + initLogic
+  )
 }
