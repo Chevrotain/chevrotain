@@ -2041,12 +2041,6 @@ export interface SubruleMethodOpts {
 
 export declare type GrammarAction<OUT> = () => OUT
 
-/**
- * TODO: remove this in next major version this `IOrAlt` is enough
- * @deprecated
- */
-export declare type IAnyOrAlt = any
-
 export interface IOrAlt<T> {
   NAME?: string
   GATE?: () => boolean

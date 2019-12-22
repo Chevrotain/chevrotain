@@ -1,14 +1,13 @@
 import {
   map,
   reduce,
-  find,
   every,
   isEmpty,
   flatten,
   forEach,
   has
 } from "../../utils/utils"
-import { PartialPathAndSuffixes, possiblePathsFrom } from "./interpreter"
+import { possiblePathsFrom } from "./interpreter"
 import { RestWalker } from "./rest"
 import { Predicate, TokenMatcher, lookAheadSequence } from "../parser/parser"
 import {
@@ -28,7 +27,7 @@ import {
 } from "./gast/gast_public"
 import { GAstVisitor } from "./gast/gast_visitor_public"
 import {
-  IAnyOrAlt,
+  IOrAlt,
   IProduction,
   IProductionWithOccurrence,
   TokenType
@@ -69,7 +68,7 @@ export function buildLookaheadFuncForOr(
   hasPredicates: boolean,
   dynamicTokensEnabled: boolean,
   laFuncBuilder: Function
-): (orAlts?: IAnyOrAlt[]) => number {
+): (orAlts?: IOrAlt<any>[]) => number {
   let lookAheadPaths = getLookaheadPathsForOr(
     occurrence,
     ruleGrammar,
@@ -129,7 +128,7 @@ export function buildAlternativesLookAheadFunc(
   hasPredicates: boolean,
   tokenMatcher: TokenMatcher,
   dynamicTokensEnabled: boolean
-): (orAlts?: IAnyOrAlt[]) => number {
+): (orAlts?: IOrAlt<any>[]) => number {
   let numOfAlts = alts.length
   let areAllOneTokenLookahead = every(alts, currAlt => {
     return every(currAlt, currPath => {
@@ -142,7 +141,7 @@ export function buildAlternativesLookAheadFunc(
     /**
      * @returns {number} - The chosen alternative index
      */
-    return function(orAlts: IAnyOrAlt[]): number {
+    return function(orAlts: IOrAlt<any>[]): number {
       // unfortunately the predicates must be extracted every single time
       // as they cannot be cached due to references to parameters(vars) which are no longer valid.
       // note that in the common case of no predicates, no cpu time will be wasted on this (see else block)

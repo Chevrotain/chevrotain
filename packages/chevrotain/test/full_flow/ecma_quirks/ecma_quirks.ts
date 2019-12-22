@@ -1,9 +1,6 @@
 import { createToken } from "../../../src/scan/tokens_public"
 import { Lexer } from "../../../src/scan/lexer_public"
-import {
-  EmbeddedActionsParser,
-  Parser
-} from "../../../src/parse/parser/traits/parser_traits"
+import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
 
 import {
   END_OF_FILE,
@@ -12,7 +9,7 @@ import {
 } from "../../../src/parse/parser/parser"
 import { MismatchedTokenException } from "../../../src/parse/exceptions_public"
 import { every, flatten, forEach, map } from "../../../src/utils/utils"
-import { IAnyOrAlt, IToken, TokenType } from "../../../api"
+import { IOrAlt, IToken, TokenType } from "../../../api"
 import { MixedInParser } from "../../../src/parse/parser/traits/parser_traits"
 
 const Return = createToken({
@@ -229,7 +226,7 @@ class EcmaScriptQuirksParser extends EmbeddedActionsParser {
     hasPredicates: boolean,
     tokenMatcher: TokenMatcher,
     dynamicTokensEnabled: boolean
-  ): (orAlts?: IAnyOrAlt[]) => number | undefined {
+  ): (orAlts?: IOrAlt<any>[]) => number | undefined {
     if (
       !every(alts, currPath => every(currPath, currAlt => currAlt.length === 1))
     ) {

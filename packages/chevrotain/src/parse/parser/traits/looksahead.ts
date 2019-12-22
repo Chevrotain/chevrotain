@@ -11,7 +11,7 @@ import {
   lookAheadSequence,
   TokenMatcher
 } from "../parser"
-import { IAnyOrAlt, IParserConfig } from "../../../../api"
+import { IOrAlt, IParserConfig } from "../../../../api"
 import {
   AT_LEAST_ONE_IDX,
   AT_LEAST_ONE_SEP_IDX,
@@ -197,7 +197,7 @@ export class LooksAhead {
     hasPredicates: boolean,
     tokenMatcher: TokenMatcher,
     dynamicTokensEnabled: boolean
-  ): (orAlts?: IAnyOrAlt[]) => number | undefined {
+  ): (orAlts?: IOrAlt<any>[]) => number | undefined {
     return buildAlternativesLookAheadFunc(
       alts,
       hasPredicates,

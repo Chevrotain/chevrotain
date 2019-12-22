@@ -4,7 +4,6 @@ import {
   DSLMethodOpts,
   DSLMethodOptsWithErr,
   GrammarAction,
-  IAnyOrAlt,
   IOrAlt,
   IRuleConfig,
   ISerializedGast,
@@ -317,70 +316,70 @@ export class RecognizerApi {
 
   OR<T>(
     this: MixedInParser,
-    altsOrOpts: IAnyOrAlt[] | OrMethodOpts<unknown>
+    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>
   ): T {
     return this.orInternal(altsOrOpts, 0)
   }
 
   OR1<T>(
     this: MixedInParser,
-    altsOrOpts: IAnyOrAlt[] | OrMethodOpts<unknown>
+    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>
   ): T {
     return this.orInternal(altsOrOpts, 1)
   }
 
   OR2<T>(
     this: MixedInParser,
-    altsOrOpts: IAnyOrAlt[] | OrMethodOpts<unknown>
+    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>
   ): T {
     return this.orInternal(altsOrOpts, 2)
   }
 
   OR3<T>(
     this: MixedInParser,
-    altsOrOpts: IAnyOrAlt[] | OrMethodOpts<unknown>
+    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>
   ): T {
     return this.orInternal(altsOrOpts, 3)
   }
 
   OR4<T>(
     this: MixedInParser,
-    altsOrOpts: IAnyOrAlt[] | OrMethodOpts<unknown>
+    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>
   ): T {
     return this.orInternal(altsOrOpts, 4)
   }
 
   OR5<T>(
     this: MixedInParser,
-    altsOrOpts: IAnyOrAlt[] | OrMethodOpts<unknown>
+    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>
   ): T {
     return this.orInternal(altsOrOpts, 5)
   }
 
   OR6<T>(
     this: MixedInParser,
-    altsOrOpts: IAnyOrAlt[] | OrMethodOpts<unknown>
+    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>
   ): T {
     return this.orInternal(altsOrOpts, 6)
   }
 
   OR7<T>(
     this: MixedInParser,
-    altsOrOpts: IAnyOrAlt[] | OrMethodOpts<unknown>
+    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>
   ): T {
     return this.orInternal(altsOrOpts, 7)
   }
 
   OR8<T>(
     this: MixedInParser,
-    altsOrOpts: IAnyOrAlt[] | OrMethodOpts<unknown>
+    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>
   ): T {
     return this.orInternal(altsOrOpts, 8)
   }
 
   OR9<T>(
     this: MixedInParser,
-    altsOrOpts: IAnyOrAlt[] | OrMethodOpts<unknown>
+    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>
   ): T {
     return this.orInternal(altsOrOpts, 9)
   }

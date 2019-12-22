@@ -4,7 +4,7 @@ import {
   DSLMethodOpts,
   DSLMethodOptsWithErr,
   GrammarAction,
-  IAnyOrAlt,
+  IOrAlt,
   IParserConfig,
   IRuleConfig,
   IToken,
@@ -724,11 +724,11 @@ export class RecognizerEngine {
 
   orInternalNoCst(
     this: MixedInParser,
-    altsOrOpts: IAnyOrAlt[] | OrMethodOpts<unknown>,
+    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>,
     occurrence: number
   ): any {
     let alts = isArray(altsOrOpts)
-      ? (altsOrOpts as IAnyOrAlt[])
+      ? (altsOrOpts as IOrAlt<any>[])
       : (altsOrOpts as OrMethodOpts<unknown>).DEF
 
     const laKey = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
@@ -746,7 +746,7 @@ export class RecognizerEngine {
 
   orInternal<T>(
     this: MixedInParser,
-    altsOrOpts: IAnyOrAlt[] | OrMethodOpts<unknown>,
+    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>,
     occurrence: number
   ): T {
     let laKey = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
@@ -757,7 +757,7 @@ export class RecognizerEngine {
 
     try {
       let alts = isArray(altsOrOpts)
-        ? (altsOrOpts as IAnyOrAlt[])
+        ? (altsOrOpts as IOrAlt<any>[])
         : (altsOrOpts as OrMethodOpts<unknown>).DEF
 
       const laFunc = this.getLaFuncFromCache(laKey)
