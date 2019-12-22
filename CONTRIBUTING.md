@@ -101,6 +101,14 @@ including linting / doc generation / d.ts API creation / ...
 - `yarn run ci_full_build`
   - Node > 4 is required to pass the coverage checks.
 
+#### Committing Changes
+
+This project enforces consistent commit message format same as in the [Angular project](https://github.com/angular/angular/blob/master/CONTRIBUTING.md#type).
+
+it is recommended to use `git cz` CLI tool to create these conventional commit messages.
+
+- requires [commitizen](https://github.com/commitizen/cz-cli#installing-the-command-line-tool) to be installed.
+
 #### Release Process
 
 The release process **requires push permissions to master**.
