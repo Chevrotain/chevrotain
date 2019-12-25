@@ -4,6 +4,7 @@
 - [Ambiguous Alternatives Detected.](#AMBIGUOUS_ALTERNATIVES)
 - [Terminal Token Name Not Found.](#TERMINAL_NAME_NOT_FOUND)
 - [Infinite Loop Detected.](#INFINITE_LOOP)
+- [Ignoring Ambiguities.](#IGNORING_AMBIGUITIES)
 
 ## Common Prefix Ambiguities
 
@@ -46,7 +47,7 @@ There are two ways to resolve this:
 An Ambiguous Alternatives Error occurs when Chevrotain cannot decide between two alternatives in
 an alternation (OR DSL method).
 
-Chevrotain "looks ahead" at most [K (4 by default)][maxlookahead]
+Chevrotain "looks ahead" at most [K (3 by default)][maxlookahead]
 tokens to determine which alternative to pick. An Ambiguous Alternatives Error indicates
 that more than K tokens lookahead is needed.
 
@@ -168,4 +169,37 @@ $.MANY(() => {
 })
 ```
 
+## Ignoring Ambiguities
+
+In some rare cases the Parser may detect ambiguities that are not actually possible or are perhaps implicitly resolved, e.g:
+
+- by the order of alternatives (an alternation alternative is attempted in the order listed).
+
+In such cases the ambiguities may be ignored explicitly by using the [IGNORE_AMBIGUITIES][ignore_ambiguities] property
+on the relevant DSL method.
+
+For example:
+
+- Ignoring all ambiguities of an alternation.
+
+  ```javascript
+  $.OR({
+    IGNORE_AMBIGUITIES: true,
+    DEF: [
+      { ALT: () => $.SUBRULE($.myRule) },
+      { ALT: () => $.SUBRULE($.myOtherRule) }
+    ]
+  })
+  ```
+
+- Ignoring ambiguities related to a **specific alternative** of an alternation:
+
+  ```javascript
+  $.OR([
+    { ALT: () => $.SUBRULE($.myRule), IGNORE_AMBIGUITIES: true },
+    { ALT: () => $.SUBRULE($.myOtherRule) }
+  ])
+  ```
+
 [maxlookahead]: https://sap.github.io/chevrotain/documentation/6_5_0/interfaces/iparserconfig.html#maxlookahead
+[ignore_ambiguities]: https://sap.github.io/chevrotain/documentation/6_5_0/interfaces/ormethodopts.html#ignore_ambiguities

@@ -5,7 +5,6 @@ import {
   has,
   isEmpty,
   map,
-  PRINT_WARNING,
   toFastProperties,
   values
 } from "../../utils/utils"
@@ -22,7 +21,6 @@ import {
 } from "../grammar/gast/gast_resolver_public"
 import {
   CstNode,
-  IgnoredParserIssues,
   IParserConfig,
   IParserDefinitionError,
   IRecognitionException,
@@ -63,7 +61,6 @@ export type lookAheadSequence = TokenType[][]
 export const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
   recoveryEnabled: false,
   maxLookahead: 3,
-  ignoredIssues: <any>{},
   dynamicTokensEnabled: false,
   outputCst: true,
   errorMessageProvider: defaultParserErrorProvider,
@@ -202,7 +199,6 @@ export class Parser {
             rules: values(this.gastProductionsCache),
             maxLookahead: this.maxLookahead,
             tokenTypes: values(this.tokensMap),
-            ignoredIssues: this.ignoredIssues,
             errMsgProvider: defaultGrammarValidatorErrorProvider,
             grammarName: className
           })
@@ -254,7 +250,6 @@ export class Parser {
     })
   }
 
-  ignoredIssues: IgnoredParserIssues = DEFAULT_PARSER_CONFIG.ignoredIssues
   definitionErrors: IParserDefinitionError[] = []
   selfAnalysisDone = false
   protected skipValidations: boolean
@@ -274,19 +269,14 @@ export class Parser {
     that.initGastRecorder(config)
     that.initPerformanceTracer(config)
 
-    /* istanbul ignore if - complete over-kill to test this, we should only add a test when we actually hard deprecate it and throw an error... */
-    if (
-      has(config, "ignoredIssues") &&
-      config.ignoredIssues !== DEFAULT_PARSER_CONFIG.ignoredIssues
-    ) {
-      PRINT_WARNING(
-        "The <ignoredIssues> IParserConfig property is soft-deprecated and will be removed in future versions.\n\t" +
-          "Please use the <IGNORE_AMBIGUITIES> flag on the relevant DSL method instead."
+    if (has(config, "ignoredIssues")) {
+      throw new Error(
+        "The <ignoredIssues> IParserConfig property has been deprecated.\n\t" +
+          "Please use the <IGNORE_AMBIGUITIES> flag on the relevant DSL method instead.\n\t" +
+          "See: https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#IGNORING_AMBIGUITIES\n\t" +
+          "For further details."
       )
     }
-    this.ignoredIssues = has(config, "ignoredIssues")
-      ? config.ignoredIssues
-      : DEFAULT_PARSER_CONFIG.ignoredIssues
 
     this.skipValidations = has(config, "skipValidations")
       ? config.skipValidations

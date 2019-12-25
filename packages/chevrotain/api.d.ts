@@ -2125,29 +2125,6 @@ export interface IParserConfig {
    */
   maxLookahead?: number
   /**
-   * @deprecated - use the IGNORE_AMBIGUITIES flag on the relevant DSL method instead
-   *               - {@link IOrAlt.IGNORE_AMBIGUITIES}
-   *               - {@link OrMethodOpts.IGNORE_AMBIGUITIES}
-   *
-   * Used to mark parser definition errors that should be ignored.
-   * For example:
-   *
-   * ```
-   *    {
-   *      myCustomRule : {
-   *                      OR3 : true
-   *                     },
-   *      myOtherRule : {
-   *                     OPTION1 : true,
-   *                     OR4 : true
-   *                    }
-   *    }
-   * ```
-   *
-   * Be careful when ignoring errors, they are usually there for a reason :).
-   */
-  ignoredIssues?: IgnoredParserIssues
-  /**
    * Enable This Flag to to support Dynamically defined Tokens.
    * This will disable performance optimizations which cannot work if the whole Token vocabulary is not known
    * During Parser initialization.
@@ -2207,20 +2184,6 @@ export interface IParserConfig {
    *   - For example: via a conditional that checks an env variable.
    */
   skipValidations?: boolean
-}
-
-/**
- * See: {@link IParserConfig.ignoredIssues}
- */
-export declare type IgnoredParserIssues = {
-  [ruleName: string]: IgnoredRuleIssues
-}
-
-/**
- * See: {@link IParserConfig.ignoredIssues}
- */
-export declare type IgnoredRuleIssues = {
-  [dslNameAndOccurrence: string]: boolean
 }
 
 export interface IParserErrorMessageProvider {
@@ -2760,7 +2723,6 @@ export declare function validateGrammar(options: {
   tokenTypes: TokenType[]
   grammarName: string
   errMsgProvider: IGrammarValidatorErrorMessageProvider
-  ignoredIssues?: IgnoredParserIssues
 }): IParserDefinitionError[]
 
 /**
