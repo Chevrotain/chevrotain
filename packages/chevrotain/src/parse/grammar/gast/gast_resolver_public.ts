@@ -9,7 +9,6 @@ import {
 } from "../../errors_public"
 import { DslMethodsCollectorVisitor } from "./gast"
 import {
-  IgnoredParserIssues,
   IGrammarResolverErrorMessageProvider,
   IGrammarValidatorErrorMessageProvider,
   IParserDefinitionError,
@@ -38,18 +37,15 @@ export function validateGrammar(options: {
   tokenTypes: TokenType[]
   grammarName: string
   errMsgProvider: IGrammarValidatorErrorMessageProvider
-  ignoredIssues?: IgnoredParserIssues
 }): IParserDefinitionError[] {
   options = defaults(options, {
-    errMsgProvider: defaultGrammarValidatorErrorProvider,
-    ignoredIssues: {}
+    errMsgProvider: defaultGrammarValidatorErrorProvider
   })
 
   return orgValidateGrammar(
     options.rules,
     options.maxLookahead,
     options.tokenTypes,
-    options.ignoredIssues,
     options.errMsgProvider,
     options.grammarName
   )

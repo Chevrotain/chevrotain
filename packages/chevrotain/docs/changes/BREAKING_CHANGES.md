@@ -14,10 +14,16 @@
   }
   ```
 
-  It is also possible (and recommended) to increase the maxLookahead for a specific method rather thn globally.
+  It is also possible (and recommended) to increase the maxLookahead for a specific DSL method rather then globally for all.
   See [relevant issue](https://github.com/SAP/chevrotain/issues/1012).
 
-* Reducing the usage of 'any' in the 'OR' method type signature may cause existing code to fail compilation.
+- The IParserConfig's `ignoredIssues` property has been deprecated.
+  Any Parser still using this property will throw an exception on initialization.
+  If any ambiguities need be ignored, the `IGNORE_AMBIGUITIES` property should be used instead.
+
+  - see: [Ignoring Ambiguities Docs](https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#IGNORING_AMBIGUITIES)
+
+- Reducing the usage of 'any' in the 'OR' method type signature may cause existing code to fail compilation.
   In such a case an explicit usage of a generic `any` type will resolve the problem.
   ```typescript
   this.OR<any>(/* ... */)

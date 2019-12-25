@@ -1084,16 +1084,7 @@ describe("lookahead Regular Tokens Mode", () => {
 
       constructor(input: IToken[] = []) {
         super(ALL_TOKENS, {
-          outputCst: false,
-          ignoredIssues: {
-            orRule: {
-              OR: true,
-              OR2: true,
-              OR3: true,
-              OR4: true,
-              OR5: true
-            }
-          }
+          outputCst: false
         })
 
         this.performSelfAnalysis()
@@ -1107,164 +1098,179 @@ describe("lookahead Regular Tokens Mode", () => {
       private parseOrRule(): string {
         let total = ""
 
-        this.OR([
-          {
-            ALT: () => {
-              this.CONSUME1(OneTok)
-              total += "A1"
+        this.OR({
+          IGNORE_AMBIGUITIES: true,
+          DEF: [
+            {
+              ALT: () => {
+                this.CONSUME1(OneTok)
+                total += "A1"
+              }
+            },
+            {
+              ALT: () => {
+                this.CONSUME2(OneTok)
+                total += "OOPS!"
+              }
+            },
+            {
+              ALT: () => {
+                this.CONSUME1(ThreeTok)
+                total += "A3"
+              }
+            },
+            {
+              ALT: () => {
+                this.CONSUME1(FourTok)
+                total += "A4"
+              }
+            },
+            {
+              ALT: () => {
+                this.CONSUME1(FiveTok)
+                total += "A5"
+              }
             }
-          },
-          {
-            ALT: () => {
-              this.CONSUME2(OneTok)
-              total += "OOPS!"
-            }
-          },
-          {
-            ALT: () => {
-              this.CONSUME1(ThreeTok)
-              total += "A3"
-            }
-          },
-          {
-            ALT: () => {
-              this.CONSUME1(FourTok)
-              total += "A4"
-            }
-          },
-          {
-            ALT: () => {
-              this.CONSUME1(FiveTok)
-              total += "A5"
-            }
-          }
-        ])
+          ]
+        })
 
-        this.OR2([
-          {
-            ALT: () => {
-              this.CONSUME2(FourTok)
-              total += "B4"
+        this.OR2({
+          IGNORE_AMBIGUITIES: true,
+          DEF: [
+            {
+              ALT: () => {
+                this.CONSUME2(FourTok)
+                total += "B4"
+              }
+            },
+            {
+              ALT: () => {
+                this.CONSUME2(ThreeTok)
+                total += "B3"
+              }
+            },
+            {
+              ALT: () => {
+                this.CONSUME2(TwoTok)
+                total += "B2"
+              }
+            },
+            {
+              ALT: () => {
+                this.CONSUME3(TwoTok)
+                total += "OOPS!"
+              }
+            },
+            {
+              ALT: () => {
+                this.CONSUME2(FiveTok)
+                total += "B5"
+              }
             }
-          },
-          {
-            ALT: () => {
-              this.CONSUME2(ThreeTok)
-              total += "B3"
-            }
-          },
-          {
-            ALT: () => {
-              this.CONSUME2(TwoTok)
-              total += "B2"
-            }
-          },
-          {
-            ALT: () => {
-              this.CONSUME3(TwoTok)
-              total += "OOPS!"
-            }
-          },
-          {
-            ALT: () => {
-              this.CONSUME2(FiveTok)
-              total += "B5"
-            }
-          }
-        ])
+          ]
+        })
 
-        this.OR3([
-          {
-            ALT: () => {
-              this.CONSUME3(FourTok)
-              total += "C4"
+        this.OR3({
+          IGNORE_AMBIGUITIES: true,
+          DEF: [
+            {
+              ALT: () => {
+                this.CONSUME3(FourTok)
+                total += "C4"
+              }
+            },
+            {
+              ALT: () => {
+                this.CONSUME3(ThreeTok)
+                total += "C3"
+              }
+            },
+            {
+              ALT: () => {
+                this.CONSUME4(ThreeTok)
+                total += "OOPS!"
+              }
+            },
+            {
+              ALT: () => {
+                this.CONSUME3(FiveTok)
+                total += "C5"
+              }
+            },
+            {
+              ALT: () => {
+                this.CONSUME3(OneTok)
+                total += "C1"
+              }
             }
-          },
-          {
-            ALT: () => {
-              this.CONSUME3(ThreeTok)
-              total += "C3"
-            }
-          },
-          {
-            ALT: () => {
-              this.CONSUME4(ThreeTok)
-              total += "OOPS!"
-            }
-          },
-          {
-            ALT: () => {
-              this.CONSUME3(FiveTok)
-              total += "C5"
-            }
-          },
-          {
-            ALT: () => {
-              this.CONSUME3(OneTok)
-              total += "C1"
-            }
-          }
-        ])
+          ]
+        })
 
-        this.OR4([
-          {
-            ALT: () => {
-              this.CONSUME4(OneTok)
-              total += "D1"
+        this.OR4({
+          IGNORE_AMBIGUITIES: true,
+          DEF: [
+            {
+              ALT: () => {
+                this.CONSUME4(OneTok)
+                total += "D1"
+              }
+            },
+            {
+              ALT: () => {
+                this.CONSUME4(FourTok)
+                total += "D4"
+              }
+            },
+            {
+              ALT: () => {
+                this.CONSUME5(FourTok)
+                total += "OOPS!"
+              }
+            },
+            {
+              ALT: () => {
+                this.CONSUME4(TwoTok)
+                total += "D2"
+              }
             }
-          },
-          {
-            ALT: () => {
-              this.CONSUME4(FourTok)
-              total += "D4"
-            }
-          },
-          {
-            ALT: () => {
-              this.CONSUME5(FourTok)
-              total += "OOPS!"
-            }
-          },
-          {
-            ALT: () => {
-              this.CONSUME4(TwoTok)
-              total += "D2"
-            }
-          }
-        ])
+          ]
+        })
 
-        this.OR5([
-          {
-            ALT: () => {
-              this.CONSUME5(TwoTok)
-              total += "E2"
+        this.OR5({
+          IGNORE_AMBIGUITIES: true,
+          DEF: [
+            {
+              ALT: () => {
+                this.CONSUME5(TwoTok)
+                total += "E2"
+              }
+            },
+            {
+              ALT: () => {
+                this.CONSUME5(OneTok)
+                total += "E1"
+              }
+            },
+            {
+              ALT: () => {
+                this.CONSUME4(FiveTok)
+                total += "E5"
+              }
+            },
+            {
+              ALT: () => {
+                this.CONSUME5(ThreeTok)
+                total += "E3"
+              }
+            },
+            {
+              ALT: () => {
+                this.CONSUME5(FiveTok)
+                total += "OOPS!"
+              }
             }
-          },
-          {
-            ALT: () => {
-              this.CONSUME5(OneTok)
-              total += "E1"
-            }
-          },
-          {
-            ALT: () => {
-              this.CONSUME4(FiveTok)
-              total += "E5"
-            }
-          },
-          {
-            ALT: () => {
-              this.CONSUME5(ThreeTok)
-              total += "E3"
-            }
-          },
-          {
-            ALT: () => {
-              this.CONSUME5(FiveTok)
-              total += "OOPS!"
-            }
-          }
-        ])
+          ]
+        })
 
         return total
       }

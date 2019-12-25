@@ -44,7 +44,6 @@ import {
 } from "./gast/gast_public"
 import { GAstVisitor } from "./gast/gast_visitor_public"
 import {
-  IgnoredParserIssues,
   IGrammarValidatorErrorMessageProvider,
   IOptionallyNamedProduction,
   IParserDefinitionError,
@@ -57,7 +56,6 @@ export function validateGrammar(
   topLevels: Rule[],
   globalMaxLookahead: number,
   tokenTypes: TokenType[],
-  ignoredIssues: IgnoredParserIssues,
   errMsgProvider: IGrammarValidatorErrorMessageProvider,
   grammarName: string
 ): IParserDefinitionError[] {
@@ -82,7 +80,6 @@ export function validateGrammar(
       validateAmbiguousAlternationAlternatives(
         currTopRule,
         globalMaxLookahead,
-        ignoredIssues,
         errMsgProvider
       )
     )
@@ -544,25 +541,11 @@ export function validateEmptyOrAlternative(
 export function validateAmbiguousAlternationAlternatives(
   topLevelRule: Rule,
   globalMaxLookahead: number,
-  ignoredIssues: IgnoredParserIssues,
   errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserAmbiguousAlternativesDefinitionError[] {
   let orCollector = new OrCollector()
   topLevelRule.accept(orCollector)
   let ors = orCollector.alternations
-
-  // TODO: this filtering should be deprecated once we remove the ignoredIssues
-  //  IParserConfig property
-  let ignoredIssuesForCurrentRule = ignoredIssues[topLevelRule.name]
-  if (ignoredIssuesForCurrentRule) {
-    ors = reject(
-      ors,
-      currOr =>
-        ignoredIssuesForCurrentRule[
-          getProductionDslName(currOr) + (currOr.idx === 0 ? "" : currOr.idx)
-        ]
-    )
-  }
 
   // New Handling of ignoring ambiguities
   // - https://github.com/SAP/chevrotain/issues/869

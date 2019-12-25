@@ -31,4 +31,18 @@ describe("The Recognizer's Configuration", () => {
     expect((<any>parser).maxLookahead).to.equal(3)
     expect((<any>parser).nodeLocationTracking).to.be.equal("none")
   })
+
+  it("default config values - no config", () => {
+    const A = createToken({ name: "A" })
+
+    const invalidConfig = { ignoredIssues: {} }
+    class IgnoredIssuesParser extends Parser {
+      constructor() {
+        super([A], invalidConfig as any)
+      }
+    }
+    expect(() => new IgnoredIssuesParser()).to.throw(
+      "The <ignoredIssues> IParserConfig property has been deprecated"
+    )
+  })
 })

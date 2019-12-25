@@ -109,7 +109,6 @@ describe("the grammar validations", () => {
       [qualifiedNameErr1, qualifiedNameErr2],
       5,
       [],
-      {},
       defaultGrammarValidatorErrorProvider,
       "bamba"
     )
