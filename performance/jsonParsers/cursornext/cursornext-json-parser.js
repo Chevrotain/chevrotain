@@ -6,10 +6,8 @@ function parse(source) {
   return parseJson(cursor);
 }
 
-var wsRegexp = /[ \t\n\r]+/gy;
-
 function skipWhitespace(cursor) {
-  var execArr = cursor.exec(wsRegexp);
+  var execArr = cursor.exec(/[ \t\n\r]+/gy);
   if (execArr) {
     cursor.next(execArr[0].length);
   }
@@ -175,10 +173,8 @@ function parseArray(cursor) {
   };
 }
 
-var numberRegexp = /-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/gy;
-
 function parseNumber(cursor) {
-  var execArr = cursor.exec(numberRegexp);
+  var execArr = cursor.exec(/-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/gy);
   if (execArr) {
     cursor.next(execArr[0].length);
 
@@ -189,10 +185,8 @@ function parseNumber(cursor) {
   }
 }
 
-var nullRegexp = /null/gy;
-
 function parseNull(cursor) {
-  if (cursor.exec(nullRegexp)) {
+  if (cursor.exec(/null/gy)) {
     cursor.next(4);
 
     return {
@@ -201,10 +195,8 @@ function parseNull(cursor) {
   }
 }
 
-var booleanRegexp = /true|false/gy;
-
 function parseBoolean(cursor) {
-  var execArr = cursor.exec(booleanRegexp);
+  var execArr = cursor.exec(/true|false/gy);
   if (execArr) {
     cursor.next(execArr[0].length);
 
@@ -215,10 +207,8 @@ function parseBoolean(cursor) {
   }
 }
 
-var stringRegexp = /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/gy;
-
 function parseString(cursor) {
-  var execArr = cursor.exec(stringRegexp);
+  var execArr = cursor.exec(/"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/gy);
 
   if (execArr) {
     cursor.next(execArr[0].length);
