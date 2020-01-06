@@ -6,7 +6,7 @@
 
 ## Introduction
 
-In This tutorial we will implement a Lexer for a simple SQL Select statement language:
+In this tutorial we will implement a Lexer for a simple SQL Select statement language:
 
 ```sql
 SELECT column1 FROM table2
