@@ -2,7 +2,8 @@
 [![npm](https://img.shields.io/npm/v/chevrotain.svg)](https://www.npmjs.com/package/chevrotain)
 [![CircleCI](https://circleci.com/gh/SAP/chevrotain.svg?style=svg)](https://circleci.com/gh/SAP/chevrotain)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
-[![Greenkeeper badge](https://badges.greenkeeper.io/SAP/chevrotain.svg)](https://greenkeeper.io/)
+[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
+[![dependentbot](https://api.dependabot.com/badges/status?host=github&repo=SAP/chevrotain)](https://dependabot.com/)
 
 # Chevrotain
 
