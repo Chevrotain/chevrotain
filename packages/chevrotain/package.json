@@ -113,7 +113,7 @@
     "requirejs": "2.3.6",
     "sinon": "^8.0.4",
     "sinon-chai": "^3.0.0",
-    "tslint": "^5.8.0",
+    "tslint": "^6.0.0",
     "typedoc": "0.14.2",
     "typescript": "3.5.3",
     "vuepress": "^0.14.2",
