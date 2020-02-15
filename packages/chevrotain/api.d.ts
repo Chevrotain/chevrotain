@@ -901,130 +901,6 @@ declare abstract class BaseParser {
 }
 
 /**
- * @deprecated Soft deprecated, CstParser or EmbeddedActionsParser instead.
- *    - {@link CstParser}
- *    - {@link EmbeddedActionsParser}
- */
-export declare class Parser extends BaseParser {
-  /**
-   * @deprecated use {@link Parser.performSelfAnalysis} **instance** method instead.
-   */
-  /* protected */ static performSelfAnalysis(parserInstance: Parser): void
-
-  /**
-   *
-   * @param name - The name of the rule.
-   * @param implementation - The implementation of the rule.
-   * @param [config] - The rule's optional configuration.
-   *
-   * @returns - The parsing rule which is the production implementation wrapped with the parsing logic that handles
-   *                     Parser state / error recovery&reporting/ ...
-   */
-  /* protected */ RULE<T>(
-    name: string,
-    implementation: (...implArgs: any[]) => T,
-    config?: IRuleConfig<T>
-  ): (idxInCallingRule?: number, ...args: any[]) => T
-
-  /**
-   * Same as {@link Parser.RULE}, but should only be used in
-   * "extending" grammars to override rules/productions from the super grammar.
-   * See [Parser Inheritance Example](https://github.com/SAP/chevrotain/tree/master/examples/parser/inheritance).
-   */
-  /* protected */ OVERRIDE_RULE<T>(
-    name: string,
-    impl: (...implArgs: any[]) => T,
-    config?: IRuleConfig<T>
-  ): (idxInCallingRule?: number, ...args: any[]) => T
-
-  /* protected */ SUBRULE<T>(
-    ruleToCall: (idx: number) => T,
-    options?: SubruleMethodOpts
-  ): T
-
-  /**
-   * @see SUBRULE
-   * @hidden
-   */
-  /* protected */ SUBRULE1<T>(
-    ruleToCall: (idx: number) => T,
-    options?: SubruleMethodOpts
-  ): T
-
-  /**
-   * @see SUBRULE
-   * @hidden
-   */
-  /* protected */ SUBRULE2<T>(
-    ruleToCall: (idx: number) => T,
-    options?: SubruleMethodOpts
-  ): T
-
-  /**
-   * @see SUBRULE
-   * @hidden
-   */
-  /* protected */ SUBRULE3<T>(
-    ruleToCall: (idx: number) => T,
-    options?: SubruleMethodOpts
-  ): T
-
-  /**
-   * @see SUBRULE
-   * @hidden
-   */
-  /* protected */ SUBRULE4<T>(
-    ruleToCall: (idx: number) => T,
-    options?: SubruleMethodOpts
-  ): T
-
-  /**
-   * @see SUBRULE
-   * @hidden
-   */
-  /* protected */ SUBRULE5<T>(
-    ruleToCall: (idx: number) => T,
-    options?: SubruleMethodOpts
-  ): T
-
-  /**
-   * @see SUBRULE
-   * @hidden
-   */
-  /* protected */ SUBRULE6<T>(
-    ruleToCall: (idx: number) => T,
-    options?: SubruleMethodOpts
-  ): T
-
-  /**
-   * @see SUBRULE
-   * @hidden
-   */
-  /* protected */ SUBRULE7<T>(
-    ruleToCall: (idx: number) => T,
-    options?: SubruleMethodOpts
-  ): T
-
-  /**
-   * @see SUBRULE
-   * @hidden
-   */
-  /* protected */ SUBRULE8<T>(
-    ruleToCall: (idx: number) => T,
-    options?: SubruleMethodOpts
-  ): T
-
-  /**
-   * @see SUBRULE
-   * @hidden
-   */
-  /* protected */ SUBRULE9<T>(
-    ruleToCall: (idx: number) => T,
-    options?: SubruleMethodOpts
-  ): T
-}
-
-/**
  * A Parser that outputs a Concrete Syntax Tree.
  * See:
  *    - https://sap.github.io/chevrotain/docs/tutorial/step3_adding_actions_root.html#alternatives
@@ -1036,7 +912,7 @@ export declare class CstParser extends BaseParser {
   /**
    * @deprecated use {@link Parser.performSelfAnalysis} **instance** method instead.
    */
-  /* protected */ static performSelfAnalysis(parserInstance: Parser): void
+  /* protected */ static performSelfAnalysis(parserInstance: CstParser): void
 
   /**
    * Creates a Grammar Rule
@@ -1185,7 +1061,9 @@ export declare class EmbeddedActionsParser extends BaseParser {
   /**
    * @deprecated use {@link Parser.performSelfAnalysis} **instance** method instead.
    */
-  /* protected */ static performSelfAnalysis(parserInstance: Parser): void
+  /* protected */ static performSelfAnalysis(
+    parserInstance: EmbeddedActionsParser
+  ): void
 
   // TODO: remove `outputCST` from the config options in the constructor
 
@@ -2133,15 +2011,6 @@ export interface IParserConfig {
    */
   dynamicTokensEnabled?: boolean
   /**
-   * @deprecated - extend either CstParser or EmbeddedActionsParser to control this flag instead
-   *               - @see CstParser
-   *               - @see EmbeddedActionsParser
-   *
-   * Enable automatic Concrete Syntax Tree creation
-   * For in-depth docs on [Concrete Syntax Trees](http://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html):
-   */
-  outputCst?: boolean
-  /**
    * Enable computation of CST nodes location.
    * By default this is set to "none", meaning this feature is disabled.
    * See: http://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html#cstnode-location
@@ -2886,11 +2755,11 @@ export declare function createSyntaxDiagramsCode(
  *
  * - See detailed docs for [Custom APIs](http://sap.github.io/chevrotain/docs/guide/custom_apis.html).
  */
-export declare function generateParserFactory(options: {
+export declare function generateParserFactory<T extends BaseParser>(options: {
   name: string
   rules: Rule[]
   tokenVocabulary: TokenVocabulary
-}): (config?: IParserConfig) => Parser
+}): (config?: IParserConfig) => T
 
 /**
  * Generate A Parser's text from a set of Rules.

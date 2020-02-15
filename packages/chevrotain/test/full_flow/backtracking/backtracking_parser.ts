@@ -4,8 +4,8 @@
 // generally one should avoid having to use backtracking, and this specific example can be resolved by parsing
 // both statements in a single rule and only distinguishing between them later, but lets see an example of using backtracking :)
 
-import { Parser } from "../../../src/parse/parser/traits/parser_traits"
-import { IParserConfig, IToken } from "../../../api"
+import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
+import { IParserConfig } from "../../../api"
 
 export enum RET_TYPE {
   WITH_DEFAULT,
@@ -42,13 +42,11 @@ export class IdentTok {
   static PATTERN = /NA/
 }
 
-const configuration: IParserConfig = {
-  outputCst: false
-}
+const configuration: IParserConfig = {}
 
 // extending the BaseErrorRecoveryRecognizer in this example because it too has logic related to backtracking
 // that needs to be tested too.
-export class BackTrackingParser extends Parser {
+export class BackTrackingParser extends EmbeddedActionsParser {
   constructor() {
     // DOCS: note the second parameter in the super class. this is the namespace in which the token constructors are defined.
     //       it is mandatory to provide this map to be able to perform self analysis

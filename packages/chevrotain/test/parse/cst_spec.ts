@@ -1,5 +1,5 @@
 import { createToken } from "../../src/scan/tokens_public"
-import { CstParser, Parser } from "../../src/parse/parser/traits/parser_traits"
+import { CstParser } from "../../src/parse/parser/traits/parser_traits"
 import { tokenStructuredMatcher } from "../../src/scan/tokens"
 import { createRegularToken } from "../utils/matchers"
 import { map } from "../../src/utils/utils"
@@ -96,7 +96,6 @@ function defineTestSuit(recoveryMode) {
       class CstTerminalParserWithLabels extends CstParser {
         constructor(input: IToken[] = []) {
           super(ALL_TOKENS, {
-            outputCst: true,
             recoveryEnabled: true
           })
           this.performSelfAnalysis()
@@ -132,7 +131,6 @@ function defineTestSuit(recoveryMode) {
       class CstTerminalAlternationParser extends CstParser {
         constructor(input: IToken[] = []) {
           super(ALL_TOKENS, {
-            outputCst: true,
             recoveryEnabled: recoveryMode
           })
           this.performSelfAnalysis()
@@ -173,7 +171,6 @@ function defineTestSuit(recoveryMode) {
       class CstTerminalAlternationSingleAltParser extends CstParser {
         constructor(input: IToken[] = []) {
           super(ALL_TOKENS, {
-            outputCst: true,
             recoveryEnabled: recoveryMode
           })
           this.performSelfAnalysis()
@@ -205,7 +202,6 @@ function defineTestSuit(recoveryMode) {
       class CstMultiTerminalParser extends CstParser {
         constructor(input: IToken[] = []) {
           super(ALL_TOKENS, {
-            outputCst: true,
             recoveryEnabled: recoveryMode
           })
           this.performSelfAnalysis()
@@ -238,7 +234,6 @@ function defineTestSuit(recoveryMode) {
       class CstMultiTerminalWithManyParser extends CstParser {
         constructor(input: IToken[] = []) {
           super(ALL_TOKENS, {
-            outputCst: true,
             recoveryEnabled: recoveryMode
           })
           this.performSelfAnalysis()
@@ -288,7 +283,6 @@ function defineTestSuit(recoveryMode) {
       class CstOptionalTerminalParser extends CstParser {
         constructor(input: IToken[] = []) {
           super(ALL_TOKENS, {
-            outputCst: true,
             recoveryEnabled: recoveryMode
           })
           this.performSelfAnalysis()
@@ -342,7 +336,6 @@ function defineTestSuit(recoveryMode) {
       class CstMultiTerminalWithAtLeastOneParser extends CstParser {
         constructor(input: IToken[] = []) {
           super(ALL_TOKENS, {
-            outputCst: true,
             recoveryEnabled: recoveryMode
           })
           this.performSelfAnalysis()
@@ -378,7 +371,6 @@ function defineTestSuit(recoveryMode) {
       class CstMultiTerminalWithManySepParser extends CstParser {
         constructor(input: IToken[] = []) {
           super(ALL_TOKENS, {
-            outputCst: true,
             recoveryEnabled: recoveryMode
           })
           this.performSelfAnalysis()
@@ -419,7 +411,6 @@ function defineTestSuit(recoveryMode) {
       class CstMultiTerminalWithAtLeastOneSepParser extends CstParser {
         constructor(input: IToken[] = []) {
           super(ALL_TOKENS, {
-            outputCst: true,
             recoveryEnabled: recoveryMode
           })
           this.performSelfAnalysis()
@@ -668,7 +659,6 @@ function defineTestSuit(recoveryMode) {
         class CstOptionalNestedTerminalParser extends CstParser {
           constructor(input: IToken[] = []) {
             super(ALL_TOKENS, {
-              outputCst: true,
               recoveryEnabled: recoveryMode
             })
             this.performSelfAnalysis()
@@ -729,7 +719,6 @@ function defineTestSuit(recoveryMode) {
         class CstAlternationNestedAltParser extends CstParser {
           constructor(input: IToken[] = []) {
             super(ALL_TOKENS, {
-              outputCst: true,
               recoveryEnabled: recoveryMode
             })
             this.performSelfAnalysis()
@@ -773,7 +762,6 @@ function defineTestSuit(recoveryMode) {
         class CstAlternationNestedParser extends CstParser {
           constructor(input: IToken[] = []) {
             super(ALL_TOKENS, {
-              outputCst: true,
               recoveryEnabled: recoveryMode
             })
             this.performSelfAnalysis()
@@ -820,7 +808,6 @@ function defineTestSuit(recoveryMode) {
         class CstAlternationNestedAltSingleParser extends CstParser {
           constructor(input: IToken[] = []) {
             super(ALL_TOKENS, {
-              outputCst: true,
               recoveryEnabled: recoveryMode
             })
             this.performSelfAnalysis()
@@ -859,7 +846,6 @@ function defineTestSuit(recoveryMode) {
         class CstMultiTerminalWithManyNestedParser extends CstParser {
           constructor(input: IToken[] = []) {
             super(ALL_TOKENS, {
-              outputCst: true,
               recoveryEnabled: recoveryMode
             })
             this.performSelfAnalysis()
@@ -918,7 +904,6 @@ function defineTestSuit(recoveryMode) {
         class CstAtLeastOneNestedParser extends CstParser {
           constructor(input: IToken[] = []) {
             super(ALL_TOKENS, {
-              outputCst: true,
               recoveryEnabled: recoveryMode
             })
             this.performSelfAnalysis()
@@ -959,7 +944,6 @@ function defineTestSuit(recoveryMode) {
         class CstNestedRuleWithManySepParser extends CstParser {
           constructor(input: IToken[] = []) {
             super(ALL_TOKENS, {
-              outputCst: true,
               recoveryEnabled: recoveryMode
             })
             this.performSelfAnalysis()
@@ -1001,7 +985,6 @@ function defineTestSuit(recoveryMode) {
         class CstAtLeastOneSepNestedParser extends CstParser {
           constructor(input: IToken[] = []) {
             super(ALL_TOKENS, {
-              outputCst: true,
               recoveryEnabled: recoveryMode
             })
             this.performSelfAnalysis()
@@ -1204,7 +1187,6 @@ function defineTestSuit(recoveryMode) {
         class CstRecoveryParserReSync extends CstParser {
           constructor(input: IToken[] = []) {
             super(ALL_TOKENS, {
-              outputCst: true,
               recoveryEnabled: true
             })
             this.performSelfAnalysis()
@@ -1280,7 +1262,6 @@ function defineTestSuit(recoveryMode) {
         class CstRecoveryParserReSyncNested extends CstParser {
           constructor(input: IToken[] = []) {
             super(ALL_TOKENS, {
-              outputCst: true,
               recoveryEnabled: true
             })
             this.performSelfAnalysis()

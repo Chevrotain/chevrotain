@@ -35,15 +35,6 @@ export type MixedInParser = ParserConstructorImpel &
   GastRecorder &
   PerformanceTracer
 
-interface MixedInParserConstructor {
-  new (
-    tokenVocabulary: defs.TokenVocabulary,
-    config?: defs.IParserConfig
-  ): defs.Parser
-}
-
-export const Parser: MixedInParserConstructor = <any>ParserConstructorImpel
-
 interface MixedInCstParserConstructor {
   new (
     tokenVocabulary: defs.TokenVocabulary,

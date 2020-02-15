@@ -28,6 +28,7 @@ import {
   Terminal
 } from "../../../src/parse/grammar/gast/gast_public"
 import { IToken, TokenType } from "../../../api"
+import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
 
 const IdentTok = createToken({ name: "IdentTok" })
 const DotTok = createToken({ name: "DotTok" })
@@ -407,7 +408,7 @@ describe("getProdType", () => {
 })
 
 context("lookahead specs", () => {
-  class ColonParserMock extends Parser {
+  class ColonParserMock extends EmbeddedActionsParser {
     constructor() {
       super([ColonTok])
     }
@@ -417,7 +418,7 @@ context("lookahead specs", () => {
     }
   }
 
-  class IdentParserMock extends Parser {
+  class IdentParserMock extends EmbeddedActionsParser {
     constructor() {
       super([IdentTok])
     }
@@ -427,7 +428,7 @@ context("lookahead specs", () => {
     }
   }
 
-  class CommaParserMock extends Parser {
+  class CommaParserMock extends EmbeddedActionsParser {
     constructor() {
       super([CommaTok])
     }
@@ -437,7 +438,7 @@ context("lookahead specs", () => {
     }
   }
 
-  class EntityParserMock extends Parser {
+  class EntityParserMock extends EmbeddedActionsParser {
     constructor() {
       super([EntityTok])
     }
@@ -447,7 +448,7 @@ context("lookahead specs", () => {
     }
   }
 
-  class KeyParserMock extends Parser {
+  class KeyParserMock extends EmbeddedActionsParser {
     constructor() {
       super([KeyTok])
     }

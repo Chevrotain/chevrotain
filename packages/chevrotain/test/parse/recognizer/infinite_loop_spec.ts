@@ -1,4 +1,4 @@
-import { Parser } from "../../../src/parse/parser/traits/parser_traits"
+import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
 import { createRegularToken } from "../../utils/matchers"
 import { augmentTokenTypes } from "../../../src/scan/tokens"
 import { IToken } from "../../../api"
@@ -11,7 +11,7 @@ describe("The Recognizer's capabilities for detecting infinite loops", () => {
   augmentTokenTypes(<any>[PlusTok])
 
   it("Will gracefully 'escape' from an infinite loop in a repetition", () => {
-    class InfiniteLoopParser extends Parser {
+    class InfiniteLoopParser extends EmbeddedActionsParser {
       constructor(input: IToken[] = []) {
         super([PlusTok])
 
@@ -54,7 +54,7 @@ describe("The Recognizer's capabilities for detecting infinite loops", () => {
 
     const allTokens = [Semi, A, B, C]
 
-    class InfParser extends Parser {
+    class InfParser extends EmbeddedActionsParser {
       constructor() {
         super(allTokens, {
           recoveryEnabled: true

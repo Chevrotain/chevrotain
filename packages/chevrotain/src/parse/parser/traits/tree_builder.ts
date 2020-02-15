@@ -48,9 +48,9 @@ export class TreeBuilder {
   initTreeBuilder(this: MixedInParser, config: IParserConfig) {
     this.LAST_EXPLICIT_RULE_STACK = []
     this.CST_STACK = []
-    this.outputCst = has(config, "outputCst")
-      ? config.outputCst
-      : DEFAULT_PARSER_CONFIG.outputCst
+
+    // outputCst is no longer exposed/defined in the pubic API
+    this.outputCst = (config as any).outputCst
 
     this.nodeLocationTracking = has(config, "nodeLocationTracking")
       ? config.nodeLocationTracking

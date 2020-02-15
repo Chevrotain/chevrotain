@@ -1,4 +1,3 @@
-import { Parser } from "../../src/parse/parser/traits/parser_traits"
 import {
   generateParserModule,
   generateParserFactory

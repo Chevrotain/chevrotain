@@ -34,7 +34,7 @@ import {
   augmentTokenTypes,
   tokenStructuredMatcher
 } from "../../../src/scan/tokens"
-import { Parser } from "../../../src/parse/parser/traits/parser_traits"
+import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
 import {
   Alternation,
   Flat,
@@ -1651,7 +1651,7 @@ describe("issue 391 - WITH_SEP variants do not take SEP into account in lookahea
     const allTokens = [WhiteSpace, LParen, RParen, Comma, FatArrow, Identifier]
     const issue391Lexer = new Lexer(allTokens)
 
-    class Issue391Parser extends Parser {
+    class Issue391Parser extends EmbeddedActionsParser {
       constructor(input: IToken[] = []) {
         super(allTokens, {
           maxLookahead: 4

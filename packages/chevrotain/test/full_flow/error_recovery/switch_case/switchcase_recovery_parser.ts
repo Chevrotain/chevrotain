@@ -28,10 +28,7 @@
  * }
  */
 
-import {
-  EmbeddedActionsParser,
-  Parser
-} from "../../../../src/parse/parser/traits/parser_traits"
+import { EmbeddedActionsParser } from "../../../../src/parse/parser/traits/parser_traits"
 import * as allTokens from "./Switchcase_recovery_tokens"
 import {
   CaseTok,

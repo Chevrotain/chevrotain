@@ -23,6 +23,7 @@
       <excludeFolder url="file://$MODULE_DIR$/packages/chevrotain/docs/.vuepress/dist" />
       <excludeFolder url="file://$MODULE_DIR$/packages/chevrotain/gh-pages" />
       <excludeFolder url="file://$MODULE_DIR$/packages/chevrotain/lib" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/chevrotain/lib_esm" />
       <excludeFolder url="file://$MODULE_DIR$/packages/chevrotain/scripts/gh-pages" />
       <excludeFolder url="file://$MODULE_DIR$/release" />
       <excludeFolder url="file://$MODULE_DIR$/target" />

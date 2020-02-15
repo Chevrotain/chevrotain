@@ -1,4 +1,4 @@
-import { Parser } from "../../../src/parse/parser/traits/parser_traits"
+import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
 import { createRegularToken } from "../../utils/matchers"
 import { augmentTokenTypes } from "../../../src/scan/tokens"
 import { IToken } from "../../../api"
@@ -15,9 +15,9 @@ describe("The Recognizer's capabilities for overriding grammar productions", () 
   augmentTokenTypes(<any>[PlusTok, MinusTok])
 
   it("Can override an existing rule", () => {
-    class SuperOverrideParser extends Parser {
+    class SuperOverrideParser extends EmbeddedActionsParser {
       constructor(isInvokedByChildConstructor = false) {
-        super(<any>[PlusTok, MinusTok], { outputCst: false })
+        super(<any>[PlusTok, MinusTok], {})
 
         // performSelfAnalysis should only be invoked once.
         if (!isInvokedByChildConstructor) {
@@ -72,7 +72,7 @@ describe("The Recognizer's capabilities for overriding grammar productions", () 
   })
 
   it("Can not override a rule which does not exist", () => {
-    class InvalidOverrideParser extends Parser {
+    class InvalidOverrideParser extends EmbeddedActionsParser {
       constructor(input: IToken[] = []) {
         super([PlusTok, MinusTok])
         this.performSelfAnalysis()
