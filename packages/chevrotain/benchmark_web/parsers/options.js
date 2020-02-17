@@ -1,4 +1,5 @@
-window.globalOptions = {
-  dev: { outputCst: false, maxLookahead: 2 },
-  latest: { outputCst: false, maxLookahead: 2 }
+self.globalOptions = {
+  outputCst: true,
+  dev: { maxLookahead: 2, outputCst: false },
+  latest: { maxLookahead: 2, outputCst: false }
 }

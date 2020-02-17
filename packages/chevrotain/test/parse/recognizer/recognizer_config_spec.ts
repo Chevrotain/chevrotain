@@ -1,11 +1,11 @@
-import { Parser } from "../../../src/parse/parser/traits/parser_traits"
+import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
 import { createToken } from "../../../src/scan/tokens_public"
 
 describe("The Recognizer's Configuration", () => {
   it("default config values - empty config", () => {
     const A = createToken({ name: "A" })
 
-    class EmptyConfigParser extends Parser {
+    class EmptyConfigParser extends EmbeddedActionsParser {
       constructor() {
         super([A], {})
       }
@@ -20,7 +20,7 @@ describe("The Recognizer's Configuration", () => {
   it("default config values - no config", () => {
     const A = createToken({ name: "A" })
 
-    class NoConfigParser extends Parser {
+    class NoConfigParser extends EmbeddedActionsParser {
       constructor() {
         super([A])
       }
@@ -36,7 +36,7 @@ describe("The Recognizer's Configuration", () => {
     const A = createToken({ name: "A" })
 
     const invalidConfig = { ignoredIssues: {} }
-    class IgnoredIssuesParser extends Parser {
+    class IgnoredIssuesParser extends EmbeddedActionsParser {
       constructor() {
         super([A], invalidConfig as any)
       }

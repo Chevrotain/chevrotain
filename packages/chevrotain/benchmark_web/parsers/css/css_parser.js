@@ -241,10 +241,13 @@ var Minus = createToken({ name: "Minus", pattern: /-/ })
 
 var lexerDefinition = cssTokens
 
-// ----------------- parser -----------------
+var ChevrotainParser = self.globalOptions.outputCst
+  ? chevrotain.CstParser
+  : chevrotain.EmbeddedActionsParser
 
+// ----------------- parser -----------------
 function parser(config) {
-  chevrotain.Parser.call(this, cssTokens, config)
+  ChevrotainParser.call(this, cssTokens, config)
 
   var $ = this
 
@@ -589,7 +592,7 @@ function parser(config) {
   this.performSelfAnalysis()
 }
 
-parser.prototype = Object.create(chevrotain.Parser.prototype)
+parser.prototype = Object.create(ChevrotainParser.prototype)
 parser.prototype.constructor = parser
 
 // ----------------- wrapping it all together -----------------

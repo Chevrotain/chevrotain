@@ -1,5 +1,5 @@
 import { createToken } from "../../src/scan/tokens_public"
-import { Parser } from "../../src/parse/parser/traits/parser_traits"
+import { EmbeddedActionsParser } from "../../src/parse/parser/traits/parser_traits"
 import { createRegularToken } from "../utils/matchers"
 import { IToken } from "../../api"
 import { isES2015MapSupported } from "../../src/utils/utils"
@@ -31,7 +31,7 @@ describe("lookahead Regular Tokens Mode", () => {
   ]
 
   describe("The implicit lookahead calculation functionality of the Recognizer For OPTION", () => {
-    class OptionsImplicitLookAheadParser extends Parser {
+    class OptionsImplicitLookAheadParser extends EmbeddedActionsParser {
       public getLookAheadCacheSize(): number {
         if (isES2015MapSupported()) {
           // @ts-ignore
@@ -43,7 +43,7 @@ describe("lookahead Regular Tokens Mode", () => {
       }
 
       constructor(input: IToken[] = []) {
-        super(ALL_TOKENS, { outputCst: false })
+        super(ALL_TOKENS, {})
 
         this.performSelfAnalysis()
         this.input = input
@@ -129,7 +129,7 @@ describe("lookahead Regular Tokens Mode", () => {
   })
 
   describe("The implicit lookahead calculation functionality of the Recognizer For MANY", () => {
-    class ManyImplicitLookAheadParser extends Parser {
+    class ManyImplicitLookAheadParser extends EmbeddedActionsParser {
       public getLookAheadCacheSize(): number {
         if (isES2015MapSupported()) {
           // @ts-ignore
@@ -141,7 +141,7 @@ describe("lookahead Regular Tokens Mode", () => {
       }
 
       constructor(input: IToken[] = []) {
-        super(ALL_TOKENS, { outputCst: false })
+        super(ALL_TOKENS, {})
 
         this.performSelfAnalysis()
         this.input = input
@@ -281,7 +281,7 @@ describe("lookahead Regular Tokens Mode", () => {
   })
 
   describe("The implicit lookahead calculation functionality of the Recognizer For MANY_SEP", () => {
-    class ManySepImplicitLookAheadParser extends Parser {
+    class ManySepImplicitLookAheadParser extends EmbeddedActionsParser {
       public getLookAheadCacheSize(): number {
         if (isES2015MapSupported()) {
           // @ts-ignore
@@ -293,7 +293,7 @@ describe("lookahead Regular Tokens Mode", () => {
       }
 
       constructor(input: IToken[] = []) {
-        super(ALL_TOKENS, { outputCst: false })
+        super(ALL_TOKENS, {})
 
         this.performSelfAnalysis()
         this.input = input
@@ -457,7 +457,7 @@ describe("lookahead Regular Tokens Mode", () => {
   })
 
   describe("The implicit lookahead calculation functionality of the Recognizer For AT_LEAST_ONE", () => {
-    class AtLeastOneImplicitLookAheadParser extends Parser {
+    class AtLeastOneImplicitLookAheadParser extends EmbeddedActionsParser {
       public getLookAheadCacheSize(): number {
         if (isES2015MapSupported()) {
           // @ts-ignore
@@ -469,7 +469,7 @@ describe("lookahead Regular Tokens Mode", () => {
       }
 
       constructor(input: IToken[] = []) {
-        super(ALL_TOKENS, { outputCst: false })
+        super(ALL_TOKENS, {})
 
         this.performSelfAnalysis()
         this.input = input
@@ -576,7 +576,7 @@ describe("lookahead Regular Tokens Mode", () => {
   })
 
   describe("The implicit lookahead calculation functionality of the Recognizer For AT_LEAST_ONE_SEP", () => {
-    class AtLeastOneSepImplicitLookAheadParser extends Parser {
+    class AtLeastOneSepImplicitLookAheadParser extends EmbeddedActionsParser {
       public getLookAheadCacheSize(): number {
         if (isES2015MapSupported()) {
           // @ts-ignore
@@ -588,7 +588,7 @@ describe("lookahead Regular Tokens Mode", () => {
       }
 
       constructor(input: IToken[] = []) {
-        super(ALL_TOKENS, { outputCst: false })
+        super(ALL_TOKENS, {})
 
         this.performSelfAnalysis()
         this.input = input
@@ -728,7 +728,7 @@ describe("lookahead Regular Tokens Mode", () => {
   })
 
   describe("The implicit lookahead calculation functionality of the Recognizer For OR", () => {
-    class OrImplicitLookAheadParser extends Parser {
+    class OrImplicitLookAheadParser extends EmbeddedActionsParser {
       public getLookAheadCacheSize(): number {
         if (isES2015MapSupported()) {
           // @ts-ignore
@@ -740,7 +740,7 @@ describe("lookahead Regular Tokens Mode", () => {
       }
 
       constructor(input: IToken[] = []) {
-        super(ALL_TOKENS, { outputCst: false })
+        super(ALL_TOKENS, {})
 
         this.performSelfAnalysis()
         this.input = input
@@ -977,9 +977,9 @@ describe("lookahead Regular Tokens Mode", () => {
 
   describe("OR production ambiguity detection when using implicit lookahead calculation", () => {
     it("will throw an error when two alternatives have the same single token (lookahead 1) prefix", () => {
-      class OrAmbiguityLookAheadParser extends Parser {
+      class OrAmbiguityLookAheadParser extends EmbeddedActionsParser {
         constructor(input: IToken[] = []) {
-          super(ALL_TOKENS, { outputCst: false })
+          super(ALL_TOKENS, {})
 
           this.performSelfAnalysis()
           this.input = input
@@ -1024,9 +1024,9 @@ describe("lookahead Regular Tokens Mode", () => {
     })
 
     it("will throw an error when two alternatives have the same multi token (lookahead > 1) prefix", () => {
-      class OrAmbiguityMultiTokenLookAheadParser extends Parser {
+      class OrAmbiguityMultiTokenLookAheadParser extends EmbeddedActionsParser {
         constructor(input: IToken[] = []) {
-          super(ALL_TOKENS, { outputCst: false })
+          super(ALL_TOKENS, {})
 
           this.performSelfAnalysis()
           this.input = input
@@ -1071,7 +1071,7 @@ describe("lookahead Regular Tokens Mode", () => {
   })
 
   describe("The implicit lookahead calculation functionality of the Recognizer For OR (with IGNORE_AMBIGUITIES)", () => {
-    class OrImplicitLookAheadParserIgnoreAmbiguities extends Parser {
+    class OrImplicitLookAheadParserIgnoreAmbiguities extends EmbeddedActionsParser {
       public getLookAheadCacheSize(): number {
         if (isES2015MapSupported()) {
           // @ts-ignore
@@ -1083,9 +1083,7 @@ describe("lookahead Regular Tokens Mode", () => {
       }
 
       constructor(input: IToken[] = []) {
-        super(ALL_TOKENS, {
-          outputCst: false
-        })
+        super(ALL_TOKENS, {})
 
         this.performSelfAnalysis()
         this.input = input
@@ -1297,9 +1295,9 @@ describe("lookahead Regular Tokens Mode", () => {
 
   describe("The support for MultiToken (K>1) implicit lookahead capabilities in DSL Production:", () => {
     it("OPTION", () => {
-      class MultiTokenLookAheadForOptionParser extends Parser {
+      class MultiTokenLookAheadForOptionParser extends EmbeddedActionsParser {
         constructor(input: IToken[] = []) {
-          super(ALL_TOKENS, { outputCst: false })
+          super(ALL_TOKENS, {})
 
           this.performSelfAnalysis()
           this.input = input
@@ -1336,9 +1334,9 @@ describe("lookahead Regular Tokens Mode", () => {
     })
 
     it("MANY", () => {
-      class MultiTokenLookAheadForManyParser extends Parser {
+      class MultiTokenLookAheadForManyParser extends EmbeddedActionsParser {
         constructor(input: IToken[] = []) {
-          super(ALL_TOKENS, { outputCst: false })
+          super(ALL_TOKENS, {})
 
           this.performSelfAnalysis()
           this.input = input
@@ -1388,9 +1386,9 @@ describe("lookahead Regular Tokens Mode", () => {
     })
 
     it("MANY_SEP", () => {
-      class MultiTokenLookAheadForManySepParser extends Parser {
+      class MultiTokenLookAheadForManySepParser extends EmbeddedActionsParser {
         constructor(input: IToken[] = []) {
-          super(ALL_TOKENS, { outputCst: false })
+          super(ALL_TOKENS, {})
 
           this.performSelfAnalysis()
           this.input = input
@@ -1443,9 +1441,9 @@ describe("lookahead Regular Tokens Mode", () => {
     })
 
     it("OR", () => {
-      class MultiTokenLookAheadForOrParser extends Parser {
+      class MultiTokenLookAheadForOrParser extends EmbeddedActionsParser {
         constructor(input: IToken[] = []) {
-          super(ALL_TOKENS, { outputCst: false })
+          super(ALL_TOKENS, {})
 
           this.performSelfAnalysis()
           this.input = input
@@ -1511,9 +1509,9 @@ describe("lookahead Regular Tokens Mode", () => {
     })
 
     it("AT_LEAST_ONE", () => {
-      class MultiTokenLookAheadForAtLeastOneParser extends Parser {
+      class MultiTokenLookAheadForAtLeastOneParser extends EmbeddedActionsParser {
         constructor(input: IToken[] = []) {
-          super(ALL_TOKENS, { outputCst: false })
+          super(ALL_TOKENS, {})
 
           this.performSelfAnalysis()
           this.input = input
@@ -1573,9 +1571,9 @@ describe("lookahead Regular Tokens Mode", () => {
     })
 
     it("AT_LEAST_ONE_SEP", () => {
-      class MultiTokenLookAheadForAtLeastOneSepParser extends Parser {
+      class MultiTokenLookAheadForAtLeastOneSepParser extends EmbeddedActionsParser {
         constructor(input: IToken[] = []) {
-          super(ALL_TOKENS, { outputCst: false })
+          super(ALL_TOKENS, {})
 
           this.performSelfAnalysis()
           this.input = input
@@ -1643,9 +1641,9 @@ describe("lookahead Regular Tokens Mode", () => {
 
   describe("The support for MultiToken (K>1) EXPLICIT lookahead capabilities in DSL Production:", () => {
     it("OPTION", () => {
-      class MultiTokenLookAheadForOptionParser extends Parser {
+      class MultiTokenLookAheadForOptionParser extends EmbeddedActionsParser {
         constructor(input: IToken[] = []) {
-          super(ALL_TOKENS, { outputCst: false })
+          super(ALL_TOKENS, {})
 
           this.performSelfAnalysis()
           this.input = input
@@ -1682,10 +1680,9 @@ describe("lookahead Regular Tokens Mode", () => {
     })
 
     it("MANY", () => {
-      class MultiTokenLookAheadForManyParser extends Parser {
+      class MultiTokenLookAheadForManyParser extends EmbeddedActionsParser {
         constructor(input: IToken[] = []) {
           super(ALL_TOKENS, {
-            outputCst: false,
             // Global Low maxLookahead
             maxLookahead: 1
           })
@@ -1742,9 +1739,9 @@ describe("lookahead Regular Tokens Mode", () => {
     })
 
     it("MANY_SEP", () => {
-      class MultiTokenLookAheadForManySepParser extends Parser {
+      class MultiTokenLookAheadForManySepParser extends EmbeddedActionsParser {
         constructor(input: IToken[] = []) {
-          super(ALL_TOKENS, { maxLookahead: 1, outputCst: false })
+          super(ALL_TOKENS, { maxLookahead: 1 })
 
           this.performSelfAnalysis()
           this.input = input
@@ -1798,12 +1795,11 @@ describe("lookahead Regular Tokens Mode", () => {
     })
 
     it("OR", () => {
-      class MultiTokenLookAheadForOrParser extends Parser {
+      class MultiTokenLookAheadForOrParser extends EmbeddedActionsParser {
         constructor(input: IToken[] = []) {
           super(ALL_TOKENS, {
             // Global low maxLookahead should cause ambiguities in this grammar
-            maxLookahead: 1,
-            outputCst: false
+            maxLookahead: 1
           })
 
           this.performSelfAnalysis()
@@ -1874,9 +1870,9 @@ describe("lookahead Regular Tokens Mode", () => {
     })
 
     it("AT_LEAST_ONE", () => {
-      class MultiTokenLookAheadForAtLeastOneParser extends Parser {
+      class MultiTokenLookAheadForAtLeastOneParser extends EmbeddedActionsParser {
         constructor(input: IToken[] = []) {
-          super(ALL_TOKENS, { maxLookahead: 1, outputCst: false })
+          super(ALL_TOKENS, { maxLookahead: 1 })
 
           this.performSelfAnalysis()
           this.input = input
@@ -1939,9 +1935,9 @@ describe("lookahead Regular Tokens Mode", () => {
     })
 
     it("AT_LEAST_ONE_SEP", () => {
-      class MultiTokenLookAheadForAtLeastOneSepParser extends Parser {
+      class MultiTokenLookAheadForAtLeastOneSepParser extends EmbeddedActionsParser {
         constructor(input: IToken[] = []) {
-          super(ALL_TOKENS, { maxLookahead: 1, outputCst: false })
+          super(ALL_TOKENS, { maxLookahead: 1 })
 
           this.performSelfAnalysis()
           this.input = input
@@ -2009,11 +2005,9 @@ describe("lookahead Regular Tokens Mode", () => {
   })
 
   describe("Lookahead bug: MANY in OR", () => {
-    class ManyInOrBugParser extends Parser {
+    class ManyInOrBugParser extends EmbeddedActionsParser {
       constructor() {
-        super(ALL_TOKENS, {
-          outputCst: false
-        })
+        super(ALL_TOKENS, {})
         this.performSelfAnalysis()
       }
 
@@ -2066,7 +2060,7 @@ describe("lookahead Regular Tokens Mode", () => {
       const C = createToken({ name: "C" })
       const D = createToken({ name: "D" })
 
-      class CategoriesLookaheadBugParser extends Parser {
+      class CategoriesLookaheadBugParser extends EmbeddedActionsParser {
         constructor() {
           super([A, B, C, D])
           this.performSelfAnalysis()

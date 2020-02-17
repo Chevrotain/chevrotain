@@ -1,11 +1,11 @@
-import { Parser, Rule, IParserConfig, TokenVocabulary } from "../../api"
+import { Rule, IParserConfig, TokenVocabulary, BaseParser } from "../../api"
 import { genUmdModule, genWrapperFunction } from "./generate"
 
-export function generateParserFactory(options: {
+export function generateParserFactory<T extends BaseParser>(options: {
   name: string
   rules: Rule[]
   tokenVocabulary: TokenVocabulary
-}): (config?: IParserConfig) => Parser {
+}): (config?: IParserConfig) => T {
   const wrapperText = genWrapperFunction({
     name: options.name,
     rules: options.rules

@@ -254,10 +254,7 @@ export class Parser {
   selfAnalysisDone = false
   protected skipValidations: boolean
 
-  constructor(
-    tokenVocabulary: TokenVocabulary,
-    config: IParserConfig = DEFAULT_PARSER_CONFIG
-  ) {
+  constructor(tokenVocabulary: TokenVocabulary, config: IParserConfig) {
     const that: MixedInParser = this as any
     that.initErrorHandler(config)
     that.initLexerAdapter()

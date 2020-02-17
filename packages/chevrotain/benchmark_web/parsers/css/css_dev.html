@@ -1,29 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Title</title>
-</head>
-<body>
+  </head>
+  <body>
+    <script src="../worker_api.js"></script>
+    <script src="../options.js"></script>
 
-<script src="../worker_api.js"></script>
-<script src="../options.js"></script>
-
-<script>
-    // relative ti thr worker impel file
-    initWorker({
-        startRule:     "stylesheet",
-        parserConfig:  window.globalOptions.dev,
+    <script>
+      // relative ti thr worker impel file
+      initWorker({
+        startRule: "stylesheet",
+        parserConfig: window.globalOptions.dev,
         importScripts: [
-            "../../lib/chevrotain.js",
-            "https://unpkg.com/xregexp@3.2.0/xregexp-all.js",
-            "./css/css_parser.js",
-            "./css/1K_css.js",
-            "./api.js"]
-    })
-</script>
-
-
-</body>
+          "../../lib/chevrotain.js",
+          "https://unpkg.com/xregexp@3.2.0/xregexp-all.js",
+          "./options.js",
+          "./css/css_parser.js",
+          "./css/1K_css.js",
+          "./api.js"
+        ]
+      })
+    </script>
+  </body>
 </html>
-

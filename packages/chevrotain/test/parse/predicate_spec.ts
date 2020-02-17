@@ -1,4 +1,4 @@
-import { Parser } from "../../src/parse/parser/traits/parser_traits"
+import { EmbeddedActionsParser } from "../../src/parse/parser/traits/parser_traits"
 import {
   EarlyExitException,
   NoViableAltException
@@ -28,9 +28,9 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
       return this.gate
     }
 
-    class PredicateOptionParser extends Parser {
+    class PredicateOptionParser extends EmbeddedActionsParser {
       constructor(input: IToken[] = [], private gate: boolean) {
-        super(ALL_TOKENS, { outputCst: false })
+        super(ALL_TOKENS, {})
         this.performSelfAnalysis()
         this.input = input
       }
@@ -78,9 +78,9 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
       return this.gate
     }
 
-    class PredicateManyParser extends Parser {
+    class PredicateManyParser extends EmbeddedActionsParser {
       constructor(input: IToken[] = [], private gate: boolean) {
-        super(ALL_TOKENS, { outputCst: false })
+        super(ALL_TOKENS, {})
         this.performSelfAnalysis()
         this.input = input
       }
@@ -129,9 +129,9 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
       return this.gate
     }
 
-    class PredicateAtLeastOneParser extends Parser {
+    class PredicateAtLeastOneParser extends EmbeddedActionsParser {
       constructor(input: IToken[] = [], private gate: boolean) {
-        super(ALL_TOKENS, { outputCst: false })
+        super(ALL_TOKENS, {})
         this.performSelfAnalysis()
         this.input = input
       }
@@ -190,9 +190,9 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
       return this.gate
     }
 
-    class PredicateOrParser extends Parser {
+    class PredicateOrParser extends EmbeddedActionsParser {
       constructor(input: IToken[] = [], private gate: boolean) {
-        super(ALL_TOKENS, { outputCst: false })
+        super(ALL_TOKENS, {})
         this.performSelfAnalysis()
         this.input = input
       }
@@ -267,9 +267,9 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
 
   describe("Predicates shall work with parametrized rules (issue #221)", () => {
     it("predicates in OR", () => {
-      class PredicateWithRuleOrParser extends Parser {
+      class PredicateWithRuleOrParser extends EmbeddedActionsParser {
         constructor(input: IToken[] = []) {
-          super(ALL_TOKENS, { outputCst: false })
+          super(ALL_TOKENS, {})
           this.performSelfAnalysis()
           this.input = input
         }
@@ -301,9 +301,9 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
     })
 
     it("predicates in OPTION", () => {
-      class PredicateWithRuleOptionParser extends Parser {
+      class PredicateWithRuleOptionParser extends EmbeddedActionsParser {
         constructor(input: IToken[] = []) {
-          super(ALL_TOKENS, { outputCst: false })
+          super(ALL_TOKENS, {})
           this.performSelfAnalysis()
           this.input = input
         }
@@ -332,9 +332,9 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
     })
 
     it("predicates in MANY", () => {
-      class PredicateWithRuleManyParser extends Parser {
+      class PredicateWithRuleManyParser extends EmbeddedActionsParser {
         constructor(input: IToken[] = []) {
-          super(ALL_TOKENS, { outputCst: false })
+          super(ALL_TOKENS, {})
           this.performSelfAnalysis()
           this.input = input
         }
@@ -369,9 +369,9 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
     })
 
     it("predicates in AT_LEAST_ONE", () => {
-      class PredicateWithRuleAtLeastOneParser extends Parser {
+      class PredicateWithRuleAtLeastOneParser extends EmbeddedActionsParser {
         constructor(input: IToken[] = []) {
-          super(ALL_TOKENS, { outputCst: false })
+          super(ALL_TOKENS, {})
           this.performSelfAnalysis()
           this.input = input
         }

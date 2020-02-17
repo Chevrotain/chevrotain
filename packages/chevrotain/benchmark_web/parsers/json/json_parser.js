@@ -51,7 +51,9 @@ var lexerDefinition = jsonTokens
 
 // https://github.com/SAP/chevrotain/blob/master/docs/faq.md#Q6
 // (Do not create a new Parser instance for each new input.)
-var ChevrotainParser = chevrotain.Parser
+var ChevrotainParser = self.globalOptions.outputCst
+  ? chevrotain.CstParser
+  : chevrotain.EmbeddedActionsParser
 
 function parser(options) {
   ChevrotainParser.call(this, jsonTokens, options)

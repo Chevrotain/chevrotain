@@ -1,6 +1,7 @@
 /// <reference path="../../lib/chevrotain.d.ts" />
 import Lexer = chevrotain.Lexer
-import Parser = chevrotain.Parser
+import EmbeddedActionsParser = chevrotain.EmbeddedActionsParser
+import CstParser = chevrotain.CstParser
 
 /**
  * This File will be compiled using TSC to verify that the custom build chevrotain.d.ts

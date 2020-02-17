@@ -2,7 +2,6 @@
 export { VERSION } from "./version"
 
 export {
-  Parser,
   CstParser,
   EmbeddedActionsParser,
   ParserDefinitionErrorType,
@@ -85,3 +84,12 @@ export {
   generateParserFactory,
   generateParserModule
 } from "./generate/generate_public"
+
+export class Parser {
+  constructor() {
+    throw new Error(
+      "The Parser class has been deprecated, use CstParser or EmbeddedActionsParser instead.\t\n" +
+        "See: https://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_7-0-0"
+    )
+  }
+}

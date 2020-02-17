@@ -2,7 +2,9 @@
 
 const chevrotain = self.chevrotain
 
-const Parser = chevrotain.Parser
+const Parser = self.globalOptions.outputCst
+  ? chevrotain.CstParser
+  : chevrotain.EmbeddedActionsParser
 const tokenMatcher = chevrotain.tokenMatcher
 const EOF = chevrotain.EOF
 
@@ -19,15 +21,7 @@ class ECMAScript5Parser extends Parser {
   }
 
   constructor(config) {
-    super(
-      tokens,
-      Object.assign({}, config, {
-        ignoredIssues: {
-          Statement: { OR: true },
-          SourceElements: { OR: true }
-        }
-      })
-    )
+    super(tokens, config)
 
     this.SUPER_CONSUME = super.CONSUME
     this.SUPER_CONSUME2 = super.CONSUME2
@@ -361,7 +355,7 @@ class ECMAScript5Parser extends Parser {
       $.OR(
         $.c2 ||
           ($.c2 = [
-            { ALT: () => $.SUBRULE($.Block) },
+            { ALT: () => $.SUBRULE($.Block), IGNORE_AMBIGUITIES: true },
             { ALT: () => $.SUBRULE($.VariableStatement) },
             { ALT: () => $.SUBRULE($.EmptyStatement) },
             // "LabelledStatement" must appear before "ExpressionStatement" due to common lookahead prefix ("inner :" vs "inner")
@@ -791,7 +785,10 @@ class ECMAScript5Parser extends Parser {
         // FunctionDeclaration appearing before statement implements [lookahead != {{, function}] in ExpressionStatement
         // See Function  https://www.ecma-international.org/ecma-262/5.1/index.html#sec-12.4Declaration
         $.OR([
-          { ALT: () => $.SUBRULE($.FunctionDeclaration) },
+          {
+            ALT: () => $.SUBRULE($.FunctionDeclaration),
+            IGNORE_AMBIGUITIES: true
+          },
           { ALT: () => $.SUBRULE($.Statement) }
         ])
       })

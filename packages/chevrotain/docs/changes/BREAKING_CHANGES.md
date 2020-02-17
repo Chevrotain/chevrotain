@@ -17,6 +17,11 @@
   It is also possible (and recommended) to increase the maxLookahead for a specific DSL method rather then globally for all.
   See [relevant issue](https://github.com/SAP/chevrotain/issues/1012).
 
+- The deprecated `Parser` class has been fully removed, use `CstParser` or `EmbeddedActionsParser`
+  depending if your parser outputs a [CST](https://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html) or not.
+  the `outputCst` property of the IParserConfig was also removed as this behavior is now controlled by base Parser class which is
+  extended.
+
 - The IParserConfig's `ignoredIssues` property has been deprecated.
   Any Parser still using this property will throw an exception on initialization.
   If any ambiguities need be ignored, the `IGNORE_AMBIGUITIES` property should be used instead.
