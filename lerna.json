@@ -2,5 +2,11 @@
   "packages": ["packages/*", "examples/*"],
   "useWorkspaces": true,
   "npmClient": "yarn",
+  "command": {
+    "version": {
+      "allowBranch": "master",
+      "message": "chore(release): release"
+    }
+  },
   "version": "6.5.0"
 }

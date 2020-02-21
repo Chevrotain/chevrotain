@@ -12,7 +12,7 @@
     ]
   },
   "scripts": {
-    "lerna:version": "lerna version",
+    "lerna:version": "yarn && lerna version",
     "lerna:publish": "lerna publish from-git --yes",
     "ci": "npm-run-all format:validate build test",
     "build": "lerna run build",
