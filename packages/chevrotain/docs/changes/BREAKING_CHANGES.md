@@ -28,11 +28,14 @@
 
   - see: [Ignoring Ambiguities Docs](https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#IGNORING_AMBIGUITIES)
 
-- Reducing the usage of 'any' in the 'OR' method type signature may cause existing code to fail compilation.
+- Reducing the usage of 'any' in the 'OR' method type signature may cause existing code to fail TypeScript compilation.
   In such a case an explicit usage of a generic `any` type will resolve the problem.
+
   ```typescript
   this.OR<any>(/* ... */)
   ```
+
+- The TokenType's `tokenName` property has been deprecated (This actually happened in 6.3.1...) use the `name` property instead.
 
 ## 6.0.0
 

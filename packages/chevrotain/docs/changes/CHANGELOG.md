@@ -7,10 +7,7 @@
 #### Minor Changes
 
 - [Improved Type Signature for 'OR' method](https://github.com/SAP/chevrotain/issues/970)
-
   - Thanks to [@OmarTawfik](https://github.com/OmarTawfik) :thumbsup
-
-- [Missing deprecation warning for deprecated tokenName property.](https://github.com/SAP/chevrotain/issues/1051)
 
 #### Documentation
 
