@@ -108,7 +108,7 @@
     "karma-requirejs": "^1.1.0",
     "karma-safari-launcher": "^1.0.0",
     "load-grunt-tasks": "^5.1.0",
-    "nyc": "^13.0.1",
+    "nyc": "^15.0.0",
     "require-from-string": "^2.0.2",
     "requirejs": "2.3.6",
     "sinon": "^9.0.0",
