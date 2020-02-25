@@ -97,7 +97,7 @@
     "grunt-karma": "~3.0.0",
     "if-env": "^1.0.0",
     "jsdom": "16.2.0",
-    "jsonfile": "^5.0.0",
+    "jsonfile": "^6.0.0",
     "karma": "4.4.1",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "~3.1.0",
