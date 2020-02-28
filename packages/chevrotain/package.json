@@ -113,6 +113,7 @@
     "requirejs": "2.3.6",
     "sinon": "^9.0.0",
     "sinon-chai": "^3.0.0",
+    "source-map-support": "0.5.16",
     "tslint": "^6.0.0",
     "typedoc": "0.14.2",
     "typescript": "3.5.3",
@@ -135,7 +136,10 @@
   "mocha": {
     "recursive": true,
     "reporter": "spec",
-    "require": "./test/test.config",
+    "require": [
+      "./test/test.config",
+      "source-map-support/register"
+    ],
     "ui": "bdd"
   }
 }
