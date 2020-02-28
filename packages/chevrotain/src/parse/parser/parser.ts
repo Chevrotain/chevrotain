@@ -145,7 +145,10 @@ export class Parser {
    *  @deprecated use the **instance** method with the same name instead
    */
   static performSelfAnalysis(parserInstance: Parser): void {
-    ;(parserInstance as any).performSelfAnalysis()
+    throw Error(
+      "The **static** `performSelfAnalysis` method has been deprecated." +
+        "\t\nUse the **instance** method with the same name instead."
+    )
   }
 
   public performSelfAnalysis(this: MixedInParser): void {

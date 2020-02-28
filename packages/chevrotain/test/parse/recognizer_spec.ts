@@ -728,8 +728,7 @@ function defineRecognizerSpecs(
               // Duplicate CONSUME Idx error
               this.CONSUME(IntTok)
             })
-            // old deprecated static api
-            ;(EmbeddedActionsParser as any).performSelfAnalysis(this)
+            this.performSelfAnalysis()
           }
         }
 
@@ -884,8 +883,7 @@ function defineRecognizerSpecs(
             this.RULE("goodRule", () => {
               this.CONSUME(IntTok)
             })
-            // old deprecated static api
-            ;(EmbeddedActionsParser as any).performSelfAnalysis(this)
+            this.performSelfAnalysis()
 
             this.RULE("badRule", () => {
               this.CONSUME(IntTok)

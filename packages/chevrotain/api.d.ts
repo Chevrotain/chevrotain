@@ -908,12 +908,6 @@ declare abstract class BaseParser {
  * For in depth docs.
  */
 export declare class CstParser extends BaseParser {
-  // TODO: remove `outputCST` from the config options in the constructor
-  /**
-   * @deprecated use {@link Parser.performSelfAnalysis} **instance** method instead.
-   */
-  /* protected */ static performSelfAnalysis(parserInstance: CstParser): void
-
   /**
    * Creates a Grammar Rule
    */
@@ -1058,15 +1052,6 @@ export declare class CstParser extends BaseParser {
  *   - https://sap.github.io/chevrotain/docs/tutorial/step3b_adding_actions_embedded.html#simple-example
  */
 export declare class EmbeddedActionsParser extends BaseParser {
-  /**
-   * @deprecated use {@link Parser.performSelfAnalysis} **instance** method instead.
-   */
-  /* protected */ static performSelfAnalysis(
-    parserInstance: EmbeddedActionsParser
-  ): void
-
-  // TODO: remove `outputCST` from the config options in the constructor
-
   /**
    * Creates a Grammar Rule
    */

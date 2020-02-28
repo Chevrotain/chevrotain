@@ -17,10 +17,12 @@
   It is also possible (and recommended) to increase the maxLookahead for a specific DSL method rather then globally for all.
   See [relevant issue](https://github.com/SAP/chevrotain/issues/1012).
 
-- The deprecated `Parser` class has been fully removed, use `CstParser` or `EmbeddedActionsParser`
-  depending if your parser outputs a [CST](https://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html) or not.
+- The soft deprecated `Parser` class has been fully removed, use `CstParser` or `EmbeddedActionsParser` instead.
+  The choice depends if your parser outputs a [CST](https://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html) or not.
   the `outputCst` property of the IParserConfig was also removed as this behavior is now controlled by base Parser class which is
   extended.
+
+- The soft deprecated **static** `performSelfAnalysis` method has been fully removed, use the **instance** method with the same name instead.
 
 - The IParserConfig's `ignoredIssues` property has been deprecated.
   Any Parser still using this property will throw an exception on initialization.
