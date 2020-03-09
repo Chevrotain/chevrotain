@@ -124,7 +124,8 @@ export function analyzeTokenTypes(
           // only these regExp meta characters which can appear in a length one regExp
           regExpSource !== "^" &&
           regExpSource !== "$" &&
-          regExpSource !== "."
+          regExpSource !== "." &&
+          !currPattern.ignoreCase
         ) {
           return regExpSource
         } else if (

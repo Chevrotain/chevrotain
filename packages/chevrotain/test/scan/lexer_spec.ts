@@ -56,11 +56,24 @@ function defineLexerSpecs(
     })
     const BambaTok = createToken({ name: "BambaTok", pattern: /bamba/ })
 
+    const SingleCharacterWithIgnoreCaseFlagTok = createToken({
+      name: "SingleCharacterWithIgnoreCaseFlagTok",
+      pattern: /a/i
+    })
+
     BambaTok.LONGER_ALT = IdentifierTok
 
-    let testLexer = new Lexer([BambaTok, IntegerTok, IdentifierTok], {
-      positionTracking: "onlyOffset"
-    })
+    let testLexer = new Lexer(
+      [
+        SingleCharacterWithIgnoreCaseFlagTok,
+        BambaTok,
+        IntegerTok,
+        IdentifierTok
+      ],
+      {
+        positionTracking: "onlyOffset"
+      }
+    )
 
     describe("The Chevrotain Lexers", () => {
       it("can create a token from a string with priority to the First Token Type with the longest match #1", () => {
@@ -113,6 +126,24 @@ function defineLexerSpecs(
         let result = testLexer.tokenize(input)
         expect(tokenMatcher(result.tokens[0], IntegerTok)).to.be.true
         expect(result.tokens[0].image).to.equal("6666543221231")
+        expect(result.tokens[0].startOffset).to.equal(0)
+      })
+
+      it("can create a token from a single character regex with ignore flag", () => {
+        let input = "a"
+        let result = testLexer.tokenize(input)
+        expect(
+          tokenMatcher(result.tokens[0], SingleCharacterWithIgnoreCaseFlagTok)
+        ).to.be.true
+        expect(result.tokens[0].image).to.equal("a")
+        expect(result.tokens[0].startOffset).to.equal(0)
+
+        input = "A"
+        result = testLexer.tokenize(input)
+        expect(
+          tokenMatcher(result.tokens[0], SingleCharacterWithIgnoreCaseFlagTok)
+        ).to.be.true
+        expect(result.tokens[0].image).to.equal("A")
         expect(result.tokens[0].startOffset).to.equal(0)
       })
     })
