@@ -66,7 +66,8 @@ export const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
   errorMessageProvider: defaultParserErrorProvider,
   nodeLocationTracking: "none",
   traceInitPerf: false,
-  skipValidations: false
+  skipValidations: false,
+  localErrors: false
 })
 
 export const DEFAULT_RULE_CONFIG: IRuleConfig<any> = Object.freeze({

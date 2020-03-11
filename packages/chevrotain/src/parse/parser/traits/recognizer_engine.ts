@@ -81,6 +81,7 @@ export class RecognizerEngine {
   // The shortName Index must be coded "after" the first 8bits to enable building unique lookahead keys
   ruleShortNameIdx: number
   tokenMatcher: TokenMatcher
+  localErrors: boolean
 
   initRecognizerEngine(
     tokenVocabulary: TokenVocabulary,
@@ -100,6 +101,8 @@ export class RecognizerEngine {
     this.RULE_STACK = []
     this.RULE_OCCURRENCE_STACK = []
     this.gastProductionsCache = {}
+
+    this.localErrors = config.localErrors
 
     if (has(config, "serializedGrammar")) {
       throw Error(
@@ -233,8 +236,13 @@ export class RecognizerEngine {
     let wrappedGrammarRule
 
     wrappedGrammarRule = function(idxInCallingRule: number = 0, args: any[]) {
+      const preErrorLength = this.errors.length
       this.ruleInvocationStateUpdate(shortName, ruleName, idxInCallingRule)
-      return invokeRuleWithTry.call(this, args)
+      const retVal = invokeRuleWithTry.call(this, args)
+      if (this.localErrors) {
+        retVal.errors = this.errors.slice(preErrorLength, this.errors.length)
+      }
+      return retVal
     }
 
     let ruleNamePropName = "ruleName"

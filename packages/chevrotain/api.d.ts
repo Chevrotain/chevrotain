@@ -2038,6 +2038,12 @@ export interface IParserConfig {
    *   - For example: via a conditional that checks an env variable.
    */
   skipValidations?: boolean
+  /**
+   * Capture errors associated with an individual CST node.
+   * By default this is disabled.  When enabled the CST node will include an "error" array,
+   * which will include all "local" errors for that rule (including child errors).
+   */
+  localErrors?: boolean
 }
 
 export interface IParserErrorMessageProvider {
