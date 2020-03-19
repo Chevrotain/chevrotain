@@ -117,7 +117,7 @@
     "tslint": "^6.0.0",
     "typedoc": "0.14.2",
     "typescript": "3.5.3",
-    "vuepress": "^0.14.2",
+    "vuepress": "^1.4.0",
     "webpack": "4.41.5",
     "webpack-cli": "^3.0.0",
     "xregexp": "^4.2.0"
