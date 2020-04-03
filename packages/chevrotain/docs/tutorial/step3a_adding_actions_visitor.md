@@ -39,7 +39,7 @@ which can be extended to create custom user visitors.
 
 ```javascript
 // BaseVisitor constructors are accessed via a parser instance.
-const parserInstance = new SelectParser([])
+const parserInstance = new SelectParser()
 
 const BaseSQLVisitor = parserInstance.getBaseCstVisitorConstructor()
 
