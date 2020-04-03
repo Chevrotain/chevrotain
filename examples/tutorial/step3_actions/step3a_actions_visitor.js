@@ -12,7 +12,7 @@ const parser = require("../step2_parsing/step2_parsing")
 const SelectParser = parser.SelectParser
 
 // A new parser instance with CST output (enabled by default).
-const parserInstance = new SelectParser([])
+const parserInstance = new SelectParser()
 // The base visitor class can be accessed via the a parser instance.
 const BaseSQLVisitor = parserInstance.getBaseCstVisitorConstructor()
 
