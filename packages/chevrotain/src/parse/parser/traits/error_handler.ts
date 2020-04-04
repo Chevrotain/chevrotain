@@ -48,7 +48,6 @@ export class ErrorHandler {
     }
   }
 
-  // TODO: extract these methods to ErrorHandler Trait?
   get errors(this: MixedInParser): IRecognitionException[] {
     return cloneArr(this._errors)
   }

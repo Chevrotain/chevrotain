@@ -10,7 +10,6 @@ import {
 } from "../../utils/utils"
 import { computeAllProdsFollows } from "../grammar/follow"
 import { createTokenInstance, EOF } from "../../scan/tokens_public"
-import { expandAllNestedRuleNames } from "../cst/cst"
 import {
   defaultGrammarValidatorErrorProvider,
   defaultParserErrorProvider
@@ -85,11 +84,9 @@ export enum ParserDefinitionErrorType {
   AMBIGUOUS_ALTS = 7,
   CONFLICT_TOKENS_RULES_NAMESPACE = 8,
   INVALID_TOKEN_NAME = 9,
-  INVALID_NESTED_RULE_NAME = 10,
-  DUPLICATE_NESTED_NAME = 11,
-  NO_NON_EMPTY_LOOKAHEAD = 12,
-  AMBIGUOUS_PREFIX_ALTS = 13,
-  TOO_MANY_ALTS = 14
+  NO_NON_EMPTY_LOOKAHEAD = 10,
+  AMBIGUOUS_PREFIX_ALTS = 11,
+  TOO_MANY_ALTS = 12
 }
 
 export interface IParserDuplicatesDefinitionError
@@ -121,7 +118,6 @@ export interface IParserState {
   lexerState: any
   RULE_STACK: string[]
   CST_STACK: CstNode[]
-  LAST_EXPLICIT_RULE_STACK: number[]
 }
 
 export type Predicate = () => boolean
@@ -229,15 +225,6 @@ export class Parser {
           this.preComputeLookaheadFunctions(values(this.gastProductionsCache))
         })
       }
-
-      this.TRACE_INIT("expandAllNestedRuleNames", () => {
-        // TODO: is this needed for EmbeddedActionsParser?
-        let cstAnalysisResult = expandAllNestedRuleNames(
-          values(this.gastProductionsCache),
-          this.fullRuleNameToShort
-        )
-        this.allRuleNames = cstAnalysisResult.allRuleNames
-      })
 
       if (
         !Parser.DEFER_DEFINITION_ERRORS_HANDLING &&

@@ -159,7 +159,6 @@ describe("GAst namespace", () => {
 
     it("can serialize a RepetitionMandatory", () => {
       let input = new RepetitionMandatory({
-        name: "repMany",
         definition: [
           new Terminal({ terminalType: C }),
           new NonTerminal({ nonTerminalName: "bamba" })
@@ -169,7 +168,6 @@ describe("GAst namespace", () => {
       expect(actual).to.deep.equal({
         type: "RepetitionMandatory",
         idx: 1,
-        name: "repMany",
         definition: [
           {
             type: "Terminal",
@@ -188,7 +186,6 @@ describe("GAst namespace", () => {
 
     it("can serialize a RepetitionMandatoryWithSeparator", () => {
       let input = new RepetitionMandatoryWithSeparator({
-        name: "repManyWithSep",
         definition: [
           new Terminal({ terminalType: C }),
           new NonTerminal({ nonTerminalName: "bamba" })
@@ -199,7 +196,6 @@ describe("GAst namespace", () => {
       expect(actual).to.deep.equal({
         type: "RepetitionMandatoryWithSeparator",
         idx: 1,
-        name: "repManyWithSep",
         separator: {
           type: "Terminal",
           name: "Comma",
@@ -224,7 +220,6 @@ describe("GAst namespace", () => {
 
     it("can serialize a Repetition", () => {
       let input = new Repetition({
-        name: "rep",
         definition: [
           new Terminal({ terminalType: C }),
           new NonTerminal({ nonTerminalName: "bamba" })
@@ -234,7 +229,6 @@ describe("GAst namespace", () => {
       expect(actual).to.deep.equal({
         type: "Repetition",
         idx: 1,
-        name: "rep",
         definition: [
           {
             type: "Terminal",
@@ -253,7 +247,6 @@ describe("GAst namespace", () => {
 
     it("can serialize a RepetitionWithSeparator", () => {
       let input = new RepetitionWithSeparator({
-        name: "repWithSep",
         definition: [
           new Terminal({ terminalType: C }),
           new NonTerminal({ nonTerminalName: "bamba" })
@@ -264,7 +257,6 @@ describe("GAst namespace", () => {
       expect(actual).to.deep.equal({
         type: "RepetitionWithSeparator",
         idx: 1,
-        name: "repWithSep",
         separator: {
           type: "Terminal",
           name: "Comma",
@@ -289,7 +281,6 @@ describe("GAst namespace", () => {
 
     it("can serialize a Alternation", () => {
       let input = new Alternation({
-        name: "alt",
         definition: [
           new Flat({
             definition: [new Terminal({ terminalType: A })]
@@ -307,7 +298,6 @@ describe("GAst namespace", () => {
       expect(actual).to.deep.equal({
         type: "Alternation",
         idx: 1,
-        name: "alt",
         definition: [
           {
             type: "Flat",

@@ -165,7 +165,7 @@ output2 = {
 }
 ```
 
-## In-Lined Rules
+## Extracting Alternatives to "sub" rules
 
 So far the CST structure is quite simple, but how would a more complex grammar be handled?
 
@@ -213,7 +213,7 @@ if (cstResult.children.Let !== undefined) {
 ```
 
 Alternatively it is possible to refactor the grammar in such a way that both alternatives
-Would be completely wrapped in their own Non-Terminal rules.
+Would be completely wrapped in their own Non-Terminal "sub" rules.
 
 ```javascript
 $.RULE("statements", () => {
@@ -226,82 +226,6 @@ $.RULE("statements", () => {
 
 This is the recommended approach in this case as more and more alternations are added the grammar rule
 will become too difficult to understand and maintain due to verbosity.
-However, sometimes refactoring out rules is too much, this is where **in-lined** rules arrive to the rescue.
-
-```javascript
-$.RULE("statements", () => {
-  $.OR([
-    // let x = 5
-    {
-      NAME: "$letStatement",
-      ALT: () => {
-        $.CONSUME(Let)
-        $.CONSUME(Identifer)
-        $.CONSUME(Equals)
-        $.SUBRULE($.expression)
-      }
-    },
-    // select age from employee where age = 120
-    {
-      NAME: "$selectStatement",
-      ALT: () => {
-        $.CONSUME(Select)
-        $.CONSUME2(Identifer)
-        $.CONSUME(From)
-        $.CONSUME3(Identifer)
-        $.CONSUME(Where)
-        $.SUBRULE($.expression)
-      }
-    }
-  ])
-})
-
-output = {
-  name: "statements",
-  // only one of they keys depending on the actual alternative chosen
-  children: {
-    $letStatement: [
-      /*...*/
-    ],
-    $$selectStatement: [
-      /*...*/
-    ]
-  }
-}
-```
-
-Providing a **NAME** property to the DSL methods will create an in-lined rule.
-It is equivalent to extraction to a separate grammar rule with two differences:
-
-- To avoid naming conflicts in-lined rules **must** start with a dollar(\$) sign.
-- In-lined rules do not posses error recovery (re-sync) capabilities as do regular rules.
-
-Syntax Limitation:
-
-- The **NAME** property of an in-lined rule must appear as the **first** property
-  of the **DSLMethodOpts** object.
-
-  ```javascript
-  // GOOD
-  $.RULE("field", () => {
-    $.OPTION({
-      NAME: "$modifier",
-      DEF: () => {
-        $.CONSUME(Static)
-      }
-    })
-  })
-
-  // Bad - won't work.
-  $.RULE("field", () => {
-    $.OPTION({
-      DEF: () => {
-        $.CONSUME(Static)
-      },
-      NAME: "$modifier"
-    })
-  })
-  ```
 
 ## CstNodes Location
 
@@ -447,7 +371,6 @@ This is a valid approach, however it can be somewhat error prone:
 - No validation that the case names match the real names of the CST Nodes.
 - The validation for missing case handler (default case) depends on attempting to run toAst with invalid input.
   (Fail slow instead of fail fast...)
-- In-Lined Rules may cause ambiguities as they should be matched on the fullName property not the name property.
 
 ## CST Visitor
 
@@ -487,11 +410,6 @@ class SqlToAstVisitor extends BaseCstVisitor {
 
   // Optional "IN" argument
   fromClause(ctx, inArg) {
-    /*...*/
-  }
-
-  // Visitor methods for in-lined rules are created by appending the in-lined rule name to the parent rule name.
-  fromClause$INLINED_NAME(ctx) {
     /*...*/
   }
 }

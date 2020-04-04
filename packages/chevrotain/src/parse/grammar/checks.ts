@@ -5,13 +5,10 @@ import {
   findAll,
   flatten,
   forEach,
-  groupBy,
   isEmpty,
   map,
-  pick,
   reduce,
-  reject,
-  values
+  reject
 } from "../../utils/utils"
 import {
   IParserAmbiguousAlternativesDefinitionError,
@@ -28,7 +25,6 @@ import {
   getProdType,
   isStrictPrefixOfPath
 } from "./lookahead"
-import { NamedDSLMethodsCollectorVisitor } from "../cst/cst"
 import { nextPossibleTokensAfter } from "./interpreter"
 import {
   Alternation,
@@ -45,7 +41,6 @@ import {
 import { GAstVisitor } from "./gast/gast_visitor_public"
 import {
   IGrammarValidatorErrorMessageProvider,
-  IOptionallyNamedProduction,
   IParserDefinitionError,
   IProduction,
   IProductionWithOccurrence,
@@ -101,16 +96,6 @@ export function validateGrammar(
     validateTokenName(currTokType, errMsgProvider)
   )
 
-  let nestedRulesNameErrors: any = validateNestedRulesNames(
-    topLevels,
-    errMsgProvider
-  )
-
-  let nestedRulesDuplicateErrors: any = validateDuplicateNestedRules(
-    topLevels,
-    errMsgProvider
-  )
-
   const tooManyAltsErrors = map(topLevels, curRule =>
     validateTooManyAlts(curRule, errMsgProvider)
   )
@@ -132,8 +117,6 @@ export function validateGrammar(
     utils.flatten(
       duplicateErrors.concat(
         tokenNameErrors,
-        nestedRulesNameErrors,
-        nestedRulesDuplicateErrors,
         emptyRepetitionErrors,
         leftRecursionErrors,
         emptyAltErrors,
@@ -145,28 +128,6 @@ export function validateGrammar(
       )
     )
   )
-}
-
-function validateNestedRulesNames(
-  topLevels: Rule[],
-  errMsgProvider: IGrammarValidatorErrorMessageProvider
-): IParserDefinitionError[] {
-  let result = []
-  forEach(topLevels, curTopLevel => {
-    let namedCollectorVisitor = new NamedDSLMethodsCollectorVisitor("")
-    curTopLevel.accept(namedCollectorVisitor)
-    let nestedProds = map(
-      namedCollectorVisitor.result,
-      currItem => currItem.orgProd
-    )
-    result.push(
-      map(nestedProds, currNestedProd =>
-        validateNestedRuleName(curTopLevel, currNestedProd, errMsgProvider)
-      )
-    )
-  })
-
-  return <any>flatten(result)
 }
 
 function validateDuplicateProductions(
@@ -268,9 +229,6 @@ export class OccurrenceValidationCollector extends GAstVisitor {
 }
 
 export const validTermsPattern = /^[a-zA-Z_]\w*$/
-export const validNestedRuleName = new RegExp(
-  validTermsPattern.source.replace("^", "^\\$")
-)
 
 // TODO: remove this limitation now that we use recorders
 export function validateRuleName(
@@ -290,30 +248,6 @@ export function validateRuleName(
       ruleName: ruleName
     })
   }
-  return errors
-}
-
-// TODO: did the nested rule name regExp now change?
-export function validateNestedRuleName(
-  topLevel: Rule,
-  nestedProd: IOptionallyNamedProduction,
-  errMsgProvider: IGrammarValidatorErrorMessageProvider
-): IParserDefinitionError[] {
-  let errors = []
-  let errMsg
-
-  if (!nestedProd.name.match(validNestedRuleName)) {
-    errMsg = errMsgProvider.buildInvalidNestedRuleNameError(
-      topLevel,
-      nestedProd
-    )
-    errors.push({
-      message: errMsg,
-      type: ParserDefinitionErrorType.INVALID_NESTED_RULE_NAME,
-      ruleName: topLevel.name
-    })
-  }
-
   return errors
 }
 
@@ -836,38 +770,6 @@ function checkTerminalAndNoneTerminalsNameSpace(
         ruleName: currRuleName
       })
     }
-  })
-
-  return errors
-}
-
-function validateDuplicateNestedRules(
-  topLevelRules: Rule[],
-  errMsgProvider: IGrammarValidatorErrorMessageProvider
-): IParserDefinitionError[] {
-  let errors = []
-
-  forEach(topLevelRules, currTopRule => {
-    let namedCollectorVisitor = new NamedDSLMethodsCollectorVisitor("")
-    currTopRule.accept(namedCollectorVisitor)
-    let prodsByGroup = groupBy(namedCollectorVisitor.result, item => item.name)
-    let duplicates: any = pick(prodsByGroup, currGroup => {
-      return currGroup.length > 1
-    })
-
-    forEach(values(duplicates), (currDupGroup: any) => {
-      const currDupProds = map(currDupGroup, dupGroup => dupGroup.orgProd)
-      const errMsg = errMsgProvider.buildDuplicateNestedRuleNameError(
-        currTopRule,
-        currDupProds
-      )
-
-      errors.push({
-        message: errMsg,
-        type: ParserDefinitionErrorType.DUPLICATE_NESTED_NAME,
-        ruleName: currTopRule.name
-      })
-    })
   })
 
   return errors

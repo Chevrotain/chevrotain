@@ -1200,11 +1200,9 @@ export declare enum ParserDefinitionErrorType {
   AMBIGUOUS_ALTS = 7,
   CONFLICT_TOKENS_RULES_NAMESPACE = 8,
   INVALID_TOKEN_NAME = 9,
-  INVALID_NESTED_RULE_NAME = 10,
-  DUPLICATE_NESTED_NAME = 11,
-  NO_NON_EMPTY_LOOKAHEAD = 12,
-  AMBIGUOUS_PREFIX_ALTS = 13,
-  TOO_MANY_ALTS = 14
+  NO_NON_EMPTY_LOOKAHEAD = 10,
+  AMBIGUOUS_PREFIX_ALTS = 11,
+  TOO_MANY_ALTS = 12
 }
 
 export interface ILexerDefinitionError {
@@ -1774,10 +1772,6 @@ export interface IRuleConfig<T> {
 
 export interface DSLMethodOpts<T> {
   /**
-   * in-lined method name
-   */
-  NAME?: string
-  /**
    * The Grammar to process in this method.
    */
   DEF: GrammarAction<T>
@@ -1812,7 +1806,6 @@ export interface DSLMethodOptsWithErr<T> extends DSLMethodOpts<T> {
 }
 
 export interface OrMethodOpts<T> {
-  NAME?: string
   /**
    * The set of alternatives,
    * See detailed description in {@link Parser.OR}
@@ -1852,7 +1845,6 @@ export interface OrMethodOpts<T> {
 }
 
 export interface ManySepMethodOpts<T> {
-  NAME?: string
   /**
    * The grammar to process in each iteration.
    */
@@ -1905,7 +1897,6 @@ export interface SubruleMethodOpts {
 export declare type GrammarAction<OUT> = () => OUT
 
 export interface IOrAlt<T> {
-  NAME?: string
   GATE?: () => boolean
   ALT: () => T
   /**
@@ -1948,11 +1939,6 @@ export interface CstNode {
    * For more details.
    */
   readonly location?: CstNodeLocation
-  /**
-   * Only relevant for [in-lined](http://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html#in-lined-rules) rules.
-   * the fullName will **also** include the name of the top level rule containing this nested rule.
-   */
-  readonly fullName?: string
 }
 
 /**
@@ -2315,9 +2301,6 @@ export declare class EarlyExitException extends Error {
   constructor(message: string, token: IToken, previousToken: IToken)
 }
 
-export interface IOptionallyNamedProduction {
-  name?: string
-}
 export interface IProduction {
   accept(visitor: IGASTVisitor): void
 }
@@ -2397,11 +2380,14 @@ export declare class NonTerminal implements IProductionWithOccurrence {
  * This is normally only used in {@link Alternation} to distinguish
  * between the different alternatives.
  */
-export declare class Flat implements IOptionallyNamedProduction {
-  name: string
+export declare class Flat {
   definition: IProduction[]
+  ignoreAmbiguities: boolean
 
-  constructor(options: { definition: IProduction[]; name?: string })
+  constructor(options: {
+    definition: IProduction[]
+    ignoreAmbiguities?: boolean
+  })
 
   accept(visitor: IGASTVisitor): void
 }
@@ -2409,10 +2395,8 @@ export declare class Flat implements IOptionallyNamedProduction {
 /**
  * The Grammar AST class representing a {@link Parser.OPTION} call.
  */
-export declare class Option
-  implements IProductionWithOccurrence, IOptionallyNamedProduction {
+export declare class Option implements IProductionWithOccurrence {
   idx: number
-  name?: string
   definition: IProduction[]
 
   constructor(options: {
@@ -2427,9 +2411,7 @@ export declare class Option
 /**
  * The Grammar AST class representing a {@link Parser.AT_LEAST_ONE} call.
  */
-export declare class RepetitionMandatory
-  implements IProductionWithOccurrence, IOptionallyNamedProduction {
-  name: string
+export declare class RepetitionMandatory implements IProductionWithOccurrence {
   idx: number
   definition: IProduction[]
 
@@ -2446,10 +2428,9 @@ export declare class RepetitionMandatory
  * The Grammar AST class representing a {@link Parser.AT_LEAST_ONE_SEP} call.
  */
 export declare class RepetitionMandatoryWithSeparator
-  implements IProductionWithOccurrence, IOptionallyNamedProduction {
+  implements IProductionWithOccurrence {
   separator: TokenType
   idx: number
-  name: string
   definition: IProduction[]
 
   constructor(options: {
@@ -2465,11 +2446,9 @@ export declare class RepetitionMandatoryWithSeparator
 /**
  * The Grammar AST class representing a {@link Parser.MANY} call.
  */
-export declare class Repetition
-  implements IProductionWithOccurrence, IOptionallyNamedProduction {
+export declare class Repetition implements IProductionWithOccurrence {
   separator: TokenType
   idx: number
-  name: string
   definition: IProduction[]
 
   constructor(options: {
@@ -2485,10 +2464,9 @@ export declare class Repetition
  * The Grammar AST class representing a {@link Parser.MANY_SEP} call.
  */
 export declare class RepetitionWithSeparator
-  implements IProductionWithOccurrence, IOptionallyNamedProduction {
+  implements IProductionWithOccurrence {
   separator: TokenType
   idx: number
-  name: string
   definition: IProduction[]
 
   constructor(options: {
@@ -2504,17 +2482,11 @@ export declare class RepetitionWithSeparator
 /**
  * The Grammar AST class representing a {@link Parser.OR} call.
  */
-export declare class Alternation
-  implements IProductionWithOccurrence, IOptionallyNamedProduction {
+export declare class Alternation implements IProductionWithOccurrence {
   idx: number
-  name: string
   definition: IProduction[]
 
-  constructor(options: {
-    definition: IProduction[]
-    idx?: number
-    name?: string
-  })
+  constructor(options: { definition: IProduction[]; idx?: number })
 
   accept(visitor: IGASTVisitor): void
 }
@@ -2618,14 +2590,6 @@ export interface IGrammarValidatorErrorMessageProvider {
   buildDuplicateFoundError(
     topLevelRule: Rule,
     duplicateProds: IProductionWithOccurrence[]
-  ): string
-  buildInvalidNestedRuleNameError(
-    topLevelRule: Rule,
-    nestedProd: IOptionallyNamedProduction
-  ): string
-  buildDuplicateNestedRuleNameError(
-    topLevelRule: Rule,
-    nestedProd: IOptionallyNamedProduction[]
   ): string
   buildNamespaceConflictError(topLevelRule: Rule): string
   buildAlternationPrefixAmbiguityError(options: {

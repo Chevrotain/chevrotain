@@ -2,7 +2,6 @@ import { assign, forEach, isRegExp, map, pick } from "../../../utils/utils"
 import { tokenLabel } from "../../../scan/tokens_public"
 import {
   IGASTVisitor,
-  IOptionallyNamedProduction,
   IProduction,
   IProductionWithOccurrence,
   ISerializedGast,
@@ -74,15 +73,11 @@ export class Rule extends AbstractProduction {
 
 // TODO: is this only used in an Alternation?
 //       Perhaps `Flat` should be renamed to `Alternative`?
-export class Flat extends AbstractProduction
-  implements IOptionallyNamedProduction {
-  public name: string
+export class Flat extends AbstractProduction {
   public ignoreAmbiguities: boolean = false
 
-  // A named Flat production is used to indicate a Nested Rule in an alternation
   constructor(options: {
     definition: IProduction[]
-    name?: string
     ignoreAmbiguities?: boolean
   }) {
     super(options.definition)
@@ -94,15 +89,13 @@ export class Flat extends AbstractProduction
 }
 
 export class Option extends AbstractProduction
-  implements IProductionWithOccurrence, IOptionallyNamedProduction {
+  implements IProductionWithOccurrence {
   public idx: number = 1
-  public name?: string
   public maxLookahead?: number
 
   constructor(options: {
     definition: IProduction[]
     idx?: number
-    name?: string
     maxLookahead?: number
   }) {
     super(options.definition)
@@ -114,15 +107,13 @@ export class Option extends AbstractProduction
 }
 
 export class RepetitionMandatory extends AbstractProduction
-  implements IProductionWithOccurrence, IOptionallyNamedProduction {
-  public name: string
+  implements IProductionWithOccurrence {
   public idx: number = 1
   public maxLookahead?: number
 
   constructor(options: {
     definition: IProduction[]
     idx?: number
-    name?: string
     maxLookahead?: number
   }) {
     super(options.definition)
@@ -134,16 +125,14 @@ export class RepetitionMandatory extends AbstractProduction
 }
 
 export class RepetitionMandatoryWithSeparator extends AbstractProduction
-  implements IProductionWithOccurrence, IOptionallyNamedProduction {
+  implements IProductionWithOccurrence {
   public separator: TokenType
   public idx: number = 1
-  public name: string
 
   constructor(options: {
     definition: IProduction[]
     separator: TokenType
     idx?: number
-    name?: string
   }) {
     super(options.definition)
     assign(
@@ -154,16 +143,14 @@ export class RepetitionMandatoryWithSeparator extends AbstractProduction
 }
 
 export class Repetition extends AbstractProduction
-  implements IProductionWithOccurrence, IOptionallyNamedProduction {
+  implements IProductionWithOccurrence {
   public separator: TokenType
   public idx: number = 1
-  public name: string
   public maxLookahead?: number
 
   constructor(options: {
     definition: IProduction[]
     idx?: number
-    name?: string
     maxLookahead?: number
   }) {
     super(options.definition)
@@ -175,16 +162,14 @@ export class Repetition extends AbstractProduction
 }
 
 export class RepetitionWithSeparator extends AbstractProduction
-  implements IProductionWithOccurrence, IOptionallyNamedProduction {
+  implements IProductionWithOccurrence {
   public separator: TokenType
   public idx: number = 1
-  public name: string
 
   constructor(options: {
     definition: IProduction[]
     separator: TokenType
     idx?: number
-    name?: string
   }) {
     super(options.definition)
     assign(
@@ -195,9 +180,8 @@ export class RepetitionWithSeparator extends AbstractProduction
 }
 
 export class Alternation extends AbstractProduction
-  implements IProductionWithOccurrence, IOptionallyNamedProduction {
+  implements IProductionWithOccurrence {
   public idx: number = 1
-  public name: string
   public ignoreAmbiguities: boolean = false
   public definition: Flat[]
   public hasPredicates: boolean = false
@@ -206,7 +190,6 @@ export class Alternation extends AbstractProduction
   constructor(options: {
     definition: Flat[]
     idx?: number
-    name?: string
     ignoreAmbiguities?: boolean
     hasPredicates?: boolean
     maxLookahead?: number
@@ -237,7 +220,6 @@ export class Terminal implements IProductionWithOccurrence {
 
 export interface ISerializedBasic extends ISerializedGast {
   type: "Flat" | "Option" | "RepetitionMandatory" | "Repetition" | "Alternation"
-  name?: string
   idx?: number
 }
 
@@ -263,7 +245,6 @@ export interface ISerializedTerminal extends ISerializedGast {
 
 export interface ISerializedTerminalWithSeparator extends ISerializedGast {
   type: "RepetitionMandatoryWithSeparator" | "RepetitionWithSeparator"
-  name: string
   idx: number
   separator: ISerializedTerminal
 }
@@ -304,14 +285,12 @@ export function serializeProduction(node: IProduction): ISerializedGast {
   } else if (node instanceof RepetitionMandatory) {
     return <ISerializedBasic>{
       type: "RepetitionMandatory",
-      name: node.name,
       idx: node.idx,
       definition: convertDefinition(node.definition)
     }
   } else if (node instanceof RepetitionMandatoryWithSeparator) {
     return <ISerializedTerminalWithSeparator>{
       type: "RepetitionMandatoryWithSeparator",
-      name: node.name,
       idx: node.idx,
       separator: <ISerializedTerminal>(
         serializeProduction(new Terminal({ terminalType: node.separator }))
@@ -321,7 +300,6 @@ export function serializeProduction(node: IProduction): ISerializedGast {
   } else if (node instanceof RepetitionWithSeparator) {
     return <ISerializedTerminalWithSeparator>{
       type: "RepetitionWithSeparator",
-      name: node.name,
       idx: node.idx,
       separator: <ISerializedTerminal>(
         serializeProduction(new Terminal({ terminalType: node.separator }))
@@ -331,14 +309,12 @@ export function serializeProduction(node: IProduction): ISerializedGast {
   } else if (node instanceof Repetition) {
     return <ISerializedBasic>{
       type: "Repetition",
-      name: node.name,
       idx: node.idx,
       definition: convertDefinition(node.definition)
     }
   } else if (node instanceof Alternation) {
     return <ISerializedBasic>{
       type: "Alternation",
-      name: node.name,
       idx: node.idx,
       definition: convertDefinition(node.definition)
     }

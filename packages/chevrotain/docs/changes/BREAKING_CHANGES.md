@@ -26,9 +26,34 @@
 
 - The IParserConfig's `ignoredIssues` property has been deprecated.
   Any Parser still using this property will throw an exception on initialization.
-  If any ambiguities need be ignored, the `IGNORE_AMBIGUITIES` property should be used instead.
+  If any ambiguities need be ignored, the `IGNORE_AMBIGUITIES` property should be used instead on specific DSL rules.
 
   - see: [Ignoring Ambiguities Docs](https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#IGNORING_AMBIGUITIES)
+
+- Nested / In-Lined rules via the `NAME` parameter for DSL rules have been deprecated, e.g:
+
+  ```typescript
+  this.RULE("statements", () => {
+    this.OR([
+      {
+        NAME: "$letStatement",
+        ALT: () => {
+          // ...
+        }
+      },
+      {
+        NAME: "$selectStatement",
+        ALT: () => {
+          // ...
+        }
+      }
+    ])
+  })
+  ```
+
+  This feature was not orthogonal with other features (e.g error recovery) and added quite a-lot of complexity for the
+  small benefit of a little syntactic sugar. Instead of using "nested / in-lined" rules, simply extract the content
+  of these rules to "regular" top level rules.
 
 - Reducing the usage of 'any' in the 'OR' method type signature may cause existing code to fail TypeScript compilation.
   In such a case an explicit usage of a generic `any` type will resolve the problem.

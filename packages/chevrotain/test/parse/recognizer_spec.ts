@@ -1117,6 +1117,39 @@ function defineRecognizerSpecs(
         ])
       })
 
+      it("Supports custom overriding of the NO Matching Alternative error message", () => {
+        const SemiColon = createToken({ name: "SemiColon" })
+
+        class CustomOrErrorParser extends EmbeddedActionsParser {
+          constructor(input: IToken[] = []) {
+            super([SemiColon])
+
+            this.performSelfAnalysis()
+            this.input = input
+          }
+
+          public myStatement = this.RULE("myStatement", () => {
+            this.OR1({
+              DEF: [
+                { ALT: () => this.CONSUME(PlusTok) },
+                { ALT: () => this.CONSUME(MinusTok) }
+              ],
+              ERR_MSG: "None of the alternatives matched"
+            })
+          })
+        }
+
+        let parser = new CustomOrErrorParser([createTokenInstance(DotTok)])
+        parser.myStatement()
+        expect(parser.errors[0]).to.be.an.instanceof(NoViableAltException)
+        expect(parser.errors[0].message).to.include(
+          "None of the alternatives matched"
+        )
+        expect(parser.errors[0].context.ruleStack).to.deep.equal([
+          "myStatement"
+        ])
+      })
+
       it("Will use Token LABELS for noViableAlt error messages when unavailable", () => {
         class LabelAltParser extends EmbeddedActionsParser {
           constructor(input: IToken[] = []) {
@@ -1143,43 +1176,6 @@ function defineRecognizerSpecs(
         }
 
         let parser = new LabelAltParser([])
-        parser.rule()
-        expect(parser.errors[0]).to.be.an.instanceof(NoViableAltException)
-        expect(parser.errors[0].context.ruleStack).to.deep.equal(["rule"])
-        expect(parser.errors[0].message).to.include("MinusTok")
-        expect(parser.errors[0].message).to.include("+")
-        expect(parser.errors[0].message).to.not.include("PlusTok")
-      })
-
-      it("Will use Token LABELS for noViableAlt error messages when unavailable - nestedRuleNames", () => {
-        class LabelAltParserNested extends CstParser {
-          constructor(input: IToken[] = []) {
-            super([PlusTok, MinusTok], {})
-
-            this.performSelfAnalysis()
-            this.input = input
-          }
-
-          public rule = this.RULE("rule", () => {
-            this.OR({
-              NAME: "$bamba",
-              DEF: [
-                {
-                  ALT: () => {
-                    this.CONSUME1(PlusTok)
-                  }
-                },
-                {
-                  ALT: () => {
-                    this.CONSUME1(MinusTok)
-                  }
-                }
-              ]
-            })
-          })
-        }
-
-        let parser = new LabelAltParserNested([])
         parser.rule()
         expect(parser.errors[0]).to.be.an.instanceof(NoViableAltException)
         expect(parser.errors[0].context.ruleStack).to.deep.equal(["rule"])

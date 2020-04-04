@@ -21,7 +21,6 @@ describe("The CSTVisitor", () => {
       this.CONSUME(A)
       this.CONSUME(B)
       this.OPTION({
-        NAME: "$bisli",
         DEF: () => {
           this.SUBRULE(this.bamba)
         }
@@ -54,12 +53,7 @@ describe("The CSTVisitor", () => {
       }
 
       testRule(ctx) {
-        expect(keys(ctx)).to.deep.equal(["A", "B", "$bisli"])
-        return this.visit(ctx.$bisli[0])
-      }
-
-      testRule$bisli(ctx) {
-        expect(keys(ctx)).to.deep.equal(["bamba"])
+        expect(keys(ctx)).to.deep.equal(["A", "B", "bamba"])
         return this.visit(ctx.bamba[0])
       }
 
@@ -89,12 +83,7 @@ describe("The CSTVisitor", () => {
       }
 
       testRule(ctx, param) {
-        expect(keys(ctx)).to.deep.equal(["A", "B", "$bisli"])
-        return this.visit(ctx.$bisli[0], param)
-      }
-
-      testRule$bisli(ctx, param) {
-        expect(keys(ctx)).to.deep.equal(["bamba"])
+        expect(keys(ctx)).to.deep.equal(["A", "B", "bamba"])
         return this.visit(ctx.bamba[0], param)
       }
 
@@ -126,7 +115,6 @@ describe("The CSTVisitor", () => {
         this.validateVisitor()
       }
 
-      // testRule and testRule$bisli visitor should be created automatically
       bamba(ctx) {
         expect(keys(ctx)).to.deep.equal(["C"])
         visited = true
@@ -154,13 +142,8 @@ describe("The CSTVisitor", () => {
       }
 
       testRule(ctx, param) {
-        expect(keys(ctx)).to.deep.equal(["A", "B", "$bisli"])
-        return this.visit(ctx.$bisli[0], param)
-      }
-
-      testRule$bisli(ctx, param) {
-        expect(keys(ctx)).to.deep.equal(["bamba"])
-        return this.visit(ctx.bamba[0], param)
+        expect(keys(ctx)).to.deep.equal(["A", "B", "bamba"])
+        return this.visit(ctx["bamba"], param)
       }
 
       bamba(ctx, param) {
@@ -191,8 +174,6 @@ describe("The CSTVisitor", () => {
 
       testRule(ctx, param) {}
 
-      testRule$bisli(ctx, param) {}
-
       // missing "bamba" method
     }
 
@@ -212,8 +193,6 @@ describe("The CSTVisitor", () => {
       }
 
       testRule(ctx, param) {}
-
-      testRule$bisli(ctx, param) {}
 
       bamba(ctx, param) {}
 
