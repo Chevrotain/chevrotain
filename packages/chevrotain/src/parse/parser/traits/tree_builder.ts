@@ -4,7 +4,7 @@ import {
   setNodeLocationFull,
   setNodeLocationOnlyOffset
 } from "../../cst/cst"
-import { has, isUndefined, NOOP } from "../../../utils/utils"
+import { has, isUndefined, keys, NOOP } from "../../../utils/utils"
 import {
   createBaseSemanticVisitorConstructor,
   createBaseVisitorConstructorWithDefaults
@@ -17,7 +17,6 @@ import {
   IToken,
   nodeLocationTrackingOptions
 } from "../../../../api"
-import { getKeyForAltIndex } from "../../grammar/keys"
 import { MixedInParser } from "./parser_traits"
 import { DEFAULT_PARSER_CONFIG } from "../parser"
 
@@ -29,7 +28,6 @@ export class TreeBuilder {
   CST_STACK: CstNode[]
   baseCstVisitorConstructor: Function
   baseCstVisitorWithDefaultsConstructor: Function
-  LAST_EXPLICIT_RULE_STACK: number[]
 
   // dynamically assigned Methods
   setNodeLocationFromNode: (
@@ -46,7 +44,6 @@ export class TreeBuilder {
   nodeLocationTracking: nodeLocationTrackingOptions
 
   initTreeBuilder(this: MixedInParser, config: IParserConfig) {
-    this.LAST_EXPLICIT_RULE_STACK = []
     this.CST_STACK = []
 
     // outputCst is no longer exposed/defined in the pubic API
@@ -62,15 +59,6 @@ export class TreeBuilder {
       this.cstPostTerminal = NOOP
       this.cstPostNonTerminal = NOOP
       this.cstPostRule = NOOP
-      this.getLastExplicitRuleShortName = this.getLastExplicitRuleShortNameNoCst
-      this.getPreviousExplicitRuleShortName = this.getPreviousExplicitRuleShortNameNoCst
-      this.getLastExplicitRuleOccurrenceIndex = this.getLastExplicitRuleOccurrenceIndexNoCst
-      this.manyInternal = this.manyInternalNoCst
-      this.orInternal = this.orInternalNoCst
-      this.optionInternal = this.optionInternalNoCst
-      this.atLeastOneInternal = this.atLeastOneInternalNoCst
-      this.manySepFirstInternal = this.manySepFirstInternalNoCst
-      this.atLeastOneSepFirstInternal = this.atLeastOneSepFirstInternalNoCst
     } else {
       if (/full/i.test(this.nodeLocationTracking)) {
         if (this.recoveryEnabled) {
@@ -161,31 +149,11 @@ export class TreeBuilder {
     }
   }
 
-  // CST
-  cstNestedInvocationStateUpdate(
-    this: MixedInParser,
-    nestedName: string,
-    shortName: string | number
-  ): void {
-    const cstNode: CstNode = {
-      name: nestedName,
-      fullName:
-        this.shortRuleNameToFull[this.getLastExplicitRuleShortName()] +
-        nestedName,
-      children: {}
-    }
-
-    this.setInitialNodeLocation(cstNode)
-    this.CST_STACK.push(cstNode)
-  }
-
   cstInvocationStateUpdate(
     this: MixedInParser,
     fullRuleName: string,
     shortName: string | number
   ): void {
-    this.LAST_EXPLICIT_RULE_STACK.push(this.RULE_STACK.length - 1)
-
     const cstNode: CstNode = {
       name: fullRuleName,
       children: {}
@@ -196,16 +164,7 @@ export class TreeBuilder {
   }
 
   cstFinallyStateUpdate(this: MixedInParser): void {
-    this.LAST_EXPLICIT_RULE_STACK.pop()
     this.CST_STACK.pop()
-  }
-
-  cstNestedFinallyStateUpdate(this: MixedInParser): void {
-    const lastCstNode = this.CST_STACK.pop()
-    // TODO: the naming is bad, this should go directly to the
-    //       (correct) cstLocation update method
-    //       e.g if we put other logic in postRule...
-    this.cstPostRule(lastCstNode)
   }
 
   cstPostRuleFull(this: MixedInParser, ruleCstNode: CstNode): void {
@@ -213,7 +172,7 @@ export class TreeBuilder {
     const loc = ruleCstNode.location
 
     // If this condition is true it means we consumed at least one Token
-    // In this CstNode or its nested children.
+    // In this CstNode.
     if (loc.startOffset <= prevToken.startOffset === true) {
       loc.endOffset = prevToken.endOffset
       loc.endLine = prevToken.endLine
@@ -232,7 +191,7 @@ export class TreeBuilder {
     const loc = ruleCstNode.location
 
     // If this condition is true it means we consumed at least one Token
-    // In this CstNode or its nested children.
+    // In this CstNode.
     if (loc.startOffset <= prevToken.startOffset === true) {
       loc.endOffset = prevToken.endOffset
     }
@@ -278,7 +237,7 @@ export class TreeBuilder {
     if (isUndefined(this.baseCstVisitorConstructor)) {
       const newBaseCstVisitorConstructor = createBaseSemanticVisitorConstructor(
         this.className,
-        this.allRuleNames
+        keys(this.gastProductionsCache)
       )
       this.baseCstVisitorConstructor = newBaseCstVisitorConstructor
       return newBaseCstVisitorConstructor
@@ -295,7 +254,7 @@ export class TreeBuilder {
     if (isUndefined(this.baseCstVisitorWithDefaultsConstructor)) {
       const newConstructor = createBaseVisitorConstructorWithDefaults(
         this.className,
-        this.allRuleNames,
+        keys(this.gastProductionsCache),
         this.getBaseCstVisitorConstructor()
       )
       this.baseCstVisitorWithDefaultsConstructor = newConstructor
@@ -305,113 +264,18 @@ export class TreeBuilder {
     return <any>this.baseCstVisitorWithDefaultsConstructor
   }
 
-  nestedRuleBeforeClause(
-    this: MixedInParser,
-    methodOpts: { NAME?: string },
-    laKey: number
-  ): string {
-    let nestedName
-    if (methodOpts.NAME !== undefined) {
-      nestedName = methodOpts.NAME
-      this.nestedRuleInvocationStateUpdate(nestedName, laKey)
-      return nestedName
-    } else {
-      return undefined
-    }
-  }
-
-  nestedAltBeforeClause(
-    this: MixedInParser,
-    methodOpts: { NAME?: string },
-    occurrence: number,
-    methodKeyIdx: number,
-    altIdx: number
-  ): { shortName?: number; nestedName?: string } {
-    let ruleIdx = this.getLastExplicitRuleShortName()
-    let shortName = getKeyForAltIndex(
-      <any>ruleIdx,
-      methodKeyIdx,
-      occurrence,
-      altIdx
-    )
-    let nestedName
-    if (methodOpts.NAME !== undefined) {
-      nestedName = methodOpts.NAME
-      this.nestedRuleInvocationStateUpdate(nestedName, shortName)
-      return {
-        shortName,
-        nestedName
-      }
-    } else {
-      return undefined
-    }
-  }
-
-  nestedRuleFinallyClause(
-    this: MixedInParser,
-    laKey: number,
-    nestedName: string
-  ): void {
-    let cstStack = this.CST_STACK
-    let nestedRuleCst = cstStack[cstStack.length - 1]
-    this.nestedRuleFinallyStateUpdate()
-    // this return a different result than the previous invocation because "nestedRuleFinallyStateUpdate" pops the cst stack
-    let parentCstNode = cstStack[cstStack.length - 1]
-    addNoneTerminalToCst(parentCstNode, nestedName, nestedRuleCst)
-    this.setNodeLocationFromNode(parentCstNode.location, nestedRuleCst.location)
-  }
-
   getLastExplicitRuleShortName(this: MixedInParser): string {
-    let lastExplictIndex = this.LAST_EXPLICIT_RULE_STACK[
-      this.LAST_EXPLICIT_RULE_STACK.length - 1
-    ]
-    return this.RULE_STACK[lastExplictIndex]
-  }
-
-  getLastExplicitRuleShortNameNoCst(this: MixedInParser): string {
     let ruleStack = this.RULE_STACK
     return ruleStack[ruleStack.length - 1]
   }
 
   getPreviousExplicitRuleShortName(this: MixedInParser): string {
-    let lastExplicitIndex = this.LAST_EXPLICIT_RULE_STACK[
-      this.LAST_EXPLICIT_RULE_STACK.length - 2
-    ]
-    return this.RULE_STACK[lastExplicitIndex]
-  }
-
-  getPreviousExplicitRuleShortNameNoCst(this: MixedInParser): string {
     let ruleStack = this.RULE_STACK
     return ruleStack[ruleStack.length - 2]
   }
 
   getLastExplicitRuleOccurrenceIndex(this: MixedInParser): number {
-    let lastExplicitIndex = this.LAST_EXPLICIT_RULE_STACK[
-      this.LAST_EXPLICIT_RULE_STACK.length - 1
-    ]
-    return this.RULE_OCCURRENCE_STACK[lastExplicitIndex]
-  }
-
-  getLastExplicitRuleOccurrenceIndexNoCst(this: MixedInParser): number {
     let occurrenceStack = this.RULE_OCCURRENCE_STACK
     return occurrenceStack[occurrenceStack.length - 1]
-  }
-
-  nestedRuleInvocationStateUpdate(
-    this: MixedInParser,
-    nestedRuleName: string,
-    shortNameKey: number
-  ): void {
-    this.RULE_OCCURRENCE_STACK.push(1)
-    this.RULE_STACK.push(<any>shortNameKey)
-    this.cstNestedInvocationStateUpdate(nestedRuleName, shortNameKey)
-  }
-
-  nestedRuleFinallyStateUpdate(this: MixedInParser): void {
-    this.RULE_STACK.pop()
-    this.RULE_OCCURRENCE_STACK.pop()
-
-    // NOOP when cst is disabled
-    this.cstNestedFinallyStateUpdate()
   }
 }

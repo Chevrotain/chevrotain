@@ -35,18 +35,3 @@ export function getKeyForAutomaticLookahead(
 }
 
 const BITS_START_FOR_ALT_IDX = 32 - BITS_FOR_ALT_IDX
-export function getKeyForAltIndex(
-  ruleIdx: number,
-  dslMethodIdx: number,
-  occurrence: number,
-  altIdx: number
-): number {
-  /* tslint:disable */
-  // alternative indices are zero based, thus must always add one (turn on one bit) to guarantee uniqueness.
-  let altIdxBitMap = (altIdx + 1) << BITS_START_FOR_ALT_IDX
-  return (
-    getKeyForAutomaticLookahead(ruleIdx, dslMethodIdx, occurrence) |
-    altIdxBitMap
-  )
-  /* tslint:enable */
-}

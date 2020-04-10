@@ -128,8 +128,7 @@ describe("The Code Generation capabilities", () => {
                 ]
               }),
               new Flat({
-                definition: [new Terminal({ terminalType: Integer })],
-                name: "$inlinedRule"
+                definition: [new Terminal({ terminalType: Integer })]
               })
             ]
           })
@@ -163,8 +162,7 @@ describe("The Code Generation capabilities", () => {
         definition: [
           new Repetition({
             definition: [new Terminal({ terminalType: Identifier })],
-            idx: 1,
-            name: "$inlinedRule"
+            idx: 1
           })
         ]
       })

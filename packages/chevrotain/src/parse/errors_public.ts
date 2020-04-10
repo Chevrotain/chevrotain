@@ -8,17 +8,13 @@ import {
   Terminal
 } from "./grammar/gast/gast_public"
 import { getProductionDslName } from "./grammar/gast/gast"
-import { validNestedRuleName } from "./grammar/checks"
-import { VERSION } from "../version"
 import {
   IGrammarResolverErrorMessageProvider,
   IGrammarValidatorErrorMessageProvider,
-  IOptionallyNamedProduction,
   IParserErrorMessageProvider,
   IProductionWithOccurrence,
   TokenType
 } from "../../api"
-import { DEFAULT_PARSER_CONFIG } from "./parser/parser"
 
 export const defaultParserErrorProvider: IParserErrorMessageProvider = {
   buildMismatchTokenMessage({ expected, actual, previous, ruleName }): string {
@@ -161,30 +157,6 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
     msg = msg.replace(/\s\s+/g, "\n")
 
     return msg
-  },
-
-  buildInvalidNestedRuleNameError(
-    topLevelRule: Rule,
-    nestedProd: IOptionallyNamedProduction
-  ): string {
-    const msg =
-      `Invalid nested rule name: ->${nestedProd.name}<- inside rule: ->${topLevelRule.name}<-\n` +
-      `it must match the pattern: ->${validNestedRuleName.toString()}<-.\n` +
-      `Note that this means a nested rule name must start with the '$'(dollar) sign.`
-
-    return msg
-  },
-
-  buildDuplicateNestedRuleNameError(
-    topLevelRule: Rule,
-    nestedProd: IOptionallyNamedProduction[]
-  ): string {
-    const duplicateName = first(nestedProd).name
-    const errMsg =
-      `Duplicate nested rule name: ->${duplicateName}<- inside rule: ->${topLevelRule.name}<-\n` +
-      `A nested name must be unique in the scope of a top level grammar rule.`
-
-    return errMsg
   },
 
   buildNamespaceConflictError(rule: Rule): string {

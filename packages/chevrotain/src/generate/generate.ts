@@ -121,9 +121,6 @@ export function genAlternation(prod: Alternation, n: number): string {
 export function genSingleAlt(prod: Flat, n: number): string {
   let result = indent(n, `{`) + NL
 
-  if (prod.name) {
-    result += indent(n + 1, `NAME: "${prod.name}",`) + NL
-  }
   result += indent(n + 1, "ALT: function() {") + NL
   result += genDefinition(prod.definition, n + 1)
   result += indent(n + 1, `}`) + NL
@@ -162,18 +159,14 @@ function genDSLRule(
   prod: {
     definition: IProduction[]
     idx: number
-    name?: string
     separator?: TokenType
   },
   n: number
 ): string {
   let result = indent(n, `$.${dslName + prod.idx}(`)
 
-  if (prod.name || prod.separator) {
+  if (prod.separator) {
     result += "{" + NL
-    if (prod.name) {
-      result += indent(n + 1, `NAME: "${prod.name}"`) + "," + NL
-    }
     if (prod.separator) {
       result +=
         indent(n + 1, `SEP: this.tokensMap.${prod.separator.name}`) + "," + NL

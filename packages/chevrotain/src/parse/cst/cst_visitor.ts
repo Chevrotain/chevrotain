@@ -24,11 +24,7 @@ export function defaultVisit<IN, OUT>(ctx: any, param: IN): OUT {
       let currChild: any = currChildArray[j]
       // distinction between Tokens Children and CstNode children
       if (currChild.tokenTypeIdx === undefined) {
-        if (currChild.fullName !== undefined) {
-          this[currChild.fullName](currChild.children, param)
-        } else {
-          this[currChild.name](currChild.children, param)
-        }
+        this[currChild.name](currChild.children, param)
       }
     }
   }
@@ -63,11 +59,7 @@ export function createBaseSemanticVisitorConstructor(
         return undefined
       }
 
-      if (cstNode.fullName !== undefined) {
-        return this[cstNode.fullName](cstNode.children, param)
-      } else {
-        return this[cstNode.name](cstNode.children, param)
-      }
+      return this[cstNode.name](cstNode.children, param)
     },
 
     validateVisitor: function() {

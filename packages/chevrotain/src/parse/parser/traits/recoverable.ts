@@ -307,18 +307,6 @@ export class Recoverable {
     let explicitRuleStack = this.RULE_STACK
     let explicitOccurrenceStack = this.RULE_OCCURRENCE_STACK
 
-    if (!isEmpty(this.LAST_EXPLICIT_RULE_STACK)) {
-      explicitRuleStack = map(
-        this.LAST_EXPLICIT_RULE_STACK,
-        idx => this.RULE_STACK[idx]
-      )
-      explicitOccurrenceStack = map(
-        this.LAST_EXPLICIT_RULE_STACK,
-        idx => this.RULE_OCCURRENCE_STACK[idx]
-      )
-    }
-
-    // TODO: only iterate over explicit rules here
     return map(explicitRuleStack, (ruleName, idx) => {
       if (idx === 0) {
         return EOF_FOLLOW_KEY
@@ -407,15 +395,9 @@ export class Recoverable {
     return grammarPath
   }
   getHumanReadableRuleStack(this: MixedInParser): string[] {
-    if (!isEmpty(this.LAST_EXPLICIT_RULE_STACK)) {
-      return map(this.LAST_EXPLICIT_RULE_STACK, currIdx =>
-        this.shortRuleNameToFullName(this.RULE_STACK[currIdx])
-      )
-    } else {
-      return map(this.RULE_STACK, currShortName =>
-        this.shortRuleNameToFullName(currShortName)
-      )
-    }
+    return map(this.RULE_STACK, currShortName =>
+      this.shortRuleNameToFullName(currShortName)
+    )
   }
 }
 

@@ -1,7 +1,24 @@
-import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
+import {
+  EmbeddedActionsParser,
+  CstParser
+} from "../../../src/parse/parser/traits/parser_traits"
 import { createToken } from "../../../src/scan/tokens_public"
 
 describe("The Recognizer's Configuration", () => {
+  it("default config values - empty config", () => {
+    const A = createToken({ name: "A" })
+
+    class InvalidNodeLocationTrackingOption extends CstParser {
+      constructor() {
+        super([A], { nodeLocationTracking: <any>"oops" })
+      }
+    }
+
+    expect(() => new InvalidNodeLocationTrackingOption()).to.throw(
+      'Invalid <nodeLocationTracking> config option: "oops"'
+    )
+  })
+
   it("default config values - empty config", () => {
     const A = createToken({ name: "A" })
 

@@ -74,7 +74,6 @@ export class RecognizerEngine {
   RULE_OCCURRENCE_STACK: number[]
   definedRulesNames: string[]
   tokensMap: { [fqn: string]: TokenType }
-  allRuleNames: string[]
   gastProductionsCache: Record<string, Rule>
   shortRuleNameToFull: Record<string, string>
   fullRuleNameToShort: Record<string, number>
@@ -95,7 +94,6 @@ export class RecognizerEngine {
 
     this.definedRulesNames = []
     this.tokensMap = {}
-    this.allRuleNames = []
     this.isBackTrackingStack = []
     this.RULE_STACK = []
     this.RULE_OCCURRENCE_STACK = []
@@ -306,25 +304,6 @@ export class RecognizerEngine {
     occurrence: number
   ): OUT {
     let key = this.getKeyForAutomaticLookahead(OPTION_IDX, occurrence)
-    let nestedName = this.nestedRuleBeforeClause(
-      actionORMethodDef as DSLMethodOpts<OUT>,
-      key
-    )
-    try {
-      return this.optionInternalLogic(actionORMethodDef, occurrence, key)
-    } finally {
-      if (nestedName !== undefined) {
-        this.nestedRuleFinallyClause(key, nestedName)
-      }
-    }
-  }
-
-  optionInternalNoCst<OUT>(
-    this: MixedInParser,
-    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
-    occurrence: number
-  ): OUT {
-    let key = this.getKeyForAutomaticLookahead(OPTION_IDX, occurrence)
     return this.optionInternalLogic(actionORMethodDef, occurrence, key)
   }
 
@@ -366,30 +345,11 @@ export class RecognizerEngine {
       AT_LEAST_ONE_IDX,
       prodOccurrence
     )
-    let nestedName = this.nestedRuleBeforeClause(
-      actionORMethodDef as DSLMethodOptsWithErr<OUT>,
+    return this.atLeastOneInternalLogic(
+      prodOccurrence,
+      actionORMethodDef,
       laKey
     )
-    try {
-      return this.atLeastOneInternalLogic(
-        prodOccurrence,
-        actionORMethodDef,
-        laKey
-      )
-    } finally {
-      if (nestedName !== undefined) {
-        this.nestedRuleFinallyClause(laKey, nestedName)
-      }
-    }
-  }
-
-  atLeastOneInternalNoCst<OUT>(
-    this: MixedInParser,
-    prodOccurrence: number,
-    actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
-  ): void {
-    let key = this.getKeyForAutomaticLookahead(AT_LEAST_ONE_IDX, prodOccurrence)
-    this.atLeastOneInternalLogic(prodOccurrence, actionORMethodDef, key)
   }
 
   atLeastOneInternalLogic<OUT>(
@@ -448,25 +408,6 @@ export class RecognizerEngine {
   }
 
   atLeastOneSepFirstInternal<OUT>(
-    this: MixedInParser,
-    prodOccurrence: number,
-    options: AtLeastOneSepMethodOpts<OUT>
-  ): void {
-    let laKey = this.getKeyForAutomaticLookahead(
-      AT_LEAST_ONE_SEP_IDX,
-      prodOccurrence
-    )
-    let nestedName = this.nestedRuleBeforeClause(options, laKey)
-    try {
-      this.atLeastOneSepFirstInternalLogic(prodOccurrence, options, laKey)
-    } finally {
-      if (nestedName !== undefined) {
-        this.nestedRuleFinallyClause(laKey, nestedName)
-      }
-    }
-  }
-
-  atLeastOneSepFirstInternalNoCst<OUT>(
     this: MixedInParser,
     prodOccurrence: number,
     options: AtLeastOneSepMethodOpts<OUT>
@@ -538,25 +479,6 @@ export class RecognizerEngine {
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
   ): void {
     let laKey = this.getKeyForAutomaticLookahead(MANY_IDX, prodOccurrence)
-    let nestedName = this.nestedRuleBeforeClause(
-      actionORMethodDef as DSLMethodOpts<OUT>,
-      laKey
-    )
-    try {
-      return this.manyInternalLogic(prodOccurrence, actionORMethodDef, laKey)
-    } finally {
-      if (nestedName !== undefined) {
-        this.nestedRuleFinallyClause(laKey, nestedName)
-      }
-    }
-  }
-
-  manyInternalNoCst<OUT>(
-    this: MixedInParser,
-    prodOccurrence: number,
-    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): void {
-    let laKey = this.getKeyForAutomaticLookahead(MANY_IDX, prodOccurrence)
     return this.manyInternalLogic(prodOccurrence, actionORMethodDef, laKey)
   }
 
@@ -607,22 +529,6 @@ export class RecognizerEngine {
   }
 
   manySepFirstInternal<OUT>(
-    this: MixedInParser,
-    prodOccurrence: number,
-    options: ManySepMethodOpts<OUT>
-  ): void {
-    let laKey = this.getKeyForAutomaticLookahead(MANY_SEP_IDX, prodOccurrence)
-    let nestedName = this.nestedRuleBeforeClause(options, laKey)
-    try {
-      this.manySepFirstInternalLogic(prodOccurrence, options, laKey)
-    } finally {
-      if (nestedName !== undefined) {
-        this.nestedRuleFinallyClause(laKey, nestedName)
-      }
-    }
-  }
-
-  manySepFirstInternalNoCst<OUT>(
     this: MixedInParser,
     prodOccurrence: number,
     options: ManySepMethodOpts<OUT>
@@ -722,16 +628,16 @@ export class RecognizerEngine {
     return afterIteration > beforeIteration
   }
 
-  orInternalNoCst(
+  orInternal<T>(
     this: MixedInParser,
     altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>,
     occurrence: number
-  ): any {
+  ): T {
+    let laKey = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
     let alts = isArray(altsOrOpts)
       ? (altsOrOpts as IOrAlt<any>[])
       : (altsOrOpts as OrMethodOpts<unknown>).DEF
 
-    const laKey = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
     const laFunc = this.getLaFuncFromCache(laKey)
     let altIdxToTake = laFunc.call(this, alts)
     if (altIdxToTake !== undefined) {
@@ -742,54 +648,6 @@ export class RecognizerEngine {
       occurrence,
       (altsOrOpts as OrMethodOpts<unknown>).ERR_MSG
     )
-  }
-
-  orInternal<T>(
-    this: MixedInParser,
-    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>,
-    occurrence: number
-  ): T {
-    let laKey = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
-    let nestedName = this.nestedRuleBeforeClause(
-      <OrMethodOpts<unknown>>altsOrOpts,
-      laKey
-    )
-
-    try {
-      let alts = isArray(altsOrOpts)
-        ? (altsOrOpts as IOrAlt<any>[])
-        : (altsOrOpts as OrMethodOpts<unknown>).DEF
-
-      const laFunc = this.getLaFuncFromCache(laKey)
-      let altIdxToTake = laFunc.call(this, alts)
-      if (altIdxToTake !== undefined) {
-        let chosenAlternative: any = alts[altIdxToTake]
-        let nestedAltBeforeClauseResult = this.nestedAltBeforeClause(
-          chosenAlternative,
-          occurrence,
-          OR_IDX,
-          altIdxToTake
-        )
-        try {
-          return chosenAlternative.ALT.call(this)
-        } finally {
-          if (nestedAltBeforeClauseResult !== undefined) {
-            this.nestedRuleFinallyClause(
-              nestedAltBeforeClauseResult.shortName,
-              nestedAltBeforeClauseResult.nestedName
-            )
-          }
-        }
-      }
-      this.raiseNoAltException(
-        occurrence,
-        (altsOrOpts as OrMethodOpts<unknown>).ERR_MSG
-      )
-    } finally {
-      if (nestedName !== undefined) {
-        this.nestedRuleFinallyClause(laKey, nestedName)
-      }
-    }
   }
 
   ruleFinallyStateUpdate(this: MixedInParser): void {
@@ -944,8 +802,7 @@ export class RecognizerEngine {
       errors: savedErrors,
       lexerState: this.exportLexerState(),
       RULE_STACK: savedRuleStack,
-      CST_STACK: this.CST_STACK,
-      LAST_EXPLICIT_RULE_STACK: this.LAST_EXPLICIT_RULE_STACK
+      CST_STACK: this.CST_STACK
     }
   }
 
@@ -990,8 +847,7 @@ export class RecognizerEngine {
     this.isBackTrackingStack = []
     this.errors = []
     this.RULE_STACK = []
-    this.LAST_EXPLICIT_RULE_STACK = []
-    // TODO: extract a specific rest for TreeBuilder trait
+    // TODO: extract a specific reset for TreeBuilder trait
     this.CST_STACK = []
     this.RULE_OCCURRENCE_STACK = []
   }

@@ -371,9 +371,6 @@ function recordProd(
   const grammarAction = isFunction(mainProdArg) ? mainProdArg : mainProdArg.DEF
 
   const newProd = new prodConstructor({ definition: [], idx: occurrence })
-  if (has(mainProdArg, "NAME")) {
-    newProd.name = mainProdArg.NAME
-  }
   if (handleSep) {
     newProd.separator = mainProdArg.SEP
   }
@@ -401,9 +398,6 @@ function recordOrProd(mainProdArg: any, occurrence: number): any {
     idx: occurrence,
     ignoreAmbiguities: hasOptions && mainProdArg.IGNORE_AMBIGUITIES === true
   })
-  if (has(mainProdArg, "NAME")) {
-    newOrProd.name = mainProdArg.NAME
-  }
   if (has(mainProdArg, "MAX_LOOKAHEAD")) {
     newOrProd.maxLookahead = mainProdArg.MAX_LOOKAHEAD
   }
@@ -416,9 +410,6 @@ function recordOrProd(mainProdArg: any, occurrence: number): any {
   forEach(alts, currAlt => {
     const currAltFlat = new Flat({ definition: [] })
     newOrProd.definition.push(currAltFlat)
-    if (has(currAlt, "NAME")) {
-      currAltFlat.name = currAlt.NAME
-    }
     if (has(currAlt, "IGNORE_AMBIGUITIES")) {
       currAltFlat.ignoreAmbiguities = currAlt.IGNORE_AMBIGUITIES
     }
