@@ -9,7 +9,7 @@ import {
 } from "./samples"
 import { setEquality } from "../../utils/matchers"
 import {
-  Flat,
+  Alternative,
   Terminal,
   Option,
   Alternation
@@ -29,14 +29,14 @@ describe("The Grammar Ast first model", () => {
   })
 
   it("can compute the first for a Sequence production ", () => {
-    let seqProduction = new Flat({
+    let seqProduction = new Alternative({
       definition: [new Terminal({ terminalType: EntityTok })]
     })
     let actual = first(seqProduction)
     expect(actual.length).to.equal(1)
     expect(actual[0]).to.equal(EntityTok)
 
-    let seqProduction2 = new Flat({
+    let seqProduction2 = new Alternative({
       definition: [
         new Terminal({ terminalType: EntityTok }),
         new Option({
@@ -52,13 +52,13 @@ describe("The Grammar Ast first model", () => {
   it("can compute the first for an alternatives production ", () => {
     let altProduction = new Alternation({
       definition: [
-        new Flat({
+        new Alternative({
           definition: [new Terminal({ terminalType: EntityTok })]
         }),
-        new Flat({
+        new Alternative({
           definition: [new Terminal({ terminalType: NamespaceTok })]
         }),
-        new Flat({
+        new Alternative({
           definition: [new Terminal({ terminalType: TypeTok })]
         })
       ]
@@ -71,7 +71,7 @@ describe("The Grammar Ast first model", () => {
   })
 
   it("can compute the first for an production with optional prefix", () => {
-    let withOptionalPrefix = new Flat({
+    let withOptionalPrefix = new Alternative({
       definition: [
         new Option({
           definition: [new Terminal({ terminalType: NamespaceTok })]
@@ -82,7 +82,7 @@ describe("The Grammar Ast first model", () => {
     let actual = first(withOptionalPrefix)
     setEquality(actual, [NamespaceTok, EntityTok])
 
-    let withTwoOptPrefix = new Flat({
+    let withTwoOptPrefix = new Alternative({
       definition: [
         new Option({
           definition: [new Terminal({ terminalType: NamespaceTok })]

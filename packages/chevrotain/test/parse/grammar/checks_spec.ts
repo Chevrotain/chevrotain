@@ -22,7 +22,7 @@ import { createToken } from "../../../src/scan/tokens_public"
 import { first, forEach, map } from "../../../src/utils/utils"
 import {
   Alternation,
-  Flat,
+  Alternative,
   NonTerminal,
   Option,
   Repetition,
@@ -342,7 +342,7 @@ describe("the getFirstNoneTerminal function", () => {
     let alternation = [
       new Alternation({
         definition: [
-          new Flat({
+          new Alternative({
             definition: [
               new NonTerminal({
                 nonTerminalName: "dummyRule",
@@ -350,7 +350,7 @@ describe("the getFirstNoneTerminal function", () => {
               })
             ]
           }),
-          new Flat({
+          new Alternative({
             definition: [
               new NonTerminal({
                 nonTerminalName: "dummyRule2",
@@ -358,7 +358,7 @@ describe("the getFirstNoneTerminal function", () => {
               })
             ]
           }),
-          new Flat({
+          new Alternative({
             definition: [
               new NonTerminal({
                 nonTerminalName: "dummyRule3",
@@ -383,7 +383,7 @@ describe("the getFirstNoneTerminal function", () => {
     let alternation = [
       new Repetition({
         definition: [
-          new Flat({
+          new Alternative({
             definition: [
               new NonTerminal({
                 nonTerminalName: "dummyRule",
@@ -391,7 +391,7 @@ describe("the getFirstNoneTerminal function", () => {
               })
             ]
           }),
-          new Flat({
+          new Alternative({
             definition: [
               new NonTerminal({
                 nonTerminalName: "dummyRule2",
@@ -416,7 +416,7 @@ describe("the getFirstNoneTerminal function", () => {
     let alternation = [
       new RepetitionMandatory({
         definition: [
-          new Flat({
+          new Alternative({
             definition: [
               new NonTerminal({
                 nonTerminalName: "dummyRule",
@@ -424,7 +424,7 @@ describe("the getFirstNoneTerminal function", () => {
               })
             ]
           }),
-          new Flat({
+          new Alternative({
             definition: [
               new NonTerminal({
                 nonTerminalName: "dummyRule2",
@@ -1596,7 +1596,7 @@ describe("The no non-empty lookahead validation", () => {
     const alternatives = []
     for (let i = 0; i < 256; i++) {
       alternatives.push(
-        new Flat({
+        new Alternative({
           definition: [
             new NonTerminal({
               nonTerminalName: "dummyRule",

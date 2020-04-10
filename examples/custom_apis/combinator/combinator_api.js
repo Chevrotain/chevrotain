@@ -13,7 +13,7 @@ const _ = require("lodash")
 const {
   Rule,
   RepetitionWithSeparator,
-  Flat,
+  Alternative,
   Alternation,
   Terminal,
   NonTerminal,
@@ -36,7 +36,8 @@ function toRule(name) {
 // rule: A B C ...
 function seq(...items) {
   const flatDef = _.flatMap(items, toDefinition)
-  const definition = new Flat({ definition: flatDef })
+  // TODO: here Flat was used outside Alternation
+  const definition = new Alternative({ definition: flatDef })
 
   const orgTextParts = _.map(items, toOriginalText)
   definition.orgText = `seq(${orgTextParts.join(", ")})`
@@ -66,7 +67,7 @@ function delimited(item, separator) {
 // rule: A | B | C | ...
 function choice(...alternatives) {
   const altsDefs = _.map(alternatives, alt => {
-    return new Flat({ definition: toDefinition(alt) })
+    return new Alternative({ definition: toDefinition(alt) })
   })
 
   const orgTextParts = _.map(alternatives, toOriginalText)

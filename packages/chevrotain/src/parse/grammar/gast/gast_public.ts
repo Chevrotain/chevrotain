@@ -71,9 +71,7 @@ export class Rule extends AbstractProduction {
   }
 }
 
-// TODO: is this only used in an Alternation?
-//       Perhaps `Flat` should be renamed to `Alternative`?
-export class Flat extends AbstractProduction {
+export class Alternative extends AbstractProduction {
   public ignoreAmbiguities: boolean = false
 
   constructor(options: {
@@ -183,12 +181,12 @@ export class Alternation extends AbstractProduction
   implements IProductionWithOccurrence {
   public idx: number = 1
   public ignoreAmbiguities: boolean = false
-  public definition: Flat[]
+  public definition: Alternative[]
   public hasPredicates: boolean = false
   public maxLookahead?: number
 
   constructor(options: {
-    definition: Flat[]
+    definition: Alternative[]
     idx?: number
     ignoreAmbiguities?: boolean
     hasPredicates?: boolean
@@ -219,7 +217,12 @@ export class Terminal implements IProductionWithOccurrence {
 }
 
 export interface ISerializedBasic extends ISerializedGast {
-  type: "Flat" | "Option" | "RepetitionMandatory" | "Repetition" | "Alternation"
+  type:
+    | "Alternative"
+    | "Option"
+    | "RepetitionMandatory"
+    | "Repetition"
+    | "Alternation"
   idx?: number
 }
 
@@ -271,9 +274,9 @@ export function serializeProduction(node: IProduction): ISerializedGast {
       name: node.nonTerminalName,
       idx: node.idx
     }
-  } else if (node instanceof Flat) {
+  } else if (node instanceof Alternative) {
     return <ISerializedBasic>{
-      type: "Flat",
+      type: "Alternative",
       definition: convertDefinition(node.definition)
     }
   } else if (node instanceof Option) {

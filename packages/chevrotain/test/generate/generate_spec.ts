@@ -6,7 +6,7 @@ import { createToken } from "../../src/scan/tokens_public"
 import { createRegularToken } from "../utils/matchers"
 import {
   Alternation,
-  Flat,
+  Alternative,
   Rule,
   Terminal,
   Option,
@@ -83,7 +83,7 @@ describe("The Code Generation capabilities", () => {
         definition: [
           new Option({
             definition: [
-              new Flat({
+              new Alternative({
                 definition: [new Terminal({ terminalType: Identifier })]
               })
             ]
@@ -120,14 +120,14 @@ describe("The Code Generation capabilities", () => {
         definition: [
           new Alternation({
             definition: [
-              new Flat({
+              new Alternative({
                 definition: [
                   new Terminal({
                     terminalType: Identifier
                   })
                 ]
               }),
-              new Flat({
+              new Alternative({
                 definition: [new Terminal({ terminalType: Integer })]
               })
             ]
@@ -318,7 +318,7 @@ describe("The Code Generation capabilities", () => {
           definition: [
             new Alternation({
               definition: [
-                new Flat({
+                new Alternative({
                   definition: [
                     new RepetitionMandatory({
                       definition: [
@@ -329,7 +329,7 @@ describe("The Code Generation capabilities", () => {
                     })
                   ]
                 }),
-                new Flat({
+                new Alternative({
                   definition: [
                     new Terminal({
                       terminalType: Integer

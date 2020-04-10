@@ -25,7 +25,7 @@ import {
 import { MixedInParser } from "./parser_traits"
 import {
   Alternation,
-  Flat,
+  Alternative,
   NonTerminal,
   Option,
   Repetition,
@@ -408,7 +408,7 @@ function recordOrProd(mainProdArg: any, occurrence: number): any {
   prevProd.definition.push(newOrProd)
 
   forEach(alts, currAlt => {
-    const currAltFlat = new Flat({ definition: [] })
+    const currAltFlat = new Alternative({ definition: [] })
     newOrProd.definition.push(currAltFlat)
     if (has(currAlt, "IGNORE_AMBIGUITIES")) {
       currAltFlat.ignoreAmbiguities = currAlt.IGNORE_AMBIGUITIES

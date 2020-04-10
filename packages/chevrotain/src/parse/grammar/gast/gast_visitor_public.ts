@@ -1,6 +1,6 @@
 import {
   Alternation,
-  Flat,
+  Alternative,
   NonTerminal,
   Option,
   Repetition,
@@ -18,8 +18,8 @@ export abstract class GAstVisitor {
     switch (nodeAny.constructor) {
       case NonTerminal:
         return this.visitNonTerminal(nodeAny)
-      case Flat:
-        return this.visitFlat(nodeAny)
+      case Alternative:
+        return this.visitAlternative(nodeAny)
       case Option:
         return this.visitOption(nodeAny)
       case RepetitionMandatory:
@@ -44,7 +44,7 @@ export abstract class GAstVisitor {
 
   public visitNonTerminal(node: NonTerminal): any {}
 
-  public visitFlat(node: Flat): any {}
+  public visitAlternative(node: Alternative): any {}
 
   public visitOption(node: Option): any {}
 

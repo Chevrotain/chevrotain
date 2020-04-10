@@ -8,7 +8,7 @@ import {
   Terminal
 } from "../../../src/parse/grammar/gast/gast_public"
 import { Alternation } from "../../../src/parse/grammar/gast/gast_public"
-import { Flat } from "../../../src/parse/grammar/gast/gast_public"
+import { Alternative } from "../../../src/parse/grammar/gast/gast_public"
 import { RepetitionWithSeparator } from "../../../src/parse/grammar/gast/gast_public"
 import { filter, values } from "../../../src/utils/utils"
 import { augmentTokenTypes } from "../../../src/scan/tokens"
@@ -222,7 +222,7 @@ export let cardinality = new Rule({
     new Terminal({ terminalType: DotDotTok }),
     new Alternation({
       definition: [
-        new Flat({
+        new Alternative({
           definition: [
             new Terminal({
               terminalType: UnsignedIntegerLiteralTok,
@@ -230,7 +230,7 @@ export let cardinality = new Rule({
             })
           ]
         }),
-        new Flat({
+        new Alternative({
           definition: [new Terminal({ terminalType: AsteriskTok })]
         })
       ]
@@ -264,11 +264,11 @@ export let lotsOfOrs = new Rule({
   definition: [
     new Alternation({
       definition: [
-        new Flat({
+        new Alternative({
           definition: [
             new Alternation({
               definition: [
-                new Flat({
+                new Alternative({
                   definition: [
                     new Terminal({
                       terminalType: CommaTok,
@@ -276,7 +276,7 @@ export let lotsOfOrs = new Rule({
                     })
                   ]
                 }),
-                new Flat({
+                new Alternative({
                   definition: [
                     new Terminal({
                       terminalType: KeyTok,
@@ -289,7 +289,7 @@ export let lotsOfOrs = new Rule({
             })
           ]
         }),
-        new Flat({
+        new Alternative({
           definition: [
             new Terminal({
               terminalType: EntityTok,
@@ -301,7 +301,7 @@ export let lotsOfOrs = new Rule({
     }),
     new Alternation({
       definition: [
-        new Flat({
+        new Alternative({
           definition: [
             new Terminal({
               terminalType: DotTok,
@@ -320,7 +320,7 @@ export let emptyAltOr = new Rule({
   definition: [
     new Alternation({
       definition: [
-        new Flat({
+        new Alternative({
           definition: [
             new Terminal({
               terminalType: KeyTok,
@@ -328,7 +328,7 @@ export let emptyAltOr = new Rule({
             })
           ]
         }),
-        new Flat({
+        new Alternative({
           definition: [
             new Terminal({
               terminalType: EntityTok,
@@ -336,7 +336,7 @@ export let emptyAltOr = new Rule({
             })
           ]
         }),
-        new Flat({ definition: [] }) // an empty alternative
+        new Alternative({ definition: [] }) // an empty alternative
       ]
     })
   ]

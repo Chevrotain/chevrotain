@@ -37,7 +37,7 @@ import {
 import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
 import {
   Alternation,
-  Flat,
+  Alternative,
   Repetition,
   RepetitionWithSeparator,
   Rule,
@@ -661,16 +661,16 @@ describe("The chevrotain grammar interpreter capabilities", () => {
       let alts = [
         new Alternation({
           definition: [
-            new Flat({
+            new Alternative({
               definition: [new Terminal({ terminalType: Alpha })]
             }),
-            new Flat({
+            new Alternative({
               definition: [
                 new Terminal({ terminalType: Beta }),
                 new Terminal({ terminalType: Beta })
               ]
             }),
-            new Flat({
+            new Alternative({
               definition: [
                 new Terminal({ terminalType: Beta }),
                 new Terminal({ terminalType: Alpha }),
@@ -869,7 +869,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
     it("Sequence positive", () => {
       let seq = [
-        new Flat({
+        new Alternative({
           definition: [
             new Terminal({ terminalType: Alpha }),
             new Terminal({ terminalType: Beta }),
@@ -910,7 +910,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
     it("Sequence negative", () => {
       let seq = [
-        new Flat({
+        new Alternative({
           definition: [
             new Terminal({ terminalType: Alpha }),
             new Terminal({ terminalType: Beta }),
@@ -999,23 +999,23 @@ describe("The chevrotain grammar interpreter capabilities", () => {
       let alts = [
         new Alternation({
           definition: [
-            new Flat({
+            new Alternative({
               definition: [new Terminal({ terminalType: Alpha })]
             }),
-            new Flat({
+            new Alternative({
               definition: [
                 new Terminal({ terminalType: Beta }),
                 new Terminal({ terminalType: Beta })
               ]
             }),
-            new Flat({
+            new Alternative({
               definition: [
                 new Terminal({ terminalType: Beta }),
                 new Terminal({ terminalType: Alpha }),
                 new Terminal({ terminalType: Gamma })
               ]
             }),
-            new Flat({
+            new Alternative({
               definition: [new Terminal({ terminalType: Gamma })]
             })
           ]
@@ -1056,16 +1056,16 @@ describe("The chevrotain grammar interpreter capabilities", () => {
       let alts = [
         new Alternation({
           definition: [
-            new Flat({
+            new Alternative({
               definition: [new Terminal({ terminalType: Alpha })]
             }),
-            new Flat({
+            new Alternative({
               definition: [
                 new Terminal({ terminalType: Beta }),
                 new Terminal({ terminalType: Beta })
               ]
             }),
-            new Flat({
+            new Alternative({
               definition: [
                 new Terminal({ terminalType: Beta }),
                 new Terminal({ terminalType: Alpha }),

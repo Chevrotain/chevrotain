@@ -13,7 +13,7 @@ import { TokenMatcher } from "../parser/parser"
 import {
   AbstractProduction,
   Alternation,
-  Flat,
+  Alternative,
   NonTerminal,
   Option,
   Repetition,
@@ -127,7 +127,7 @@ export class NextAfterTokenWalker extends AbstractNextPossibleTokensWalker {
       !this.found
     ) {
       let fullRest = currRest.concat(prevRest)
-      let restProd = new Flat({ definition: fullRest })
+      let restProd = new Alternative({ definition: fullRest })
       this.possibleTokTypes = first(restProd)
       this.found = true
     }
@@ -281,7 +281,7 @@ export function possiblePathsFrom(
     let prod = targetDef[i]
 
     /* istanbul ignore else */
-    if (prod instanceof Flat) {
+    if (prod instanceof Alternative) {
       return getAlternativesForProd(prod.definition)
     } else if (prod instanceof NonTerminal) {
       return getAlternativesForProd(prod.definition)
@@ -296,7 +296,7 @@ export function possiblePathsFrom(
       return getAlternativesForProd(newDef)
     } else if (prod instanceof RepetitionMandatoryWithSeparator) {
       const newDef = [
-        new Flat({ definition: prod.definition }),
+        new Alternative({ definition: prod.definition }),
         new Repetition({
           definition: [new Terminal({ terminalType: prod.separator })].concat(
             <any>prod.definition
@@ -564,7 +564,7 @@ export function nextPossibleTokensAfter(
         possiblePaths.push(currAltPath)
         possiblePaths.push(EXIT_ALTERNATIVE)
       }
-    } else if (prod instanceof Flat) {
+    } else if (prod instanceof Alternative) {
       possiblePaths.push({
         idx: currIdx,
         def: prod.definition.concat(drop(currDef)),

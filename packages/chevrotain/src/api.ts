@@ -43,7 +43,7 @@ export { defaultLexerErrorProvider } from "./scan/lexer_errors_public"
 
 export {
   Alternation,
-  Flat,
+  Alternative,
   NonTerminal,
   Option,
   Repetition,

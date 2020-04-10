@@ -2,7 +2,7 @@ import { drop, forEach } from "../../utils/utils"
 import {
   AbstractProduction,
   Alternation,
-  Flat,
+  Alternative,
   NonTerminal,
   Option,
   Repetition,
@@ -25,7 +25,7 @@ export abstract class RestWalker {
         this.walkProdRef(subProd, currRest, prevRest)
       } else if (subProd instanceof Terminal) {
         this.walkTerminal(subProd, currRest, prevRest)
-      } else if (subProd instanceof Flat) {
+      } else if (subProd instanceof Alternative) {
         this.walkFlat(subProd, currRest, prevRest)
       } else if (subProd instanceof Option) {
         this.walkOption(subProd, currRest, prevRest)
@@ -58,7 +58,7 @@ export abstract class RestWalker {
   ): void {}
 
   walkFlat(
-    flatProd: Flat,
+    flatProd: Alternative,
     currRest: IProduction[],
     prevRest: IProduction[]
   ): void {
@@ -141,7 +141,7 @@ export abstract class RestWalker {
       // wrapping each alternative in a single definition wrapper
       // to avoid errors in computing the rest of that alternative in the invocation to computeInProdFollows
       // (otherwise for OR([alt1,alt2]) alt2 will be considered in 'rest' of alt1
-      let prodWrapper = new Flat({ definition: [alt] })
+      let prodWrapper = new Alternative({ definition: [alt] })
       this.walk(prodWrapper, <any>fullOrRest)
     })
   }

@@ -28,7 +28,7 @@ import {
 import { nextPossibleTokensAfter } from "./interpreter"
 import {
   Alternation,
-  Flat,
+  Alternative as AlternativeGAST,
   NonTerminal,
   Option,
   Repetition,
@@ -385,7 +385,7 @@ export function getFirstNoneTerminal(definition: IProduction[]): Rule[] {
   if (firstProd instanceof NonTerminal) {
     result.push(firstProd.referencedRule)
   } else if (
-    firstProd instanceof Flat ||
+    firstProd instanceof AlternativeGAST ||
     firstProd instanceof Option ||
     firstProd instanceof RepetitionMandatory ||
     firstProd instanceof RepetitionMandatoryWithSeparator ||
@@ -399,7 +399,7 @@ export function getFirstNoneTerminal(definition: IProduction[]): Rule[] {
     // each sub definition in alternation is a FLAT
     result = utils.flatten(
       utils.map(firstProd.definition, currSubDef =>
-        getFirstNoneTerminal((<Flat>currSubDef).definition)
+        getFirstNoneTerminal((<AlternativeGAST>currSubDef).definition)
       )
     )
   } else if (firstProd instanceof Terminal) {

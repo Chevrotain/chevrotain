@@ -17,7 +17,7 @@ import {
 import { createRegularToken } from "../../utils/matchers"
 import {
   Alternation,
-  Flat,
+  Alternative,
   NonTerminal,
   Option,
   Repetition,
@@ -232,7 +232,7 @@ let cardinality = new Rule({
     new Terminal({ terminalType: DotDotTok }),
     new Alternation({
       definition: [
-        new Flat({
+        new Alternative({
           definition: [
             new Terminal({
               terminalType: UnsignedIntegerLiteralTok,
@@ -240,7 +240,7 @@ let cardinality = new Rule({
             })
           ]
         }),
-        new Flat({
+        new Alternative({
           definition: [new Terminal({ terminalType: AsteriskTok })]
         })
       ]
@@ -274,11 +274,11 @@ let lotsOfOrs = new Rule({
   definition: [
     new Alternation({
       definition: [
-        new Flat({
+        new Alternative({
           definition: [
             new Alternation({
               definition: [
-                new Flat({
+                new Alternative({
                   definition: [
                     new Terminal({
                       terminalType: CommaTok,
@@ -286,7 +286,7 @@ let lotsOfOrs = new Rule({
                     })
                   ]
                 }),
-                new Flat({
+                new Alternative({
                   definition: [
                     new Terminal({
                       terminalType: KeyTok,
@@ -299,7 +299,7 @@ let lotsOfOrs = new Rule({
             })
           ]
         }),
-        new Flat({
+        new Alternative({
           definition: [
             new Terminal({
               terminalType: EntityTok,
@@ -311,7 +311,7 @@ let lotsOfOrs = new Rule({
     }),
     new Alternation({
       definition: [
-        new Flat({
+        new Alternative({
           definition: [
             new Terminal({
               terminalType: DotTok,
@@ -330,7 +330,7 @@ let emptyAltOr = new Rule({
   definition: [
     new Alternation({
       definition: [
-        new Flat({
+        new Alternative({
           definition: [
             new Terminal({
               terminalType: KeyTok,
@@ -338,7 +338,7 @@ let emptyAltOr = new Rule({
             })
           ]
         }),
-        new Flat({
+        new Alternative({
           definition: [
             new Terminal({
               terminalType: EntityTok,
@@ -346,7 +346,7 @@ let emptyAltOr = new Rule({
             })
           ]
         }),
-        new Flat({ definition: [] }) // an empty alternative
+        new Alternative({ definition: [] }) // an empty alternative
       ]
     })
   ]
@@ -578,7 +578,7 @@ context("lookahead specs", () => {
         definition: [
           new Alternation({
             definition: [
-              new Flat({
+              new Alternative({
                 definition: [
                   new Terminal({
                     terminalType: A,
@@ -586,7 +586,7 @@ context("lookahead specs", () => {
                   })
                 ]
               }),
-              new Flat({
+              new Alternative({
                 definition: [
                   new Terminal({
                     terminalType: B,
@@ -660,13 +660,13 @@ context("lookahead specs", () => {
       it("two simple one token alternatives", () => {
         let alt1 = new Alternation({
           definition: [
-            new Flat({
+            new Alternative({
               definition: [new Terminal({ terminalType: Alpha })]
             }),
-            new Flat({
+            new Alternative({
               definition: [new Terminal({ terminalType: Beta })]
             }),
-            new Flat({
+            new Alternative({
               definition: [new Terminal({ terminalType: Beta })]
             })
           ]
@@ -680,19 +680,19 @@ context("lookahead specs", () => {
       it("three simple one token alternatives", () => {
         let alt1 = new Alternation({
           definition: [
-            new Flat({
+            new Alternative({
               definition: [new Terminal({ terminalType: Alpha })]
             }),
-            new Flat({
+            new Alternative({
               definition: [new Terminal({ terminalType: Beta })]
             }),
-            new Flat({
+            new Alternative({
               definition: [new Terminal({ terminalType: Beta })]
             })
           ]
         })
         let alt2 = new Terminal({ terminalType: Gamma })
-        let alt3 = new Flat({
+        let alt3 = new Alternative({
           definition: [
             new Terminal({ terminalType: Delta }),
             new Terminal({ terminalType: Charlie })
@@ -706,16 +706,16 @@ context("lookahead specs", () => {
       it("two complex multi token alternatives", () => {
         let alt1 = new Alternation({
           definition: [
-            new Flat({
+            new Alternative({
               definition: [
                 new Terminal({ terminalType: Alpha }),
                 new Terminal({ terminalType: Beta })
               ]
             }),
-            new Flat({
+            new Alternative({
               definition: [new Terminal({ terminalType: Beta })]
             }),
-            new Flat({
+            new Alternative({
               definition: [
                 new Terminal({ terminalType: Alpha }),
                 new Terminal({ terminalType: Gamma }),
@@ -726,13 +726,13 @@ context("lookahead specs", () => {
         })
         let alt2 = new Alternation({
           definition: [
-            new Flat({
+            new Alternative({
               definition: [
                 new Terminal({ terminalType: Alpha }),
                 new Terminal({ terminalType: Delta })
               ]
             }),
-            new Flat({
+            new Alternative({
               definition: [new Terminal({ terminalType: Charlie })]
             })
           ]
@@ -748,30 +748,30 @@ context("lookahead specs", () => {
       it("three complex multi token alternatives", () => {
         let alt1 = new Alternation({
           definition: [
-            new Flat({
+            new Alternative({
               definition: [
                 new Terminal({ terminalType: Alpha }),
                 new Terminal({ terminalType: Beta }),
                 new Terminal({ terminalType: Gamma })
               ]
             }),
-            new Flat({
+            new Alternative({
               definition: [new Terminal({ terminalType: Beta })]
             })
           ]
         })
         let alt2 = new Alternation({
           definition: [
-            new Flat({
+            new Alternative({
               definition: [
                 new Terminal({ terminalType: Alpha }),
                 new Terminal({ terminalType: Delta })
               ]
             }),
-            new Flat({
+            new Alternative({
               definition: [new Terminal({ terminalType: Charlie })]
             }),
-            new Flat({
+            new Alternative({
               definition: [
                 new Terminal({ terminalType: Gamma }),
                 new Terminal({ terminalType: Gamma })
@@ -781,14 +781,14 @@ context("lookahead specs", () => {
         })
         let alt3 = new Alternation({
           definition: [
-            new Flat({
+            new Alternative({
               definition: [
                 new Terminal({ terminalType: Alpha }),
                 new Terminal({ terminalType: Beta }),
                 new Terminal({ terminalType: Delta })
               ]
             }),
-            new Flat({
+            new Alternative({
               definition: [
                 new Terminal({ terminalType: Charlie }),
                 new Terminal({ terminalType: Beta })
@@ -809,7 +809,7 @@ context("lookahead specs", () => {
       })
 
       it("two complex multi token alternatives with shared prefix", () => {
-        let alt1 = new Flat({
+        let alt1 = new Alternative({
           definition: [
             new Terminal({ terminalType: Alpha }),
             new Terminal({ terminalType: Beta }),
@@ -818,7 +818,7 @@ context("lookahead specs", () => {
           ]
         })
 
-        let alt2 = new Flat({
+        let alt2 = new Alternative({
           definition: [
             new Terminal({ terminalType: Alpha }),
             new Terminal({ terminalType: Beta }),
@@ -837,10 +837,10 @@ context("lookahead specs", () => {
       })
 
       it("simple ambiguous alternatives", () => {
-        let alt1 = new Flat({
+        let alt1 = new Alternative({
           definition: [new Terminal({ terminalType: Alpha })]
         })
-        let alt2 = new Flat({
+        let alt2 = new Alternative({
           definition: [new Terminal({ terminalType: Alpha })]
         })
 
@@ -849,7 +849,7 @@ context("lookahead specs", () => {
       })
 
       it("complex(multi-token) ambiguous alternatives", () => {
-        let alt1 = new Flat({
+        let alt1 = new Alternative({
           definition: [
             new Terminal({ terminalType: Alpha }),
             new Terminal({ terminalType: Beta }),
@@ -857,7 +857,7 @@ context("lookahead specs", () => {
           ]
         })
 
-        let alt2 = new Flat({
+        let alt2 = new Alternative({
           definition: [
             new Terminal({ terminalType: Alpha }),
             new Terminal({ terminalType: Beta }),
