@@ -24,8 +24,7 @@ There are a few use cases in which a custom pattern could be used:
   - When context on previously lexed tokens is needed.
     For example: [Lexing Python like indentation using Chevrotain](https://github.com/SAP/chevrotain/blob/master/examples/lexer/python_indentation/python_indentation.js).
 
-- Workaround performance issues in specific regExp engines by providing a none regExp matcher implementation:
-  - [WebKit/Safari multiple orders of magnitude performance degradation for specific regExp patterns](https://bugs.webkit.org/show_bug.cgi?id=152578) 😞
+- Workaround possible performance issues/bugs in regExp engines.
 
 ## Usage
 
