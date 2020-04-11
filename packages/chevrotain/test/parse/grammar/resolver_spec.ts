@@ -2,7 +2,7 @@ import { GastRefResolverVisitor } from "../../../src/parse/grammar/resolver"
 import { ParserDefinitionErrorType } from "../../../src/parse/parser/parser"
 import {
   Alternation,
-  Flat,
+  Alternative,
   NonTerminal,
   Option,
   Repetition,
@@ -60,7 +60,7 @@ describe("The assignOccurrenceIndices utility", () => {
         }),
         new Alternation({
           definition: [
-            new Flat({
+            new Alternative({
               definition: [new Terminal({ terminalType: B })]
             })
           ]
@@ -88,7 +88,7 @@ describe("The assignOccurrenceIndices utility", () => {
         }),
         new Alternation({
           definition: [
-            new Flat({
+            new Alternative({
               definition: [new Terminal({ terminalType: B })]
             })
           ]

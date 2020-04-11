@@ -10,7 +10,7 @@ import {
   RepetitionWithSeparator,
   Repetition,
   serializeProduction,
-  Flat,
+  Alternative,
   Rule,
   serializeGrammar
 } from "../../../src/parse/grammar/gast/gast_public"
@@ -103,8 +103,8 @@ describe("GAst namespace", () => {
       })
     })
 
-    it("can serialize a Flat", () => {
-      let input = new Flat({
+    it("can serialize a Alternative", () => {
+      let input = new Alternative({
         definition: [
           new Terminal({ terminalType: WithLiteral }),
           new NonTerminal({ nonTerminalName: "bamba" })
@@ -112,7 +112,7 @@ describe("GAst namespace", () => {
       })
       let actual = serializeProduction(input)
       expect(actual).to.deep.equal({
-        type: "Flat",
+        type: "Alternative",
         definition: [
           {
             type: "Terminal",
@@ -282,13 +282,13 @@ describe("GAst namespace", () => {
     it("can serialize a Alternation", () => {
       let input = new Alternation({
         definition: [
-          new Flat({
+          new Alternative({
             definition: [new Terminal({ terminalType: A })]
           }),
-          new Flat({
+          new Alternative({
             definition: [new Terminal({ terminalType: B })]
           }),
-          new Flat({
+          new Alternative({
             definition: [new Terminal({ terminalType: C })]
           })
         ]
@@ -300,7 +300,7 @@ describe("GAst namespace", () => {
         idx: 1,
         definition: [
           {
-            type: "Flat",
+            type: "Alternative",
             definition: [
               {
                 type: "Terminal",
@@ -311,7 +311,7 @@ describe("GAst namespace", () => {
             ]
           },
           {
-            type: "Flat",
+            type: "Alternative",
             definition: [
               {
                 type: "Terminal",
@@ -323,7 +323,7 @@ describe("GAst namespace", () => {
             ]
           },
           {
-            type: "Flat",
+            type: "Alternative",
             definition: [
               {
                 type: "Terminal",

@@ -64,6 +64,8 @@
 
 - The TokenType's `tokenName` property has been deprecated (This actually happened in 6.3.1...) use the `name` property instead.
 
+- The GAST `Flat` class was renamed to `Alternative`.
+
 ## 6.0.0
 
 - Due to re-implementation of the grammar analysis via ["grammar recording"](../guide/internals.md#grammar-recording), certain semantics action

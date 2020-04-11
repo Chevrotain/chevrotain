@@ -2,7 +2,7 @@ import { contains, every, has, some } from "../../../utils/utils"
 import {
   AbstractProduction,
   Alternation,
-  Flat,
+  Alternative,
   NonTerminal,
   Option,
   Repetition,
@@ -17,7 +17,7 @@ import { IProduction, IProductionWithOccurrence } from "../../../../api"
 
 export function isSequenceProd(prod: IProduction): boolean {
   return (
-    prod instanceof Flat ||
+    prod instanceof Alternative ||
     prod instanceof Option ||
     prod instanceof Repetition ||
     prod instanceof RepetitionMandatory ||

@@ -2,7 +2,7 @@ import { RestWalker } from "./rest"
 import { first } from "./first"
 import { assign, forEach } from "../../utils/utils"
 import { IN } from "../constants"
-import { Flat, NonTerminal, Rule, Terminal } from "./gast/gast_public"
+import { Alternative, NonTerminal, Rule, Terminal } from "./gast/gast_public"
 import { IProduction, TokenType } from "../../../api"
 
 // This ResyncFollowsWalker computes all of the follows required for RESYNC
@@ -36,7 +36,7 @@ export class ResyncFollowsWalker extends RestWalker {
       buildBetweenProdsFollowPrefix(refProd.referencedRule, refProd.idx) +
       this.topProd.name
     let fullRest: IProduction[] = currRest.concat(prevRest)
-    let restProd = new Flat({ definition: fullRest })
+    let restProd = new Alternative({ definition: fullRest })
     let t_in_topProd_follows = first(restProd)
     this.follows[followName] = t_in_topProd_follows
   }

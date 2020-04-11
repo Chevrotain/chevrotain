@@ -26,7 +26,7 @@ The structure of the GAST is made up of the following classes:
 - [RepetitionWithSeparator](https://sap.github.io/chevrotain/documentation/6_5_0/classes/repetitionwithseparator.html)
 - [RepetitionMandatory](https://sap.github.io/chevrotain/documentation/6_5_0/classes/repetitionmandatory.html)
 - [RepetitionMandatoryWithSeparator](https://sap.github.io/chevrotain/documentation/6_5_0/classes/repetitionmandatorywithseparator.html)
-- [Flat](https://sap.github.io/chevrotain/documentation/6_5_0/classes/flat.html) (sequence)
+- [Alternative](https://sap.github.io/chevrotain/documentation/6_5_0/classes/alternative.html) (sequence)
 
 For example to define a grammar rule for a fully qualified name:
 
@@ -59,29 +59,29 @@ Important to note that:
 
 - By default the definition array for each GAST class acts as a sequence,
   However in the case of Alternation each element in the definition array represents a different
-  alternative which should be wrapped in a Flat class.
+  alternative which should be wrapped in the `Alternative` class.
 
   e.g:
 
   ```javascript
-  const { Flat, Alternation } = require("chevrotain")
+  const { Alternative, Alternation } = require("chevrotain")
 
   const gastAlts = new Alternation({
     definition: [
       // first alternative
-      new Flat({
+      new Alternative({
         definition: [
           /*...*/
         ]
       }),
       // second alternative
-      new Flat({
+      new Alternative({
         definition: [
           /*...*/
         ]
       }),
       // third alternative
-      new Flat({
+      new Alternative({
         definition: [
           /*...*/
         ]

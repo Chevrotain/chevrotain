@@ -17,7 +17,7 @@ import {
 import {
   AbstractProduction,
   Alternation,
-  Flat,
+  Alternative as AlternativeGAST,
   Option,
   Repetition,
   RepetitionMandatory,
@@ -636,8 +636,8 @@ export function getLookaheadPathsForOptionalProd(
   )
   let afterDef = afterDefWalker.startWalking()
 
-  let insideFlat = new Flat({ definition: insideDef })
-  let afterFlat = new Flat({ definition: afterDef })
+  let insideFlat = new AlternativeGAST({ definition: insideDef })
+  let afterFlat = new AlternativeGAST({ definition: afterDef })
 
   return lookAheadSequenceFromAlternatives([insideFlat, afterFlat], k)
 }

@@ -8,7 +8,7 @@ import {
   Terminal,
   NonTerminal,
   Alternation,
-  Flat,
+  Alternative,
   Repetition
 } from "../parse/grammar/gast/gast_public"
 import { IProduction, TokenType } from "../../api"
@@ -118,7 +118,7 @@ export function genAlternation(prod: Alternation, n: number): string {
   return result
 }
 
-export function genSingleAlt(prod: Flat, n: number): string {
+export function genSingleAlt(prod: Alternative, n: number): string {
   let result = indent(n, `{`) + NL
 
   result += indent(n + 1, "ALT: function() {") + NL
@@ -147,7 +147,7 @@ function genProd(prod: IProduction, n: number): string {
     return genAlternation(prod, n)
   } else if (prod instanceof Terminal) {
     return genTerminal(prod, n)
-  } else if (prod instanceof Flat) {
+  } else if (prod instanceof Alternative) {
     return genDefinition(prod.definition, n)
   } else {
     throw Error("non exhaustive match")

@@ -2128,7 +2128,7 @@ export declare type ISeparatedIterationResult<OUT> = {
 export interface ISerializedGast {
   type:
     | "NonTerminal"
-    | "Flat"
+    | "Alternative"
     | "Option"
     | "RepetitionMandatory"
     | "RepetitionMandatoryWithSeparator"
@@ -2321,7 +2321,7 @@ export abstract class GAstVisitor {
 
   abstract visitNonTerminal(node: NonTerminal): any
 
-  abstract visitFlat(node: Flat): any
+  abstract visitAlternative(node: Alternative): any
 
   abstract visitOption(node: Option): any
 
@@ -2376,11 +2376,9 @@ export declare class NonTerminal implements IProductionWithOccurrence {
 }
 
 /**
- * The Grammar AST class used to represent a sequence.
- * This is normally only used in {@link Alternation} to distinguish
- * between the different alternatives.
+ * The Grammar AST class used to represent a single alternative in an {@link Alternation}.
  */
-export declare class Flat {
+export declare class Alternative {
   definition: IProduction[]
   ignoreAmbiguities: boolean
 
