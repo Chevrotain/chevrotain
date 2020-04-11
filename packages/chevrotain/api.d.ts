@@ -1930,6 +1930,15 @@ export interface ICstVisitor<IN, OUT> {
 export interface CstNode {
   readonly name: string
   readonly children: CstChildrenDictionary
+  /**
+   * A flag indicating the whole CSTNode has been recovered during **re-sync** error recovery.
+   * This means that some of the node's children may be missing.
+   * - Note that single token insertion/deletion recovery would not activate this flag.
+   *   This flag would only be activated in **re-sync** recovery when the rule's
+   *   grammar cannot be fully parsed.
+   * - See: https://sap.github.io/chevrotain/docs/tutorial/step4_fault_tolerance.html
+   *   for more info on error recovery and fault tolerance.
+   */
   readonly recoveredNode?: boolean
 
   /**
