@@ -194,7 +194,7 @@ class Calculator extends EmbeddedActionsParser {
 const parser = new Calculator()
 
 // wrapping it all together
-module.exports = function(text) {
+module.exports = function (text) {
   const lexResult = CalculatorLexer.tokenize(text)
   // setting a new input will RESET the parser instance's state.
   parser.input = lexResult.tokens

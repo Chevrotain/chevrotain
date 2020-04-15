@@ -167,7 +167,7 @@ class TinyCParser extends CstParser {
 // reuse the same parser instance.
 const parser = new TinyCParser()
 
-module.exports = function(text) {
+module.exports = function (text) {
   const lexResult = TinyCLexer.tokenize(text)
 
   // setting a new input will RESET the parser instance's state.

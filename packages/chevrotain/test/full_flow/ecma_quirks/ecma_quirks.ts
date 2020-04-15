@@ -57,7 +57,7 @@ const allTokens = [
 // Avoids errors in browser tests where the bundled specs will execute this
 // file even if the tests will avoid running it.
 if (typeof (<any>new RegExp("(?:)")).sticky === "boolean") {
-  forEach(allTokens, currTokType => {
+  forEach(allTokens, (currTokType) => {
     currTokType.PATTERN = new RegExp(currTokType.PATTERN.source, "y")
   })
 }
@@ -194,13 +194,13 @@ class EcmaScriptQuirksParser extends EmbeddedActionsParser {
     tokenMatcher: TokenMatcher,
     dynamicTokensEnabled: boolean
   ): () => boolean {
-    if (!every(alt, currAlt => currAlt.length === 1)) {
+    if (!every(alt, (currAlt) => currAlt.length === 1)) {
       throw Error("This scannerLess parser only supports LL(1) lookahead.")
     }
 
     const allTokenTypes = flatten(alt)
 
-    return function() {
+    return function () {
       // save & restore lexer state as otherwise the text index will move ahead
       // and the parser will fail consuming the tokens we have looked ahead for.
       let lexerState = this.exportLexerState()
@@ -228,14 +228,16 @@ class EcmaScriptQuirksParser extends EmbeddedActionsParser {
     dynamicTokensEnabled: boolean
   ): (orAlts?: IOrAlt<any>[]) => number | undefined {
     if (
-      !every(alts, currPath => every(currPath, currAlt => currAlt.length === 1))
+      !every(alts, (currPath) =>
+        every(currPath, (currAlt) => currAlt.length === 1)
+      )
     ) {
       throw Error("This scannerLess parser only supports LL(1) lookahead.")
     }
 
     const allTokenTypesPerAlt = map(alts, flatten)
 
-    return function() {
+    return function () {
       // save & restore lexer state as otherwise the text index will move ahead
       // and the parser will fail consuming the tokens we have looked ahead for.
       let lexerState = this.exportLexerState()

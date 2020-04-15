@@ -45,7 +45,7 @@ class SQLToAstVisitor extends BaseSQLVisitor {
   selectClause(ctx) {
     // Each Terminal or Non-Terminal in a grammar rule are collected into
     // an array with the same name(key) in the ctx object.
-    const columns = ctx.Identifier.map(identToken => identToken.image)
+    const columns = ctx.Identifier.map((identToken) => identToken.image)
 
     return {
       type: "SELECT_CLAUSE",
@@ -107,7 +107,7 @@ class SQLToAstVisitor extends BaseSQLVisitor {
 const toAstVisitorInstance = new SQLToAstVisitor()
 
 module.exports = {
-  toAst: function(inputText) {
+  toAst: function (inputText) {
     const lexResult = selectLexer.lex(inputText)
 
     // ".input" is a setter which will reset the parser's internal's state.

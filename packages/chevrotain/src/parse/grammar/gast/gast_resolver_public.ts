@@ -25,7 +25,7 @@ export function resolveGrammar(options: {
   })
 
   const topRulesTable = {}
-  forEach(options.rules, rule => {
+  forEach(options.rules, (rule) => {
     topRulesTable[rule.name] = rule
   })
   return orgResolveGrammar(topRulesTable, options.errMsgProvider)
@@ -52,10 +52,10 @@ export function validateGrammar(options: {
 }
 
 export function assignOccurrenceIndices(options: { rules: Rule[] }): void {
-  forEach(options.rules, currRule => {
+  forEach(options.rules, (currRule) => {
     const methodsCollector = new DslMethodsCollectorVisitor()
     currRule.accept(methodsCollector)
-    forEach(methodsCollector.dslMethods, methods => {
+    forEach(methodsCollector.dslMethods, (methods) => {
       forEach(methods, (currMethod: IProductionWithOccurrence, arrIdx) => {
         currMethod.idx = arrIdx + 1
       })

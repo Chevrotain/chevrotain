@@ -52,7 +52,7 @@ function JsonParserES5() {
   // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
   var $ = this
 
-  this.RULE("json", function() {
+  this.RULE("json", function () {
     // prettier-ignore
     $.OR([
             {ALT: function() {$.SUBRULE($.object)}},
@@ -60,35 +60,35 @@ function JsonParserES5() {
         ])
   })
 
-  this.RULE("object", function() {
+  this.RULE("object", function () {
     $.CONSUME(LCurly)
     $.MANY_SEP({
       SEP: Comma,
-      DEF: function() {
+      DEF: function () {
         $.SUBRULE2($.objectItem)
       }
     })
     $.CONSUME(RCurly)
   })
 
-  this.RULE("objectItem", function() {
+  this.RULE("objectItem", function () {
     $.CONSUME(StringLiteral)
     $.CONSUME(Colon)
     $.SUBRULE($.value)
   })
 
-  this.RULE("array", function() {
+  this.RULE("array", function () {
     $.CONSUME(LSquare)
     $.MANY_SEP({
       SEP: Comma,
-      DEF: function() {
+      DEF: function () {
         $.SUBRULE2($.value)
       }
     })
     $.CONSUME(RSquare)
   })
 
-  this.RULE("value", function() {
+  this.RULE("value", function () {
     // prettier-ignore
     $.OR([
             {ALT: function() {$.CONSUME(StringLiteral)}},
@@ -116,7 +116,7 @@ JsonParserES5.prototype.constructor = JsonParserES5
 // reuse the same parser instance.
 var parser = new JsonParserES5()
 
-module.exports = function(text) {
+module.exports = function (text) {
   var lexResult = JsonLexer.tokenize(text)
 
   // setting a new input will RESET the parser instance's state.

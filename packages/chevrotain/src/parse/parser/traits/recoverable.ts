@@ -320,7 +320,7 @@ export class Recoverable {
   }
 
   flattenFollowSet(this: MixedInParser): TokenType[] {
-    let followStack = map(this.buildFullFollowKeyStack(), currKey => {
+    let followStack = map(this.buildFullFollowKeyStack(), (currKey) => {
       return this.getFollowSetFromFollowKey(currKey)
     })
     return <any>flatten(followStack)
@@ -395,7 +395,7 @@ export class Recoverable {
     return grammarPath
   }
   getHumanReadableRuleStack(this: MixedInParser): string[] {
-    return map(this.RULE_STACK, currShortName =>
+    return map(this.RULE_STACK, (currShortName) =>
       this.shortRuleNameToFullName(currShortName)
     )
   }

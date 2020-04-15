@@ -50,7 +50,7 @@ module.exports = {
   IntegerLiteral: IntegerLiteral,
   Comma: Comma,
 
-  tokenize: function(text) {
+  tokenize: function (text) {
     const lexResult = customPatternLexer.tokenize(text)
 
     if (lexResult.errors.length < 0) {

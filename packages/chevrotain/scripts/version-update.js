@@ -26,7 +26,7 @@ const changeLogDate = config.changeLogString.replace(
 )
 fs.writeFileSync(config.changeLogPath, changeLogDate)
 
-_.forEach(config.docFilesPaths, function(currDocPath) {
+_.forEach(config.docFilesPaths, function (currDocPath) {
   if (_.includes(currDocPath, "changes")) {
     console.log("SKIPPING bumping file: <" + currDocPath + ">")
     return

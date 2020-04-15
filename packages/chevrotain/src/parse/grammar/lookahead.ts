@@ -130,8 +130,8 @@ export function buildAlternativesLookAheadFunc(
   dynamicTokensEnabled: boolean
 ): (orAlts?: IOrAlt<any>[]) => number {
   let numOfAlts = alts.length
-  let areAllOneTokenLookahead = every(alts, currAlt => {
-    return every(currAlt, currPath => {
+  let areAllOneTokenLookahead = every(alts, (currAlt) => {
+    return every(currAlt, (currPath) => {
       return currPath.length === 1
     })
   })
@@ -141,11 +141,11 @@ export function buildAlternativesLookAheadFunc(
     /**
      * @returns {number} - The chosen alternative index
      */
-    return function(orAlts: IOrAlt<any>[]): number {
+    return function (orAlts: IOrAlt<any>[]): number {
       // unfortunately the predicates must be extracted every single time
       // as they cannot be cached due to references to parameters(vars) which are no longer valid.
       // note that in the common case of no predicates, no cpu time will be wasted on this (see else block)
-      let predicates: Predicate[] = map(orAlts, currAlt => currAlt.GATE)
+      let predicates: Predicate[] = map(orAlts, (currAlt) => currAlt.GATE)
 
       for (let t = 0; t < numOfAlts; t++) {
         let currAlt = alts[t]
@@ -180,18 +180,18 @@ export function buildAlternativesLookAheadFunc(
   } else if (areAllOneTokenLookahead && !dynamicTokensEnabled) {
     // optimized (common) case of all the lookaheads paths requiring only
     // a single token lookahead. These Optimizations cannot work if dynamically defined Tokens are used.
-    let singleTokenAlts = map(alts, currAlt => {
+    let singleTokenAlts = map(alts, (currAlt) => {
       return flatten(currAlt)
     })
 
     let choiceToAlt = reduce(
       singleTokenAlts,
       (result, currAlt, idx) => {
-        forEach(currAlt, currTokType => {
+        forEach(currAlt, (currTokType) => {
           if (!has(result, currTokType.tokenTypeIdx)) {
             result[currTokType.tokenTypeIdx] = idx
           }
-          forEach(currTokType.categoryMatches, currExtendingType => {
+          forEach(currTokType.categoryMatches, (currExtendingType) => {
             if (!has(result, currExtendingType)) {
               result[currExtendingType] = idx
             }
@@ -205,7 +205,7 @@ export function buildAlternativesLookAheadFunc(
     /**
      * @returns {number} - The chosen alternative index
      */
-    return function(): number {
+    return function (): number {
       let nextToken = this.LA(1)
       return choiceToAlt[nextToken.tokenTypeIdx]
     }
@@ -215,7 +215,7 @@ export function buildAlternativesLookAheadFunc(
     /**
      * @returns {number} - The chosen alternative index
      */
-    return function(): number {
+    return function (): number {
       for (let t = 0; t < numOfAlts; t++) {
         let currAlt = alts[t]
         let currNumOfPaths = currAlt.length
@@ -248,7 +248,7 @@ export function buildSingleAlternativeLookaheadFunction(
   tokenMatcher: TokenMatcher,
   dynamicTokensEnabled: boolean
 ): () => boolean {
-  let areAllOneTokenLookahead = every(alt, currPath => {
+  let areAllOneTokenLookahead = every(alt, (currPath) => {
     return currPath.length === 1
   })
 
@@ -266,7 +266,7 @@ export function buildSingleAlternativeLookaheadFunction(
       let expectedTokenType = singleTokensTypes[0]
       let expectedTokenUniqueKey = (<any>expectedTokenType).tokenTypeIdx
 
-      return function(): boolean {
+      return function (): boolean {
         return this.LA(1).tokenTypeIdx === expectedTokenUniqueKey
       }
     } else {
@@ -274,7 +274,7 @@ export function buildSingleAlternativeLookaheadFunction(
         singleTokensTypes,
         (result, currTokType, idx) => {
           result[currTokType.tokenTypeIdx] = true
-          forEach(currTokType.categoryMatches, currExtendingType => {
+          forEach(currTokType.categoryMatches, (currExtendingType) => {
             result[currExtendingType] = true
           })
           return result
@@ -282,13 +282,13 @@ export function buildSingleAlternativeLookaheadFunction(
         []
       )
 
-      return function(): boolean {
+      return function (): boolean {
         let nextToken = this.LA(1)
         return choiceToAlt[nextToken.tokenTypeIdx] === true
       }
     }
   } else {
-    return function(): boolean {
+    return function (): boolean {
       nextPath: for (let j = 0; j < numOfPaths; j++) {
         let currPath = alt[j]
         let currPathLength = currPath.length
@@ -535,13 +535,13 @@ export function lookAheadSequenceFromAlternatives(
   altsDefs: IProduction[],
   k: number
 ): lookAheadSequence[] {
-  let partialAlts = map(altsDefs, currAlt => possiblePathsFrom([currAlt], 1))
+  let partialAlts = map(altsDefs, (currAlt) => possiblePathsFrom([currAlt], 1))
   let finalResult = initializeArrayOfArrays(partialAlts.length)
-  const altsHashes = map(partialAlts, currAltPaths => {
+  const altsHashes = map(partialAlts, (currAltPaths) => {
     const dict = {}
-    forEach(currAltPaths, item => {
+    forEach(currAltPaths, (item) => {
       const keys = pathToHashKeys(item.partialPath)
-      forEach(keys, currKey => {
+      forEach(keys, (currKey) => {
         dict[currKey] = true
       })
     })
@@ -590,9 +590,9 @@ export function lookAheadSequenceFromAlternatives(
           newData[altIdx] = newData[altIdx].concat(newPartialPathsAndSuffixes)
 
           // Update keys for new known paths
-          forEach(newPartialPathsAndSuffixes, item => {
+          forEach(newPartialPathsAndSuffixes, (item) => {
             const prefixKeys = pathToHashKeys(item.partialPath)
-            forEach(prefixKeys, key => {
+            forEach(prefixKeys, (key) => {
               altsHashes[altIdx][key] = true
             })
           })
@@ -687,9 +687,9 @@ export function isStrictPrefixOfPath(
 export function areTokenCategoriesNotUsed(
   lookAheadPaths: lookAheadSequence[]
 ): boolean {
-  return every(lookAheadPaths, singleAltPaths =>
-    every(singleAltPaths, singlePath =>
-      every(singlePath, token => isEmpty(token.categoryMatches))
+  return every(lookAheadPaths, (singleAltPaths) =>
+    every(singleAltPaths, (singlePath) =>
+      every(singlePath, (token) => isEmpty(token.categoryMatches))
     )
   )
 }

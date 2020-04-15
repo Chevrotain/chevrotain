@@ -118,8 +118,8 @@ describe("The assignOccurrenceIndices utility", () => {
     const methodsCollector = new DslMethodsCollectorVisitor()
     rule.accept(methodsCollector)
 
-    forEach(methodsCollector.dslMethods, currMethodArr => {
-      const indices = map(currMethodArr, currMethod => currMethod.idx)
+    forEach(methodsCollector.dslMethods, (currMethodArr) => {
+      const indices = map(currMethodArr, (currMethod) => currMethod.idx)
       expect(indices.length).to.equal(uniq(indices).length)
     })
   })

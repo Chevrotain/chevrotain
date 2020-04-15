@@ -1,7 +1,7 @@
 /**
  * based on https://github.com/x2es/boilerplate-karma-mocha-chai-requirejs/blob/master/test/test-main.js
  */
-;(function() {
+;(function () {
   var specFiles = null
   var requirejsCallback = null
 

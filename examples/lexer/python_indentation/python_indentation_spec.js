@@ -14,7 +14,7 @@ describe("The Chevrotain Lexer ability to lex python like indentation.", () => {
       "    print 999\n"
 
     let lexResult = tokenize(input)
-    const actualTokenTypes = lexResult.tokens.map(tok => tok.tokenType.name)
+    const actualTokenTypes = lexResult.tokens.map((tok) => tok.tokenType.name)
 
     expect(actualTokenTypes).to.eql([
       "If",
@@ -44,7 +44,7 @@ describe("The Chevrotain Lexer ability to lex python like indentation.", () => {
       "if 1\n" + "  if 2\n" + "    if 3\n" + "else\n" + "  print 666666666666\n"
 
     const lexResult = tokenize(input)
-    const actualTokenTypes = lexResult.tokens.map(tok => tok.tokenType.name)
+    const actualTokenTypes = lexResult.tokens.map((tok) => tok.tokenType.name)
     expect(actualTokenTypes).to.eql([
       "If",
       "IntegerLiteral",

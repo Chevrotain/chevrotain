@@ -69,7 +69,7 @@ class MultiStartParser extends CstParser {
 const parser = new MultiStartParser()
 
 function parseStartingWithRule(ruleName) {
-  return function(text) {
+  return function (text) {
     const lexResult = PhoneticLexer.tokenize(text)
     // setting a new input will RESET the parser instance's state.
     parser.input = lexResult.tokens

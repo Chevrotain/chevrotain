@@ -47,7 +47,7 @@ export function computeAllProdsFollows(
 ): Record<string, TokenType[]> {
   let reSyncFollows = {}
 
-  forEach(topProductions, topProd => {
+  forEach(topProductions, (topProd) => {
     let currRefsFollow = new ResyncFollowsWalker(topProd).startWalking()
     assign(reSyncFollows, currRefsFollow)
   })

@@ -104,7 +104,7 @@ export function analyzeTokenTypes(
 
   let onlyRelevantTypes
   tracer("Reject Lexer.NA", () => {
-    onlyRelevantTypes = reject(tokenTypes, currType => {
+    onlyRelevantTypes = reject(tokenTypes, (currType) => {
       return currType[PATTERN] === Lexer.NA
     })
   })
@@ -113,7 +113,7 @@ export function analyzeTokenTypes(
   let allTransformedPatterns
   tracer("Transform Patterns", () => {
     hasCustom = false
-    allTransformedPatterns = map(onlyRelevantTypes, currType => {
+    allTransformedPatterns = map(onlyRelevantTypes, (currType) => {
       let currPattern = currType[PATTERN]
 
       /* istanbul ignore else */
@@ -196,7 +196,10 @@ export function analyzeTokenTypes(
   let patternIdxToPushMode
   let patternIdxToPopMode
   tracer("misc mapping", () => {
-    patternIdxToType = map(onlyRelevantTypes, currType => currType.tokenTypeIdx)
+    patternIdxToType = map(
+      onlyRelevantTypes,
+      (currType) => currType.tokenTypeIdx
+    )
 
     patternIdxToGroup = map(onlyRelevantTypes, (clazz: any) => {
       let groupName = clazz.GROUP
@@ -236,9 +239,9 @@ export function analyzeTokenTypes(
     const lineTerminatorCharCodes = getCharCodes(
       options.lineTerminatorCharacters
     )
-    patternIdxToCanLineTerminator = map(onlyRelevantTypes, tokType => false)
+    patternIdxToCanLineTerminator = map(onlyRelevantTypes, (tokType) => false)
     if (options.positionTracking !== "onlyOffset") {
-      patternIdxToCanLineTerminator = map(onlyRelevantTypes, tokType => {
+      patternIdxToCanLineTerminator = map(onlyRelevantTypes, (tokType) => {
         if (has(tokType, "LINE_BREAKS")) {
           return tokType.LINE_BREAKS
         } else {
@@ -302,7 +305,7 @@ export function analyzeTokenTypes(
             addToMapOfArrays(result, optimizedIdx, patternIdxToConfig[idx])
           } else if (isArray(currTokType.START_CHARS_HINT)) {
             let lastOptimizedIdx
-            forEach(currTokType.START_CHARS_HINT, charOrInt => {
+            forEach(currTokType.START_CHARS_HINT, (charOrInt) => {
               const charCode =
                 typeof charOrInt === "string"
                   ? charOrInt.charCodeAt(0)
@@ -347,7 +350,7 @@ export function analyzeTokenTypes(
                 // Not actually sure this is an error, no debug message
                 canBeOptimized = false
               }
-              forEach(optimizedCodes, code => {
+              forEach(optimizedCodes, (code) => {
                 addToMapOfArrays(result, code, patternIdxToConfig[idx])
               })
             }
@@ -412,7 +415,7 @@ function validateRegExpPattern(
   tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
   let errors = []
-  let withRegExpPatterns = filter(tokenTypes, currTokType =>
+  let withRegExpPatterns = filter(tokenTypes, (currTokType) =>
     isRegExp(currTokType[PATTERN])
   )
 
@@ -437,11 +440,11 @@ export interface ILexerFilterResult {
 export function findMissingPatterns(
   tokenTypes: TokenType[]
 ): ILexerFilterResult {
-  let tokenTypesWithMissingPattern = filter(tokenTypes, currType => {
+  let tokenTypesWithMissingPattern = filter(tokenTypes, (currType) => {
     return !has(currType, PATTERN)
   })
 
-  let errors = map(tokenTypesWithMissingPattern, currType => {
+  let errors = map(tokenTypesWithMissingPattern, (currType) => {
     return {
       message:
         "Token Type: ->" +
@@ -459,7 +462,7 @@ export function findMissingPatterns(
 export function findInvalidPatterns(
   tokenTypes: TokenType[]
 ): ILexerFilterResult {
-  let tokenTypesWithInvalidPattern = filter(tokenTypes, currType => {
+  let tokenTypesWithInvalidPattern = filter(tokenTypes, (currType) => {
     let pattern = currType[PATTERN]
     return (
       !isRegExp(pattern) &&
@@ -469,7 +472,7 @@ export function findInvalidPatterns(
     )
   })
 
-  let errors = map(tokenTypesWithInvalidPattern, currType => {
+  let errors = map(tokenTypesWithInvalidPattern, (currType) => {
     return {
       message:
         "Token Type: ->" +
@@ -498,7 +501,7 @@ export function findEndOfInputAnchor(
     }
   }
 
-  let invalidRegex = filter(tokenTypes, currType => {
+  let invalidRegex = filter(tokenTypes, (currType) => {
     const pattern = currType[PATTERN]
 
     try {
@@ -514,7 +517,7 @@ export function findEndOfInputAnchor(
     }
   })
 
-  let errors = map(invalidRegex, currType => {
+  let errors = map(invalidRegex, (currType) => {
     return {
       message:
         "Unexpected RegExp Anchor Error:\n" +
@@ -534,12 +537,12 @@ export function findEndOfInputAnchor(
 export function findEmptyMatchRegExps(
   tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
-  let matchesEmptyString = filter(tokenTypes, currType => {
+  let matchesEmptyString = filter(tokenTypes, (currType) => {
     let pattern = currType[PATTERN]
     return pattern.test("")
   })
 
-  let errors = map(matchesEmptyString, currType => {
+  let errors = map(matchesEmptyString, (currType) => {
     return {
       message:
         "Token Type: ->" +
@@ -566,7 +569,7 @@ export function findStartOfInputAnchor(
     }
   }
 
-  let invalidRegex = filter(tokenTypes, currType => {
+  let invalidRegex = filter(tokenTypes, (currType) => {
     const pattern = currType[PATTERN]
     try {
       const regexpAst = getRegExpAst(pattern)
@@ -581,7 +584,7 @@ export function findStartOfInputAnchor(
     }
   })
 
-  let errors = map(invalidRegex, currType => {
+  let errors = map(invalidRegex, (currType) => {
     return {
       message:
         "Unexpected RegExp Anchor Error:\n" +
@@ -601,12 +604,12 @@ export function findStartOfInputAnchor(
 export function findUnsupportedFlags(
   tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
-  let invalidFlags = filter(tokenTypes, currType => {
+  let invalidFlags = filter(tokenTypes, (currType) => {
     let pattern = currType[PATTERN]
     return pattern instanceof RegExp && (pattern.multiline || pattern.global)
   })
 
-  let errors = map(invalidFlags, currType => {
+  let errors = map(invalidFlags, (currType) => {
     return {
       message:
         "Token Type: ->" +
@@ -648,7 +651,7 @@ export function findDuplicatePatterns(
 
   identicalPatterns = compact(identicalPatterns)
 
-  let duplicatePatterns = filter(identicalPatterns, currIdenticalSet => {
+  let duplicatePatterns = filter(identicalPatterns, (currIdenticalSet) => {
     return currIdenticalSet.length > 1
   })
 
@@ -684,7 +687,7 @@ export function findInvalidGroupType(
     return group !== Lexer.SKIPPED && group !== Lexer.NA && !isString(group)
   })
 
-  let errors = map(invalidTypes, currType => {
+  let errors = map(invalidTypes, (currType) => {
     return {
       message:
         "Token Type: ->" +
@@ -708,7 +711,7 @@ export function findModesThatDoNotExist(
     )
   })
 
-  let errors = map(invalidModes, tokType => {
+  let errors = map(invalidModes, (tokType) => {
     let msg =
       `Token Type: ->${tokType.name}<- static 'PUSH_MODE' value cannot refer to a Lexer Mode ->${tokType.PUSH_MODE}<-` +
       `which does not exist`
@@ -804,7 +807,7 @@ function noMetaChar(regExp: RegExp): boolean {
     "{"
   ]
   return (
-    find(metaChars, char => regExp.source.indexOf(char) !== -1) === undefined
+    find(metaChars, (char) => regExp.source.indexOf(char) !== -1) === undefined
   )
 }
 
@@ -890,16 +893,16 @@ export function performWarningRuntimeChecks(
   const warnings = []
   let hasAnyLineBreak = false
   const allTokenTypes = compact(
-    flatten(mapValues(lexerDefinition.modes, tokTypes => tokTypes))
+    flatten(mapValues(lexerDefinition.modes, (tokTypes) => tokTypes))
   )
 
   const concreteTokenTypes = reject(
     allTokenTypes,
-    currType => currType[PATTERN] === Lexer.NA
+    (currType) => currType[PATTERN] === Lexer.NA
   )
   const terminatorCharCodes = getCharCodes(lineTerminatorCharacters)
   if (trackLines) {
-    forEach(concreteTokenTypes, tokType => {
+    forEach(concreteTokenTypes, (tokType) => {
       const currIssue = checkLineBreaksIssues(tokType, terminatorCharCodes)
       if (currIssue !== false) {
         const message = buildLineBreakIssueMessage(tokType, currIssue)
@@ -944,7 +947,7 @@ export function cloneEmptyGroups(emptyGroups: {
   let clonedResult: any = {}
   let groupKeys = keys(emptyGroups)
 
-  forEach(groupKeys, currKey => {
+  forEach(groupKeys, (currKey) => {
     let currGroupValue = emptyGroups[currKey]
 
     /* istanbul ignore else */
@@ -990,7 +993,7 @@ export function isShortPattern(pattern: any): number | boolean {
  */
 export const LineTerminatorOptimizedTester: ILineTerminatorsTester = {
   // implements /\n|\r\n?/g.test
-  test: function(text) {
+  test: function (text) {
     let len = text.length
     for (let i = this.lastIndex; i < len; i++) {
       let c = text.charCodeAt(i)
@@ -1081,7 +1084,7 @@ export function buildLineBreakIssueMessage(
 }
 
 function getCharCodes(charsOrCodes: (number | string)[]): number[] {
-  const charCodes = map(charsOrCodes, numOrString => {
+  const charCodes = map(charsOrCodes, (numOrString) => {
     if (isString(numOrString) && numOrString.length > 0) {
       return numOrString.charCodeAt(0)
     } else {

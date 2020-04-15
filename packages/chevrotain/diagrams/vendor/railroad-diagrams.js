@@ -22,14 +22,14 @@
  At runtime, these constants can be found on the Diagram class.
  */
 
-;(function(options) {
+;(function (options) {
   function subclassOf(baseClass, superClass) {
     baseClass.prototype = Object.create(superClass.prototype)
     baseClass.prototype.$super = superClass.prototype
   }
 
   function unnull(/* children */) {
-    return [].slice.call(arguments).reduce(function(sofar, x) {
+    return [].slice.call(arguments).reduce(function (sofar, x) {
       return sofar !== undefined ? sofar : x
     })
   }
@@ -87,10 +87,10 @@
     this.attrs = unnull(attrs, {})
     return this
   }
-  FakeSVG.prototype.format = function(x, y, width) {
+  FakeSVG.prototype.format = function (x, y, width) {
     // Virtual
   }
-  FakeSVG.prototype.addTo = function(parent) {
+  FakeSVG.prototype.addTo = function (parent) {
     if (parent instanceof FakeSVG) {
       parent.children.push(this)
       return this
@@ -100,24 +100,24 @@
       return svg
     }
   }
-  FakeSVG.prototype.escapeString = function(string) {
+  FakeSVG.prototype.escapeString = function (string) {
     // Escape markdown and HTML special characters
-    return string.replace(/[*_\`\[\]<&]/g, function(charString) {
+    return string.replace(/[*_\`\[\]<&]/g, function (charString) {
       return "&#" + charString.charCodeAt(0) + ";"
     })
   }
-  FakeSVG.prototype.toSVG = function() {
+  FakeSVG.prototype.toSVG = function () {
     var el = SVG(this.tagName, this.attrs)
     if (typeof this.children == "string") {
       el.textContent = this.children
     } else {
-      this.children.forEach(function(e) {
+      this.children.forEach(function (e) {
         el.appendChild(e.toSVG())
       })
     }
     return el
   }
-  FakeSVG.prototype.toString = function() {
+  FakeSVG.prototype.toString = function () {
     var str = "<" + this.tagName
     var group = this.tagName == "g" || this.tagName == "svg"
     for (var attr in this.attrs) {
@@ -133,7 +133,7 @@
     if (typeof this.children == "string") {
       str += FakeSVG.prototype.escapeString(this.children)
     } else {
-      this.children.forEach(function(e) {
+      this.children.forEach(function (e) {
         str += e
       })
     }
@@ -147,27 +147,27 @@
     this.attrs.d = "M" + x + " " + y
   }
   subclassOf(Path, FakeSVG)
-  Path.prototype.m = function(x, y) {
+  Path.prototype.m = function (x, y) {
     this.attrs.d += "m" + x + " " + y
     return this
   }
-  Path.prototype.h = function(val) {
+  Path.prototype.h = function (val) {
     this.attrs.d += "h" + val
     return this
   }
   Path.prototype.right = Path.prototype.h
-  Path.prototype.left = function(val) {
+  Path.prototype.left = function (val) {
     return this.h(-val)
   }
-  Path.prototype.v = function(val) {
+  Path.prototype.v = function (val) {
     this.attrs.d += "v" + val
     return this
   }
   Path.prototype.down = Path.prototype.v
-  Path.prototype.up = function(val) {
+  Path.prototype.up = function (val) {
     return this.v(-val)
   }
-  Path.prototype.arc = function(sweep) {
+  Path.prototype.arc = function (sweep) {
     var x = Diagram.ARC_RADIUS
     var y = Diagram.ARC_RADIUS
     if (sweep[0] == "e" || sweep[1] == "w") {
@@ -194,7 +194,7 @@
       y
     return this
   }
-  Path.prototype.format = function() {
+  Path.prototype.format = function () {
     // All paths in this library start/end horizontally.
     // The extra .5 ensures a minor overlap, so there's no seams in bad rasterizers.
     this.attrs.d += "h.5"
@@ -213,21 +213,21 @@
     this.items.unshift(new Start())
     this.items.push(new End())
     this.width =
-      this.items.reduce(function(sofar, el) {
+      this.items.reduce(function (sofar, el) {
         return sofar + el.width + (el.needsSpace ? 20 : 0)
       }, 0) + 1
-    this.height = this.items.reduce(function(sofar, el) {
+    this.height = this.items.reduce(function (sofar, el) {
       return sofar + el.height
     }, 0)
     this.up = Math.max.apply(
       null,
-      this.items.map(function(x) {
+      this.items.map(function (x) {
         return x.up
       })
     )
     this.down = Math.max.apply(
       null,
-      this.items.map(function(x) {
+      this.items.map(function (x) {
         return x.down
       })
     )
@@ -237,7 +237,7 @@
   for (var option in options) {
     Diagram[option] = options[option]
   }
-  Diagram.prototype.format = function(paddingt, paddingr, paddingb, paddingl) {
+  Diagram.prototype.format = function (paddingt, paddingr, paddingb, paddingl) {
     paddingt = unnull(paddingt, 20)
     paddingr = unnull(paddingr, paddingt, 20)
     paddingb = unnull(paddingb, paddingt, 20)
@@ -252,18 +252,14 @@
     for (var i = 0; i < this.items.length; i++) {
       var item = this.items[i]
       if (item.needsSpace) {
-        Path(x, y)
-          .h(10)
-          .addTo(g)
+        Path(x, y).h(10).addTo(g)
         x += 10
       }
       item.format(x, y, item.width + item.offsetX).addTo(g)
       x += item.width + item.offsetX
       y += item.height
       if (item.needsSpace) {
-        Path(x, y)
-          .h(10)
-          .addTo(g)
+        Path(x, y).h(10).addTo(g)
         x += 10
       }
     }
@@ -274,20 +270,20 @@
     this.formatted = true
     return this
   }
-  Diagram.prototype.addTo = function(parent) {
+  Diagram.prototype.addTo = function (parent) {
     var scriptTag = document.getElementsByTagName("script")
     scriptTag = scriptTag[scriptTag.length - 1]
     var parentTag = scriptTag.parentNode
     parent = parent || parentTag
     return this.$super.addTo.call(this, parent)
   }
-  Diagram.prototype.toSVG = function() {
+  Diagram.prototype.toSVG = function () {
     if (!this.formatted) {
       this.format()
     }
     return this.$super.toSVG.call(this)
   }
-  Diagram.prototype.toString = function() {
+  Diagram.prototype.toString = function () {
     if (!this.formatted) {
       this.format()
     }
@@ -315,27 +311,25 @@
       )
     }
     this.items = items.map(wrapString)
-    this.width = this.items.reduce(function(sofar, el) {
+    this.width = this.items.reduce(function (sofar, el) {
       return sofar + el.width + (el.needsSpace ? 20 : 0)
     }, 0)
     this.offsetX = 0
-    this.height = this.items.reduce(function(sofar, el) {
+    this.height = this.items.reduce(function (sofar, el) {
       return sofar + el.height
     }, 0)
-    this.up = this.items.reduce(function(sofar, el) {
+    this.up = this.items.reduce(function (sofar, el) {
       return Math.max(sofar, el.up)
     }, 0)
-    this.down = this.items.reduce(function(sofar, el) {
+    this.down = this.items.reduce(function (sofar, el) {
       return Math.max(sofar, el.down)
     }, 0)
   }
   subclassOf(Sequence, FakeSVG)
-  Sequence.prototype.format = function(x, y, width) {
+  Sequence.prototype.format = function (x, y, width) {
     // Hook up the two sides if this is narrower than its stated width.
     var gaps = determineGaps(width, this.width)
-    Path(x, y)
-      .h(gaps[0])
-      .addTo(this)
+    Path(x, y).h(gaps[0]).addTo(this)
     Path(x + gaps[0] + this.width, y + this.height)
       .h(gaps[1])
       .addTo(this)
@@ -344,18 +338,14 @@
     for (var i = 0; i < this.items.length; i++) {
       var item = this.items[i]
       if (item.needsSpace) {
-        Path(x, y)
-          .h(10)
-          .addTo(this)
+        Path(x, y).h(10).addTo(this)
         x += 10
       }
       item.format(x, y, item.width).addTo(this)
       x += item.width
       y += item.height
       if (item.needsSpace) {
-        Path(x, y)
-          .h(10)
-          .addTo(this)
+        Path(x, y).h(10).addTo(this)
         x += 10
       }
     }
@@ -374,7 +364,7 @@
       throw new RangeError("Stack() must have at least one child.")
     }
     this.items = items.map(wrapString)
-    this.width = this.items.reduce(function(sofar, el) {
+    this.width = this.items.reduce(function (sofar, el) {
       return Math.max(sofar, el.width + (el.needsSpace ? 20 : 0))
     }, 0)
     if (this.items.length > 1) {
@@ -411,15 +401,13 @@
     }
   }
   subclassOf(Stack, FakeSVG)
-  Stack.prototype.format = function(x, y, width) {
+  Stack.prototype.format = function (x, y, width) {
     var xIntitial = x
 
     for (var i = 0; i < this.items.length; i++) {
       var item = this.items[i]
       if (item.needsSpace) {
-        Path(x, y)
-          .h(10)
-          .addTo(this)
+        Path(x, y).h(10).addTo(this)
         x += 10
       }
       item
@@ -432,9 +420,7 @@
       x += Math.max(item.width + item.offsetX, Diagram.ARC_RADIUS * 2)
       y += item.height
       if (item.needsSpace) {
-        Path(x, y)
-          .h(10)
-          .addTo(this)
+        Path(x, y).h(10).addTo(this)
         x += 10
       }
 
@@ -479,7 +465,7 @@
     }
     this.items = items.map(wrapString)
     this.width =
-      this.items.reduce(function(sofar, el) {
+      this.items.reduce(function (sofar, el) {
         return Math.max(sofar, el.width)
       }, 0) +
       Diagram.ARC_RADIUS * 4
@@ -507,12 +493,10 @@
     }
   }
   subclassOf(Choice, FakeSVG)
-  Choice.prototype.format = function(x, y, width) {
+  Choice.prototype.format = function (x, y, width) {
     // Hook up the two sides if this is narrower than its stated width.
     var gaps = determineGaps(width, this.width)
-    Path(x, y)
-      .h(gaps[0])
-      .addTo(this)
+    Path(x, y).h(gaps[0]).addTo(this)
     Path(x + gaps[0] + this.width, y + this.height)
       .h(gaps[1])
       .addTo(this)
@@ -646,21 +630,17 @@
   }
   subclassOf(OneOrMore, FakeSVG)
   OneOrMore.prototype.needsSpace = true
-  OneOrMore.prototype.format = function(x, y, width) {
+  OneOrMore.prototype.format = function (x, y, width) {
     // Hook up the two sides if this is narrower than its stated width.
     var gaps = determineGaps(width, this.width)
-    Path(x, y)
-      .h(gaps[0])
-      .addTo(this)
+    Path(x, y).h(gaps[0]).addTo(this)
     Path(x + gaps[0] + this.width, y + this.height)
       .h(gaps[1])
       .addTo(this)
     x += gaps[0]
 
     // Draw item
-    Path(x, y)
-      .right(Diagram.ARC_RADIUS)
-      .addTo(this)
+    Path(x, y).right(Diagram.ARC_RADIUS).addTo(this)
     this.item
       .format(x + Diagram.ARC_RADIUS, y, this.width - Diagram.ARC_RADIUS * 2)
       .addTo(this)
@@ -720,7 +700,7 @@
     this.simpleType = simpleType
   }
   subclassOf(Start, FakeSVG)
-  Start.prototype.format = function(x, y) {
+  Start.prototype.format = function (x, y) {
     if (this.simpleType === false) {
       this.attrs.d = "M " + x + " " + (y - 10) + " v 20 m 0 -10 h 20.5"
     } else {
@@ -741,7 +721,7 @@
     this.simpleType = simpleType
   }
   subclassOf(End, FakeSVG)
-  End.prototype.format = function(x, y) {
+  End.prototype.format = function (x, y) {
     if (this.simpleType === false) {
       this.attrs.d = "M " + x + " " + y + " h 20 m 0 -10 v 20"
     } else {
@@ -788,12 +768,10 @@
   }
   subclassOf(Terminal, FakeSVG)
   Terminal.prototype.needsSpace = true
-  Terminal.prototype.format = function(x, y, width) {
+  Terminal.prototype.format = function (x, y, width) {
     // Hook up the two sides if this is narrower than its stated width.
     var gaps = determineGaps(width, this.width)
-    Path(x, y)
-      .h(gaps[0])
-      .addTo(this)
+    Path(x, y).h(gaps[0]).addTo(this)
     Path(x + gaps[0] + this.width, y)
       .h(gaps[1])
       .addTo(this)
@@ -849,12 +827,10 @@
   }
   subclassOf(NonTerminal, FakeSVG)
   NonTerminal.prototype.needsSpace = true
-  NonTerminal.prototype.format = function(x, y, width) {
+  NonTerminal.prototype.format = function (x, y, width) {
     // Hook up the two sides if this is narrower than its stated width.
     var gaps = determineGaps(width, this.width)
-    Path(x, y)
-      .h(gaps[0])
-      .addTo(this)
+    Path(x, y).h(gaps[0]).addTo(this)
     Path(x + gaps[0] + this.width, y)
       .h(gaps[1])
       .addTo(this)
@@ -894,12 +870,10 @@
   }
   subclassOf(Comment, FakeSVG)
   Comment.prototype.needsSpace = true
-  Comment.prototype.format = function(x, y, width) {
+  Comment.prototype.format = function (x, y, width) {
     // Hook up the two sides if this is narrower than its stated width.
     var gaps = determineGaps(width, this.width)
-    Path(x, y)
-      .h(gaps[0])
-      .addTo(this)
+    Path(x, y).h(gaps[0]).addTo(this)
     Path(x + gaps[0] + this.width, y + this.height)
       .h(gaps[1])
       .addTo(this)
@@ -927,10 +901,8 @@
     this.down = 0
   }
   subclassOf(Skip, FakeSVG)
-  Skip.prototype.format = function(x, y, width) {
-    Path(x, y)
-      .right(width)
-      .addTo(this)
+  Skip.prototype.format = function (x, y, width) {
+    Path(x, y).right(width).addTo(this)
     return this
   }
 
@@ -938,7 +910,7 @@
   if (typeof define === "function" && define.amd) {
     // AMD. Register as an anonymous module.
     root = {}
-    define([], function() {
+    define([], function () {
       return root
     })
   } else if (typeof exports === "object") {
@@ -981,7 +953,7 @@
     "NonTerminal",
     "Comment",
     "Skip"
-  ].forEach(function(e, i) {
+  ].forEach(function (e, i) {
     root[e] = temp[i]
   })
 }.call(this, {

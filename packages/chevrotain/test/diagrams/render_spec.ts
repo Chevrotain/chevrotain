@@ -6,7 +6,7 @@ import { DDLExampleRecoveryParser } from "../full_flow/error_recovery/sql_statem
 const { lt } = require("semver")
 
 // more in depth testing will require jsdom to support SVG elements (WIP).
-describe("The Chevrotain diagrams rendering APIs", function() {
+describe("The Chevrotain diagrams rendering APIs", function () {
   // The JSDom tests that actually perform network traffic seem unstable...
   this.retries(4)
 
@@ -23,7 +23,7 @@ describe("The Chevrotain diagrams rendering APIs", function() {
 
   skipOnBrowser(
     "Produces valid and executable html text with custom options",
-    function(done) {
+    function (done) {
       this.timeout(20000)
       const jsdom = require("jsdom")
       const { JSDOM } = jsdom
@@ -41,7 +41,7 @@ describe("The Chevrotain diagrams rendering APIs", function() {
 
       document.addEventListener(
         "DOMContentLoaded",
-        function() {
+        function () {
           try {
             expect(document.scripts.length).to.equal(6)
             expect(document.scripts.item(1).src).to.include("jsdelivr")
@@ -56,7 +56,7 @@ describe("The Chevrotain diagrams rendering APIs", function() {
     }
   )
 
-  skipOnBrowser("Produces valid and executable html text", function(done) {
+  skipOnBrowser("Produces valid and executable html text", function (done) {
     this.timeout(20000)
     const jsdom = require("jsdom")
     const { JSDOM } = jsdom
@@ -73,7 +73,7 @@ describe("The Chevrotain diagrams rendering APIs", function() {
 
     document.addEventListener(
       "DOMContentLoaded",
-      function() {
+      function () {
         try {
           expect(document.scripts.length).to.equal(6)
           expect(document.scripts.item(1).src).to.include("unpkg")

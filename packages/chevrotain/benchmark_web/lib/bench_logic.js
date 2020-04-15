@@ -37,12 +37,10 @@ function onRunAll(options) {
   clearResults()
 
   // These names are in the order in which they appear in the DOM
-  var enabledTestCaseNames = _.map($(".dataRow").has(":checked"), function(
+  var enabledTestCaseNames = _.map($(".dataRow").has(":checked"), function (
     currDataRow
   ) {
-    var currClassNames = $(currDataRow)
-      .attr("class")
-      .split(" ")
+    var currClassNames = $(currDataRow).attr("class").split(" ")
     return _.first(
       _.difference(currClassNames, ["dataRow", "json-only", "hide"])
     )
@@ -61,7 +59,7 @@ function onRunAll(options) {
   //handle "Running..."
   var valueBeforeTheDots = "Running"
   wait.innerHTML = valueBeforeTheDots
-  var dots = window.setInterval(function() {
+  var dots = window.setInterval(function () {
     var wait = document.getElementById("wait")
     if (wait.innerHTML.length >= valueBeforeTheDots.length + 3)
       wait.innerHTML = valueBeforeTheDots
@@ -75,12 +73,12 @@ function onRunAll(options) {
 
   var enabledTestCaseDefs = _.pick(testCases, enabledTestCaseNames)
   // adds the tests in the order they appear in the DOM table.
-  _.forEach(enabledTestCaseDefs, function(currTestCaseDefFn) {
+  _.forEach(enabledTestCaseDefs, function (currTestCaseDefFn) {
     currTestCaseDefFn(suite)
   })
 
   suite
-    .on("cycle", function(event) {
+    .on("cycle", function (event) {
       var suite = event.target
       var rate = suite.hz.toFixed(2)
       var $rate = $("." + suite.name + " .benchRate .value")
@@ -117,7 +115,7 @@ function onRunAll(options) {
         console.warn(e)
       }
     })
-    .on("complete", function() {
+    .on("complete", function () {
       try {
         var suites = this.filter("successful"),
           fastestSuite = this.filter("fastest")[0]
@@ -128,7 +126,7 @@ function onRunAll(options) {
         $("#wait").html("&nbsp;")
       } finally {
         // TODO: investigate hack around strange race condition
-        setTimeout(function() {
+        setTimeout(function () {
           $("#runAllButton").prop("disabled", false)
           $("#runAllButton_lexer").prop("disabled", false)
           $("#runAllButton_parser").prop("disabled", false)

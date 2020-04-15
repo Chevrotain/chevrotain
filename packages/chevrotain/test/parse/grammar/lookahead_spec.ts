@@ -878,7 +878,7 @@ context("lookahead specs", () => {
         public input: IToken[]
 
         constructor(public inputConstructors: TokenType[]) {
-          this.input = map(inputConstructors, currConst =>
+          this.input = map(inputConstructors, (currConst) =>
             createRegularToken(currConst)
           )
         }

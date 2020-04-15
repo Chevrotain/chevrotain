@@ -550,7 +550,7 @@ class ECMAScript5Parser extends EmbeddedActionsParser {
        *        the current context. note that this means the grammar is not context free.
        *        however the only other alternative is to use backtracking which is even worse.
        */
-      inPossible => {
+      (inPossible) => {
         $.OR([
           {
             ALT: () => {

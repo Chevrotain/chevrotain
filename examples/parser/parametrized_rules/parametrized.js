@@ -52,13 +52,13 @@ class HelloParser extends CstParser {
 
     const $ = this
 
-    $.RULE("topRule", mood => {
+    $.RULE("topRule", (mood) => {
       // Passing arguments via a SUBRULE is done using a config object
       $.SUBRULE($.hello, { ARGS: [mood] })
     })
 
     // the <hello> rule's implementation is defined with a <mood> parameter
-    $.RULE("hello", mood => {
+    $.RULE("hello", (mood) => {
       $.CONSUME(Hello)
 
       // The mood parameter is used to determine which path to take
@@ -104,7 +104,7 @@ class HelloParser extends CstParser {
 // reuse the same parser instance.
 const parser = new HelloParser()
 
-module.exports = function(text, mood) {
+module.exports = function (text, mood) {
   const lexResult = HelloLexer.tokenize(text)
 
   // setting a new input will RESET the parser instance's state.

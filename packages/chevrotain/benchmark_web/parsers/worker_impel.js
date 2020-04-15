@@ -1,10 +1,10 @@
 var initialized = false
 var startRule
 var parserConfig = {}
-onmessage = function(event) {
+onmessage = function (event) {
   if (!initialized) {
     initialized = true
-    event.data.importScripts.forEach(function(elem) {
+    event.data.importScripts.forEach(function (elem) {
       importScripts(elem)
     })
 

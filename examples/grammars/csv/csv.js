@@ -67,7 +67,7 @@ class CsvParser extends CstParser {
 // reuse the same parser instance.
 const parser = new CsvParser([])
 
-module.exports = function(text) {
+module.exports = function (text) {
   // 1. Tokenize the input.
   const lexResult = CsvLexer.tokenize(text)
 

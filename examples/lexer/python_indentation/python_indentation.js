@@ -73,7 +73,7 @@ function matchIndentBase(text, offset, matchedTokens, groups, type) {
     else if (currIndentLevel < prevIndentLevel && type === "outdent") {
       const matchIndentIndex = _.findLastIndex(
         indentStack,
-        stackIndentDepth => stackIndentDepth === currIndentLevel
+        (stackIndentDepth) => stackIndentDepth === currIndentLevel
       )
 
       // any outdent must match some previous indentation level.
@@ -181,7 +181,7 @@ module.exports = {
   LParen: LParen,
   RParen: RParen,
 
-  tokenize: function(text) {
+  tokenize: function (text) {
     // have to reset the indent stack between processing of different text inputs
     indentStack = [0]
 

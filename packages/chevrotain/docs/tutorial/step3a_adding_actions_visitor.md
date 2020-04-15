@@ -98,7 +98,7 @@ class SQLToAstVisitor extends BaseSQLVisitor {
   selectClause(ctx) {
     // Each Terminal or Non-Terminal in a grammar rule are collected into
     // an array with the same name(key) in the ctx object.
-    let columns = ctx.Identifier.map(identToken => identToken.image)
+    let columns = ctx.Identifier.map((identToken) => identToken.image)
 
     return {
       type: "SELECT_CLAUSE",

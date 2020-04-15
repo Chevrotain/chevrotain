@@ -15,7 +15,7 @@ function addTest(suite, id, action) {
   if ($el && $el.is(":checked")) {
     suite.add(id, {
       defer: true,
-      fn: function(deferred) {
+      fn: function (deferred) {
         action({ lexerOnly: lexerOnly, parserOnly: parserOnly }, deferred)
       }
     })

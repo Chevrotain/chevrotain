@@ -13,7 +13,7 @@ export abstract class AbstractProduction implements IProduction {
 
   accept(visitor: IGASTVisitor): void {
     visitor.visit(this)
-    forEach(this.definition, prod => {
+    forEach(this.definition, (prod) => {
       prod.accept(visitor)
     })
   }
@@ -33,7 +33,7 @@ export class NonTerminal extends AbstractProduction
     super([])
     assign(
       this,
-      pick(options, v => v !== undefined)
+      pick(options, (v) => v !== undefined)
     )
   }
 
@@ -66,7 +66,7 @@ export class Rule extends AbstractProduction {
     super(options.definition)
     assign(
       this,
-      pick(options, v => v !== undefined)
+      pick(options, (v) => v !== undefined)
     )
   }
 }
@@ -81,7 +81,7 @@ export class Alternative extends AbstractProduction {
     super(options.definition)
     assign(
       this,
-      pick(options, v => v !== undefined)
+      pick(options, (v) => v !== undefined)
     )
   }
 }
@@ -99,7 +99,7 @@ export class Option extends AbstractProduction
     super(options.definition)
     assign(
       this,
-      pick(options, v => v !== undefined)
+      pick(options, (v) => v !== undefined)
     )
   }
 }
@@ -117,7 +117,7 @@ export class RepetitionMandatory extends AbstractProduction
     super(options.definition)
     assign(
       this,
-      pick(options, v => v !== undefined)
+      pick(options, (v) => v !== undefined)
     )
   }
 }
@@ -135,7 +135,7 @@ export class RepetitionMandatoryWithSeparator extends AbstractProduction
     super(options.definition)
     assign(
       this,
-      pick(options, v => v !== undefined)
+      pick(options, (v) => v !== undefined)
     )
   }
 }
@@ -154,7 +154,7 @@ export class Repetition extends AbstractProduction
     super(options.definition)
     assign(
       this,
-      pick(options, v => v !== undefined)
+      pick(options, (v) => v !== undefined)
     )
   }
 }
@@ -172,7 +172,7 @@ export class RepetitionWithSeparator extends AbstractProduction
     super(options.definition)
     assign(
       this,
-      pick(options, v => v !== undefined)
+      pick(options, (v) => v !== undefined)
     )
   }
 }
@@ -195,7 +195,7 @@ export class Alternation extends AbstractProduction
     super(options.definition)
     assign(
       this,
-      pick(options, v => v !== undefined)
+      pick(options, (v) => v !== undefined)
     )
   }
 }
@@ -207,7 +207,7 @@ export class Terminal implements IProductionWithOccurrence {
   constructor(options: { terminalType: TokenType; idx?: number }) {
     assign(
       this,
-      pick(options, v => v !== undefined)
+      pick(options, (v) => v !== undefined)
     )
   }
 

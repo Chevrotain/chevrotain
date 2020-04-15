@@ -7,7 +7,7 @@ describe("The Chevrotain Lexer ability switch between Lexer modes", () => {
     const lexResult = multiModeLexer.tokenize(input)
     expect(lexResult.errors).to.be.empty
 
-    const images = lexResult.tokens.map(currTok => currTok.image)
+    const images = lexResult.tokens.map((currTok) => currTok.image)
     expect(images).to.deep.equal([
       // by default starting with the "first" mode "numbers_mode".
       // The ".tokenize" method can accept an optional inital mode argument as the second parameter.
@@ -33,7 +33,7 @@ describe("The Chevrotain Lexer ability switch between Lexer modes", () => {
     expect(lexResult.errors[0].message).to.contain("2")
     expect(lexResult.errors[0].message).to.contain("at offset: 10")
 
-    const images = lexResult.tokens.map(currTok => currTok.image)
+    const images = lexResult.tokens.map((currTok) => currTok.image)
     expect(images).to.deep.equal(["1", "LETTERS"])
   })
 })

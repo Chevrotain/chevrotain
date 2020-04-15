@@ -6,7 +6,7 @@ function initWorker(options) {
   parserWorker = new Worker("../worker_impel.js")
 
   parserWorker.postMessage(options)
-  parserWorker.onmessage = function(errCode) {
+  parserWorker.onmessage = function (errCode) {
     globalDeferred.resolve()
   }
 }

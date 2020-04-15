@@ -22,7 +22,7 @@ function MAKE_PATTERN(def, flags) {
 // A Little wrapper to save us the trouble of manually building the
 // array of cssTokens
 const cssTokens = []
-const createToken = function() {
+const createToken = function () {
   const newToken = chevrotain.createToken.apply(null, arguments)
   cssTokens.push(newToken)
   return newToken
@@ -605,7 +605,7 @@ class CssParser extends CstParser {
 const parser = new CssParser()
 
 module.exports = {
-  parseCss: function(text) {
+  parseCss: function (text) {
     const lexResult = CssLexer.tokenize(text)
     // setting a new input will RESET the parser instance's state.
     parser.input = lexResult.tokens

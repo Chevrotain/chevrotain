@@ -40,7 +40,7 @@ module.exports = {
   Comment: Comment,
   Whitespace: Whitespace,
 
-  tokenize: function(text) {
+  tokenize: function (text) {
     const lexResult = TokenGroupsLexer.tokenize(text)
 
     if (lexResult.errors.length > 0) {

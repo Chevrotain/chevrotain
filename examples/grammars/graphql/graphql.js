@@ -13,7 +13,7 @@
  */
 // wrapping in UMD to allow code to work both in node.js
 // and in the browser
-;(function(root, factory) {
+;(function (root, factory) {
   if (typeof module === "object" && module.exports) {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
@@ -23,7 +23,7 @@
     // Browser globals (root is window)
     root["graphQlGrammar"] = factory(root.chevrotain, root.XRegExp)
   }
-})(this, function(chevrotain, XRegExp) {
+})(this, function (chevrotain, XRegExp) {
   const { CstParser, Lexer, createToken: orgCreateToken } = chevrotain
 
   // ----------------- lexer -----------------
@@ -40,14 +40,14 @@
 
   const allTokens = []
 
-  const createToken = function() {
+  const createToken = function () {
     const newToken = orgCreateToken.apply(null, arguments)
     allTokens.push(newToken)
     return newToken
   }
 
   const keywordTokens = []
-  const createKeywordToken = function(config) {
+  const createKeywordToken = function (config) {
     config.longer_alt = Name
     const newToken = createToken(config)
     keywordTokens.push(newToken)
@@ -55,16 +55,16 @@
     return newToken
   }
 
-  const createNotToken = function(config) {
+  const createNotToken = function (config) {
     const newNotTokenCategory = orgCreateToken({
       name: config.name,
       pattern: Lexer.NA
     })
     const notMatch = config.not
     // "reject" all the none matching keywords
-    const matchingKeywords = keywordTokens.filter(keywordTokType => {
+    const matchingKeywords = keywordTokens.filter((keywordTokType) => {
       let found = false
-      notMatch.forEach(notTokType => {
+      notMatch.forEach((notTokType) => {
         if (notTokType === keywordTokType) {
           found = true
         }
@@ -73,7 +73,7 @@
     })
 
     // All matching keywords now match the category of the NOT token.
-    matchingKeywords.forEach(keywordTokType =>
+    matchingKeywords.forEach((keywordTokType) =>
       keywordTokType.CATEGORIES.push(newNotTokenCategory)
     )
 
@@ -381,7 +381,7 @@
         $.CONSUME(Colon)
       })
 
-      $.RULE("Arguments", isConst => {
+      $.RULE("Arguments", (isConst) => {
         $.CONSUME(LParen)
         $.AT_LEAST_ONE(() => {
           $.SUBRULE($.Argument, { ARGS: [isConst] })
@@ -389,7 +389,7 @@
         $.CONSUME(RParen)
       })
 
-      $.RULE("Argument", isConst => {
+      $.RULE("Argument", (isConst) => {
         $.CONSUME(Name)
         $.CONSUME(Colon)
         $.SUBRULE($.Value, { ARGS: [isConst] })
@@ -433,7 +433,7 @@
         $.SUBRULE($.NamedType)
       })
 
-      $.RULE("Value", isConst => {
+      $.RULE("Value", (isConst) => {
         $.OR([
           { GATE: () => !isConst, ALT: () => $.SUBRULE($.Variable) },
           { ALT: () => $.CONSUME(IntValue) },
@@ -459,7 +459,7 @@
         $.CONSUME(NameButNotTrueOrFalseOrNull)
       })
 
-      $.RULE("ListValue", isConst => {
+      $.RULE("ListValue", (isConst) => {
         $.CONSUME(LSquare)
         $.MANY(() => {
           $.SUBRULE($.Value, { ARGS: [isConst] })
@@ -467,7 +467,7 @@
         $.CONSUME(RSquare)
       })
 
-      $.RULE("ObjectValue", isConst => {
+      $.RULE("ObjectValue", (isConst) => {
         $.CONSUME(LCurly)
         $.MANY(() => {
           $.SUBRULE($.ObjectField, { ARGS: [isConst] })
@@ -475,7 +475,7 @@
         $.CONSUME(RCurly)
       })
 
-      $.RULE("ObjectField", isConst => {
+      $.RULE("ObjectField", (isConst) => {
         $.CONSUME(Name)
         $.CONSUME(Colon)
         $.SUBRULE($.Value, { ARGS: [isConst] })
@@ -533,13 +533,13 @@
         $.CONSUME(RSquare)
       })
 
-      $.RULE("Directives", isConst => {
+      $.RULE("Directives", (isConst) => {
         $.AT_LEAST_ONE(() => {
           $.SUBRULE($.Directive, { ARGS: [isConst] })
         })
       })
 
-      $.RULE("Directive", isConst => {
+      $.RULE("Directive", (isConst) => {
         $.CONSUME(At)
         $.CONSUME(Name)
         $.OPTION(() => {

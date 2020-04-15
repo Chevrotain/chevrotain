@@ -49,26 +49,20 @@ describe("The Official Content Assist Feature example Example", () => {
       it('Text: "call aver"', () => {
         const inputText = "call aver"
         const suggestions = getContentAssistSuggestions(inputText, symbolTable)
-        expect(suggestions)
-          .to.have.members(["average"])
-          .and.to.have.lengthOf(1)
+        expect(suggestions).to.have.members(["average"]).and.to.have.lengthOf(1)
       })
 
       it('Text: "private enu"', () => {
         const inputText = "private enu"
         const suggestions = getContentAssistSuggestions(inputText, symbolTable)
-        expect(suggestions)
-          .to.have.members(["enum"])
-          .and.to.have.lengthOf(1)
+        expect(suggestions).to.have.members(["enum"]).and.to.have.lengthOf(1)
       })
 
       it('Text: "private enum "', () => {
         // no suggestion for declaration identifier
         const inputText = "private enum "
         const suggestions = getContentAssistSuggestions(inputText, symbolTable)
-        expect(suggestions)
-          .to.have.members([])
-          .and.to.have.lengthOf(0)
+        expect(suggestions).to.have.members([]).and.to.have.lengthOf(0)
       })
 
       it('Text: "private enum MONTHS\n' + '      static "', () => {

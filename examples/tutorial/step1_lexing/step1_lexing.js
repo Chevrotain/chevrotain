@@ -61,14 +61,14 @@ const allTokens = [
 
 const SelectLexer = new Lexer(allTokens)
 
-allTokens.forEach(tokenType => {
+allTokens.forEach((tokenType) => {
   tokenVocabulary[tokenType.name] = tokenType
 })
 
 module.exports = {
   tokenVocabulary: tokenVocabulary,
 
-  lex: function(inputText) {
+  lex: function (inputText) {
     const lexingResult = SelectLexer.tokenize(inputText)
 
     if (lexingResult.errors.length > 0) {

@@ -32,7 +32,7 @@ const CustomErrorsLexer = new Lexer([Whitespace, A, B, C], {
 })
 
 module.exports = {
-  tokenize: function(text) {
+  tokenize: function (text) {
     const lexResult = CustomErrorsLexer.tokenize(text)
     return lexResult
   }

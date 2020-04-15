@@ -9,7 +9,7 @@ Instead re-use a single instance and reset its state between iterations. For exa
 // reuse the same parser instance.
 const parser = new JsonParser([])
 
-module.exports = function(text) {
+module.exports = function (text) {
   const lexResult = JsonLexer.tokenize(text)
 
   // setting a new input will RESET the parser instance's state.
@@ -86,7 +86,7 @@ $.RULE("value", () => {
 A simple JavaScript pattern can avoid this costly re-initialization:
 
 ```javascript
-$.RULE("value", function() {
+$.RULE("value", function () {
   // c1 is used as a cache, the short circuit "||" will ensure only a single initialization
   $.OR(
     $.c1 ||
@@ -117,7 +117,7 @@ It is important to note that:
 
   ```javascript
   // BAD
-  $.RULE("value", function() {
+  $.RULE("value", function () {
     let result
     // We reference the "result" variable via a closure.
     // So a new function is needed each time this grammar rule is invoked.
@@ -134,7 +134,7 @@ It is important to note that:
   })
 
   // GOOD
-  $.RULE("value", function() {
+  $.RULE("value", function () {
     let result
     // no closure for the result variable, we use the returned value of the OR instead.
     result = $.OR(
@@ -177,7 +177,7 @@ These are only required if you are trying to squeeze every tiny bit of performan
     For example:
 
     ```javascript
-    this.myRedundantRule = this.RULE("myRedundantRule", function() {
+    this.myRedundantRule = this.RULE("myRedundantRule", function () {
       $.CONSUME(StringLiteral)
     })
     ```

@@ -62,7 +62,7 @@ function getContentAssistSuggestions(text) {
   // The suggestions also include the context, we are only interested
   // in the TokenTypes in this example.
   const tokenTypesSuggestions = syntacticSuggestions.map(
-    suggestion => suggestion.nextTokenType
+    (suggestion) => suggestion.nextTokenType
   )
 
   return tokenTypesSuggestions

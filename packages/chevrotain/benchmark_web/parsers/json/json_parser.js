@@ -61,7 +61,7 @@ function parser(options) {
   const $ = this
   $.C1 = []
 
-  $.RULE("json", function() {
+  $.RULE("json", function () {
     // prettier-ignore
     $.OR([
             {ALT: function() {$.SUBRULE($.object)}},
@@ -69,11 +69,11 @@ function parser(options) {
         ])
   })
 
-  $.RULE("object", function() {
+  $.RULE("object", function () {
     $.CONSUME(LCurly)
-    $.OPTION(function() {
+    $.OPTION(function () {
       $.SUBRULE($.objectItem)
-      $.MANY(function() {
+      $.MANY(function () {
         $.CONSUME(Comma)
         $.SUBRULE2($.objectItem)
       })
@@ -81,17 +81,17 @@ function parser(options) {
     $.CONSUME(RCurly)
   })
 
-  $.RULE("objectItem", function() {
+  $.RULE("objectItem", function () {
     $.CONSUME(StringLiteral)
     $.CONSUME(Colon)
     $.SUBRULE($.value)
   })
 
-  $.RULE("array", function() {
+  $.RULE("array", function () {
     $.CONSUME(LSquare)
-    $.OPTION(function() {
+    $.OPTION(function () {
       $.SUBRULE($.value)
-      $.MANY(function() {
+      $.MANY(function () {
         $.CONSUME(Comma)
         $.SUBRULE2($.value)
       })
@@ -99,7 +99,7 @@ function parser(options) {
     $.CONSUME(RSquare)
   })
 
-  $.RULE("value", function() {
+  $.RULE("value", function () {
     // Perf boost: https://github.com/SAP/chevrotain/blob/master/docs/faq.md#PERFORMANCE
     // See "Avoid reinitializing large arrays of alternatives." section
     $.OR(

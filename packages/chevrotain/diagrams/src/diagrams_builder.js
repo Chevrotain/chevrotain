@@ -1,4 +1,4 @@
-;(function(root, factory) {
+;(function (root, factory) {
   if (typeof define === "function" && define.amd) {
     // AMD. Register as an anonymous module.
     // TODO: remove dependency to Chevrotain
@@ -13,7 +13,7 @@
     // Browser globals (root is window)
     root.diagrams_builder = factory(root.railroad)
   }
-})(this, function(railroad) {
+})(this, function (railroad) {
   var Diagram = railroad.Diagram
   var Sequence = railroad.Sequence
   var Choice = railroad.Choice
@@ -31,7 +31,7 @@
   function buildSyntaxDiagramsText(topRules) {
     var diagramsHtml = ""
 
-    topRules.forEach(function(production) {
+    topRules.forEach(function (production) {
       var currDiagramHtml = convertProductionToDiagram(
         production,
         production.name
@@ -47,7 +47,7 @@
   }
 
   function definitionsToSubDiagrams(definitions, topRuleName) {
-    var subDiagrams = definitions.map(function(subProd) {
+    var subDiagrams = definitions.map(function (subProd) {
       return convertProductionToDiagram(subProd, topRuleName)
     })
     return subDiagrams

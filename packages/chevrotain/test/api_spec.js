@@ -5,7 +5,7 @@ const _ = require("lodash")
 
 describe("the new api impel", () => {
   it("is identical to the old API", () => {
-    _.forEach(_.keys(masterApi), key => {
+    _.forEach(_.keys(masterApi), (key) => {
       const masterVal = masterApi[key]
       const newVal = newApi[key]
 
@@ -16,7 +16,7 @@ describe("the new api impel", () => {
       if (_.isFunction(masterVal)) {
         expect(masterVal.toString()).to.eql(newVal.toString())
       } else if (_.endsWith(key, "ErrorProvider")) {
-        _.forEach(_.keys(masterVal), key => {
+        _.forEach(_.keys(masterVal), (key) => {
           const nestedMasterVal = masterVal[key]
           const nestedNewVal = newVal[key]
           // All these props are functions

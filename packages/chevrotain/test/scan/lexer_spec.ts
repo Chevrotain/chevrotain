@@ -529,11 +529,11 @@ function defineLexerSpecs(
 
           let allPatterns = map(
             analyzeResult.patternIdxToConfig,
-            currConfig => currConfig.pattern
+            (currConfig) => currConfig.pattern
           )
 
           expect(allPatterns.length).to.equal(8)
-          let allPatternsString = map(allPatterns, pattern => {
+          let allPatternsString = map(allPatterns, (pattern) => {
             return isString(pattern) ? pattern : pattern.source
           })
           setEquality(allPatternsString, [
@@ -549,7 +549,7 @@ function defineLexerSpecs(
 
           let patternIdxToClass = map(
             analyzeResult.patternIdxToConfig,
-            currConfig => currConfig.tokenType
+            (currConfig) => currConfig.tokenType
           )
           expect(keys(patternIdxToClass).length).to.equal(8)
           expect(patternIdxToClass[0]).to.equal(If)
@@ -583,10 +583,10 @@ function defineLexerSpecs(
           })
           let allPatterns = map(
             analyzeResult.patternIdxToConfig,
-            currConfig => currConfig.pattern
+            (currConfig) => currConfig.pattern
           )
           expect(allPatterns.length).to.equal(8)
-          let allPatternsString = map(allPatterns, pattern => {
+          let allPatternsString = map(allPatterns, (pattern) => {
             return isString(pattern) ? pattern : pattern.source
           })
           setEquality(allPatternsString, [
@@ -600,14 +600,14 @@ function defineLexerSpecs(
             "return"
           ])
 
-          forEach(allPatterns, currPattern => {
+          forEach(allPatterns, (currPattern) => {
             if (isRegExp(currPattern)) {
               expect(currPattern.sticky).to.be.true
             }
           })
           let patternIdxToClass = map(
             analyzeResult.patternIdxToConfig,
-            currConfig => currConfig.tokenType
+            (currConfig) => currConfig.tokenType
           )
           expect(keys(patternIdxToClass).length).to.equal(8)
           expect(patternIdxToClass[0]).to.equal(If)
@@ -1501,7 +1501,7 @@ function defineLexerSpecs(
           let lexResult = ModeLexer.tokenize(input)
           expect(lexResult.errors).to.be.empty
 
-          let images = map(lexResult.tokens, currTok => currTok.image)
+          let images = map(lexResult.tokens, (currTok) => currTok.image)
           expect(images).to.deep.equal([
             "1",
             "LETTERS",
@@ -1531,7 +1531,7 @@ function defineLexerSpecs(
           let lexResult = ModeLexer.tokenize(input, "letters")
           expect(lexResult.errors).to.be.empty
 
-          let images = map(lexResult.tokens, currTok => currTok.image)
+          let images = map(lexResult.tokens, (currTok) => currTok.image)
           expect(images).to.deep.equal(["A", "G", "SIGNS", "^"])
         })
 
@@ -1542,7 +1542,7 @@ function defineLexerSpecs(
           expect(lexResult.errors[0].message).to.include("skipped 1")
           expect(lexResult.errors[0].message).to.include(">1<")
 
-          let images = map(lexResult.tokens, currTok => currTok.image)
+          let images = map(lexResult.tokens, (currTok) => currTok.image)
 
           expect(images).to.deep.equal([
             "1",
@@ -1567,7 +1567,7 @@ function defineLexerSpecs(
 
           expect(lexResult.errors[0].length).to.equal(12)
 
-          let images = map(lexResult.tokens, currTok => currTok.image)
+          let images = map(lexResult.tokens, (currTok) => currTok.image)
           expect(images).to.deep.equal(["1", "EXIT_NUMBERS", "2"])
         })
 
@@ -1576,7 +1576,7 @@ function defineLexerSpecs(
           let lexResult = ModeLexer.tokenize(input)
           expect(lexResult.errors).to.be.empty
 
-          let images = map(lexResult.tokens, currTok => currTok.image)
+          let images = map(lexResult.tokens, (currTok) => currTok.image)
           expect(images).to.deep.equal([
             "LETTERS",
             "SIGNS_AND_EXIT_LETTERS",
@@ -1867,14 +1867,14 @@ if (typeof window !== "undefined") {
 skipOnBrowser("debugging and messages and optimizations", () => {
   let consoleErrorSpy, consoleWarnSpy
 
-  beforeEach(function() {
+  beforeEach(function () {
     // @ts-ignore
     consoleErrorSpy = sinon.spy(console, "error")
     // @ts-ignore
     consoleWarnSpy = sinon.spy(console, "warn")
   })
 
-  afterEach(function() {
+  afterEach(function () {
     // @ts-ignore
     console.error.restore()
     // @ts-ignore
@@ -1981,7 +1981,7 @@ skipOnBrowser("debugging and messages and optimizations", () => {
 })
 
 function wrapWithCustom(baseExtendToken) {
-  return function() {
+  return function () {
     let newToken = baseExtendToken.apply(null, arguments)
 
     let pattern = newToken.PATTERN
@@ -1990,7 +1990,7 @@ function wrapWithCustom(baseExtendToken) {
       !/\\n|\\r|\\s/g.test(pattern.source) &&
       pattern !== Lexer.NA
     ) {
-      newToken.PATTERN = function(text, offset) {
+      newToken.PATTERN = function (text, offset) {
         // can't use sticky here because tests on node.js version 4 won't pass.
         let withStart = addStartOfInput(pattern)
         let execResult = withStart.exec(text.substring(offset))

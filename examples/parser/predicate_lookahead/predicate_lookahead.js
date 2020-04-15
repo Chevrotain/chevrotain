@@ -95,7 +95,7 @@ class PredicateLookaheadParser extends EmbeddedActionsParser {
 const parser = new PredicateLookaheadParser()
 
 module.exports = {
-  parse: function(text) {
+  parse: function (text) {
     const lexResult = PredicateLookaheadLexer.tokenize(text)
     // setting a new input will RESET the parser instance's state.
     parser.input = lexResult.tokens
@@ -109,7 +109,7 @@ module.exports = {
     }
   },
 
-  setMaxAllowed: function(newMaxAllowed) {
+  setMaxAllowed: function (newMaxAllowed) {
     maxNumberAllowed = newMaxAllowed
   }
 }

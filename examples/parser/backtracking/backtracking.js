@@ -99,7 +99,7 @@ class BackTrackingParser extends CstParser {
 // reuse the same parser instance.
 const parser = new BackTrackingParser()
 
-module.exports = function(text) {
+module.exports = function (text) {
   const lexResult = backtrackingLexer.tokenize(text)
 
   // setting a new input will RESET the parser instance's state.

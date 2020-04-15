@@ -124,7 +124,7 @@ export function filter<T>(arr: T[], predicate: (T) => boolean): T[] {
 }
 
 export function reject<T>(arr: T[], predicate: (T) => boolean): T[] {
-  return filter(arr, item => !predicate(item))
+  return filter(arr, (item) => !predicate(item))
 }
 
 export function pick(obj: Object, predicate: (item) => boolean) {
@@ -150,7 +150,7 @@ export function has(obj: any, prop: string): boolean {
 }
 
 export function contains<T>(arr: T[], item): boolean {
-  return find(arr, currItem => currItem === item) !== undefined ? true : false
+  return find(arr, (currItem) => currItem === item) !== undefined ? true : false
 }
 
 /**
@@ -222,12 +222,12 @@ export function reduce<T, A>(
 }
 
 export function compact<T>(arr: T[]): T[] {
-  return reject(arr, item => item === null || item === undefined)
+  return reject(arr, (item) => item === null || item === undefined)
 }
 
 export function uniq<T>(
   arr: T[],
-  identity: (item: T) => any = item => item
+  identity: (item: T) => any = (item) => item
 ): T[] {
   let identities = []
   return reduce(
@@ -276,7 +276,7 @@ export function every<T>(
 }
 
 export function difference<T>(arr: T[], values: T[]): T[] {
-  return reject(arr, item => contains(values, item))
+  return reject(arr, (item) => contains(values, item))
 }
 
 export function some<T>(arr: T[], predicate: (item: T) => boolean): boolean {
@@ -363,7 +363,7 @@ export function groupBy<T>(
 ): { [groupKey: string]: T[] } {
   let result: { [groupKey: string]: T[] } = {}
 
-  forEach(arr, item => {
+  forEach(arr, (item) => {
     let currGroupKey = groupKeyFunc(item)
     let currGroupArr = result[currGroupKey]
 
@@ -431,9 +431,9 @@ export function isES2015MapSupported(): boolean {
 }
 
 export function applyMixins(derivedCtor: any, baseCtors: any[]) {
-  baseCtors.forEach(baseCtor => {
+  baseCtors.forEach((baseCtor) => {
     const baseProto = baseCtor.prototype
-    Object.getOwnPropertyNames(baseProto).forEach(propName => {
+    Object.getOwnPropertyNames(baseProto).forEach((propName) => {
       if (propName === "constructor") {
         return
       }

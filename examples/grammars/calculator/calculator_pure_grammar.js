@@ -242,7 +242,7 @@ class CalculatorInterpreter extends BaseCstVisitor {
 // We only need a single interpreter instance because our interpreter has no state.
 const interpreter = new CalculatorInterpreter()
 
-module.exports = function(text) {
+module.exports = function (text) {
   // 1. Tokenize the input.
   const lexResult = CalculatorLexer.tokenize(text)
 

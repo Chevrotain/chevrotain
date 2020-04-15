@@ -102,7 +102,7 @@ export function firstCharOptimizedIndices(ast, result, ignoreCase): number[] {
             if (atom.complement === true) {
               throw Error(complementErrorMessage)
             }
-            forEach(atom.value, code => {
+            forEach(atom.value, (code) => {
               if (typeof code === "number") {
                 addOptimizedIdxToResult(code, result, ignoreCase)
               } else {
@@ -212,7 +212,7 @@ function handleIgnoreCase(code: number, result: number[]) {
 }
 
 function findCode(setNode, targetCharCodes) {
-  return find(setNode.value, codeOrRange => {
+  return find(setNode.value, (codeOrRange) => {
     if (typeof codeOrRange === "number") {
       return contains(targetCharCodes, codeOrRange)
     } else {
@@ -221,7 +221,7 @@ function findCode(setNode, targetCharCodes) {
       return (
         find(
           targetCharCodes,
-          targetCode => range.from <= targetCode && targetCode <= range.to
+          (targetCode) => range.from <= targetCode && targetCode <= range.to
         ) !== undefined
       )
     }
@@ -299,7 +299,7 @@ export function canMatchCharCode(
     return charCodeFinder.found
   } else {
     return (
-      find(<any>pattern, char => {
+      find(<any>pattern, (char) => {
         return contains(charCodes, (<string>char).charCodeAt(0))
       }) !== undefined
     )

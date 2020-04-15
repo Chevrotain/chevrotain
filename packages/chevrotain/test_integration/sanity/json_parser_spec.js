@@ -1,11 +1,11 @@
-;(function(root, factory) {
+;(function (root, factory) {
   if (typeof define === "function" && define.amd) {
     // AMD. Register as an anonymous module.
     define(["chevrotain"], factory)
   } else {
     factory(root.chevrotain)
   }
-})(this, function(chevrotain) {
+})(this, function (chevrotain) {
   // ----------------- lexer -----------------
   var createToken = chevrotain.createToken
   var Lexer = chevrotain.Lexer
@@ -59,7 +59,7 @@
     // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
     var $ = this
 
-    this.json = this.RULE("json", function() {
+    this.json = this.RULE("json", function () {
       // prettier-ignore
       $.OR([
                 {ALT: function() {$.SUBRULE($.object)}},
@@ -67,11 +67,11 @@
             ])
     })
 
-    this.object = this.RULE("object", function() {
+    this.object = this.RULE("object", function () {
       $.CONSUME(LCurly)
-      $.OPTION(function() {
+      $.OPTION(function () {
         $.SUBRULE($.objectItem)
-        $.MANY(function() {
+        $.MANY(function () {
           $.CONSUME(Comma)
           $.SUBRULE2($.objectItem)
         })
@@ -79,17 +79,17 @@
       $.CONSUME(RCurly)
     })
 
-    this.objectItem = this.RULE("objectItem", function() {
+    this.objectItem = this.RULE("objectItem", function () {
       $.CONSUME(StringLiteral)
       $.CONSUME(Colon)
       $.SUBRULE($.value)
     })
 
-    this.array = this.RULE("array", function() {
+    this.array = this.RULE("array", function () {
       $.CONSUME(LSquare)
-      $.OPTION(function() {
+      $.OPTION(function () {
         $.SUBRULE($.value)
-        $.MANY(function() {
+        $.MANY(function () {
           $.CONSUME(Comma)
           $.SUBRULE2($.value)
         })
@@ -97,7 +97,7 @@
       $.CONSUME(RSquare)
     })
 
-    this.value = this.RULE("value", function() {
+    this.value = this.RULE("value", function () {
       // prettier-ignore
       $.OR([
                 {ALT: function() {$.CONSUME(StringLiteral)}},
@@ -141,8 +141,8 @@
     }
   }
 
-  describe("The Json Parser", function() {
-    it("can parse a simple Json without errors", function() {
+  describe("The Json Parser", function () {
+    it("can parse a simple Json without errors", function () {
       var inputText = '{ "arr": [1,2,3], "obj": {"num":666}}'
       var lexAndParseResult = parseJson(inputText)
 
@@ -152,7 +152,7 @@
 
     // attempt to resolve random failures when running multiple (separate) karma tests
     // on travis-ci + chrome.
-    after(function(done) {
+    after(function (done) {
       setTimeout(done, 1000)
     })
   })

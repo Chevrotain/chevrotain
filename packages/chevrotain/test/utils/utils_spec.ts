@@ -39,9 +39,9 @@ describe("The Utils functions namespace", () => {
       expect(item).to.equal(idx + 1)
     })
 
-    expect(() => forEach(null, item => {})).to.throw("non exhaustive match")
+    expect(() => forEach(null, (item) => {})).to.throw("non exhaustive match")
 
-    forEach([], item => {
+    forEach([], (item) => {
       throw Error("call back should not be invoked for empty array")
     })
   })
@@ -69,32 +69,32 @@ describe("The Utils functions namespace", () => {
 
   it("exports a filter utility", () => {
     expect(
-      filter([], item => {
+      filter([], (item) => {
         return true
       })
     ).to.deep.equal([])
     expect(
-      filter([1, 2, 3], item => {
+      filter([1, 2, 3], (item) => {
         return true
       })
     ).to.deep.equal([1, 2, 3])
     expect(
-      filter([1, 2, 3], item => {
+      filter([1, 2, 3], (item) => {
         return false
       })
     ).to.deep.equal([])
     expect(
-      filter([1, 2, 3], item => {
+      filter([1, 2, 3], (item) => {
         return item % 2 === 0
       })
     ).to.deep.equal([2])
     expect(
-      filter([1, 2, 3], item => {
+      filter([1, 2, 3], (item) => {
         return item % 2 === 1
       })
     ).to.deep.equal([1, 3])
     expect(
-      filter(null, item => {
+      filter(null, (item) => {
         return item % 2 === 1
       })
     ).to.deep.equal([])
@@ -102,32 +102,32 @@ describe("The Utils functions namespace", () => {
 
   it("exports a reject utility", () => {
     expect(
-      reject([], item => {
+      reject([], (item) => {
         return true
       })
     ).to.deep.equal([])
     expect(
-      reject([1, 2, 3], item => {
+      reject([1, 2, 3], (item) => {
         return false
       })
     ).to.deep.equal([1, 2, 3])
     expect(
-      reject([1, 2, 3], item => {
+      reject([1, 2, 3], (item) => {
         return true
       })
     ).to.deep.equal([])
     expect(
-      reject([1, 2, 3], item => {
+      reject([1, 2, 3], (item) => {
         return item % 2 === 0
       })
     ).to.deep.equal([1, 3])
     expect(
-      reject([1, 2, 3], item => {
+      reject([1, 2, 3], (item) => {
         return item % 2 === 1
       })
     ).to.deep.equal([2])
     expect(
-      reject(null, item => {
+      reject(null, (item) => {
         return item % 2 === 1
       })
     ).to.deep.equal([])
@@ -166,11 +166,11 @@ describe("The Utils functions namespace", () => {
   })
 
   it("exports a find utility", () => {
-    expect(find([1, 2, 3], item => item === 2)).to.equal(2)
-    expect(find([], item => item === 2)).to.be.undefined
+    expect(find([1, 2, 3], (item) => item === 2)).to.equal(2)
+    expect(find([], (item) => item === 2)).to.be.undefined
     let a = {}
     let b = {}
-    expect(find([a, b], item => item === b)).to.equal(b)
+    expect(find([a, b], (item) => item === b)).to.equal(b)
   })
 
   it("exports a reduce utility", () => {
@@ -205,7 +205,7 @@ describe("The Utils functions namespace", () => {
   it("exports a uniq utility", () => {
     expect(uniq([1, 2, 3, 2])).to.contain.members([1, 2, 3])
     expect(
-      uniq([2, 2, 4, 2], item => {
+      uniq([2, 2, 4, 2], (item) => {
         return 666
       })
     ).to.have.length(1)
@@ -213,14 +213,14 @@ describe("The Utils functions namespace", () => {
   })
 
   it("exports a pick utility", () => {
-    expect(pick({ bamba: true, bisli: false }, item => item)).to.deep.equal({
+    expect(pick({ bamba: true, bisli: false }, (item) => item)).to.deep.equal({
       bamba: true
     })
-    expect(pick({}, item => item)).to.be.empty
+    expect(pick({}, (item) => item)).to.be.empty
   })
 
   it("exports a partial utility", () => {
-    let add = function(x, y) {
+    let add = function (x, y) {
       return x + y
     }
     expect(partial(add)(2, 3)).to.equal(5)
@@ -230,23 +230,23 @@ describe("The Utils functions namespace", () => {
 
   it("exports an every utility", () => {
     expect(
-      every([], item => {
+      every([], (item) => {
         return true
       })
     ).to.be.true
     // empty set always true...
     expect(
-      every([], item => {
+      every([], (item) => {
         return false
       })
     ).to.be.true
     expect(
-      every([1, 2, 3], item => {
+      every([1, 2, 3], (item) => {
         return item % 2 === 0
       })
     ).to.be.false
     expect(
-      every([2, 4, 6], item => {
+      every([2, 4, 6], (item) => {
         return item % 2 === 0
       })
     ).to.be.true
@@ -261,22 +261,22 @@ describe("The Utils functions namespace", () => {
 
   it("exports an some utility", () => {
     expect(
-      some([], item => {
+      some([], (item) => {
         return true
       })
     ).to.be.false
     expect(
-      some([], item => {
+      some([], (item) => {
         return false
       })
     ).to.be.false
     expect(
-      some([1, 2, 3], item => {
+      some([1, 2, 3], (item) => {
         return item % 2 === 0
       })
     ).to.be.true
     expect(
-      some([1, 3, 5], item => {
+      some([1, 3, 5], (item) => {
         return item % 2 === 0
       })
     ).to.be.false
@@ -290,8 +290,8 @@ describe("The Utils functions namespace", () => {
   })
 
   it("exports a sortBy utility", () => {
-    expect(sortBy([1, 2, 3], num => num)).to.deep.equal([1, 2, 3])
-    expect(sortBy([3, 2, 1], num => num)).to.deep.equal([1, 2, 3])
+    expect(sortBy([1, 2, 3], (num) => num)).to.deep.equal([1, 2, 3])
+    expect(sortBy([3, 2, 1], (num) => num)).to.deep.equal([1, 2, 3])
   })
 
   it("exports a zipObject utility", () => {
@@ -319,11 +319,11 @@ describe("The Utils functions namespace", () => {
   })
 
   it("exports a groupBy utility", () => {
-    expect(groupBy([1, 2, 3, 4], num => "" + (num % 2))).to.deep.equal({
+    expect(groupBy([1, 2, 3, 4], (num) => "" + (num % 2))).to.deep.equal({
       0: [2, 4],
       1: [1, 3]
     })
-    expect(groupBy([1, 2, 3, 4], num => "" + num)).to.deep.equal({
+    expect(groupBy([1, 2, 3, 4], (num) => "" + num)).to.deep.equal({
       1: [1],
       2: [2],
       3: [3],
@@ -332,11 +332,11 @@ describe("The Utils functions namespace", () => {
   })
 
   it("exports a groupBy utility", () => {
-    expect(groupBy([1, 2, 3, 4], num => "" + (num % 2))).to.deep.equal({
+    expect(groupBy([1, 2, 3, 4], (num) => "" + (num % 2))).to.deep.equal({
       0: [2, 4],
       1: [1, 3]
     })
-    expect(groupBy([1, 2, 3, 4], num => "" + num)).to.deep.equal({
+    expect(groupBy([1, 2, 3, 4], (num) => "" + num)).to.deep.equal({
       1: [1],
       2: [2],
       3: [3],

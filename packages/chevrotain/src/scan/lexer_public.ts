@@ -216,7 +216,7 @@ export class Lexer {
       forEach(actualDefinition.modes, (currModeValue, currModeName) => {
         actualDefinition.modes[currModeName] = reject<TokenType>(
           currModeValue,
-          currTokType => isUndefined(currTokType)
+          (currTokType) => isUndefined(currTokType)
         )
       })
 
@@ -280,7 +280,7 @@ export class Lexer {
         !isEmpty(this.lexerDefinitionErrors) &&
         !this.config.deferDefinitionErrorsHandling
       ) {
-        let allErrMessages = map(this.lexerDefinitionErrors, error => {
+        let allErrMessages = map(this.lexerDefinitionErrors, (error) => {
           return error.message
         })
         let allErrMessagesString = allErrMessages.join(
@@ -292,7 +292,7 @@ export class Lexer {
       }
 
       // Only print warning if there are no errors, This will avoid pl
-      forEach(this.lexerDefinitionWarning, warningDescriptor => {
+      forEach(this.lexerDefinitionWarning, (warningDescriptor) => {
         PRINT_WARNING(warningDescriptor.message)
       })
 
@@ -379,7 +379,7 @@ export class Lexer {
     initialMode: string = this.defaultMode
   ): ILexingResult {
     if (!isEmpty(this.lexerDefinitionErrors)) {
-      let allErrMessages = map(this.lexerDefinitionErrors, error => {
+      let allErrMessages = map(this.lexerDefinitionErrors, (error) => {
         return error.message
       })
       let allErrMessagesString = allErrMessages.join(
@@ -458,7 +458,7 @@ export class Lexer {
       }
     }
 
-    let pop_mode = popToken => {
+    let pop_mode = (popToken) => {
       // TODO: perhaps avoid this error in the edge case there is no more input?
       if (
         modeStack.length === 1 &&

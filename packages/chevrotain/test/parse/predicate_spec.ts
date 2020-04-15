@@ -274,7 +274,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
           this.input = input
         }
 
-        public topRule = this.RULE("topRule", param => {
+        public topRule = this.RULE("topRule", (param) => {
           return this.OR1([
             {
               GATE: () => param,
@@ -308,7 +308,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
           this.input = input
         }
 
-        public topRule = this.RULE("topRule", param => {
+        public topRule = this.RULE("topRule", (param) => {
           let result = ""
           result += this.CONSUME1(B).image
 
@@ -339,7 +339,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
           this.input = input
         }
 
-        public topRule = this.RULE("topRule", param => {
+        public topRule = this.RULE("topRule", (param) => {
           let result = ""
           this.MANY({
             GATE: () => param,
@@ -376,7 +376,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
           this.input = input
         }
 
-        public topRule = this.RULE("topRule", param => {
+        public topRule = this.RULE("topRule", (param) => {
           let times = 0
 
           function gateFunc() {

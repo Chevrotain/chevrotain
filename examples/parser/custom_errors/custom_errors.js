@@ -28,7 +28,7 @@ const PhoneticLexer = new Lexer(allTokens)
 
 // ----------------- Custom Error Provider ------------
 const myErrorProvider = {
-  buildMismatchTokenMessage: function(options) {
+  buildMismatchTokenMessage: function (options) {
     // override mismatch tokens errors when Bravo is expected
     // Imagine Bravo is a terminating Token such as "SemiColon"
     if (options.expected === Bravo) {
@@ -38,7 +38,7 @@ const myErrorProvider = {
       return defaultParserErrorProvider.buildMismatchTokenMessage(options)
     }
   },
-  buildNotAllInputParsedMessage: function(options) {
+  buildNotAllInputParsedMessage: function (options) {
     // changing the template of the error message #1
     return `very bad dog! you still have some input remaining at offset:${options.firstRedundant.startOffset}`
   },
@@ -46,7 +46,7 @@ const myErrorProvider = {
   // the default implementation will be automatically used instead.
   // buildNoViableAltMessage: function(options) {},
 
-  buildEarlyExitMessage: function(options) {
+  buildEarlyExitMessage: function (options) {
     // translating the error message to Spanish
     return `Esperando por lo menos una iteración de: ${options.expectedIterationPaths[0][0].name}`
   }
@@ -117,7 +117,7 @@ class CustomErrorsParser extends CstParser {
 const parser = new CustomErrorsParser()
 
 function parseStartingWithRule(ruleName) {
-  return function(text) {
+  return function (text) {
     const lexResult = PhoneticLexer.tokenize(text)
     // setting a new input will RESET the parser instance's state.
     parser.input = lexResult.tokens

@@ -86,7 +86,7 @@ ${options.name}.prototype.constructor = ${options.name}
 }
 
 export function genAllRules(rules: Rule[]): string {
-  let rulesText = map(rules, currRule => {
+  let rulesText = map(rules, (currRule) => {
     return genRule(currRule, 1)
   })
 
@@ -112,7 +112,7 @@ export function genNonTerminal(prod: NonTerminal, n: number): string {
 
 export function genAlternation(prod: Alternation, n: number): string {
   let result = indent(n, `$.OR${prod.idx}([`) + NL
-  const alts = map(prod.definition, altDef => genSingleAlt(altDef, n + 1))
+  const alts = map(prod.definition, (altDef) => genSingleAlt(altDef, n + 1))
   result += alts.join("," + NL)
   result += NL + indent(n, `])` + NL)
   return result
@@ -188,7 +188,7 @@ function genDefFunction(definition: IProduction[], n: number): string {
 
 function genDefinition(def: IProduction[], n: number): string {
   let result = ""
-  forEach(def, prod => {
+  forEach(def, (prod) => {
     result += genProd(prod, n + 1)
   })
   return result

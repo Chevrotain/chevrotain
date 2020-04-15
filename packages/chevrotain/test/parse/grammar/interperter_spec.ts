@@ -588,7 +588,7 @@ describe("The NextTerminalAfterAtLeastOneSepWalker", () => {
 
 describe("The chevrotain grammar interpreter capabilities", () => {
   function extractPartialPaths(newResultFormat) {
-    return map(newResultFormat, currItem => currItem.partialPath)
+    return map(newResultFormat, (currItem) => currItem.partialPath)
   }
 
   class Alpha {
@@ -860,11 +860,11 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
   context("can calculate the next possible single tokens for: ", () => {
     function INPUT(tokTypes: TokenType[]): IToken[] {
-      return map(tokTypes, currTokType => createRegularToken(currTokType))
+      return map(tokTypes, (currTokType) => createRegularToken(currTokType))
     }
 
     function pluckTokenTypes(arr: any[]): TokenType[] {
-      return map(arr, currItem => currItem.nextTokenType)
+      return map(arr, (currItem) => currItem.nextTokenType)
     }
 
     it("Sequence positive", () => {

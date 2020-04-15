@@ -88,7 +88,7 @@ DynamicDelimiterParser.prototype.constructor = DynamicDelimiterParser
 // reuse the same parser instance.
 const parser = new DynamicDelimiterParser()
 
-module.exports = function(text, dynamicDelimiterRegExp) {
+module.exports = function (text, dynamicDelimiterRegExp) {
   // make this parameter optional
   if (dynamicDelimiterRegExp === undefined) {
     dynamicDelimiterRegExp = Lexer.NA

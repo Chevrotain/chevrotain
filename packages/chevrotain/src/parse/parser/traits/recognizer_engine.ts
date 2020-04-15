@@ -168,7 +168,7 @@ export class RecognizerEngine {
     // TODO: This check may not be accurate for multi mode lexers
     const noTokenCategoriesUsed = every(
       values(tokenVocabulary),
-      tokenConstructor => isEmpty(tokenConstructor.categoryMatches)
+      (tokenConstructor) => isEmpty(tokenConstructor.categoryMatches)
     )
 
     this.tokenMatcher = noTokenCategoriesUsed
@@ -230,7 +230,7 @@ export class RecognizerEngine {
 
     let wrappedGrammarRule
 
-    wrappedGrammarRule = function(idxInCallingRule: number = 0, args: any[]) {
+    wrappedGrammarRule = function (idxInCallingRule: number = 0, args: any[]) {
       this.ruleInvocationStateUpdate(shortName, ruleName, idxInCallingRule)
       return invokeRuleWithTry.call(this, args)
     }

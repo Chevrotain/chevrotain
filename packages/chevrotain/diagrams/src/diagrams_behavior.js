@@ -1,4 +1,4 @@
-;(function(root, factory) {
+;(function (root, factory) {
   if (typeof define === "function" && define.amd) {
     // AMD. Register as an anonymous module.
     define([], factory)
@@ -11,7 +11,7 @@
     // Browser globals (root is window)
     root.diagrams_behavior = factory()
   }
-})(this, function() {
+})(this, function () {
   /**
    * @param [scrollingEnabled=true] {boolean} - Is the scrolling from a non-terminal usage to it's definition
    * enabled. it is enabled by default, but this flow is not relevant in all use cases (playground) and thus
@@ -23,7 +23,7 @@
     }
 
     var diagramHeaders = toArr(document.getElementsByClassName("diagramHeader"))
-    diagramHeaders.forEach(function(header) {
+    diagramHeaders.forEach(function (header) {
       header.addEventListener(
         "mouseover",
         toggleNonTerminalUsageAndDef_fromHeader
@@ -36,7 +36,7 @@
 
     var noneTerminals = toArr(document.getElementsByClassName("non-terminal"))
     var noneTerminalsText = findDomChildrenByTagName(noneTerminals, "text")
-    noneTerminalsText.forEach(function(nonTerminal) {
+    noneTerminalsText.forEach(function (nonTerminal) {
       nonTerminal.addEventListener(
         "mouseover",
         toggleNonTerminalUsageAndDef_fromNoneTerminal
@@ -53,7 +53,7 @@
 
     var terminals = toArr(document.getElementsByClassName("terminal"))
     var terminalsText = findDomChildrenByTagName(terminals, "text")
-    terminalsText.forEach(function(terminal) {
+    terminalsText.forEach(function (terminal) {
       terminal.addEventListener("mouseover", toggleTerminalUsage)
       terminal.addEventListener("mouseout", toggleTerminalUsage)
     })
@@ -87,7 +87,7 @@
   function getUsageSvgRect(definitionName, className, attributeName) {
     var classDomElements = toArr(document.getElementsByClassName(className))
     var rects = findDomChildrenByTagName(classDomElements, "rect")
-    return rects.filter(function(currRect) {
+    return rects.filter(function (currRect) {
       var textNode = currRect.parentNode.getElementsByTagName("text")[0]
       return textNode.getAttribute(attributeName) === definitionName
     })
@@ -95,7 +95,7 @@
 
   function findHeader(headerName) {
     var headers = toArr(document.getElementsByClassName("diagramHeader"))
-    var header = headers.find(function(currHeader) {
+    var header = headers.find(function (currHeader) {
       // this works on H2 dom elements and not SVG elements so innerHTML usage is safe.
       return currHeader.innerHTML === headerName
     })
@@ -127,7 +127,7 @@
   }
 
   function toggleClassForNodes(domNodes, className) {
-    domNodes.forEach(function(currDomNode) {
+    domNodes.forEach(function (currDomNode) {
       toggleClass(currDomNode, className)
     })
   }
@@ -138,12 +138,12 @@
 
   // first add raf shim
   // http://www.paulirish.com/2011/requestanimationframe-for-smart-animating/
-  var requestAnimFrame = (function() {
+  var requestAnimFrame = (function () {
     return (
       window.requestAnimationFrame ||
       window.webkitRequestAnimationFrame ||
       window.mozRequestAnimationFrame ||
-      function(callback) {
+      function (callback) {
         window.setTimeout(callback, 1000 / 60)
       }
     )
@@ -170,13 +170,13 @@
     // easing equations from https://github.com/danro/easing-js/blob/master/easing.js
     var PI_D2 = Math.PI / 2,
       easingEquations = {
-        easeOutSine: function(pos) {
+        easeOutSine: function (pos) {
           return Math.sin(pos * (Math.PI / 2))
         },
-        easeInOutSine: function(pos) {
+        easeInOutSine: function (pos) {
           return -0.5 * (Math.cos(Math.PI * pos) - 1)
         },
-        easeInOutQuint: function(pos) {
+        easeInOutQuint: function (pos) {
           if ((pos /= 0.5) < 1) {
             return 0.5 * Math.pow(pos, 5)
           }
@@ -206,8 +206,8 @@
 
   function findDomChildrenByTagName(domElements, tagName) {
     var elemsFound = []
-    domElements.forEach(function(currDomNode) {
-      toArr(currDomNode.children).forEach(function(currChild) {
+    domElements.forEach(function (currDomNode) {
+      toArr(currDomNode.children).forEach(function (currChild) {
         if (currChild.tagName === tagName) {
           elemsFound.push(currChild)
         }

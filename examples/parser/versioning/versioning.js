@@ -133,7 +133,7 @@ class SelectParserVersion2 extends SelectParserVersion1 {
 const version1Parser = new SelectParserVersion1()
 const version2Parser = new SelectParserVersion2()
 
-module.exports = function(text, version) {
+module.exports = function (text, version) {
   const lexResult = SelectLexer.tokenize(text)
 
   let parser

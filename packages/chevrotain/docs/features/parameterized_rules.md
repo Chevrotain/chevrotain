@@ -17,7 +17,7 @@ $.RULE("ArgumentInConst", () => {
 })
 
 // isConst is a parameter passed from another rule.
-$.RULE("Value", isConst => {
+$.RULE("Value", (isConst) => {
   $.OR([
     // the Variable alternative is only possible when "isConst" is Falsey
     { GATE: () => !isConst, ALT: () => $.SUBRULE($.Variable) },

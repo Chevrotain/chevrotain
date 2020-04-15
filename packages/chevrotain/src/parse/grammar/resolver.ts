@@ -31,7 +31,7 @@ export class GastRefResolverVisitor extends GAstVisitor {
   }
 
   public resolveRefs(): void {
-    forEach(values(this.nameToTopRule), prod => {
+    forEach(values(this.nameToTopRule), (prod) => {
       this.currTopLevel = prod
       prod.accept(this)
     })

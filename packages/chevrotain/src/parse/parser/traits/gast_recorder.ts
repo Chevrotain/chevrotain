@@ -102,49 +102,49 @@ export class GastRecorder {
        */
       for (let i = 0; i < 10; i++) {
         const idx = i > 0 ? i : ""
-        this[`CONSUME${idx}`] = function(arg1, arg2) {
+        this[`CONSUME${idx}`] = function (arg1, arg2) {
           return this.consumeInternalRecord(arg1, i, arg2)
         }
-        this[`SUBRULE${idx}`] = function(arg1, arg2) {
+        this[`SUBRULE${idx}`] = function (arg1, arg2) {
           return this.subruleInternalRecord(arg1, i, arg2)
         }
-        this[`OPTION${idx}`] = function(arg1) {
+        this[`OPTION${idx}`] = function (arg1) {
           return this.optionInternalRecord(arg1, i)
         }
-        this[`OR${idx}`] = function(arg1) {
+        this[`OR${idx}`] = function (arg1) {
           return this.orInternalRecord(arg1, i)
         }
-        this[`MANY${idx}`] = function(arg1) {
+        this[`MANY${idx}`] = function (arg1) {
           this.manyInternalRecord(i, arg1)
         }
-        this[`MANY_SEP${idx}`] = function(arg1) {
+        this[`MANY_SEP${idx}`] = function (arg1) {
           this.manySepFirstInternalRecord(i, arg1)
         }
-        this[`AT_LEAST_ONE${idx}`] = function(arg1) {
+        this[`AT_LEAST_ONE${idx}`] = function (arg1) {
           this.atLeastOneInternalRecord(i, arg1)
         }
-        this[`AT_LEAST_ONE_SEP${idx}`] = function(arg1) {
+        this[`AT_LEAST_ONE_SEP${idx}`] = function (arg1) {
           this.atLeastOneSepFirstInternalRecord(i, arg1)
         }
       }
 
       // DSL methods with the idx(suffix) as an argument
-      this[`consume`] = function(idx, arg1, arg2) {
+      this[`consume`] = function (idx, arg1, arg2) {
         return this.consumeInternalRecord(arg1, idx, arg2)
       }
-      this[`subrule`] = <any>function(idx, arg1, arg2) {
+      this[`subrule`] = <any>function (idx, arg1, arg2) {
         return this.subruleInternalRecord(arg1, idx, arg2)
       }
-      this[`option`] = function(idx, arg1) {
+      this[`option`] = function (idx, arg1) {
         return this.optionInternalRecord(arg1, idx)
       }
-      this[`or`] = function(idx, arg1) {
+      this[`or`] = function (idx, arg1) {
         return this.orInternalRecord(arg1, idx)
       }
-      this[`many`] = function(idx, arg1) {
+      this[`many`] = function (idx, arg1) {
         this.manyInternalRecord(idx, arg1)
       }
-      this[`atLeastOne`] = function(idx, arg1) {
+      this[`atLeastOne`] = function (idx, arg1) {
         this.atLeastOneInternalRecord(idx, arg1)
       }
 
@@ -407,7 +407,7 @@ function recordOrProd(mainProdArg: any, occurrence: number): any {
 
   prevProd.definition.push(newOrProd)
 
-  forEach(alts, currAlt => {
+  forEach(alts, (currAlt) => {
     const currAltFlat = new Alternative({ definition: [] })
     newOrProd.definition.push(currAltFlat)
     if (has(currAlt, "IGNORE_AMBIGUITIES")) {
@@ -433,8 +433,9 @@ function assertMethodIdxIsValid(idx): void {
     const error: any = new Error(
       // The stack trace will contain all the needed details
       `Invalid DSL Method idx value: <${idx}>\n\t` +
-        `Idx value must be a none negative value smaller than ${MAX_METHOD_IDX +
-          1}`
+        `Idx value must be a none negative value smaller than ${
+          MAX_METHOD_IDX + 1
+        }`
     )
     error.KNOWN_RECORDER_ERROR = true
     throw error

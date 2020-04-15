@@ -47,9 +47,12 @@ export function firstForSequence(prod: AbstractProduction): TokenType[] {
 }
 
 export function firstForBranching(prod: AbstractProduction): TokenType[] {
-  let allAlternativesFirsts: TokenType[][] = map(prod.definition, innerProd => {
-    return first(innerProd)
-  })
+  let allAlternativesFirsts: TokenType[][] = map(
+    prod.definition,
+    (innerProd) => {
+      return first(innerProd)
+    }
+  )
   return uniq(flatten<TokenType>(allAlternativesFirsts))
 }
 

@@ -114,7 +114,7 @@ describe("the grammar validations", () => {
     )
     expect(actualErrors.length).to.equal(4)
 
-    forEach(actualErrors, err => delete err.message)
+    forEach(actualErrors, (err) => delete err.message)
     expect(actualErrors).to.deep.include.members(expectedErrorsNoMsg)
     expect(expectedErrorsNoMsg).to.deep.include.members(actualErrors)
   })
@@ -334,7 +334,7 @@ describe("the getFirstNoneTerminal function", () => {
     ]
     let result = getFirstNoneTerminal(sqeuence)
     expect(result).to.have.length(2)
-    let resultRuleNames = map(result, currItem => currItem.name)
+    let resultRuleNames = map(result, (currItem) => currItem.name)
     expect(resultRuleNames).to.include.members(["dummyRule", "dummyRule2"])
   })
 
@@ -371,7 +371,7 @@ describe("the getFirstNoneTerminal function", () => {
     ]
     let result = getFirstNoneTerminal(alternation)
     expect(result).to.have.length(3)
-    let resultRuleNames = map(result, currItem => currItem.name)
+    let resultRuleNames = map(result, (currItem) => currItem.name)
     expect(resultRuleNames).to.include.members([
       "dummyRule",
       "dummyRule2",
@@ -408,7 +408,7 @@ describe("the getFirstNoneTerminal function", () => {
     ]
     let result = getFirstNoneTerminal(alternation)
     expect(result).to.have.length(2)
-    let resultRuleNames = map(result, currItem => currItem.name)
+    let resultRuleNames = map(result, (currItem) => currItem.name)
     expect(resultRuleNames).to.include.members(["dummyRule", "dummyRule3"])
   })
 
@@ -441,7 +441,7 @@ describe("the getFirstNoneTerminal function", () => {
     ]
     let result = getFirstNoneTerminal(alternation)
     expect(result).to.have.length(1)
-    let resultRuleNames = map(result, currItem => currItem.name)
+    let resultRuleNames = map(result, (currItem) => currItem.name)
     expect(resultRuleNames).to.include.members(["dummyRule"])
   })
 })

@@ -38,7 +38,7 @@ export function createBaseSemanticVisitorConstructor(
 ): {
   new (...args: any[]): ICstVisitor<any, any>
 } {
-  let derivedConstructor: any = function() {}
+  let derivedConstructor: any = function () {}
 
   // can be overwritten according to:
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/
@@ -46,7 +46,7 @@ export function createBaseSemanticVisitorConstructor(
   defineNameProp(derivedConstructor, grammarName + "BaseSemantics")
 
   let semanticProto = {
-    visit: function(cstNode, param) {
+    visit: function (cstNode, param) {
       // enables writing more concise visitor methods when CstNode has only a single child
       if (isArray(cstNode)) {
         // A CST Node's children dictionary can never have empty arrays as values
@@ -62,12 +62,12 @@ export function createBaseSemanticVisitorConstructor(
       return this[cstNode.name](cstNode.children, param)
     },
 
-    validateVisitor: function() {
+    validateVisitor: function () {
       let semanticDefinitionErrors = validateVisitor(this, ruleNames)
       if (!isEmpty(semanticDefinitionErrors)) {
         let errorMessages = map(
           semanticDefinitionErrors,
-          currDefError => currDefError.msg
+          (currDefError) => currDefError.msg
         )
         throw Error(
           `Errors Detected in CST Visitor <${functionName(
@@ -93,7 +93,7 @@ export function createBaseVisitorConstructorWithDefaults(
 ): {
   new (...args: any[]): ICstVisitor<any, any>
 } {
-  let derivedConstructor: any = function() {}
+  let derivedConstructor: any = function () {}
 
   // can be overwritten according to:
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/
@@ -101,7 +101,7 @@ export function createBaseVisitorConstructorWithDefaults(
   defineNameProp(derivedConstructor, grammarName + "BaseSemanticsWithDefaults")
 
   let withDefaultsProto = Object.create(baseConstructor.prototype)
-  forEach(ruleNames, ruleName => {
+  forEach(ruleNames, (ruleName) => {
     withDefaultsProto[ruleName] = defaultVisit
   })
 
@@ -136,7 +136,7 @@ export function validateMissingCstMethods(
   visitorInstance: Function,
   ruleNames: string[]
 ): IVisitorDefinitionError[] {
-  let errors: IVisitorDefinitionError[] = map(ruleNames, currRuleName => {
+  let errors: IVisitorDefinitionError[] = map(ruleNames, (currRuleName) => {
     if (!isFunction(visitorInstance[currRuleName])) {
       return {
         msg: `Missing visitor method: <${currRuleName}> on ${functionName(

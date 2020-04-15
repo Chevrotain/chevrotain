@@ -123,7 +123,7 @@ export interface IParserState {
 export type Predicate = () => boolean
 
 export function EMPTY_ALT<T>(value: T = undefined): () => T {
-  return function() {
+  return function () {
     return value
   }
 }
@@ -165,7 +165,7 @@ export class Parser {
         try {
           this.enableRecording()
           // Building the GAST
-          forEach(this.definedRulesNames, currRuleName => {
+          forEach(this.definedRulesNames, (currRuleName) => {
             const wrappedRule = this[currRuleName]
             const originalGrammarAction = wrappedRule["originalGrammarAction"]
             let recordedRuleGast = undefined
@@ -230,7 +230,10 @@ export class Parser {
         !Parser.DEFER_DEFINITION_ERRORS_HANDLING &&
         !isEmpty(this.definitionErrors)
       ) {
-        defErrorsMsgs = map(this.definitionErrors, defError => defError.message)
+        defErrorsMsgs = map(
+          this.definitionErrors,
+          (defError) => defError.message
+        )
         throw new Error(
           `Parser Definition Errors detected:\n ${defErrorsMsgs.join(
             "\n-------------------------------\n"

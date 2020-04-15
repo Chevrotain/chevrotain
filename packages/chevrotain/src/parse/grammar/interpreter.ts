@@ -321,7 +321,7 @@ export function possiblePathsFrom(
       ])
       result = getAlternativesForProd(newDef)
     } else if (prod instanceof Alternation) {
-      forEach(prod.definition, currAlt => {
+      forEach(prod.definition, (currAlt) => {
         result = getAlternativesForProd(currAlt.definition)
       })
       return result

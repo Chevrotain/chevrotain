@@ -90,7 +90,7 @@ module.exports = {
   StringLiteral: StringLiteral,
   DateLiteral: DateLiteral,
 
-  tokenize: function(text) {
+  tokenize: function (text) {
     const lexResult = customPatternsLexer.tokenize(text)
 
     if (lexResult.errors.length > 0) {

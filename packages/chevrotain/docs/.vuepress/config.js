@@ -51,7 +51,7 @@ module.exports = {
   base: "/chevrotain/docs/",
   description: "Parser Building Toolkit for JavaScript",
   markdown: {
-    slugify: function(str) {
+    slugify: function (str) {
       const mappedSlug = slugMap[str]
       if (mappedSlug) {
         // TODO: can we test all mappings have been used?

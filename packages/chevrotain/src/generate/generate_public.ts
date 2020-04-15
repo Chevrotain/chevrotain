@@ -18,7 +18,7 @@ export function generateParserFactory<T extends BaseParser>(options: {
     wrapperText
   )
 
-  return function(config) {
+  return function (config) {
     return constructorWrapper(
       options.tokenVocabulary,
       config,

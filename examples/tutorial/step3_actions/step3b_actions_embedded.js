@@ -136,7 +136,7 @@ class SelectParserEmbedded extends EmbeddedActionsParser {
 const parserInstance = new SelectParserEmbedded()
 
 module.exports = {
-  toAst: function(inputText) {
+  toAst: function (inputText) {
     const lexResult = selectLexer.lex(inputText)
 
     // ".input" is a setter which will reset the parser's internal's state.

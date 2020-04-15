@@ -44,7 +44,7 @@ export function augmentTokenTypes(tokenTypes: TokenType[]): void {
   assignCategoriesMapProp(tokenTypesAndParents)
   assignCategoriesTokensProp(tokenTypesAndParents)
 
-  forEach(tokenTypesAndParents, tokType => {
+  forEach(tokenTypesAndParents, (tokType) => {
     tokType.isParent = tokType.categoryMatches.length > 0
   })
 }
@@ -56,7 +56,7 @@ export function expandCategories(tokenTypes: TokenType[]): TokenType[] {
   let searching = true
   while (searching) {
     categories = compact(
-      flatten(map(categories, currTokType => currTokType.CATEGORIES))
+      flatten(map(categories, (currTokType) => currTokType.CATEGORIES))
     )
 
     let newCategories = difference(categories, result)
@@ -73,7 +73,7 @@ export function expandCategories(tokenTypes: TokenType[]): TokenType[] {
 }
 
 export function assignTokenDefaultProps(tokenTypes: TokenType[]): void {
-  forEach(tokenTypes, currTokType => {
+  forEach(tokenTypes, (currTokType) => {
     if (!hasShortKeyProperty(currTokType)) {
       tokenIdxToClass[tokenShortNameIdx] = currTokType
       ;(<any>currTokType).tokenTypeIdx = tokenShortNameIdx++
@@ -104,7 +104,7 @@ export function assignTokenDefaultProps(tokenTypes: TokenType[]): void {
 }
 
 export function assignCategoriesTokensProp(tokenTypes: TokenType[]): void {
-  forEach(tokenTypes, currTokType => {
+  forEach(tokenTypes, (currTokType) => {
     // avoid duplications
     currTokType.categoryMatches = []
     forEach(currTokType.categoryMatchesMap, (val, key) => {
@@ -114,7 +114,7 @@ export function assignCategoriesTokensProp(tokenTypes: TokenType[]): void {
 }
 
 export function assignCategoriesMapProp(tokenTypes: TokenType[]): void {
-  forEach(tokenTypes, currTokType => {
+  forEach(tokenTypes, (currTokType) => {
     singleAssignCategoriesToksMap([], currTokType)
   })
 }
@@ -123,11 +123,11 @@ export function singleAssignCategoriesToksMap(
   path: TokenType[],
   nextNode: TokenType
 ): void {
-  forEach(path, pathNode => {
+  forEach(path, (pathNode) => {
     nextNode.categoryMatchesMap[pathNode.tokenTypeIdx] = true
   })
 
-  forEach(nextNode.CATEGORIES, nextCategory => {
+  forEach(nextNode.CATEGORIES, (nextCategory) => {
     const newPath = path.concat(nextNode)
     // avoids infinite loops due to cyclic categories.
     if (!contains(newPath, nextCategory)) {

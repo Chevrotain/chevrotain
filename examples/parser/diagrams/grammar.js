@@ -1,6 +1,6 @@
 // wrapping in UMD to allow code to work both in node.js
 // and in the browser
-;(function(root, factory) {
+;(function (root, factory) {
   if (typeof module === "object" && module.exports) {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
@@ -10,7 +10,7 @@
     // Browser globals (root is window)
     root["grammar"] = factory(root.chevrotain)
   }
-})(this, function(chevrotain) {
+})(this, function (chevrotain) {
   // ----------------- lexer -----------------
   const createToken = chevrotain.createToken
   const Lexer = chevrotain.Lexer
@@ -64,7 +64,7 @@
     // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
     const $ = this
 
-    this.RULE("json", function() {
+    this.RULE("json", function () {
       // prettier-ignore
       $.OR([
                 {ALT: function() {$.SUBRULE($.object)}},
@@ -72,11 +72,11 @@
             ])
     })
 
-    this.RULE("object", function() {
+    this.RULE("object", function () {
       $.CONSUME(LCurly)
-      $.OPTION(function() {
+      $.OPTION(function () {
         $.SUBRULE($.objectItem)
-        $.MANY(function() {
+        $.MANY(function () {
           $.CONSUME(Comma)
           $.SUBRULE2($.objectItem)
         })
@@ -84,17 +84,17 @@
       $.CONSUME(RCurly)
     })
 
-    this.RULE("objectItem", function() {
+    this.RULE("objectItem", function () {
       $.CONSUME(StringLiteral)
       $.CONSUME(Colon)
       $.SUBRULE($.value)
     })
 
-    this.RULE("array", function() {
+    this.RULE("array", function () {
       $.CONSUME(LSquare)
-      $.OPTION(function() {
+      $.OPTION(function () {
         $.SUBRULE($.value)
-        $.MANY(function() {
+        $.MANY(function () {
           $.CONSUME(Comma)
           $.SUBRULE2($.value)
         })
@@ -102,7 +102,7 @@
       $.CONSUME(RSquare)
     })
 
-    this.RULE("value", function() {
+    this.RULE("value", function () {
       // prettier-ignore
       $.OR([
                 {ALT: function() {$.CONSUME(StringLiteral)}},
@@ -131,7 +131,7 @@
   const parser = new JsonParser()
 
   return {
-    parse: function(text) {
+    parse: function (text) {
       const lexResult = JsonLexer.tokenize(text)
 
       // setting a new input will RESET the parser instance's state.

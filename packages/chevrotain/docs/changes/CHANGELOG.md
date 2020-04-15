@@ -959,14 +959,14 @@ so not many changes will be needed (if at all) for most users.
 
   ```javascript
   // old deprecated form
-  this.RULE_NO_RESYNC("createStmt", function() {
+  this.RULE_NO_RESYNC("createStmt", function () {
     /* ... */
   })
 
   // new form
   this.RULE(
     "createStmt",
-    function() {
+    function () {
       /* ... */
     },
     { resyncEnabled: false }

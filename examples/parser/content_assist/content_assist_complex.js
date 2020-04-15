@@ -184,7 +184,7 @@ function getContentAssistSuggestions(text, symbolTable) {
 
   // throw away any suggestion that is not a suffix of the last partialToken.
   if (partialSuggestionMode) {
-    finalSuggestions = _.filter(finalSuggestions, currSuggestion => {
+    finalSuggestions = _.filter(finalSuggestions, (currSuggestion) => {
       return _.startsWith(currSuggestion, lastInputToken.image)
     })
   }

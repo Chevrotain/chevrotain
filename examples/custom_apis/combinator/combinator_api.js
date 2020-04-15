@@ -66,7 +66,7 @@ function delimited(item, separator) {
 
 // rule: A | B | C | ...
 function choice(...alternatives) {
-  const altsDefs = _.map(alternatives, alt => {
+  const altsDefs = _.map(alternatives, (alt) => {
     return new Alternative({ definition: toDefinition(alt) })
   })
 
@@ -166,13 +166,13 @@ const combinatorGrammarErrorMsgProvider = _.clone(
 )
 
 // Secondly we "override" one of the methods to customize it.
-combinatorGrammarErrorMsgProvider.buildAlternationAmbiguityError = function({
+combinatorGrammarErrorMsgProvider.buildAlternationAmbiguityError = function ({
   topLevelRule,
   prefixPath,
   ambiguityIndices,
   alternation
 }) {
-  let pathMsg = _.map(prefixPath, tokType => tokenLabel(tokType)).join(", ")
+  let pathMsg = _.map(prefixPath, (tokType) => tokenLabel(tokType)).join(", ")
   let errMsg =
     `Ambiguous alternatives: <${ambiguityIndices.join(" ,")}> in <${
       alternation.orgText

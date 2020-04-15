@@ -58,7 +58,7 @@ export class LooksAhead {
   }
 
   preComputeLookaheadFunctions(this: MixedInParser, rules: Rule[]): void {
-    forEach(rules, currRule => {
+    forEach(rules, (currRule) => {
       this.TRACE_INIT(`${currRule.name} Rule Lookahead`, () => {
         const {
           alternation,
@@ -69,7 +69,7 @@ export class LooksAhead {
           repetitionWithSeparator
         } = collectMethods(currRule)
 
-        forEach(alternation, currProd => {
+        forEach(alternation, (currProd) => {
           const prodIdx = currProd.idx === 0 ? "" : currProd.idx
           this.TRACE_INIT(`${getProductionDslName(currProd)}${prodIdx}`, () => {
             const laFunc = buildLookaheadFuncForOr(
@@ -90,7 +90,7 @@ export class LooksAhead {
           })
         })
 
-        forEach(repetition, currProd => {
+        forEach(repetition, (currProd) => {
           this.computeLookaheadFunc(
             currRule,
             currProd.idx,
@@ -101,7 +101,7 @@ export class LooksAhead {
           )
         })
 
-        forEach(option, currProd => {
+        forEach(option, (currProd) => {
           this.computeLookaheadFunc(
             currRule,
             currProd.idx,
@@ -112,7 +112,7 @@ export class LooksAhead {
           )
         })
 
-        forEach(repetitionMandatory, currProd => {
+        forEach(repetitionMandatory, (currProd) => {
           this.computeLookaheadFunc(
             currRule,
             currProd.idx,
@@ -123,7 +123,7 @@ export class LooksAhead {
           )
         })
 
-        forEach(repetitionMandatoryWithSeparator, currProd => {
+        forEach(repetitionMandatoryWithSeparator, (currProd) => {
           this.computeLookaheadFunc(
             currRule,
             currProd.idx,
@@ -134,7 +134,7 @@ export class LooksAhead {
           )
         })
 
-        forEach(repetitionWithSeparator, currProd => {
+        forEach(repetitionWithSeparator, (currProd) => {
           this.computeLookaheadFunc(
             currRule,
             currProd.idx,

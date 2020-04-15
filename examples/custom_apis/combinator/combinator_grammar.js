@@ -31,7 +31,7 @@ const jsonParserInstance = c.createParser(
   tokens
 )
 
-module.exports = function(text) {
+module.exports = function (text) {
   const lexResult = JsonLexer.tokenize(text)
 
   if (lexResult.errors.length > 0) {

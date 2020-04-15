@@ -57,7 +57,7 @@ module.exports = {
   Do: Do,
   Whitespace: Whitespace,
 
-  tokenize: function(text) {
+  tokenize: function (text) {
     const lexResult = keywordsVsIdentifiersLexer.tokenize(text)
 
     if (lexResult.errors.length > 0) {

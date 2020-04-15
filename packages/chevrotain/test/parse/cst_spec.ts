@@ -6,7 +6,7 @@ import { map } from "../../src/utils/utils"
 import { CstNode, IToken, TokenType } from "../../api"
 
 function createTokenVector(tokTypes: TokenType[]): any[] {
-  return map(tokTypes, curTokType => {
+  return map(tokTypes, (curTokType) => {
     return createRegularToken(curTokType)
   })
 }

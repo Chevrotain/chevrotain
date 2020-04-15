@@ -54,7 +54,7 @@ class JsonParserWithComments extends JsonParser {
 // reuse the same parser instance.
 const parser = new JsonParserWithComments([])
 
-module.exports = function(text) {
+module.exports = function (text) {
   const lexResult = JsonWithCommentsLexer.tokenize(text)
   // setting a new input will RESET the parser instance's state.
   parser.input = lexResult.tokens

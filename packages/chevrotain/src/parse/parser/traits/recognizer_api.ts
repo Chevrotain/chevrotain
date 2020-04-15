@@ -685,7 +685,7 @@ export class RecognizerApi {
     grammarRule: (...args: any[]) => T,
     args?: any[]
   ): () => boolean {
-    return function() {
+    return function () {
       // save org state
       this.isBackTrackingStack.push(1)
       const orgState = this.saveRecogState()

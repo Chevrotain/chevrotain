@@ -117,7 +117,7 @@ describe("Chevrotain Tutorial", () => {
       // CstNode
       if (cstElement.children !== undefined) {
         cstElement.children = _.omitBy(cstElement.children, _.isEmpty)
-        _.forEach(cstElement.children, childArr => {
+        _.forEach(cstElement.children, (childArr) => {
           _.forEach(childArr, minimizeCst)
         })
       }

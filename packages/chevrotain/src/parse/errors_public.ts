@@ -54,8 +54,8 @@ export const defaultParserErrorProvider: IParserErrorMessageProvider = {
       )
       let nextValidTokenSequences = map(
         allLookAheadPaths,
-        currPath =>
-          `[${map(currPath, currTokenType => tokenLabel(currTokenType)).join(
+        (currPath) =>
+          `[${map(currPath, (currTokenType) => tokenLabel(currTokenType)).join(
             ", "
           )}]`
       )
@@ -87,8 +87,8 @@ export const defaultParserErrorProvider: IParserErrorMessageProvider = {
     } else {
       let nextValidTokenSequences = map(
         expectedIterationPaths,
-        currPath =>
-          `[${map(currPath, currTokenType => tokenLabel(currTokenType)).join(
+        (currPath) =>
+          `[${map(currPath, (currTokenType) => tokenLabel(currTokenType)).join(
             ","
           )}]`
       )
@@ -176,7 +176,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
     ambiguityIndices: number[]
     alternation: Alternation
   }): string {
-    const pathMsg = map(options.prefixPath, currTok =>
+    const pathMsg = map(options.prefixPath, (currTok) =>
       tokenLabel(currTok)
     ).join(", ")
     const occurrence =
@@ -199,9 +199,9 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
     ambiguityIndices: number[]
     alternation: Alternation
   }): string {
-    let pathMsg = map(options.prefixPath, currtok => tokenLabel(currtok)).join(
-      ", "
-    )
+    let pathMsg = map(options.prefixPath, (currtok) =>
+      tokenLabel(currtok)
+    ).join(", ")
     let occurrence =
       options.alternation.idx === 0 ? "" : options.alternation.idx
     let currMessage =
@@ -276,7 +276,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
     const ruleName = options.topLevelRule.name
     let pathNames = utils.map(
       options.leftRecursionPath,
-      currRule => currRule.name
+      (currRule) => currRule.name
     )
     let leftRecursivePath = `${ruleName} --> ${pathNames
       .concat([ruleName])

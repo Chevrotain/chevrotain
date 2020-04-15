@@ -197,7 +197,7 @@ class GermanCommandsParser extends AbstractCommandsParser {
 const englishParser = new EnglishCommandsParser()
 const germanParser = new GermanCommandsParser()
 
-module.exports = function(text, language) {
+module.exports = function (text, language) {
   // lex
   let lexer
   // match language and lexer.
