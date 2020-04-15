@@ -1,5 +1,5 @@
 const _ = require("lodash")
-const vueSlugify = require("vuepress/lib/markdown/slugify")
+const vueSlugify = require("@vuepress/shared-utils/lib/slugify")
 const jf = require("jsonfile")
 const path = require("path")
 
