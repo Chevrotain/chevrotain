@@ -167,10 +167,8 @@ function genDSLRule(
 
   if (prod.separator) {
     result += "{" + NL
-    if (prod.separator) {
-      result +=
-        indent(n + 1, `SEP: this.tokensMap.${prod.separator.name}`) + "," + NL
-    }
+    result +=
+      indent(n + 1, `SEP: this.tokensMap.${prod.separator.name}`) + "," + NL
     result += `DEF: ${genDefFunction(prod.definition, n + 2)}` + NL
     result += indent(n, "}") + NL
   } else {

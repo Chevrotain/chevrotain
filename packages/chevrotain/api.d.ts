@@ -66,7 +66,7 @@ declare abstract class BaseParser {
 
   /**
    * @param grammarRule - The rule to try and parse in backtracking mode.
-   * @param args - argumens to be passed to the grammar rule execution
+   * @param args - argument to be passed to the grammar rule execution
    *
    * @return a lookahead function that will try to parse the given grammarRule and will return true if succeed.
    */

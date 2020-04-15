@@ -309,6 +309,9 @@ export function analyzeTokenTypes(
                   : charOrInt
               const currOptimizedIdx = charCodeToOptimizedIndex(charCode)
               // Avoid adding the config multiple times
+              /* istanbul ignore else */
+              // - Difficult to check this scenario effects as it is only a performance
+              //   optimization that does not change correctness
               if (lastOptimizedIdx !== currOptimizedIdx) {
                 lastOptimizedIdx = currOptimizedIdx
                 addToMapOfArrays(

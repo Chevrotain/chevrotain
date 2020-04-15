@@ -217,16 +217,10 @@ export class TreeBuilder {
     ruleCstResult: CstNode,
     ruleName: string
   ): void {
-    // Avoid side effects due to back tracking
-    // TODO: This costs a 2-3% in performance, A flag on IParserConfig
-    //   could be used to get rid of this conditional, but not sure its worth the effort
-    //   and API complexity.
-    if (this.isBackTracking() !== true) {
-      const preCstNode = this.CST_STACK[this.CST_STACK.length - 1]
-      addNoneTerminalToCst(preCstNode, ruleName, ruleCstResult)
-      // This is only used when **both** error recovery and CST Output are enabled.
-      this.setNodeLocationFromNode(preCstNode.location, ruleCstResult.location)
-    }
+    const preCstNode = this.CST_STACK[this.CST_STACK.length - 1]
+    addNoneTerminalToCst(preCstNode, ruleName, ruleCstResult)
+    // This is only used when **both** error recovery and CST Output are enabled.
+    this.setNodeLocationFromNode(preCstNode.location, ruleCstResult.location)
   }
 
   getBaseCstVisitorConstructor(
