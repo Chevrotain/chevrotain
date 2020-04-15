@@ -20,7 +20,7 @@ export class LexerAdapter {
     this.currIdx = -1
   }
 
-  set input(this: MixedInParser, newInput: IToken[]) {
+  set input(newInput: IToken[]) {
     if (this.selfAnalysisDone !== true) {
       throw Error(
         `Missing <performSelfAnalysis> invocation at the end of the Parser's constructor.`

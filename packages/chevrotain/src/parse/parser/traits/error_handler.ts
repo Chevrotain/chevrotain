@@ -48,11 +48,11 @@ export class ErrorHandler {
     }
   }
 
-  get errors(this: MixedInParser): IRecognitionException[] {
+  get errors(): IRecognitionException[] {
     return cloneArr(this._errors)
   }
 
-  set errors(this: MixedInParser, newErrors: IRecognitionException[]) {
+  set errors(newErrors: IRecognitionException[]) {
     this._errors = newErrors
   }
 
