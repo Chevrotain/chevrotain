@@ -7,11 +7,18 @@
 #### Minor Changes
 
 - [Improved Type Signature for 'OR' method](https://github.com/SAP/chevrotain/issues/970)
+
   - Thanks to [@OmarTawfik](https://github.com/OmarTawfik) :thumbsup
+
+#### Bug Fixes
+
+- [Literal single token character "ignore case" flag bug.](https://github.com/SAP/chevrotain/issues/1141)
+  - Thanks to [@janisdd](https://github.com/janisdd) :thumbsup
 
 #### Documentation
 
 - [Clarify Lexer Limitation: "Complement Sets cannot be automatically optimized" Docs.](https://github.com/SAP/chevrotain/issues/1044)
+- [document `recoveredNode` property on CST Nodes.](https://github.com/SAP/chevrotain/commit/09afb8d5187c596def3932625b53aac84e6d2d02)
 
 ## 6.5.0 (9-20-2019)
 
