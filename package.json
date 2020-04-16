@@ -17,6 +17,7 @@
     "format:validate": "prettier --ignore-path .gitignore --check \"**/*.@(ts|js|json|md|yml)\""
   },
   "prettier": {
+    "endOfLine": "lf",
     "trailingComma": "none",
     "semi": false
   },

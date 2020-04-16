@@ -1,6 +1,7 @@
 /.idea/workspace.xml
 node_modules
 /.idea/dictionaries/
+/.idea/
 /.tscache
 .baseDir.ts
 /bower_components
