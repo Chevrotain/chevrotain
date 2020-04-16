@@ -881,7 +881,7 @@ class ECMAScript5Parser extends EmbeddedActionsParser {
     const seekEnd = nextToken.startOffset - 1
 
     let i = seekStart
-    while (i < seekEnd) {
+    while (i <= seekEnd) {
       const code = this._orgText.charCodeAt(i)
       if (code === 10 || code === 13 || code === 0x2028 || code === 0x2029) {
         return true
