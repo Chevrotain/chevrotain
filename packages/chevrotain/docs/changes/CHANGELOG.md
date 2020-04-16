@@ -10,6 +10,8 @@
 
   - Thanks to [@OmarTawfik](https://github.com/OmarTawfik) :thumbsup
 
+- [Include source maps and original \*.ts sources in npm package](https://github.com/SAP/chevrotain/issues/1167)
+
 #### Bug Fixes
 
 - [Literal single token character "ignore case" flag bug.](https://github.com/SAP/chevrotain/issues/1141)
