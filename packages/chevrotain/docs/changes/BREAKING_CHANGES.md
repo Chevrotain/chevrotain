@@ -62,6 +62,45 @@
   this.OR<any>(/* ... */)
   ```
 
+- All properties of the Interface `errorMessageProvider` are **mandatory**.
+  To defer to the default error message template behavior, defer to `chevrotain.defaultParserErrorProvider`, e.g:
+
+  ```typescript
+  import {
+    defaultParserErrorProvider,
+    IParserErrorMessageProvider,
+    IToken,
+    TokenType
+  } from "chevrotain"
+
+  class myCustomErrorMsgProvider implements IParserErrorMessageProvider {
+    buildNoViableAltMessage(options: {
+      expectedPathsPerAlt: TokenType[][][]
+      actual: IToken[]
+      previous: IToken
+      customUserDescription: string
+      ruleName: string
+    }): string {
+      // Custom user error message builder
+      return "sad sad panda:" + options.actual[0].image
+    }
+
+    buildEarlyExitMessage(options: {
+      expectedIterationPaths: TokenType[][]
+      actual: IToken[]
+      previous: IToken
+      customUserDescription: string
+      ruleName: string
+    }): string {
+      // invoking the default error message string builder.
+      return defaultParserErrorProvider.buildEarlyExitMessage(options)
+    }
+
+    // Implementation of other properties from `IParserErrorMessageProvider`
+    // ...
+  }
+  ```
+
 - The TokenType's `tokenName` property has been deprecated (This actually happened in 6.3.1...) use the `name` property instead.
 
 - The GAST `Flat` class was renamed to `Alternative`.

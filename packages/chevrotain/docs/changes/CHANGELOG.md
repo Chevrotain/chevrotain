@@ -15,7 +15,10 @@
 #### Bug Fixes
 
 - [Literal single token character "ignore case" flag bug.](https://github.com/SAP/chevrotain/issues/1141)
+
   - Thanks to [@janisdd](https://github.com/janisdd) :thumbsup
+
+- [IParserErrorMessageProvider properties must be implemented as **own** properties.](https://github.com/SAP/chevrotain/issues/1129)
 
 #### Documentation
 

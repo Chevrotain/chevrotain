@@ -8,7 +8,7 @@ import {
   isRecognitionException,
   NoViableAltException
 } from "../../exceptions_public"
-import { cloneArr, defaults } from "../../../utils/utils"
+import { cloneArr, has } from "../../../utils/utils"
 import {
   getLookaheadPathsForOptionalProd,
   getLookaheadPathsForOr,
@@ -26,10 +26,9 @@ export class ErrorHandler {
 
   initErrorHandler(config: IParserConfig) {
     this._errors = []
-    this.errorMessageProvider = defaults(
-      config.errorMessageProvider,
-      DEFAULT_PARSER_CONFIG.errorMessageProvider
-    )
+    this.errorMessageProvider = has(config, "errorMessageProvider")
+      ? config.errorMessageProvider
+      : DEFAULT_PARSER_CONFIG.errorMessageProvider
   }
 
   SAVE_ERROR(

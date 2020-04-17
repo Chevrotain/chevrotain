@@ -2035,6 +2035,10 @@ export interface IParserConfig {
   skipValidations?: boolean
 }
 
+/**
+ * A set of methods used to customize parsing error messages.
+ * Call {@link defaultParserErrorProvider} to implement the default behavior
+ */
 export interface IParserErrorMessageProvider {
   /**
    * Mismatched Token Error happens when the parser attempted to consume a terminal and failed.
@@ -2049,7 +2053,7 @@ export interface IParserErrorMessageProvider {
    *
    * @param options.ruleName - The rule in which the error occurred.
    */
-  buildMismatchTokenMessage?(options: {
+  buildMismatchTokenMessage(options: {
     expected: TokenType
     actual: IToken
     previous: IToken
@@ -2063,7 +2067,7 @@ export interface IParserErrorMessageProvider {
    *
    * @param options.ruleName - The rule in which the error occurred.
    */
-  buildNotAllInputParsedMessage?(options: {
+  buildNotAllInputParsedMessage(options: {
     firstRedundant: IToken
     ruleName: string
   }): string
@@ -2084,7 +2088,7 @@ export interface IParserErrorMessageProvider {
    *
    * @param options.ruleName - The rule in which the error occurred.
    */
-  buildNoViableAltMessage?(options: {
+  buildNoViableAltMessage(options: {
     expectedPathsPerAlt: TokenType[][][]
     actual: IToken[]
     previous: IToken
@@ -2107,7 +2111,7 @@ export interface IParserErrorMessageProvider {
    *
    * @param options.ruleName - The rule in which the error occurred.
    */
-  buildEarlyExitMessage?(options: {
+  buildEarlyExitMessage(options: {
     expectedIterationPaths: TokenType[][]
     actual: IToken[]
     previous: IToken

@@ -42,9 +42,11 @@ const myErrorProvider = {
     // changing the template of the error message #1
     return `very bad dog! you still have some input remaining at offset:${options.firstRedundant.startOffset}`
   },
-  // we are not overriding "buildNoViableAltMessage"
-  // the default implementation will be automatically used instead.
-  // buildNoViableAltMessage: function(options) {},
+
+  buildNoViableAltMessage: function (options) {
+    // defer to the default implementation for `buildNoViableAltMessage`
+    return defaultParserErrorProvider.buildNoViableAltMessage(options)
+  },
 
   buildEarlyExitMessage: function (options) {
     // translating the error message to Spanish

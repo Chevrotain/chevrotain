@@ -339,9 +339,6 @@ export function assignNoOverwrite(
 ): Object {
   for (let i = 0; i < sources.length; i++) {
     let curSource = sources[i]
-    if (isUndefined(curSource)) {
-      continue
-    }
     let currSourceKeys = keys(curSource)
     for (let j = 0; j < currSourceKeys.length; j++) {
       let currKey = currSourceKeys[j]
