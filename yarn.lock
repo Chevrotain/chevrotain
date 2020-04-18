@@ -5722,9 +5722,9 @@ gitconfiglocal@^1.0.0:
     ini "^1.3.2"
 
 gitty@^3.6.0:
-  version "3.7.1"
-  resolved "https://registry.yarnpkg.com/gitty/-/gitty-3.7.1.tgz#11fdb4c85cd9a1b5f75574d558f0bdd774186b9c"
-  integrity sha512-SvHYMmSJeqAtNU0w18LlORkbREwrM/dXcQ+r72hBgnpZa9XDvG69iBe4CFG06yQLHE94F/leOn6K5JWZm8tmcw==
+  version "3.7.2"
+  resolved "https://registry.yarnpkg.com/gitty/-/gitty-3.7.2.tgz#81634085f18d347f885b01d1bbd1713fe8ce743e"
+  integrity sha512-ywg8ic2arweoBSXJCrsAWDxDnyRzobGt6YYAXvyVL9E7vQMGtqz4AUBJin5+uW6EepCahrk+D2LY72cuLQpomw==
 
 glob-parent@^3.1.0:
   version "3.1.0"
