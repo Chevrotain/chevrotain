@@ -1,11 +1,11 @@
 {
   "name": "chevrotain_examples_custom_apis",
-  "version": "6.5.0",
+  "version": "7.0.0",
   "scripts": {
     "test": "mocha \"!(node_modules)/**/*_spec.js\""
   },
   "dependencies": {
-    "chevrotain": "^6.5.0"
+    "chevrotain": "^7.0.0"
   },
   "private": true
 }

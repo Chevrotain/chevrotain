@@ -34,8 +34,8 @@ as any other pure code without requiring any new tools or processes.
     - `https://unpkg.com/chevrotain/lib/chevrotain.js`
     - `https://unpkg.com/chevrotain/lib/chevrotain.min.js`
   - Explicit version number:
-    - `https://unpkg.com/chevrotain@6.5.0/lib/chevrotain.js`
-    - `https://unpkg.com/chevrotain@6.5.0/lib/chevrotain.min.js`
+    - `https://unpkg.com/chevrotain@7.0.0/lib/chevrotain.js`
+    - `https://unpkg.com/chevrotain@7.0.0/lib/chevrotain.min.js`
 
 ## Documentation & Resources
 
@@ -49,7 +49,7 @@ as any other pure code without requiring any new tools or processes.
 
 - **[HTML API docs](https://sap.github.io/chevrotain/documentation).**
 
-  - [The Parsing DSL Docs](https://sap.github.io/chevrotain/documentation/6_5_0/classes/parser.html#at_least_one).
+  - [The Parsing DSL Docs](https://sap.github.io/chevrotain/documentation/7_0_0/classes/parser.html#at_least_one).
 
 ## Dependencies
 
