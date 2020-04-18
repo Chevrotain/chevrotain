@@ -62,7 +62,7 @@
   this.OR<any>(/* ... */)
   ```
 
-- All properties of the Interface `errorMessageProvider` are **mandatory**.
+- All methods of the Interface `errorMessageProvider` are now **mandatory**.
   To defer to the default error message template behavior, defer to `chevrotain.defaultParserErrorProvider`, e.g:
 
   ```typescript
