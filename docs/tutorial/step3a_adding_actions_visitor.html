@@ -4,14 +4,26 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Tutorial - Semantics CST Visitor | Chevrotain</title>
+    <meta name="generator" content="VuePress 1.4.1">
+    
     <meta name="description" content="Parser Building Toolkit for JavaScript">
-    
-    
-    <link rel="preload" href="/chevrotain/docs/assets/css/0.styles.4a8df942.css" as="style"><link rel="preload" href="/chevrotain/docs/assets/js/app.a6d3cdf3.js" as="script"><link rel="preload" href="/chevrotain/docs/assets/js/44.f3391912.js" as="script"><link rel="prefetch" href="/chevrotain/docs/assets/js/10.6ecb427b.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/11.1d0ad6c7.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/12.a64f8d5a.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/13.8b99c4b8.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/14.d6fd1a6d.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/15.2eca922b.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/16.03595df0.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/17.0e712e48.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/18.e0fce0db.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/19.2b641377.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/20.eb9063ae.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/21.57642e24.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/22.b306613a.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/23.0281f32c.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/24.d33e4975.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/25.5231399c.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/26.e4e2ce2b.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/27.6f2e17a8.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/28.da2c5bb1.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/29.ec02d053.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/3.3cff5854.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/30.90b30e61.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/31.f61e9150.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/32.9eb943f2.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/33.023a203b.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/34.687b734a.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/35.81cf4653.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/36.00a74cef.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/37.0fb983e9.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/38.c4c18f63.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/39.698f7b58.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/4.471def21.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/40.bdd8776c.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/41.29e3a539.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/42.e2644440.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/43.4169b617.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/45.6cbad6cb.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/46.9b895d88.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/47.7042e1ba.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/5.21be642c.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/6.749a35a2.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/7.6483ca33.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/8.7cf44501.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/9.aa305f4c.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/vendors~docsearch.35738036.js">
-    <link rel="stylesheet" href="/chevrotain/docs/assets/css/0.styles.4a8df942.css">
+    <link rel="preload" href="/chevrotain/docs/assets/css/0.styles.69866cb9.css" as="style"><link rel="preload" href="/chevrotain/docs/assets/js/app.f4313b86.js" as="script"><link rel="preload" href="/chevrotain/docs/assets/js/3.1d3331a1.js" as="script"><link rel="preload" href="/chevrotain/docs/assets/js/46.ed7077a3.js" as="script"><link rel="prefetch" href="/chevrotain/docs/assets/js/10.595afdc4.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/11.f7969197.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/12.a766aeb5.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/13.f58471ae.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/14.55bafbd6.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/15.3a6344ac.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/16.204eab1c.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/17.3c061e13.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/18.77edc394.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/19.875a0737.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/20.51403d53.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/21.d95500bb.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/22.0a88f440.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/23.b2184ab8.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/24.a813314d.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/25.cc5ecb38.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/26.0d88649d.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/27.dd6a6130.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/28.2ceba9f9.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/29.c54709fc.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/30.1fa78200.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/31.1af6b88a.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/32.ccee860e.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/33.3c5c5852.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/34.cc0e2c79.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/35.1f6877fc.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/36.39a02e9a.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/37.ad6f5b7f.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/38.282a1021.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/39.192785fc.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/4.74a9e780.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/40.a1c4ffc4.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/41.dfc22b3a.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/42.c414201a.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/43.9bee8f5e.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/44.f70a442f.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/45.f7a03eeb.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/47.6d14f2cf.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/48.46d36698.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/49.72b1f1b2.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/5.78bc163e.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/6.382678a4.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/7.acf9180e.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/8.3888f7b2.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/9.fe198670.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/vendors~docsearch.d4a8ace8.js">
+    <link rel="stylesheet" href="/chevrotain/docs/assets/css/0.styles.69866cb9.css">
   </head>
   <body>
-    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/chevrotain/docs/" class="home-link router-link-active"><!----> <span class="site-name">Chevrotain</span></a> <div class="links" style="max-width:nullpx;"><form id="search-form" class="algolia-search-wrapper search-box"><input id="algolia-search-input" class="search-query"></form> <nav class="nav-links can-hide"><div class="nav-item"><a href="/chevrotain/docs/" class="nav-link">Home</a></div><div class="nav-item"><a href="/chevrotain/docs/features/blazing_fast.html" class="nav-link">Features</a></div><div class="nav-item"><a href="/chevrotain/docs/tutorial/step0_introduction.html" class="nav-link">Tutorial</a></div><div class="nav-item"><a href="/chevrotain/docs/guide/introduction.html" class="nav-link">Guide</a></div><div class="nav-item"><a href="/chevrotain/docs/FAQ.html" class="nav-link">FAQ</a></div><div class="nav-item"><a href="/chevrotain/docs/changes/BREAKING_CHANGES.html" class="nav-link">Changes</a></div><div class="nav-item"><a href="https://sap.github.io/chevrotain/documentation/6_5_0/globals.html" target="_blank" rel="noopener noreferrer" class="nav-link external">
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/chevrotain/docs/" class="home-link router-link-active"><!----> <span class="site-name">Chevrotain</span></a> <div class="links"><form id="search-form" role="search" class="algolia-search-wrapper search-box"><input id="algolia-search-input" class="search-query"></form> <nav class="nav-links can-hide"><div class="nav-item"><a href="/chevrotain/docs/" class="nav-link">
+  Home
+</a></div><div class="nav-item"><a href="/chevrotain/docs/features/blazing_fast.html" class="nav-link">
+  Features
+</a></div><div class="nav-item"><a href="/chevrotain/docs/tutorial/step0_introduction.html" class="nav-link">
+  Tutorial
+</a></div><div class="nav-item"><a href="/chevrotain/docs/guide/introduction.html" class="nav-link">
+  Guide
+</a></div><div class="nav-item"><a href="/chevrotain/docs/FAQ.html" class="nav-link">
+  FAQ
+</a></div><div class="nav-item"><a href="/chevrotain/docs/changes/BREAKING_CHANGES.html" class="nav-link">
+  Changes
+</a></div><div class="nav-item"><a href="https://sap.github.io/chevrotain/documentation/7_0_0/globals.html" target="_blank" rel="noopener noreferrer" class="nav-link external">
   APIs
   <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></div><div class="nav-item"><a href="https://sap.github.io/chevrotain/playground/" target="_blank" rel="noopener noreferrer" class="nav-link external">
   Playground
@@ -21,7 +33,19 @@
   Chat
   <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></div> <a href="https://github.com/SAP/chevrotain" target="_blank" rel="noopener noreferrer" class="repo-link">
     GitHub
-    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></nav></div></header> <div class="sidebar-mask"></div> <div class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/chevrotain/docs/" class="nav-link">Home</a></div><div class="nav-item"><a href="/chevrotain/docs/features/blazing_fast.html" class="nav-link">Features</a></div><div class="nav-item"><a href="/chevrotain/docs/tutorial/step0_introduction.html" class="nav-link">Tutorial</a></div><div class="nav-item"><a href="/chevrotain/docs/guide/introduction.html" class="nav-link">Guide</a></div><div class="nav-item"><a href="/chevrotain/docs/FAQ.html" class="nav-link">FAQ</a></div><div class="nav-item"><a href="/chevrotain/docs/changes/BREAKING_CHANGES.html" class="nav-link">Changes</a></div><div class="nav-item"><a href="https://sap.github.io/chevrotain/documentation/6_5_0/globals.html" target="_blank" rel="noopener noreferrer" class="nav-link external">
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/chevrotain/docs/" class="nav-link">
+  Home
+</a></div><div class="nav-item"><a href="/chevrotain/docs/features/blazing_fast.html" class="nav-link">
+  Features
+</a></div><div class="nav-item"><a href="/chevrotain/docs/tutorial/step0_introduction.html" class="nav-link">
+  Tutorial
+</a></div><div class="nav-item"><a href="/chevrotain/docs/guide/introduction.html" class="nav-link">
+  Guide
+</a></div><div class="nav-item"><a href="/chevrotain/docs/FAQ.html" class="nav-link">
+  FAQ
+</a></div><div class="nav-item"><a href="/chevrotain/docs/changes/BREAKING_CHANGES.html" class="nav-link">
+  Changes
+</a></div><div class="nav-item"><a href="https://sap.github.io/chevrotain/documentation/7_0_0/globals.html" target="_blank" rel="noopener noreferrer" class="nav-link external">
   APIs
   <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></div><div class="nav-item"><a href="https://sap.github.io/chevrotain/playground/" target="_blank" rel="noopener noreferrer" class="nav-link external">
   Playground
@@ -31,20 +55,20 @@
   Chat
   <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></div> <a href="https://github.com/SAP/chevrotain" target="_blank" rel="noopener noreferrer" class="repo-link">
     GitHub
-    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></nav>  <ul class="sidebar-links"><li><div class="sidebar-group first"><p class="sidebar-heading open"><span>Tutorial</span> <!----></p> <ul class="sidebar-group-items"><li><a href="/chevrotain/docs/tutorial/step0_introduction.html" class="sidebar-link">Introduction</a></li><li><a href="/chevrotain/docs/tutorial/step1_lexing.html" class="sidebar-link">Lexer</a></li><li><a href="/chevrotain/docs/tutorial/step2_parsing.html" class="sidebar-link">Parser</a></li><li><a href="/chevrotain/docs/tutorial/step3_adding_actions_root.html" class="sidebar-link">Semantics</a></li><li><a href="/chevrotain/docs/tutorial/step3a_adding_actions_visitor.html" class="active sidebar-link">Semantics - CST Visitor</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/chevrotain/docs/tutorial/step3a_adding_actions_visitor.html#introduction" class="sidebar-link">Introduction</a></li><li class="sidebar-sub-header"><a href="/chevrotain/docs/tutorial/step3a_adding_actions_visitor.html#enabling-cst" class="sidebar-link">Enabling CST</a></li><li class="sidebar-sub-header"><a href="/chevrotain/docs/tutorial/step3a_adding_actions_visitor.html#the-cst-visitor" class="sidebar-link">The CST Visitor</a></li><li class="sidebar-sub-header"><a href="/chevrotain/docs/tutorial/step3a_adding_actions_visitor.html#visitor-methods" class="sidebar-link">Visitor Methods</a></li><li class="sidebar-sub-header"><a href="/chevrotain/docs/tutorial/step3a_adding_actions_visitor.html#full-visitor" class="sidebar-link">Full Visitor</a></li></ul></li><li><a href="/chevrotain/docs/tutorial/step3b_adding_actions_embedded.html" class="sidebar-link">Semantics - Embedded</a></li><li><a href="/chevrotain/docs/tutorial/step4_fault_tolerance.html" class="sidebar-link">Fault Tolerance</a></li></ul></div></li></ul> </div> <div class="page"> <div class="content"><h1 id="tutorial-semantics-cst-visitor"><a href="#tutorial-semantics-cst-visitor" aria-hidden="true" class="header-anchor">#</a> Tutorial - Semantics CST Visitor</h1> <p><a href="https://github.com/SAP/chevrotain/tree/master/examples/tutorial/step3_actions/step3a_actions_visitor.js" target="_blank" rel="noopener noreferrer">Run and Debug the source code<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a>.</p> <h2 id="introduction"><a href="#introduction" aria-hidden="true" class="header-anchor">#</a> Introduction</h2> <p>In the <a href="/chevrotain/docs/tutorial/step2_parsing.html">previous</a> tutorial step
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>Tutorial</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/chevrotain/docs/tutorial/step0_introduction.html" class="sidebar-link">Introduction</a></li><li><a href="/chevrotain/docs/tutorial/step1_lexing.html" class="sidebar-link">Lexer</a></li><li><a href="/chevrotain/docs/tutorial/step2_parsing.html" class="sidebar-link">Parser</a></li><li><a href="/chevrotain/docs/tutorial/step3_adding_actions_root.html" class="sidebar-link">Semantics</a></li><li><a href="/chevrotain/docs/tutorial/step3a_adding_actions_visitor.html" class="active sidebar-link">Semantics - CST Visitor</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/chevrotain/docs/tutorial/step3a_adding_actions_visitor.html#introduction" class="sidebar-link">Introduction</a></li><li class="sidebar-sub-header"><a href="/chevrotain/docs/tutorial/step3a_adding_actions_visitor.html#enabling-cst" class="sidebar-link">Enabling CST</a></li><li class="sidebar-sub-header"><a href="/chevrotain/docs/tutorial/step3a_adding_actions_visitor.html#the-cst-visitor" class="sidebar-link">The CST Visitor</a></li><li class="sidebar-sub-header"><a href="/chevrotain/docs/tutorial/step3a_adding_actions_visitor.html#visitor-methods" class="sidebar-link">Visitor Methods</a></li><li class="sidebar-sub-header"><a href="/chevrotain/docs/tutorial/step3a_adding_actions_visitor.html#full-visitor" class="sidebar-link">Full Visitor</a></li></ul></li><li><a href="/chevrotain/docs/tutorial/step3b_adding_actions_embedded.html" class="sidebar-link">Semantics - Embedded</a></li><li><a href="/chevrotain/docs/tutorial/step4_fault_tolerance.html" class="sidebar-link">Fault Tolerance</a></li></ul></section></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><h1 id="tutorial-semantics-cst-visitor"><a href="#tutorial-semantics-cst-visitor" class="header-anchor">#</a> Tutorial - Semantics CST Visitor</h1> <p><a href="https://github.com/SAP/chevrotain/tree/master/examples/tutorial/step3_actions/step3a_actions_visitor.js" target="_blank" rel="noopener noreferrer">Run and Debug the source code<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a>.</p> <h2 id="introduction"><a href="#introduction" class="header-anchor">#</a> Introduction</h2> <p>In the <a href="/chevrotain/docs/tutorial/step2_parsing.html">previous</a> tutorial step
 we have implemented a parser for a &quot;mini&quot; SQL Select grammar. The current problem is that our parser only
 validates the input conforms to the grammar, in other words it is just a recognizer.
-But in most real world use cases the parser will <strong>also</strong> have to output some result/data structure/value.</p> <p>This can be accomplished using a CST (Concrete Syntax Tree) Visitor defined <strong>outside</strong> our grammar:</p> <ul><li>See in depth documentation of Chevrotain's <a href="https://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html" target="_blank" rel="noopener noreferrer">CST capabilities<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></li></ul> <h2 id="enabling-cst"><a href="#enabling-cst" aria-hidden="true" class="header-anchor">#</a> Enabling CST</h2> <p>This feature is automatically enabled when a Parser extends the Chevrotain [CstParser)[https://sap.github.io/chevrotain/documentation/6_5_0/classes/cstparser.html] class</p> <p>The invocation of any grammar rule will now automatically create a CST.</p> <div class="language-javascript extra-class"><pre class="language-javascript"><code><span class="token keyword">function</span> <span class="token function">parseInput</span><span class="token punctuation">(</span><span class="token parameter">text</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">const</span> lexingResult <span class="token operator">=</span> SelectLexer<span class="token punctuation">.</span><span class="token function">tokenize</span><span class="token punctuation">(</span>text<span class="token punctuation">)</span>
-    <span class="token keyword">const</span> parser <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SelectParser</span><span class="token punctuation">(</span>lexingResult<span class="token punctuation">.</span>tokens<span class="token punctuation">)</span>
+But in most real world use cases the parser will <strong>also</strong> have to output some result/data structure/value.</p> <p>This can be accomplished using a CST (Concrete Syntax Tree) Visitor defined <strong>outside</strong> our grammar:</p> <ul><li>See in depth documentation of Chevrotain's <a href="https://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html" target="_blank" rel="noopener noreferrer">CST capabilities<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></li></ul> <h2 id="enabling-cst"><a href="#enabling-cst" class="header-anchor">#</a> Enabling CST</h2> <p>This feature is automatically enabled when a Parser extends the Chevrotain <a href="https://sap.github.io/chevrotain/documentation/7_0_0/classes/cstparser.html" target="_blank" rel="noopener noreferrer">CstParser<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a> class</p> <p>The invocation of any grammar rule will now automatically create a CST.</p> <div class="language-javascript extra-class"><pre class="language-javascript"><code><span class="token keyword">function</span> <span class="token function">parseInput</span><span class="token punctuation">(</span><span class="token parameter">text</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> lexingResult <span class="token operator">=</span> SelectLexer<span class="token punctuation">.</span><span class="token function">tokenize</span><span class="token punctuation">(</span>text<span class="token punctuation">)</span>
+  <span class="token keyword">const</span> parser <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SelectParser</span><span class="token punctuation">(</span>lexingResult<span class="token punctuation">.</span>tokens<span class="token punctuation">)</span>
 
-    <span class="token comment">// CST automatically created.</span>
-    <span class="token keyword">const</span> cstOutput <span class="token operator">=</span> parser<span class="token punctuation">.</span><span class="token function">selectStatement</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token comment">// CST automatically created.</span>
+  <span class="token keyword">const</span> cstOutput <span class="token operator">=</span> parser<span class="token punctuation">.</span><span class="token function">selectStatement</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span class="token punctuation">}</span>
-</code></pre></div><h2 id="the-cst-visitor"><a href="#the-cst-visitor" aria-hidden="true" class="header-anchor">#</a> The CST Visitor</h2> <p>Creating a CST is not enough, we also need to traverse this structure
+</code></pre></div><h2 id="the-cst-visitor"><a href="#the-cst-visitor" class="header-anchor">#</a> The CST Visitor</h2> <p>Creating a CST is not enough, we also need to traverse this structure
 and execute our actions (semantics).</p> <p>Each Chevrotain parser <strong>instance</strong> exposes two BaseVisitor classes
 which can be extended to create custom user visitors.</p> <div class="language-javascript extra-class"><pre class="language-javascript"><code><span class="token comment">// BaseVisitor constructors are accessed via a parser instance.</span>
-<span class="token keyword">const</span> parserInstance <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SelectParser</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">const</span> parserInstance <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SelectParser</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 
 <span class="token keyword">const</span> BaseSQLVisitor <span class="token operator">=</span> parserInstance<span class="token punctuation">.</span><span class="token function">getBaseCstVisitorConstructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 
@@ -52,84 +76,84 @@ which can be extended to create custom user visitors.</p> <div class="language-j
 <span class="token keyword">const</span> BaseSQLVisitorWithDefaults <span class="token operator">=</span> parserInstance<span class="token punctuation">.</span><span class="token function">getBaseCstVisitorConstructorWithDefaults</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 
 <span class="token keyword">class</span> <span class="token class-name">myCustomVisitor</span> <span class="token keyword">extends</span> <span class="token class-name">BaseSQLVisitor</span> <span class="token punctuation">{</span>
-    <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-        <span class="token comment">// The &quot;validateVisitor&quot; method is a helper utility which performs static analysis</span>
-        <span class="token comment">// to detect missing or redundant visitor methods</span>
-        <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">validateVisitor</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token punctuation">}</span>
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token comment">// The &quot;validateVisitor&quot; method is a helper utility which performs static analysis</span>
+    <span class="token comment">// to detect missing or redundant visitor methods</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">validateVisitor</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
 
-    <span class="token comment">/* Visit methods go here */</span>
+  <span class="token comment">/* Visit methods go here */</span>
 <span class="token punctuation">}</span>
 
 <span class="token keyword">class</span> <span class="token class-name">myCustomVisitorWithDefaults</span> <span class="token keyword">extends</span> <span class="token class-name">BaseSQLVisitorWithDefaults</span> <span class="token punctuation">{</span>
-    <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-        <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">validateVisitor</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token punctuation">}</span>
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">validateVisitor</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
 
-    <span class="token comment">/* Visit methods go here */</span>
+  <span class="token comment">/* Visit methods go here */</span>
 <span class="token punctuation">}</span>
 
 <span class="token keyword">const</span> myVisitorInstance <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">myCustomVisitor</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span class="token keyword">const</span> myVisitorInstanceWithDefaults <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">myCustomVisitorWithDefaults</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-</code></pre></div><p>In our example we will use the BaseVisitor constructor (<strong>without</strong> defaults )</p> <h2 id="visitor-methods"><a href="#visitor-methods" aria-hidden="true" class="header-anchor">#</a> Visitor Methods</h2> <p>So we now know how to create a CST visitor.
+</code></pre></div><p>In our example we will use the BaseVisitor constructor (<strong>without</strong> defaults )</p> <h2 id="visitor-methods"><a href="#visitor-methods" class="header-anchor">#</a> Visitor Methods</h2> <p>So we now know how to create a CST visitor.
 But how do we actually make it perform the actions (semantics) we wish?
 For that we must create a <strong>visit method</strong> for each grammar rule.</p> <p>Recall the selectClause grammar from the previous step:</p> <div class="language-antlr extra-class"><pre class="language-text"><code>selectClause:
   &quot;SELECT&quot; Identifier (&quot;,&quot; Identifier)*;
 </code></pre></div><p>Lets create a visitor method for the selectClause rule.</p> <div class="language-javascript extra-class"><pre class="language-javascript"><code><span class="token keyword">class</span> <span class="token class-name">SQLToAstVisitor</span> <span class="token keyword">extends</span> <span class="token class-name">BaseSQLVisitor</span> <span class="token punctuation">{</span>
-    <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-        <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">validateVisitor</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token punctuation">}</span>
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">validateVisitor</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
 
-    <span class="token comment">// The Ctx argument is the current CSTNode's children.</span>
-    <span class="token function">selectClause</span><span class="token punctuation">(</span><span class="token parameter">ctx</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token comment">// Each Terminal or Non-Terminal in a grammar rule are collected into</span>
-        <span class="token comment">// an array with the same name(key) in the ctx object.</span>
-        <span class="token keyword">let</span> columns <span class="token operator">=</span> ctx<span class="token punctuation">.</span>Identifier<span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token parameter">identToken</span> <span class="token operator">=&gt;</span> identToken<span class="token punctuation">.</span>image<span class="token punctuation">)</span>
+  <span class="token comment">// The Ctx argument is the current CSTNode's children.</span>
+  <span class="token function">selectClause</span><span class="token punctuation">(</span><span class="token parameter">ctx</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// Each Terminal or Non-Terminal in a grammar rule are collected into</span>
+    <span class="token comment">// an array with the same name(key) in the ctx object.</span>
+    <span class="token keyword">let</span> columns <span class="token operator">=</span> ctx<span class="token punctuation">.</span>Identifier<span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">identToken</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> identToken<span class="token punctuation">.</span>image<span class="token punctuation">)</span>
 
-        <span class="token keyword">return</span> <span class="token punctuation">{</span>
-            type<span class="token punctuation">:</span> <span class="token string">&quot;SELECT_CLAUSE&quot;</span><span class="token punctuation">,</span>
-            columns<span class="token punctuation">:</span> columns
-        <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token punctuation">{</span>
+      type<span class="token operator">:</span> <span class="token string">&quot;SELECT_CLAUSE&quot;</span><span class="token punctuation">,</span>
+      columns<span class="token operator">:</span> columns
     <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
 </code></pre></div><p>So far pretty simple, now lets add another visit method for &quot;selectStatement&quot;.
 First lets recall it's grammar.</p> <div class="language-antlr extra-class"><pre class="language-text"><code>selectStatement
    : selectClause fromClause (whereClause)?
 </code></pre></div><p>And now to the code:</p> <div class="language-javascript extra-class"><pre class="language-javascript"><code><span class="token keyword">class</span> <span class="token class-name">SQLToAstVisitor</span> <span class="token keyword">extends</span> <span class="token class-name">BaseSQLVisitor</span> <span class="token punctuation">{</span>
-    <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-        <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">validateVisitor</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">validateVisitor</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment">// The Ctx argument is the current CSTNode's children.</span>
+  <span class="token function">selectClause</span><span class="token punctuation">(</span><span class="token parameter">ctx</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">/* as above... */</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token function">selectStatement</span><span class="token punctuation">(</span><span class="token parameter">ctx</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// &quot;this.visit&quot; can be used to visit none-terminals and will invoke the correct visit method for the CstNode passed.</span>
+    <span class="token keyword">let</span> select <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">visit</span><span class="token punctuation">(</span>ctx<span class="token punctuation">.</span>selectClause<span class="token punctuation">)</span>
+
+    <span class="token comment">//  &quot;this.visit&quot; can work on either a CstNode or an Array of CstNodes.</span>
+    <span class="token comment">//  If an array is passed (ctx.fromClause is an array) it is equivalent</span>
+    <span class="token comment">//  to passing the first element of that array</span>
+    <span class="token keyword">let</span> <span class="token keyword">from</span> <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">visit</span><span class="token punctuation">(</span>ctx<span class="token punctuation">.</span>fromClause<span class="token punctuation">)</span>
+
+    <span class="token comment">// &quot;whereClause&quot; is optional, &quot;this.visit&quot; will ignore empty arrays (optional)</span>
+    <span class="token keyword">let</span> where <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">visit</span><span class="token punctuation">(</span>ctx<span class="token punctuation">.</span>whereClause<span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> <span class="token punctuation">{</span>
+      type<span class="token operator">:</span> <span class="token string">&quot;SELECT_STMT&quot;</span><span class="token punctuation">,</span>
+      selectClause<span class="token operator">:</span> select<span class="token punctuation">,</span>
+      fromClause<span class="token operator">:</span> <span class="token keyword">from</span><span class="token punctuation">,</span>
+      whereClause<span class="token operator">:</span> where
     <span class="token punctuation">}</span>
-
-    <span class="token comment">// The Ctx argument is the current CSTNode's children.</span>
-    <span class="token function">selectClause</span><span class="token punctuation">(</span><span class="token parameter">ctx</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token comment">/* as above... */</span>
-    <span class="token punctuation">}</span>
-
-    <span class="token function">selectStatement</span><span class="token punctuation">(</span><span class="token parameter">ctx</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token comment">// &quot;this.visit&quot; can be used to visit none-terminals and will invoke the correct visit method for the CstNode passed.</span>
-        <span class="token keyword">let</span> select <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">visit</span><span class="token punctuation">(</span>ctx<span class="token punctuation">.</span>selectClause<span class="token punctuation">)</span>
-
-        <span class="token comment">//  &quot;this.visit&quot; can work on either a CstNode or an Array of CstNodes.</span>
-        <span class="token comment">//  If an array is passed (ctx.fromClause is an array) it is equivalent</span>
-        <span class="token comment">//  to passing the first element of that array</span>
-        <span class="token keyword">let</span> <span class="token keyword">from</span> <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">visit</span><span class="token punctuation">(</span>ctx<span class="token punctuation">.</span>fromClause<span class="token punctuation">)</span>
-
-        <span class="token comment">// &quot;whereClause&quot; is optional, &quot;this.visit&quot; will ignore empty arrays (optional)</span>
-        <span class="token keyword">let</span> where <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">visit</span><span class="token punctuation">(</span>ctx<span class="token punctuation">.</span>whereClause<span class="token punctuation">)</span>
-
-        <span class="token keyword">return</span> <span class="token punctuation">{</span>
-            type<span class="token punctuation">:</span> <span class="token string">&quot;SELECT_STMT&quot;</span><span class="token punctuation">,</span>
-            selectClause<span class="token punctuation">:</span> select<span class="token punctuation">,</span>
-            fromClause<span class="token punctuation">:</span> <span class="token keyword">from</span><span class="token punctuation">,</span>
-            whereClause<span class="token punctuation">:</span> where
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
-</code></pre></div><h2 id="full-visitor"><a href="#full-visitor" aria-hidden="true" class="header-anchor">#</a> Full Visitor</h2> <p>We still have a few grammar rules we need to build visitors for.</p> <div class="language-ANTLR extra-class"><pre class="language-text"><code>fromClause
+</code></pre></div><h2 id="full-visitor"><a href="#full-visitor" class="header-anchor">#</a> Full Visitor</h2> <p>We still have a few grammar rules we need to build visitors for.</p> <div class="language-ANTLR extra-class"><pre class="language-text"><code>fromClause
    : &quot;FROM&quot; Identifier
 
 whereClause
@@ -144,100 +168,100 @@ atomicExpression
 relationalOperator
    : &quot;&gt;&quot; | &quot;&lt;&quot;
 </code></pre></div><p>lets implement those as well.</p> <div class="language-javascript extra-class"><pre class="language-javascript"><code><span class="token keyword">class</span> <span class="token class-name">SQLToAstVisitor</span> <span class="token keyword">extends</span> <span class="token class-name">BaseSQLVisitor</span> <span class="token punctuation">{</span>
-    <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-        <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">validateVisitor</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">validateVisitor</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token function">selectStatement</span><span class="token punctuation">(</span><span class="token parameter">ctx</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">/* as above... */</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token function">selectClause</span><span class="token punctuation">(</span><span class="token parameter">ctx</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">/* as above... */</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token function">fromClause</span><span class="token punctuation">(</span><span class="token parameter">ctx</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> tableName <span class="token operator">=</span> ctx<span class="token punctuation">.</span>Identifier<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>image
+
+    <span class="token keyword">return</span> <span class="token punctuation">{</span>
+      type<span class="token operator">:</span> <span class="token string">&quot;FROM_CLAUSE&quot;</span><span class="token punctuation">,</span>
+      table<span class="token operator">:</span> tableName
     <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
 
-    <span class="token function">selectStatement</span><span class="token punctuation">(</span><span class="token parameter">ctx</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token comment">/* as above... */</span>
+  <span class="token function">whereClause</span><span class="token punctuation">(</span><span class="token parameter">ctx</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> condition <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">visit</span><span class="token punctuation">(</span>ctx<span class="token punctuation">.</span>expression<span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> <span class="token punctuation">{</span>
+      type<span class="token operator">:</span> <span class="token string">&quot;WHERE_CLAUSE&quot;</span><span class="token punctuation">,</span>
+      condition<span class="token operator">:</span> condition
     <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
 
-    <span class="token function">selectClause</span><span class="token punctuation">(</span><span class="token parameter">ctx</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token comment">/* as above... */</span>
+  <span class="token function">expression</span><span class="token punctuation">(</span><span class="token parameter">ctx</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// Note the usage of the &quot;rhs&quot; and &quot;lhs&quot; labels defined in step 2 in the expression rule.</span>
+    <span class="token keyword">const</span> lhs <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">visit</span><span class="token punctuation">(</span>ctx<span class="token punctuation">.</span>lhs<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token keyword">const</span> operator <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">visit</span><span class="token punctuation">(</span>ctx<span class="token punctuation">.</span>relationalOperator<span class="token punctuation">)</span>
+    <span class="token keyword">const</span> rhs <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">visit</span><span class="token punctuation">(</span>ctx<span class="token punctuation">.</span>rhs<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> <span class="token punctuation">{</span>
+      type<span class="token operator">:</span> <span class="token string">&quot;EXPRESSION&quot;</span><span class="token punctuation">,</span>
+      lhs<span class="token operator">:</span> lhs<span class="token punctuation">,</span>
+      operator<span class="token operator">:</span> operator<span class="token punctuation">,</span>
+      rhs<span class="token operator">:</span> rhs
     <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
 
-    <span class="token function">fromClause</span><span class="token punctuation">(</span><span class="token parameter">ctx</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">const</span> tableName <span class="token operator">=</span> ctx<span class="token punctuation">.</span>Identifier<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>image
-
-        <span class="token keyword">return</span> <span class="token punctuation">{</span>
-            type<span class="token punctuation">:</span> <span class="token string">&quot;FROM_CLAUSE&quot;</span><span class="token punctuation">,</span>
-            table<span class="token punctuation">:</span> tableName
-        <span class="token punctuation">}</span>
+  <span class="token comment">// these two visitor methods will return a string.</span>
+  <span class="token function">atomicExpression</span><span class="token punctuation">(</span><span class="token parameter">ctx</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>ctx<span class="token punctuation">.</span>Integer<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> ctx<span class="token punctuation">.</span>Integer<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>image
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> ctx<span class="token punctuation">.</span>Identifier<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>image
     <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
 
-    <span class="token function">whereClause</span><span class="token punctuation">(</span><span class="token parameter">ctx</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">const</span> condition <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">visit</span><span class="token punctuation">(</span>ctx<span class="token punctuation">.</span>expression<span class="token punctuation">)</span>
-
-        <span class="token keyword">return</span> <span class="token punctuation">{</span>
-            type<span class="token punctuation">:</span> <span class="token string">&quot;WHERE_CLAUSE&quot;</span><span class="token punctuation">,</span>
-            condition<span class="token punctuation">:</span> condition
-        <span class="token punctuation">}</span>
+  <span class="token function">relationalOperator</span><span class="token punctuation">(</span><span class="token parameter">ctx</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>ctx<span class="token punctuation">.</span>GreaterThan<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> ctx<span class="token punctuation">.</span>GreaterThan<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>image
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> ctx<span class="token punctuation">.</span>LessThan<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>image
     <span class="token punctuation">}</span>
-
-    <span class="token function">expression</span><span class="token punctuation">(</span><span class="token parameter">ctx</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token comment">// Note the usage of the &quot;rhs&quot; and &quot;lhs&quot; labels defined in step 2 in the expression rule.</span>
-        <span class="token keyword">const</span> lhs <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">visit</span><span class="token punctuation">(</span>ctx<span class="token punctuation">.</span>lhs<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-        <span class="token keyword">const</span> operator <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">visit</span><span class="token punctuation">(</span>ctx<span class="token punctuation">.</span>relationalOperator<span class="token punctuation">)</span>
-        <span class="token keyword">const</span> rhs <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">visit</span><span class="token punctuation">(</span>ctx<span class="token punctuation">.</span>rhs<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-
-        <span class="token keyword">return</span> <span class="token punctuation">{</span>
-            type<span class="token punctuation">:</span> <span class="token string">&quot;EXPRESSION&quot;</span><span class="token punctuation">,</span>
-            lhs<span class="token punctuation">:</span> lhs<span class="token punctuation">,</span>
-            operator<span class="token punctuation">:</span> operator<span class="token punctuation">,</span>
-            rhs<span class="token punctuation">:</span> rhs
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span>
-
-    <span class="token comment">// these two visitor methods will return a string.</span>
-    <span class="token function">atomicExpression</span><span class="token punctuation">(</span><span class="token parameter">ctx</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">if</span> <span class="token punctuation">(</span>ctx<span class="token punctuation">.</span>Integer<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            <span class="token keyword">return</span> ctx<span class="token punctuation">.</span>Integer<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>image
-        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
-            <span class="token keyword">return</span> ctx<span class="token punctuation">.</span>Identifier<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>image
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span>
-
-    <span class="token function">relationalOperator</span><span class="token punctuation">(</span><span class="token parameter">ctx</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">if</span> <span class="token punctuation">(</span>ctx<span class="token punctuation">.</span>GreaterThan<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            <span class="token keyword">return</span> ctx<span class="token punctuation">.</span>GreaterThan<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>image
-        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
-            <span class="token keyword">return</span> ctx<span class="token punctuation">.</span>LessThan<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>image
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
-</code></pre></div><h4 id="usage"><a href="#usage" aria-hidden="true" class="header-anchor">#</a> Usage</h4> <p>So we know how to create a CST Visitor, but how do we actually use it?</p> <div class="language-javascript extra-class"><pre class="language-javascript"><code><span class="token comment">// A new parser instance with CST output enabled.</span>
-<span class="token keyword">const</span> parserInstance <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SelectParser</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> outputCst<span class="token punctuation">:</span> <span class="token boolean">true</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre></div><h4 id="usage"><a href="#usage" class="header-anchor">#</a> Usage</h4> <p>So we know how to create a CST Visitor, but how do we actually use it?</p> <div class="language-javascript extra-class"><pre class="language-javascript"><code><span class="token comment">// A new parser instance with CST output enabled.</span>
+<span class="token keyword">const</span> parserInstance <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SelectParser</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> outputCst<span class="token operator">:</span> <span class="token boolean">true</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
 <span class="token comment">// Our visitor has no state, so a single instance is sufficient.</span>
 <span class="token keyword">const</span> toAstVisitorInstance <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SQLToAstVisitor</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 
 <span class="token keyword">function</span> <span class="token function">toAst</span><span class="token punctuation">(</span><span class="token parameter">inputText</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token comment">// Lex</span>
-    <span class="token keyword">const</span> lexResult <span class="token operator">=</span> selectLexer<span class="token punctuation">.</span><span class="token function">tokenize</span><span class="token punctuation">(</span>inputText<span class="token punctuation">)</span>
-    parserInstance<span class="token punctuation">.</span>input <span class="token operator">=</span> lexResult<span class="token punctuation">.</span>tokens
+  <span class="token comment">// Lex</span>
+  <span class="token keyword">const</span> lexResult <span class="token operator">=</span> selectLexer<span class="token punctuation">.</span><span class="token function">tokenize</span><span class="token punctuation">(</span>inputText<span class="token punctuation">)</span>
+  parserInstance<span class="token punctuation">.</span>input <span class="token operator">=</span> lexResult<span class="token punctuation">.</span>tokens
 
-    <span class="token comment">// Automatic CST created when parsing</span>
-    <span class="token keyword">const</span> cst <span class="token operator">=</span> parserInstance<span class="token punctuation">.</span><span class="token function">selectStatement</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span>parserInstance<span class="token punctuation">.</span>errors<span class="token punctuation">.</span>length <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">throw</span> <span class="token function">Error</span><span class="token punctuation">(</span>
-            <span class="token string">&quot;Sad sad panda, parsing errors detected!\n&quot;</span> <span class="token operator">+</span>
-                parserInstance<span class="token punctuation">.</span>errors<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>message
-        <span class="token punctuation">)</span>
-    <span class="token punctuation">}</span>
+  <span class="token comment">// Automatic CST created when parsing</span>
+  <span class="token keyword">const</span> cst <span class="token operator">=</span> parserInstance<span class="token punctuation">.</span><span class="token function">selectStatement</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>parserInstance<span class="token punctuation">.</span>errors<span class="token punctuation">.</span>length <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">throw</span> <span class="token function">Error</span><span class="token punctuation">(</span>
+      <span class="token string">&quot;Sad sad panda, parsing errors detected!\n&quot;</span> <span class="token operator">+</span>
+        parserInstance<span class="token punctuation">.</span>errors<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>message
+    <span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
 
-    <span class="token comment">// Visit</span>
-    <span class="token keyword">const</span> ast <span class="token operator">=</span> toAstVisitorInstance<span class="token punctuation">.</span><span class="token function">visit</span><span class="token punctuation">(</span>cst<span class="token punctuation">)</span>
-    <span class="token keyword">return</span> ast
+  <span class="token comment">// Visit</span>
+  <span class="token keyword">const</span> ast <span class="token operator">=</span> toAstVisitorInstance<span class="token punctuation">.</span><span class="token function">visit</span><span class="token punctuation">(</span>cst<span class="token punctuation">)</span>
+  <span class="token keyword">return</span> ast
 <span class="token punctuation">}</span>
-</code></pre></div></div> <div class="page-edit"><div class="edit-link"><a href="https://github.com/SAP/chevrotain/edit/master/packages/chevrotain/docs/tutorial/step3a_adding_actions_visitor.md" target="_blank" rel="noopener noreferrer">Edit this page on GitHub</a> <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></div> <!----></div> <div class="page-nav"><p class="inner"><span class="prev">
-        ←
-        <a href="/chevrotain/docs/tutorial/step3_adding_actions_root.html" class="prev">
-          Semantics
-        </a></span> <span class="next"><a href="/chevrotain/docs/tutorial/step3b_adding_actions_embedded.html">
-          Semantics - Embedded
-        </a>
-        →
-      </span></p></div> </div> <!----></div></div>
-    <script src="/chevrotain/docs/assets/js/app.a6d3cdf3.js" defer></script><script src="/chevrotain/docs/assets/js/44.f3391912.js" defer></script>
+</code></pre></div></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/SAP/chevrotain/edit/master/packages/chevrotain/docs/tutorial/step3a_adding_actions_visitor.md" target="_blank" rel="noopener noreferrer">Edit this page on GitHub</a> <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></div> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
+      ←
+      <a href="/chevrotain/docs/tutorial/step3_adding_actions_root.html" class="prev">
+        Semantics
+      </a></span> <span class="next"><a href="/chevrotain/docs/tutorial/step3b_adding_actions_embedded.html">
+        Semantics - Embedded
+      </a>
+      →
+    </span></p></div> </main></div><div class="global-ui"></div></div>
+    <script src="/chevrotain/docs/assets/js/app.f4313b86.js" defer></script><script src="/chevrotain/docs/assets/js/3.1d3331a1.js" defer></script><script src="/chevrotain/docs/assets/js/46.ed7077a3.js" defer></script>
   </body>
 </html>
