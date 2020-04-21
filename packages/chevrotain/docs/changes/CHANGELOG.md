@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+- [Broken diagram generation in 7.0.0.](https://github.com/SAP/chevrotain/issues/1186)
+
 ## 7.0.0 (4-18-2020)
 
 #### Breaking Changes

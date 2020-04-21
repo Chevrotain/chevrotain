@@ -104,7 +104,7 @@
       var subDiagrams = definitionsToSubDiagrams(prod.definition, topRuleName)
       if (prod.type === "Rule") {
         return Diagram.apply(this, subDiagrams)
-      } else if (prod.type === "Flat") {
+      } else if (prod.type === "Alternative") {
         return Sequence.apply(this, subDiagrams)
       } else if (prod.type === "Option") {
         if (subDiagrams.length > 1) {
