@@ -80,9 +80,9 @@ function jsonExample() {
 
 
     // ----------------- parser -----------------
-    const Parser = chevrotain.Parser;
+    const EmbeddedActionsParser = chevrotain.EmbeddedActionsParser;
 
-    class JsonParser extends Parser {
+    class JsonParser extends EmbeddedActionsParser {
         constructor() {
             super(jsonTokens, {recoveryEnabled: true, outputCst: false})
 
@@ -226,9 +226,9 @@ function jsonGrammarOnlyExample() {
 
 
     // ----------------- parser -----------------
-    const Parser = chevrotain.Parser;
+    const CstParser = chevrotain.CstParser;
 
-    class JsonParser extends Parser {
+    class JsonParser extends CstParser {
         constructor() {
             super(jsonTokens, {
                 recoveryEnabled: true
@@ -457,9 +457,9 @@ function cssExample() {
     });
 
     // ----------------- parser -----------------
-    const Parser = chevrotain.Parser;
+    const CstParser = chevrotain.CstParser;
 
-    class CssParser extends Parser {
+    class CssParser extends CstParser {
         constructor() {
             super(cssTokens, {
                 recoveryEnabled: true,
@@ -808,7 +808,7 @@ function calculatorExample() {
     const createToken = chevrotain.createToken;
     const tokenMatcher = chevrotain.tokenMatcher;
     const Lexer = chevrotain.Lexer;
-    const Parser = chevrotain.Parser;
+    const EmbeddedActionsParser = chevrotain.EmbeddedActionsParser;
 
     // using the NA pattern marks this Token class as 'irrelevant' for the Lexer.
     // AdditionOperator defines a Tokens hierarchy but only leafs in this hierarchy
@@ -842,9 +842,9 @@ function calculatorExample() {
     const CalculatorLexer = new Lexer(allTokens);
 
 
-    class Calculator extends Parser {
+    class Calculator extends EmbeddedActionsParser {
         constructor() {
-            super(allTokens, {outputCst : false});
+            super(allTokens);
 
             const $ = this;
 
@@ -971,7 +971,7 @@ function calculatorExampleCst() {
     const createToken = chevrotain.createToken;
     const tokenMatcher = chevrotain.tokenMatcher;
     const Lexer = chevrotain.Lexer;
-    const Parser = chevrotain.Parser;
+    const CstParser = chevrotain.CstParser;
 
     // using the NA pattern marks this Token class as 'irrelevant' for the Lexer.
     // AdditionOperator defines a Tokens hierarchy but only the leafs in this hierarchy define
@@ -1005,7 +1005,7 @@ function calculatorExampleCst() {
     // ----------------- parser -----------------
     // Note that this is a Pure grammar, it only describes the grammar
     // Not any actions (semantics) to perform during parsing.
-    class CalculatorPure extends Parser {
+    class CalculatorPure extends CstParser {
         constructor() {
             super(allTokens);
 
