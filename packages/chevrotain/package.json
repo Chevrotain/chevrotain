@@ -99,7 +99,7 @@
     "requirejs": "2.3.6",
     "sinon": "^9.0.0",
     "sinon-chai": "^3.0.0",
-    "source-map-support": "0.5.16",
+    "source-map-support": "0.5.19",
     "tslint": "^6.0.0",
     "typedoc": "^0.17.4",
     "typescript": "3.8.3",
