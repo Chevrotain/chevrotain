@@ -39,12 +39,10 @@ function matchIndentBase(text, offset, matchedTokens, groups, type) {
   const isStartOfLine =
     // only newlines matched so far
     (noTokensMatchedYet && !noNewLinesMatchedYet) ||
-    // Both newlines and other Tokens have been matched AND the last matched Token is a newline
+    // Both newlines and other Tokens have been matched AND the offset is just after the last newline
     (!noTokensMatchedYet &&
       !noNewLinesMatchedYet &&
-      (!_.isEmpty(newLines) &&
-        !_.isEmpty(matchedTokens) &&
-        _.last(newLines).startOffset) > _.last(matchedTokens).startOffset)
+      offset === _.last(newLines).startOffset + 1)
 
   // indentation can only be matched at the start of a line.
   if (isFirstLine || isStartOfLine) {

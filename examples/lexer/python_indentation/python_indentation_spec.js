@@ -10,6 +10,7 @@ describe("The Chevrotain Lexer ability to lex python like indentation.", () => {
       "  if 2\n" +
       "    if 3\n" +
       "      print 666\n" +
+      "      print 777\n" +
       "  else\n" +
       "    print 999\n"
 
@@ -26,6 +27,8 @@ describe("The Chevrotain Lexer ability to lex python like indentation.", () => {
       "If",
       "IntegerLiteral",
       "Indent",
+      "Print",
+      "IntegerLiteral",
       "Print",
       "IntegerLiteral",
       "Outdent",
