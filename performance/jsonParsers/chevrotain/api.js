@@ -27,3 +27,5 @@ function parse(text) {
         parseErrors: chevrotainJsonParserInstance.errors
     };
 }
+
+parse("{}")

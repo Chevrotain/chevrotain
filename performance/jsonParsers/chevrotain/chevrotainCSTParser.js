@@ -27,10 +27,10 @@ var ChevJsonLexer = new ChevrotainLexer(jsonTokens, {positionTracking: "onlyOffs
 
 // https://github.com/SAP/chevrotain/blob/master/docs/faq.md#Q6
 // (Do not create a new Parser instance for each new input.)
-var ChevrotainParser = chevrotain.Parser;
+var ChevrotainCSTParser = chevrotain.CstParser;
 
 function ChevrotainJsonParser(options) {
-    ChevrotainParser.call(this, jsonTokens, options);
+    ChevrotainCSTParser.call(this, jsonTokens, options);
     const $ = this;
 
     $.RULE("json", function () {
@@ -87,9 +87,9 @@ function ChevrotainJsonParser(options) {
     // very important to call this after all the rules have been setup.
     // otherwise the parser may not work correctly as it will lack information
     // derived from the self analysis.
-    ChevrotainParser.performSelfAnalysis(this);
+    this.performSelfAnalysis();
 }
 
-ChevrotainJsonParser.prototype = Object.create(ChevrotainParser.prototype);
+ChevrotainJsonParser.prototype = Object.create(ChevrotainCSTParser.prototype);
 ChevrotainJsonParser.prototype.constructor = ChevrotainJsonParser;
 
