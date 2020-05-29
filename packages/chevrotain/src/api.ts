@@ -1,3 +1,5 @@
+/* istanbul ignore file - tricky to import some things from this module during testing */
+
 // semantic version
 export { VERSION } from "./version"
 
