@@ -8,7 +8,7 @@
     "chevrotain": "^7.0.1"
   },
   "devDependencies": {
-    "acorn": "^7.0.0",
+    "acorn": "^8.0.1",
     "xregexp": "^4.2.0"
   },
   "private": true
