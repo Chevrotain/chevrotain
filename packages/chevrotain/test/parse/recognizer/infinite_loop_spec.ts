@@ -1,16 +1,20 @@
-import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
+import {
+  EmbeddedActionsParser,
+  CstParser
+} from "../../../src/parse/parser/traits/parser_traits"
 import { createRegularToken } from "../../utils/matchers"
 import { augmentTokenTypes } from "../../../src/scan/tokens"
 import { IToken } from "../../../api"
 import { createToken } from "../../../src/scan/tokens_public"
+import { EMPTY_ALT } from "../../../src/parse/parser/parser"
 
-describe("The Recognizer's capabilities for detecting infinite loops", () => {
-  class PlusTok {
-    static PATTERN = /\+/
-  }
-  augmentTokenTypes(<any>[PlusTok])
-
+describe("The Recognizer's capabilities for detecting / handling infinite loops", () => {
   it("Will gracefully 'escape' from an infinite loop in a repetition", () => {
+    class PlusTok {
+      static PATTERN = /\+/
+    }
+    augmentTokenTypes(<any>[PlusTok])
+
     class InfiniteLoopParser extends EmbeddedActionsParser {
       constructor(input: IToken[] = []) {
         super([PlusTok])
@@ -96,5 +100,43 @@ describe("The Recognizer's capabilities for detecting infinite loops", () => {
     )
     expect(parser.errors[0].message).to.match(/[A, B]/)
     expect(parser.errors[0].message).to.match(/[A, C]/)
+  })
+
+  it("Will enter an infinite loop during parser initialization when there is an empty alternative inside nested repetitionn", () => {
+    // ----------------- lexer -----------------
+    const Comma = createToken({ name: "Comma", pattern: /,/ })
+    const Comma2 = createToken({ name: "Comma", pattern: /,/ })
+
+    const allTokens = [Comma]
+
+    class NestedManyEmptyAltBugParser extends CstParser {
+      constructor() {
+        super(allTokens)
+        this.performSelfAnalysis()
+      }
+
+      public A = this.RULE("A", () => {
+        this.MANY(() => {
+          this.SUBRULE(this.B)
+        })
+      })
+
+      public B = this.RULE("B", () => {
+        this.MANY(() => {
+          this.SUBRULE(this.C)
+        })
+      })
+
+      public C = this.RULE("C", () => {
+        this.OR([
+          { ALT: () => this.CONSUME(Comma) },
+          {
+            ALT: EMPTY_ALT()
+          }
+        ])
+      })
+    }
+
+    expect(() => new NestedManyEmptyAltBugParser()).to.not.throw()
   })
 })

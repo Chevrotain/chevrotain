@@ -322,7 +322,12 @@ export function possiblePathsFrom(
       result = getAlternativesForProd(newDef)
     } else if (prod instanceof Alternation) {
       forEach(prod.definition, (currAlt) => {
-        result = getAlternativesForProd(currAlt.definition)
+        // TODO: this is a limited check for empty alternatives
+        //   It would prevent a common case of infinite loops during parser initialization.
+        //   However **in-directly** empty alternatives may still cause issues.
+        if (isEmpty(currAlt.definition) === false) {
+          result = getAlternativesForProd(currAlt.definition)
+        }
       })
       return result
     } else if (prod instanceof Terminal) {

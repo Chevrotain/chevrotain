@@ -2,6 +2,12 @@
 
 #### Bug Fixes
 
+- [Empty Alternative inside Nested Repetitions causes infinite loops on Parser initilization.](https://github.com/SAP/chevrotain/issues/1200)
+
+## 7.0.1 (4-22-2020)
+
+#### Bug Fixes
+
 - [Broken diagram generation in 7.0.0.](https://github.com/SAP/chevrotain/issues/1186)
 
 ## 7.0.0 (4-18-2020)
