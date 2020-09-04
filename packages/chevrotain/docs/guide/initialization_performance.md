@@ -7,7 +7,7 @@ In some use cases this overhead may need to be reduced as much as possible.
 ## Enabling Initialization Performance Tracing
 
 Measuring a Parser's initialization performance can be done by enabling the
-[`IParserConfig.traceInitPerf`](https://sap.github.io/chevrotain/documentation/7_0_1/interfaces/iparserconfig.html#traceinitperf)
+[`IParserConfig.traceInitPerf`](https://sap.github.io/chevrotain/documentation/7_0_2/interfaces/iparserconfig.html#traceinitperf)
 flag. For example:
 
 ```javascript
@@ -26,7 +26,7 @@ new InitTracingParser() // Will print tracing info to the console.
 ```
 
 A Lexer's initialization performance can similarly be measured by enabling the
-[`ILexerConfig.traceInitPerf`](https://sap.github.io/chevrotain/documentation/7_0_1/interfaces/ilexerconfig.html#traceinitperf)
+[`ILexerConfig.traceInitPerf`](https://sap.github.io/chevrotain/documentation/7_0_2/interfaces/ilexerconfig.html#traceinitperf)
 flag:
 
 ```javascript
@@ -43,7 +43,7 @@ Chevrotain is a K tokens lookahead Parser, this means it peeks ahead (at most) K
 determine the alternative to pick whenever it encounters a "branching" in the grammar.
 
 During initialization Chevrotain pre-computes and caches lookahead functions that would
-later be used at runtime. The global [maxLookahead](https://sap.github.io/chevrotain/documentation/7_0_1/interfaces/iparserconfig.html#maxlookahead)
+later be used at runtime. The global [maxLookahead](https://sap.github.io/chevrotain/documentation/7_0_2/interfaces/iparserconfig.html#maxlookahead)
 setting can significantly affect the performance of this pre-computation due to the fact the number of possible "paths"
 in the grammar can grow **exponentially** as the max length of the possible paths increases.
 
@@ -103,7 +103,7 @@ class LowLookaheadParser extends CstParser {
 Chevrotain performs many validations during Lexer & Parser initialization, however those are not really relevant
 when the Lexer & Parser are known to be valid, These validations are a **development time** tool, and not really needed during productive flows.
 
-The [IParserConfig.skipValidations](https://sap.github.io/chevrotain/documentation/7_0_1/interfaces/iparserconfig.html#skipvalidations)
+The [IParserConfig.skipValidations](https://sap.github.io/chevrotain/documentation/7_0_2/interfaces/iparserconfig.html#skipvalidations)
 config property can be used to avoid running these validations during **Parser** initialization.
 
 ```javascript
@@ -119,7 +119,7 @@ class NaiveSkippedValidationsParser extends CstParser {
 }
 ```
 
-Similarly the [ILexerConfig.skipValidations](https://sap.github.io/chevrotain/documentation/7_0_1/interfaces/ilexerconfig.html#skipvalidations)
+Similarly the [ILexerConfig.skipValidations](https://sap.github.io/chevrotain/documentation/7_0_2/interfaces/ilexerconfig.html#skipvalidations)
 config property can be used to skip the optional validations during **Lexer** initialization.
 
 ```javascript
