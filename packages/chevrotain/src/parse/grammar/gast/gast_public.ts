@@ -8,8 +8,16 @@ import {
   TokenType
 } from "../../../../api"
 
-export abstract class AbstractProduction implements IProduction {
-  constructor(public definition: IProduction[]) {}
+export abstract class AbstractProduction<T extends IProduction = IProduction>
+  implements IProduction {
+  public get definition(): T[] {
+    return this._definition
+  }
+  public set definition(value: T[]) {
+    this._definition = value
+  }
+
+  constructor(protected _definition: T[]) {}
 
   accept(visitor: IGASTVisitor): void {
     visitor.visit(this)
@@ -177,13 +185,19 @@ export class RepetitionWithSeparator extends AbstractProduction
   }
 }
 
-export class Alternation extends AbstractProduction
+export class Alternation extends AbstractProduction<Alternative>
   implements IProductionWithOccurrence {
   public idx: number = 1
   public ignoreAmbiguities: boolean = false
-  public definition: Alternative[]
   public hasPredicates: boolean = false
   public maxLookahead?: number
+
+  public get definition(): Alternative[] {
+    return this._definition
+  }
+  public set definition(value: Alternative[]) {
+    this._definition = value
+  }
 
   constructor(options: {
     definition: Alternative[]

@@ -4,14 +4,13 @@ import {
   Option,
   RepetitionMandatoryWithSeparator,
   RepetitionWithSeparator,
-  Rule,
   Terminal,
   NonTerminal,
   Alternation,
   Alternative,
   Repetition
 } from "../parse/grammar/gast/gast_public"
-import { IProduction, TokenType } from "../../api"
+import { IProduction, TokenType, Rule } from "../../api"
 
 /**
  * Missing features

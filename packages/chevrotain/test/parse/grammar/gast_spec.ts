@@ -23,6 +23,17 @@ describe("GAst namespace", () => {
       })
       expect(prodRef.definition).to.be.an.instanceof(Array)
     })
+
+    it("cannot be used to re-set the referenced Rule's definition", () => {
+      const myRule = new Rule({ name: "myRule", definition: [] })
+      const prodRef = new NonTerminal({
+        nonTerminalName: "myRule",
+        referencedRule: myRule
+      })
+      expect(prodRef.definition).to.be.be.empty
+      prodRef.definition = [new Alternation({ definition: [] })]
+      expect(prodRef.definition).to.be.be.empty
+    })
   })
 
   describe("the mappings between a GAst instance and its matching DSL method name for: ", () => {
