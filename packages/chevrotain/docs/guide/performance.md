@@ -29,7 +29,7 @@ Avoiding the creation of new instances is important to avoid re-paying the Parse
 Additionally, re-using the same instance may leverage hot-spot optimizations of the respective JavaScript engine.
 
 Note that this means that if your parser "carries" additional state, that state should also be reset.
-Simply override the Parser's [reset](https://sap.github.io/chevrotain/documentation/7_0_2/classes/cstparser.html#reset) method
+Simply override the Parser's [reset](https://sap.github.io/chevrotain/documentation/7_0_3/classes/cstparser.html#reset) method
 to accomplish that.
 
 ## Ensuring Lexer Optimizations
@@ -44,7 +44,7 @@ To apply this optimization the first possible charCodes for **every** TokenType 
 Sometimes a TokenType's first charCodes cannot be automatically identified.
 In that case the lexer will **silently** revert to using the unoptimized algorithms.
 
-If the TokenType's first charCodes cannot be automatically identified, you can set the [`start_chars_hint`](https://sap.github.io/chevrotain/documentation/7_0_2/interfaces/itokenconfig.html#start_chars_hint) property when calling `createToken()`. If you define a custom [pattern](https://sap.github.io/chevrotain/documentation/7_0_2/interfaces/itokenconfig.html#pattern) for your token, then you should set `start_chars_hint` manually for optimal performance.
+If the TokenType's first charCodes cannot be automatically identified, you can set the [`start_chars_hint`](https://sap.github.io/chevrotain/documentation/7_0_3/interfaces/itokenconfig.html#start_chars_hint) property when calling `createToken()`. If you define a custom [pattern](https://sap.github.io/chevrotain/documentation/7_0_3/interfaces/itokenconfig.html#pattern) for your token, then you should set `start_chars_hint` manually for optimal performance.
 
 It it possible to configure the Lexer **throw** an error
 in case the optimizations cannot be enabled by turning on the
@@ -168,7 +168,7 @@ It is important to note that:
 These are only required if you are trying to squeeze every tiny bit of performance out of your parser.
 
 1.  **Reduce the amount of Token position tracking** the lexer performs.
-    See The [ILexerConfig.positionTracking](https://sap.github.io/chevrotain/documentation/7_0_2/interfaces/ilexerconfig.html) property.
+    See The [ILexerConfig.positionTracking](https://sap.github.io/chevrotain/documentation/7_0_3/interfaces/ilexerconfig.html) property.
 
 2.  **Avoid creating parsing rules which only parse a single Terminal.**
 

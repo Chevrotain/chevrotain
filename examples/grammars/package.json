@@ -1,11 +1,11 @@
 {
   "name": "chevrotain_examples_grammars",
-  "version": "7.0.2",
+  "version": "7.0.3",
   "scripts": {
     "test": "mocha \"!(node_modules)/**/*spec.js\""
   },
   "dependencies": {
-    "chevrotain": "^7.0.2"
+    "chevrotain": "^7.0.3"
   },
   "devDependencies": {
     "acorn": "^8.0.1",
