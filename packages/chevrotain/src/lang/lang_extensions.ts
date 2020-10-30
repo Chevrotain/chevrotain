@@ -5,22 +5,23 @@ export function classNameFromInstance(instance: any): string {
   return functionName(instance.constructor)
 }
 
-const FUNC_NAME_REGEXP = /^\s*function\s*(\S*)\s*\(/
 const NAME = "name"
 
-/* istanbul ignore next too many hacks for IE/old versions of node.js here*/
+/**
+ * Utility to obtain Function names.
+ * Note that there should not be an assumptions on the result of this function.
+ * E.g: When running from minified source code the result may be auto generated.
+ */
 export function functionName(func: TokenType): string {
   // Engines that support Function.prototype.name OR the nth (n>1) time after
   // the name has been computed in the following else block.
   let existingNameProp = (<any>func).name
+  /* istanbul ignore else - too many hacks for IE/old versions of node.js here*/
   if (existingNameProp) {
     return existingNameProp
+  } else {
+    return "anonymous"
   }
-
-  // hack for IE and engines that do not support Object.defineProperty on function.name (Node.js 0.10 && 0.12)
-  let computedName = func.toString().match(FUNC_NAME_REGEXP)[1]
-
-  return computedName
 }
 
 /**
