@@ -1,8 +1,14 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+- [Runtime errors after Webpack minification.](https://github.com/SAP/chevrotain/issues/1265)
+
 ## 7.0.2 (9-4-2020)
 
 #### Bug Fixes
 
-- [Empty Alternative inside Nested Repetitions causes infinite loops on Parser initilization.](https://github.com/SAP/chevrotain/issues/1200)
+- [Empty Alternative inside Nested Repetitions causes infinite loops on Parser initialization.](https://github.com/SAP/chevrotain/issues/1200)
 
 ## 7.0.1 (4-22-2020)
 
