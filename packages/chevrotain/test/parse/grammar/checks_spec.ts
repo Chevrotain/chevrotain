@@ -1504,7 +1504,7 @@ describe("The invalid token name validation", () => {
       })
     }
     expect(() => new InvalidTokenName([])).to.throw(
-      "Invalid Grammar Token name: ->במבה<- it must match the pattern: ->/^[a-zA-Z_]\\w*$/<-"
+      "Invalid Grammar Token name: ->במבה<- it must match the pattern: ->/^[a-zA-Z_](?:[\\w-]*\\w|\\w*)$/<-"
     )
   })
 })

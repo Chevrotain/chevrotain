@@ -228,7 +228,7 @@ export class OccurrenceValidationCollector extends GAstVisitor {
   }
 }
 
-export const validTermsPattern = /^[a-zA-Z_]\w*$/
+export const validTermsPattern = /^[a-zA-Z_](?:[\w-]*\w|\w*)$/
 
 // TODO: remove this limitation now that we use recorders
 export function validateRuleName(
