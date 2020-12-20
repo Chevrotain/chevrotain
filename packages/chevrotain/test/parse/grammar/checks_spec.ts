@@ -15,7 +15,6 @@ import {
   validateGrammar,
   validateRuleDoesNotAlreadyExist,
   validateRuleIsOverridden,
-  validateRuleName,
   validateTooManyAlts
 } from "../../../src/parse/grammar/checks"
 import { createToken } from "../../../src/scan/tokens_public"
@@ -151,44 +150,6 @@ describe("the grammar validations", () => {
       ParserDefinitionErrorType.DUPLICATE_RULE_NAME
     )
     expect(duplicateErr[0]).to.have.property("ruleName", "A")
-  })
-
-  it("only allows a subset of ECMAScript identifiers as rule names", () => {
-    let res1 = validateRuleName(
-      new Rule({ name: "1baa", definition: [] }),
-      defaultGrammarValidatorErrorProvider
-    )
-    expect(res1).to.have.lengthOf(1)
-    expect(res1[0]).to.have.property("message")
-    expect(res1[0]).to.have.property(
-      "type",
-      ParserDefinitionErrorType.INVALID_RULE_NAME
-    )
-    expect(res1[0]).to.have.property("ruleName", "1baa")
-
-    let res2 = validateRuleName(
-      new Rule({ name: "שלום", definition: [] }),
-      defaultGrammarValidatorErrorProvider
-    )
-    expect(res2).to.have.lengthOf(1)
-    expect(res2[0]).to.have.property("message")
-    expect(res2[0]).to.have.property(
-      "type",
-      ParserDefinitionErrorType.INVALID_RULE_NAME
-    )
-    expect(res2[0]).to.have.property("ruleName", "שלום")
-
-    let res3 = validateRuleName(
-      new Rule({ name: "$bamba", definition: [] }),
-      defaultGrammarValidatorErrorProvider
-    )
-    expect(res3).to.have.lengthOf(1)
-    expect(res3[0]).to.have.property("message")
-    expect(res3[0]).to.have.property(
-      "type",
-      ParserDefinitionErrorType.INVALID_RULE_NAME
-    )
-    expect(res3[0]).to.have.property("ruleName", "$bamba")
   })
 
   it("does not allow overriding a rule which does not already exist", () => {
@@ -916,16 +877,6 @@ describe("The rule names validation full flow", () => {
     expect(() => new DuplicateRulesParser()).to.throw("oops_duplicate")
   })
 
-  it("will throw an error when trying to init a parser with an invalid rule names", () => {
-    expect(() => new InvalidRuleNameParser()).to.throw(
-      "it must match the pattern"
-    )
-    expect(() => new InvalidRuleNameParser()).to.throw(
-      "Invalid grammar rule name"
-    )
-    expect(() => new InvalidRuleNameParser()).to.throw("שלום")
-  })
-
   it(
     "won't throw an errors when trying to init a parser with definition errors but with a flag active to defer handling" +
       "of definition errors (ruleName validation",
@@ -1479,32 +1430,6 @@ describe("The namespace conflict detection full flow", () => {
 
     expect(() => new NameSpaceConflict([])).to.throw(
       "The grammar has both a Terminal(Token) and a Non-Terminal(Rule) named: <Bamba>"
-    )
-  })
-})
-
-describe("The invalid token name validation", () => {
-  it("will throw an error when a Token is using an invalid name", () => {
-    class במבה {
-      static PATTERN = /NA/
-    }
-    class A {
-      static PATTERN = /NA/
-    }
-
-    class InvalidTokenName extends EmbeddedActionsParser {
-      constructor(input: IToken[] = []) {
-        super([במבה, A])
-        this.performSelfAnalysis()
-        this.input = input
-      }
-
-      public someRule = this.RULE("someRule", () => {
-        this.CONSUME(A)
-      })
-    }
-    expect(() => new InvalidTokenName([])).to.throw(
-      "Invalid Grammar Token name: ->במבה<- it must match the pattern: ->/^[a-zA-Z_](?:[\\w-]*\\w|\\w*)$/<-"
     )
   })
 })
