@@ -234,13 +234,14 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
     return errMsg
   },
 
+  // TODO: remove - `errors_public` from nyc.config.js exclude
+  //       once this method is fully removed from this file
   buildTokenNameError(options: {
     tokenType: TokenType
     expectedPattern: RegExp
   }): string {
-    const tokTypeName = options.tokenType.name
-    const errMsg = `Invalid Grammar Token name: ->${tokTypeName}<- it must match the pattern: ->${options.expectedPattern.toString()}<-`
-    return errMsg
+    /* istanbul ignore next */
+    return "deprecated"
   },
 
   buildEmptyAlternationError(options: {
@@ -291,14 +292,14 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
     return errMsg
   },
 
+  // TODO: remove - `errors_public` from nyc.config.js exclude
+  //       once this method is fully removed from this file
   buildInvalidRuleNameError(options: {
     topLevelRule: Rule
     expectedPattern: RegExp
   }): string {
-    const ruleName = options.topLevelRule.name
-    const expectedPatternString = options.expectedPattern.toString()
-    const errMsg = `Invalid grammar rule name: ->${ruleName}<- it must match the pattern: ->${expectedPatternString}<-`
-    return errMsg
+    /* istanbul ignore next */
+    return "deprecated"
   },
 
   buildDuplicateRuleNameError(options: {

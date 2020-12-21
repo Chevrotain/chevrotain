@@ -828,7 +828,7 @@ class ECMAScript5Parser extends Parser {
     return (
       isNextTokenSemiColon === false &&
       (this.lineTerminatorHere() || // basic rule 1a and 3
-      tokenMatcher(nextToken, t.RCurly) || // basic rule 1b
+        tokenMatcher(nextToken, t.RCurly) || // basic rule 1b
         tokenMatcher(nextToken, EOF))
     ) // basic rule 2
   }

@@ -2619,10 +2619,16 @@ export interface IGrammarValidatorErrorMessageProvider {
     topLevelRule: Rule
     repetition: IProductionWithOccurrence
   }): string
+  /**
+   * @deprecated - There are no longer constraints on Token names
+   *               This method will be removed from the interface in future versions.
+   *               Providing it will currently have no impact on the runtime.
+   */
   buildTokenNameError(options: {
     tokenType: TokenType
     expectedPattern: RegExp
   }): any
+
   buildEmptyAlternationError(options: {
     topLevelRule: Rule
     alternation: Alternation
@@ -2636,6 +2642,11 @@ export interface IGrammarValidatorErrorMessageProvider {
     topLevelRule: Rule
     leftRecursionPath: Rule[]
   }): string
+  /**
+   * @deprecated - There are no longer constraints on Rule names
+   *               This method will be removed from the interface in future versions.
+   *               Providing it will currently have no impact on the runtime.
+   */
   buildInvalidRuleNameError(options: {
     topLevelRule: Rule
     expectedPattern: RegExp

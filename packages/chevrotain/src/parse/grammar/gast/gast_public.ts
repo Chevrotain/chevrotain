@@ -27,7 +27,8 @@ export abstract class AbstractProduction<T extends IProduction = IProduction>
   }
 }
 
-export class NonTerminal extends AbstractProduction
+export class NonTerminal
+  extends AbstractProduction
   implements IProductionWithOccurrence {
   public nonTerminalName: string
   public referencedRule: Rule
@@ -94,7 +95,8 @@ export class Alternative extends AbstractProduction {
   }
 }
 
-export class Option extends AbstractProduction
+export class Option
+  extends AbstractProduction
   implements IProductionWithOccurrence {
   public idx: number = 1
   public maxLookahead?: number
@@ -112,7 +114,8 @@ export class Option extends AbstractProduction
   }
 }
 
-export class RepetitionMandatory extends AbstractProduction
+export class RepetitionMandatory
+  extends AbstractProduction
   implements IProductionWithOccurrence {
   public idx: number = 1
   public maxLookahead?: number
@@ -130,7 +133,8 @@ export class RepetitionMandatory extends AbstractProduction
   }
 }
 
-export class RepetitionMandatoryWithSeparator extends AbstractProduction
+export class RepetitionMandatoryWithSeparator
+  extends AbstractProduction
   implements IProductionWithOccurrence {
   public separator: TokenType
   public idx: number = 1
@@ -148,7 +152,8 @@ export class RepetitionMandatoryWithSeparator extends AbstractProduction
   }
 }
 
-export class Repetition extends AbstractProduction
+export class Repetition
+  extends AbstractProduction
   implements IProductionWithOccurrence {
   public separator: TokenType
   public idx: number = 1
@@ -167,7 +172,8 @@ export class Repetition extends AbstractProduction
   }
 }
 
-export class RepetitionWithSeparator extends AbstractProduction
+export class RepetitionWithSeparator
+  extends AbstractProduction
   implements IProductionWithOccurrence {
   public separator: TokenType
   public idx: number = 1
@@ -185,7 +191,8 @@ export class RepetitionWithSeparator extends AbstractProduction
   }
 }
 
-export class Alternation extends AbstractProduction<Alternative>
+export class Alternation
+  extends AbstractProduction<Alternative>
   implements IProductionWithOccurrence {
   public idx: number = 1
   public ignoreAmbiguities: boolean = false

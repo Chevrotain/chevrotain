@@ -37,14 +37,15 @@ function onRunAll(options) {
   clearResults()
 
   // These names are in the order in which they appear in the DOM
-  var enabledTestCaseNames = _.map($(".dataRow").has(":checked"), function (
-    currDataRow
-  ) {
-    var currClassNames = $(currDataRow).attr("class").split(" ")
-    return _.first(
-      _.difference(currClassNames, ["dataRow", "json-only", "hide"])
-    )
-  })
+  var enabledTestCaseNames = _.map(
+    $(".dataRow").has(":checked"),
+    function (currDataRow) {
+      var currClassNames = $(currDataRow).attr("class").split(" ")
+      return _.first(
+        _.difference(currClassNames, ["dataRow", "json-only", "hide"])
+      )
+    }
+  )
 
   if (_.isEmpty(enabledTestCaseNames)) {
     // otherwise the run button will never become enabled again and

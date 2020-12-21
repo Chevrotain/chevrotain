@@ -107,16 +107,6 @@
     "xregexp": "^4.2.0"
   },
   "typings": "lib/chevrotain.d.ts",
-  "nyc": {
-    "reporter": [
-      "lcov",
-      "text"
-    ],
-    "exclude": [
-      "lib/test/**/*.*",
-      "test/test.config.js"
-    ]
-  },
   "mocha": {
     "recursive": true,
     "reporter": "spec",
