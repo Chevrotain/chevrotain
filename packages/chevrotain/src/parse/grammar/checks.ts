@@ -92,16 +92,8 @@ export function validateGrammar(
     errMsgProvider
   )
 
-  let tokenNameErrors: any = utils.map(tokenTypes, (currTokType) =>
-    validateTokenName(currTokType, errMsgProvider)
-  )
-
   const tooManyAltsErrors = map(topLevels, (curRule) =>
     validateTooManyAlts(curRule, errMsgProvider)
-  )
-
-  const ruleNameErrors = map(topLevels, (curRule) =>
-    validateRuleName(curRule, errMsgProvider)
   )
 
   const duplicateRulesError = map(topLevels, (curRule) =>
@@ -116,14 +108,12 @@ export function validateGrammar(
   return <any>(
     utils.flatten(
       duplicateErrors.concat(
-        tokenNameErrors,
         emptyRepetitionErrors,
         leftRecursionErrors,
         emptyAltErrors,
         ambiguousAltsErrors,
         termsNamespaceConflictErrors,
         tooManyAltsErrors,
-        ruleNameErrors,
         duplicateRulesError
       )
     )
@@ -226,50 +216,6 @@ export class OccurrenceValidationCollector extends GAstVisitor {
   public visitTerminal(terminal: Terminal): void {
     this.allProductions.push(terminal)
   }
-}
-
-export const validTermsPattern = /^[a-zA-Z_]\w*$/
-
-// TODO: remove this limitation now that we use recorders
-export function validateRuleName(
-  rule: Rule,
-  errMsgProvider: IGrammarValidatorErrorMessageProvider
-): IParserDefinitionError[] {
-  const errors = []
-  const ruleName = rule.name
-
-  if (!ruleName.match(validTermsPattern)) {
-    errors.push({
-      message: errMsgProvider.buildInvalidRuleNameError({
-        topLevelRule: rule,
-        expectedPattern: validTermsPattern
-      }),
-      type: ParserDefinitionErrorType.INVALID_RULE_NAME,
-      ruleName: ruleName
-    })
-  }
-  return errors
-}
-
-// TODO: remove this limitation now that we use recorders
-export function validateTokenName(
-  tokenType: TokenType,
-  errMsgProvider: IGrammarValidatorErrorMessageProvider
-): IParserDefinitionError[] {
-  const errors = []
-  const tokTypeName = tokenType.name
-
-  if (!tokTypeName.match(validTermsPattern)) {
-    errors.push({
-      message: errMsgProvider.buildTokenNameError({
-        tokenType: tokenType,
-        expectedPattern: validTermsPattern
-      }),
-      type: ParserDefinitionErrorType.INVALID_TOKEN_NAME
-    })
-  }
-
-  return errors
 }
 
 export function validateRuleDoesNotAlreadyExist(
