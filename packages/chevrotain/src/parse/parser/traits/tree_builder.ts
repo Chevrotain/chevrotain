@@ -223,10 +223,10 @@ export class TreeBuilder {
     this.setNodeLocationFromNode(preCstNode.location, ruleCstResult.location)
   }
 
-  getBaseCstVisitorConstructor(
+  getBaseCstVisitorConstructor<IN = any, OUT = any>(
     this: MixedInParser
   ): {
-    new (...args: any[]): ICstVisitor<any, any>
+    new (...args: any[]): ICstVisitor<IN, OUT>
   } {
     if (isUndefined(this.baseCstVisitorConstructor)) {
       const newBaseCstVisitorConstructor = createBaseSemanticVisitorConstructor(
@@ -240,10 +240,10 @@ export class TreeBuilder {
     return <any>this.baseCstVisitorConstructor
   }
 
-  getBaseCstVisitorConstructorWithDefaults(
+  getBaseCstVisitorConstructorWithDefaults<IN = any, OUT = any>(
     this: MixedInParser
   ): {
-    new (...args: any[]): ICstVisitor<any, any>
+    new (...args: any[]): ICstVisitor<IN, OUT>
   } {
     if (isUndefined(this.baseCstVisitorWithDefaultsConstructor)) {
       const newConstructor = createBaseVisitorConstructorWithDefaults(
