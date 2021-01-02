@@ -1,3 +1,12 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+- [feat: remove constraints on rules and token names](https://github.com/SAP/chevrotain/pull/1303)
+  - Thanks to [@OmarTawfik](https://github.com/jlguenego) :thumbsup
+- [Add generics to getBaseCSTVisitorConstructor](https://github.com/SAP/chevrotain/pull/1303)
+  - Thanks to [@OmarTawfik](https://github.com/ryanleecode) :thumbsup
+
 ## 7.0.3 (10-30-2020)
 
 #### Bug Fixes
