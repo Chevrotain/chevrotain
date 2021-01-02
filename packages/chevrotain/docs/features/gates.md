@@ -20,7 +20,7 @@ $.RULE("Value", (isConst) => {
 })
 ```
 
-Using the [Look Ahead](https://sap.github.io/chevrotain/documentation/7_0_3/classes/cstparser.html#la) method is often helpful with the use of Gates to determine if a path should be followed or not, for example:
+Using the [Look Ahead](https://sap.github.io/chevrotain/documentation/7_1_0/classes/cstparser.html#la) method is often helpful with the use of Gates to determine if a path should be followed or not, for example:
 
 ```javascript
 // SELECT LIMIT.ID FROM USER_LIMIT LIMIT
