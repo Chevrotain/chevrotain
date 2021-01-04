@@ -1964,7 +1964,7 @@ export interface CstNodeLocation {
 }
 
 export declare type CstChildrenDictionary = {
-  [identifier: string]: CstElement[]
+  [identifier: string]: CstElement[] | undefined
 }
 
 export declare type CstElement = IToken | CstNode
