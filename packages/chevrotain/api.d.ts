@@ -2280,8 +2280,6 @@ export interface IRecognitionException {
  */
 export declare function isRecognitionException(error: Error): boolean
 
-// TODO refactor exceptions constructors to classes
-
 /**
  * An exception of this type will be saved in {@link Parser.errors} when {@link Parser.CONSUME}
  * was called but failed to match the expected Token Type.
