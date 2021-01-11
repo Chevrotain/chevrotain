@@ -99,7 +99,7 @@
     "sinon-chai": "^3.0.0",
     "source-map-support": "0.5.19",
     "tslint": "^6.0.0",
-    "typedoc": "^0.19.2",
+    "typedoc": "^0.20.14",
     "typescript": "4.1.3",
     "vuepress": "^1.4.1",
     "webpack": "5.11.1",
