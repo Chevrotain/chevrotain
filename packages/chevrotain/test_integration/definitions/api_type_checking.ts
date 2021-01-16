@@ -13,10 +13,6 @@ export type TypeCheckForApi = [
       /** @see  https://github.com/SAP/chevrotain/blob/87ed262c36b6f5cb4073e14f4f59901146c6c7a5/packages/chevrotain/src/api.ts#L213-L215*/
       CstParser: any
       EmbeddedActionsParser: any
-      MismatchedTokenException: ErrorConstructor
-      NoViableAltException: ErrorConstructor
-      NotAllInputParsedException: ErrorConstructor
-      EarlyExitException: ErrorConstructor
     },
     typeof apiDefs
   >,

@@ -2280,13 +2280,18 @@ export interface IRecognitionException {
  */
 export declare function isRecognitionException(error: Error): boolean
 
-// TODO refactor exceptions constructors to classes
-
 /**
  * An exception of this type will be saved in {@link Parser.errors} when {@link Parser.CONSUME}
  * was called but failed to match the expected Token Type.
  */
-export declare class MismatchedTokenException extends Error {
+export declare class MismatchedTokenException
+  extends Error
+  implements IRecognitionException {
+  context: IRecognizerContext
+  resyncedTokens: IToken[]
+  token: IToken
+  previousToken: IToken
+
   constructor(message: string, token: IToken, previousToken: IToken)
 }
 
@@ -2294,7 +2299,14 @@ export declare class MismatchedTokenException extends Error {
  * An exception of this type will be saved in {@link Parser.errors} when {@link Parser.OR}
  * was called yet none of the possible alternatives could be matched.
  */
-export declare class NoViableAltException extends Error {
+export declare class NoViableAltException
+  extends Error
+  implements IRecognitionException {
+  context: IRecognizerContext
+  resyncedTokens: IToken[]
+  token: IToken
+  previousToken: IToken
+
   constructor(message: string, token: IToken, previousToken: IToken)
 }
 
@@ -2302,7 +2314,13 @@ export declare class NoViableAltException extends Error {
  * An exception of this type will be saved in {@link Parser.errors} when
  * the parser has finished yet there exists remaining input (tokens) that has not processed.
  */
-export declare class NotAllInputParsedException extends Error {
+export declare class NotAllInputParsedException
+  extends Error
+  implements IRecognitionException {
+  context: IRecognizerContext
+  resyncedTokens: IToken[]
+  token: IToken
+
   constructor(message: string, token: IToken)
 }
 
@@ -2310,7 +2328,14 @@ export declare class NotAllInputParsedException extends Error {
  * An exception of this type will be saved in {@link Parser.errors} when {@link Parser.AT_LEAST_ONE}
  * or {@link Parser.AT_LEAST_ONE_SEP} was called but failed to match even a single iteration.
  */
-export declare class EarlyExitException extends Error {
+export declare class EarlyExitException
+  extends Error
+  implements IRecognitionException {
+  context: IRecognizerContext
+  resyncedTokens: IToken[]
+  token: IToken
+  previousToken: IToken
+
   constructor(message: string, token: IToken, previousToken: IToken)
 }
 

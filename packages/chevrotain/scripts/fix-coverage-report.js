@@ -8,20 +8,23 @@
 const fs = require("fs-extra")
 const path = require("path")
 
-const interPath = path.resolve(
-  __dirname,
-  "../lib/src/parse/grammar/interpreter.js"
-)
+// call to ignore errors introduced by TS downleveling class inheritance to ES5
+function fixClassConstructorSuperCalls(filePath) {
+  const interPath = path.resolve(__dirname, filePath)
 
-const interString = fs.readFileSync(interPath, "utf8").toString()
-let fixedInterString = interString.replace(
-  "var __extends =",
-  "/* istanbul ignore next */ var __extends ="
-)
+  const interString = fs.readFileSync(interPath, "utf8").toString()
+  let fixedInterString = interString.replace(
+    "var __extends =",
+    "/* istanbul ignore next */ var __extends ="
+  )
 
-fixedInterString = fixedInterString.replace(
-  /\|\| this/g,
-  "/* istanbul ignore next */ || this"
-)
+  fixedInterString = fixedInterString.replace(
+    /\|\| this/g,
+    "/* istanbul ignore next */ || this"
+  )
 
-fs.writeFileSync(interPath, fixedInterString)
+  fs.writeFileSync(interPath, fixedInterString)
+}
+
+fixClassConstructorSuperCalls("../lib/src/parse/exceptions_public.js")
+fixClassConstructorSuperCalls("../lib/src/parse/grammar/interpreter.js")

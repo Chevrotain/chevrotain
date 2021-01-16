@@ -1,5 +1,5 @@
 import { contains } from "../utils/utils"
-import { IToken } from "../../api"
+import { IToken, IRecognitionException, IRecognizerContext } from "../../api"
 
 const MISMATCHED_TOKEN_EXCEPTION = "MismatchedTokenException"
 const NO_VIABLE_ALT_EXCEPTION = "NoViableAltException"
@@ -21,55 +21,49 @@ export function isRecognitionException(error: Error) {
   return contains(RECOGNITION_EXCEPTION_NAMES, error.name)
 }
 
-export function MismatchedTokenException(
-  message: string,
-  token: IToken,
-  previousToken: IToken
-) {
-  this.name = MISMATCHED_TOKEN_EXCEPTION
-  this.message = message
-  this.token = token
-  this.previousToken = previousToken
-  this.resyncedTokens = []
+abstract class RecognitionException
+  extends Error
+  implements IRecognitionException {
+  context: IRecognizerContext
+  resyncedTokens = []
+
+  protected constructor(message: string, public token: IToken) {
+    super(message)
+
+    // fix prototype chain when typescript target is ES5
+    Object.setPrototypeOf(this, new.target.prototype)
+
+    /* istanbul ignore next - V8 workaround to remove constructor from stacktrace when typescript target is ES5 */
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor)
+    }
+  }
 }
 
-// must use the "Error.prototype" instead of "new Error"
-// because the stack trace points to where "new Error" was invoked"
-MismatchedTokenException.prototype = Error.prototype
-
-export function NoViableAltException(
-  message: string,
-  token: IToken,
-  previousToken: IToken
-) {
-  this.name = NO_VIABLE_ALT_EXCEPTION
-  this.message = message
-  this.token = token
-  this.previousToken = previousToken
-  this.resyncedTokens = []
+export class MismatchedTokenException extends RecognitionException {
+  constructor(message: string, token: IToken, public previousToken: IToken) {
+    super(message, token)
+    this.name = MISMATCHED_TOKEN_EXCEPTION
+  }
 }
 
-NoViableAltException.prototype = Error.prototype
-
-export function NotAllInputParsedException(message: string, token: IToken) {
-  this.name = NOT_ALL_INPUT_PARSED_EXCEPTION
-  this.message = message
-  this.token = token
-  this.resyncedTokens = []
+export class NoViableAltException extends RecognitionException {
+  constructor(message: string, token: IToken, public previousToken: IToken) {
+    super(message, token)
+    this.name = NO_VIABLE_ALT_EXCEPTION
+  }
 }
 
-NotAllInputParsedException.prototype = Error.prototype
-
-export function EarlyExitException(
-  message: string,
-  token: IToken,
-  previousToken: IToken
-) {
-  this.name = EARLY_EXIT_EXCEPTION
-  this.message = message
-  this.token = token
-  this.previousToken = previousToken
-  this.resyncedTokens = []
+export class NotAllInputParsedException extends RecognitionException {
+  constructor(message: string, token: IToken) {
+    super(message, token)
+    this.name = NOT_ALL_INPUT_PARSED_EXCEPTION
+  }
 }
 
-EarlyExitException.prototype = Error.prototype
+export class EarlyExitException extends RecognitionException {
+  constructor(message: string, token: IToken, public previousToken: IToken) {
+    super(message, token)
+    this.name = EARLY_EXIT_EXCEPTION
+  }
+}
