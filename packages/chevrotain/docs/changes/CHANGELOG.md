@@ -1,11 +1,22 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+- [fix: add missing members to parser exception type declarations](https://github.com/SAP/chevrotain/pull/1322)
+
+  - Thanks to [@mbett7](https://github.com/mbett7) :thumbsup
+
+- [fix: update type declaration for CstChildrenDictionary](https://github.com/SAP/chevrotain/pull/1315)
+  - Thanks to [@raineszm](https://github.com/raineszm) :thumbsup
+
 ## 7.1.0 (1-2-2021)
 
 #### Minor Changes
 
-- [feat: remove constraints on rules and token names](https://github.com/SAP/chevrotain/pull/1303)
-  - Thanks to [@OmarTawfik](https://github.com/jlguenego) :thumbsup
+- [feat: remove constraints on rules and token names](https://github.com/SAP/chevrotain/pull/1293)
+  - Thanks to [@jlguenego](https://github.com/jlguenego) :thumbsup
 - [Add generics to getBaseCSTVisitorConstructor](https://github.com/SAP/chevrotain/pull/1303)
-  - Thanks to [@OmarTawfik](https://github.com/ryanleecode) :thumbsup
+  - Thanks to [@ryanleecode](https://github.com/ryanleecode) :thumbsup
 
 ## 7.0.3 (10-30-2020)
 
