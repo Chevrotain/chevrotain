@@ -3,8 +3,8 @@
 Chevrotain allows users to customize both the parser and lexer error messages.
 This can be accomplished by implementing the following interfaces:
 
-- [IParserErrorMessageProvider](https://sap.github.io/chevrotain/documentation/7_1_0/interfaces/iparsererrormessageprovider.html)
-- [ILexerErrorMessageProvider](https://sap.github.io/chevrotain/documentation/7_1_0/interfaces/ilexererrormessageprovider.html)
+- [IParserErrorMessageProvider](https://sap.github.io/chevrotain/documentation/7_1_1/interfaces/iparsererrormessageprovider.html)
+- [ILexerErrorMessageProvider](https://sap.github.io/chevrotain/documentation/7_1_1/interfaces/ilexererrormessageprovider.html)
 
 See executable examples:
 
@@ -25,7 +25,7 @@ $.RULE("myStatement", () => {
 
 The **ERR_MSG** config property is available for the following DSL methods:
 
-- [CONSUME](https://sap.github.io/chevrotain/documentation/7_1_0/classes/cstparser.html#consume)
-- [OR](https://sap.github.io/chevrotain/documentation/7_1_0/classes/cstparser.html#or)
-- [AT_LEAST_ONE](https://sap.github.io/chevrotain/documentation/7_1_0/classes/cstparser.html#at_least_one)
-- [AT_LEAST_ONE_SEP](https://sap.github.io/chevrotain/documentation/7_1_0/classes/cstparser.html#at_least_one_sep)
+- [CONSUME](https://sap.github.io/chevrotain/documentation/7_1_1/classes/cstparser.html#consume)
+- [OR](https://sap.github.io/chevrotain/documentation/7_1_1/classes/cstparser.html#or)
+- [AT_LEAST_ONE](https://sap.github.io/chevrotain/documentation/7_1_1/classes/cstparser.html#at_least_one)
+- [AT_LEAST_ONE_SEP](https://sap.github.io/chevrotain/documentation/7_1_1/classes/cstparser.html#at_least_one_sep)
