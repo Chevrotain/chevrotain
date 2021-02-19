@@ -85,7 +85,7 @@ const MultiLineStringLiteral = createToken({
 ```
 
 Also please open an issue in the [regexp-to-ast library][regexp_to_ast]
-so the the root problem could be tracked and resolved.
+so the root problem could be tracked and resolved.
 
 ## A Custom Token Pattern should specify the <line_breaks> option
 
@@ -344,9 +344,9 @@ It will only enable performance optimizations in the lexer.
 
 ## Missing \<lineTerminatorCharacters\> property on the Lexer config
 
-Chevrotain treats /\n|\r\n?/ as line terminators, but that is insufficient for some grammars
-Therefore it is possible to customize the definition of line terminators using the the [lineTerminatorPattern option][line_terminator_pattern]
-When doing so however it is also necessary to provide the [lineTerminatorCharacters option][line_terminator_characters].
+Chevrotain treats `/\n|\r\n?/` as line terminators, but that is insufficient for some grammars.
+Therefore, it is possible to customize the definition of line terminators using the [lineTerminatorPattern option][line_terminator_pattern].
+When doing so, however, it is also necessary to provide the [lineTerminatorCharacters option][line_terminator_characters].
 This causes a bit of duplication and may be simplified in future versions.
 
 Example:
