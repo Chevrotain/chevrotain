@@ -180,7 +180,7 @@ For the following invalid json input:
 }
 ```
 
-- When encountering the the redundant colon the rule stack will be as follows:
+- When encountering the redundant colon the rule stack will be as follows:
 
   - **object** --> top level object
   - **objectItem** --> "someData": ... - second item in the top level object

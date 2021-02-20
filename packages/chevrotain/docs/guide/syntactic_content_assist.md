@@ -155,7 +155,7 @@ In that case additional post processing logic may need to be added to farther fi
 In details: the content assist parser is a "backtracking" Parser,
 which means it will try **all** the paths until it finds a valid one.
 It disregards the max token lookahead constraints of the base Chevrotain parser.
-Therefor for a grammar path that has been disabled by a Gate / Predicate to be offered as content assist suggestion:
+Therefore, for a grammar path that has been disabled by a Gate / Predicate to be offered as content assist suggestion:
 Not only does the fixed tokens lookahead have to match at the Gate's position.
 The **remaining input** following the Gate's position must **also** match.
 This is a much stronger condition (K tokens vs dozens/hundreds/infinity) thus making this issue a very minor one.
