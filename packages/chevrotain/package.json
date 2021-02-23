@@ -16,7 +16,7 @@
     "tolerant"
   ],
   "bugs": {
-    "url": "https://github.com/chevrotain/chevrotain/issues"
+    "url": "https://github.com/Chevrotain/chevrotain/issues"
   },
   "license": "Apache-2.0",
   "author": {
@@ -40,7 +40,7 @@
   "module": "lib_esm/src/api.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/chevrotain/chevrotain.git"
+    "url": "git://github.com/Chevrotain/chevrotain.git"
   },
   "homepage": "https://chevrotain.io/docs/",
   "scripts": {
