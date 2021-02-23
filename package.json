@@ -9,7 +9,7 @@
   },
   "scripts": {
     "lerna:version": "yarn && lerna version",
-    "lerna:publish": "lerna publish from-git --yes",
+    "lerna:publish": "lerna publish from-git --yes --no-verify-access",
     "ci": "npm-run-all format:validate build test",
     "build": "lerna run build",
     "test": "lerna run test",
