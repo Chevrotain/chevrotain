@@ -68,7 +68,7 @@ due to performance and grammar complexity reasons.
 From a performance perspective this is particularly problematic as some analysis
 done on the grammar (during initialization) may become **exponentially** more complex as the maxLookahead grows.
 
-We could also specify the [MAX_LOOKAHEAD](https://sap.github.io/chevrotain/documentation/7_1_1/interfaces/ormethodopts.html#ignore_ambiguities)
+We could also specify the [MAX_LOOKAHEAD](https://chevrotain.io/documentation/7_1_1/interfaces/ormethodopts.html#ignore_ambiguities)
 config on the **specific** DSL method invocation where the problem occurs, This is still not the optimal solution in this case.
 
 **_The recommended solution in this case would be to refactor the grammar to require a smaller lookahead_**.
@@ -111,13 +111,13 @@ Although this is **strongly** discouraged due to performance and complexity reas
 ## Terminal Token Name Not Found
 
 This problem can no longer occur in versions of Chevrotain after (and including) 6.0.0.
-See [V5 of these Docs](https://github.com/SAP/chevrotain/blob/v5.0.0/packages/chevrotain/docs/guide/resolving_grammar_errors.md#terminal-token-name-not-found)
+See [V5 of these Docs](https://github.com/chevrotain/chevrotain/blob/v5.0.0/packages/chevrotain/docs/guide/resolving_grammar_errors.md#terminal-token-name-not-found)
 if you have not yet upgraded.
 
 ## Infinite Loop Detected
 
 - Note **This error is only relevant in versions prior to 4.4.0**
-  See: https://github.com/SAP/chevrotain/issues/958
+  See: https://github.com/chevrotain/chevrotain/issues/958
 
 A repetition must consume at least one token in each iteration.
 Entering an iteration while failing to do so would cause an **infinite loop** because
@@ -157,7 +157,7 @@ $.MANY(() => {
 This is similar to the previous example as if the condition is false, once
 again the parser will consume nothing in the iteration.
 Modeling conditional grammar paths must be done using Chevrotain grammar constructs
-such as OPTION and/or [GATE](https://sap.github.io/chevrotain/docs/features/gates.html).
+such as OPTION and/or [GATE](https://chevrotain.io/docs/features/gates.html).
 
 For example the above example should be written as:
 
@@ -201,5 +201,5 @@ For example:
   ])
   ```
 
-[maxlookahead]: https://sap.github.io/chevrotain/documentation/7_1_1/interfaces/iparserconfig.html#maxlookahead
-[ignore_ambiguities]: https://sap.github.io/chevrotain/documentation/7_1_1/interfaces/ormethodopts.html#ignore_ambiguities
+[maxlookahead]: https://chevrotain.io/documentation/7_1_1/interfaces/iparserconfig.html#maxlookahead
+[ignore_ambiguities]: https://chevrotain.io/documentation/7_1_1/interfaces/ormethodopts.html#ignore_ambiguities

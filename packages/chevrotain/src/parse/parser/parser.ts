@@ -263,7 +263,7 @@ export class Parser {
       throw new Error(
         "The <ignoredIssues> IParserConfig property has been deprecated.\n\t" +
           "Please use the <IGNORE_AMBIGUITIES> flag on the relevant DSL method instead.\n\t" +
-          "See: https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#IGNORING_AMBIGUITIES\n\t" +
+          "See: https://chevrotain.io/docs/guide/resolving_grammar_errors.html#IGNORING_AMBIGUITIES\n\t" +
           "For further details."
       )
     }

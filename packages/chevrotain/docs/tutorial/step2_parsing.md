@@ -2,7 +2,7 @@
 
 ### TLDR
 
-[Run and Debug the source code](https://github.com/SAP/chevrotain/tree/master/examples/tutorial/step2_parsing).
+[Run and Debug the source code](https://github.com/chevrotain/chevrotain/tree/master/examples/tutorial/step2_parsing).
 
 ## Introduction
 
@@ -36,17 +36,17 @@ relationalOperator
    : ">" | "<"
 ```
 
-A Chevrotain Parser analyses an [IToken](https://sap.github.io/chevrotain/documentation/7_1_1/interfaces/itoken.html) vector that conforms to some grammar.
-The grammar is defined using the [parsing DSL](https://sap.github.io/chevrotain/documentation/7_1_1/classes/cstparser.html#at_least_one), which includes the following methods.
+A Chevrotain Parser analyses an [IToken](https://chevrotain.io/documentation/7_1_1/interfaces/itoken.html) vector that conforms to some grammar.
+The grammar is defined using the [parsing DSL](https://chevrotain.io/documentation/7_1_1/classes/cstparser.html#at_least_one), which includes the following methods.
 
-- [CONSUME](https://sap.github.io/chevrotain/documentation/7_1_1/classes/cstparser.html#consume) - 'eat' a Token.
-- [SUBRULE](https://sap.github.io/chevrotain/documentation/7_1_1/classes/cstparser.html#subrule) - reference to another rule.
-- [OR](https://sap.github.io/chevrotain/documentation/7_1_1/classes/cstparser.html#or) - Alternation
-- [OPTION](https://sap.github.io/chevrotain/documentation/7_1_1/classes/cstparser.html#option) - optional production.
-- [MANY](https://sap.github.io/chevrotain/documentation/7_1_1/classes/cstparser.html#many) - repetition zero or more.
-- [AT_LEAST_ONE](https://sap.github.io/chevrotain/documentation/7_1_1/classes/cstparser.html#at_least_one) - repetition one or more.
-- [MANY_SEP](https://sap.github.io/chevrotain/documentation/7_1_1/classes/cstparser.html#many_sep) - repetition (zero or more) with a separator between any two items
-- [AT_LEAST_ONE_SEP](https://sap.github.io/chevrotain/documentation/7_1_1/classes/cstparser.html#at_least_one_sep) - repetition (one or more) with a separator between any two items
+- [CONSUME](https://chevrotain.io/documentation/7_1_1/classes/cstparser.html#consume) - 'eat' a Token.
+- [SUBRULE](https://chevrotain.io/documentation/7_1_1/classes/cstparser.html#subrule) - reference to another rule.
+- [OR](https://chevrotain.io/documentation/7_1_1/classes/cstparser.html#or) - Alternation
+- [OPTION](https://chevrotain.io/documentation/7_1_1/classes/cstparser.html#option) - optional production.
+- [MANY](https://chevrotain.io/documentation/7_1_1/classes/cstparser.html#many) - repetition zero or more.
+- [AT_LEAST_ONE](https://chevrotain.io/documentation/7_1_1/classes/cstparser.html#at_least_one) - repetition one or more.
+- [MANY_SEP](https://chevrotain.io/documentation/7_1_1/classes/cstparser.html#many_sep) - repetition (zero or more) with a separator between any two items
+- [AT_LEAST_ONE_SEP](https://chevrotain.io/documentation/7_1_1/classes/cstparser.html#at_least_one_sep) - repetition (one or more) with a separator between any two items
 
 ## First Rule
 
@@ -171,7 +171,7 @@ $.RULE("selectClause", () => {
 There **do not** exist two different representations for the grammar
 and the runnable implementation (for example, grammar file vs generated code in the case of parser generators).
 Again, please note that Chevrotain is **NOT** a parser generator.
-Extra details can be found [in the FAQ](https://sap.github.io/chevrotain/docs/FAQ.html#VS_GENERATORS).
+Extra details can be found [in the FAQ](https://chevrotain.io/docs/FAQ.html#VS_GENERATORS).
 
 ## Under The Hood
 

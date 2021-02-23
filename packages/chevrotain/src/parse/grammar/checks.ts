@@ -428,7 +428,7 @@ export function validateAmbiguousAlternationAlternatives(
   let ors = orCollector.alternations
 
   // New Handling of ignoring ambiguities
-  // - https://github.com/SAP/chevrotain/issues/869
+  // - https://github.com/chevrotain/chevrotain/issues/869
   ors = reject(ors, (currOr) => currOr.ignoreAmbiguities === true)
 
   let errors = utils.reduce(

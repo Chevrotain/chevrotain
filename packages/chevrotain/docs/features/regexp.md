@@ -41,5 +41,5 @@ $.RULE("statement", () => {
 })
 ```
 
-See [full executable example](https://github.com/SAP/chevrotain/blob/master/examples/grammars/graphql/graphql.js)
+See [full executable example](https://github.com/chevrotain/chevrotain/blob/master/examples/grammars/graphql/graphql.js)
 as part of the graphQL example grammar.

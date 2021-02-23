@@ -124,10 +124,10 @@ The release process **requires push permissions to master**.
   - Additionally new website contents will be pushed to the gh-pages branch.
 - Check that the release was successful.
 
-  - On [circle-ci](https://circleci.com/gh/SAP/chevrotain)
+  - On [circle-ci](https://circleci.com/gh/chevrotain/chevrotain)
   - On [npmjs.com](https://www.npmjs.com/package/chevrotain)
-  - On [The website](https://sap.github.io/chevrotain/docs/changes/CHANGELOG.html)
-  - On [The APIs webpage](https://sap.github.io/chevrotain/documentation/)
+  - On [The website](https://chevrotain.io/docs/changes/CHANGELOG.html)
+  - On [The APIs webpage](https://chevrotain.io/documentation/)
     - The URL being redirected to should include the latest version number.
 
 #### Legal
@@ -136,7 +136,7 @@ All Contributors must sign the [CLA][cla].
 The process is completely automated using https://cla-assistant.io/
 simply follow the instructions in the pull request.
 
-[examples]: https://github.com/SAP/chevrotain/tree/master/examples
-[sample_grammars]: https://github.com/SAP/chevrotain/tree/master/examples/grammars
-[cla]: https://cla-assistant.io/SAP/chevrotain
-[package]: https://github.com/SAP/chevrotain/blob/master/packages/chevrotain/package.json
+[examples]: https://github.com/chevrotain/chevrotain/tree/master/examples
+[sample_grammars]: https://github.com/chevrotain/chevrotain/tree/master/examples/grammars
+[cla]: https://cla-assistant.io/chevrotain/chevrotain
+[package]: https://github.com/chevrotain/chevrotain/blob/master/packages/chevrotain/package.json

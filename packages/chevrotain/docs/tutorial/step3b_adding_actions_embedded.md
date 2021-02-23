@@ -2,7 +2,7 @@
 
 ### TLDR
 
-[Run and Debug the source code](https://github.com/SAP/chevrotain/tree/master/examples/tutorial/step3_actions/step3b_actions_embedded.js).
+[Run and Debug the source code](https://github.com/chevrotain/chevrotain/tree/master/examples/tutorial/step3_actions/step3b_actions_embedded.js).
 
 ### Introduction
 
@@ -13,9 +13,9 @@ result/data structure/value.
 
 This can be accomplished using two features of the Parsing DSL:
 
-- [CONSUME](https://sap.github.io/chevrotain/documentation/7_1_1/classes/embeddedactionsparser.html#consume) will return
-  The [IToken](https://sap.github.io/chevrotain/documentation/7_1_1/interfaces/itoken.html) object consumed.
-- [SUBRULE](https://sap.github.io/chevrotain/documentation/7_1_1/classes/embeddedactionsparser.html#subrule) will return
+- [CONSUME](https://chevrotain.io/documentation/7_1_1/classes/embeddedactionsparser.html#consume) will return
+  The [IToken](https://chevrotain.io/documentation/7_1_1/interfaces/itoken.html) object consumed.
+- [SUBRULE](https://chevrotain.io/documentation/7_1_1/classes/embeddedactionsparser.html#subrule) will return
   the result of the grammar rule invoked.
 
 ### Enabling embedded actions

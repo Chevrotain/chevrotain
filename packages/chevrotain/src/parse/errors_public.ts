@@ -149,7 +149,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
                   appears more than once (${
                     duplicateProds.length
                   } times) in the top level rule: ->${topLevelName}<-.                  
-                  For further details see: https://sap.github.io/chevrotain/docs/FAQ.html#NUMERICAL_SUFFIXES 
+                  For further details see: https://chevrotain.io/docs/FAQ.html#NUMERICAL_SUFFIXES 
                   `
 
     // white space trimming time! better to trim afterwards as it allows to use WELL formatted multi line template strings...
@@ -187,7 +187,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
       )}> due to common lookahead prefix\n` +
       `in <OR${occurrence}> inside <${options.topLevelRule.name}> Rule,\n` +
       `<${pathMsg}> may appears as a prefix path in all these alternatives.\n` +
-      `See: https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#COMMON_PREFIX\n` +
+      `See: https://chevrotain.io/docs/guide/resolving_grammar_errors.html#COMMON_PREFIX\n` +
       `For Further details.`
 
     return errMsg
@@ -213,7 +213,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
 
     currMessage =
       currMessage +
-      `See: https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES\n` +
+      `See: https://chevrotain.io/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES\n` +
       `For Further details.`
     return currMessage
   },

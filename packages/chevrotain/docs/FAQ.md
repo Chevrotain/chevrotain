@@ -33,7 +33,7 @@ This is because the grammar is written in a **different** language than the targ
 
 - **Performance**: Chevrotain is generally faster (often much more so) than other existing JavaScript Parsing Solutions.
   And can even compete with the performance of hand built parsers.
-  See an [Online Benchmark](https://sap.github.io/chevrotain/performance/) that compares the performance of JSON Parsers implemented using multiple JavaScript Parsing solutions.
+  See an [Online Benchmark](https://chevrotain.io/performance/) that compares the performance of JSON Parsers implemented using multiple JavaScript Parsing solutions.
 
 - **Error Recovery / Fault Tolerance**: With the exception of Antlr4, other JavaScript Parsing Solutions usually do not have Error Recovery capabilities.
 
@@ -95,7 +95,7 @@ used for many things such as:
 This means that certain aggressive minification options can break Chevrotain grammars.~~
 
 The dependence on `Function.prototype.toString` was removed in
-[version 6.0.0](http://sap.github.io/chevrotain/docs/changes/CHANGELOG.html#_6-0-0-8-20-2019) of Chevrotain.
+[version 6.0.0](http://chevrotain.io/docs/changes/CHANGELOG.html#_6-0-0-8-20-2019) of Chevrotain.
 Special handling is no longer needed during minification scenarios.
 
 ## Why does Chevrotain not work correctly after I webpacked my Grammar?
@@ -104,14 +104,14 @@ Special handling is no longer needed during minification scenarios.
 This means that certain webpack optimizations can break Chevrotain grammars.~~
 
 The dependence on `Function.prototype.toString` was removed in
-[version 6.0.0](http://sap.github.io/chevrotain/docs/changes/CHANGELOG.html#_6-0-0-8-20-2019) of Chevrotain.
+[version 6.0.0](http://chevrotain.io/docs/changes/CHANGELOG.html#_6-0-0-8-20-2019) of Chevrotain.
 Special handling is no longer needed during WebPacking scenarios.
 
 ## Why does my parser appear to be stuck during its initialization?
 
 The first time a Chevrotain parser is initialized additional validations and computations are performed.
 Some of these can take a very long time under certain edge cases. Specifically the detection of ambiguous alternatives
-when the parser uses a larger than the default [maxLookahead](https://sap.github.io/chevrotain/documentation/7_1_1/interfaces/iparserconfig.html#maxlookahead)
+when the parser uses a larger than the default [maxLookahead](https://chevrotain.io/documentation/7_1_1/interfaces/iparserconfig.html#maxlookahead)
 and there are many (thousands) of ambiguous paths.
 
 To resolve this try reducing the maxLookahead and inspect the ambiguity errors to fix

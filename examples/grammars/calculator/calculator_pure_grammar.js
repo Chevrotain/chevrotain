@@ -7,7 +7,7 @@
  * of chevrotain.
  *
  * See farther details here:
- * https://github.com/SAP/chevrotain/blob/master/docs/concrete_syntax_tree.md
+ * https://github.com/chevrotain/chevrotain/blob/master/docs/concrete_syntax_tree.md
  */
 const { createToken, tokenMatcher, Lexer, CstParser } = require("chevrotain")
 

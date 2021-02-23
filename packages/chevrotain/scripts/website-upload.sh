@@ -3,7 +3,7 @@ rm -rf gh-pages
 mkdir gh-pages
 cd gh-pages
 
-git clone https://github.com/SAP/chevrotain.git .
+git clone https://github.com/chevrotain/chevrotain.git .
 git checkout gh-pages
 
 # update contents

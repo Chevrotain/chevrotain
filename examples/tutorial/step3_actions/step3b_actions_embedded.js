@@ -1,13 +1,13 @@
 "use strict"
 // Written Docs for this tutorial step can be found here:
-// https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3b_adding_actions_embedded.md
+// https://github.com/chevrotain/chevrotain/blob/master/docs/tutorial/step3b_adding_actions_embedded.md
 
 // Tutorial Step 3:
 
 // Adding a actions(semantics) embedded in the grammar.
 // This is the highest performance approach, but its also verbose and none modular
 // Therefore using the CST Visitor is the recommended approach:
-// https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step3a_actions_visitor.js
+// https://github.com/chevrotain/chevrotain/blob/master/docs/tutorial/src/step3a_actions_visitor.js
 
 const selectLexer = require("../step1_lexing/step1_lexing")
 const EmbeddedActionsParser = require("chevrotain").EmbeddedActionsParser

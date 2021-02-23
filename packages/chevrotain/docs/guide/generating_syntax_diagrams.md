@@ -9,8 +9,8 @@ library by @tabatkins.
 
 ## Examples
 
-- [JSON Syntax diagrams](https://sap.github.io/chevrotain/diagrams_samples/json.html).
-- [CSS Syntax diagrams](https://sap.github.io/chevrotain/diagrams_samples/css.html).
+- [JSON Syntax diagrams](https://chevrotain.io/diagrams_samples/json.html).
+- [CSS Syntax diagrams](https://chevrotain.io/diagrams_samples/css.html).
 
 ## Features
 
@@ -19,7 +19,7 @@ library by @tabatkins.
 
 ## Instructions
 
-Chevrotain provides the [**createSyntaxDiagramsCode**](https://sap.github.io/chevrotain/documentation/7_1_1/globals.html#createsyntaxdiagramscode) API to generate the **html source code**
+Chevrotain provides the [**createSyntaxDiagramsCode**](https://chevrotain.io/documentation/7_1_1/globals.html#createsyntaxdiagramscode) API to generate the **html source code**
 of syntax diagrams. This html source code can then be used by an end user in either node.js or a browser:
 
 1.  By writing it directly to the disk in a pure node.js runtime scenario.
@@ -27,16 +27,16 @@ of syntax diagrams. This html source code can then be used by an end user in eit
 
 **Examples:**
 
-- [Generating syntax diagrams to a file](https://github.com/SAP/chevrotain/blob/master/examples/parser/diagrams/gen_diagrams.js)
+- [Generating syntax diagrams to a file](https://github.com/chevrotain/chevrotain/blob/master/examples/parser/diagrams/gen_diagrams.js)
 
   - Self contained, no need for Chevrotain or the grammar when rendering the html.
 
-- [Generating syntax diagrams dynamically into an iframe](https://github.com/SAP/chevrotain/blob/master/examples/parser/diagrams/diagrams_browser.html)
+- [Generating syntax diagrams dynamically into an iframe](https://github.com/chevrotain/chevrotain/blob/master/examples/parser/diagrams/diagrams_browser.html)
   - Requires loading **both** Chevrotain and the grammar (and dependencies!) when rendering the html.
 
 ## Customization
 
-The [logic for generating the HTML](https://github.com/SAP/chevrotain/tree/master/src/diagrams/render_public.ts)
+The [logic for generating the HTML](https://github.com/chevrotain/chevrotain/tree/master/src/diagrams/render_public.ts)
 is quite trivial and the generated code itself is also very simple with a decent separation of concerns.
 These can be used as a basis for creating more advanced custom scenarios, for example:
 

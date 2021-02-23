@@ -3,7 +3,7 @@ set -e
 rm -rf gh-pages
 mkdir gh-pages
 cd gh-pages
-git clone https://github.com/SAP/chevrotain.git .
+git clone https://github.com/chevrotain/chevrotain.git .
 
 echo "checkout gh-pages"
 git checkout gh-pages

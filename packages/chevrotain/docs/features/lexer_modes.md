@@ -5,5 +5,5 @@ In essence this means having multiple separate lexers that can be switched betwe
 
 This capability is necessary to tokenize some languages such as HTML.
 
-See [executable example](https://github.com/SAP/chevrotain/tree/master/examples/lexer/multi_mode_lexer)
+See [executable example](https://github.com/chevrotain/chevrotain/tree/master/examples/lexer/multi_mode_lexer)
 for further details.

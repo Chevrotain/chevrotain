@@ -30,6 +30,6 @@ const IntegerToken = createToken({
 })
 ```
 
-This feature is often used to implement complex lexing logic, such as [python indentation](https://github.com/SAP/chevrotain/tree/master/examples/lexer/python_indentation).
+This feature is often used to implement complex lexing logic, such as [python indentation](https://github.com/chevrotain/chevrotain/tree/master/examples/lexer/python_indentation).
 
 See [in depth guide](../guide/custom_token_patterns.md) for further details.

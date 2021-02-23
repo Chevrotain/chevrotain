@@ -333,7 +333,7 @@ export function analyzeTokenTypes(
                     `\tUnable to analyze < ${currTokType.PATTERN.toString()} > pattern.\n` +
                     "\tThe regexp unicode flag is not currently supported by the regexp-to-ast library.\n" +
                     "\tThis will disable the lexer's first char optimizations.\n" +
-                    "\tFor details See: https://sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#UNICODE_OPTIMIZE"
+                    "\tFor details See: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#UNICODE_OPTIMIZE"
                 )
               }
             } else {
@@ -360,7 +360,7 @@ export function analyzeTokenTypes(
                 `${failedOptimizationPrefixMsg}` +
                   `\tTokenType: <${currTokType.name}> is using a custom token pattern without providing <start_chars_hint> parameter.\n` +
                   "\tThis will disable the lexer's first char optimizations.\n" +
-                  "\tFor details See: https://sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#CUSTOM_OPTIMIZE"
+                  "\tFor details See: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#CUSTOM_OPTIMIZE"
               )
             }
             canBeOptimized = false
@@ -524,7 +524,7 @@ export function findEndOfInputAnchor(
         "\tToken Type: ->" +
         currType.name +
         "<- static 'PATTERN' cannot contain end of input anchor '$'\n" +
-        "\tSee sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#ANCHORS" +
+        "\tSee chevrotain.io/docs/guide/resolving_lexer_errors.html#ANCHORS" +
         "\tfor details.",
       type: LexerDefinitionErrorType.EOI_ANCHOR_FOUND,
       tokenTypes: [currType]
@@ -591,7 +591,7 @@ export function findStartOfInputAnchor(
         "\tToken Type: ->" +
         currType.name +
         "<- static 'PATTERN' cannot contain start of input anchor '^'\n" +
-        "\tSee https://sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#ANCHORS" +
+        "\tSee https://chevrotain.io/docs/guide/resolving_lexer_errors.html#ANCHORS" +
         "\tfor details.",
       type: LexerDefinitionErrorType.SOI_ANCHOR_FOUND,
       tokenTypes: [currType]
@@ -758,7 +758,7 @@ export function findUnreachablePatterns(
           `Token: ->${tokenType.name}<- can never be matched.\n` +
           `Because it appears AFTER the Token Type ->${tokType.name}<-` +
           `in the lexer's definition.\n` +
-          `See https://sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#UNREACHABLE`
+          `See https://chevrotain.io/docs/guide/resolving_lexer_errors.html#UNREACHABLE`
         errors.push({
           message: msg,
           type: LexerDefinitionErrorType.UNREACHABLE_PATTERN,
@@ -933,7 +933,7 @@ export function performWarningRuntimeChecks(
         "Warning: No LINE_BREAKS Found.\n" +
         "\tThis Lexer has been defined to track line and column information,\n" +
         "\tBut none of the Token Types can be identified as matching a line terminator.\n" +
-        "\tSee https://sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#LINE_BREAKS \n" +
+        "\tSee https://chevrotain.io/docs/guide/resolving_lexer_errors.html#LINE_BREAKS \n" +
         "\tfor details.",
       type: LexerDefinitionErrorType.NO_LINE_BREAKS_FLAGS
     })
@@ -1070,13 +1070,13 @@ export function buildLineBreakIssueMessage(
       "Warning: unable to identify line terminator usage in pattern.\n" +
       `\tThe problem is in the <${tokType.name}> Token Type\n` +
       `\t Root cause: ${details.errMsg}.\n` +
-      "\tFor details See: https://sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#IDENTIFY_TERMINATOR"
+      "\tFor details See: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#IDENTIFY_TERMINATOR"
     )
   } else if (details.issue === LexerDefinitionErrorType.CUSTOM_LINE_BREAK) {
     return (
       "Warning: A Custom Token Pattern should specify the <line_breaks> option.\n" +
       `\tThe problem is in the <${tokType.name}> Token Type\n` +
-      "\tFor details See: https://sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#CUSTOM_LINE_BREAK"
+      "\tFor details See: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#CUSTOM_LINE_BREAK"
     )
   } else {
     throw Error("non exhaustive match")

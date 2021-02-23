@@ -16,7 +16,7 @@
     "tolerant"
   ],
   "bugs": {
-    "url": "https://github.com/SAP/chevrotain/issues"
+    "url": "https://github.com/chevrotain/chevrotain/issues"
   },
   "license": "Apache-2.0",
   "author": {
@@ -40,9 +40,9 @@
   "module": "lib_esm/src/api.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/SAP/chevrotain.git"
+    "url": "git://github.com/chevrotain/chevrotain.git"
   },
-  "homepage": "https://sap.github.io/chevrotain/docs/",
+  "homepage": "https://chevrotain.io/docs/",
   "scripts": {
     "---------- CI FLOWS --------": "",
     "build": "npm-run-all clean lint compile build:esm dts api-site:build bundle",

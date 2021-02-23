@@ -63,7 +63,7 @@ module.exports = {
     }
   },
   themeConfig: {
-    repo: "SAP/chevrotain",
+    repo: "chevrotain/chevrotain",
     docsDir: "packages/chevrotain/docs",
     docsBranch: "master",
     algolia: {
@@ -83,15 +83,15 @@ module.exports = {
 
       {
         text: "APIs",
-        link: `https://sap.github.io/chevrotain/documentation/${versionWithLowDashs}/globals.html`
+        link: `https://chevrotain.io/documentation/${versionWithLowDashs}/globals.html`
       },
       {
         text: "Playground",
-        link: "https://sap.github.io/chevrotain/playground/"
+        link: "https://chevrotain.io/playground/"
       },
       {
         text: "Benchmark",
-        link: "https://sap.github.io/chevrotain/performance/"
+        link: "https://chevrotain.io/performance/"
       },
       {
         text: "Chat",

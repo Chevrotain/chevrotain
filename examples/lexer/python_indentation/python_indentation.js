@@ -10,7 +10,7 @@
  * - To implement this the previous Ident levels will be saved in a stack.
  *
  * For additional details on custom token patterns, see the docs:
- * https://github.com/SAP/chevrotain/blob/master/docs/custom_token_patterns.md
+ * https://github.com/chevrotain/chevrotain/blob/master/docs/custom_token_patterns.md
  */
 
 "use strict"

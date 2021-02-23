@@ -1,6 +1,6 @@
 # Tutorial - Semantics CST Visitor
 
-[Run and Debug the source code](https://github.com/SAP/chevrotain/tree/master/examples/tutorial/step3_actions/step3a_actions_visitor.js).
+[Run and Debug the source code](https://github.com/chevrotain/chevrotain/tree/master/examples/tutorial/step3_actions/step3a_actions_visitor.js).
 
 ## Introduction
 
@@ -11,11 +11,11 @@ But in most real world use cases the parser will **also** have to output some re
 
 This can be accomplished using a CST (Concrete Syntax Tree) Visitor defined **outside** our grammar:
 
-- See in depth documentation of Chevrotain's [CST capabilities](https://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html)
+- See in depth documentation of Chevrotain's [CST capabilities](https://chevrotain.io/docs/guide/concrete_syntax_tree.html)
 
 ## Enabling CST
 
-This feature is automatically enabled when a Parser extends the Chevrotain [CstParser](https://sap.github.io/chevrotain/documentation/7_1_1/classes/cstparser.html) class
+This feature is automatically enabled when a Parser extends the Chevrotain [CstParser](https://chevrotain.io/documentation/7_1_1/classes/cstparser.html) class
 
 The invocation of any grammar rule will now automatically create a CST.
 

@@ -9,7 +9,7 @@ describe("Chevrotain's runtime deprecation checks", () => {
     expect(() => new Parser()).to.throw("The Parser class has been deprecated")
     expect(() => new Parser()).to.throw("CstParser or EmbeddedActionsParser")
     expect(() => new Parser()).to.throw(
-      "https://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_7-0-0"
+      "https://chevrotain.io/docs/changes/BREAKING_CHANGES.html#_7-0-0"
     )
   })
 

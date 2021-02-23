@@ -56,7 +56,7 @@ const RECORDING_PHASE_TOKEN = createTokenInstance(
   RFT,
   "This IToken indicates the Parser is in Recording Phase\n\t" +
     "" +
-    "See: https://sap.github.io/chevrotain/docs/guide/internals.html#grammar-recording for details",
+    "See: https://chevrotain.io/docs/guide/internals.html#grammar-recording for details",
   // Using "-1" instead of NaN (as in EOF) because an actual number is less likely to
   // cause errors if the output of LA or CONSUME would be (incorrectly) used during the recording phase.
   -1,
@@ -71,7 +71,7 @@ Object.freeze(RECORDING_PHASE_TOKEN)
 const RECORDING_PHASE_CSTNODE: CstNode = {
   name:
     "This CSTNode indicates the Parser is in Recording Phase\n\t" +
-    "See: https://sap.github.io/chevrotain/docs/guide/internals.html#grammar-recording for details",
+    "See: https://chevrotain.io/docs/guide/internals.html#grammar-recording for details",
   children: {}
 }
 
@@ -224,7 +224,7 @@ export class GastRecorder {
           originalError.message =
             originalError.message +
             '\n\t This error was thrown during the "grammar recording phase" For more info see:\n\t' +
-            "https://sap.github.io/chevrotain/docs/guide/internals.html#grammar-recording"
+            "https://chevrotain.io/docs/guide/internals.html#grammar-recording"
         } catch (mutabilityError) {
           // We may not be able to modify the original error object
           throw originalError

@@ -8,7 +8,7 @@
  * This can be useful for simple use cases and it is also very fast.
  * It can become very verbose for complex use cases, see the same grammar with separated semantics
  * for an alternative:
- * https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js
+ * https://github.com/chevrotain/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js
  */
 const {
   createToken,

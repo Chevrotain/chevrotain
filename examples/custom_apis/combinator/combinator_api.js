@@ -86,7 +86,7 @@ function createParser(name, rules, tokenVocabulary) {
   const resolutionErrors = resolveGrammar({ rules: rules })
 
   // The indices must be unique.
-  // See https://sap.github.io/chevrotain/docs/FAQ.html#NUMERICAL_SUFFIXES
+  // See https://chevrotain.io/docs/FAQ.html#NUMERICAL_SUFFIXES
   assignOccurrenceIndices({ rules: rules })
 
   if (!_.isEmpty(resolutionErrors)) {

@@ -15,10 +15,10 @@ Chevrotain supports two **very different** solutions to this problem:
 
 - **Separation** of grammar(syntax) and user actions (semantics) using a **CST Visitor**.
 
-  - [Example](https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js)
+  - [Example](https://github.com/chevrotain/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js)
 
 - **Embedding** user actions (semantics) inside the grammar rules.
-  - [Example](https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_embedded_actions.js)
+  - [Example](https://github.com/chevrotain/chevrotain/blob/master/examples/grammars/calculator/calculator_embedded_actions.js)
 
 Before we continue one of the two approaches must be chosen.
 
@@ -35,7 +35,7 @@ The main advantage of embedded actions is their **performance**. Embedded action
 about 50% faster than using a CST Visitor. This may sound like an unbeatable advantage
 but that is not the case:
 
-- Chevrotain is [so fast](https://sap.github.io/chevrotain/performance/) that even with that performance penalty
+- Chevrotain is [so fast](https://chevrotain.io/performance/) that even with that performance penalty
   it would beat other parsing solutions.
 
   - Tested on Modern V8

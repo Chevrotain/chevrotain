@@ -4,7 +4,7 @@
  *
  * Custom payloads allow attaching additional information on the IToken objects
  * For additional details see the docs:
- * https://sap.github.io/chevrotain/docs/guide/custom_token_patterns.html#custom-payloads
+ * https://chevrotain.io/docs/guide/custom_token_patterns.html#custom-payloads
  */
 const { createToken, Lexer } = require("chevrotain")
 

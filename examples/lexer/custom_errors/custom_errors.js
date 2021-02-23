@@ -10,7 +10,7 @@ const Whitespace = createToken({
 })
 
 // A link to the detailed API for the ILexerErrorMessageProvider can be found here:
-// https://sap.github.io/chevrotain/docs/features/custom_errors.htmlconst OyVeyErrorMessageProvider = {
+// https://chevrotain.io/docs/features/custom_errors.htmlconst OyVeyErrorMessageProvider = {
 const OyVeyErrorMessageProvider = {
   buildUnexpectedCharactersMessage(
     fullText,

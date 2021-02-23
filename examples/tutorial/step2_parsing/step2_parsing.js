@@ -1,6 +1,6 @@
 "use strict"
 // Written Docs for this tutorial step can be found here:
-// https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md
+// https://github.com/chevrotain/chevrotain/blob/master/docs/tutorial/step2_parsing.md
 
 // Tutorial Step 2:
 

@@ -20,5 +20,5 @@ const ClassKeyword = createToken({
 })
 ```
 
-See [executable example](https://github.com/SAP/chevrotain/tree/master/examples/lexer/keywords_vs_identifiers)
+See [executable example](https://github.com/chevrotain/chevrotain/tree/master/examples/lexer/keywords_vs_identifiers)
 for further details.

@@ -1,6 +1,6 @@
 "use strict"
 // Written Docs for this tutorial step can be found here:
-// https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step1_lexing.md
+// https://github.com/chevrotain/chevrotain/blob/master/docs/tutorial/step1_lexing.md
 
 // Tutorial Step 1:
 // Implementation of A lexer for a simple SELECT statement grammar
@@ -16,7 +16,7 @@ const tokenVocabulary = {}
 const Identifier = createToken({ name: "Identifier", pattern: /[a-zA-Z]\w*/ })
 
 // We specify the "longer_alt" property to resolve keywords vs identifiers ambiguity.
-// See: https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js
+// See: https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js
 const Select = createToken({
   name: "Select",
   pattern: /SELECT/,

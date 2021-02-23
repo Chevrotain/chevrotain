@@ -46,7 +46,7 @@ function createTokenInternal(config: ITokenConfig): TokenType {
   if (has(config, PARENT)) {
     throw (
       "The parent property is no longer supported.\n" +
-      "See: https://github.com/SAP/chevrotain/issues/564#issuecomment-349062346 for details."
+      "See: https://github.com/chevrotain/chevrotain/issues/564#issuecomment-349062346 for details."
     )
   }
 

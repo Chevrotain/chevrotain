@@ -10,7 +10,7 @@ export declare const VERSION: string
 declare abstract class BaseParser {
   /**
    * This must be called at the end of a Parser constructor.
-   * See: http://sap.github.io/chevrotain/docs/tutorial/step2_parsing.html#under-the-hood
+   * See: http://chevrotain.io/docs/tutorial/step2_parsing.html#under-the-hood
    */
   /* protected */ performSelfAnalysis(): void
 
@@ -18,7 +18,7 @@ declare abstract class BaseParser {
    * It is recommended to reuse the same Parser instance
    * by passing an empty array to the input argument
    * and only later setting the input by using the input property.
-   * See: http://sap.github.io/chevrotain/docs/FAQ.html#major-performance-benefits
+   * See: http://chevrotain.io/docs/FAQ.html#major-performance-benefits
    *
    * @param tokenVocabulary - A data structure containing all the Tokens used by the Parser.
    * @param config - The Parser's configuration.
@@ -32,7 +32,7 @@ declare abstract class BaseParser {
    * Can be used to implement methods similar to {@link BaseParser.ACTION}
    * Or any other logic to requires knowledge of the recording phase.
    * See:
-   *   - https://sap.github.io/chevrotain/docs/guide/internals.html#grammar-recording
+   *   - https://chevrotain.io/docs/guide/internals.html#grammar-recording
    * to learn more on the recording phase and how Chevrotain works.
    */
   RECORDING_PHASE: boolean
@@ -82,7 +82,7 @@ declare abstract class BaseParser {
    * - Have global side effects that should be avoided during "recording phase".
    *
    * For more information see:
-   *   - https://sap.github.io/chevrotain/docs/guide/internals.html#grammar-recording
+   *   - https://chevrotain.io/docs/guide/internals.html#grammar-recording
    */
   /* protected */ ACTION<T>(impl: () => T): T
 
@@ -182,7 +182,7 @@ declare abstract class BaseParser {
    *   })
    * ```
    *
-   * - See more details on the [unique suffixes requirement](http://sap.github.io/chevrotain/docs/FAQ.html#NUMERICAL_SUFFIXES).
+   * - See more details on the [unique suffixes requirement](http://chevrotain.io/docs/FAQ.html#NUMERICAL_SUFFIXES).
    *
    * @param tokType - The Type of the token to be consumed.
    * @param options - optional properties to modify the behavior of CONSUME.
@@ -895,7 +895,7 @@ declare abstract class BaseParser {
    * This behavior can be used to avoid infinite loops.
    *
    * This is often used to implement custom lookahead logic for GATES.
-   * https://sap.github.io/chevrotain/docs/features/gates.html
+   * https://chevrotain.io/docs/features/gates.html
    */
   /* protected */ LA(howMuch: number): IToken
 }
@@ -903,8 +903,8 @@ declare abstract class BaseParser {
 /**
  * A Parser that outputs a Concrete Syntax Tree.
  * See:
- *    - https://sap.github.io/chevrotain/docs/tutorial/step3_adding_actions_root.html#alternatives
- *    - https://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html
+ *    - https://chevrotain.io/docs/tutorial/step3_adding_actions_root.html#alternatives
+ *    - https://chevrotain.io/docs/guide/concrete_syntax_tree.html
  * For in depth docs.
  */
 export declare class CstParser extends BaseParser {
@@ -919,7 +919,7 @@ export declare class CstParser extends BaseParser {
 
   /**
    * Overrides a Grammar Rule
-   * See usage example in: https://github.com/SAP/chevrotain/blob/master/examples/parser/versioning/versioning.js
+   * See usage example in: https://github.com/chevrotain/chevrotain/blob/master/examples/parser/versioning/versioning.js
    */
   /* protected */ OVERRIDE_RULE<T>(
     name: string,
@@ -1048,8 +1048,8 @@ export declare class CstParser extends BaseParser {
 /**
  * A Parser that relies on end user's embedded actions to control its output.
  * For more details see:
- *   - https://sap.github.io/chevrotain/docs/tutorial/step3_adding_actions_root.html#alternatives
- *   - https://sap.github.io/chevrotain/docs/tutorial/step3b_adding_actions_embedded.html#simple-example
+ *   - https://chevrotain.io/docs/tutorial/step3_adding_actions_root.html#alternatives
+ *   - https://chevrotain.io/docs/tutorial/step3b_adding_actions_embedded.html#simple-example
  */
 export declare class EmbeddedActionsParser extends BaseParser {
   /**
@@ -1063,7 +1063,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
 
   /**
    * Overrides a Grammar Rule
-   * See usage example in: https://github.com/SAP/chevrotain/blob/master/examples/parser/versioning/versioning.js
+   * See usage example in: https://github.com/chevrotain/chevrotain/blob/master/examples/parser/versioning/versioning.js
    */
   /* protected */ OVERRIDE_RULE<T>(
     name: string,
@@ -1256,7 +1256,7 @@ export declare class Lexer {
    *    For example when one pattern may match a prefix of another pattern.
    *
    *    Note that there are situations in which we may wish to order the longer pattern after the shorter one.
-   *    For example: [keywords vs Identifiers](https://github.com/SAP/chevrotain/tree/master/examples/lexer/keywords_vs_identifiers).
+   *    For example: [keywords vs Identifiers](https://github.com/chevrotain/chevrotain/tree/master/examples/lexer/keywords_vs_identifiers).
    */
   constructor(
     lexerDefinition: TokenType[] | IMultiModeLexerDefinition,
@@ -1495,7 +1495,7 @@ export interface ITokenConfig {
    * This defines what sequence of characters would be matched
    * To this TokenType when Lexing.
    *
-   * For Custom Patterns see: http://sap.github.io/chevrotain/docs/guide/custom_token_patterns.html
+   * For Custom Patterns see: http://chevrotain.io/docs/guide/custom_token_patterns.html
    */
   pattern?: TokenPattern
 
@@ -1506,7 +1506,7 @@ export interface ITokenConfig {
    * For example this could be used to collect comments for
    * post processing.
    *
-   * See: https://github.com/SAP/chevrotain/tree/master/examples/lexer/token_groups
+   * See: https://github.com/chevrotain/chevrotain/tree/master/examples/lexer/token_groups
    */
   group?: string
 
@@ -1516,7 +1516,7 @@ export interface ITokenConfig {
    *
    * Lexer Modes work as a stack of Lexers, so "entering" a mode means pushing it to the top of the stack.
    *
-   * See: https://github.com/SAP/chevrotain/tree/master/examples/lexer/multi_mode_lexer
+   * See: https://github.com/chevrotain/chevrotain/tree/master/examples/lexer/multi_mode_lexer
    */
   push_mode?: string
 
@@ -1524,7 +1524,7 @@ export interface ITokenConfig {
    * If "pop_mode" is true the Lexer will pop the last mode of the modes stack and
    * continue lexing using the new mode at the top of the stack.
    *
-   * See: https://github.com/SAP/chevrotain/tree/master/examples/lexer/multi_mode_lexer
+   * See: https://github.com/chevrotain/chevrotain/tree/master/examples/lexer/multi_mode_lexer
    */
   pop_mode?: boolean
 
@@ -1535,7 +1535,7 @@ export interface ITokenConfig {
    * This feature can be useful when two Token Types have common prefixes which
    * cannot be resolved (only) by the ordering of the Tokens in the lexer definition.
    *
-   * For example see: https://github.com/SAP/chevrotain/tree/master/examples/lexer/keywords_vs_identifiers
+   * For example see: https://github.com/chevrotain/chevrotain/tree/master/examples/lexer/keywords_vs_identifiers
    * For resolving the keywords vs Identifier ambiguity.
    */
   longer_alt?: TokenType
@@ -1595,7 +1595,7 @@ export declare function createTokenInstance(
 ): IToken
 
 /**
- *  API #1 [Custom Token Patterns](http://sap.github.io/chevrotain/docs/guide/custom_token_patterns.html).
+ *  API #1 [Custom Token Patterns](http://chevrotain.io/docs/guide/custom_token_patterns.html).
  */
 export declare type CustomPatternMatcherFunc = (
   /**
@@ -1640,7 +1640,7 @@ export interface TokenType {
 }
 
 /**
- *  API #2 for [Custom Token Patterns](http://sap.github.io/chevrotain/docs/guide/custom_token_patterns.html).
+ *  API #2 for [Custom Token Patterns](http://chevrotain.io/docs/guide/custom_token_patterns.html).
  */
 interface ICustomPattern {
   exec: CustomPatternMatcherFunc
@@ -1685,7 +1685,7 @@ export interface IToken {
   /**
    * Custom Payload value, this is an optional feature of Custom Token Patterns
    * For additional details see the docs:
-   * https://sap.github.io/chevrotain/docs/guide/custom_token_patterns.html#custom-payloads
+   * https://chevrotain.io/docs/guide/custom_token_patterns.html#custom-payloads
    */
   payload?: any
 }
@@ -1777,7 +1777,7 @@ export interface DSLMethodOpts<T> {
   DEF: GrammarAction<T>
   /**
    * A semantic constraint on this DSL method
-   * @see https://github.com/SAP/chevrotain/blob/master/examples/parser/predicate_lookahead/predicate_lookahead.js
+   * @see https://github.com/chevrotain/chevrotain/blob/master/examples/parser/predicate_lookahead/predicate_lookahead.js
    * For farther details.
    */
   GATE?: () => boolean
@@ -1885,7 +1885,7 @@ export interface ConsumeMethodOpts {
 export interface SubruleMethodOpts {
   /**
    * The arguments to parameterized rules, see:
-   * https://github.com/SAP/chevrotain/blob/master/examples/parser/parametrized_rules/parametrized.js
+   * https://github.com/chevrotain/chevrotain/blob/master/examples/parser/parametrized_rules/parametrized.js
    */
   ARGS?: any[]
   /**
@@ -1919,7 +1919,7 @@ export interface ICstVisitor<IN, OUT> {
 }
 
 /**
- * A [Concrete Syntax Tree](http://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html) Node.
+ * A [Concrete Syntax Tree](http://chevrotain.io/docs/guide/concrete_syntax_tree.html) Node.
  * This structure represents the whole parse tree of the grammar
  * This means that information on each and every Token is present.
  * This is unlike an AST (Abstract Syntax Tree) where some of the syntactic information is missing.
@@ -1936,7 +1936,7 @@ export interface CstNode {
    * - Note that single token insertion/deletion recovery would not activate this flag.
    *   This flag would only be activated in **re-sync** recovery when the rule's
    *   grammar cannot be fully parsed.
-   * - See: https://sap.github.io/chevrotain/docs/tutorial/step4_fault_tolerance.html
+   * - See: https://chevrotain.io/docs/tutorial/step4_fault_tolerance.html
    *   for more info on error recovery and fault tolerance.
    */
   readonly recoveredNode?: boolean
@@ -1944,7 +1944,7 @@ export interface CstNode {
   /**
    * Will only be present if the {@link IParserConfig.nodeLocationTracking} is
    * **not** set to "none".
-   * See: http://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html#cstnode-location
+   * See: http://chevrotain.io/docs/guide/concrete_syntax_tree.html#cstnode-location
    * For more details.
    */
   readonly location?: CstNodeLocation
@@ -1987,13 +1987,13 @@ export interface IParserConfig {
    * This will disable performance optimizations which cannot work if the whole Token vocabulary is not known
    * During Parser initialization.
    *
-   * See [runnable example](https://github.com/SAP/chevrotain/tree/master/examples/parser/dynamic_tokens)
+   * See [runnable example](https://github.com/chevrotain/chevrotain/tree/master/examples/parser/dynamic_tokens)
    */
   dynamicTokensEnabled?: boolean
   /**
    * Enable computation of CST nodes location.
    * By default this is set to "none", meaning this feature is disabled.
-   * See: http://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html#cstnode-location
+   * See: http://chevrotain.io/docs/guide/concrete_syntax_tree.html#cstnode-location
    * For more details.
    */
   nodeLocationTracking?: nodeLocationTrackingOptions
@@ -2559,7 +2559,7 @@ export declare function serializeProduction(node: IProduction): ISerializedGast
  * "Resolving" means assigning the appropiate value for all {@link NonTerminal.referencedRule}
  * properties in the grammar AST.
  *
- * - See detailed docs for [Custom APIs](http://sap.github.io/chevrotain/docs/guide/custom_apis.html)
+ * - See detailed docs for [Custom APIs](http://chevrotain.io/docs/guide/custom_apis.html)
  */
 export declare function resolveGrammar(options: {
   rules: Rule[]
@@ -2570,7 +2570,7 @@ export declare function resolveGrammar(options: {
  * A utility to validate a grammar AST (rules parameter).
  * For example: left recursion detection, ambiguity detection, ...
  *
- * - See detailed docs for [Custom APIs](http://sap.github.io/chevrotain/docs/guide/custom_apis.html)
+ * - See detailed docs for [Custom APIs](http://chevrotain.io/docs/guide/custom_apis.html)
  */
 export declare function validateGrammar(options: {
   rules: Rule[]
@@ -2591,8 +2591,8 @@ export declare function validateGrammar(options: {
  * A utility for assigning unique occurence indices to a grammar AST (rules parameter).
  * This can be useful when using Chevrotain to create custom APIs.
  *
- * - FAQ: [Why are these unique occurences needed](http://sap.github.io/chevrotain/docs/FAQ.html#NUMERICAL_SUFFIXES)
- * - See detailed docs for [Custom APIs](http://sap.github.io/chevrotain/docs/guide/custom_apis.html)
+ * - FAQ: [Why are these unique occurences needed](http://chevrotain.io/docs/FAQ.html#NUMERICAL_SUFFIXES)
+ * - See detailed docs for [Custom APIs](http://chevrotain.io/docs/guide/custom_apis.html)
  */
 export declare function assignOccurrenceIndices(options: {
   rules: Rule[]
@@ -2603,7 +2603,7 @@ export declare function assignOccurrenceIndices(options: {
  * this can be used as the basis for custom error providers when using Chevrotain's
  * custom APIs.
  *
- * - See detailed docs for [Custom APIs](http://sap.github.io/chevrotain/docs/guide/custom_apis.html#grammar-validations)
+ * - See detailed docs for [Custom APIs](http://chevrotain.io/docs/guide/custom_apis.html#grammar-validations)
  */
 export declare const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessageProvider
 
@@ -2612,7 +2612,7 @@ export declare const defaultGrammarValidatorErrorProvider: IGrammarValidatorErro
  * this can be used as the basis for custom error providers when using Chevrotain's
  * custom APIs.
  *
- * - See detailed docs for [Custom APIs](http://sap.github.io/chevrotain/docs/guide/custom_apis.html#grammar-validations)
+ * - See detailed docs for [Custom APIs](http://chevrotain.io/docs/guide/custom_apis.html#grammar-validations)
  */
 export declare const defaultGrammarResolverErrorProvider: IGrammarResolverErrorMessageProvider
 
@@ -2620,7 +2620,7 @@ export declare const defaultGrammarResolverErrorProvider: IGrammarResolverErrorM
  * Implementing this interface enables customizing grammar validation errors
  * when using custom APIs.
  *
- * - See detailed docs for [Custom APIs](http://sap.github.io/chevrotain/docs/guide/custom_apis.html#grammar-validations)
+ * - See detailed docs for [Custom APIs](http://chevrotain.io/docs/guide/custom_apis.html#grammar-validations)
  */
 export interface IGrammarValidatorErrorMessageProvider {
   buildDuplicateFoundError(
@@ -2686,7 +2686,7 @@ export interface IGrammarValidatorErrorMessageProvider {
  * Implementing this interface enables customizing grammar resolving errors
  * when using custom APIs.
  *
- * - See detailed docs for [Custom APIs](http://sap.github.io/chevrotain/docs/guide/custom_apis.html#grammar-validations)
+ * - See detailed docs for [Custom APIs](http://chevrotain.io/docs/guide/custom_apis.html#grammar-validations)
  */
 export interface IGrammarResolverErrorMessageProvider {
   buildRuleNotFoundError(topLevelRule: Rule, undefinedRule: NonTerminal): string
@@ -2695,7 +2695,7 @@ export interface IGrammarResolverErrorMessageProvider {
 /**
  * Structure of grammar validations errors.
  *
- * - See detailed docs for [Custom APIs](http://sap.github.io/chevrotain/docs/guide/custom_apis.html#grammar-validations)
+ * - See detailed docs for [Custom APIs](http://chevrotain.io/docs/guide/custom_apis.html#grammar-validations)
  */
 export interface IParserDefinitionError {
   message: string
@@ -2728,7 +2728,7 @@ export interface ICreateSyntaxDiagramsConfig {
  * Will generate an html source code (text).
  * This html text will render syntax diagrams for the provided grammar.
  *
- * - See detailed docs for [Syntax Diagrams](http://sap.github.io/chevrotain/docs/guide/generating_syntax_diagrams.html).
+ * - See detailed docs for [Syntax Diagrams](http://chevrotain.io/docs/guide/generating_syntax_diagrams.html).
  */
 export declare function createSyntaxDiagramsCode(
   grammar: ISerializedGast[],
@@ -2749,7 +2749,7 @@ export declare function createSyntaxDiagramsCode(
  *
  *   For productive flows targeting a browser runtime see {@link generateParserModule}.
  *
- * - See detailed docs for [Custom APIs](http://sap.github.io/chevrotain/docs/guide/custom_apis.html).
+ * - See detailed docs for [Custom APIs](http://chevrotain.io/docs/guide/custom_apis.html).
  */
 export declare function generateParserFactory<T extends BaseParser>(options: {
   name: string
@@ -2766,7 +2766,7 @@ export declare function generateParserFactory<T extends BaseParser>(options: {
  * - Note that the constructor exposed by the generated module must receive the TokenVocabulary as the first
  *   argument, the IParser config can be passed as the second argument.
  *
- * - See detailed docs for [Custom APIs](http://sap.github.io/chevrotain/docs/guide/custom_apis.html).
+ * - See detailed docs for [Custom APIs](http://chevrotain.io/docs/guide/custom_apis.html).
  */
 export declare function generateParserModule(options: {
   name: string

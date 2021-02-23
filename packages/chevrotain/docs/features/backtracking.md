@@ -8,7 +8,7 @@ Backtracking is not automatic and must be **explicitly** invoked.
 This is because it is inefficient and is mutually exclusive with error recovery.
 It is strongly recommended to avoid using backtracking if possible.
 
-Backtracking is implemented by using [Gates](https://sap.github.io/chevrotain/docs/features/gates.html)
+Backtracking is implemented by using [Gates](https://chevrotain.io/docs/features/gates.html)
 
 For example, given the following grammar which is not LL(K), as
 both the alternatives in "statement" have a potentially infinitely long common prefix.
@@ -43,5 +43,5 @@ $.RULE("statement", () => {
 })
 ```
 
-See [executable example](https://github.com/SAP/chevrotain/tree/master/examples/parser/backtracking)
+See [executable example](https://github.com/chevrotain/chevrotain/tree/master/examples/parser/backtracking)
 for further details.

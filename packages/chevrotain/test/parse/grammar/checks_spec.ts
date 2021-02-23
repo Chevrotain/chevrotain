@@ -507,7 +507,7 @@ describe("The duplicate occurrence validations full flow", () => {
       "appears more than once (2 times) in the top level rule: ->duplicateMany<-"
     )
     expect(() => new ErroneousOccurrenceNumUsageParser3()).to.throw(
-      "https://sap.github.io/chevrotain/docs/FAQ.html#NUMERICAL_SUFFIXES"
+      "https://chevrotain.io/docs/FAQ.html#NUMERICAL_SUFFIXES"
     )
   })
 
@@ -1198,7 +1198,7 @@ describe("The empty alternative detection full flow", () => {
 
       public noneLastEmpty = this.RULE("noneLastEmpty", () => {
         this.OR([
-          // using OR without occurrence suffix, test to check for fix for https://github.com/SAP/chevrotain/issues/101
+          // using OR without occurrence suffix, test to check for fix for https://github.com/chevrotain/chevrotain/issues/101
           {
             ALT: EMPTY_ALT()
           }, // empty alternative #1 which is not the last one!
@@ -1264,7 +1264,7 @@ describe("The prefix ambiguity detection full flow", () => {
     )
     expect(() => new PrefixAltAmbiguity()).to.throw("<B, A>")
     expect(() => new PrefixAltAmbiguity()).to.throw(
-      "https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#COMMON_PREFIX"
+      "https://chevrotain.io/docs/guide/resolving_grammar_errors.html#COMMON_PREFIX"
     )
   })
 
@@ -1314,7 +1314,7 @@ describe("The prefix ambiguity detection full flow", () => {
       "Comma, Comma, Comma, Comma"
     )
     expect(() => new AlternativesAmbiguityParser()).to.throw(
-      "https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES"
+      "https://chevrotain.io/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES"
     )
   })
 
@@ -1363,7 +1363,7 @@ describe("The prefix ambiguity detection full flow", () => {
     )
     expect(() => new AlternativesAmbiguityParser()).to.throw("D, D, D, D")
     expect(() => new AlternativesAmbiguityParser()).to.throw(
-      "https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES"
+      "https://chevrotain.io/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES"
     )
   })
 
@@ -1401,7 +1401,7 @@ describe("The prefix ambiguity detection full flow", () => {
     )
     expect(() => new PrefixAltAmbiguity2()).to.throw("<PlusTok, MinusTok>")
     expect(() => new PrefixAltAmbiguity2()).to.throw(
-      "https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#COMMON_PREFIX"
+      "https://chevrotain.io/docs/guide/resolving_grammar_errors.html#COMMON_PREFIX"
     )
   })
 })

@@ -1,1 +1,1 @@
-See [online docs](https://sap.github.io/chevrotain/docs/guide/generating_syntax_diagrams.html).
+See [online docs](https://chevrotain.io/docs/guide/generating_syntax_diagrams.html).

@@ -2,7 +2,7 @@
 
 ### TLDR
 
-See: [**Runnable example**](https://github.com/SAP/chevrotain/blob/master/examples/lexer/custom_patterns/custom_patterns.js) for quick starting.
+See: [**Runnable example**](https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/custom_patterns/custom_patterns.js) for quick starting.
 
 ## Background
 
@@ -22,7 +22,7 @@ There are a few use cases in which a custom pattern could be used:
 - The token cannot be easily (or at all) be defined using pure regular expressions.
 
   - When context on previously lexed tokens is needed.
-    For example: [Lexing Python like indentation using Chevrotain](https://github.com/SAP/chevrotain/blob/master/examples/lexer/python_indentation/python_indentation.js).
+    For example: [Lexing Python like indentation using Chevrotain](https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/python_indentation/python_indentation.js).
 
 - Workaround possible performance issues/bugs in regExp engines.
 
@@ -34,7 +34,7 @@ function. But with a small constraint.
 - A custom pattern should behave as though the RegExp [sticky flag](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/sticky) has been set.
   This means that attempted matches must begin at the offset argument, **not** at the start of the input.
 
-The basic syntax for supplying a custom pattern is defined by the [ICustomPattern](https://sap.github.io/chevrotain/documentation/7_1_1/interfaces/icustompattern.html) interface.
+The basic syntax for supplying a custom pattern is defined by the [ICustomPattern](https://chevrotain.io/documentation/7_1_1/interfaces/icustompattern.html) interface.
 Example:
 
 ```javascript
@@ -62,7 +62,7 @@ createToken({
   pattern: { exec: matchInteger },
 
   // Optional property that will enable optimizations in the lexer
-  // See: https://sap.github.io/chevrotain/documentation/7_1_1/interfaces/itokenconfig.html#start_chars_hint
+  // See: https://chevrotain.io/documentation/7_1_1/interfaces/itokenconfig.html#start_chars_hint
   start_chars_hint: ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 })
 ```
@@ -97,9 +97,9 @@ function matchInteger(text, offset, matchedTokens, groups) {
 }
 ```
 
-A larger and non contrived example can seen here: [Lexing Python like indentation using Chevrotain](https://github.com/SAP/chevrotain/blob/master/examples/lexer/python_indentation/python_indentation.js).
+A larger and non contrived example can seen here: [Lexing Python like indentation using Chevrotain](https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/python_indentation/python_indentation.js).
 
-It is important to note that The matchedTokens and groups arguments match the token and groups properties of the tokenize output ([ILexingResult](https://sap.github.io/chevrotain/documentation/7_1_1/interfaces/ilexingresult.html)).
+It is important to note that The matchedTokens and groups arguments match the token and groups properties of the tokenize output ([ILexingResult](https://chevrotain.io/documentation/7_1_1/interfaces/ilexingresult.html)).
 These arguments are the current state of the lexing result so even if the lexer has performed error recovery any tokens found
 in those arguments are still guaranteed to be in the final result.
 
@@ -155,4 +155,4 @@ Note:
   - Capturing groups from a regExp exec method's results.
   - The "groups" property of an regExp exec method's result (If [Named Capturing Groups are used](https://github.com/tc39/proposal-regexp-named-groups)).
 
-Additional examples can be found [here](See: [**Runnable example for custom payloads**](https://github.com/SAP/chevrotain/blob/master/examples/lexer/custom_patterns/custom_patterns_payloads.js)).
+Additional examples can be found [here](See: [**Runnable example for custom payloads**](https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/custom_patterns/custom_patterns_payloads.js)).

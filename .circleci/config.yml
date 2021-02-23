@@ -43,7 +43,7 @@ jobs:
       - run: git status
       # the yarn.lock and some other generated files may change due to running
       # the build with the newly commited version numbers
-      # e.g: https://circleci.com/gh/SAP/chevrotain/159
+      # e.g: https://circleci.com/gh/chevrotain/chevrotain/159
       # resetting the working tree avoids lerna errors due to unclean working trees
       - run: git reset --hard
       - run: yarn run lerna:publish

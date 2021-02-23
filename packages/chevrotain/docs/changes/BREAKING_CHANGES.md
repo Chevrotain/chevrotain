@@ -15,10 +15,10 @@
   ```
 
   It is also possible (and recommended) to increase the maxLookahead for a specific DSL method rather then globally for all.
-  See [relevant issue](https://github.com/SAP/chevrotain/issues/1012).
+  See [relevant issue](https://github.com/chevrotain/chevrotain/issues/1012).
 
 - The soft deprecated `Parser` class has been fully removed, use `CstParser` or `EmbeddedActionsParser` instead.
-  The choice depends if your parser outputs a [CST](https://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html) or not.
+  The choice depends if your parser outputs a [CST](https://chevrotain.io/docs/guide/concrete_syntax_tree.html) or not.
   the `outputCst` property of the IParserConfig was also removed as this behavior is now controlled by base Parser class which is
   extended.
 
@@ -28,7 +28,7 @@
   Any Parser still using this property will throw an exception on initialization.
   If any ambiguities need be ignored, the `IGNORE_AMBIGUITIES` property should be used instead on specific DSL rules.
 
-  - see: [Ignoring Ambiguities Docs](https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#IGNORING_AMBIGUITIES)
+  - see: [Ignoring Ambiguities Docs](https://chevrotain.io/docs/guide/resolving_grammar_errors.html#IGNORING_AMBIGUITIES)
 
 - Nested / In-Lined rules via the `NAME` parameter for DSL rules have been deprecated, e.g:
 
@@ -108,16 +108,16 @@
 ## 6.0.0
 
 - Due to re-implementation of the grammar analysis via ["grammar recording"](../guide/internals.md#grammar-recording), certain semantics action
-  will now need to be wrapped in the new [ACTION](https://sap.github.io/chevrotain/documentation/6_0_0/classes/baseparser.html#action) Parsing
+  will now need to be wrapped in the new [ACTION](https://chevrotain.io/documentation/6_0_0/classes/baseparser.html#action) Parsing
   DSL method. This will not affect Parsers that output a CST and only affect some of the Parsers which employ embedded semantic actions.
   The Missing `ACTION` wrappers will be automatically detected and throw a descriptive error message to ease migration.
 
 - Grammar de-serialization support has been removed as it is now redundant as Chevrotain no longer relies on `Function.prototype.toString`.
   And the de-serialization feature was a workaround to issues caused by `Function.prototype.toString`.
-  This means the [serializedGrammar property](https://sap.github.io/chevrotain/documentation/5_0_0/interfaces/iparserconfig.html#serializedgrammar)
+  This means the [serializedGrammar property](https://chevrotain.io/documentation/5_0_0/interfaces/iparserconfig.html#serializedgrammar)
   of the Parser's configuration was removed, and using it will cause an error to be thrown during initialization.
 
-- The Parser's [getGAstProductions method](https://sap.github.io/chevrotain/documentation/6_0_0/classes/baseparser.html#getgastproductions)
+- The Parser's [getGAstProductions method](https://chevrotain.io/documentation/6_0_0/classes/baseparser.html#getgastproductions)
   now returns a plain JavaScript object representing a Map/Dictionary rather than the Chevrotain's internal HashTable implementation.
 
 ## 5.0.0
@@ -166,7 +166,7 @@
     in the official examples and documentation, therefore it is likely that
     only the constructor need be modified in existing parsers.
 
-- Automatic [Concrete Syntax Tree](https://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html) output is now enabled by default.
+- Automatic [Concrete Syntax Tree](https://chevrotain.io/docs/guide/concrete_syntax_tree.html) output is now enabled by default.
   This means that parser which rely on **embedded actions** must **explicitly** disable
   the CST output, for example:
 
@@ -247,7 +247,7 @@
   })
   ```
 
-  See the reasoning in [this issue](https://github.com/SAP/chevrotain/issues/653).
+  See the reasoning in [this issue](https://github.com/chevrotain/chevrotain/issues/653).
 
 * defaultErrorProvider was renamed to defaultParserErrorProvider
 
@@ -266,13 +266,13 @@
 * The constructors of all the gast (Grammar AST) structure have been
   refactored to use the config object pattern additionally some properties have been renamed or removed.
   See the new SDK docs for details:
-  - [Rule](https://sap.github.io/chevrotain/documentation/2_0_0/classes/rule.html)
-  - [Terminal](https://sap.github.io/chevrotain/documentation/2_0_0/classes/terminal.html)
-  - [NonTerminal](https://sap.github.io/chevrotain/documentation/2_0_0/classes/nonterminal.html)
-  - [Alternation](https://sap.github.io/chevrotain/documentation/2_0_0/classes/alternation.html)
-  - [Option](https://sap.github.io/chevrotain/documentation/2_0_0/classes/option.html)
-  - [Repetition](https://sap.github.io/chevrotain/documentation/2_0_0/classes/repetition.html)
-  - [RepetitionWithSeparator](https://sap.github.io/chevrotain/documentation/2_0_0/classes/repetitionwithseparator.html)
-  - [RepetitionMandatory](https://sap.github.io/chevrotain/documentation/2_0_0/classes/repetitionmandatory.html)
-  - [RepetitionMandatoryWithSeparator](https://sap.github.io/chevrotain/documentation/2_0_0/classes/repetitionmandatorywithseparator.html)
-  - [Flat](https://sap.github.io/chevrotain/documentation/2_0_0/classes/flat.html) (sequence)
+  - [Rule](https://chevrotain.io/documentation/2_0_0/classes/rule.html)
+  - [Terminal](https://chevrotain.io/documentation/2_0_0/classes/terminal.html)
+  - [NonTerminal](https://chevrotain.io/documentation/2_0_0/classes/nonterminal.html)
+  - [Alternation](https://chevrotain.io/documentation/2_0_0/classes/alternation.html)
+  - [Option](https://chevrotain.io/documentation/2_0_0/classes/option.html)
+  - [Repetition](https://chevrotain.io/documentation/2_0_0/classes/repetition.html)
+  - [RepetitionWithSeparator](https://chevrotain.io/documentation/2_0_0/classes/repetitionwithseparator.html)
+  - [RepetitionMandatory](https://chevrotain.io/documentation/2_0_0/classes/repetitionmandatory.html)
+  - [RepetitionMandatoryWithSeparator](https://chevrotain.io/documentation/2_0_0/classes/repetitionmandatorywithseparator.html)
+  - [Flat](https://chevrotain.io/documentation/2_0_0/classes/flat.html) (sequence)

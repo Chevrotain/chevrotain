@@ -4,13 +4,13 @@
 
 for quick starting, see:
 
-- [**Runnable example - simple**](https://github.com/SAP/chevrotain/blob/master/examples/parser/content_assist/content_assist_simple.js)
-- [**Runnable example - complex**](https://github.com/SAP/chevrotain/blob/master/examples/parser/content_assist/content_assist_complex.js)
+- [**Runnable example - simple**](https://github.com/chevrotain/chevrotain/blob/master/examples/parser/content_assist/content_assist_simple.js)
+- [**Runnable example - complex**](https://github.com/chevrotain/chevrotain/blob/master/examples/parser/content_assist/content_assist_complex.js)
 
 ## Introduction
 
 Chevrotain provides Syntactic Content assist Capabilities.
-These can be accessed via the [**computeContentAssist**](https://sap.github.io/chevrotain/documentation/7_1_1/classes/cstparser.html#computecontentassist) method.
+These can be accessed via the [**computeContentAssist**](https://chevrotain.io/documentation/7_1_1/classes/cstparser.html#computecontentassist) method.
 
 Note that this feature **only** provides syntactic suggestions (meaning next possible token types) **not** semantic suggestions.
 It could be used as a building block in a semantic suggestions provider, but it cannot do this on "its own".
@@ -24,7 +24,7 @@ The `computeContentAssist` method is called on a Parser instance and given as in
 and a partial token vector, the output of this method would be the (first) possible Token Types that can appear after the
 partial token vector.
 
-See the simple [**Runnable example**](https://github.com/SAP/chevrotain/blob/master/examples/parser/content_assist/content_assist_simple.js)
+See the simple [**Runnable example**](https://github.com/chevrotain/chevrotain/blob/master/examples/parser/content_assist/content_assist_simple.js)
 to understand this flow.
 
 ## Advance Flow
@@ -37,7 +37,7 @@ A real world scenario would be far more complex than the simple scenario shown a
 
 These concerns are not part of the Chevrotain library, Chevrotain only deals with **syntactic** context assist
 and it is the responsibility of the end users to handle the **semantic** content assistance logic of their specific languages.
-However, a more complex [**Runnable example**](https://github.com/SAP/chevrotain/blob/master/examples/parser/content_assist/content_assist_complex.js)
+However, a more complex [**Runnable example**](https://github.com/chevrotain/chevrotain/blob/master/examples/parser/content_assist/content_assist_complex.js)
 is provided to demonstrate some of these possible "advance" flows mentioned above.
 
 ## Limitations
@@ -62,7 +62,7 @@ Lets put this in perspective for relevant use cases:
 
 - Being an order of magnitude slower also means approximately the same speed as Jison.
 
-  - Tested on Chrome 68, See: [performance benchmark](https://sap.github.io/chevrotain/performance/).
+  - Tested on Chrome 68, See: [performance benchmark](https://chevrotain.io/performance/).
 
 - **Smaller input Size 1**: Content Assist is requested for an offset inside a text, this means that on average only half the text input
   will have to be parsed. Suddenly the problem is halved...

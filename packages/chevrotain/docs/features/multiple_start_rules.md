@@ -8,5 +8,5 @@ other constructs, For example this can be used for:
 - Parsing only modified text in an IDE for performance.
 - Easy unit testing for small language snippets.
 
-See [executable example](https://github.com/SAP/chevrotain/tree/master/examples/parser/multi_start_rules)
+See [executable example](https://github.com/chevrotain/chevrotain/tree/master/examples/parser/multi_start_rules)
 for further details.

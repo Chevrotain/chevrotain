@@ -2,7 +2,7 @@
 
 ### TLDR
 
-[Run and Debug the source code](https://github.com/SAP/chevrotain/tree/master/examples/tutorial/step1_lexing).
+[Run and Debug the source code](https://github.com/chevrotain/chevrotain/tree/master/examples/tutorial/step1_lexing).
 
 ## Introduction
 
@@ -14,7 +14,7 @@ SELECT name, age FROM persons WHERE age > 100
 ...
 ```
 
-A Lexer transforms a string input into a [Token](https://sap.github.io/chevrotain/documentation/7_1_1/interfaces/itoken.html) vector.
+A Lexer transforms a string input into a [Token](https://chevrotain.io/documentation/7_1_1/interfaces/itoken.html) vector.
 Chevrotain has a built in Lexer engine based on Javascript Regular Expressions.
 
 ## Our First Token
@@ -28,7 +28,7 @@ const createToken = chevrotain.createToken
 const From = createToken({ name: "From", pattern: /FROM/ })
 ```
 
-There is nothing much to it. We simply use the [**createToken** API](https://sap.github.io/chevrotain/documentation/7_1_1/globals.html#createtoken)
+There is nothing much to it. We simply use the [**createToken** API](https://chevrotain.io/documentation/7_1_1/globals.html#createtoken)
 to define the tokens, and provide it with a `name` property and a `pattern` property which is a RegExp which will be used when splitting up the input string
 into separate Tokens.
 
@@ -62,7 +62,7 @@ Lets examine all the needed Tokens definitions"
 ```javascript
 const Identifier = createToken({ name: "Identifier", pattern: /[a-zA-Z]\w*/ })
 // We specify the "longer_alt" property to resolve keywords vs identifiers ambiguity.
-// See: https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js
+// See: https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js
 const Select = createToken({
   name: "Select",
   pattern: /SELECT/,
@@ -121,7 +121,7 @@ Note that:
 - The **order** of Token definitions passed to the Lexer is **important**.
   The first PATTERN to match will be chosen not the longest.
 
-  - See how to resolve [Keywords vs Identifiers](https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js).
+  - See how to resolve [Keywords vs Identifiers](https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js).
 
 - The lexer's `Tokenize` method is a **pure function**, thus only a **single Lexer** (per grammar) is needed.
 
@@ -142,4 +142,4 @@ The Lexing Result will contain:
 
 1.  A Token Vector.
 2.  the lexing errors (if any were encountered)
-3.  And other [Token groups](https://github.com/SAP/chevrotain/blob/master/examples/lexer/token_groups/token_groups.js) (if grouping was used)
+3.  And other [Token groups](https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/token_groups/token_groups.js) (if grouping was used)

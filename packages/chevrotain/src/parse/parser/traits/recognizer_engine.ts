@@ -102,7 +102,7 @@ export class RecognizerEngine {
     if (has(config, "serializedGrammar")) {
       throw Error(
         "The Parser's configuration can no longer contain a <serializedGrammar> property.\n" +
-          "\tSee: https://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_6-0-0\n" +
+          "\tSee: https://chevrotain.io/docs/changes/BREAKING_CHANGES.html#_6-0-0\n" +
           "\tFor Further details."
       )
     }
@@ -122,7 +122,7 @@ export class RecognizerEngine {
       if (typeof (tokenVocabulary as any[])[0].startOffset === "number") {
         throw Error(
           "The Parser constructor no longer accepts a token vector as the first argument.\n" +
-            "\tSee: https://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_4-0-0\n" +
+            "\tSee: https://chevrotain.io/docs/changes/BREAKING_CHANGES.html#_4-0-0\n" +
             "\tFor Further details."
         )
       }

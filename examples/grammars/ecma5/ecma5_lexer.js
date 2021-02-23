@@ -8,7 +8,7 @@
  * The Acorn project was used to (only) tokenize the input text
  *
  * In the future this should be refactored to avoid the distinct lexing phase based on:
- * https://github.com/SAP/chevrotain/blob/master/test/full_flow/ecma_quirks/ecma_quirks.ts
+ * https://github.com/chevrotain/chevrotain/blob/master/test/full_flow/ecma_quirks/ecma_quirks.ts
  *
  */
 const acorn = require("acorn")

@@ -1,15 +1,15 @@
 [![Join the chat at https://gitter.im/chevrotain-parser/Lobby](https://badges.gitter.im/chevrotain-parser/Lobby.svg)](https://gitter.im/chevrotain-parser/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![npm](https://img.shields.io/npm/v/chevrotain.svg)](https://www.npmjs.com/package/chevrotain)
-[![CircleCI](https://circleci.com/gh/SAP/chevrotain.svg?style=svg)](https://circleci.com/gh/SAP/chevrotain)
+[![CircleCI](https://circleci.com/gh/chevrotain/chevrotain.svg?style=svg)](https://circleci.com/gh/chevrotain/chevrotain)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
-[![dependentbot](https://api.dependabot.com/badges/status?host=github&repo=SAP/chevrotain)](https://dependabot.com/)
+[![dependentbot](https://api.dependabot.com/badges/status?host=github&repo=chevrotain/chevrotain)](https://dependabot.com/)
 
 # Chevrotain
 
 ## Introduction
 
-Chevrotain is a [**blazing fast**][benchmark] and [**feature rich**](http://sap.github.io/chevrotain/docs/features/blazing_fast.html) **Parser Building Toolkit** for **JavaScript**.
+Chevrotain is a [**blazing fast**][benchmark] and [**feature rich**](http://chevrotain.io/docs/features/blazing_fast.html) **Parser Building Toolkit** for **JavaScript**.
 It can be used to build parsers/compilers/interpreters for various use cases ranging from simple configuration files,
 to full fledged programing languages.
 
@@ -20,8 +20,8 @@ as any other pure code without requiring any new tools or processes.
 
 ## TLDR
 
-- [**Online Playground**](https://sap.github.io/chevrotain/playground/)
-- **[Getting Started Tutorial](https://sap.github.io/chevrotain/docs/tutorial/step0_introduction.html)**
+- [**Online Playground**](https://chevrotain.io/playground/)
+- **[Getting Started Tutorial](https://chevrotain.io/docs/tutorial/step0_introduction.html)**
 - [**Performance benchmark**][benchmark]
 
 ## Installation
@@ -39,17 +39,17 @@ as any other pure code without requiring any new tools or processes.
 
 ## Documentation & Resources
 
-- **[Getting Started Tutorial](https://sap.github.io/chevrotain/docs/tutorial/step1_lexing.html)**.
+- **[Getting Started Tutorial](https://chevrotain.io/docs/tutorial/step1_lexing.html)**.
 
-- **[Sample Grammars](https://github.com/SAP/chevrotain/blob/master/examples/grammars)**.
+- **[Sample Grammars](https://github.com/chevrotain/chevrotain/blob/master/examples/grammars)**.
 
-- **[FAQ](https://sap.github.io/chevrotain/docs/FAQ.html).**
+- **[FAQ](https://chevrotain.io/docs/FAQ.html).**
 
-- **[Other Examples](https://github.com/SAP/chevrotain/blob/master/examples)**.
+- **[Other Examples](https://github.com/chevrotain/chevrotain/blob/master/examples)**.
 
-- **[HTML API docs](https://sap.github.io/chevrotain/documentation).**
+- **[HTML API docs](https://chevrotain.io/documentation).**
 
-  - [The Parsing DSL Docs](https://sap.github.io/chevrotain/documentation/7_1_1/classes/parser.html#at_least_one).
+  - [The Parsing DSL Docs](https://chevrotain.io/documentation/7_1_1/classes/parser.html#at_least_one).
 
 ## Dependencies
 
@@ -82,7 +82,7 @@ Some interesting samples:
 - [Eve Interactive Programing Language Parser][sample_eve].
 - [BioModelAnalyzer's ChatBot Parser][sample_biomodel].
 
-[benchmark]: https://sap.github.io/chevrotain/performance/
+[benchmark]: https://chevrotain.io/performance/
 [sample_metabase]: https://github.com/metabase/metabase/blob/136dfb17954f4e4302b3bf2fee99ff7b7b12fd7c/frontend/src/metabase/lib/expressions/parser.js
 [sample_jhipster]: https://github.com/jhipster/jhipster-core/blob/master/lib/dsl/jdl_parser.js
 [sample_eve]: https://github.com/witheve/Eve/blob/master/src/parser/parser.ts
@@ -92,6 +92,6 @@ Some interesting samples:
 [sample_threejs]: https://github.com/mrdoob/three.js/blob/dev/examples/js/loaders/VRMLLoader.js
 [sample_prettier_java]: https://github.com/jhipster/prettier-java/tree/master/packages/java-parser/src/productions
 [sample_stardog]: https://github.com/stardog-union/millan/tree/master/src
-[languages]: https://github.com/SAP/chevrotain/tree/master/examples/implementation_languages
-[backtracking]: https://github.com/SAP/chevrotain/blob/master/examples/parser/backtracking/backtracking.js
-[custom_apis]: https://sap.github.io/chevrotain/docs/guide/custom_apis.html
+[languages]: https://github.com/chevrotain/chevrotain/tree/master/examples/implementation_languages
+[backtracking]: https://github.com/chevrotain/chevrotain/blob/master/examples/parser/backtracking/backtracking.js
+[custom_apis]: https://chevrotain.io/docs/guide/custom_apis.html

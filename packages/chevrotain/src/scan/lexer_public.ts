@@ -152,7 +152,7 @@ export class Lexer {
           ) {
             throw Error(
               "Error: Missing <lineTerminatorCharacters> property on the Lexer config.\n" +
-                "\tFor details See: https://sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#MISSING_LINE_TERM_CHARS"
+                "\tFor details See: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#MISSING_LINE_TERM_CHARS"
             )
           }
         }

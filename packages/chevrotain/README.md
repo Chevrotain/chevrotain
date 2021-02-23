@@ -2,8 +2,8 @@
 
 For details see:
 
-- Chevrotain's [website](https://sap.github.io/chevrotain/docs/).
-- Chevrotain's root [README](https://github.com/SAP/chevrotain).
+- Chevrotain's [website](https://chevrotain.io/docs/).
+- Chevrotain's root [README](https://github.com/chevrotain/chevrotain).
 
 ## Install
 
