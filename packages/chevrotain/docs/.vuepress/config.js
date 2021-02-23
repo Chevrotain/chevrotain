@@ -83,7 +83,7 @@ module.exports = {
 
       {
         text: "APIs",
-        link: `https://chevrotain.io/documentation/${versionWithLowDashs}/globals.html`
+        link: `https://chevrotain.io/documentation/${versionWithLowDashs}/modules.html`
       },
       {
         text: "Playground",
