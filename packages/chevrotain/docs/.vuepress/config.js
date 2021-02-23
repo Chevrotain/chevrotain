@@ -48,7 +48,7 @@ const slugMapUsed = _.mapValues(slugMap, () => false)
 
 module.exports = {
   title: "Chevrotain",
-  base: "/chevrotain/docs/",
+  base: "/docs/",
   description: "Parser Building Toolkit for JavaScript",
   markdown: {
     slugify: function (str) {
