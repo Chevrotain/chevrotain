@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 7.1.2 (2-23-2021)
 
 Patch release after migration to new github org with updated metadata in package.json
 

@@ -33,8 +33,8 @@ as any other pure code without requiring any new tools or processes.
     - `https://unpkg.com/chevrotain/lib/chevrotain.js`
     - `https://unpkg.com/chevrotain/lib/chevrotain.min.js`
   - Explicit version number:
-    - `https://unpkg.com/chevrotain@7.1.1/lib/chevrotain.js`
-    - `https://unpkg.com/chevrotain@7.1.1/lib/chevrotain.min.js`
+    - `https://unpkg.com/chevrotain@7.1.2/lib/chevrotain.js`
+    - `https://unpkg.com/chevrotain@7.1.2/lib/chevrotain.min.js`
 
 ## Documentation & Resources
 
@@ -48,7 +48,7 @@ as any other pure code without requiring any new tools or processes.
 
 - **[HTML API docs](https://chevrotain.io/documentation).**
 
-  - [The Parsing DSL Docs](https://chevrotain.io/documentation/7_1_1/classes/parser.html#at_least_one).
+  - [The Parsing DSL Docs](https://chevrotain.io/documentation/7_1_2/classes/parser.html#at_least_one).
 
 ## Dependencies
 
