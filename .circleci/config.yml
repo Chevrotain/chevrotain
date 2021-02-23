@@ -1,0 +1,16 @@
+version: 2
+jobs:
+  build-node14:
+    docker:
+      - image: circleci/node:14-browsers
+    working_directory: ~/repo
+    steps:
+      - checkout
+      # https://circleci.canny.io/cloud-feature-requests/p/allow-empty-workflow-jobs
+      - run: echo "empty job..."
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build-node14
