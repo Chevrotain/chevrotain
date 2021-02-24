@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "acorn": "^8.0.1",
-    "xregexp": "^4.2.0"
+    "xregexp": "^5.0.1"
   },
   "private": true
 }
