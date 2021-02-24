@@ -54,6 +54,6 @@
     "shx": "^0.3.2",
     "cz-conventional-changelog": "3.3.0",
     "@commitlint/cli": "12.0.0",
-    "@commitlint/config-conventional": "11.0.0"
+    "@commitlint/config-conventional": "12.0.0"
   }
 }
