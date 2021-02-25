@@ -1535,6 +1535,8 @@ export interface ITokenConfig {
    * This feature can be useful when two Token Types have common prefixes which
    * cannot be resolved (only) by the ordering of the Tokens in the lexer definition.
    *
+   * - Note that the `longer_alt` capability is **cannot be chained**, only a single longer_alt will be checked for a specific Token.
+   *
    * For example see: https://github.com/chevrotain/chevrotain/tree/master/examples/lexer/keywords_vs_identifiers
    * For resolving the keywords vs Identifier ambiguity.
    */

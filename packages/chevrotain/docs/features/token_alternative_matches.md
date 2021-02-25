@@ -20,5 +20,7 @@ const ClassKeyword = createToken({
 })
 ```
 
+Note that the `longer_alt` capability is **cannot be chained**, only a single longer_alt will be checked for a specific Token.
+
 See [executable example](https://github.com/chevrotain/chevrotain/tree/master/examples/lexer/keywords_vs_identifiers)
 for further details.
