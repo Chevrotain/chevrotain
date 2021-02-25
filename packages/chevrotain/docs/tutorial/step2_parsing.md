@@ -114,7 +114,7 @@ class SelectParser extends CstParser {
 Important to note that:
 
 - The **super** invocation has an array of the Tokens as the second parameter.
-  This is the same array we used to define the Lexer and it is used to define the Parser's vocabulary.
+  This is the same array we used to define the Lexer, In this context it is used to define the Parser's **vocabulary**.
 - The method **performSelfAnalysis** must be invoked at the end of the constructor.
   This is where much of the 'secret sauce' happens, including creating the inner grammar representation
   and performing static checks on the grammar.
@@ -184,10 +184,9 @@ So how does it work?
 
 The answer is the 'secret sauce' of Chevrotain:
 
-- `$.RULE` will both:
-  - Analyse (using Function.toString) the implementation passed to it and construct a representation of the grammar in memory.
-  - Wrap the implementation passed to it in logic for running the Parser (fault tolerance/rule stacks/...)
-- `Parser.prototype.performSelfAnalysis(this)` will finish 'compiling' the grammar representation (name resolution/static analysis)
+- During the call to `this.performSelfAnalysis()` the **grammar structure** will be "**recorded**" by replacing the implementations
+  of the parsing DSL methods with matching "recording" variants.
+- This grammar structure will then undergo further processing and validation.
 
 So when the parser needs to choose between the two alternatives:
 
@@ -211,10 +210,10 @@ It is aware of:
 - Where it is (`OR [1] INSIDE_RULE [A] INSIDE_RULE [B] ...`)
 - What Tokens can come next for each alternative, as it "is aware" of the whole grammar representation.
 
-Thus the parser can dynamically create (and cache) the lookahead function to choose between the two alternatives.
+Thus, the parser can dynamically create (and cache) the lookahead function to choose between the two alternatives.
 
 The same applies for any grammar rule where the parser has a choice,
-and even in some where there is no choice as that same in memory representation of the grammar
+and even in somewhere there is no choice as that same in memory representation of the grammar
 can be used for error messages and fault tolerance as well as deciding which path to take.
 
 ## Complete Parser
@@ -299,12 +298,12 @@ class SelectParser extends CstParser {
 ```
 
 - Note that as a consequence of the parser having to 'know' its position in the grammar during runtime, the Parsing DSL methods need to be distinguishable when appearing in the same rule.
-  Thus in the `"expression"` rule above, the second appearance of `SUBRULE` with `atomicExpression` parameter has a '2' suffix: `$.SUBRULE2($.atomicExpression)`
-- Such errors will be detected during self analysis, and will prevent the creation of parser instances with a descriptive error message (fail fast...).
+  Thus, in the `"expression"` rule above, the second appearance of `SUBRULE` with `atomicExpression` parameter has a '2' suffix: `$.SUBRULE2($.atomicExpression)`
+- Such errors will be detected during self-analysis, and will prevent the creation of parser instances with a descriptive error message (fail fast...).
 
 ## Usage
 
-- But how do we actually use this Parser?
+- But, how do we actually use this Parser?
 
 ```javascript
 // ONLY ONCE
