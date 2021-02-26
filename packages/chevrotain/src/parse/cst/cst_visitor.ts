@@ -13,14 +13,14 @@ import { defineNameProp, functionName } from "../../lang/lang_extensions"
 import { ICstVisitor } from "../../../api"
 
 export function defaultVisit<IN, OUT>(ctx: any, param: IN): OUT {
-  let childrenNames = keys(ctx)
-  let childrenNamesLength = childrenNames.length
+  const childrenNames = keys(ctx)
+  const childrenNamesLength = childrenNames.length
   for (let i = 0; i < childrenNamesLength; i++) {
-    let currChildName = childrenNames[i]
-    let currChildArray = ctx[currChildName]
-    let currChildArrayLength = currChildArray.length
+    const currChildName = childrenNames[i]
+    const currChildArray = ctx[currChildName]
+    const currChildArrayLength = currChildArray.length
     for (let j = 0; j < currChildArrayLength; j++) {
-      let currChild: any = currChildArray[j]
+      const currChild: any = currChildArray[j]
       // distinction between Tokens Children and CstNode children
       if (currChild.tokenTypeIdx === undefined) {
         this[currChild.name](currChild.children, param)
@@ -37,14 +37,14 @@ export function createBaseSemanticVisitorConstructor(
 ): {
   new (...args: any[]): ICstVisitor<any, any>
 } {
-  let derivedConstructor: any = function () {}
+  const derivedConstructor: any = function () {}
 
   // can be overwritten according to:
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/
   // name?redirectlocale=en-US&redirectslug=JavaScript%2FReference%2FGlobal_Objects%2FFunction%2Fname
   defineNameProp(derivedConstructor, grammarName + "BaseSemantics")
 
-  let semanticProto = {
+  const semanticProto = {
     visit: function (cstNode, param) {
       // enables writing more concise visitor methods when CstNode has only a single child
       if (isArray(cstNode)) {
@@ -62,9 +62,9 @@ export function createBaseSemanticVisitorConstructor(
     },
 
     validateVisitor: function () {
-      let semanticDefinitionErrors = validateVisitor(this, ruleNames)
+      const semanticDefinitionErrors = validateVisitor(this, ruleNames)
       if (!isEmpty(semanticDefinitionErrors)) {
-        let errorMessages = map(
+        const errorMessages = map(
           semanticDefinitionErrors,
           (currDefError) => currDefError.msg
         )
@@ -92,14 +92,14 @@ export function createBaseVisitorConstructorWithDefaults(
 ): {
   new (...args: any[]): ICstVisitor<any, any>
 } {
-  let derivedConstructor: any = function () {}
+  const derivedConstructor: any = function () {}
 
   // can be overwritten according to:
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/
   // name?redirectlocale=en-US&redirectslug=JavaScript%2FReference%2FGlobal_Objects%2FFunction%2Fname
   defineNameProp(derivedConstructor, grammarName + "BaseSemanticsWithDefaults")
 
-  let withDefaultsProto = Object.create(baseConstructor.prototype)
+  const withDefaultsProto = Object.create(baseConstructor.prototype)
   forEach(ruleNames, (ruleName) => {
     withDefaultsProto[ruleName] = defaultVisit
   })
@@ -125,8 +125,8 @@ export function validateVisitor(
   visitorInstance: Function,
   ruleNames: string[]
 ): IVisitorDefinitionError[] {
-  let missingErrors = validateMissingCstMethods(visitorInstance, ruleNames)
-  let redundantErrors = validateRedundantMethods(visitorInstance, ruleNames)
+  const missingErrors = validateMissingCstMethods(visitorInstance, ruleNames)
+  const redundantErrors = validateRedundantMethods(visitorInstance, ruleNames)
 
   return missingErrors.concat(redundantErrors)
 }
@@ -135,7 +135,7 @@ export function validateMissingCstMethods(
   visitorInstance: Function,
   ruleNames: string[]
 ): IVisitorDefinitionError[] {
-  let errors: IVisitorDefinitionError[] = map(ruleNames, (currRuleName) => {
+  const errors: IVisitorDefinitionError[] = map(ruleNames, (currRuleName) => {
     if (!isFunction(visitorInstance[currRuleName])) {
       return {
         msg: `Missing visitor method: <${currRuleName}> on ${functionName(
@@ -155,9 +155,9 @@ export function validateRedundantMethods(
   visitorInstance: Function,
   ruleNames: string[]
 ): IVisitorDefinitionError[] {
-  let errors = []
+  const errors = []
 
-  for (let prop in visitorInstance) {
+  for (const prop in visitorInstance) {
     if (
       isFunction(visitorInstance[prop]) &&
       !contains(VALID_PROP_NAMES, prop) &&

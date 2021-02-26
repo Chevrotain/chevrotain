@@ -1,6 +1,5 @@
 "use strict"
 const expect = require("chai").expect
-const _ = require("lodash")
 const parse = require("./step2_parsing").parse
 
 describe("Chevrotain Tutorial", () => {

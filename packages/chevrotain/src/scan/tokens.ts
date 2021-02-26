@@ -35,7 +35,7 @@ export const tokenIdxToClass = {}
 
 export function augmentTokenTypes(tokenTypes: TokenType[]): void {
   // collect the parent Token Types as well.
-  let tokenTypesAndParents = expandCategories(tokenTypes)
+  const tokenTypesAndParents = expandCategories(tokenTypes)
 
   // add required tokenType and categoryMatches properties
   assignTokenDefaultProps(tokenTypesAndParents)
@@ -59,7 +59,7 @@ export function expandCategories(tokenTypes: TokenType[]): TokenType[] {
       flatten(map(categories, (currTokType) => currTokType.CATEGORIES))
     )
 
-    let newCategories = difference(categories, result)
+    const newCategories = difference(categories, result)
 
     result = result.concat(newCategories)
 

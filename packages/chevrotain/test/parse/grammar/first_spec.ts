@@ -17,26 +17,26 @@ import {
 
 describe("The Grammar Ast first model", () => {
   it("can compute the first for a terminal", () => {
-    let terminal = new Terminal({ terminalType: EntityTok })
-    let actual = first(terminal)
+    const terminal = new Terminal({ terminalType: EntityTok })
+    const actual = first(terminal)
     expect(actual.length).to.equal(1)
     expect(actual[0]).to.equal(EntityTok)
 
-    let terminal2 = new Terminal({ terminalType: CommaTok })
-    let actual2 = first(terminal2)
+    const terminal2 = new Terminal({ terminalType: CommaTok })
+    const actual2 = first(terminal2)
     expect(actual2.length).to.equal(1)
     expect(actual2[0]).to.equal(CommaTok)
   })
 
   it("can compute the first for a Sequence production ", () => {
-    let seqProduction = new Alternative({
+    const seqProduction = new Alternative({
       definition: [new Terminal({ terminalType: EntityTok })]
     })
-    let actual = first(seqProduction)
+    const actual = first(seqProduction)
     expect(actual.length).to.equal(1)
     expect(actual[0]).to.equal(EntityTok)
 
-    let seqProduction2 = new Alternative({
+    const seqProduction2 = new Alternative({
       definition: [
         new Terminal({ terminalType: EntityTok }),
         new Option({
@@ -44,13 +44,13 @@ describe("The Grammar Ast first model", () => {
         })
       ]
     })
-    let actual2 = first(seqProduction2)
+    const actual2 = first(seqProduction2)
     expect(actual2.length).to.equal(1)
     expect(actual2[0]).to.equal(EntityTok)
   })
 
   it("can compute the first for an alternatives production ", () => {
-    let altProduction = new Alternation({
+    const altProduction = new Alternation({
       definition: [
         new Alternative({
           definition: [new Terminal({ terminalType: EntityTok })]
@@ -63,7 +63,7 @@ describe("The Grammar Ast first model", () => {
         })
       ]
     })
-    let actual = first(altProduction)
+    const actual = first(altProduction)
     expect(actual.length).to.equal(3)
     expect(actual[0]).to.equal(EntityTok)
     expect(actual[1]).to.equal(NamespaceTok)
@@ -71,7 +71,7 @@ describe("The Grammar Ast first model", () => {
   })
 
   it("can compute the first for an production with optional prefix", () => {
-    let withOptionalPrefix = new Alternative({
+    const withOptionalPrefix = new Alternative({
       definition: [
         new Option({
           definition: [new Terminal({ terminalType: NamespaceTok })]
@@ -79,10 +79,10 @@ describe("The Grammar Ast first model", () => {
         new Terminal({ terminalType: EntityTok })
       ]
     })
-    let actual = first(withOptionalPrefix)
+    const actual = first(withOptionalPrefix)
     setEquality(actual, [NamespaceTok, EntityTok])
 
-    let withTwoOptPrefix = new Alternative({
+    const withTwoOptPrefix = new Alternative({
       definition: [
         new Option({
           definition: [new Terminal({ terminalType: NamespaceTok })]
@@ -96,7 +96,7 @@ describe("The Grammar Ast first model", () => {
         })
       ]
     })
-    let actual2 = first(withTwoOptPrefix)
+    const actual2 = first(withTwoOptPrefix)
     setEquality(actual2, [NamespaceTok, ColonTok, EntityTok])
   })
 })

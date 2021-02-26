@@ -66,7 +66,7 @@ export class Recoverable {
   }
 
   public getTokenToInsert(tokType: TokenType): IToken {
-    let tokToInsert = createTokenInstance(
+    const tokToInsert = createTokenInstance(
       tokType,
       "",
       NaN,
@@ -92,25 +92,25 @@ export class Recoverable {
     expectedTokType: TokenType
   ): void {
     // TODO: can the resyncTokenType be cached?
-    let reSyncTokType = this.findReSyncTokenType()
-    let savedLexerState = this.exportLexerState()
-    let resyncedTokens = []
+    const reSyncTokType = this.findReSyncTokenType()
+    const savedLexerState = this.exportLexerState()
+    const resyncedTokens = []
     let passedResyncPoint = false
 
-    let nextTokenWithoutResync = this.LA(1)
+    const nextTokenWithoutResync = this.LA(1)
     let currToken = this.LA(1)
 
-    let generateErrorMessage = () => {
-      let previousToken = this.LA(0)
+    const generateErrorMessage = () => {
+      const previousToken = this.LA(0)
       // we are preemptively re-syncing before an error has been detected, therefor we must reproduce
       // the error that would have been thrown
-      let msg = this.errorMessageProvider.buildMismatchTokenMessage({
+      const msg = this.errorMessageProvider.buildMismatchTokenMessage({
         expected: expectedTokType,
         actual: nextTokenWithoutResync,
         previous: previousToken,
         ruleName: this.getCurrRuleFullName()
       })
-      let error = new MismatchedTokenException(
+      const error = new MismatchedTokenException(
         msg,
         nextTokenWithoutResync,
         this.LA(0)
@@ -194,8 +194,8 @@ export class Recoverable {
     tokType: TokenType,
     tokIdxInRule: number
   ): TokenType[] {
-    let grammarPath = this.getCurrentGrammarPath(tokType, tokIdxInRule)
-    let follows = this.getNextPossibleTokenTypes(grammarPath)
+    const grammarPath = this.getCurrentGrammarPath(tokType, tokIdxInRule)
+    const follows = this.getNextPossibleTokenTypes(grammarPath)
     return follows
   }
 
@@ -205,12 +205,12 @@ export class Recoverable {
     follows: TokenType[]
   ): IToken {
     if (this.canRecoverWithSingleTokenInsertion(expectedTokType, follows)) {
-      let tokToInsert = this.getTokenToInsert(expectedTokType)
+      const tokToInsert = this.getTokenToInsert(expectedTokType)
       return tokToInsert
     }
 
     if (this.canRecoverWithSingleTokenDeletion(expectedTokType)) {
-      let nextTok = this.SKIP_TOKEN()
+      const nextTok = this.SKIP_TOKEN()
       this.consumeToken()
       return nextTok
     }
@@ -243,8 +243,8 @@ export class Recoverable {
       return false
     }
 
-    let mismatchedTok = this.LA(1)
-    let isMisMatchedTokInFollows =
+    const mismatchedTok = this.LA(1)
+    const isMisMatchedTokInFollows =
       find(follows, (possibleFollowsTokType: TokenType) => {
         return this.tokenMatcher(mismatchedTok, possibleFollowsTokType)
       }) !== undefined
@@ -256,7 +256,7 @@ export class Recoverable {
     this: MixedInParser,
     expectedTokType: TokenType
   ): boolean {
-    let isNextTokenWhatIsExpected = this.tokenMatcher(
+    const isNextTokenWhatIsExpected = this.tokenMatcher(
       this.LA(2),
       expectedTokType
     )
@@ -267,18 +267,18 @@ export class Recoverable {
     this: MixedInParser,
     tokenTypeIdx: TokenType
   ): boolean {
-    let followKey = this.getCurrFollowKey()
-    let currentRuleReSyncSet = this.getFollowSetFromFollowKey(followKey)
+    const followKey = this.getCurrFollowKey()
+    const currentRuleReSyncSet = this.getFollowSetFromFollowKey(followKey)
     return contains(currentRuleReSyncSet, tokenTypeIdx)
   }
 
   findReSyncTokenType(this: MixedInParser): TokenType {
-    let allPossibleReSyncTokTypes = this.flattenFollowSet()
+    const allPossibleReSyncTokTypes = this.flattenFollowSet()
     // this loop will always terminate as EOF is always in the follow stack and also always (virtually) in the input
     let nextToken = this.LA(1)
     let k = 2
     while (true) {
-      let nextTokenType: any = nextToken.tokenType
+      const nextTokenType: any = nextToken.tokenType
       if (contains(allPossibleReSyncTokTypes, nextTokenType)) {
         return nextTokenType
       }
@@ -292,9 +292,9 @@ export class Recoverable {
     if (this.RULE_STACK.length === 1) {
       return EOF_FOLLOW_KEY
     }
-    let currRuleShortName = this.getLastExplicitRuleShortName()
-    let currRuleIdx = this.getLastExplicitRuleOccurrenceIndex()
-    let prevRuleShortName = this.getPreviousExplicitRuleShortName()
+    const currRuleShortName = this.getLastExplicitRuleShortName()
+    const currRuleIdx = this.getLastExplicitRuleOccurrenceIndex()
+    const prevRuleShortName = this.getPreviousExplicitRuleShortName()
 
     return {
       ruleName: this.shortRuleNameToFullName(currRuleShortName),
@@ -304,8 +304,8 @@ export class Recoverable {
   }
 
   buildFullFollowKeyStack(this: MixedInParser): IFollowKey[] {
-    let explicitRuleStack = this.RULE_STACK
-    let explicitOccurrenceStack = this.RULE_OCCURRENCE_STACK
+    const explicitRuleStack = this.RULE_STACK
+    const explicitOccurrenceStack = this.RULE_OCCURRENCE_STACK
 
     return map(explicitRuleStack, (ruleName, idx) => {
       if (idx === 0) {
@@ -320,7 +320,7 @@ export class Recoverable {
   }
 
   flattenFollowSet(this: MixedInParser): TokenType[] {
-    let followStack = map(this.buildFullFollowKeyStack(), (currKey) => {
+    const followStack = map(this.buildFullFollowKeyStack(), (currKey) => {
       return this.getFollowSetFromFollowKey(currKey)
     })
     return <any>flatten(followStack)
@@ -334,7 +334,7 @@ export class Recoverable {
       return [EOF]
     }
 
-    let followName =
+    const followName =
       followKey.ruleName + followKey.idxInCallingRule + IN + followKey.inRule
 
     return this.resyncFollows[followName]
@@ -354,7 +354,7 @@ export class Recoverable {
   }
 
   reSyncTo(this: MixedInParser, tokType: TokenType): IToken[] {
-    let resyncedTokens = []
+    const resyncedTokens = []
     let nextTok = this.LA(1)
     while (this.tokenMatcher(nextTok, tokType) === false) {
       nextTok = this.SKIP_TOKEN()
@@ -383,9 +383,9 @@ export class Recoverable {
     tokType: TokenType,
     tokIdxInRule: number
   ): ITokenGrammarPath {
-    let pathRuleStack: string[] = this.getHumanReadableRuleStack()
-    let pathOccurrenceStack: number[] = cloneArr(this.RULE_OCCURRENCE_STACK)
-    let grammarPath: any = {
+    const pathRuleStack: string[] = this.getHumanReadableRuleStack()
+    const pathOccurrenceStack: number[] = cloneArr(this.RULE_OCCURRENCE_STACK)
+    const grammarPath: any = {
       ruleStack: pathRuleStack,
       occurrenceStack: pathOccurrenceStack,
       lastTok: tokType,
@@ -411,12 +411,12 @@ export function attemptInRepetitionRecovery(
   nextToksWalker: typeof AbstractNextTerminalAfterProductionWalker,
   notStuck?: boolean
 ) {
-  let key = this.getKeyForAutomaticLookahead(dslMethodIdx, prodOccurrence)
+  const key = this.getKeyForAutomaticLookahead(dslMethodIdx, prodOccurrence)
   let firstAfterRepInfo = this.firstAfterRepMap[key]
   if (firstAfterRepInfo === undefined) {
-    let currRuleName = this.getCurrRuleFullName()
-    let ruleGrammar = this.getGAstProductions()[currRuleName]
-    let walker: AbstractNextTerminalAfterProductionWalker = new nextToksWalker(
+    const currRuleName = this.getCurrRuleFullName()
+    const ruleGrammar = this.getGAstProductions()[currRuleName]
+    const walker: AbstractNextTerminalAfterProductionWalker = new nextToksWalker(
       ruleGrammar,
       prodOccurrence
     )
@@ -426,7 +426,7 @@ export function attemptInRepetitionRecovery(
 
   let expectTokAfterLastMatch = firstAfterRepInfo.token
   let nextTokIdx = firstAfterRepInfo.occurrence
-  let isEndOfRule = firstAfterRepInfo.isEndOfRule
+  const isEndOfRule = firstAfterRepInfo.isEndOfRule
 
   // special edge case of a TOP most repetition after which the input should END.
   // this will force an attempt for inRule recovery in that scenario.

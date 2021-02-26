@@ -343,14 +343,14 @@ export function serializeProduction(node: IProduction): ISerializedGast {
       definition: convertDefinition(node.definition)
     }
   } else if (node instanceof Terminal) {
-    let serializedTerminal = <ISerializedTerminal>{
+    const serializedTerminal = <ISerializedTerminal>{
       type: "Terminal",
       name: node.terminalType.name,
       label: tokenLabel(node.terminalType),
       idx: node.idx
     }
 
-    let pattern = node.terminalType.PATTERN
+    const pattern = node.terminalType.PATTERN
     if (node.terminalType.PATTERN) {
       serializedTerminal.pattern = isRegExp(pattern)
         ? (<any>pattern).source

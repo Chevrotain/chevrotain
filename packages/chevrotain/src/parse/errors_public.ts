@@ -18,12 +18,12 @@ import {
 
 export const defaultParserErrorProvider: IParserErrorMessageProvider = {
   buildMismatchTokenMessage({ expected, actual, previous, ruleName }): string {
-    let hasLabel = hasTokenLabel(expected)
-    let expectedMsg = hasLabel
+    const hasLabel = hasTokenLabel(expected)
+    const expectedMsg = hasLabel
       ? `--> ${tokenLabel(expected)} <--`
       : `token of type --> ${expected.name} <--`
 
-    let msg = `Expecting ${expectedMsg} but found --> '${actual.image}' <--`
+    const msg = `Expecting ${expectedMsg} but found --> '${actual.image}' <--`
 
     return msg
   },
@@ -39,31 +39,31 @@ export const defaultParserErrorProvider: IParserErrorMessageProvider = {
     customUserDescription,
     ruleName
   }): string {
-    let errPrefix = "Expecting: "
+    const errPrefix = "Expecting: "
     // TODO: issue: No Viable Alternative Error may have incomplete details. #502
-    let actualText = first(actual).image
-    let errSuffix = "\nbut found: '" + actualText + "'"
+    const actualText = first(actual).image
+    const errSuffix = "\nbut found: '" + actualText + "'"
 
     if (customUserDescription) {
       return errPrefix + customUserDescription + errSuffix
     } else {
-      let allLookAheadPaths = reduce(
+      const allLookAheadPaths = reduce(
         expectedPathsPerAlt,
         (result, currAltPaths) => result.concat(currAltPaths),
         []
       )
-      let nextValidTokenSequences = map(
+      const nextValidTokenSequences = map(
         allLookAheadPaths,
         (currPath) =>
           `[${map(currPath, (currTokenType) => tokenLabel(currTokenType)).join(
             ", "
           )}]`
       )
-      let nextValidSequenceItems = map(
+      const nextValidSequenceItems = map(
         nextValidTokenSequences,
         (itemMsg, idx) => `  ${idx + 1}. ${itemMsg}`
       )
-      let calculatedDescription = `one of these possible Token sequences:\n${nextValidSequenceItems.join(
+      const calculatedDescription = `one of these possible Token sequences:\n${nextValidSequenceItems.join(
         "\n"
       )}`
 
@@ -77,22 +77,22 @@ export const defaultParserErrorProvider: IParserErrorMessageProvider = {
     customUserDescription,
     ruleName
   }): string {
-    let errPrefix = "Expecting: "
+    const errPrefix = "Expecting: "
     // TODO: issue: No Viable Alternative Error may have incomplete details. #502
-    let actualText = first(actual).image
-    let errSuffix = "\nbut found: '" + actualText + "'"
+    const actualText = first(actual).image
+    const errSuffix = "\nbut found: '" + actualText + "'"
 
     if (customUserDescription) {
       return errPrefix + customUserDescription + errSuffix
     } else {
-      let nextValidTokenSequences = map(
+      const nextValidTokenSequences = map(
         expectedIterationPaths,
         (currPath) =>
           `[${map(currPath, (currTokenType) => tokenLabel(currTokenType)).join(
             ","
           )}]`
       )
-      let calculatedDescription =
+      const calculatedDescription =
         `expecting at least one iteration which starts with one of these possible Token sequences::\n  ` +
         `<${nextValidTokenSequences.join(" ,")}>`
 
@@ -140,7 +140,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
     const duplicateProd = first(duplicateProds)
     const index = duplicateProd.idx
     const dslName = getProductionDslName(duplicateProd)
-    let extraArgument = getExtraProductionArgument(duplicateProd)
+    const extraArgument = getExtraProductionArgument(duplicateProd)
 
     const hasExplicitIndex = index > 0
     let msg = `->${dslName}${hasExplicitIndex ? index : ""}<- ${
@@ -199,10 +199,10 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
     ambiguityIndices: number[]
     alternation: Alternation
   }): string {
-    let pathMsg = map(options.prefixPath, (currtok) =>
+    const pathMsg = map(options.prefixPath, (currtok) =>
       tokenLabel(currtok)
     ).join(", ")
-    let occurrence =
+    const occurrence =
       options.alternation.idx === 0 ? "" : options.alternation.idx
     let currMessage =
       `Ambiguous Alternatives Detected: <${options.ambiguityIndices.join(
@@ -275,14 +275,14 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
     leftRecursionPath: Rule[]
   }): string {
     const ruleName = options.topLevelRule.name
-    let pathNames = utils.map(
+    const pathNames = utils.map(
       options.leftRecursionPath,
       (currRule) => currRule.name
     )
-    let leftRecursivePath = `${ruleName} --> ${pathNames
+    const leftRecursivePath = `${ruleName} --> ${pathNames
       .concat([ruleName])
       .join(" --> ")}`
-    let errMsg =
+    const errMsg =
       `Left Recursion found in grammar.\n` +
       `rule: <${ruleName}> can be invoked from itself (directly or indirectly)\n` +
       `without consuming any Tokens. The grammar path that causes this is: \n ${leftRecursivePath}\n` +

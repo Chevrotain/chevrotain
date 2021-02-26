@@ -45,6 +45,7 @@ FRAGMENT("spaces", "[ \\t\\r\\n\\f]+")
 FRAGMENT("ident", "-?{{nmstart}}{{nmchar}}*")
 FRAGMENT("num", "[0-9]+|[0-9]*\\.[0-9]+")
 
+/* eslint-disable no-unused-vars -- tokens are collected in our `createToken` wrapper */
 const Whitespace = createToken({
   name: "Whitespace",
   pattern: MAKE_PATTERN("{{spaces}}"),
@@ -243,6 +244,8 @@ const Ident = createToken({
 })
 
 const Minus = createToken({ name: "Minus", pattern: /-/ })
+
+/* eslint-enable no-unused-vars -- tokens are collected in our `createToken` wrapper */
 
 const CssLexer = new Lexer(cssTokens)
 

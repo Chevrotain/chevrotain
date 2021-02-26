@@ -3,7 +3,7 @@ import { IToken } from "../../api"
 
 describe("The Chevrotain default lexer error message provider", () => {
   it("Will build unexpected character message", () => {
-    let input = "1 LETTERS EXIT_LETTERS +"
+    const input = "1 LETTERS EXIT_LETTERS +"
     const msg = defaultLexerErrorProvider.buildUnexpectedCharactersMessage(
       input,
       23,

@@ -37,13 +37,13 @@ import { IToken } from "../../../../api"
 // for side effect if augmenting the Token classes.
 new DDLExampleRecoveryParser()
 describe("Error Recovery SQL DDL Example", () => {
-  let schemaFQN = [
+  const schemaFQN = [
     createRegularToken(IdentTok, "schema2"),
     createRegularToken(DotTok),
     createRegularToken(IdentTok, "Persons")
   ]
   /* tslint:disable:quotemark  */
-  let shahar32Record = [
+  const shahar32Record = [
     createRegularToken(LParenTok),
     createRegularToken(IntTok, "32"),
     createRegularToken(CommaTok),
@@ -51,7 +51,7 @@ describe("Error Recovery SQL DDL Example", () => {
     createRegularToken(RParenTok)
   ]
 
-  let shahar31Record = [
+  const shahar31Record = [
     createRegularToken(LParenTok),
     createRegularToken(IntTok, "31"),
     createRegularToken(CommaTok),
@@ -61,7 +61,7 @@ describe("Error Recovery SQL DDL Example", () => {
   /* tslint:enable:quotemark  */
 
   it("can parse a series of three statements successfully", () => {
-    let input: any = flatten([
+    const input: any = flatten([
       // CREATE TABLE schema2.Persons
       createRegularToken(CreateTok),
       createRegularToken(TableTok),
@@ -81,15 +81,15 @@ describe("Error Recovery SQL DDL Example", () => {
       createRegularToken(SemiColonTok)
     ])
 
-    let parser = new DDLExampleRecoveryParser()
+    const parser = new DDLExampleRecoveryParser()
     parser.input = input
-    let ptResult = parser.ddl()
+    const ptResult = parser.ddl()
     expect(parser.errors.length).to.equal(0)
     assertAllThreeStatementsPresentAndValid(ptResult)
   })
 
   describe("Single Token insertion recovery mechanism", () => {
-    let input: any = flatten([
+    const input: any = flatten([
       // CREATE TABLE schema2.Persons
       createRegularToken(CreateTok),
       createRegularToken(TableTok),
@@ -109,24 +109,24 @@ describe("Error Recovery SQL DDL Example", () => {
     ])
 
     it("can perform single token insertion for a missing semicolon", () => {
-      let parser = new DDLExampleRecoveryParser()
+      const parser = new DDLExampleRecoveryParser()
       parser.input = input
-      let ptResult: any = parser.ddl()
+      const ptResult: any = parser.ddl()
       // one error encountered
       expect(parser.errors.length).to.equal(1)
       // yet the whole input has been parsed
       // and the output parseTree contains ALL three statements
       assertAllThreeStatementsPresentAndValid(ptResult)
-      let insertedSemiColon: IToken = ptResult.children[1].children[4].payload
+      const insertedSemiColon: IToken = ptResult.children[1].children[4].payload
       // the semicolon is present even though it did not exist in the input, magic!
       expect(tokenMatcher(insertedSemiColon, SemiColonTok)).to.be.true
       expect(insertedSemiColon.isInsertedInRecovery).to.equal(true)
     })
 
     it("can disable single token insertion for a missing semicolon", () => {
-      let parser = new DDLExampleRecoveryParser(false)
+      const parser = new DDLExampleRecoveryParser(false)
       parser.input = input
-      let ptResult: any = parser.ddl()
+      const ptResult: any = parser.ddl()
       expect(parser.errors.length).to.equal(1)
       expect(ptResult.payload.tokenType).to.equal(INVALID_DDL)
       expect(ptResult.children).to.have.length(0)
@@ -134,7 +134,7 @@ describe("Error Recovery SQL DDL Example", () => {
   })
 
   describe("Single Token deletion recovery mechanism", () => {
-    let input: any = flatten([
+    const input: any = flatten([
       // CREATE TABLE schema2.Persons
       createRegularToken(CreateTok),
       createRegularToken(TableTok),
@@ -156,9 +156,9 @@ describe("Error Recovery SQL DDL Example", () => {
     ])
 
     it("can perform single token deletion for a redundant keyword", () => {
-      let parser = new DDLExampleRecoveryParser()
+      const parser = new DDLExampleRecoveryParser()
       parser.input = input
-      let ptResult = parser.ddl()
+      const ptResult = parser.ddl()
       // one error encountered
       expect(parser.errors.length).to.equal(1)
       // yet the whole input has been parsed
@@ -167,9 +167,9 @@ describe("Error Recovery SQL DDL Example", () => {
     })
 
     it("can disable single token deletion for a redundant keyword", () => {
-      let parser = new DDLExampleRecoveryParser(false)
+      const parser = new DDLExampleRecoveryParser(false)
       parser.input = input
-      let ptResult: any = parser.ddl()
+      const ptResult: any = parser.ddl()
       expect(parser.errors.length).to.equal(1)
       expect(ptResult.payload.tokenType).to.equal(INVALID_DDL)
       expect(ptResult.children).to.have.length(0)
@@ -178,7 +178,7 @@ describe("Error Recovery SQL DDL Example", () => {
 
   describe("resync recovery mechanism", () => {
     it("can perform re-sync recovery and only 'lose' part of the input", () => {
-      let input: any = flatten([
+      const input: any = flatten([
         // CREATE TABLE schema2.Persons
         createRegularToken(CreateTok),
         createRegularToken(TableTok),
@@ -200,10 +200,10 @@ describe("Error Recovery SQL DDL Example", () => {
         createRegularToken(SemiColonTok)
       ])
 
-      let parser = new DDLExampleRecoveryParser()
+      const parser = new DDLExampleRecoveryParser()
       parser.input = input
 
-      let ptResult: any = parser.ddl()
+      const ptResult: any = parser.ddl()
       // one error encountered
       expect(parser.errors.length).to.equal(1)
       // yet the whole input has been parsed
@@ -225,7 +225,7 @@ describe("Error Recovery SQL DDL Example", () => {
       )
     })
     // (32, "SHAHAR" ( <-- wrong parenthesis
-    let badShahar32Record = [
+    const badShahar32Record = [
       createRegularToken(LParenTok),
       createRegularToken(IntTok, "32"),
       createRegularToken(CommaTok),
@@ -233,7 +233,7 @@ describe("Error Recovery SQL DDL Example", () => {
       createRegularToken(LParenTok)
     ]
 
-    let input: any = flatten([
+    const input: any = flatten([
       // CREATE TABLE schema2.Persons
       createRegularToken(CreateTok),
       createRegularToken(TableTok),
@@ -256,9 +256,9 @@ describe("Error Recovery SQL DDL Example", () => {
     ])
 
     it("can perform re-sync recovery and only 'lose' part of the input even when re-syncing to two rules 'above'", () => {
-      let parser = new DDLExampleRecoveryParser()
+      const parser = new DDLExampleRecoveryParser()
       parser.input = input
-      let ptResult: any = parser.ddl()
+      const ptResult: any = parser.ddl()
       // one error encountered
       expect(parser.errors.length).to.equal(1)
       // yet the whole input has been parsed
@@ -281,9 +281,9 @@ describe("Error Recovery SQL DDL Example", () => {
     })
 
     it("can disable re-sync recovery and only 'lose' part of the input even when re-syncing to two rules 'above'", () => {
-      let parser = new DDLExampleRecoveryParser(false)
+      const parser = new DDLExampleRecoveryParser(false)
       parser.input = input
-      let ptResult: any = parser.ddl()
+      const ptResult: any = parser.ddl()
       // one error encountered
       expect(parser.errors.length).to.equal(1)
       // yet the whole input has been parsed
@@ -311,7 +311,7 @@ describe("Error Recovery SQL DDL Example", () => {
   }
 
   it("will encounter an NotAllInputParsedException when some of the input vector has not been parsed", () => {
-    let input: any = flatten([
+    const input: any = flatten([
       // CREATE TABLE schema2.Persons; TABLE <-- redundant "TABLE" token
       createRegularToken(CreateTok),
       createRegularToken(TableTok),
@@ -319,7 +319,7 @@ describe("Error Recovery SQL DDL Example", () => {
       createRegularToken(SemiColonTok),
       createRegularToken(TableTok)
     ])
-    let parser = new DDLExampleRecoveryParser()
+    const parser = new DDLExampleRecoveryParser()
     parser.input = input
 
     parser.ddl()
@@ -328,18 +328,18 @@ describe("Error Recovery SQL DDL Example", () => {
   })
 
   it("can use the same parser instance to parse multiple inputs", () => {
-    let input1: any = flatten([
+    const input1: any = flatten([
       // CREATE TABLE schema2.Persons;
       createRegularToken(CreateTok),
       createRegularToken(TableTok),
       schemaFQN,
       createRegularToken(SemiColonTok)
     ])
-    let parser = new DDLExampleRecoveryParser(input1)
+    const parser = new DDLExampleRecoveryParser(input1)
     parser.ddl()
     expect(parser.errors.length).to.equal(0)
 
-    let input2: any = flatten([
+    const input2: any = flatten([
       // DELETE (31, "SHAHAR") FROM schema2.Persons
       createRegularToken(DeleteTok),
       shahar31Record,
@@ -350,7 +350,7 @@ describe("Error Recovery SQL DDL Example", () => {
     // the parser is being reset instead of creating a new instance for each new input
     parser.reset()
     parser.input = input2
-    let ptResult: any = parser.ddl()
+    const ptResult: any = parser.ddl()
     expect(parser.errors.length).to.equal(0)
     // verify returned ParseTree
     expect(ptResult.payload.tokenType).to.equal(STATEMENTS)
@@ -362,7 +362,7 @@ describe("Error Recovery SQL DDL Example", () => {
   })
 
   it("can re-sync to the next iteration in a MANY rule", () => {
-    let input: any = flatten([
+    const input: any = flatten([
       // CREATE TABLE schema2.Persons
       createRegularToken(CreateTok),
       createRegularToken(TableTok),
@@ -384,9 +384,9 @@ describe("Error Recovery SQL DDL Example", () => {
       createRegularToken(SemiColonTok)
     ])
 
-    let parser = new DDLExampleRecoveryParser()
+    const parser = new DDLExampleRecoveryParser()
     parser.input = input
-    let ptResult = parser.ddl()
+    const ptResult = parser.ddl()
     expect(parser.errors.length).to.equal(1)
     assertAllThreeStatementsPresentAndValid(ptResult)
   })

@@ -16,7 +16,7 @@ function createToken(options) {
   return newToken
 }
 
-const WhiteSpace = createToken({
+createToken({
   name: "WhiteSpace",
   pattern: /\s+/,
   group: Lexer.SKIPPED

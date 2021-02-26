@@ -10,11 +10,13 @@
   "scripts": {
     "lerna:version": "yarn && lerna version",
     "lerna:publish": "lerna publish from-git --yes --no-verify-access",
-    "ci": "npm-run-all format:validate build test",
+    "ci": "npm-run-all format:validate lint:validate build test",
     "build": "lerna run build",
     "test": "lerna run test",
     "format:fix": "prettier --ignore-path .gitignore --write \"**/*.@(ts|js|json|md|yml)\"",
-    "format:validate": "prettier --ignore-path .gitignore --check \"**/*.@(ts|js|json|md|yml)\""
+    "format:validate": "prettier --ignore-path .gitignore --check \"**/*.@(ts|js|json|md|yml)\"",
+    "lint:fix": "eslint . --ext=js,ts --fix --max-warnings=0 --ignore-path=.gitignore",
+    "lint:validate": "eslint . --ext=js,ts --max-warnings=0 --ignore-path=.gitignore"
   },
   "prettier": {
     "endOfLine": "lf",
@@ -30,6 +32,9 @@
   "lint-staged": {
     "*.{ts,js,json,md}": [
       "prettier --write"
+    ],
+    "*.{ts,js}": [
+      "eslint --fix --max-warnings=0 --ignore-pattern=!.*"
     ]
   },
   "config": {
@@ -54,6 +59,11 @@
     "shx": "^0.3.2",
     "cz-conventional-changelog": "3.3.0",
     "@commitlint/cli": "12.0.0",
-    "@commitlint/config-conventional": "12.0.0"
+    "@commitlint/config-conventional": "12.0.0",
+    "eslint": "7.18.0",
+    "@typescript-eslint/parser": "4.14.0",
+    "@typescript-eslint/eslint-plugin": "4.15.0",
+    "eslint-config-prettier": "7.2.0",
+    "eslint-plugin-eslint-comments": "3.2.0"
   }
 }

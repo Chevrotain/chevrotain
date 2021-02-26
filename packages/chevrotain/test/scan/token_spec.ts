@@ -10,7 +10,7 @@ import { singleAssignCategoriesToksMap } from "../../src/scan/tokens"
 
 describe("The Chevrotain Tokens namespace", () => {
   context("createToken", () => {
-    let TrueLiteral = createToken({ name: "TrueLiteral" })
+    const TrueLiteral = createToken({ name: "TrueLiteral" })
     class FalseLiteral {}
 
     it("assigns `name` property to tokenTypes", () => {
@@ -21,26 +21,26 @@ describe("The Chevrotain Tokens namespace", () => {
       expect(tokenName(TrueLiteral)).to.equal("TrueLiteral")
     })
 
-    let A = createToken({ name: "A" })
-    let B = createToken({ name: "B", categories: A })
+    const A = createToken({ name: "A" })
+    const B = createToken({ name: "B", categories: A })
 
     B.GROUP = "Special"
 
-    let C = createToken({
+    const C = createToken({
       name: "C",
       pattern: /\d+/,
       categories: B
     })
-    let D = createToken({
+    const D = createToken({
       name: "D",
       pattern: /\w+/,
       categories: B
     })
-    let Plus = createToken({ name: "Plus", pattern: /\+/ })
+    const Plus = createToken({ name: "Plus", pattern: /\+/ })
     Plus.LABEL = "+"
 
     it("provides an createTokenInstance utility - creating an instance", () => {
-      let aInstance = createTokenInstance(A, "Hello", 0, 4, 1, 1, 1, 5)
+      const aInstance = createTokenInstance(A, "Hello", 0, 4, 1, 1, 1, 5)
       expect(aInstance.image).to.equal("Hello")
       expect(aInstance.startOffset).to.equal(0)
       expect(aInstance.endOffset).to.equal(4)
@@ -51,7 +51,7 @@ describe("The Chevrotain Tokens namespace", () => {
     })
 
     it("provides an extendToken utility - creating a subclass instance", () => {
-      let aInstance = createTokenInstance(A, "World", 0, 4, 1, 1, 1, 5)
+      const aInstance = createTokenInstance(A, "World", 0, 4, 1, 1, 1, 5)
       expect(aInstance.image).to.equal("World")
       expect(aInstance.startOffset).to.equal(0)
       expect(aInstance.endOffset).to.equal(4)
@@ -69,13 +69,13 @@ describe("The Chevrotain Tokens namespace", () => {
     })
 
     it("provides a utility to verify if a token instance matches a Token Type", () => {
-      let ATokRegular = createToken({
+      const ATokRegular = createToken({
         name: "ATokRegular"
       })
-      let BTokRegular = createToken({
+      const BTokRegular = createToken({
         name: "BTokRegular"
       })
-      let AInstanceRegular = createTokenInstance(
+      const AInstanceRegular = createTokenInstance(
         ATokRegular,
         "a",
         -1,
@@ -85,7 +85,7 @@ describe("The Chevrotain Tokens namespace", () => {
         -1,
         -1
       )
-      let BInstanceRegular = createTokenInstance(
+      const BInstanceRegular = createTokenInstance(
         BTokRegular,
         "b",
         -1,
@@ -103,8 +103,8 @@ describe("The Chevrotain Tokens namespace", () => {
     })
 
     it("Will augment Token Constructors with additional metadata basic", () => {
-      let A = createToken({ name: "A" })
-      let B = createToken({ name: "B" })
+      const A = createToken({ name: "A" })
+      const B = createToken({ name: "B" })
 
       expect(A.tokenTypeIdx).to.be.greaterThan(0)
       expect(B.tokenTypeIdx).to.be.greaterThan(A.tokenTypeIdx)
@@ -116,7 +116,7 @@ describe("The Chevrotain Tokens namespace", () => {
     })
 
     it("can define a token Label via the createToken utilities", () => {
-      let A = createToken({
+      const A = createToken({
         name: "A",
         label: "bamba"
       })
@@ -124,7 +124,7 @@ describe("The Chevrotain Tokens namespace", () => {
     })
 
     it("can define a POP_MODE via the createToken utilities", () => {
-      let A = createToken({
+      const A = createToken({
         name: "A",
         pop_mode: true
       })
@@ -133,7 +133,7 @@ describe("The Chevrotain Tokens namespace", () => {
     })
 
     it("can define a PUSH_MODE via the createToken utilities", () => {
-      let A = createToken({
+      const A = createToken({
         name: "A",
         push_mode: "attribute"
       })
@@ -142,14 +142,14 @@ describe("The Chevrotain Tokens namespace", () => {
     })
 
     it("can define a LONGER_ALT via the createToken utilities", () => {
-      let A = createToken({ name: "A" })
-      let B = createToken({ name: "B", longer_alt: A })
+      const A = createToken({ name: "A" })
+      const B = createToken({ name: "B", longer_alt: A })
       expect(B).to.haveOwnProperty("LONGER_ALT")
       expect(B.LONGER_ALT).to.equal(A)
     })
 
     it("can define a token group via the createToken utilities", () => {
-      let A = createToken({
+      const A = createToken({
         name: "A",
         group: Lexer.SKIPPED
       })

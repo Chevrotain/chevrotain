@@ -47,7 +47,7 @@ const JsonLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
 class JsonParserES6 extends CstParser {
-  constructor(input) {
+  constructor() {
     super(allTokens)
 
     // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)

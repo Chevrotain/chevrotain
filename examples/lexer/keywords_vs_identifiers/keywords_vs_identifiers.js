@@ -39,7 +39,7 @@ const Whitespace = createToken({
   group: Lexer.SKIPPED
 })
 
-keywordsVsIdentifiersLexer = new Lexer([
+const keywordsVsIdentifiersLexer = new Lexer([
   Whitespace, // Whitespace is very common in most languages so placing it first generally speeds up the lexing.
 
   While, // the actual keywords (While/For/Do) must appear BEFORE the Identifier Token as they are all a valid prefix of it's PATTERN.

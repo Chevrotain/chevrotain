@@ -52,14 +52,14 @@ import { IToken, ITokenGrammarPath, TokenType } from "../../../api"
 describe("The Grammar Interpeter namespace", () => {
   describe("The NextAfterTokenWalker", () => {
     it("can compute the next possible token types From ActionDec in scope of ActionDec #1", () => {
-      let caPath: ITokenGrammarPath = {
+      const caPath: ITokenGrammarPath = {
         ruleStack: ["actionDec"],
         occurrenceStack: [1],
         lastTok: ActionTok,
         lastTokOccurrence: 1
       }
 
-      let possibleNextTokTypes = new NextAfterTokenWalker(
+      const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
         caPath
       ).startWalking()
@@ -68,14 +68,14 @@ describe("The Grammar Interpeter namespace", () => {
     })
 
     it("can compute the next possible token types From ActionDec in scope of ActionDec #2", () => {
-      let caPath: ITokenGrammarPath = {
+      const caPath: ITokenGrammarPath = {
         ruleStack: ["actionDec"],
         occurrenceStack: [1],
         lastTok: IdentTok,
         lastTokOccurrence: 1
       }
 
-      let possibleNextTokTypes = new NextAfterTokenWalker(
+      const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
         caPath
       ).startWalking()
@@ -84,14 +84,14 @@ describe("The Grammar Interpeter namespace", () => {
     })
 
     it("can compute the next possible token types From ActionDec in scope of ActionDec #3", () => {
-      let caPath: ITokenGrammarPath = {
+      const caPath: ITokenGrammarPath = {
         ruleStack: ["actionDec"],
         occurrenceStack: [1],
         lastTok: LParenTok,
         lastTokOccurrence: 1
       }
 
-      let possibleNextTokTypes = new NextAfterTokenWalker(
+      const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
         caPath
       ).startWalking()
@@ -100,14 +100,14 @@ describe("The Grammar Interpeter namespace", () => {
     })
 
     it("can compute the next possible token types From ActionDec in scope of ActionDec #4", () => {
-      let caPath: ITokenGrammarPath = {
+      const caPath: ITokenGrammarPath = {
         ruleStack: ["actionDec"],
         occurrenceStack: [1],
         lastTok: CommaTok,
         lastTokOccurrence: 1
       }
 
-      let possibleNextTokTypes = new NextAfterTokenWalker(
+      const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
         caPath
       ).startWalking()
@@ -116,14 +116,14 @@ describe("The Grammar Interpeter namespace", () => {
     })
 
     it("can compute the next possible token types From ActionDec in scope of ActionDec #5", () => {
-      let caPath: ITokenGrammarPath = {
+      const caPath: ITokenGrammarPath = {
         ruleStack: ["actionDec"],
         occurrenceStack: [1],
         lastTok: RParenTok,
         lastTokOccurrence: 1
       }
 
-      let possibleNextTokTypes = new NextAfterTokenWalker(
+      const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
         caPath
       ).startWalking()
@@ -132,14 +132,14 @@ describe("The Grammar Interpeter namespace", () => {
     })
 
     it("can compute the next possible token types From ActionDec in scope of ActionDec #6", () => {
-      let caPath: ITokenGrammarPath = {
+      const caPath: ITokenGrammarPath = {
         ruleStack: ["actionDec"],
         occurrenceStack: [1],
         lastTok: ColonTok,
         lastTokOccurrence: 1
       }
 
-      let possibleNextTokTypes = new NextAfterTokenWalker(
+      const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
         caPath
       ).startWalking()
@@ -148,14 +148,14 @@ describe("The Grammar Interpeter namespace", () => {
     })
 
     it("can compute the next possible token types From ActionDec in scope of ActionDec #7", () => {
-      let caPath: ITokenGrammarPath = {
+      const caPath: ITokenGrammarPath = {
         ruleStack: ["actionDec"],
         occurrenceStack: [1],
         lastTok: SemicolonTok,
         lastTokOccurrence: 1
       }
 
-      let possibleNextTokTypes = new NextAfterTokenWalker(
+      const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
         caPath
       ).startWalking()
@@ -163,14 +163,14 @@ describe("The Grammar Interpeter namespace", () => {
     })
 
     it("can compute the next possible token types From the first paramSpec INSIDE ActionDec #1", () => {
-      let caPath: ITokenGrammarPath = {
+      const caPath: ITokenGrammarPath = {
         ruleStack: ["actionDec", "paramSpec"],
         occurrenceStack: [1, 1],
         lastTok: IdentTok,
         lastTokOccurrence: 1
       }
 
-      let possibleNextTokTypes = new NextAfterTokenWalker(
+      const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
         caPath
       ).startWalking()
@@ -179,14 +179,14 @@ describe("The Grammar Interpeter namespace", () => {
     })
 
     it("can compute the next possible token types From the first paramSpec INSIDE ActionDec #2", () => {
-      let caPath: ITokenGrammarPath = {
+      const caPath: ITokenGrammarPath = {
         ruleStack: ["actionDec", "paramSpec"],
         occurrenceStack: [1, 1],
         lastTok: ColonTok,
         lastTokOccurrence: 1
       }
 
-      let possibleNextTokTypes = new NextAfterTokenWalker(
+      const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
         caPath
       ).startWalking()
@@ -195,14 +195,14 @@ describe("The Grammar Interpeter namespace", () => {
     })
 
     it("can compute the next possible token types From the first paramSpec INSIDE ActionDec #3", () => {
-      let caPath: ITokenGrammarPath = {
+      const caPath: ITokenGrammarPath = {
         ruleStack: ["actionDec", "paramSpec"],
         occurrenceStack: [1, 1],
         lastTok: LSquareTok,
         lastTokOccurrence: 1
       }
 
-      let possibleNextTokTypes = new NextAfterTokenWalker(
+      const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
         caPath
       ).startWalking()
@@ -211,14 +211,14 @@ describe("The Grammar Interpeter namespace", () => {
     })
 
     it("can compute the next possible token types From the first paramSpec INSIDE ActionDec #4", () => {
-      let caPath: ITokenGrammarPath = {
+      const caPath: ITokenGrammarPath = {
         ruleStack: ["actionDec", "paramSpec"],
         occurrenceStack: [1, 1],
         lastTok: RSquareTok,
         lastTokOccurrence: 1
       }
 
-      let possibleNextTokTypes = new NextAfterTokenWalker(
+      const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
         caPath
       ).startWalking()
@@ -227,14 +227,14 @@ describe("The Grammar Interpeter namespace", () => {
     })
 
     it("can compute the next possible token types From the second paramSpec INSIDE ActionDec #1", () => {
-      let caPath: ITokenGrammarPath = {
+      const caPath: ITokenGrammarPath = {
         ruleStack: ["actionDec", "paramSpec"],
         occurrenceStack: [1, 2],
         lastTok: IdentTok,
         lastTokOccurrence: 1
       }
 
-      let possibleNextTokTypes = new NextAfterTokenWalker(
+      const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
         caPath
       ).startWalking()
@@ -243,14 +243,14 @@ describe("The Grammar Interpeter namespace", () => {
     })
 
     it("can compute the next possible token types From the second paramSpec INSIDE ActionDec #2", () => {
-      let caPath: ITokenGrammarPath = {
+      const caPath: ITokenGrammarPath = {
         ruleStack: ["actionDec", "paramSpec"],
         occurrenceStack: [1, 2],
         lastTok: ColonTok,
         lastTokOccurrence: 1
       }
 
-      let possibleNextTokTypes = new NextAfterTokenWalker(
+      const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
         caPath
       ).startWalking()
@@ -259,14 +259,14 @@ describe("The Grammar Interpeter namespace", () => {
     })
 
     it("can compute the next possible token types From the second paramSpec INSIDE ActionDec #3", () => {
-      let caPath: ITokenGrammarPath = {
+      const caPath: ITokenGrammarPath = {
         ruleStack: ["actionDec", "paramSpec"],
         occurrenceStack: [1, 2],
         lastTok: LSquareTok,
         lastTokOccurrence: 1
       }
 
-      let possibleNextTokTypes = new NextAfterTokenWalker(
+      const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
         caPath
       ).startWalking()
@@ -275,14 +275,14 @@ describe("The Grammar Interpeter namespace", () => {
     })
 
     it("can compute the next possible token types From the second paramSpec INSIDE ActionDec #4", () => {
-      let caPath: ITokenGrammarPath = {
+      const caPath: ITokenGrammarPath = {
         ruleStack: ["actionDec", "paramSpec"],
         occurrenceStack: [1, 2],
         lastTok: RSquareTok,
         lastTokOccurrence: 1
       }
 
-      let possibleNextTokTypes = new NextAfterTokenWalker(
+      const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
         caPath
       ).startWalking()
@@ -294,14 +294,14 @@ describe("The Grammar Interpeter namespace", () => {
       "can compute the next possible token types From a fqn inside an actionParamSpec" +
         " inside an paramSpec INSIDE ActionDec #1",
       () => {
-        let caPath: ITokenGrammarPath = {
+        const caPath: ITokenGrammarPath = {
           ruleStack: ["actionDec", "paramSpec", "qualifiedName"],
           occurrenceStack: [1, 1, 1],
           lastTok: IdentTok,
           lastTokOccurrence: 1
         }
 
-        let possibleNextTokTypes = new NextAfterTokenWalker(
+        const possibleNextTokTypes = new NextAfterTokenWalker(
           actionDec,
           caPath
         ).startWalking()
@@ -319,14 +319,14 @@ describe("The Grammar Interpeter namespace", () => {
       "can compute the next possible token types From a fqn inside an actionParamSpec" +
         " inside an paramSpec INSIDE ActionDec #2",
       () => {
-        let caPath: ITokenGrammarPath = {
+        const caPath: ITokenGrammarPath = {
           ruleStack: ["actionDec", "paramSpec", "qualifiedName"],
           occurrenceStack: [1, 1, 1],
           lastTok: DotTok,
           lastTokOccurrence: 1
         }
 
-        let possibleNextTokTypes = new NextAfterTokenWalker(
+        const possibleNextTokTypes = new NextAfterTokenWalker(
           actionDec,
           caPath
         ).startWalking()
@@ -339,14 +339,14 @@ describe("The Grammar Interpeter namespace", () => {
       "can compute the next possible token types From a fqn inside an actionParamSpec" +
         " inside an paramSpec INSIDE ActionDec #3",
       () => {
-        let caPath: ITokenGrammarPath = {
+        const caPath: ITokenGrammarPath = {
           ruleStack: ["actionDec", "paramSpec", "qualifiedName"],
           occurrenceStack: [1, 1, 1],
           lastTok: IdentTok,
           lastTokOccurrence: 2
         }
 
-        let possibleNextTokTypes = new NextAfterTokenWalker(
+        const possibleNextTokTypes = new NextAfterTokenWalker(
           actionDec,
           caPath
         ).startWalking()
@@ -364,14 +364,14 @@ describe("The Grammar Interpeter namespace", () => {
       "can compute the next possible token types From a fqn inside an actionParamSpec" +
         " inside an paramSpec INSIDE ActionDec #3",
       () => {
-        let caPath: ITokenGrammarPath = {
+        const caPath: ITokenGrammarPath = {
           ruleStack: ["paramSpec", "qualifiedName"],
           occurrenceStack: [1, 1],
           lastTok: IdentTok,
           lastTokOccurrence: 1
         }
 
-        let possibleNextTokTypes = new NextAfterTokenWalker(
+        const possibleNextTokTypes = new NextAfterTokenWalker(
           paramSpec,
           caPath
         ).startWalking()
@@ -384,14 +384,14 @@ describe("The Grammar Interpeter namespace", () => {
       "can compute the next possible token types From a fqn inside an actionParamSpec" +
         " inside an paramSpec INSIDE ActionDec #3",
       () => {
-        let caPath: ITokenGrammarPath = {
+        const caPath: ITokenGrammarPath = {
           ruleStack: ["paramSpec", "qualifiedName"],
           occurrenceStack: [1, 1],
           lastTok: DotTok,
           lastTokOccurrence: 1
         }
 
-        let possibleNextTokTypes = new NextAfterTokenWalker(
+        const possibleNextTokTypes = new NextAfterTokenWalker(
           paramSpec,
           caPath
         ).startWalking()
@@ -404,14 +404,14 @@ describe("The Grammar Interpeter namespace", () => {
       "can compute the next possible token types From a fqn inside an actionParamSpec" +
         " inside an paramSpec INSIDE ActionDec #3",
       () => {
-        let caPath: ITokenGrammarPath = {
+        const caPath: ITokenGrammarPath = {
           ruleStack: ["paramSpec", "qualifiedName"],
           occurrenceStack: [1, 1],
           lastTok: IdentTok,
           lastTokOccurrence: 2
         }
 
-        let possibleNextTokTypes = new NextAfterTokenWalker(
+        const possibleNextTokTypes = new NextAfterTokenWalker(
           paramSpec,
           caPath
         ).startWalking()
@@ -421,14 +421,14 @@ describe("The Grammar Interpeter namespace", () => {
     )
 
     it("will fail if we try to compute the next token starting from a rule that does not match the path", () => {
-      let caPath: ITokenGrammarPath = {
+      const caPath: ITokenGrammarPath = {
         ruleStack: ["I_WILL_FAIL_THE_WALKER", "qualifiedName"],
         occurrenceStack: [1, 1],
         lastTok: IdentTok,
         lastTokOccurrence: 2
       }
 
-      let walker = new NextAfterTokenWalker(paramSpec, caPath)
+      const walker = new NextAfterTokenWalker(paramSpec, caPath)
       expect(() => walker.startWalking()).to.throw(
         "The path does not start with the walker's top Rule!"
       )
@@ -438,7 +438,7 @@ describe("The Grammar Interpeter namespace", () => {
 
 describe("The NextTerminalAfterManyWalker", () => {
   it("can compute the next possible token types after the MANY in QualifiedName", () => {
-    let rule = new Rule({
+    const rule = new Rule({
       name: "TwoRepetitionRule",
       definition: [
         new Repetition({
@@ -466,7 +466,7 @@ describe("The NextTerminalAfterManyWalker", () => {
       ]
     })
 
-    let result = new NextTerminalAfterManyWalker(rule, 1).startWalking()
+    const result = new NextTerminalAfterManyWalker(rule, 1).startWalking()
     //noinspection BadExpressionStatementJS
     expect(result.occurrence).to.be.undefined
     //noinspection BadExpressionStatementJS
@@ -474,7 +474,7 @@ describe("The NextTerminalAfterManyWalker", () => {
   })
 
   it("can compute the next possible token types after the MANY in paramSpec inside ActionDec", () => {
-    let result = new NextTerminalAfterManyWalker(actionDec, 1).startWalking()
+    const result = new NextTerminalAfterManyWalker(actionDec, 1).startWalking()
     expect(result.occurrence).to.equal(1)
     expect(result.token).to.equal(RParenTok)
   })
@@ -482,7 +482,7 @@ describe("The NextTerminalAfterManyWalker", () => {
 
 describe("The NextTerminalAfterManySepWalker", () => {
   it("can compute the next possible token types after the MANY_SEP in QualifiedName", () => {
-    let result = new NextTerminalAfterManySepWalker(
+    const result = new NextTerminalAfterManySepWalker(
       callArguments,
       1
     ).startWalking()
@@ -493,7 +493,7 @@ describe("The NextTerminalAfterManySepWalker", () => {
   })
 
   it("can compute the next possible token types after the MANY in paramSpec inside ActionDec", () => {
-    let result = new NextTerminalAfterManySepWalker(
+    const result = new NextTerminalAfterManySepWalker(
       actionDecSep,
       1
     ).startWalking()
@@ -504,21 +504,21 @@ describe("The NextTerminalAfterManySepWalker", () => {
 
 describe("The NextTerminalAfterAtLeastOneWalker", () => {
   it("can compute the next possible token types after an AT_LEAST_ONE production", () => {
-    let result = new NextTerminalAfterAtLeastOneWalker(
+    const result = new NextTerminalAfterAtLeastOneWalker(
       atLeastOneRule,
       1
     ).startWalking()
     expect(result.occurrence).to.equal(2)
     expect(result.token).to.equal(DotTok)
 
-    let result2 = new NextTerminalAfterAtLeastOneWalker(
+    const result2 = new NextTerminalAfterAtLeastOneWalker(
       atLeastOneRule,
       2
     ).startWalking()
     expect(result2.occurrence).to.equal(1)
     expect(result2.token).to.equal(DotTok)
 
-    let result3 = new NextTerminalAfterAtLeastOneWalker(
+    const result3 = new NextTerminalAfterAtLeastOneWalker(
       atLeastOneRule,
       3
     ).startWalking()
@@ -527,7 +527,7 @@ describe("The NextTerminalAfterAtLeastOneWalker", () => {
   })
 
   it("can compute the next possible token types after an AT_LEAST_ONE production - EMPTY", () => {
-    let atLeastOneRule = new Rule({
+    const atLeastOneRule = new Rule({
       name: "atLeastOneRule",
       definition: [
         new RepetitionMandatory({
@@ -541,7 +541,7 @@ describe("The NextTerminalAfterAtLeastOneWalker", () => {
       ]
     })
 
-    let result = new NextTerminalAfterAtLeastOneWalker(
+    const result = new NextTerminalAfterAtLeastOneWalker(
       atLeastOneRule,
       1
     ).startWalking()
@@ -552,21 +552,21 @@ describe("The NextTerminalAfterAtLeastOneWalker", () => {
 
 describe("The NextTerminalAfterAtLeastOneSepWalker", () => {
   it("can compute the next possible token types after an AT_LEAST_ONE_SEP production", () => {
-    let result = new NextTerminalAfterAtLeastOneSepWalker(
+    const result = new NextTerminalAfterAtLeastOneSepWalker(
       atLeastOneSepRule,
       1
     ).startWalking()
     expect(result.occurrence).to.equal(2)
     expect(result.token).to.equal(DotTok)
 
-    let result2 = new NextTerminalAfterAtLeastOneSepWalker(
+    const result2 = new NextTerminalAfterAtLeastOneSepWalker(
       atLeastOneSepRule,
       2
     ).startWalking()
     expect(result2.occurrence).to.equal(1)
     expect(result2.token).to.equal(DotTok)
 
-    let result3 = new NextTerminalAfterAtLeastOneSepWalker(
+    const result3 = new NextTerminalAfterAtLeastOneSepWalker(
       atLeastOneSepRule,
       3
     ).startWalking()
@@ -575,7 +575,7 @@ describe("The NextTerminalAfterAtLeastOneSepWalker", () => {
   })
 
   it("can compute the next possible token types after an AT_LEAST_ONE_SEP production EMPTY", () => {
-    let result = new NextTerminalAfterAtLeastOneSepWalker(
+    const result = new NextTerminalAfterAtLeastOneSepWalker(
       qualifiedNameSep,
       1
     ).startWalking()
@@ -611,7 +611,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
   context("can calculate the next possible paths in a", () => {
     it("Sequence", () => {
-      let seq = [
+      const seq = [
         new Terminal({ terminalType: Alpha }),
         new Terminal({ terminalType: Beta }),
         new Terminal({ terminalType: Gamma })
@@ -632,7 +632,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     })
 
     it("Optional", () => {
-      let seq = [
+      const seq = [
         new Terminal({ terminalType: Alpha }),
         new Option({
           definition: [new Terminal({ terminalType: Beta })]
@@ -658,7 +658,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     })
 
     it("Alternation", () => {
-      let alts = [
+      const alts = [
         new Alternation({
           definition: [
             new Alternative({
@@ -704,7 +704,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     })
 
     it("Repetition", () => {
-      let rep = [
+      const rep = [
         new Repetition({
           definition: [
             new Terminal({ terminalType: Alpha }),
@@ -735,7 +735,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     })
 
     it("Mandatory Repetition", () => {
-      let repMand = [
+      const repMand = [
         new RepetitionMandatory({
           definition: [
             new Terminal({ terminalType: Alpha }),
@@ -764,7 +764,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     it("Repetition with Separator", () => {
       // same as Mandatory Repetition because currently possiblePaths only cares about
       // the first repetition.
-      let rep = [
+      const rep = [
         new RepetitionWithSeparator({
           definition: [
             new Terminal({ terminalType: Alpha }),
@@ -797,7 +797,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     it("Mandatory Repetition with Separator", () => {
       // same as Mandatory Repetition because currently possiblePaths only cares about
       // the first repetition.
-      let repMandSep = [
+      const repMandSep = [
         new RepetitionMandatoryWithSeparator({
           definition: [
             new Terminal({ terminalType: Alpha }),
@@ -829,12 +829,12 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     })
 
     it("NonTerminal", () => {
-      let someSubRule = new Rule({
+      const someSubRule = new Rule({
         name: "blah",
         definition: [new Terminal({ terminalType: Beta })]
       })
 
-      let seq = [
+      const seq = [
         new Terminal({ terminalType: Alpha }),
         new NonTerminal({
           nonTerminalName: "blah",
@@ -868,7 +868,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     }
 
     it("Sequence positive", () => {
-      let seq = [
+      const seq = [
         new Alternative({
           definition: [
             new Terminal({ terminalType: Alpha }),
@@ -909,7 +909,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     })
 
     it("Sequence negative", () => {
-      let seq = [
+      const seq = [
         new Alternative({
           definition: [
             new Terminal({ terminalType: Alpha }),
@@ -942,7 +942,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     })
 
     it("Optional positive", () => {
-      let seq = [
+      const seq = [
         new Terminal({ terminalType: Alpha }),
         new Option({
           definition: [new Terminal({ terminalType: Beta })]
@@ -966,7 +966,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     })
 
     it("Optional Negative", () => {
-      let seq = [
+      const seq = [
         new Terminal({ terminalType: Alpha }),
         new Option({
           definition: [new Terminal({ terminalType: Beta })]
@@ -996,7 +996,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     })
 
     it("Alternation positive", () => {
-      let alts = [
+      const alts = [
         new Alternation({
           definition: [
             new Alternative({
@@ -1053,7 +1053,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     })
 
     it("Alternation Negative", () => {
-      let alts = [
+      const alts = [
         new Alternation({
           definition: [
             new Alternative({
@@ -1101,7 +1101,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     })
 
     it("Repetition - positive", () => {
-      let rep = [
+      const rep = [
         new Repetition({
           definition: [
             new Terminal({ terminalType: Alpha }),
@@ -1164,7 +1164,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     })
 
     it("Repetition - negative", () => {
-      let rep = [
+      const rep = [
         new Repetition({
           definition: [
             new Terminal({ terminalType: Alpha }),
@@ -1204,7 +1204,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     })
 
     it("Mandatory Repetition - positive", () => {
-      let repMand = [
+      const repMand = [
         new RepetitionMandatory({
           definition: [
             new Terminal({ terminalType: Alpha }),
@@ -1267,7 +1267,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     })
 
     it("Mandatory Repetition - negative", () => {
-      let repMand = [
+      const repMand = [
         new RepetitionMandatory({
           definition: [
             new Terminal({ terminalType: Alpha }),
@@ -1312,7 +1312,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     })
 
     it("Repetition with Separator - positive", () => {
-      let repSep = [
+      const repSep = [
         new RepetitionWithSeparator({
           definition: [
             new Terminal({ terminalType: Alpha }),
@@ -1376,7 +1376,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     })
 
     it("Repetition with Separator - negative", () => {
-      let repMand = [
+      const repMand = [
         new RepetitionWithSeparator({
           definition: [
             new Terminal({ terminalType: Alpha }),
@@ -1422,7 +1422,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     })
 
     it("Repetition with Separator Mandatory - positive", () => {
-      let repSep = [
+      const repSep = [
         new RepetitionMandatoryWithSeparator({
           definition: [
             new Terminal({ terminalType: Alpha }),
@@ -1486,7 +1486,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     })
 
     it("Repetition with Separator Mandatory - negative", () => {
-      let repMand = [
+      const repMand = [
         new RepetitionMandatoryWithSeparator({
           definition: [
             new Terminal({ terminalType: Alpha }),
@@ -1540,12 +1540,12 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     })
 
     it("NonTerminal - positive", () => {
-      let someSubRule = new Rule({
+      const someSubRule = new Rule({
         name: "blah",
         definition: [new Terminal({ terminalType: Beta })]
       })
 
-      let seq = [
+      const seq = [
         new Terminal({ terminalType: Alpha }),
         new NonTerminal({
           nonTerminalName: "blah",
@@ -1585,12 +1585,12 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     })
 
     it("NonTerminal - negative", () => {
-      let someSubRule = new Rule({
+      const someSubRule = new Rule({
         name: "blah",
         definition: [new Terminal({ terminalType: Beta })]
       })
 
-      let seq = [
+      const seq = [
         new Terminal({ terminalType: Alpha }),
         new NonTerminal({
           nonTerminalName: "blah",

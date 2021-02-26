@@ -9,11 +9,20 @@ import {
 
 describe("Chevrotain's Parsing Exceptions", () => {
   describe("the exception instance subclasses Error with the right properties for: ", () => {
-    let currentToken = createTokenInstance(EOF, "cur", -1, -1, -1, -1, -1, -1)
-    let previousToken = createTokenInstance(EOF, "prv", -1, -1, -1, -1, -1, -1)
+    const currentToken = createTokenInstance(EOF, "cur", -1, -1, -1, -1, -1, -1)
+    const previousToken = createTokenInstance(
+      EOF,
+      "prv",
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1
+    )
 
     it("EarlyExitException", () => {
-      let exceptionInstance = new EarlyExitException(
+      const exceptionInstance = new EarlyExitException(
         "error message",
         currentToken,
         previousToken
@@ -28,7 +37,7 @@ describe("Chevrotain's Parsing Exceptions", () => {
     })
 
     it("NoViableAltException", () => {
-      let exceptionInstance = new NoViableAltException(
+      const exceptionInstance = new NoViableAltException(
         "error message",
         currentToken,
         previousToken
@@ -43,7 +52,7 @@ describe("Chevrotain's Parsing Exceptions", () => {
     })
 
     it("NotAllInputParsedException", () => {
-      let exceptionInstance = new NotAllInputParsedException(
+      const exceptionInstance = new NotAllInputParsedException(
         "error message",
         currentToken
       )
@@ -56,7 +65,7 @@ describe("Chevrotain's Parsing Exceptions", () => {
     })
 
     it("MismatchedTokenException", () => {
-      let exceptionInstance = new MismatchedTokenException(
+      const exceptionInstance = new MismatchedTokenException(
         "error message",
         currentToken,
         previousToken
@@ -71,7 +80,7 @@ describe("Chevrotain's Parsing Exceptions", () => {
   })
 
   describe("the exception instance stacktrace is valid for: ", () => {
-    let dummyToken = createTokenInstance(EOF, "cur", -1, -1, -1, -1, -1, -1)
+    const dummyToken = createTokenInstance(EOF, "cur", -1, -1, -1, -1, -1, -1)
 
     function throwAndCatchException(errorFactory: () => Error) {
       try {
@@ -82,37 +91,37 @@ describe("Chevrotain's Parsing Exceptions", () => {
     }
 
     it("EarlyExitException", () => {
-      let exceptionInstance = throwAndCatchException(
+      const exceptionInstance = throwAndCatchException(
         () => new EarlyExitException("", dummyToken, dummyToken)
       )
-      let stacktrace = ErrorStackParser.parse(exceptionInstance)
+      const stacktrace = ErrorStackParser.parse(exceptionInstance)
       expect(stacktrace[0].functionName).to.be.undefined // lambda function
       expect(stacktrace[1].functionName).to.equal("throwAndCatchException")
     })
 
     it("NoViableAltException", () => {
-      let exceptionInstance = throwAndCatchException(
+      const exceptionInstance = throwAndCatchException(
         () => new NoViableAltException("", dummyToken, dummyToken)
       )
-      let stacktrace = ErrorStackParser.parse(exceptionInstance)
+      const stacktrace = ErrorStackParser.parse(exceptionInstance)
       expect(stacktrace[0].functionName).to.be.undefined // lambda function
       expect(stacktrace[1].functionName).to.equal("throwAndCatchException")
     })
 
     it("NotAllInputParsedException", () => {
-      let exceptionInstance = throwAndCatchException(
+      const exceptionInstance = throwAndCatchException(
         () => new NotAllInputParsedException("", dummyToken)
       )
-      let stacktrace = ErrorStackParser.parse(exceptionInstance)
+      const stacktrace = ErrorStackParser.parse(exceptionInstance)
       expect(stacktrace[0].functionName).to.be.undefined // lambda function
       expect(stacktrace[1].functionName).to.equal("throwAndCatchException")
     })
 
     it("MismatchedTokenException", () => {
-      let exceptionInstance = throwAndCatchException(
+      const exceptionInstance = throwAndCatchException(
         () => new MismatchedTokenException("", dummyToken, dummyToken)
       )
-      let stacktrace = ErrorStackParser.parse(exceptionInstance)
+      const stacktrace = ErrorStackParser.parse(exceptionInstance)
       expect(stacktrace[0].functionName).to.be.undefined // lambda function
       expect(stacktrace[1].functionName).to.equal("throwAndCatchException")
     })

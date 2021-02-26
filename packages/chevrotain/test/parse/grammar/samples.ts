@@ -39,7 +39,7 @@ export const RequiredTok = createToken({ name: "RequiredTok", pattern: /NA/ })
 export const KeyTok = createToken({ name: "KeyTok", pattern: /NA/ })
 export const ElementTok = createToken({ name: "ElementTok", pattern: /NA/ })
 
-export let atLeastOneRule = new Rule({
+export const atLeastOneRule = new Rule({
   name: "atLeastOneRule",
   definition: [
     new RepetitionMandatory({
@@ -61,7 +61,7 @@ export let atLeastOneRule = new Rule({
   ]
 })
 
-export let atLeastOneSepRule = new Rule({
+export const atLeastOneSepRule = new Rule({
   name: "atLeastOneSepRule",
   definition: [
     new RepetitionMandatoryWithSeparator({
@@ -86,7 +86,7 @@ export let atLeastOneSepRule = new Rule({
   ]
 })
 
-export let qualifiedName = new Rule({
+export const qualifiedName = new Rule({
   name: "qualifiedName",
   definition: [
     new Terminal({ terminalType: IdentTok }),
@@ -99,7 +99,7 @@ export let qualifiedName = new Rule({
   ]
 })
 
-export let qualifiedNameSep = new Rule({
+export const qualifiedNameSep = new Rule({
   name: "qualifiedNameSep",
   definition: [
     new RepetitionMandatoryWithSeparator({
@@ -109,7 +109,7 @@ export let qualifiedNameSep = new Rule({
   ]
 })
 
-export let paramSpec = new Rule({
+export const paramSpec = new Rule({
   name: "paramSpec",
   definition: [
     new Terminal({ terminalType: IdentTok }),
@@ -127,7 +127,7 @@ export let paramSpec = new Rule({
   ]
 })
 
-export let actionDec = new Rule({
+export const actionDec = new Rule({
   name: "actionDec",
   definition: [
     new Terminal({ terminalType: ActionTok }),
@@ -166,7 +166,7 @@ export let actionDec = new Rule({
   ]
 })
 
-export let actionDecSep = new Rule({
+export const actionDecSep = new Rule({
   name: "actionDecSep",
   definition: [
     new Terminal({ terminalType: ActionTok }),
@@ -199,7 +199,7 @@ export let actionDecSep = new Rule({
   ]
 })
 
-export let manyActions = new Rule({
+export const manyActions = new Rule({
   name: "manyActions",
   definition: [
     new Repetition({
@@ -214,7 +214,7 @@ export let manyActions = new Rule({
   ]
 })
 
-export let cardinality = new Rule({
+export const cardinality = new Rule({
   name: "cardinality",
   definition: [
     new Terminal({ terminalType: LSquareTok }),
@@ -239,7 +239,7 @@ export let cardinality = new Rule({
   ]
 })
 
-export let assignedTypeSpec = new Rule({
+export const assignedTypeSpec = new Rule({
   name: "assignedTypeSpec",
   definition: [
     new Terminal({ terminalType: ColonTok }),
@@ -259,7 +259,7 @@ export let assignedTypeSpec = new Rule({
   ]
 })
 
-export let lotsOfOrs = new Rule({
+export const lotsOfOrs = new Rule({
   name: "lotsOfOrs",
   definition: [
     new Alternation({
@@ -315,7 +315,7 @@ export let lotsOfOrs = new Rule({
   ]
 })
 
-export let emptyAltOr = new Rule({
+export const emptyAltOr = new Rule({
   name: "emptyAltOr",
   definition: [
     new Alternation({
@@ -342,7 +342,7 @@ export let emptyAltOr = new Rule({
   ]
 })
 
-export let callArguments = new Rule({
+export const callArguments = new Rule({
   name: "callArguments",
   definition: [
     new RepetitionWithSeparator({

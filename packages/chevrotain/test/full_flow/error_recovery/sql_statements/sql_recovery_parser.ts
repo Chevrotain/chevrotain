@@ -91,7 +91,7 @@ export class DDLExampleRecoveryParser extends EmbeddedActionsParser {
   // DOCS: note how all the parsing rules in this example return a ParseTree, we require some output from the parser
   // to demonstrate the error recovery mechanisms. otherwise it is harder to prove we have indeed recovered.
   private parseDdl(): ParseTree {
-    let stmts = []
+    const stmts = []
 
     this.MANY(() => {
       this.OR([
@@ -117,12 +117,10 @@ export class DDLExampleRecoveryParser extends EmbeddedActionsParser {
   }
 
   private parseCreateStmt(): ParseTree {
-    let createKW, tableKW, qn, semiColon
-
-    createKW = this.CONSUME1(CreateTok)
-    tableKW = this.CONSUME1(TableTok)
-    qn = this.SUBRULE(this.qualifiedName)
-    semiColon = this.CONSUME1(SemiColonTok)
+    const createKW = this.CONSUME1(CreateTok)
+    const tableKW = this.CONSUME1(TableTok)
+    const qn = this.SUBRULE(this.qualifiedName)
+    const semiColon = this.CONSUME1(SemiColonTok)
 
     return PT(createRegularToken(CREATE_STMT), [
       PT(createKW),
@@ -133,14 +131,12 @@ export class DDLExampleRecoveryParser extends EmbeddedActionsParser {
   }
 
   private parseInsertStmt(): ParseTree {
-    let insertKW, recordValue, intoKW, qn, semiColon
-
     // parse
-    insertKW = this.CONSUME1(InsertTok)
-    recordValue = this.SUBRULE(this.recordValue)
-    intoKW = this.CONSUME1(IntoTok)
-    qn = this.SUBRULE(this.qualifiedName)
-    semiColon = this.CONSUME1(SemiColonTok)
+    const insertKW = this.CONSUME1(InsertTok)
+    const recordValue = this.SUBRULE(this.recordValue)
+    const intoKW = this.CONSUME1(IntoTok)
+    const qn = this.SUBRULE(this.qualifiedName)
+    const semiColon = this.CONSUME1(SemiColonTok)
 
     // tree rewrite
     return PT(createRegularToken(INSERT_STMT), [
@@ -153,14 +149,12 @@ export class DDLExampleRecoveryParser extends EmbeddedActionsParser {
   }
 
   private parseDeleteStmt(): ParseTree {
-    let deleteKW, recordValue, fromKW, qn, semiColon
-
     // parse
-    deleteKW = this.CONSUME1(DeleteTok)
-    recordValue = this.SUBRULE(this.recordValue)
-    fromKW = this.CONSUME1(FromTok)
-    qn = this.SUBRULE(this.qualifiedName)
-    semiColon = this.CONSUME1(SemiColonTok)
+    const deleteKW = this.CONSUME1(DeleteTok)
+    const recordValue = this.SUBRULE(this.recordValue)
+    const fromKW = this.CONSUME1(FromTok)
+    const qn = this.SUBRULE(this.qualifiedName)
+    const semiColon = this.CONSUME1(SemiColonTok)
 
     // tree rewrite
     return PT(createRegularToken(DELETE_STMT), [
@@ -173,8 +167,8 @@ export class DDLExampleRecoveryParser extends EmbeddedActionsParser {
   }
 
   private parseQualifiedName(): ParseTree {
-    let dots = []
-    let idents = []
+    const dots = []
+    const idents = []
 
     // parse
     // DOCS: note how we use CONSUME1(IdentTok) here
@@ -188,15 +182,15 @@ export class DDLExampleRecoveryParser extends EmbeddedActionsParser {
     })
 
     // tree rewrite
-    let allIdentsPts = WRAP_IN_PT(idents)
-    let dotsPt = PT(createRegularToken(DOTS), WRAP_IN_PT(dots))
-    let allPtChildren = allIdentsPts.concat([dotsPt])
+    const allIdentsPts = WRAP_IN_PT(idents)
+    const dotsPt = PT(createRegularToken(DOTS), WRAP_IN_PT(dots))
+    const allPtChildren = allIdentsPts.concat([dotsPt])
     return PT(createRegularToken(QUALIFIED_NAME), <any>allPtChildren)
   }
 
   private parseRecordValue(): ParseTree {
-    let values = []
-    let commas = []
+    const values = []
+    const commas = []
 
     // parse
     this.CONSUME1(LParenTok)
@@ -207,8 +201,8 @@ export class DDLExampleRecoveryParser extends EmbeddedActionsParser {
     })
     this.CONSUME1(RParenTok)
     // tree rewrite
-    let commasPt = PT(createRegularToken(COMMAS), WRAP_IN_PT(commas))
-    let allPtChildren = values.concat([commasPt])
+    const commasPt = PT(createRegularToken(COMMAS), WRAP_IN_PT(commas))
+    const allPtChildren = values.concat([commasPt])
     return PT(createRegularToken(QUALIFIED_NAME), allPtChildren)
   }
 
@@ -237,7 +231,7 @@ function PT(token: IToken, children: ParseTree[] = []): ParseTree {
 }
 
 export function WRAP_IN_PT(toks: IToken[]): ParseTree[] {
-  let parseTrees = new Array(toks.length)
+  const parseTrees = new Array(toks.length)
   for (let i = 0; i < toks.length; i++) {
     parseTrees[i] = PT(toks[i])
   }

@@ -5,9 +5,9 @@ import { keys } from "../../src/utils/utils"
 import { IToken } from "../../api"
 
 describe("The CSTVisitor", () => {
-  let A = createToken({ name: "A" })
-  let B = createToken({ name: "B" })
-  let C = createToken({ name: "C" })
+  const A = createToken({ name: "A" })
+  const B = createToken({ name: "B" })
+  const C = createToken({ name: "C" })
 
   const ALL_TOKENS = [A, B, C]
 
@@ -63,15 +63,15 @@ describe("The CSTVisitor", () => {
       }
     }
 
-    let input = [
+    const input = [
       createRegularToken(A),
       createRegularToken(B),
       createRegularToken(C)
     ]
     parserInstance.input = input
-    let cst = parserInstance.testRule()
+    const cst = parserInstance.testRule()
 
-    let visitor = new CstVisitorValidator()
+    const visitor = new CstVisitorValidator()
     expect(visitor.visit(cst)).to.equal(666)
   })
 
@@ -95,15 +95,15 @@ describe("The CSTVisitor", () => {
       }
     }
 
-    let input = [
+    const input = [
       createRegularToken(A),
       createRegularToken(B),
       createRegularToken(C)
     ]
     parserInstance.input = input
-    let cst = parserInstance.testRule()
+    const cst = parserInstance.testRule()
 
-    let visitor = new CstVisitorValidator()
+    const visitor = new CstVisitorValidator()
     expect(visitor.visit(cst, 1)).to.equal(667)
   })
 
@@ -121,15 +121,15 @@ describe("The CSTVisitor", () => {
       }
     }
 
-    let input = [
+    const input = [
       createRegularToken(A),
       createRegularToken(B),
       createRegularToken(C)
     ]
     parserInstance.input = input
-    let cst = parserInstance.testRule()
+    const cst = parserInstance.testRule()
 
-    let visitor = new CstVisitorValidator()
+    const visitor = new CstVisitorValidator()
     visitor.visit(cst)
     expect(visited).to.be.true
   })
@@ -152,15 +152,15 @@ describe("The CSTVisitor", () => {
       }
     }
 
-    let input = [
+    const input = [
       createRegularToken(A),
       createRegularToken(B),
       createRegularToken(C)
     ]
     parserInstance.input = input
-    let cst = parserInstance.testRule()
+    const cst = parserInstance.testRule()
 
-    let visitor = new CstVisitorValidator()
+    const visitor = new CstVisitorValidator()
     expect(visitor.visit([cst], 1)).to.equal(667)
     expect(visitor.visit([], 1)).to.be.undefined
   })
