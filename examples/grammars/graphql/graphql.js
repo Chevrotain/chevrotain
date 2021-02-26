@@ -13,7 +13,7 @@
  */
 // wrapping in UMD to allow code to work both in node.js
 // and in the browser
-;(function (root, factory) {
+(function (root, factory) {
   if (typeof module === "object" && module.exports) {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
@@ -84,6 +84,8 @@
     return newNotTokenCategory
   }
 
+  /* eslint-disable no-unused-vars -- tokens are collected in our `createToken` wrapper */
+
   // B1 - Ignored-Tokens
   // http://facebook.github.io/graphql/June2018/#sec-Appendix-Grammar-Summary.Ignored-Tokens
   const WhiteSpace = createToken({
@@ -115,6 +117,8 @@
     pattern: ",",
     group: Lexer.SKIPPED
   })
+
+  /* eslint-enable no-unused-vars -- tokens are collected in our `createToken` wrapper */
 
   // B2 - Lexical Tokens
   // http://facebook.github.io/graphql/June2018/#sec-Appendix-Grammar-Summary.Lexical-Tokens

@@ -69,7 +69,7 @@ export function buildLookaheadFuncForOr(
   dynamicTokensEnabled: boolean,
   laFuncBuilder: Function
 ): (orAlts?: IOrAlt<any>[]) => number {
-  let lookAheadPaths = getLookaheadPathsForOr(
+  const lookAheadPaths = getLookaheadPathsForOr(
     occurrence,
     ruleGrammar,
     maxLookahead
@@ -107,7 +107,7 @@ export function buildLookaheadFuncForOptionalProd(
   prodType: PROD_TYPE,
   lookaheadBuilder: (lookAheadSequence, TokenMatcher, boolean) => () => boolean
 ): () => boolean {
-  let lookAheadPaths = getLookaheadPathsForOptionalProd(
+  const lookAheadPaths = getLookaheadPathsForOptionalProd(
     occurrence,
     ruleGrammar,
     prodType,
@@ -129,8 +129,8 @@ export function buildAlternativesLookAheadFunc(
   tokenMatcher: TokenMatcher,
   dynamicTokensEnabled: boolean
 ): (orAlts?: IOrAlt<any>[]) => number {
-  let numOfAlts = alts.length
-  let areAllOneTokenLookahead = every(alts, (currAlt) => {
+  const numOfAlts = alts.length
+  const areAllOneTokenLookahead = every(alts, (currAlt) => {
     return every(currAlt, (currPath) => {
       return currPath.length === 1
     })
@@ -145,22 +145,22 @@ export function buildAlternativesLookAheadFunc(
       // unfortunately the predicates must be extracted every single time
       // as they cannot be cached due to references to parameters(vars) which are no longer valid.
       // note that in the common case of no predicates, no cpu time will be wasted on this (see else block)
-      let predicates: Predicate[] = map(orAlts, (currAlt) => currAlt.GATE)
+      const predicates: Predicate[] = map(orAlts, (currAlt) => currAlt.GATE)
 
       for (let t = 0; t < numOfAlts; t++) {
-        let currAlt = alts[t]
-        let currNumOfPaths = currAlt.length
+        const currAlt = alts[t]
+        const currNumOfPaths = currAlt.length
 
-        let currPredicate = predicates[t]
+        const currPredicate = predicates[t]
         if (currPredicate !== undefined && currPredicate.call(this) === false) {
           // if the predicate does not match there is no point in checking the paths
           continue
         }
         nextPath: for (let j = 0; j < currNumOfPaths; j++) {
-          let currPath = currAlt[j]
-          let currPathLength = currPath.length
+          const currPath = currAlt[j]
+          const currPathLength = currPath.length
           for (let i = 0; i < currPathLength; i++) {
-            let nextToken = this.LA(i + 1)
+            const nextToken = this.LA(i + 1)
             if (tokenMatcher(nextToken, currPath[i]) === false) {
               // mismatch in current path
               // try the next pth
@@ -180,11 +180,11 @@ export function buildAlternativesLookAheadFunc(
   } else if (areAllOneTokenLookahead && !dynamicTokensEnabled) {
     // optimized (common) case of all the lookaheads paths requiring only
     // a single token lookahead. These Optimizations cannot work if dynamically defined Tokens are used.
-    let singleTokenAlts = map(alts, (currAlt) => {
+    const singleTokenAlts = map(alts, (currAlt) => {
       return flatten(currAlt)
     })
 
-    let choiceToAlt = reduce(
+    const choiceToAlt = reduce(
       singleTokenAlts,
       (result, currAlt, idx) => {
         forEach(currAlt, (currTokType) => {
@@ -206,7 +206,7 @@ export function buildAlternativesLookAheadFunc(
      * @returns {number} - The chosen alternative index
      */
     return function (): number {
-      let nextToken = this.LA(1)
+      const nextToken = this.LA(1)
       return choiceToAlt[nextToken.tokenTypeIdx]
     }
   } else {
@@ -217,13 +217,13 @@ export function buildAlternativesLookAheadFunc(
      */
     return function (): number {
       for (let t = 0; t < numOfAlts; t++) {
-        let currAlt = alts[t]
-        let currNumOfPaths = currAlt.length
+        const currAlt = alts[t]
+        const currNumOfPaths = currAlt.length
         nextPath: for (let j = 0; j < currNumOfPaths; j++) {
-          let currPath = currAlt[j]
-          let currPathLength = currPath.length
+          const currPath = currAlt[j]
+          const currPathLength = currPath.length
           for (let i = 0; i < currPathLength; i++) {
-            let nextToken = this.LA(i + 1)
+            const nextToken = this.LA(i + 1)
             if (tokenMatcher(nextToken, currPath[i]) === false) {
               // mismatch in current path
               // try the next pth
@@ -248,29 +248,29 @@ export function buildSingleAlternativeLookaheadFunction(
   tokenMatcher: TokenMatcher,
   dynamicTokensEnabled: boolean
 ): () => boolean {
-  let areAllOneTokenLookahead = every(alt, (currPath) => {
+  const areAllOneTokenLookahead = every(alt, (currPath) => {
     return currPath.length === 1
   })
 
-  let numOfPaths = alt.length
+  const numOfPaths = alt.length
 
   // optimized (common) case of all the lookaheads paths requiring only
   // a single token lookahead.
   if (areAllOneTokenLookahead && !dynamicTokensEnabled) {
-    let singleTokensTypes = flatten(alt)
+    const singleTokensTypes = flatten(alt)
 
     if (
       singleTokensTypes.length === 1 &&
       isEmpty((<any>singleTokensTypes[0]).categoryMatches)
     ) {
-      let expectedTokenType = singleTokensTypes[0]
-      let expectedTokenUniqueKey = (<any>expectedTokenType).tokenTypeIdx
+      const expectedTokenType = singleTokensTypes[0]
+      const expectedTokenUniqueKey = (<any>expectedTokenType).tokenTypeIdx
 
       return function (): boolean {
         return this.LA(1).tokenTypeIdx === expectedTokenUniqueKey
       }
     } else {
-      let choiceToAlt = reduce(
+      const choiceToAlt = reduce(
         singleTokensTypes,
         (result, currTokType, idx) => {
           result[currTokType.tokenTypeIdx] = true
@@ -283,17 +283,17 @@ export function buildSingleAlternativeLookaheadFunction(
       )
 
       return function (): boolean {
-        let nextToken = this.LA(1)
+        const nextToken = this.LA(1)
         return choiceToAlt[nextToken.tokenTypeIdx] === true
       }
     }
   } else {
     return function (): boolean {
       nextPath: for (let j = 0; j < numOfPaths; j++) {
-        let currPath = alt[j]
-        let currPathLength = currPath.length
+        const currPath = alt[j]
+        const currPathLength = currPath.length
         for (let i = 0; i < currPathLength; i++) {
-          let nextToken = this.LA(i + 1)
+          const nextToken = this.LA(i + 1)
           if (tokenMatcher(nextToken, currPath[i]) === false) {
             // mismatch in current path
             // try the next pth
@@ -472,7 +472,7 @@ class InsideDefinitionFinderVisitor extends GAstVisitor {
 }
 
 function initializeArrayOfArrays(size): any[][] {
-  let result = new Array(size)
+  const result = new Array(size)
   for (let i = 0; i < size; i++) {
     result[i] = []
   }
@@ -488,7 +488,7 @@ function pathToHashKeys(path: TokenType[]): string[] {
   let keys = [""]
   for (let i = 0; i < path.length; i++) {
     const tokType = path[i]
-    let longerKeys = []
+    const longerKeys = []
     for (let j = 0; j < keys.length; j++) {
       const currShorterKey = keys[j]
       longerKeys.push(currShorterKey + "_" + tokType.tokenTypeIdx)
@@ -535,8 +535,10 @@ export function lookAheadSequenceFromAlternatives(
   altsDefs: IProduction[],
   k: number
 ): lookAheadSequence[] {
-  let partialAlts = map(altsDefs, (currAlt) => possiblePathsFrom([currAlt], 1))
-  let finalResult = initializeArrayOfArrays(partialAlts.length)
+  const partialAlts = map(altsDefs, (currAlt) =>
+    possiblePathsFrom([currAlt], 1)
+  )
+  const finalResult = initializeArrayOfArrays(partialAlts.length)
   const altsHashes = map(partialAlts, (currAltPaths) => {
     const dict = {}
     forEach(currAltPaths, (item) => {
@@ -551,25 +553,25 @@ export function lookAheadSequenceFromAlternatives(
 
   // maxLookahead loop
   for (let pathLength = 1; pathLength <= k; pathLength++) {
-    let currDataset = newData
+    const currDataset = newData
     newData = initializeArrayOfArrays(currDataset.length)
 
     // alternatives loop
     for (let altIdx = 0; altIdx < currDataset.length; altIdx++) {
-      let currAltPathsAndSuffixes = currDataset[altIdx]
+      const currAltPathsAndSuffixes = currDataset[altIdx]
       // paths in current alternative loop
       for (
         let currPathIdx = 0;
         currPathIdx < currAltPathsAndSuffixes.length;
         currPathIdx++
       ) {
-        let currPathPrefix = currAltPathsAndSuffixes[currPathIdx].partialPath
-        let suffixDef = currAltPathsAndSuffixes[currPathIdx].suffixDef
+        const currPathPrefix = currAltPathsAndSuffixes[currPathIdx].partialPath
+        const suffixDef = currAltPathsAndSuffixes[currPathIdx].suffixDef
         const prefixKeys = pathToHashKeys(currPathPrefix)
-        let isUnique = isUniquePrefixHash(altsHashes, prefixKeys, altIdx)
+        const isUnique = isUniquePrefixHash(altsHashes, prefixKeys, altIdx)
         // End of the line for this path.
         if (isUnique || isEmpty(suffixDef) || currPathPrefix.length === k) {
-          let currAltResult = finalResult[altIdx]
+          const currAltResult = finalResult[altIdx]
           // TODO: Can we implement a containsPath using Maps/Dictionaries?
           if (containsPath(currAltResult, currPathPrefix) === false) {
             currAltResult.push(currPathPrefix)
@@ -582,7 +584,7 @@ export function lookAheadSequenceFromAlternatives(
         }
         // Expand longer paths
         else {
-          let newPartialPathsAndSuffixes = possiblePathsFrom(
+          const newPartialPathsAndSuffixes = possiblePathsFrom(
             suffixDef,
             pathLength + 1,
             currPathPrefix
@@ -625,19 +627,22 @@ export function getLookaheadPathsForOptionalProd(
   prodType: PROD_TYPE,
   k: number
 ): lookAheadSequence[] {
-  let insideDefVisitor = new InsideDefinitionFinderVisitor(occurrence, prodType)
+  const insideDefVisitor = new InsideDefinitionFinderVisitor(
+    occurrence,
+    prodType
+  )
   ruleGrammar.accept(insideDefVisitor)
-  let insideDef = insideDefVisitor.result
+  const insideDef = insideDefVisitor.result
 
-  let afterDefWalker = new RestDefinitionFinderWalker(
+  const afterDefWalker = new RestDefinitionFinderWalker(
     ruleGrammar,
     occurrence,
     prodType
   )
-  let afterDef = afterDefWalker.startWalking()
+  const afterDef = afterDefWalker.startWalking()
 
-  let insideFlat = new AlternativeGAST({ definition: insideDef })
-  let afterFlat = new AlternativeGAST({ definition: afterDef })
+  const insideFlat = new AlternativeGAST({ definition: insideDef })
+  const afterFlat = new AlternativeGAST({ definition: afterDef })
 
   return lookAheadSequenceFromAlternatives([insideFlat, afterFlat], k)
 }

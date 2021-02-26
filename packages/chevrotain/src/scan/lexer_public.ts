@@ -220,7 +220,7 @@ export class Lexer {
         )
       })
 
-      let allModeNames = keys(actualDefinition.modes)
+      const allModeNames = keys(actualDefinition.modes)
 
       forEach(
         actualDefinition.modes,
@@ -280,10 +280,10 @@ export class Lexer {
         !isEmpty(this.lexerDefinitionErrors) &&
         !this.config.deferDefinitionErrorsHandling
       ) {
-        let allErrMessages = map(this.lexerDefinitionErrors, (error) => {
+        const allErrMessages = map(this.lexerDefinitionErrors, (error) => {
           return error.message
         })
-        let allErrMessagesString = allErrMessages.join(
+        const allErrMessagesString = allErrMessages.join(
           "-----------------------\n"
         )
         throw new Error(
@@ -379,10 +379,10 @@ export class Lexer {
     initialMode: string = this.defaultMode
   ): ILexingResult {
     if (!isEmpty(this.lexerDefinitionErrors)) {
-      let allErrMessages = map(this.lexerDefinitionErrors, (error) => {
+      const allErrMessages = map(this.lexerDefinitionErrors, (error) => {
         return error.message
       })
-      let allErrMessagesString = allErrMessages.join(
+      const allErrMessagesString = allErrMessages.join(
         "-----------------------\n"
       )
       throw new Error(
@@ -391,7 +391,7 @@ export class Lexer {
       )
     }
 
-    let lexResult = this.tokenizeInternal(text, initialMode)
+    const lexResult = this.tokenizeInternal(text, initialMode)
 
     return lexResult
   }
@@ -414,30 +414,30 @@ export class Lexer {
       droppedChar,
       msg,
       match
-    let orgText = text
-    let orgLength = orgText.length
+    const orgText = text
+    const orgLength = orgText.length
     let offset = 0
     let matchedTokensIndex = 0
     // initializing the tokensArray to the "guessed" size.
     // guessing too little will still reduce the number of array re-sizes on pushes.
     // guessing too large (Tested by guessing x4 too large) may cost a bit more of memory
     // but would still have a faster runtime by avoiding (All but one) array resizing.
-    let guessedNumberOfTokens = this.hasCustom
+    const guessedNumberOfTokens = this.hasCustom
       ? 0 // will break custom token pattern APIs the matchedTokens array will contain undefined elements.
       : Math.floor(text.length / 10)
-    let matchedTokens = new Array(guessedNumberOfTokens)
-    let errors: ILexingError[] = []
+    const matchedTokens = new Array(guessedNumberOfTokens)
+    const errors: ILexingError[] = []
     let line = this.trackStartLines ? 1 : undefined
     let column = this.trackStartLines ? 1 : undefined
-    let groups: any = cloneEmptyGroups(this.emptyGroups)
-    let trackLines = this.trackStartLines
+    const groups: any = cloneEmptyGroups(this.emptyGroups)
+    const trackLines = this.trackStartLines
     const lineTerminatorPattern = this.config.lineTerminatorsPattern
 
     let currModePatternsLength = 0
     let patternIdxToConfig = []
     let currCharCodeToPatternIdxToConfig = []
 
-    let modeStack = []
+    const modeStack = []
 
     const emptyArray = []
     Object.freeze(emptyArray)
@@ -458,7 +458,7 @@ export class Lexer {
       }
     }
 
-    let pop_mode = (popToken) => {
+    const pop_mode = (popToken) => {
       // TODO: perhaps avoid this error in the edge case there is no more input?
       if (
         modeStack.length === 1 &&
@@ -468,7 +468,7 @@ export class Lexer {
       ) {
         // if we try to pop the last mode there lexer will no longer have ANY mode.
         // thus the pop is ignored, an error will be created and the lexer will continue parsing in the previous mode.
-        let msg = this.config.errorMessageProvider.buildUnableToPopLexerModeMessage(
+        const msg = this.config.errorMessageProvider.buildUnableToPopLexerModeMessage(
           popToken
         )
 
@@ -485,7 +485,7 @@ export class Lexer {
         })
       } else {
         modeStack.pop()
-        let newMode = last(modeStack)
+        const newMode = last(modeStack)
         patternIdxToConfig = this.patternIdxToConfig[newMode]
         currCharCodeToPatternIdxToConfig = this.charCodeToPatternIdxToConfig[
           newMode
@@ -531,17 +531,17 @@ export class Lexer {
     while (offset < orgLength) {
       matchedImage = null
 
-      let nextCharCode = orgText.charCodeAt(offset)
+      const nextCharCode = orgText.charCodeAt(offset)
       const chosenPatternIdxToConfig = getPossiblePatterns(nextCharCode)
-      let chosenPatternsLength = chosenPatternIdxToConfig.length
+      const chosenPatternsLength = chosenPatternIdxToConfig.length
 
       for (i = 0; i < chosenPatternsLength; i++) {
         currConfig = chosenPatternIdxToConfig[i]
-        let currPattern = currConfig.pattern
+        const currPattern = currConfig.pattern
         payload = null
 
         // manually in-lined because > 600 chars won't be in-lined in V8
-        let singleCharCode = currConfig.short
+        const singleCharCode = currConfig.short
         if (singleCharCode !== false) {
           if (nextCharCode === singleCharCode) {
             // single character string
@@ -569,8 +569,8 @@ export class Lexer {
           if (longerAltIdx !== undefined) {
             // TODO: micro optimize, avoid extra prop access
             // by saving/linking longerAlt on the original config?
-            let longerAltConfig = patternIdxToConfig[longerAltIdx]
-            let longerAltPattern = longerAltConfig.pattern
+            const longerAltConfig = patternIdxToConfig[longerAltIdx]
+            const longerAltPattern = longerAltConfig.pattern
             altPayload = null
 
             // single Char can never be a longer alt so no need to test it.
@@ -673,9 +673,9 @@ export class Lexer {
         this.handleModes(currConfig, pop_mode, push_mode, newToken)
       } else {
         // error recovery, drop characters until we identify a valid token's start point
-        let errorStartOffset = offset
-        let errorLine = line
-        let errorColumn = column
+        const errorStartOffset = offset
+        const errorLine = line
+        const errorColumn = column
         let foundResyncPoint = false
         while (!foundResyncPoint && offset < orgLength) {
           // drop chars until we succeed in matching something
@@ -684,11 +684,11 @@ export class Lexer {
           text = this.chopInput(text, 1)
           offset++
           for (j = 0; j < currModePatternsLength; j++) {
-            let currConfig = patternIdxToConfig[j]
-            let currPattern = currConfig.pattern
+            const currConfig = patternIdxToConfig[j]
+            const currPattern = currConfig.pattern
 
             // manually in-lined because > 600 chars won't be in-lined in V8
-            let singleCharCode = currConfig.short
+            const singleCharCode = currConfig.short
             if (singleCharCode !== false) {
               if (orgText.charCodeAt(offset) === singleCharCode) {
                 // single character string
@@ -746,7 +746,7 @@ export class Lexer {
     if (config.pop === true) {
       // need to save the PUSH_MODE property as if the mode is popped
       // patternIdxToPopMode is updated to reflect the new mode after popping the stack
-      let pushMode = config.push
+      const pushMode = config.push
       pop_mode(newToken)
       if (pushMode !== undefined) {
         push_mode.call(this, pushMode)
@@ -884,7 +884,7 @@ export class Lexer {
   }
 
   private matchWithTest(pattern: RegExp, text: string, offset: number): string {
-    let found = pattern.test(text)
+    const found = pattern.test(text)
     if (found === true) {
       return text.substring(offset, pattern.lastIndex)
     }
@@ -892,7 +892,7 @@ export class Lexer {
   }
 
   private matchWithExec(pattern, text): string {
-    let regExpArray = pattern.exec(text)
+    const regExpArray = pattern.exec(text)
     return regExpArray !== null ? regExpArray[0] : regExpArray
   }
 

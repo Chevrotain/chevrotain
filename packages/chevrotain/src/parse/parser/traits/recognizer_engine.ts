@@ -141,8 +141,8 @@ export class RecognizerEngine {
       has(tokenVocabulary, "modes") &&
       every(flatten(values((<any>tokenVocabulary).modes)), isTokenType)
     ) {
-      let allTokenTypes = flatten(values((<any>tokenVocabulary).modes))
-      let uniqueTokens = uniq(allTokenTypes)
+      const allTokenTypes = flatten(values((<any>tokenVocabulary).modes))
+      const uniqueTokens = uniq(allTokenTypes)
       this.tokensMap = <any>reduce(
         uniqueTokens,
         (acc, tokType: TokenType) => {
@@ -193,17 +193,17 @@ export class RecognizerEngine {
           `Make sure that all grammar rule definitions are done before 'performSelfAnalysis' is called.`
       )
     }
-    let resyncEnabled = has(config, "resyncEnabled")
+    const resyncEnabled = has(config, "resyncEnabled")
       ? config.resyncEnabled
       : DEFAULT_RULE_CONFIG.resyncEnabled
-    let recoveryValueFunc = has(config, "recoveryValueFunc")
+    const recoveryValueFunc = has(config, "recoveryValueFunc")
       ? config.recoveryValueFunc
       : DEFAULT_RULE_CONFIG.recoveryValueFunc
 
     // performance optimization: Use small integers as keys for the longer human readable "full" rule names.
     // this greatly improves Map access time (as much as 8% for some performance benchmarks).
     /* tslint:disable */
-    let shortName =
+    const shortName =
       this.ruleShortNameIdx << (BITS_FOR_METHOD_TYPE + BITS_FOR_OCCURRENCE_IDX)
     /* tslint:enable */
 
@@ -228,14 +228,15 @@ export class RecognizerEngine {
       }
     }
 
-    let wrappedGrammarRule
-
-    wrappedGrammarRule = function (idxInCallingRule: number = 0, args: any[]) {
+    const wrappedGrammarRule = function (
+      idxInCallingRule: number = 0,
+      args: any[]
+    ) {
       this.ruleInvocationStateUpdate(shortName, ruleName, idxInCallingRule)
       return invokeRuleWithTry.call(this, args)
     }
 
-    let ruleNamePropName = "ruleName"
+    const ruleNamePropName = "ruleName"
     wrappedGrammarRule[ruleNamePropName] = ruleName
     wrappedGrammarRule["originalGrammarAction"] = impl
     return wrappedGrammarRule
@@ -247,22 +248,22 @@ export class RecognizerEngine {
     resyncEnabledConfig: boolean,
     recoveryValueFunc: Function
   ): void {
-    let isFirstInvokedRule = this.RULE_STACK.length === 1
+    const isFirstInvokedRule = this.RULE_STACK.length === 1
     // note the reSync is always enabled for the first rule invocation, because we must always be able to
     // reSync with EOF and just output some INVALID ParseTree
     // during backtracking reSync recovery is disabled, otherwise we can't be certain the backtracking
     // path is really the most valid one
-    let reSyncEnabled =
+    const reSyncEnabled =
       resyncEnabledConfig && !this.isBackTracking() && this.recoveryEnabled
 
     if (isRecognitionException(e)) {
       const recogError: any = e
       if (reSyncEnabled) {
-        let reSyncTokType = this.findReSyncTokenType()
+        const reSyncTokType = this.findReSyncTokenType()
         if (this.isInCurrentRuleReSyncSet(reSyncTokType)) {
           recogError.resyncedTokens = this.reSyncTo(reSyncTokType)
           if (this.outputCst) {
-            let partialCstResult: any = this.CST_STACK[
+            const partialCstResult: any = this.CST_STACK[
               this.CST_STACK.length - 1
             ]
             partialCstResult.recoveredNode = true
@@ -303,7 +304,7 @@ export class RecognizerEngine {
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
     occurrence: number
   ): OUT {
-    let key = this.getKeyForAutomaticLookahead(OPTION_IDX, occurrence)
+    const key = this.getKeyForAutomaticLookahead(OPTION_IDX, occurrence)
     return this.optionInternalLogic(actionORMethodDef, occurrence, key)
   }
 
@@ -321,7 +322,7 @@ export class RecognizerEngine {
       predicate = (<DSLMethodOpts<OUT>>actionORMethodDef).GATE
       // predicate present
       if (predicate !== undefined) {
-        let orgLookaheadFunction = lookAheadFunc
+        const orgLookaheadFunction = lookAheadFunc
         lookAheadFunc = () => {
           return predicate.call(this) && orgLookaheadFunction.call(this)
         }
@@ -341,7 +342,7 @@ export class RecognizerEngine {
     prodOccurrence: number,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
   ): void {
-    let laKey = this.getKeyForAutomaticLookahead(
+    const laKey = this.getKeyForAutomaticLookahead(
       AT_LEAST_ONE_IDX,
       prodOccurrence
     )
@@ -367,7 +368,7 @@ export class RecognizerEngine {
       predicate = (<DSLMethodOptsWithErr<OUT>>actionORMethodDef).GATE
       // predicate present
       if (predicate !== undefined) {
-        let orgLookaheadFunction = lookAheadFunc
+        const orgLookaheadFunction = lookAheadFunc
         lookAheadFunc = () => {
           return predicate.call(this) && orgLookaheadFunction.call(this)
         }
@@ -412,7 +413,7 @@ export class RecognizerEngine {
     prodOccurrence: number,
     options: AtLeastOneSepMethodOpts<OUT>
   ): void {
-    let laKey = this.getKeyForAutomaticLookahead(
+    const laKey = this.getKeyForAutomaticLookahead(
       AT_LEAST_ONE_SEP_IDX,
       prodOccurrence
     )
@@ -425,10 +426,10 @@ export class RecognizerEngine {
     options: AtLeastOneSepMethodOpts<OUT>,
     key: number
   ): void {
-    let action = options.DEF
-    let separator = options.SEP
+    const action = options.DEF
+    const separator = options.SEP
 
-    let firstIterationLookaheadFunc = this.getLaFuncFromCache(key)
+    const firstIterationLookaheadFunc = this.getLaFuncFromCache(key)
 
     // 1st iteration
     if (firstIterationLookaheadFunc.call(this) === true) {
@@ -436,7 +437,7 @@ export class RecognizerEngine {
 
       //  TODO: Optimization can move this function construction into "attemptInRepetitionRecovery"
       //  because it is only needed in error recovery scenarios.
-      let separatorLookAheadFunc = () => {
+      const separatorLookAheadFunc = () => {
         return this.tokenMatcher(this.LA(1), separator)
       }
 
@@ -478,7 +479,7 @@ export class RecognizerEngine {
     prodOccurrence: number,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
   ): void {
-    let laKey = this.getKeyForAutomaticLookahead(MANY_IDX, prodOccurrence)
+    const laKey = this.getKeyForAutomaticLookahead(MANY_IDX, prodOccurrence)
     return this.manyInternalLogic(prodOccurrence, actionORMethodDef, laKey)
   }
 
@@ -497,7 +498,7 @@ export class RecognizerEngine {
       predicate = (<DSLMethodOpts<OUT>>actionORMethodDef).GATE
       // predicate present
       if (predicate !== undefined) {
-        let orgLookaheadFunction = lookaheadFunction
+        const orgLookaheadFunction = lookaheadFunction
         lookaheadFunction = () => {
           return predicate.call(this) && orgLookaheadFunction.call(this)
         }
@@ -533,7 +534,7 @@ export class RecognizerEngine {
     prodOccurrence: number,
     options: ManySepMethodOpts<OUT>
   ): void {
-    let laKey = this.getKeyForAutomaticLookahead(MANY_SEP_IDX, prodOccurrence)
+    const laKey = this.getKeyForAutomaticLookahead(MANY_SEP_IDX, prodOccurrence)
     this.manySepFirstInternalLogic(prodOccurrence, options, laKey)
   }
 
@@ -543,15 +544,15 @@ export class RecognizerEngine {
     options: ManySepMethodOpts<OUT>,
     key: number
   ): void {
-    let action = options.DEF
-    let separator = options.SEP
-    let firstIterationLaFunc = this.getLaFuncFromCache(key)
+    const action = options.DEF
+    const separator = options.SEP
+    const firstIterationLaFunc = this.getLaFuncFromCache(key)
 
     // 1st iteration
     if (firstIterationLaFunc.call(this) === true) {
       action.call(this)
 
-      let separatorLookAheadFunc = () => {
+      const separatorLookAheadFunc = () => {
         return this.tokenMatcher(this.LA(1), separator)
       }
       // 2nd..nth iterations
@@ -633,15 +634,15 @@ export class RecognizerEngine {
     altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>,
     occurrence: number
   ): T {
-    let laKey = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
-    let alts = isArray(altsOrOpts)
+    const laKey = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
+    const alts = isArray(altsOrOpts)
       ? (altsOrOpts as IOrAlt<any>[])
       : (altsOrOpts as OrMethodOpts<unknown>).DEF
 
     const laFunc = this.getLaFuncFromCache(laKey)
-    let altIdxToTake = laFunc.call(this, alts)
+    const altIdxToTake = laFunc.call(this, alts)
     if (altIdxToTake !== undefined) {
-      let chosenAlternative: any = alts[altIdxToTake]
+      const chosenAlternative: any = alts[altIdxToTake]
       return chosenAlternative.ALT.call(this)
     }
     this.raiseNoAltException(
@@ -658,8 +659,8 @@ export class RecognizerEngine {
     this.cstFinallyStateUpdate()
 
     if (this.RULE_STACK.length === 0 && this.isAtEndOfInput() === false) {
-      let firstRedundantTok = this.LA(1)
-      let errMsg = this.errorMessageProvider.buildNotAllInputParsedMessage({
+      const firstRedundantTok = this.LA(1)
+      const errMsg = this.errorMessageProvider.buildNotAllInputParsedMessage({
         firstRedundant: firstRedundantTok,
         ruleName: this.getCurrRuleFullName()
       })
@@ -716,7 +717,7 @@ export class RecognizerEngine {
   ): IToken {
     let consumedToken
     try {
-      let nextToken = this.LA(1)
+      const nextToken = this.LA(1)
       if (this.tokenMatcher(nextToken, tokType) === true) {
         this.consumeToken()
         consumedToken = nextToken
@@ -747,7 +748,7 @@ export class RecognizerEngine {
     options: ConsumeMethodOpts
   ): void {
     let msg
-    let previousToken = this.LA(0)
+    const previousToken = this.LA(0)
     if (options !== undefined && options.ERR_MSG) {
       msg = options.ERR_MSG
     } else {
@@ -777,7 +778,7 @@ export class RecognizerEngine {
       eFromConsumption.name === "MismatchedTokenException" &&
       !this.isBackTracking()
     ) {
-      let follows = this.getFollowsForInRuleRecovery(<any>tokType, idx)
+      const follows = this.getFollowsForInRuleRecovery(<any>tokType, idx)
       try {
         return this.tryInRuleRecovery(<any>tokType, follows)
       } catch (eFromInRuleRecovery) {
@@ -796,8 +797,8 @@ export class RecognizerEngine {
 
   saveRecogState(this: MixedInParser): IParserState {
     // errors is a getter which will clone the errors array
-    let savedErrors = this.errors
-    let savedRuleStack = cloneArr(this.RULE_STACK)
+    const savedErrors = this.errors
+    const savedRuleStack = cloneArr(this.RULE_STACK)
     return {
       errors: savedErrors,
       lexerState: this.exportLexerState(),
@@ -829,7 +830,7 @@ export class RecognizerEngine {
   }
 
   getCurrRuleFullName(this: MixedInParser): string {
-    let shortName = this.getLastExplicitRuleShortName()
+    const shortName = this.getLastExplicitRuleShortName()
     return this.shortRuleNameToFull[shortName]
   }
 

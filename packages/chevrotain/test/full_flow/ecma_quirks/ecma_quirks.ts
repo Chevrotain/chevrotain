@@ -158,7 +158,7 @@ class EcmaScriptQuirksParser extends EmbeddedActionsParser {
     idx: number
   ): IToken {
     this.skipWhitespace()
-    let nextToken = this.consumeExpected(tokClass)
+    const nextToken = this.consumeExpected(tokClass)
     if (nextToken !== false) {
       return nextToken
     } else {
@@ -169,7 +169,7 @@ class EcmaScriptQuirksParser extends EmbeddedActionsParser {
         startOffset: this.textIdx
       }
       const previousToken = this.LA(0)
-      let msg = this.errorMessageProvider.buildMismatchTokenMessage({
+      const msg = this.errorMessageProvider.buildMismatchTokenMessage({
         expected: tokClass,
         actual: errorToken,
         previous: previousToken,
@@ -203,7 +203,7 @@ class EcmaScriptQuirksParser extends EmbeddedActionsParser {
     return function () {
       // save & restore lexer state as otherwise the text index will move ahead
       // and the parser will fail consuming the tokens we have looked ahead for.
-      let lexerState = this.exportLexerState()
+      const lexerState = this.exportLexerState()
       try {
         for (let i = 0; i < allTokenTypes.length; i++) {
           const nextToken = this.IS_NEXT_TOKEN(allTokenTypes[i])
@@ -240,7 +240,7 @@ class EcmaScriptQuirksParser extends EmbeddedActionsParser {
     return function () {
       // save & restore lexer state as otherwise the text index will move ahead
       // and the parser will fail consuming the tokens we have looked ahead for.
-      let lexerState = this.exportLexerState()
+      const lexerState = this.exportLexerState()
       try {
         for (let i = 0; i < allTokenTypesPerAlt.length; i++) {
           const currAltTypes = allTokenTypesPerAlt[i]
@@ -268,7 +268,7 @@ const parser = new EcmaScriptQuirksParser()
 
 export function parse(text): any {
   parser.textInput = text
-  let value = parser.statement()
+  const value = parser.statement()
 
   return {
     value: value,

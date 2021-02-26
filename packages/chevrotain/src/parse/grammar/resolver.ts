@@ -14,7 +14,7 @@ export function resolveGrammar(
   topLevels: Record<string, Rule>,
   errMsgProvider: IGrammarResolverErrorMessageProvider
 ): IParserDefinitionError[] {
-  let refResolver = new GastRefResolverVisitor(topLevels, errMsgProvider)
+  const refResolver = new GastRefResolverVisitor(topLevels, errMsgProvider)
   refResolver.resolveRefs()
   return refResolver.errors
 }
@@ -38,10 +38,10 @@ export class GastRefResolverVisitor extends GAstVisitor {
   }
 
   public visitNonTerminal(node: NonTerminal): void {
-    let ref = this.nameToTopRule[node.nonTerminalName]
+    const ref = this.nameToTopRule[node.nonTerminalName]
 
     if (!ref) {
-      let msg = this.errMsgProvider.buildRuleNotFoundError(
+      const msg = this.errMsgProvider.buildRuleNotFoundError(
         this.currTopLevel,
         node
       )

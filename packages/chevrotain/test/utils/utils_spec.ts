@@ -150,7 +150,7 @@ describe("The Utils functions namespace", () => {
   it("exports a cloneArr utility", () => {
     expect(cloneArr([1, 2, 3])).to.deep.equal([1, 2, 3])
     expect(cloneArr([])).to.deep.equal([])
-    let arr = []
+    const arr = []
     expect(cloneArr(arr)).to.not.equal(arr)
   })
 
@@ -159,7 +159,7 @@ describe("The Utils functions namespace", () => {
       bamba: 666,
       bisli: 777
     })
-    let obj = { bamba: 666, bisli: 777 }
+    const obj = { bamba: 666, bisli: 777 }
     expect(cloneObj(obj)).to.not.equal(obj)
     expect(cloneObj(["bamba"])).to.not.have.property("length")
     expect(cloneObj(["bamba"])).to.deep.equal({ "0": "bamba" })
@@ -168,8 +168,8 @@ describe("The Utils functions namespace", () => {
   it("exports a find utility", () => {
     expect(find([1, 2, 3], (item) => item === 2)).to.equal(2)
     expect(find([], (item) => item === 2)).to.be.undefined
-    let a = {}
-    let b = {}
+    const a = {}
+    const b = {}
     expect(find([a, b], (item) => item === b)).to.equal(b)
   })
 
@@ -220,7 +220,7 @@ describe("The Utils functions namespace", () => {
   })
 
   it("exports a partial utility", () => {
-    let add = function (x, y) {
+    const add = function (x, y) {
       return x + y
     }
     expect(partial(add)(2, 3)).to.equal(5)

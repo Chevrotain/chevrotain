@@ -97,7 +97,7 @@ export class SwitchCaseRecoveryParser extends EmbeddedActionsParser {
     // previous grammar rule invocations.
     this.invalidIdx = 1
 
-    let retObj: RetType = {}
+    const retObj: RetType = {}
 
     this.CONSUME(SwitchTok)
     this.CONSUME(LParenTok)
@@ -115,20 +115,18 @@ export class SwitchCaseRecoveryParser extends EmbeddedActionsParser {
   }
 
   private parseCaseStmt(): RetType {
-    let keyTok, valueTok, key, value
-
     this.CONSUME(CaseTok)
-    keyTok = this.CONSUME(StringTok)
+    const keyTok = this.CONSUME(StringTok)
     this.CONSUME(ColonTok)
     this.CONSUME(ReturnTok)
-    valueTok = this.CONSUME(IntTok)
+    const valueTok = this.CONSUME(IntTok)
     this.OPTION6(() => {
       this.CONSUME(SemiColonTok)
     })
 
-    key = keyTok.image
-    value = parseInt(valueTok.image, 10)
-    let caseKeyValue: RetType = {}
+    const key = keyTok.image
+    const value = parseInt(valueTok.image, 10)
+    const caseKeyValue: RetType = {}
     caseKeyValue[key] = value
     return caseKeyValue
   }
@@ -139,7 +137,7 @@ export class SwitchCaseRecoveryParser extends EmbeddedActionsParser {
 
   private INVALID(): () => RetType {
     return () => {
-      let retObj: RetType = {}
+      const retObj: RetType = {}
       retObj["invalid" + this.invalidIdx++] = undefined
       return retObj
     }

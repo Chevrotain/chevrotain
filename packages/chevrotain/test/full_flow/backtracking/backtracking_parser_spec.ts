@@ -18,7 +18,7 @@ describe("Simple backtracking example", () => {
   new BackTrackingParser()
 
   // TODO: modify example to use the Chevrotain Lexer to increase readability
-  let largeFqnTokenVector = [
+  const largeFqnTokenVector = [
     createRegularToken(IdentTok, "ns1"),
     createRegularToken(DotTok, "."),
     createRegularToken(IdentTok, "ns2"),
@@ -48,7 +48,7 @@ describe("Simple backtracking example", () => {
   // largeFqnTokenVector,new DefaultTok(1,1), new NumberTok(1,1,"666"), createRegularToken(SemiColonTok, ";")
 
   it("can parse an element with Equals and a very long qualified name", () => {
-    let input: any = flatten([
+    const input: any = flatten([
       // element A:ns1.ns2.ns3.ns4.ns5.ns6.ns7.ns8.ns9.ns10.ns11.ns12 = 666;
       createRegularToken(ElementTok, "element"),
       createRegularToken(IdentTok, "A"),
@@ -59,16 +59,16 @@ describe("Simple backtracking example", () => {
       createRegularToken(SemiColonTok, ";")
     ])
 
-    let parser = new BackTrackingParser()
+    const parser = new BackTrackingParser()
     parser.input = input
-    let result = parser.statement()
+    const result = parser.statement()
 
     expect(parser.errors.length).to.equal(0)
     expect(result).to.equal(RET_TYPE.WITH_EQUALS)
   })
 
   it("can parse an element with Default and a very long qualified name", () => {
-    let input: any = flatten([
+    const input: any = flatten([
       // element A:ns1.ns2.ns3.ns4.ns5.ns6.ns7.ns8.ns9.ns10.ns11.ns12 default 666;
       createRegularToken(ElementTok, "element"),
       createRegularToken(IdentTok, "A"),
@@ -79,9 +79,9 @@ describe("Simple backtracking example", () => {
       createRegularToken(SemiColonTok, ";")
     ])
 
-    let parser = new BackTrackingParser()
+    const parser = new BackTrackingParser()
     parser.input = input
-    let result = parser.statement()
+    const result = parser.statement()
 
     expect(parser.errors.length).to.equal(0)
     expect(result).to.equal(RET_TYPE.WITH_DEFAULT)

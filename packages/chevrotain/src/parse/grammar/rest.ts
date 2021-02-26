@@ -19,7 +19,7 @@ import { IProduction } from "../../../api"
 export abstract class RestWalker {
   walk(prod: AbstractProduction, prevRest: any[] = []): void {
     forEach(prod.definition, (subProd: IProduction, index) => {
-      let currRest = drop(prod.definition, index + 1)
+      const currRest = drop(prod.definition, index + 1)
       /* istanbul ignore else */
       if (subProd instanceof NonTerminal) {
         this.walkProdRef(subProd, currRest, prevRest)
@@ -63,7 +63,7 @@ export abstract class RestWalker {
     prevRest: IProduction[]
   ): void {
     // ABCDEF => after the D the rest is EF
-    let fullOrRest = currRest.concat(prevRest)
+    const fullOrRest = currRest.concat(prevRest)
     this.walk(flatProd, <any>fullOrRest)
   }
 
@@ -73,7 +73,7 @@ export abstract class RestWalker {
     prevRest: IProduction[]
   ): void {
     // ABC(DE)?F => after the (DE)? the rest is F
-    let fullOrRest = currRest.concat(prevRest)
+    const fullOrRest = currRest.concat(prevRest)
     this.walk(optionProd, <any>fullOrRest)
   }
 
@@ -83,7 +83,7 @@ export abstract class RestWalker {
     prevRest: IProduction[]
   ): void {
     // ABC(DE)+F => after the (DE)+ the rest is (DE)?F
-    let fullAtLeastOneRest: IProduction[] = [
+    const fullAtLeastOneRest: IProduction[] = [
       new Option({ definition: atLeastOneProd.definition })
     ].concat(<any>currRest, <any>prevRest)
     this.walk(atLeastOneProd, fullAtLeastOneRest)
@@ -95,7 +95,7 @@ export abstract class RestWalker {
     prevRest: IProduction[]
   ): void {
     // ABC DE(,DE)* F => after the (,DE)+ the rest is (,DE)?F
-    let fullAtLeastOneSepRest = restForRepetitionWithSeparator(
+    const fullAtLeastOneSepRest = restForRepetitionWithSeparator(
       atLeastOneSepProd,
       currRest,
       prevRest
@@ -109,7 +109,7 @@ export abstract class RestWalker {
     prevRest: IProduction[]
   ): void {
     // ABC(DE)*F => after the (DE)* the rest is (DE)?F
-    let fullManyRest: IProduction[] = [
+    const fullManyRest: IProduction[] = [
       new Option({ definition: manyProd.definition })
     ].concat(<any>currRest, <any>prevRest)
     this.walk(manyProd, fullManyRest)
@@ -121,7 +121,7 @@ export abstract class RestWalker {
     prevRest: IProduction[]
   ): void {
     // ABC (DE(,DE)*)? F => after the (,DE)* the rest is (,DE)?F
-    let fullManySepRest = restForRepetitionWithSeparator(
+    const fullManySepRest = restForRepetitionWithSeparator(
       manySepProd,
       currRest,
       prevRest
@@ -135,27 +135,27 @@ export abstract class RestWalker {
     prevRest: IProduction[]
   ): void {
     // ABC(D|E|F)G => when finding the (D|E|F) the rest is G
-    let fullOrRest = currRest.concat(prevRest)
+    const fullOrRest = currRest.concat(prevRest)
     // walk all different alternatives
     forEach(orProd.definition, (alt) => {
       // wrapping each alternative in a single definition wrapper
       // to avoid errors in computing the rest of that alternative in the invocation to computeInProdFollows
       // (otherwise for OR([alt1,alt2]) alt2 will be considered in 'rest' of alt1
-      let prodWrapper = new Alternative({ definition: [alt] })
+      const prodWrapper = new Alternative({ definition: [alt] })
       this.walk(prodWrapper, <any>fullOrRest)
     })
   }
 }
 
 function restForRepetitionWithSeparator(repSepProd, currRest, prevRest) {
-  let repSepRest = [
+  const repSepRest = [
     new Option({
       definition: [new Terminal({ terminalType: repSepProd.separator })].concat(
         repSepProd.definition
       )
     })
   ]
-  let fullRepSepRest: IProduction[] = repSepRest.concat(
+  const fullRepSepRest: IProduction[] = repSepRest.concat(
     <any>currRest,
     <any>prevRest
   )

@@ -658,7 +658,7 @@ export class RecognizerApi {
 
     this.definedRulesNames.push(name)
 
-    let ruleImplementation = this.defineRule(name, implementation, config)
+    const ruleImplementation = this.defineRule(name, implementation, config)
     this[name] = ruleImplementation
     return ruleImplementation
   }
@@ -673,9 +673,9 @@ export class RecognizerApi {
     ruleErrors = ruleErrors.concat(
       validateRuleIsOverridden(name, this.definedRulesNames, this.className)
     )
-    this.definitionErrors.push.apply(this.definitionErrors, ruleErrors) // mutability for the win
+    this.definitionErrors = this.definitionErrors.concat(ruleErrors)
 
-    let ruleImplementation = this.defineRule(name, impl, config)
+    const ruleImplementation = this.defineRule(name, impl, config)
     this[name] = ruleImplementation
     return ruleImplementation
   }

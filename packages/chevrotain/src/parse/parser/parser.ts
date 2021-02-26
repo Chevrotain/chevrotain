@@ -152,7 +152,7 @@ export class Parser {
       let defErrorsMsgs
 
       this.selfAnalysisDone = true
-      let className = this.className
+      const className = this.className
 
       this.TRACE_INIT("toFastProps", () => {
         // Without this voodoo magic the parser would be x3-x4 slower
@@ -187,25 +187,21 @@ export class Parser {
         resolverErrors = resolveGrammar({
           rules: values(this.gastProductionsCache)
         })
-        this.definitionErrors.push.apply(this.definitionErrors, resolverErrors) // mutability for the win?
+        this.definitionErrors = this.definitionErrors.concat(resolverErrors)
       })
 
       this.TRACE_INIT("Grammar Validations", () => {
         // only perform additional grammar validations IFF no resolving errors have occurred.
         // as unresolved grammar may lead to unhandled runtime exceptions in the follow up validations.
         if (isEmpty(resolverErrors) && this.skipValidations === false) {
-          let validationErrors = validateGrammar({
+          const validationErrors = validateGrammar({
             rules: values(this.gastProductionsCache),
             maxLookahead: this.maxLookahead,
             tokenTypes: values(this.tokensMap),
             errMsgProvider: defaultGrammarValidatorErrorProvider,
             grammarName: className
           })
-
-          this.definitionErrors.push.apply(
-            this.definitionErrors,
-            validationErrors
-          ) // mutability for the win?
+          this.definitionErrors = this.definitionErrors.concat(validationErrors)
         }
       })
 
@@ -214,7 +210,7 @@ export class Parser {
         // The results of these computations are not needed unless error recovery is enabled.
         if (this.recoveryEnabled) {
           this.TRACE_INIT("computeAllProdsFollows", () => {
-            let allFollows = computeAllProdsFollows(
+            const allFollows = computeAllProdsFollows(
               values(this.gastProductionsCache)
             )
             this.resyncFollows = allFollows

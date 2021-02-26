@@ -34,7 +34,7 @@ import { IToken } from "../../../api"
 
 describe("the grammar validations", () => {
   it("validates every one of the TOP_RULEs in the input", () => {
-    let expectedErrorsNoMsg = [
+    const expectedErrorsNoMsg = [
       {
         type: ParserDefinitionErrorType.DUPLICATE_PRODUCTIONS,
         ruleName: "qualifiedNameErr1",
@@ -64,7 +64,7 @@ describe("the grammar validations", () => {
       }
     ]
 
-    let qualifiedNameErr1 = new Rule({
+    const qualifiedNameErr1 = new Rule({
       name: "qualifiedNameErr1",
       definition: [
         new Terminal({ terminalType: IdentTok, idx: 1 }),
@@ -80,7 +80,7 @@ describe("the grammar validations", () => {
       ]
     })
 
-    let qualifiedNameErr2 = new Rule({
+    const qualifiedNameErr2 = new Rule({
       name: "qualifiedNameErr2",
       definition: [
         new Terminal({ terminalType: IdentTok, idx: 1 }),
@@ -104,7 +104,7 @@ describe("the grammar validations", () => {
         })
       ]
     })
-    let actualErrors = validateGrammar(
+    const actualErrors = validateGrammar(
       [qualifiedNameErr1, qualifiedNameErr2],
       5,
       [],
@@ -119,7 +119,7 @@ describe("the grammar validations", () => {
   })
 
   it("does not allow duplicate grammar rule names", () => {
-    let noErrors = validateRuleDoesNotAlreadyExist(
+    const noErrors = validateRuleDoesNotAlreadyExist(
       new Rule({ name: "A", definition: [] }),
       [
         new Rule({ name: "B", definition: [] }),
@@ -131,7 +131,7 @@ describe("the grammar validations", () => {
     //noinspection BadExpressionStatementJS
     expect(noErrors).to.be.empty
 
-    let duplicateErr = validateRuleDoesNotAlreadyExist(
+    const duplicateErr = validateRuleDoesNotAlreadyExist(
       new Rule({ name: "A", definition: [] }),
       [
         new Rule({ name: "A", definition: [] }),
@@ -153,7 +153,11 @@ describe("the grammar validations", () => {
   })
 
   it("does not allow overriding a rule which does not already exist", () => {
-    let positive = validateRuleIsOverridden("AAA", ["BBB", "CCC"], "className")
+    const positive = validateRuleIsOverridden(
+      "AAA",
+      ["BBB", "CCC"],
+      "className"
+    )
     expect(positive).to.have.lengthOf(1)
     expect(positive[0].message).to.contain("Invalid rule override")
     expect(positive[0].type).to.equal(
@@ -161,7 +165,7 @@ describe("the grammar validations", () => {
     )
     expect(positive[0].ruleName).to.equal("AAA")
 
-    let negative = validateRuleIsOverridden(
+    const negative = validateRuleIsOverridden(
       "AAA",
       ["BBB", "CCC", "AAA"],
       "className"
@@ -172,42 +176,42 @@ describe("the grammar validations", () => {
 
 describe("identifyProductionForDuplicates function", () => {
   it("generates DSL code for a ProdRef", () => {
-    let dslCode = identifyProductionForDuplicates(
+    const dslCode = identifyProductionForDuplicates(
       new NonTerminal({ nonTerminalName: "ActionDeclaration" })
     )
     expect(dslCode).to.equal("SUBRULE_#_1_#_ActionDeclaration")
   })
 
   it("generates DSL code for a OPTION", () => {
-    let dslCode = identifyProductionForDuplicates(
+    const dslCode = identifyProductionForDuplicates(
       new Option({ definition: [], idx: 3 })
     )
     expect(dslCode).to.equal("OPTION_#_3_#_")
   })
 
   it("generates DSL code for a AT_LEAST_ONE", () => {
-    let dslCode = identifyProductionForDuplicates(
+    const dslCode = identifyProductionForDuplicates(
       new RepetitionMandatory({ definition: [] })
     )
     expect(dslCode).to.equal("AT_LEAST_ONE_#_1_#_")
   })
 
   it("generates DSL code for a MANY", () => {
-    let dslCode = identifyProductionForDuplicates(
+    const dslCode = identifyProductionForDuplicates(
       new Repetition({ definition: [], idx: 5 })
     )
     expect(dslCode).to.equal("MANY_#_5_#_")
   })
 
   it("generates DSL code for a OR", () => {
-    let dslCode = identifyProductionForDuplicates(
+    const dslCode = identifyProductionForDuplicates(
       new Alternation({ definition: [], idx: 1 })
     )
     expect(dslCode).to.equal("OR_#_1_#_")
   })
 
   it("generates DSL code for a Terminal", () => {
-    let dslCode = identifyProductionForDuplicates(
+    const dslCode = identifyProductionForDuplicates(
       new Terminal({ terminalType: IdentTok, idx: 4 })
     )
     expect(dslCode).to.equal("CONSUME_#_4_#_IdentTok")
@@ -216,13 +220,13 @@ describe("identifyProductionForDuplicates function", () => {
 
 describe("OccurrenceValidationCollector GASTVisitor class", () => {
   it("collects all the productions relevant to occurrence validation", () => {
-    let qualifiedNameVisitor = new OccurrenceValidationCollector()
+    const qualifiedNameVisitor = new OccurrenceValidationCollector()
     qualifiedName.accept(qualifiedNameVisitor)
     expect(qualifiedNameVisitor.allProductions.length).to.equal(4)
 
     // TODO: check set equality
 
-    let actionDecVisitor = new OccurrenceValidationCollector()
+    const actionDecVisitor = new OccurrenceValidationCollector()
     actionDec.accept(actionDecVisitor)
     expect(actionDecVisitor.allProductions.length).to.equal(13)
 
@@ -233,15 +237,15 @@ describe("OccurrenceValidationCollector GASTVisitor class", () => {
 class DummyToken {
   static PATTERN = /NA/
 }
-let dummyRule = new Rule({
+const dummyRule = new Rule({
   name: "dummyRule",
   definition: [new Terminal({ terminalType: DummyToken })]
 })
-let dummyRule2 = new Rule({
+const dummyRule2 = new Rule({
   name: "dummyRule2",
   definition: [new Terminal({ terminalType: DummyToken })]
 })
-let dummyRule3 = new Rule({
+const dummyRule3 = new Rule({
   name: "dummyRule3",
   definition: [new Terminal({ terminalType: DummyToken })]
 })
@@ -252,7 +256,7 @@ describe("the getFirstNoneTerminal function", () => {
   })
 
   it("can find the firstNoneTerminal of a sequence with only one item", () => {
-    let result = getFirstNoneTerminal([
+    const result = getFirstNoneTerminal([
       new NonTerminal({
         nonTerminalName: "dummyRule",
         referencedRule: dummyRule
@@ -263,7 +267,7 @@ describe("the getFirstNoneTerminal function", () => {
   })
 
   it("can find the firstNoneTerminal of a sequence with two items", () => {
-    let sqeuence = [
+    const sqeuence = [
       new NonTerminal({
         nonTerminalName: "dummyRule",
         referencedRule: dummyRule
@@ -273,13 +277,13 @@ describe("the getFirstNoneTerminal function", () => {
         referencedRule: dummyRule2
       })
     ]
-    let result = getFirstNoneTerminal(sqeuence)
+    const result = getFirstNoneTerminal(sqeuence)
     expect(result).to.have.length(1)
     expect(first(result).name).to.equal("dummyRule")
   })
 
   it("can find the firstNoneTerminal of a sequence with two items where the first is optional", () => {
-    let sqeuence = [
+    const sqeuence = [
       new Option({
         definition: [
           new NonTerminal({
@@ -293,14 +297,14 @@ describe("the getFirstNoneTerminal function", () => {
         referencedRule: dummyRule2
       })
     ]
-    let result = getFirstNoneTerminal(sqeuence)
+    const result = getFirstNoneTerminal(sqeuence)
     expect(result).to.have.length(2)
-    let resultRuleNames = map(result, (currItem) => currItem.name)
+    const resultRuleNames = map(result, (currItem) => currItem.name)
     expect(resultRuleNames).to.include.members(["dummyRule", "dummyRule2"])
   })
 
   it("can find the firstNoneTerminal of an alternation", () => {
-    let alternation = [
+    const alternation = [
       new Alternation({
         definition: [
           new Alternative({
@@ -330,9 +334,9 @@ describe("the getFirstNoneTerminal function", () => {
         ]
       })
     ]
-    let result = getFirstNoneTerminal(alternation)
+    const result = getFirstNoneTerminal(alternation)
     expect(result).to.have.length(3)
-    let resultRuleNames = map(result, (currItem) => currItem.name)
+    const resultRuleNames = map(result, (currItem) => currItem.name)
     expect(resultRuleNames).to.include.members([
       "dummyRule",
       "dummyRule2",
@@ -341,7 +345,7 @@ describe("the getFirstNoneTerminal function", () => {
   })
 
   it("can find the firstNoneTerminal of an optional repetition", () => {
-    let alternation = [
+    const alternation = [
       new Repetition({
         definition: [
           new Alternative({
@@ -367,14 +371,14 @@ describe("the getFirstNoneTerminal function", () => {
         referencedRule: dummyRule3
       })
     ]
-    let result = getFirstNoneTerminal(alternation)
+    const result = getFirstNoneTerminal(alternation)
     expect(result).to.have.length(2)
-    let resultRuleNames = map(result, (currItem) => currItem.name)
+    const resultRuleNames = map(result, (currItem) => currItem.name)
     expect(resultRuleNames).to.include.members(["dummyRule", "dummyRule3"])
   })
 
   it("can find the firstNoneTerminal of a mandatory repetition", () => {
-    let alternation = [
+    const alternation = [
       new RepetitionMandatory({
         definition: [
           new Alternative({
@@ -400,9 +404,9 @@ describe("the getFirstNoneTerminal function", () => {
         referencedRule: dummyRule3
       })
     ]
-    let result = getFirstNoneTerminal(alternation)
+    const result = getFirstNoneTerminal(alternation)
     expect(result).to.have.length(1)
-    let resultRuleNames = map(result, (currItem) => currItem.name)
+    const resultRuleNames = map(result, (currItem) => currItem.name)
     expect(resultRuleNames).to.include.members(["dummyRule"])
   })
 })
@@ -432,8 +436,8 @@ class ErroneousOccurrenceNumUsageParser2 extends EmbeddedActionsParser {
   })
 }
 
-let myToken = createToken({ name: "myToken" })
-let myOtherToken = createToken({ name: "myOtherToken" })
+const myToken = createToken({ name: "myToken" })
+const myOtherToken = createToken({ name: "myOtherToken" })
 
 class ValidOccurrenceNumUsageParser extends EmbeddedActionsParser {
   constructor(input: IToken[] = []) {
@@ -513,7 +517,7 @@ describe("The duplicate occurrence validations full flow", () => {
 
   it("won't detect issues in a Parser using Tokens created by extendToken(...) utility (anonymous)", () => {
     //noinspection JSUnusedLocalSymbols
-    let parser = new ValidOccurrenceNumUsageParser()
+    const parser = new ValidOccurrenceNumUsageParser()
   })
 })
 
@@ -1228,9 +1232,9 @@ describe("The empty alternative detection full flow", () => {
 
 describe("The prefix ambiguity detection full flow", () => {
   it("will throw an error when an a common prefix ambiguity is detected - categories", () => {
-    let A = createToken({ name: "A" })
-    let B = createToken({ name: "B", categories: A })
-    let C = createToken({ name: "C" })
+    const A = createToken({ name: "A" })
+    const B = createToken({ name: "B", categories: A })
+    const C = createToken({ name: "C" })
 
     class PrefixAltAmbiguity extends EmbeddedActionsParser {
       constructor(input: IToken[] = []) {

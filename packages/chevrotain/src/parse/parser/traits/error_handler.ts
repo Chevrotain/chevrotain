@@ -62,20 +62,20 @@ export class ErrorHandler {
     prodType: PROD_TYPE,
     userDefinedErrMsg: string
   ): void {
-    let ruleName = this.getCurrRuleFullName()
-    let ruleGrammar = this.getGAstProductions()[ruleName]
-    let lookAheadPathsPerAlternative = getLookaheadPathsForOptionalProd(
+    const ruleName = this.getCurrRuleFullName()
+    const ruleGrammar = this.getGAstProductions()[ruleName]
+    const lookAheadPathsPerAlternative = getLookaheadPathsForOptionalProd(
       occurrence,
       ruleGrammar,
       prodType,
       this.maxLookahead
     )
-    let insideProdPaths = lookAheadPathsPerAlternative[0]
-    let actualTokens = []
+    const insideProdPaths = lookAheadPathsPerAlternative[0]
+    const actualTokens = []
     for (let i = 1; i <= this.maxLookahead; i++) {
       actualTokens.push(this.LA(i))
     }
-    let msg = this.errorMessageProvider.buildEarlyExitMessage({
+    const msg = this.errorMessageProvider.buildEarlyExitMessage({
       expectedIterationPaths: insideProdPaths,
       actual: actualTokens,
       previous: this.LA(0),
@@ -92,22 +92,22 @@ export class ErrorHandler {
     occurrence: number,
     errMsgTypes: string
   ): void {
-    let ruleName = this.getCurrRuleFullName()
-    let ruleGrammar = this.getGAstProductions()[ruleName]
+    const ruleName = this.getCurrRuleFullName()
+    const ruleGrammar = this.getGAstProductions()[ruleName]
     // TODO: getLookaheadPathsForOr can be slow for large enough maxLookahead and certain grammars, consider caching ?
-    let lookAheadPathsPerAlternative = getLookaheadPathsForOr(
+    const lookAheadPathsPerAlternative = getLookaheadPathsForOr(
       occurrence,
       ruleGrammar,
       this.maxLookahead
     )
 
-    let actualTokens = []
+    const actualTokens = []
     for (let i = 1; i <= this.maxLookahead; i++) {
       actualTokens.push(this.LA(i))
     }
-    let previousToken = this.LA(0)
+    const previousToken = this.LA(0)
 
-    let errMsg = this.errorMessageProvider.buildNoViableAltMessage({
+    const errMsg = this.errorMessageProvider.buildNoViableAltMessage({
       expectedPathsPerAlt: lookAheadPathsPerAlternative,
       actual: actualTokens,
       previous: previousToken,

@@ -56,7 +56,7 @@ const myErrorProvider = {
 
 // ----------------- parser -----------------
 class CustomErrorsParser extends CstParser {
-  constructor(input) {
+  constructor() {
     super(allTokens, {
       // passing our custom error message provider
       errorMessageProvider: myErrorProvider
@@ -124,6 +124,7 @@ function parseStartingWithRule(ruleName) {
     // setting a new input will RESET the parser instance's state.
     parser.input = lexResult.tokens
     // just invoke which ever rule you want as the start rule. its all just plain javascript...
+    // eslint-disable-next-line  no-unused-vars -- template
     const cst = parser[ruleName]()
 
     // we are only interested in the errors in this scenario.

@@ -32,12 +32,12 @@ export class ResyncFollowsWalker extends RestWalker {
     currRest: IProduction[],
     prevRest: IProduction[]
   ): void {
-    let followName =
+    const followName =
       buildBetweenProdsFollowPrefix(refProd.referencedRule, refProd.idx) +
       this.topProd.name
-    let fullRest: IProduction[] = currRest.concat(prevRest)
-    let restProd = new Alternative({ definition: fullRest })
-    let t_in_topProd_follows = first(restProd)
+    const fullRest: IProduction[] = currRest.concat(prevRest)
+    const restProd = new Alternative({ definition: fullRest })
+    const t_in_topProd_follows = first(restProd)
     this.follows[followName] = t_in_topProd_follows
   }
 }
@@ -45,10 +45,10 @@ export class ResyncFollowsWalker extends RestWalker {
 export function computeAllProdsFollows(
   topProductions: Rule[]
 ): Record<string, TokenType[]> {
-  let reSyncFollows = {}
+  const reSyncFollows = {}
 
   forEach(topProductions, (topProd) => {
-    let currRefsFollow = new ResyncFollowsWalker(topProd).startWalking()
+    const currRefsFollow = new ResyncFollowsWalker(topProd).startWalking()
     assign(reSyncFollows, currRefsFollow)
   })
   return reSyncFollows
@@ -62,6 +62,6 @@ export function buildBetweenProdsFollowPrefix(
 }
 
 export function buildInProdFollowPrefix(terminal: Terminal): string {
-  let terminalName = terminal.terminalType.name
+  const terminalName = terminal.terminalType.name
   return terminalName + terminal.idx + IN
 }

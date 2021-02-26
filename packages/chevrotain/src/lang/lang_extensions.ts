@@ -15,7 +15,7 @@ const NAME = "name"
 export function functionName(func: TokenType): string {
   // Engines that support Function.prototype.name OR the nth (n>1) time after
   // the name has been computed in the following else block.
-  let existingNameProp = (<any>func).name
+  const existingNameProp = (<any>func).name
   /* istanbul ignore else - too many hacks for IE/old versions of node.js here*/
   if (existingNameProp) {
     return existingNameProp
@@ -28,7 +28,7 @@ export function functionName(func: TokenType): string {
  * @returns {boolean} - has the property been successfully defined
  */
 export function defineNameProp(obj, nameValue): boolean {
-  let namePropDescriptor = Object.getOwnPropertyDescriptor(obj, NAME)
+  const namePropDescriptor = Object.getOwnPropertyDescriptor(obj, NAME)
   /* istanbul ignore else -> will only run in old versions of node.js */
   if (isUndefined(namePropDescriptor) || namePropDescriptor.configurable) {
     Object.defineProperty(obj, NAME, {

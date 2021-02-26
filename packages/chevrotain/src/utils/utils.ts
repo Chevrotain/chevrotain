@@ -20,8 +20,8 @@ export function keys(obj: any): string[] {
 }
 
 export function values(obj: any): any[] {
-  let vals = []
-  let keys = Object.keys(obj)
+  const vals = []
+  const keys = Object.keys(obj)
   for (let i = 0; i < keys.length; i++) {
     vals.push(obj[keys[i]])
   }
@@ -32,17 +32,17 @@ export function mapValues<I, O>(
   obj: Object,
   callback: (value: I, key?: string) => O
 ): O[] {
-  let result: O[] = []
-  let objKeys = keys(obj)
+  const result: O[] = []
+  const objKeys = keys(obj)
   for (let idx = 0; idx < objKeys.length; idx++) {
-    let currKey = objKeys[idx]
+    const currKey = objKeys[idx]
     result.push(callback.call(null, obj[currKey], currKey))
   }
   return result
 }
 
 export function map<I, O>(arr: I[], callback: (I, idx?: number) => O): O[] {
-  let result: O[] = []
+  const result: O[] = []
   for (let idx = 0; idx < arr.length; idx++) {
     result.push(callback.call(null, arr[idx], idx))
   }
@@ -53,7 +53,7 @@ export function flatten<T>(arr: any[]): T[] {
   let result = []
 
   for (let idx = 0; idx < arr.length; idx++) {
-    let currItem = arr[idx]
+    const currItem = arr[idx]
     if (Array.isArray(currItem)) {
       result = result.concat(flatten(currItem))
     } else {
@@ -68,7 +68,7 @@ export function first<T>(arr: T[]): T {
 }
 
 export function last<T>(arr: T[]): T {
-  let len = arr && arr.length
+  const len = arr && arr.length
   return len ? arr[len - 1] : undefined
 }
 
@@ -79,10 +79,10 @@ export function forEach(collection: any, iteratorCallback: Function): void {
       iteratorCallback.call(null, collection[i], i)
     }
   } else if (isObject(collection)) {
-    let colKeys = keys(collection)
+    const colKeys = keys(collection)
     for (let i = 0; i < colKeys.length; i++) {
-      let key = colKeys[i]
-      let value = collection[key]
+      const key = colKeys[i]
+      const value = collection[key]
       iteratorCallback.call(null, value, key)
     }
   } else {
@@ -111,10 +111,10 @@ export function dropRight<T>(arr: T[], howMuch: number = 1): T[] {
 }
 
 export function filter<T>(arr: T[], predicate: (T) => boolean): T[] {
-  let result = []
+  const result = []
   if (Array.isArray(arr)) {
     for (let i = 0; i < arr.length; i++) {
-      let item = arr[i]
+      const item = arr[i]
       if (predicate.call(null, item)) {
         result.push(item)
       }
@@ -128,12 +128,12 @@ export function reject<T>(arr: T[], predicate: (T) => boolean): T[] {
 }
 
 export function pick(obj: Object, predicate: (item) => boolean) {
-  let keys = Object.keys(obj)
-  let result = {}
+  const keys = Object.keys(obj)
+  const result = {}
 
   for (let i = 0; i < keys.length; i++) {
-    let currKey = keys[i]
-    let currItem = obj[currKey]
+    const currKey = keys[i]
+    const currItem = obj[currKey]
     if (predicate(currItem)) {
       result[currKey] = currItem
     }
@@ -157,7 +157,7 @@ export function contains<T>(arr: T[], item): boolean {
  * shallow clone
  */
 export function cloneArr<T>(arr: T[]): T[] {
-  let newArr = []
+  const newArr = []
   for (let i = 0; i < arr.length; i++) {
     newArr.push(arr[i])
   }
@@ -168,8 +168,8 @@ export function cloneArr<T>(arr: T[]): T[] {
  * shallow clone
  */
 export function cloneObj(obj: Object): any {
-  let clonedObj = {}
-  for (let key in obj) {
+  const clonedObj = {}
+  for (const key in obj) {
     /* istanbul ignore else */
     if (Object.prototype.hasOwnProperty.call(obj, key)) {
       clonedObj[key] = obj[key]
@@ -180,7 +180,7 @@ export function cloneObj(obj: Object): any {
 
 export function find<T>(arr: T[], predicate: (item: T) => boolean): T {
   for (let i = 0; i < arr.length; i++) {
-    let item = arr[i]
+    const item = arr[i]
     if (predicate.call(null, item)) {
       return item
     }
@@ -189,9 +189,9 @@ export function find<T>(arr: T[], predicate: (item: T) => boolean): T {
 }
 
 export function findAll<T>(arr: T[], predicate: (item: T) => boolean): T[] {
-  let found = []
+  const found = []
   for (let i = 0; i < arr.length; i++) {
-    let item = arr[i]
+    const item = arr[i]
     if (predicate.call(null, item)) {
       found.push(item)
     }
@@ -206,8 +206,8 @@ export function reduce<T, A>(
 ): A {
   const isArr = Array.isArray(arrOrObj)
 
-  let vals: T[] = isArr ? <Array<T>>arrOrObj : values(arrOrObj)
-  let objKeys = isArr ? [] : keys(arrOrObj)
+  const vals: T[] = isArr ? <Array<T>>arrOrObj : values(arrOrObj)
+  const objKeys = isArr ? [] : keys(arrOrObj)
 
   let accumulator = initial
   for (let i = 0; i < vals.length; i++) {
@@ -229,11 +229,11 @@ export function uniq<T>(
   arr: T[],
   identity: (item: T) => any = (item) => item
 ): T[] {
-  let identities = []
+  const identities = []
   return reduce(
     arr,
     (result, currItem) => {
-      let currIdentity = identity(currItem)
+      const currIdentity = identity(currItem)
       if (contains(identities, currIdentity)) {
         return result
       } else {
@@ -246,8 +246,8 @@ export function uniq<T>(
 }
 
 export function partial(func: Function, ...restArgs: any[]): Function {
-  let firstArg = [null]
-  let allArgs = firstArg.concat(restArgs)
+  const firstArg = [null]
+  const allArgs = firstArg.concat(restArgs)
   return Function.bind.apply(func, allArgs)
 }
 
@@ -298,7 +298,7 @@ export function indexOf<T>(arr: T[], value: T): number {
 }
 
 export function sortBy<T>(arr: T[], orderFunc: (item: T) => number): T[] {
-  let result = cloneArr(arr)
+  const result = cloneArr(arr)
   result.sort((a, b) => orderFunc(a) - orderFunc(b))
   return result
 }
@@ -308,7 +308,7 @@ export function zipObject(keys: any[], values: any[]): Object {
     throw Error("can't zipObject with different number of keys and values!")
   }
 
-  let result = {}
+  const result = {}
   for (let i = 0; i < keys.length; i++) {
     result[keys[i]] = values[i]
   }
@@ -320,10 +320,10 @@ export function zipObject(keys: any[], values: any[]): Object {
  */
 export function assign(target: Object, ...sources: Object[]): Object {
   for (let i = 0; i < sources.length; i++) {
-    let curSource = sources[i]
-    let currSourceKeys = keys(curSource)
+    const curSource = sources[i]
+    const currSourceKeys = keys(curSource)
     for (let j = 0; j < currSourceKeys.length; j++) {
-      let currKey = currSourceKeys[j]
+      const currKey = currSourceKeys[j]
       target[currKey] = curSource[currKey]
     }
   }
@@ -338,10 +338,10 @@ export function assignNoOverwrite(
   ...sources: Object[]
 ): Object {
   for (let i = 0; i < sources.length; i++) {
-    let curSource = sources[i]
-    let currSourceKeys = keys(curSource)
+    const curSource = sources[i]
+    const currSourceKeys = keys(curSource)
     for (let j = 0; j < currSourceKeys.length; j++) {
-      let currKey = currSourceKeys[j]
+      const currKey = currSourceKeys[j]
       if (!has(target, currKey)) {
         target[currKey] = curSource[currKey]
       }
@@ -351,18 +351,18 @@ export function assignNoOverwrite(
 }
 
 export function defaults(...sources: any[]): any {
-  return assignNoOverwrite.apply(null, [{}].concat(sources))
+  return assignNoOverwrite({}, ...sources)
 }
 
 export function groupBy<T>(
   arr: T[],
   groupKeyFunc: (item: T) => string
 ): { [groupKey: string]: T[] } {
-  let result: { [groupKey: string]: T[] } = {}
+  const result: { [groupKey: string]: T[] } = {}
 
   forEach(arr, (item) => {
-    let currGroupKey = groupKeyFunc(item)
-    let currGroupArr = result[currGroupKey]
+    const currGroupKey = groupKeyFunc(item)
+    const currGroupArr = result[currGroupKey]
 
     if (currGroupArr) {
       currGroupArr.push(item)
@@ -379,11 +379,11 @@ export function groupBy<T>(
  * Will overwrite existing properties with the same name
  */
 export function merge(obj1: Object, obj2: Object): any {
-  let result = cloneObj(obj1)
-  let keys2 = keys(obj2)
+  const result = cloneObj(obj1)
+  const keys2 = keys(obj2)
   for (let i = 0; i < keys2.length; i++) {
-    let key = keys2[i]
-    let value = obj2[key]
+    const key = keys2[i]
+    const value = obj2[key]
     result[key] = value
   }
 

@@ -19,7 +19,7 @@ export class ContentAssist {
     startRuleName: string,
     precedingInput: IToken[]
   ): ISyntacticContentAssistPath[] {
-    let startRuleGast = this.gastProductionsCache[startRuleName]
+    const startRuleGast = this.gastProductionsCache[startRuleName]
 
     if (isUndefined(startRuleGast)) {
       throw Error(`Rule ->${startRuleName}<- does not exist in this grammar.`)
@@ -39,10 +39,10 @@ export class ContentAssist {
     this: MixedInParser,
     grammarPath: ITokenGrammarPath
   ): TokenType[] {
-    let topRuleName = first(grammarPath.ruleStack)
-    let gastProductions = this.getGAstProductions()
-    let topProduction = gastProductions[topRuleName]
-    let nextPossibleTokenTypes = new NextAfterTokenWalker(
+    const topRuleName = first(grammarPath.ruleStack)
+    const gastProductions = this.getGAstProductions()
+    const topProduction = gastProductions[topRuleName]
+    const nextPossibleTokenTypes = new NextAfterTokenWalker(
       topProduction,
       grammarPath
     ).startWalking()

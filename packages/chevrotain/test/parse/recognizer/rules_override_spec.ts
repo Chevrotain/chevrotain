@@ -54,19 +54,19 @@ describe("The Recognizer's capabilities for overriding grammar productions", () 
       })
     }
 
-    let superParser = new SuperOverrideParser()
+    const superParser = new SuperOverrideParser()
     superParser.input = [createRegularToken(PlusTok)]
-    let superResult = superParser.topRule()
+    const superResult = superParser.topRule()
     expect(superResult).to.equal("yey")
     expect(superParser.errors).to.be.empty
 
-    let childParser = new ChildOverrideParser()
+    const childParser = new ChildOverrideParser()
     childParser.input = [
       createRegularToken(MinusTok),
       createRegularToken(MinusTok),
       createRegularToken(MinusTok)
     ]
-    let childResult = childParser.topRule()
+    const childResult = childParser.topRule()
     expect(childResult).to.equal("ney")
     expect(superParser.errors).to.be.empty
   })

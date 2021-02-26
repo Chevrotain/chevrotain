@@ -28,7 +28,7 @@ export function first(prod: IProduction): TokenType[] {
 
 export function firstForSequence(prod: AbstractProduction): TokenType[] {
   let firstSet: TokenType[] = []
-  let seq = prod.definition
+  const seq = prod.definition
   let nextSubProdIdx = 0
   let hasInnerProdsRemaining = seq.length > nextSubProdIdx
   let currSubProd
@@ -47,7 +47,7 @@ export function firstForSequence(prod: AbstractProduction): TokenType[] {
 }
 
 export function firstForBranching(prod: AbstractProduction): TokenType[] {
-  let allAlternativesFirsts: TokenType[][] = map(
+  const allAlternativesFirsts: TokenType[][] = map(
     prod.definition,
     (innerProd) => {
       return first(innerProd)

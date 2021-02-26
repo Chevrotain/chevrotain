@@ -59,7 +59,7 @@ return new ${options.name}(tokenVocabulary, config)
 
 export function genClass(options: { name: string; rules: Rule[] }): string {
   // TODO: how to pass the token vocabulary? Constructor? other?
-  let result = `
+  const result = `
 function ${options.name}(tokenVocabulary, config) {
     // invoke super constructor
     // No support for embedded actions currently, so we can 'hardcode'
@@ -85,7 +85,7 @@ ${options.name}.prototype.constructor = ${options.name}
 }
 
 export function genAllRules(rules: Rule[]): string {
-  let rulesText = map(rules, (currRule) => {
+  const rulesText = map(rules, (currRule) => {
     return genRule(currRule, 1)
   })
 

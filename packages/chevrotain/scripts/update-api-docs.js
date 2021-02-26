@@ -1,8 +1,7 @@
-const _ = require("lodash")
 const fs = require("fs-extra")
 const path = require("path")
 
-pkgPath = path.join(__dirname, "../package.json")
+const pkgPath = path.join(__dirname, "../package.json")
 const pkg = fs.readJsonSync(pkgPath)
 
 console.log("updating api docs re-direct")
@@ -15,7 +14,7 @@ const newVersionApiDocsDir = path.join(
 )
 
 try {
-  stats = fs.lstatSync(newVersionApiDocsDir)
+  const stats = fs.lstatSync(newVersionApiDocsDir)
 
   if (stats.isDirectory()) {
     console.error("docs directory for " + noDotsVersion + " already exists")

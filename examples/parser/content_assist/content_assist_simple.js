@@ -7,7 +7,6 @@
  * "Public sta" --> ["static"]
  * "call f" --> ["foo"] // assuming foo is in the symbol table.
  */
-const _ = require("lodash")
 const { createToken, Lexer, CstParser } = require("chevrotain")
 
 const A = createToken({ name: "A", pattern: /A/ })

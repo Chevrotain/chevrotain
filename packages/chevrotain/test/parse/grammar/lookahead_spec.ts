@@ -49,7 +49,7 @@ const AsteriskTok = createToken({ name: "AsteriskTok" })
 const EntityTok = createToken({ name: "EntityTok" })
 const KeyTok = createToken({ name: "KeyTok" })
 
-let atLeastOneRule = new Rule({
+const atLeastOneRule = new Rule({
   name: "atLeastOneRule",
   definition: [
     new RepetitionMandatory({
@@ -71,7 +71,7 @@ let atLeastOneRule = new Rule({
   ]
 })
 
-let atLeastOneSepRule = new Rule({
+const atLeastOneSepRule = new Rule({
   name: "atLeastOneSepRule",
   definition: [
     new RepetitionMandatoryWithSeparator({
@@ -96,7 +96,7 @@ let atLeastOneSepRule = new Rule({
   ]
 })
 
-let qualifiedName = new Rule({
+const qualifiedName = new Rule({
   name: "qualifiedName",
   definition: [
     new Terminal({ terminalType: IdentTok }),
@@ -109,7 +109,7 @@ let qualifiedName = new Rule({
   ]
 })
 
-let qualifiedNameSep = new Rule({
+const qualifiedNameSep = new Rule({
   name: "qualifiedNameSep",
   definition: [
     new RepetitionMandatoryWithSeparator({
@@ -119,7 +119,7 @@ let qualifiedNameSep = new Rule({
   ]
 })
 
-let paramSpec = new Rule({
+const paramSpec = new Rule({
   name: "paramSpec",
   definition: [
     new Terminal({ terminalType: IdentTok }),
@@ -137,7 +137,7 @@ let paramSpec = new Rule({
   ]
 })
 
-let actionDec = new Rule({
+const actionDec = new Rule({
   name: "actionDec",
   definition: [
     new Terminal({ terminalType: ActionTok }),
@@ -176,7 +176,7 @@ let actionDec = new Rule({
   ]
 })
 
-let actionDecSep = new Rule({
+const actionDecSep = new Rule({
   name: "actionDecSep",
   definition: [
     new Terminal({ terminalType: ActionTok }),
@@ -209,7 +209,7 @@ let actionDecSep = new Rule({
   ]
 })
 
-let manyActions = new Rule({
+const manyActions = new Rule({
   name: "manyActions",
   definition: [
     new Repetition({
@@ -224,7 +224,7 @@ let manyActions = new Rule({
   ]
 })
 
-let cardinality = new Rule({
+const cardinality = new Rule({
   name: "cardinality",
   definition: [
     new Terminal({ terminalType: LSquareTok }),
@@ -249,7 +249,7 @@ let cardinality = new Rule({
   ]
 })
 
-let assignedTypeSpec = new Rule({
+const assignedTypeSpec = new Rule({
   name: "assignedTypeSpec",
   definition: [
     new Terminal({ terminalType: ColonTok }),
@@ -269,7 +269,7 @@ let assignedTypeSpec = new Rule({
   ]
 })
 
-let lotsOfOrs = new Rule({
+const lotsOfOrs = new Rule({
   name: "lotsOfOrs",
   definition: [
     new Alternation({
@@ -325,7 +325,7 @@ let lotsOfOrs = new Rule({
   ]
 })
 
-let emptyAltOr = new Rule({
+const emptyAltOr = new Rule({
   name: "emptyAltOr",
   definition: [
     new Alternation({
@@ -352,7 +352,7 @@ let emptyAltOr = new Rule({
   ]
 })
 
-let callArguments = new Rule({
+const callArguments = new Rule({
   name: "callArguments",
   definition: [
     new RepetitionWithSeparator({
@@ -460,10 +460,10 @@ context("lookahead specs", () => {
 
   describe("The Grammar Lookahead namespace", () => {
     it("can compute the lookahead function for the first OPTION in ActionDec", () => {
-      let colonMock = new ColonParserMock()
-      let indentMock = new IdentParserMock()
+      const colonMock = new ColonParserMock()
+      const indentMock = new IdentParserMock()
 
-      let laFunc = buildLookaheadFuncForOptionalProd(
+      const laFunc = buildLookaheadFuncForOptionalProd(
         1,
         actionDec,
         1,
@@ -477,10 +477,10 @@ context("lookahead specs", () => {
     })
 
     it("can compute the lookahead function for the second OPTION in ActionDec", () => {
-      let colonParserMock = new ColonParserMock()
-      let identParserMock = new IdentParserMock()
+      const colonParserMock = new ColonParserMock()
+      const identParserMock = new IdentParserMock()
 
-      let laFunc = buildLookaheadFuncForOptionalProd(
+      const laFunc = buildLookaheadFuncForOptionalProd(
         2,
         actionDec,
         1,
@@ -497,7 +497,7 @@ context("lookahead specs", () => {
       const B = createToken({ name: "B" })
       const C = createToken({ name: "C", categories: [B] })
 
-      let optionRule = new Rule({
+      const optionRule = new Rule({
         name: "optionRule",
         definition: [
           new Option({
@@ -511,7 +511,7 @@ context("lookahead specs", () => {
         ]
       })
 
-      let laFunc = buildLookaheadFuncForOptionalProd(
+      const laFunc = buildLookaheadFuncForOptionalProd(
         1,
         optionRule,
         1,
@@ -531,10 +531,10 @@ context("lookahead specs", () => {
     })
 
     it("can compute the lookahead function for the first MANY in ActionDec", () => {
-      let identParserMock = new IdentParserMock()
-      let commaParserMock = new CommaParserMock()
+      const identParserMock = new IdentParserMock()
+      const commaParserMock = new CommaParserMock()
 
-      let laFunc = buildLookaheadFuncForOptionalProd(
+      const laFunc = buildLookaheadFuncForOptionalProd(
         1,
         actionDec,
         1,
@@ -548,12 +548,12 @@ context("lookahead specs", () => {
     })
 
     it("can compute the lookahead function for lots of ORs sample", () => {
-      let keyParserMock = new KeyParserMock()
-      let entityParserMock = new EntityParserMock()
-      let colonParserMock = new ColonParserMock()
-      let commaParserMock = new CommaParserMock()
+      const keyParserMock = new KeyParserMock()
+      const entityParserMock = new EntityParserMock()
+      const colonParserMock = new ColonParserMock()
+      const commaParserMock = new CommaParserMock()
 
-      let laFunc = buildLookaheadFuncForOr(
+      const laFunc = buildLookaheadFuncForOr(
         1,
         lotsOfOrs,
         1,
@@ -573,7 +573,7 @@ context("lookahead specs", () => {
       const B = createToken({ name: "B" })
       const C = createToken({ name: "C", categories: [B] })
 
-      let orRule = new Rule({
+      const orRule = new Rule({
         name: "orRule",
         definition: [
           new Alternation({
@@ -619,11 +619,11 @@ context("lookahead specs", () => {
     })
 
     it("can compute the lookahead function for EMPTY OR sample", () => {
-      let commaParserMock = new CommaParserMock()
-      let keyParserMock = new KeyParserMock()
-      let entityParserMock = new EntityParserMock()
+      const commaParserMock = new CommaParserMock()
+      const keyParserMock = new KeyParserMock()
+      const entityParserMock = new EntityParserMock()
 
-      let laFunc = buildLookaheadFuncForOr(
+      const laFunc = buildLookaheadFuncForOr(
         1,
         emptyAltOr,
         1,
@@ -658,7 +658,7 @@ context("lookahead specs", () => {
 
     context("computing lookahead sequences for", () => {
       it("two simple one token alternatives", () => {
-        let alt1 = new Alternation({
+        const alt1 = new Alternation({
           definition: [
             new Alternative({
               definition: [new Terminal({ terminalType: Alpha })]
@@ -671,14 +671,14 @@ context("lookahead specs", () => {
             })
           ]
         })
-        let alt2 = new Terminal({ terminalType: Gamma })
+        const alt2 = new Terminal({ terminalType: Gamma })
 
-        let actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
+        const actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
         expect(actual).to.deep.equal([[[Alpha], [Beta]], [[Gamma]]])
       })
 
       it("three simple one token alternatives", () => {
-        let alt1 = new Alternation({
+        const alt1 = new Alternation({
           definition: [
             new Alternative({
               definition: [new Terminal({ terminalType: Alpha })]
@@ -691,20 +691,20 @@ context("lookahead specs", () => {
             })
           ]
         })
-        let alt2 = new Terminal({ terminalType: Gamma })
-        let alt3 = new Alternative({
+        const alt2 = new Terminal({ terminalType: Gamma })
+        const alt3 = new Alternative({
           definition: [
             new Terminal({ terminalType: Delta }),
             new Terminal({ terminalType: Charlie })
           ]
         })
 
-        let actual = lookAheadSequenceFromAlternatives([alt1, alt2, alt3], 5)
+        const actual = lookAheadSequenceFromAlternatives([alt1, alt2, alt3], 5)
         expect(actual).to.deep.equal([[[Alpha], [Beta]], [[Gamma]], [[Delta]]])
       })
 
       it("two complex multi token alternatives", () => {
-        let alt1 = new Alternation({
+        const alt1 = new Alternation({
           definition: [
             new Alternative({
               definition: [
@@ -724,7 +724,7 @@ context("lookahead specs", () => {
             })
           ]
         })
-        let alt2 = new Alternation({
+        const alt2 = new Alternation({
           definition: [
             new Alternative({
               definition: [
@@ -738,7 +738,7 @@ context("lookahead specs", () => {
           ]
         })
 
-        let actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
+        const actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
         expect(actual).to.deep.equal([
           [[Beta], [Alpha, Beta], [Alpha, Gamma]],
           [[Charlie], [Alpha, Delta]]
@@ -746,7 +746,7 @@ context("lookahead specs", () => {
       })
 
       it("three complex multi token alternatives", () => {
-        let alt1 = new Alternation({
+        const alt1 = new Alternation({
           definition: [
             new Alternative({
               definition: [
@@ -760,7 +760,7 @@ context("lookahead specs", () => {
             })
           ]
         })
-        let alt2 = new Alternation({
+        const alt2 = new Alternation({
           definition: [
             new Alternative({
               definition: [
@@ -779,7 +779,7 @@ context("lookahead specs", () => {
             })
           ]
         })
-        let alt3 = new Alternation({
+        const alt3 = new Alternation({
           definition: [
             new Alternative({
               definition: [
@@ -797,7 +797,7 @@ context("lookahead specs", () => {
           ]
         })
 
-        let actual = lookAheadSequenceFromAlternatives([alt1, alt2, alt3], 5)
+        const actual = lookAheadSequenceFromAlternatives([alt1, alt2, alt3], 5)
         expect(actual).to.deep.equal([
           [[Beta], [Alpha, Beta, Gamma]],
           [[Charlie], [Gamma], [Alpha, Delta]],
@@ -809,7 +809,7 @@ context("lookahead specs", () => {
       })
 
       it("two complex multi token alternatives with shared prefix", () => {
-        let alt1 = new Alternative({
+        const alt1 = new Alternative({
           definition: [
             new Terminal({ terminalType: Alpha }),
             new Terminal({ terminalType: Beta }),
@@ -818,7 +818,7 @@ context("lookahead specs", () => {
           ]
         })
 
-        let alt2 = new Alternative({
+        const alt2 = new Alternative({
           definition: [
             new Terminal({ terminalType: Alpha }),
             new Terminal({ terminalType: Beta }),
@@ -829,7 +829,7 @@ context("lookahead specs", () => {
           ]
         })
 
-        let actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
+        const actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
         expect(actual).to.deep.equal([
           [[Alpha, Beta, Charlie, Delta]],
           [[Alpha, Beta, Charlie, Delta, Gamma]]
@@ -837,19 +837,19 @@ context("lookahead specs", () => {
       })
 
       it("simple ambiguous alternatives", () => {
-        let alt1 = new Alternative({
+        const alt1 = new Alternative({
           definition: [new Terminal({ terminalType: Alpha })]
         })
-        let alt2 = new Alternative({
+        const alt2 = new Alternative({
           definition: [new Terminal({ terminalType: Alpha })]
         })
 
-        let actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
+        const actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
         expect(actual).to.deep.equal([[[Alpha]], [[Alpha]]])
       })
 
       it("complex(multi-token) ambiguous alternatives", () => {
-        let alt1 = new Alternative({
+        const alt1 = new Alternative({
           definition: [
             new Terminal({ terminalType: Alpha }),
             new Terminal({ terminalType: Beta }),
@@ -857,7 +857,7 @@ context("lookahead specs", () => {
           ]
         })
 
-        let alt2 = new Alternative({
+        const alt2 = new Alternative({
           definition: [
             new Terminal({ terminalType: Alpha }),
             new Terminal({ terminalType: Beta }),
@@ -865,7 +865,7 @@ context("lookahead specs", () => {
           ]
         })
 
-        let actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
+        const actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
         expect(actual).to.deep.equal([
           [[Alpha, Beta, Charlie]],
           [[Alpha, Beta, Charlie]]
@@ -893,12 +893,12 @@ context("lookahead specs", () => {
       }
 
       it("inheritance Alternative alternatives - positive", () => {
-        let alternatives = [
+        const alternatives = [
           [[ExtendsAlphaAlpha]], // 0
           [[ExtendsAlpha]], // 1
           [[Alpha]] // 2
         ]
-        let laFunc = buildAlternativesLookAheadFunc(
+        const laFunc = buildAlternativesLookAheadFunc(
           alternatives,
           false,
           tokenStructuredMatcher,
@@ -911,12 +911,12 @@ context("lookahead specs", () => {
       })
 
       it("simple alternatives - positive", () => {
-        let alternatives = [
+        const alternatives = [
           [[Alpha], [Beta]], // 0
           [[Delta], [Gamma]], // 1
           [[Charlie]] // 2
         ]
-        let laFunc = buildAlternativesLookAheadFunc(
+        const laFunc = buildAlternativesLookAheadFunc(
           alternatives,
           false,
           tokenStructuredMatcher,
@@ -931,11 +931,11 @@ context("lookahead specs", () => {
       })
 
       it("simple alternatives - negative", () => {
-        let alternatives = [
+        const alternatives = [
           [[Alpha], [Beta]], // 0
           [[Delta], [Gamma]] // 1
         ]
-        let laFunc = buildAlternativesLookAheadFunc(
+        const laFunc = buildAlternativesLookAheadFunc(
           alternatives,
           false,
           tokenStructuredMatcher,
@@ -947,7 +947,7 @@ context("lookahead specs", () => {
       })
 
       it("complex alternatives - positive", () => {
-        let alternatives = [
+        const alternatives = [
           [
             [Alpha, Beta, Gamma],
             [Alpha, Beta, Delta]
@@ -955,7 +955,7 @@ context("lookahead specs", () => {
           [[Alpha, Beta, Beta]], // 1
           [[Alpha, Beta]] // 2 - Prefix of '1' alternative
         ]
-        let laFunc = buildAlternativesLookAheadFunc(
+        const laFunc = buildAlternativesLookAheadFunc(
           alternatives,
           false,
           tokenStructuredMatcher,
@@ -972,7 +972,7 @@ context("lookahead specs", () => {
       })
 
       it("complex alternatives - negative", () => {
-        let alternatives = [
+        const alternatives = [
           [
             [Alpha, Beta, Gamma],
             [Alpha, Beta, Delta]
@@ -980,7 +980,7 @@ context("lookahead specs", () => {
           [[Alpha, Beta, Beta]], // 1
           [[Alpha, Beta], [Gamma]] // 2
         ]
-        let laFunc = buildAlternativesLookAheadFunc(
+        const laFunc = buildAlternativesLookAheadFunc(
           alternatives,
           false,
           tokenStructuredMatcher,
@@ -996,12 +996,12 @@ context("lookahead specs", () => {
       })
 
       it("complex alternatives with inheritance - positive", () => {
-        let alternatives = [
+        const alternatives = [
           [[ExtendsAlpha, Beta]], // 0
           [[Alpha, Beta]] // 1
         ]
 
-        let laFunc = buildAlternativesLookAheadFunc(
+        const laFunc = buildAlternativesLookAheadFunc(
           alternatives,
           false,
           tokenStructuredMatcher,
@@ -1018,12 +1018,12 @@ context("lookahead specs", () => {
       })
 
       it("complex alternatives with inheritance - negative", () => {
-        let alternatives = [
+        const alternatives = [
           [[ExtendsAlpha, Beta]], // 0
           [[Alpha, Gamma]] // 1
         ]
 
-        let laFunc = buildAlternativesLookAheadFunc(
+        const laFunc = buildAlternativesLookAheadFunc(
           alternatives,
           false,
           tokenStructuredMatcher,
@@ -1036,11 +1036,11 @@ context("lookahead specs", () => {
       })
 
       it("Empty alternatives", () => {
-        let alternatives = [
+        const alternatives = [
           [[Alpha]], // 0
           [[]] // 1
         ]
-        let laFunc = buildAlternativesLookAheadFunc(
+        const laFunc = buildAlternativesLookAheadFunc(
           alternatives,
           false,
           tokenStructuredMatcher,
@@ -1053,8 +1053,8 @@ context("lookahead specs", () => {
       })
 
       it("simple optional - positive", () => {
-        let alternative = [[Alpha], [Beta], [Charlie]]
-        let laFunc = buildSingleAlternativeLookaheadFunction(
+        const alternative = [[Alpha], [Beta], [Charlie]]
+        const laFunc = buildSingleAlternativeLookaheadFunction(
           alternative,
           tokenStructuredMatcher,
           false
@@ -1066,8 +1066,8 @@ context("lookahead specs", () => {
       })
 
       it("simple optional - negative", () => {
-        let alternative = [[Alpha], [Beta], [Charlie]]
-        let laFunc = buildSingleAlternativeLookaheadFunction(
+        const alternative = [[Alpha], [Beta], [Charlie]]
+        const laFunc = buildSingleAlternativeLookaheadFunction(
           alternative,
           tokenStructuredMatcher,
           false
@@ -1078,8 +1078,8 @@ context("lookahead specs", () => {
       })
 
       it("complex optional - positive", () => {
-        let alternative = [[Alpha, Beta, Gamma], [Beta], [Charlie, Delta]]
-        let laFunc = buildSingleAlternativeLookaheadFunction(
+        const alternative = [[Alpha, Beta, Gamma], [Beta], [Charlie, Delta]]
+        const laFunc = buildSingleAlternativeLookaheadFunction(
           alternative,
           tokenStructuredMatcher,
           false
@@ -1091,8 +1091,8 @@ context("lookahead specs", () => {
       })
 
       it("complex optional - Negative", () => {
-        let alternative = [[Alpha, Beta, Gamma], [Beta], [Charlie, Delta]]
-        let laFunc = buildSingleAlternativeLookaheadFunction(
+        const alternative = [[Alpha, Beta, Gamma], [Beta], [Charlie, Delta]]
+        const laFunc = buildSingleAlternativeLookaheadFunction(
           alternative,
           tokenStructuredMatcher,
           false
@@ -1104,8 +1104,8 @@ context("lookahead specs", () => {
       })
 
       it("complex optional with inheritance - positive", () => {
-        let alternative = [[Alpha, ExtendsAlpha, ExtendsAlphaAlpha]]
-        let laFunc = buildSingleAlternativeLookaheadFunction(
+        const alternative = [[Alpha, ExtendsAlpha, ExtendsAlphaAlpha]]
+        const laFunc = buildSingleAlternativeLookaheadFunction(
           alternative,
           tokenStructuredMatcher,
           false
@@ -1136,8 +1136,8 @@ context("lookahead specs", () => {
       })
 
       it("complex optional with inheritance - negative", () => {
-        let alternative = [[Alpha, ExtendsAlpha, ExtendsAlphaAlpha]]
-        let laFunc = buildSingleAlternativeLookaheadFunction(
+        const alternative = [[Alpha, ExtendsAlpha, ExtendsAlphaAlpha]]
+        const laFunc = buildSingleAlternativeLookaheadFunction(
           alternative,
           tokenStructuredMatcher,
           false

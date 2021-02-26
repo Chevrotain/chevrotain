@@ -20,7 +20,7 @@
   var Optional = railroad.Optional
   var OneOrMore = railroad.OneOrMore
   var ZeroOrMore = railroad.ZeroOrMore
-  var Terminal = railroad.Terminal
+  // var Terminal = railroad.Terminal
   var NonTerminal = railroad.NonTerminal
 
   /**

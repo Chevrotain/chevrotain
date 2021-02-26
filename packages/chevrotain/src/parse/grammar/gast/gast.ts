@@ -32,7 +32,7 @@ export function isOptionalProd(
   prod: IProduction,
   alreadyVisited: NonTerminal[] = []
 ): boolean {
-  let isDirectlyOptional =
+  const isDirectlyOptional =
     prod instanceof Option ||
     prod instanceof Repetition ||
     prod instanceof RepetitionWithSeparator

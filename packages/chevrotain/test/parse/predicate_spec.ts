@@ -20,7 +20,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
     static PATTERN = /a/
   }
 
-  let ALL_TOKENS = [A, B, C]
+  const ALL_TOKENS = [A, B, C]
   augmentTokenTypes(ALL_TOKENS)
 
   it("OPTION", () => {
@@ -48,25 +48,25 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
       })
     }
 
-    let gateOpenInputGood = new PredicateOptionParser(
+    const gateOpenInputGood = new PredicateOptionParser(
       [createRegularToken(A)],
       true
     ).optionRule()
     expect(gateOpenInputGood).to.equal("entered!")
 
-    let gateOpenInputBad = new PredicateOptionParser(
+    const gateOpenInputBad = new PredicateOptionParser(
       [createRegularToken(B)],
       true
     ).optionRule()
     expect(gateOpenInputBad).to.equal("not entered!")
 
-    let gateClosedInputGood = new PredicateOptionParser(
+    const gateClosedInputGood = new PredicateOptionParser(
       [createRegularToken(A)],
       false
     ).optionRule()
     expect(gateClosedInputGood).to.equal("not entered!")
 
-    let gateClosedInputBad = new PredicateOptionParser(
+    const gateClosedInputBad = new PredicateOptionParser(
       [createRegularToken(B)],
       false
     ).optionRule()
@@ -99,25 +99,25 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
       })
     }
 
-    let gateOpenInputGood = new PredicateManyParser(
+    const gateOpenInputGood = new PredicateManyParser(
       [createRegularToken(A), createRegularToken(A)],
       true
     ).manyRule()
     expect(gateOpenInputGood).to.equal("entered!")
 
-    let gateOpenInputBad = new PredicateManyParser(
+    const gateOpenInputBad = new PredicateManyParser(
       [createRegularToken(B)],
       true
     ).manyRule()
     expect(gateOpenInputBad).to.equal("not entered!")
 
-    let gateClosedInputGood = new PredicateManyParser(
+    const gateClosedInputGood = new PredicateManyParser(
       [createRegularToken(A), createRegularToken(A)],
       false
     ).manyRule()
     expect(gateClosedInputGood).to.equal("not entered!")
 
-    let gateClosedInputBad = new PredicateManyParser(
+    const gateClosedInputBad = new PredicateManyParser(
       [createRegularToken(B)],
       false
     ).manyRule()
@@ -150,13 +150,13 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
       })
     }
 
-    let gateOpenInputGood = new PredicateAtLeastOneParser(
+    const gateOpenInputGood = new PredicateAtLeastOneParser(
       [createRegularToken(A), createRegularToken(A)],
       true
     ).atLeastOneRule()
     expect(gateOpenInputGood).to.equal("entered!")
 
-    let gateOpenInputBadParser = new PredicateAtLeastOneParser(
+    const gateOpenInputBadParser = new PredicateAtLeastOneParser(
       [createRegularToken(B)],
       true
     )
@@ -166,7 +166,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
       EarlyExitException
     )
 
-    let gateClosedInputGood = new PredicateAtLeastOneParser(
+    const gateClosedInputGood = new PredicateAtLeastOneParser(
       [createRegularToken(A), createRegularToken(A)],
       false
     )
@@ -176,7 +176,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
       EarlyExitException
     )
 
-    let gateClosedInputBad = new PredicateAtLeastOneParser(
+    const gateClosedInputBad = new PredicateAtLeastOneParser(
       [createRegularToken(B)],
       false
     )
@@ -224,31 +224,31 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
       })
     }
 
-    let gateOpenInputA = new PredicateOrParser(
+    const gateOpenInputA = new PredicateOrParser(
       [createRegularToken(A)],
       true
     ).orRule()
     expect(gateOpenInputA).to.equal("A")
 
-    let gateOpenInputB = new PredicateOrParser(
+    const gateOpenInputB = new PredicateOrParser(
       [createRegularToken(B)],
       true
     ).orRule()
     expect(gateOpenInputB).to.equal("B")
 
-    let gateOpenInputC = new PredicateOrParser(
+    const gateOpenInputC = new PredicateOrParser(
       [createRegularToken(C)],
       true
     ).orRule()
     expect(gateOpenInputC).to.equal("C")
 
-    let gateClosedInputA = new PredicateOrParser(
+    const gateClosedInputA = new PredicateOrParser(
       [createRegularToken(A)],
       false
     ).orRule()
     expect(gateClosedInputA).to.equal("A")
 
-    let gateClosedInputBad = new PredicateOrParser(
+    const gateClosedInputBad = new PredicateOrParser(
       [createRegularToken(B)],
       false
     )
@@ -258,7 +258,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
       NoViableAltException
     )
 
-    let gateClosedInputC = new PredicateOrParser(
+    const gateClosedInputC = new PredicateOrParser(
       [createRegularToken(C)],
       false
     ).orRule()
@@ -288,13 +288,13 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
         })
       }
 
-      let gateOpenInputA = new PredicateWithRuleOrParser([
+      const gateOpenInputA = new PredicateWithRuleOrParser([
         createRegularToken(A, "a")
       ]).topRule(1, [true])
       expect(gateOpenInputA).to.equal("a")
 
       // if the predicate function still kept a reference via a closure to the original param this will not work.
-      let gateOpenInputB = new PredicateWithRuleOrParser([
+      const gateOpenInputB = new PredicateWithRuleOrParser([
         createRegularToken(B, "b")
       ]).topRule(1, [false])
       expect(gateOpenInputB).to.equal("b")
@@ -319,7 +319,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
       const parser = new PredicateWithRuleOptionParser([
         createRegularToken(B, "b")
       ])
-      let gateOpenInputB = parser.topRule(1, [false])
+      const gateOpenInputB = parser.topRule(1, [false])
       expect(gateOpenInputB).to.equal("b")
 
       // // if the predicate function still kept a reference via a closure to the original param this will not work.
@@ -352,14 +352,14 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
         })
       }
 
-      let gateOpenInputB = new PredicateWithRuleManyParser([
+      const gateOpenInputB = new PredicateWithRuleManyParser([
         createRegularToken(B, "b")
       ]).topRule(1, [false])
       expect(gateOpenInputB).to.equal("b")
 
       // if the predicate function still kept a reference via a closure to the original param this will not work.
       // because the <() => param> in the MANY will ALWAYS return false (the original param)
-      let gateOpenInputA = new PredicateWithRuleManyParser([
+      const gateOpenInputA = new PredicateWithRuleManyParser([
         createRegularToken(A, "a"),
         createRegularToken(A, "a"),
         createRegularToken(A, "a"),
@@ -401,7 +401,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
         })
       }
 
-      let gateOpenInputB = new PredicateWithRuleAtLeastOneParser([
+      const gateOpenInputB = new PredicateWithRuleAtLeastOneParser([
         createRegularToken(A, "a"),
         createRegularToken(B, "b")
       ]).topRule(1, [false])
@@ -409,7 +409,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
 
       // if the predicate function still kept a reference via a closure to the original param this will not work.
       // because the <() => param> in the AT_LEAST_ONE will ALWAYS return false (the original param)
-      let gateOpenInputA = new PredicateWithRuleAtLeastOneParser([
+      const gateOpenInputA = new PredicateWithRuleAtLeastOneParser([
         createRegularToken(A, "a"),
         createRegularToken(A, "a"),
         createRegularToken(A, "a"),

@@ -1,6 +1,11 @@
 "use strict"
 
-const { EmbeddedActionsParser, EOF, tokenMatcher } = require("chevrotain")
+const {
+  EmbeddedActionsParser,
+  EOF,
+  tokenMatcher,
+  MismatchedTokenException
+} = require("chevrotain")
 const tokens = require("./ecma5_tokens")
 // for conciseness
 const t = tokens
@@ -689,7 +694,7 @@ class ECMAScript5Parser extends EmbeddedActionsParser {
         // there is no danger of inRule recovery (single token insertion/deletion)
         // happening in this case because that type of recovery can only happen if CONSUME(...) was invoked.
         this.SAVE_ERROR(
-          new chevrotain.MismatchedTokenException(
+          new MismatchedTokenException(
             "Line Terminator not allowed before Expression in Throw Statement"
             // TODO: create line terminator token on the fly?
           )
@@ -865,8 +870,9 @@ class ECMAScript5Parser extends EmbeddedActionsParser {
   // the "IN" is only allowed if x is a left hand side expression
   // https://www.ecma-international.org/ecma-262/5.1/index.html#sec-12.6
   // so this method must verify that the exp parameter fulfills this condition.
+  // eslint-disable-next-line no-unused-vars -- function signature
   canInComeAfterExp(exp) {
-    // TODO: temp implemntatoin, will always allow IN style iteration for now.
+    // TODO: temp implementation, will always allow IN style iteration for now.
     return true
   }
 

@@ -13,11 +13,11 @@ function createTokenVector(tokTypes: TokenType[]): any[] {
 
 function defineTestSuit(recoveryMode) {
   context(`CST Recovery: ${recoveryMode}`, () => {
-    let A = createToken({ name: "A" })
-    let B = createToken({ name: "B" })
-    let C = createToken({ name: "C" })
-    let D = createToken({ name: "D" })
-    let E = createToken({ name: "E" })
+    const A = createToken({ name: "A" })
+    const B = createToken({ name: "B" })
+    const C = createToken({ name: "C" })
+    const D = createToken({ name: "D" })
+    const E = createToken({ name: "E" })
 
     const ALL_TOKENS = [A, B, C, D, E]
 
@@ -40,13 +40,13 @@ function defineTestSuit(recoveryMode) {
         })
       }
 
-      let input = [
+      const input = [
         createRegularToken(A),
         createRegularToken(B),
         createRegularToken(C)
       ]
-      let parser = new CstTerminalParser(input)
-      let cst: any = parser.testRule()
+      const parser = new CstTerminalParser(input)
+      const cst: any = parser.testRule()
       expect(cst.name).to.equal("testRule")
       expect(cst.children).to.have.keys("A", "B", "bamba")
       expect(tokenStructuredMatcher(cst.children.A[0], A)).to.be.true
@@ -75,13 +75,13 @@ function defineTestSuit(recoveryMode) {
         })
       }
 
-      let input = [
+      const input = [
         createRegularToken(A),
         createRegularToken(B),
         createRegularToken(C)
       ]
-      let parser = new CstTerminalParser2(input)
-      let cst: any = parser.testRule()
+      const parser = new CstTerminalParser2(input)
+      const cst: any = parser.testRule()
       expect(cst.name).to.equal("testRule")
       expect(cst.children).to.have.keys("myLabel", "B", "myOtherLabel")
       expect(tokenStructuredMatcher(cst.children.myLabel[0], A)).to.be.true
@@ -113,9 +113,9 @@ function defineTestSuit(recoveryMode) {
         })
       }
 
-      let input = [createRegularToken(A), createRegularToken(B)]
-      let parser = new CstTerminalParserWithLabels(input)
-      let cst = parser.testRule()
+      const input = [createRegularToken(A), createRegularToken(B)]
+      const parser = new CstTerminalParserWithLabels(input)
+      const cst = parser.testRule()
 
       expect(cst.name).to.equal("testRule")
       expect(cst.children).to.have.keys("myLabel", "B", "myOtherLabel")
@@ -158,9 +158,9 @@ function defineTestSuit(recoveryMode) {
         })
       }
 
-      let input = [createRegularToken(A)]
-      let parser = new CstTerminalAlternationParser(input)
-      let cst = parser.testRule()
+      const input = [createRegularToken(A)]
+      const parser = new CstTerminalAlternationParser(input)
+      const cst = parser.testRule()
       expect(cst.name).to.equal("testRule")
       expect(cst.children).to.have.keys("A")
       expect(tokenStructuredMatcher(cst.children.A[0], A)).to.be.true
@@ -189,9 +189,9 @@ function defineTestSuit(recoveryMode) {
         })
       }
 
-      let input = [createRegularToken(A), createRegularToken(B)]
-      let parser = new CstTerminalAlternationSingleAltParser(input)
-      let cst = parser.testRule()
+      const input = [createRegularToken(A), createRegularToken(B)]
+      const parser = new CstTerminalAlternationSingleAltParser(input)
+      const cst = parser.testRule()
       expect(cst.name).to.equal("testRule")
       expect(cst.children).to.have.keys("A", "B")
       expect(tokenStructuredMatcher(cst.children.A[0], A)).to.be.true
@@ -215,13 +215,13 @@ function defineTestSuit(recoveryMode) {
         })
       }
 
-      let input = [
+      const input = [
         createRegularToken(A),
         createRegularToken(B),
         createRegularToken(A)
       ]
-      let parser = new CstMultiTerminalParser(input)
-      let cst = parser.testRule()
+      const parser = new CstMultiTerminalParser(input)
+      const cst = parser.testRule()
       expect(cst.name).to.equal("testRule")
       expect(cst.children).to.have.keys("A", "B")
       expect(cst.children.A).to.have.length(2)
@@ -253,7 +253,7 @@ function defineTestSuit(recoveryMode) {
         })
       }
 
-      let input = [
+      const input = [
         createRegularToken(A),
         createRegularToken(C),
         createRegularToken(A),
@@ -262,8 +262,8 @@ function defineTestSuit(recoveryMode) {
         createRegularToken(C),
         createRegularToken(B)
       ]
-      let parser = new CstMultiTerminalWithManyParser(input)
-      let cst = parser.testRule()
+      const parser = new CstMultiTerminalWithManyParser(input)
+      const cst = parser.testRule()
       expect(cst.name).to.equal("testRule")
       expect(cst.children).to.have.keys("A", "B", "bamba")
       expect(cst.children.A).to.have.length(3)
@@ -303,13 +303,13 @@ function defineTestSuit(recoveryMode) {
       }
 
       it("path taken", () => {
-        let input = [
+        const input = [
           createRegularToken(A),
           createRegularToken(C),
           createRegularToken(B)
         ]
-        let parser = new CstOptionalTerminalParser(input)
-        let cst = parser.ruleWithOptional()
+        const parser = new CstOptionalTerminalParser(input)
+        const cst = parser.ruleWithOptional()
         expect(cst.name).to.equal("ruleWithOptional")
         expect(cst.children).to.have.keys("A", "B", "bamba")
         expect(tokenStructuredMatcher(cst.children.A[0], A)).to.be.true
@@ -321,9 +321,9 @@ function defineTestSuit(recoveryMode) {
       })
 
       it("path NOT taken", () => {
-        let input = [createRegularToken(B)]
-        let parser = new CstOptionalTerminalParser(input)
-        let cst = parser.ruleWithOptional()
+        const input = [createRegularToken(B)]
+        const parser = new CstOptionalTerminalParser(input)
+        const cst = parser.ruleWithOptional()
         expect(cst.name).to.equal("ruleWithOptional")
         expect(cst.children).to.have.keys("B")
         expect(cst.children.A).to.be.undefined
@@ -350,14 +350,14 @@ function defineTestSuit(recoveryMode) {
         })
       }
 
-      let input = [
+      const input = [
         createRegularToken(A),
         createRegularToken(A),
         createRegularToken(A),
         createRegularToken(B)
       ]
-      let parser = new CstMultiTerminalWithAtLeastOneParser(input)
-      let cst = parser.testRule()
+      const parser = new CstMultiTerminalWithAtLeastOneParser(input)
+      const cst = parser.testRule()
       expect(cst.name).to.equal("testRule")
       expect(cst.children).to.have.keys("A", "B")
       expect(cst.children.A).to.have.length(3)
@@ -388,14 +388,14 @@ function defineTestSuit(recoveryMode) {
         })
       }
 
-      let input = [
+      const input = [
         createRegularToken(A),
         createRegularToken(C),
         createRegularToken(A),
         createRegularToken(B)
       ]
-      let parser = new CstMultiTerminalWithManySepParser(input)
-      let cst = parser.testRule()
+      const parser = new CstMultiTerminalWithManySepParser(input)
+      const cst = parser.testRule()
       expect(cst.name).to.equal("testRule")
       expect(cst.children).to.have.keys("A", "B", "C")
       expect(cst.children.A).to.have.length(2)
@@ -428,14 +428,14 @@ function defineTestSuit(recoveryMode) {
         })
       }
 
-      let input = [
+      const input = [
         createRegularToken(A),
         createRegularToken(C),
         createRegularToken(A),
         createRegularToken(B)
       ]
-      let parser = new CstMultiTerminalWithAtLeastOneSepParser(input)
-      let cst = parser.testRule()
+      const parser = new CstMultiTerminalWithAtLeastOneSepParser(input)
+      const cst = parser.testRule()
       expect(cst.name).to.equal("testRule")
       expect(cst.children).to.have.keys("A", "B", "C")
       expect(cst.children.A).to.have.length(2)
@@ -562,14 +562,14 @@ function defineTestSuit(recoveryMode) {
         })
       }
 
-      let input = [
+      const input = [
         createRegularToken(A, "1", 1, NaN, NaN, 2),
         createRegularToken(B, "2", 12, NaN, NaN, 13),
         createRegularToken(C, "3", 15, NaN, NaN, 16),
         createRegularToken(D, "4", 17, NaN, NaN, 18)
       ]
-      let parser = new CstTerminalParser(input)
-      let cst = parser.testRule()
+      const parser = new CstTerminalParser(input)
+      const cst = parser.testRule()
       expect(cst.name).to.equal("testRule")
       expect(cst.children).to.have.keys("B", "C", "first", "empty", "second")
       expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
@@ -628,14 +628,14 @@ function defineTestSuit(recoveryMode) {
         })
       }
 
-      let input = [
+      const input = [
         createRegularToken(A, "", 1, 1, 1, 2, 1, 2),
         createRegularToken(B, "", 12, 1, 3, 13, 1, 4),
         createRegularToken(C, "", 15, 2, 10, 16, 3, 15),
         createRegularToken(D, "", 17, 5, 2, 18, 5, 4)
       ]
-      let parser = new CstTerminalParser(input)
-      let cst = parser.testRule()
+      const parser = new CstTerminalParser(input)
+      const cst = parser.testRule()
       expect(cst.name).to.equal("testRule")
       expect(cst.children).to.have.keys("B", "C", "first", "second")
       expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
@@ -698,9 +698,9 @@ function defineTestSuit(recoveryMode) {
           }
         }
 
-        let input = createTokenVector([A, E, E, C, D])
-        let parser = new CstRecoveryParserReSync(input)
-        let cst = parser.root()
+        const input = createTokenVector([A, E, E, C, D])
+        const parser = new CstRecoveryParserReSync(input)
+        const cst = parser.root()
         expect(parser.errors).to.have.lengthOf(1)
         expect(parser.errors[0].message).to.include(
           "Expecting token of type --> B <--"
@@ -713,17 +713,17 @@ function defineTestSuit(recoveryMode) {
         expect(cst.name).to.equal("root")
         expect(cst.children).to.have.keys("first", "second")
 
-        let firstCollection = cst.children.first
+        const firstCollection = cst.children.first
         expect(firstCollection).to.have.lengthOf(1)
-        let first = firstCollection[0] as CstNode
+        const first = firstCollection[0] as CstNode
         expect(first.recoveredNode).to.be.true
         expect(first.children).to.have.keys("A")
         expect(tokenStructuredMatcher(first.children.A[0], A)).to.be.true
         expect(first.children.B).to.be.undefined
 
-        let secondCollection = cst.children.second
+        const secondCollection = cst.children.second
         expect(secondCollection).to.have.lengthOf(1)
-        let second = secondCollection[0] as CstNode
+        const second = secondCollection[0] as CstNode
         expect(second.recoveredNode).to.be.undefined
         expect(second.children).to.have.keys("C", "D")
         expect(tokenStructuredMatcher(second.children.C[0], C)).to.be.true
@@ -777,9 +777,9 @@ function defineTestSuit(recoveryMode) {
           }
         }
 
-        let input = createTokenVector([A, E, E, C, D])
-        let parser = new CstRecoveryParserReSyncNested(input)
-        let cst = parser.root()
+        const input = createTokenVector([A, E, E, C, D])
+        const parser = new CstRecoveryParserReSyncNested(input)
+        const cst = parser.root()
         expect(parser.errors).to.have.lengthOf(1)
         expect(parser.errors[0].message).to.include(
           "Expecting token of type --> B <--"
@@ -791,20 +791,20 @@ function defineTestSuit(recoveryMode) {
         expect(cst.name).to.equal("root")
         expect(cst.children).to.have.keys("first_root", "second")
 
-        let firstRootCollection = cst.children.first_root
+        const firstRootCollection = cst.children.first_root
         expect(firstRootCollection).to.have.lengthOf(1)
-        let firstRoot = firstRootCollection[0] as CstNode
+        const firstRoot = firstRootCollection[0] as CstNode
         expect(firstRoot.children).to.have.keys("first")
 
-        let first = firstRoot.children.first[0] as CstNode
+        const first = firstRoot.children.first[0] as CstNode
         expect(first.recoveredNode).to.be.true
         expect(first.children).to.have.keys("A")
         expect(tokenStructuredMatcher(first.children.A[0], A)).to.be.true
         expect(first.children.B).to.be.undefined
 
-        let secondCollection = cst.children.second
+        const secondCollection = cst.children.second
         expect(secondCollection).to.have.lengthOf(1)
-        let second = secondCollection[0] as CstNode
+        const second = secondCollection[0] as CstNode
         expect(second.recoveredNode).to.be.undefined
         expect(second.children).to.have.keys("C", "D")
         expect(tokenStructuredMatcher(second.children.C[0], C)).to.be.true

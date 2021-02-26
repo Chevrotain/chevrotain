@@ -29,7 +29,7 @@ export function PT(
   tokenOrTokenClass: TokenType | IToken,
   children: ParseTree[] = []
 ): ParseTree {
-  let childrenCompact = compact(children)
+  const childrenCompact = compact(children)
 
   if ((<IToken>tokenOrTokenClass).image !== undefined) {
     return new ParseTree(<IToken>tokenOrTokenClass, childrenCompact)

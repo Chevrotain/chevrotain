@@ -34,9 +34,9 @@ export function createToken(config: ITokenConfig): TokenType {
 }
 
 function createTokenInternal(config: ITokenConfig): TokenType {
-  let pattern = config.pattern
+  const pattern = config.pattern
 
-  let tokenType: TokenType = <any>{}
+  const tokenType: TokenType = <any>{}
   tokenType.name = config.name
 
   if (!isUndefined(pattern)) {

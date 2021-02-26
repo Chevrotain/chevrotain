@@ -212,7 +212,7 @@ export class LooksAhead {
     dslMethodIdx: number,
     occurrence: number
   ): number {
-    let currRuleShortName: any = this.getLastExplicitRuleShortName()
+    const currRuleShortName: any = this.getLastExplicitRuleShortName()
     return getKeyForAutomaticLookahead(
       currRuleShortName,
       dslMethodIdx,
