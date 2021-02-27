@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "CommonJS",
     "removeComments": false,
     "target": "ES5",
     "outDir": "lib",

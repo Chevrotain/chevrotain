@@ -1,3 +1,8 @@
+## 8.0.0
+
+- Chevrotain now uses the package.json `exports` field, as specified in the [documentation](https://nodejs.org/api/packages.html#packages_package_entry_points):
+  > Warning: Introducing the "exports" field prevents consumers of a package from using any entry points that are not defined, including the package.json (e.g. require('your-package/package.json'). This will likely be a breaking change.
+
 ## 7.0.0
 
 - The Parser's default `maxLookahead` was reduced to 3. This could cause ambiguity issues in existing
@@ -14,11 +19,11 @@
   }
   ```
 
-  It is also possible (and recommended) to increase the maxLookahead for a specific DSL method rather then globally for all.
+  It is also possible (and recommended) to increase the maxLookahead for a specific DSL method rather than globally for all.
   See [relevant issue](https://github.com/chevrotain/chevrotain/issues/1012).
 
 - The soft deprecated `Parser` class has been fully removed, use `CstParser` or `EmbeddedActionsParser` instead.
-  The choice depends if your parser outputs a [CST](https://chevrotain.io/docs/guide/concrete_syntax_tree.html) or not.
+  The choice depends on if your parser outputs a [CST](https://chevrotain.io/docs/guide/concrete_syntax_tree.html) or not.
   the `outputCst` property of the IParserConfig was also removed as this behavior is now controlled by base Parser class which is
   extended.
 

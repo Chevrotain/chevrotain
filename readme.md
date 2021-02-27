@@ -32,9 +32,13 @@ as any other pure code without requiring any new tools or processes.
   - Latest:
     - `https://unpkg.com/chevrotain/lib/chevrotain.js`
     - `https://unpkg.com/chevrotain/lib/chevrotain.min.js`
+    - `https://unpkg.com/chevrotain/lib_esm/chevrotain.mjs`
+    - `https://unpkg.com/chevrotain/lib_esm/chevrotain.min.mjs`
   - Explicit version number:
     - `https://unpkg.com/chevrotain@7.1.2/lib/chevrotain.js`
     - `https://unpkg.com/chevrotain@7.1.2/lib/chevrotain.min.js`
+    - `https://unpkg.com/chevrotain@7.1.2/lib_esm/chevrotain.mjs`
+    - `https://unpkg.com/chevrotain@7.1.2/lib_esm/chevrotain.min.mjs`
 
 ## Documentation & Resources
 

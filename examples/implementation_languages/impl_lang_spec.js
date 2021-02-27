@@ -12,7 +12,6 @@ function createSanityTest(languageName, parseJson) {
 
 describe("The ability to use Chevrotain using different implementation languages", () => {
   createSanityTest("ECMAScript 5", require("./ecma5/ecma5_json"))
-  createSanityTest("ECMAScript 6/2015", require("./ecma6/ecma6_json"))
   createSanityTest(
     "TypeScript",
     require("./typescript/typescript_json").parseJson

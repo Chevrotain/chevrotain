@@ -1,5 +1,5 @@
 "use strict"
-const { createToken, Lexer, CstParser } = require("chevrotain")
+import { createToken, Lexer, CstParser } from "chevrotain"
 
 // ----------------- lexer -----------------
 const True = createToken({ name: "True", pattern: /true/ })
@@ -114,7 +114,7 @@ class JsonParserES6 extends CstParser {
 // reuse the same parser instance.
 const parser = new JsonParserES6()
 
-module.exports = function (text) {
+export function parseJson (text) {
   const lexResult = JsonLexer.tokenize(text)
   // setting a new input will RESET the parser instance's state.
   parser.input = lexResult.tokens
