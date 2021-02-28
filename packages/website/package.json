@@ -1,0 +1,25 @@
+{
+  "name": "@chevrotain/website",
+  "version": "8.0.1",
+  "private": true,
+  "description": "source Code for https://chevrotain.io/docs/",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Shahar Soel"
+  },
+  "homepage": "https://chevrotain.io/docs/",
+  "scripts": {
+    "build": "npm-run-all website:build",
+    "version": "node ./scripts/version-update.js",
+    "postversion": "npm-run-all website:build website:upload",
+    "website:dev": "vuepress dev ./docs",
+    "website:build": "vuepress build ./docs",
+    "website:upload": "./scripts/website-upload.sh"
+  },
+  "devDependencies": {
+    "lodash": "^4.17.21",
+    "gitty": "^3.6.0",
+    "vuepress": "^1.4.1",
+    "jsonfile": "^6.1.0"
+  }
+}

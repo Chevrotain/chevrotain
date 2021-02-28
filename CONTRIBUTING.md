@@ -113,9 +113,9 @@ it is recommended to use `git cz` CLI tool to create these conventional commit m
 
 The release process **requires push permissions to master**.
 
-- Update the [CHANGELOG](./packages/chevrotain/docs/changes/CHANGELOG.md).
+- Update the [CHANGELOG](./packages/website/docs/changes/CHANGELOG.md).
   - The header must be `## X.Y.Z (INSERT_DATE_HERE)` (**literally**).
-- Update the [BREAKING_CHANGES.md](./packages/chevrotain/docs/changes/BREAKING_CHANGES.md).
+- Update the [BREAKING_CHANGES.md](./packages/website/docs/changes/BREAKING_CHANGES.md).
   - Only for major versions...
 - Push the changes related updates to master.
 - execute `yarn run lerna:version` and follow the instructions.

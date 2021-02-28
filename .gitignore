@@ -11,7 +11,7 @@ yarn-error.log
 
 # Chevrotain package ignores
 # as prettier --ignore-path does not support nested folders ignores
-/packages/chevrotain/docs/.vuepress/dist/
+/packages/website/docs/.vuepress/dist/
 /packages/chevrotain/dev
 /packages/chevrotain/lib
 /packages/chevrotain/lib_esm
