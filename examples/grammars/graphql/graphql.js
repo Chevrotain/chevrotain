@@ -13,7 +13,7 @@
  */
 // wrapping in UMD to allow code to work both in node.js
 // and in the browser
-(function (root, factory) {
+;(function (root, factory) {
   if (typeof module === "object" && module.exports) {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,

@@ -25,11 +25,14 @@ module.exports = {
         "**/diagrams/**/*.js",
         "**/benchmark_web/**/*.js"
       ],
-
       parserOptions: {
         // The `ecmaVersion` should align to the supported features of our target runtimes (browsers / nodejs / others)
         // Consult with: https://kangax.github.io/compat-table/es2016plus/
         ecmaVersion: 2017
+      },
+      rules: {
+        // conflicts with some prettier settings in UMD sources.
+        "no-extra-semi": "off"
       }
     },
     {
