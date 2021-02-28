@@ -15,7 +15,7 @@ This can be accomplished using a CST (Concrete Syntax Tree) Visitor defined **ou
 
 ## Enabling CST
 
-This feature is automatically enabled when a Parser extends the Chevrotain [CstParser](https://chevrotain.io/documentation/7_1_2/classes/cstparser.html) class
+This feature is automatically enabled when a Parser extends the Chevrotain [CstParser](https://chevrotain.io/documentation/8_0_0/classes/cstparser.html) class
 
 The invocation of any grammar rule will now automatically create a CST.
 

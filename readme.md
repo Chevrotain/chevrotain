@@ -35,10 +35,10 @@ as any other pure code without requiring any new tools or processes.
     - `https://unpkg.com/chevrotain/lib_esm/chevrotain.mjs`
     - `https://unpkg.com/chevrotain/lib_esm/chevrotain.min.mjs`
   - Explicit version number:
-    - `https://unpkg.com/chevrotain@7.1.2/lib/chevrotain.js`
-    - `https://unpkg.com/chevrotain@7.1.2/lib/chevrotain.min.js`
-    - `https://unpkg.com/chevrotain@7.1.2/lib_esm/chevrotain.mjs`
-    - `https://unpkg.com/chevrotain@7.1.2/lib_esm/chevrotain.min.mjs`
+    - `https://unpkg.com/chevrotain@8.0.0/lib/chevrotain.js`
+    - `https://unpkg.com/chevrotain@8.0.0/lib/chevrotain.min.js`
+    - `https://unpkg.com/chevrotain@8.0.0/lib_esm/chevrotain.mjs`
+    - `https://unpkg.com/chevrotain@8.0.0/lib_esm/chevrotain.min.mjs`
 
 ## Documentation & Resources
 
@@ -52,7 +52,7 @@ as any other pure code without requiring any new tools or processes.
 
 - **[HTML API docs](https://chevrotain.io/documentation).**
 
-  - [The Parsing DSL Docs](https://chevrotain.io/documentation/7_1_2/classes/parser.html#at_least_one).
+  - [The Parsing DSL Docs](https://chevrotain.io/documentation/8_0_0/classes/parser.html#at_least_one).
 
 ## Dependencies
 
