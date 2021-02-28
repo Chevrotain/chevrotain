@@ -1,4 +1,10 @@
-## 8.0.0 (2-28-2021)
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+- [fix: resolve multiple issues with bundled artifacts](https://github.com/chevrotain/chevrotain/issues/1387)
+
+## 8.0.0 (2-28-202)
 
 #### Breaking Changes
 

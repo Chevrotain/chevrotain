@@ -65,7 +65,7 @@
     "dts": "node scripts/process-docs.js",
     "coverage": "nyc mocha \"./lib/test/**/*spec.js\"",
     "check-coverage": "nyc check-coverage --lines 100 --branches 100 --statements 100 --functions 100",
-    "bundle": "npm-run-all bundle:*",
+    "bundle": "npm-run-all bundle:**",
     "api-site:build": "typedoc api.d.ts --out dev/docs --excludeExternals --excludePrivate",
     "api-site:upload": "./scripts/api-site-upload.sh",
     "website:dev": "vuepress dev docs",
@@ -77,10 +77,10 @@
     "compile-def-modules": "tsc --noImplicitAny test_integration/definitions/es6_modules.ts --outDir dev/garbage --lib \"es2015\"",
     "compile-def-namespace": "tsc --noImplicitAny test_integration/definitions/namespaces.ts --module none --outDir dev/garbage --lib \"es2015\"",
     "---------- BUNDLING --------": "",
-    "bundle:regular": "esbuild ./lib/src/api.js --bundle --sourcemap --outfile=lib/chevrotain.js",
-    "bundle:min": "esbuild ./lib/src/api.js --bundle --minify --sourcemap --outfile=lib/chevrotain.min.js",
-    "bundle:esm:regular": "esbuild ./lib/src/api.js --bundle --sourcemap --format=esm --outfile=lib/chevrotain.mjs",
-    "bundle:esm:min": "esbuild ./lib/src/api.js --bundle --minify --format=esm --sourcemap --outfile=lib/chevrotain.min.mjs"
+    "bundle:regular": "webpack --config webpack_release.config.js",
+    "bundle:min": "webpack --config webpack_release_min.config.js",
+    "bundle:esm:regular": "esbuild ./lib/src/api.js --bundle --sourcemap --format=esm --outfile=lib_esm/chevrotain.mjs",
+    "bundle:esm:min": "esbuild ./lib/src/api.js --bundle --minify --format=esm --sourcemap --outfile=lib_esm/chevrotain.min.mjs"
   },
   "dependencies": {
     "regexp-to-ast": "0.5.0"
@@ -92,6 +92,8 @@
     "chai": "^4.1.2",
     "error-stack-parser": "^2.0.6",
     "esbuild": "^0.8.53",
+    "webpack": "5.24.2",
+    "webpack-cli": "^4.1.0",
     "gen-esm-wrapper": "^1.0.4",
     "gitty": "^3.6.0",
     "jsdom": "16.4.0",
