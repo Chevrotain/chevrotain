@@ -8,13 +8,13 @@ The following examples all implement the same JSON parser using a variety of imp
 
 - [ECMAScript 5](https://github.com/chevrotain/chevrotain/blob/master/examples/implementation_languages/ecma5/ecma5_json.js)
 
-- [ECMAScript 6/2015](https://github.com/chevrotain/chevrotain/blob/master/examples/implementation_languages/ecma6/ecma6_json.js)
+- [Modern ECMAScript](https://github.com/chevrotain/chevrotain/blob/master/examples/implementation_languages/modern_ecmascript/modern_ecmascript_json.mjs)
 
 - [TypeScript](https://github.com/chevrotain/chevrotain/blob/master/examples/implementation_languages/typescript/typescript_json.ts)
 
 - [CoffeeScript](https://github.com/chevrotain/chevrotain/blob/master/examples/implementation_languages/coffeescript/coffeescript_json.coffee)
 
-To run all the implementation languages examples's tests:
+To run all the implementation languages examples tests:
 
 - `npm install` (only once)
 - `npm test`

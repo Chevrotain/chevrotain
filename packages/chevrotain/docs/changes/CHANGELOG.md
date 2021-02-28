@@ -1,3 +1,18 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Breaking Changes
+
+- [BREAKING_CHANGES For V8.0](https://chevrotain.io/docs/changes/BREAKING_CHANGES.html#_8-0-0)
+
+#### Minor Changes
+
+- [feat: improve ESM compatibility](https://github.com/Chevrotain/chevrotain/issues/1383)
+
+#### Documentation
+
+- [docs: update "under the hood" section in tutorial](https://github.com/Chevrotain/chevrotain/commit/7d2bb119d4009ef7954c5aa18cbad29a5a3a0760)
+- [docs: add clarification for longer_alt chaining](https://github.com/Chevrotain/chevrotain/commit/5a508199632f787a4ac3d2b9000f6a6bed04d31f)
+
 ## 7.1.2 (2-23-2021)
 
 Patch release after migration to new github org with updated metadata in package.json
