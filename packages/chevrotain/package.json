@@ -23,6 +23,7 @@
     "name": "Shahar Soel"
   },
   "files": [
+    "api.d.ts",
     "lib_esm/**/*.js",
     "lib_esm/**/*.js.map",
     "lib/src/**/*.js",
@@ -36,6 +37,7 @@
     "diagrams/**/*.*",
     "CHANGELOG.md"
   ],
+  "typings": "api.d.ts",
   "main": "./lib/src/api.js",
   "exports": {
     "require": "./lib/src/api.js",
@@ -48,10 +50,9 @@
   "homepage": "https://chevrotain.io/docs/",
   "scripts": {
     "---------- CI FLOWS --------": "",
-    "build": "npm-run-all clean compile dts api-site:build bundle",
-    "test": "npm-run-all compile:def coverage check-coverage",
+    "build": "npm-run-all clean compile bundle",
+    "test": "npm-run-all coverage check-coverage",
     "version": "tsc ./src/version.ts --outDir lib/src && node ./scripts/version-update.js",
-    "postversion": "npm-run-all website:build website:upload api-site:build api-site:upload",
     "---------- DEV FLOWS --------": "",
     "watch": "tsc -w",
     "unit-tests": "mocha \"./lib/test/**/*spec.js\"",
@@ -60,25 +61,18 @@
     "clean": "shx rm -rf coverage dev lib lib_esm",
     "compile": "tsc && node ./scripts/fix-coverage-report.js && npm-run-all gen-esm-wrapper",
     "compile:watch": "tsc -w",
-    "compile:def": "npm-run-all compile-def-api compile-def-modules compile-def-namespace",
     "gen-esm-wrapper": "gen-esm-wrapper . ./lib_esm/api_esm.mjs",
-    "dts": "node scripts/process-docs.js",
     "coverage": "nyc mocha \"./lib/test/**/*spec.js\"",
     "check-coverage": "nyc check-coverage --lines 100 --branches 100 --statements 100 --functions 100",
-    "bundle": "npm-run-all bundle:**",
-    "api-site:build": "typedoc api.d.ts --out dev/docs --excludeExternals --excludePrivate",
-    "api-site:upload": "./scripts/api-site-upload.sh",
-    "---------- DEFINITIONS --------": "",
-    "compile-def-api": "tsc --noImplicitAny test_integration/definitions/api_type_checking.ts --outDir dev/garbage --lib \"es2015\"",
-    "compile-def-modules": "tsc --noImplicitAny test_integration/definitions/es6_modules.ts --outDir dev/garbage --lib \"es2015\"",
-    "compile-def-namespace": "tsc --noImplicitAny test_integration/definitions/namespaces.ts --module none --outDir dev/garbage --lib \"es2015\"",
     "---------- BUNDLING --------": "",
+    "bundle": "npm-run-all bundle:**",
     "bundle:regular": "webpack --config webpack_release.config.js",
     "bundle:min": "webpack --config webpack_release_min.config.js",
     "bundle:esm:regular": "esbuild ./lib/src/api.js --bundle --sourcemap --format=esm --outfile=lib_esm/chevrotain.mjs",
     "bundle:esm:min": "esbuild ./lib/src/api.js --bundle --minify --format=esm --sourcemap --outfile=lib_esm/chevrotain.min.mjs"
   },
   "dependencies": {
+    "@chevrotain/types": "8.0.1",
     "regexp-to-ast": "0.5.0"
   },
   "devDependencies": {
@@ -97,13 +91,11 @@
     "sinon": "^9.0.0",
     "sinon-chai": "^3.0.0",
     "source-map-support": "0.5.19",
-    "typedoc": "^0.20.28",
     "typescript": "4.2.2",
     "webpack": "5.24.2",
     "webpack-cli": "^4.1.0",
     "xregexp": "^5.0.1"
   },
-  "typings": "lib/chevrotain.d.ts",
   "mocha": {
     "recursive": true,
     "reporter": "spec",
