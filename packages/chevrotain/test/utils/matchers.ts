@@ -1,4 +1,5 @@
 import { IToken } from "../../api"
+import { expect } from "chai"
 
 export function setEquality(actual: any[], expected: any[]): void {
   expect(actual).to.deep.include.members(expected)

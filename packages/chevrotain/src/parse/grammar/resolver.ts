@@ -2,7 +2,7 @@ import {
   IParserUnresolvedRefDefinitionError,
   ParserDefinitionErrorType
 } from "../parser/parser"
-import { forEach, values } from "../../utils/utils"
+import { forEach, values } from "@chevrotain/utils"
 import { NonTerminal, Rule } from "./gast/gast_public"
 import { GAstVisitor } from "./gast/gast_visitor_public"
 import {

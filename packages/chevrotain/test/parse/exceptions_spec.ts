@@ -6,6 +6,7 @@ import {
   NotAllInputParsedException,
   MismatchedTokenException
 } from "../../src/parse/exceptions_public"
+import { expect } from "chai"
 
 describe("Chevrotain's Parsing Exceptions", () => {
   describe("the exception instance subclasses Error with the right properties for: ", () => {

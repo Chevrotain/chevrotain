@@ -1,5 +1,6 @@
 import { Lexer } from "../../src/scan/lexer_public"
-import { find, flatten } from "../../src/utils/utils"
+import { find, flatten } from "@chevrotain/utils"
+import { expect } from "chai"
 
 let skipOnBrowser = describe
 if (typeof window !== "undefined") {

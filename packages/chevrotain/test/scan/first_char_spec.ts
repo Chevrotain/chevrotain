@@ -1,5 +1,6 @@
 import { getRegExpAst } from "../../src/scan/reg_exp_parser"
 import { firstCharOptimizedIndices } from "../../src/scan/reg_exp"
+import { expect } from "chai"
 
 describe("The Chevrotain Lexer First Char Optimization", () => {
   it("considers ignoreCase flag", () => {

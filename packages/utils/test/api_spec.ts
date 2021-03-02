@@ -25,7 +25,8 @@ import {
   assign,
   groupBy,
   mapValues
-} from "../../src/utils/utils"
+} from "../src/api"
+import { expect } from "chai"
 
 describe("The Utils functions namespace", () => {
   it("exports a last utility", () => {

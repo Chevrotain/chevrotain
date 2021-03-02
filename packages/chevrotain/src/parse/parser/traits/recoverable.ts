@@ -12,7 +12,7 @@ import {
   has,
   isEmpty,
   map
-} from "../../../utils/utils"
+} from "@chevrotain/utils"
 import {
   IParserConfig,
   IToken,

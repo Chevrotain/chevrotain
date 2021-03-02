@@ -6,7 +6,7 @@ import {
   keys,
   last,
   map
-} from "../../src/utils/utils"
+} from "@chevrotain/utils"
 import { createToken } from "../../src/scan/tokens_public"
 import { Lexer, LexerDefinitionErrorType } from "../../src/scan/lexer_public"
 import {
@@ -33,6 +33,7 @@ import {
   ILexerErrorMessageProvider,
   IToken
 } from "../../api"
+import { expect } from "chai"
 
 const ORG_SUPPORT_STICKY = SUPPORT_STICKY
 function defineLexerSpecs(

@@ -26,7 +26,7 @@ import {
   reduce,
   uniq,
   values
-} from "../../../utils/utils"
+} from "@chevrotain/utils"
 import {
   AT_LEAST_ONE_IDX,
   AT_LEAST_ONE_SEP_IDX,

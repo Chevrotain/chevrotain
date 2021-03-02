@@ -21,7 +21,7 @@ import {
   isFunction,
   peek,
   some
-} from "../../../utils/utils"
+} from "@chevrotain/utils"
 import { MixedInParser } from "./parser_traits"
 import {
   Alternation,

@@ -427,36 +427,20 @@ export function isES2015MapSupported(): boolean {
   return typeof Map === "function"
 }
 
-export function applyMixins(derivedCtor: any, baseCtors: any[]) {
-  baseCtors.forEach((baseCtor) => {
-    const baseProto = baseCtor.prototype
-    Object.getOwnPropertyNames(baseProto).forEach((propName) => {
-      if (propName === "constructor") {
-        return
-      }
-
-      const basePropDescriptor = Object.getOwnPropertyDescriptor(
-        baseProto,
-        propName
-      )
-      // Handle Accessors
-      if (
-        basePropDescriptor &&
-        (basePropDescriptor.get || basePropDescriptor.set)
-      ) {
-        Object.defineProperty(
-          derivedCtor.prototype,
-          propName,
-          basePropDescriptor
-        )
-      } else {
-        derivedCtor.prototype[propName] = baseCtor.prototype[propName]
-      }
-    })
-  })
+export function peek<T>(arr: T[]): T {
+  return arr[arr.length - 1]
 }
 
-// base on: https://github.com/petkaantonov/bluebird/blob/b97c0d2d487e8c5076e8bd897e0dcd4622d31846/src/util.js#L201-L216
+/* istanbul ignore next - for performance tracing*/
+export function timer<T>(func: () => T): { time: number; value: T } {
+  const start = new Date().getTime()
+  const val = func()
+  const end = new Date().getTime()
+  const total = end - start
+  return { time: total, value: val }
+}
+
+// based on: https://github.com/petkaantonov/bluebird/blob/b97c0d2d487e8c5076e8bd897e0dcd4622d31846/src/util.js#L201-L216
 export function toFastProperties(toBecomeFast) {
   function FakeConstructor() {}
   // If our object is used as a constructor it would receive
@@ -475,17 +459,4 @@ export function toFastProperties(toBecomeFast) {
   /* istanbul ignore next */
   // tslint:disable-next-line
   eval(toBecomeFast)
-}
-
-export function peek<T>(arr: T[]): T {
-  return arr[arr.length - 1]
-}
-
-/* istanbul ignore next - for performance tracing*/
-export function timer<T>(func: () => T): { time: number; value: T } {
-  const start = new Date().getTime()
-  const val = func()
-  const end = new Date().getTime()
-  const total = end - start
-  return { time: total, value: val }
 }

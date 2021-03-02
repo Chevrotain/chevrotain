@@ -8,7 +8,7 @@ import {
   isUndefined,
   keys,
   map
-} from "../../utils/utils"
+} from "@chevrotain/utils"
 import { defineNameProp, functionName } from "../../lang/lang_extensions"
 import { ICstVisitor } from "../../../api"
 

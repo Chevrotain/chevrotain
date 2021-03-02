@@ -6,6 +6,7 @@ import {
 import { augmentTokenTypes } from "../../src/scan/tokens"
 import { createRegularToken } from "../utils/matchers"
 import { IToken } from "../../api"
+import { expect } from "chai"
 
 describe("The chevrotain support for custom gates/predicates on DSL production:", () => {
   class A {

@@ -9,7 +9,7 @@ import {
   isArray,
   isEmpty,
   map
-} from "../utils/utils"
+} from "@chevrotain/utils"
 import { TokenType } from "../../api"
 
 export function tokenStructuredMatcher(tokInstance, tokConstructor) {

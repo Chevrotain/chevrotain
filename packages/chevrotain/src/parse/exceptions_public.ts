@@ -1,4 +1,4 @@
-import { contains } from "../utils/utils"
+import { contains } from "@chevrotain/utils"
 import { IToken, IRecognitionException, IRecognizerContext } from "../../api"
 
 const MISMATCHED_TOKEN_EXCEPTION = "MismatchedTokenException"

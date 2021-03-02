@@ -5,7 +5,7 @@ import {
   buildSingleAlternativeLookaheadFunction,
   PROD_TYPE
 } from "../../grammar/lookahead"
-import { forEach, has, isES2015MapSupported } from "../../../utils/utils"
+import { forEach, has, isES2015MapSupported } from "@chevrotain/utils"
 import {
   DEFAULT_PARSER_CONFIG,
   lookAheadSequence,

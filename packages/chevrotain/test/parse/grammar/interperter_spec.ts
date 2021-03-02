@@ -28,7 +28,7 @@ import {
 } from "../../../src/parse/grammar/interpreter"
 import { createRegularToken, setEquality } from "../../utils/matchers"
 import { createToken } from "../../../src/scan/tokens_public"
-import { map } from "../../../src/utils/utils"
+import { map } from "@chevrotain/utils"
 import { Lexer } from "../../../src/scan/lexer_public"
 import {
   augmentTokenTypes,
@@ -48,6 +48,7 @@ import {
   RepetitionMandatoryWithSeparator
 } from "../../../src/parse/grammar/gast/gast_public"
 import { IToken, ITokenGrammarPath, TokenType } from "../../../api"
+import { expect } from "chai"
 
 describe("The Grammar Interpeter namespace", () => {
   describe("The NextAfterTokenWalker", () => {

@@ -1,3 +1,4 @@
+import { expect } from "chai"
 import { VERSION } from "../../src/version"
 const createSyntaxDiagramsCode = require("../../src/api")
   .createSyntaxDiagramsCode

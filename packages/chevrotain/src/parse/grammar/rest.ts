@@ -1,4 +1,4 @@
-import { drop, forEach } from "../../utils/utils"
+import { drop, forEach } from "@chevrotain/utils"
 import {
   AbstractProduction,
   Alternation,

@@ -1,5 +1,5 @@
 import { IParserConfig } from "../../../../api"
-import { has, timer } from "../../../utils/utils"
+import { has, timer } from "@chevrotain/utils"
 import { MixedInParser } from "./parser_traits"
 import { DEFAULT_PARSER_CONFIG } from "../parser"
 

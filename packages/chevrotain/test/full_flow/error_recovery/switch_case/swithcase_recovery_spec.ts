@@ -21,6 +21,7 @@ import {
   MismatchedTokenException
 } from "../../../../src/parse/exceptions_public"
 import { createRegularToken } from "../../../utils/matchers"
+import { expect } from "chai"
 
 describe("Error Recovery switch-case Example", () => {
   // called for side effect of augmenting

@@ -1,4 +1,5 @@
 import { Lexer } from "../../src/scan/lexer_public"
+import { expect } from "chai"
 
 let skipOnBrowser = describe
 if (typeof window !== "undefined") {

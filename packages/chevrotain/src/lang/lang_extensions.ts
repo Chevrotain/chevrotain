@@ -1,5 +1,5 @@
 import { TokenType } from "../../api"
-import { isUndefined } from "../utils/utils"
+import { isUndefined } from "@chevrotain/utils"
 
 export function classNameFromInstance(instance: any): string {
   return functionName(instance.constructor)

@@ -1,4 +1,4 @@
-import { assign, forEach, isRegExp, map, pick } from "../../../utils/utils"
+import { assign, forEach, isRegExp, map, pick } from "@chevrotain/utils"
 import { tokenLabel } from "../../../scan/tokens_public"
 import {
   IGASTVisitor,

@@ -25,7 +25,7 @@ import {
   PRINT_ERROR,
   reduce,
   reject
-} from "../utils/utils"
+} from "@chevrotain/utils"
 import {
   canMatchCharCode,
   failedOptimizationPrefixMsg,
@@ -1034,7 +1034,8 @@ function checkLineBreaksIssues(
     /* istanbul ignore else */
     if (isRegExp(tokType.PATTERN)) {
       try {
-        canMatchCharCode(lineTerminatorCharCodes, tokType.PATTERN)
+        // TODO: why is the casting suddenly needed?
+        canMatchCharCode(lineTerminatorCharCodes, tokType.PATTERN as RegExp)
       } catch (e) {
         /* istanbul ignore next - to test this we would have to mock <canMatchCharCode> to throw an error */
         return {
