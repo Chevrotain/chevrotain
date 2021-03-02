@@ -1,0 +1,4 @@
+{
+  "compilerOptions": {},
+  "include": ["api.d.ts"]
+}
