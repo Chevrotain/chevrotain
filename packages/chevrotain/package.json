@@ -89,7 +89,7 @@
     "sinon": "^9.0.0",
     "sinon-chai": "^3.0.0",
     "source-map-support": "0.5.19",
-    "webpack": "5.24.2",
+    "webpack": "5.24.3",
     "webpack-cli": "^4.1.0",
     "xregexp": "^5.0.1"
   },
