@@ -6,7 +6,7 @@ import {
   flatten,
   forEach,
   has
-} from "../../utils/utils"
+} from "@chevrotain/utils"
 import { possiblePathsFrom } from "./interpreter"
 import { RestWalker } from "./rest"
 import { Predicate, TokenMatcher, lookAheadSequence } from "../parser/parser"

@@ -1,13 +1,12 @@
 import {
-  applyMixins,
   cloneObj,
   forEach,
   has,
   isEmpty,
   map,
-  toFastProperties,
-  values
-} from "../../utils/utils"
+  values,
+  toFastProperties
+} from "@chevrotain/utils"
 import { computeAllProdsFollows } from "../grammar/follow"
 import { createTokenInstance, EOF } from "../../scan/tokens_public"
 import {
@@ -40,6 +39,7 @@ import { MixedInParser } from "./traits/parser_traits"
 import { ContentAssist } from "./traits/context_assist"
 import { GastRecorder } from "./traits/gast_recorder"
 import { PerformanceTracer } from "./traits/perf_tracer"
+import { applyMixins } from "./utils/apply_mixins"
 
 export const END_OF_FILE = createTokenInstance(
   EOF,

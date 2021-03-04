@@ -7,6 +7,7 @@ import { augmentTokenTypes } from "../../../src/scan/tokens"
 import { IToken } from "../../../api"
 import { createToken } from "../../../src/scan/tokens_public"
 import { EMPTY_ALT } from "../../../src/parse/parser/parser"
+import { expect } from "chai"
 
 describe("The Recognizer's capabilities for detecting / handling infinite loops", () => {
   it("Will gracefully 'escape' from an infinite loop in a repetition", () => {

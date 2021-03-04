@@ -7,6 +7,7 @@ import {
 import { Lexer } from "../../src/scan/lexer_public"
 import { createTokenInstance } from "../../src/scan/tokens_public"
 import { singleAssignCategoriesToksMap } from "../../src/scan/tokens"
+import { expect } from "chai"
 
 describe("The Chevrotain Tokens namespace", () => {
   context("createToken", () => {

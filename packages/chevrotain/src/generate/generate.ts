@@ -1,4 +1,4 @@
-import { forEach, map } from "../utils/utils"
+import { forEach, map } from "@chevrotain/utils"
 import {
   RepetitionMandatory,
   Option,

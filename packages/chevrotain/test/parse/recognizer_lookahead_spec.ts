@@ -2,7 +2,8 @@ import { createToken } from "../../src/scan/tokens_public"
 import { EmbeddedActionsParser } from "../../src/parse/parser/traits/parser_traits"
 import { createRegularToken } from "../utils/matchers"
 import { IToken } from "../../api"
-import { isES2015MapSupported } from "../../src/utils/utils"
+import { isES2015MapSupported } from "@chevrotain/utils"
+import { expect } from "chai"
 
 describe("lookahead Regular Tokens Mode", () => {
   const OneTok = createToken({ name: "OneTok" })

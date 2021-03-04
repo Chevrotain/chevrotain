@@ -1,4 +1,4 @@
-import { compact, isFunction, isUndefined } from "../../src/utils/utils"
+import { compact, isFunction, isUndefined } from "@chevrotain/utils"
 import { IToken, TokenType } from "../../api"
 
 export class ParseTree {

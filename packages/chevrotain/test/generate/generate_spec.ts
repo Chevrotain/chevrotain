@@ -16,6 +16,7 @@ import {
   RepetitionWithSeparator,
   RepetitionMandatoryWithSeparator
 } from "../../src/parse/grammar/gast/gast_public"
+import { expect } from "chai"
 
 let describeNodeOnly = describe
 if (typeof window !== "undefined") {

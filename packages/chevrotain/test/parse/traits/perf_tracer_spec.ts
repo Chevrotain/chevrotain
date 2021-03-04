@@ -3,6 +3,7 @@ import {
   CstParser,
   EmbeddedActionsParser
 } from "../../../src/parse/parser/traits/parser_traits"
+import { expect } from "chai"
 
 let skipOnBrowser = describe
 if (typeof window !== "undefined") {

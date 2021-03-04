@@ -1,8 +1,9 @@
 import { createToken } from "../../src/scan/tokens_public"
 import { CstParser } from "../../src/parse/parser/traits/parser_traits"
 import { createRegularToken } from "../utils/matchers"
-import { keys } from "../../src/utils/utils"
+import { keys } from "@chevrotain/utils"
 import { IToken } from "../../api"
+import { expect } from "chai"
 
 describe("The CSTVisitor", () => {
   const A = createToken({ name: "A" })

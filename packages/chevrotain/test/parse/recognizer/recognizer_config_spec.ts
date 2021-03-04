@@ -3,6 +3,7 @@ import {
   CstParser
 } from "../../../src/parse/parser/traits/parser_traits"
 import { createToken } from "../../../src/scan/tokens_public"
+import { expect } from "chai"
 
 describe("The Recognizer's Configuration", () => {
   it("default config values - empty config", () => {

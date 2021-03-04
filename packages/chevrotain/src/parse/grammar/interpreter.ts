@@ -7,7 +7,7 @@ import {
   forEach,
   isEmpty,
   last
-} from "../../utils/utils"
+} from "@chevrotain/utils"
 import { first } from "./first"
 import { TokenMatcher } from "../parser/parser"
 import {

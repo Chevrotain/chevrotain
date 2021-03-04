@@ -1,4 +1,5 @@
 import { Range } from "../../src/text/range"
+import { expect } from "chai"
 
 describe("The Chevrotain Range namespace", () => {
   it("an invalid range can not be created", () => {

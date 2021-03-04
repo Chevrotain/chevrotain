@@ -14,6 +14,7 @@ import {
   Rule,
   serializeGrammar
 } from "../../../src/parse/grammar/gast/gast_public"
+import { expect } from "chai"
 
 describe("GAst namespace", () => {
   describe("the ProdRef class", () => {

@@ -14,6 +14,7 @@ import {
   Option,
   Alternation
 } from "../../../src/parse/grammar/gast/gast_public"
+import { expect } from "chai"
 
 describe("The Grammar Ast first model", () => {
   it("can compute the first for a terminal", () => {

@@ -4,6 +4,7 @@ import {
   canMatchCharCode,
   getOptimizedStartCodesIndices
 } from "../../src/scan/reg_exp"
+import { expect } from "chai"
 
 describe("The Chevrotain regexp analysis", () => {
   it("Will re-attempt none 'optimized' patterns if the optimization failed", () => {

@@ -8,7 +8,7 @@ import {
   TokenMatcher
 } from "../../../src/parse/parser/parser"
 import { MismatchedTokenException } from "../../../src/parse/exceptions_public"
-import { every, flatten, forEach, map } from "../../../src/utils/utils"
+import { every, flatten, forEach, map } from "@chevrotain/utils"
 import { IOrAlt, IToken, TokenType } from "../../../api"
 import { MixedInParser } from "../../../src/parse/parser/traits/parser_traits"
 

@@ -1,6 +1,6 @@
 import { Rule } from "./gast_public"
 
-import { defaults, forEach } from "../../../utils/utils"
+import { defaults, forEach } from "@chevrotain/utils"
 import { resolveGrammar as orgResolveGrammar } from "../resolver"
 import { validateGrammar as orgValidateGrammar } from "../checks"
 import {

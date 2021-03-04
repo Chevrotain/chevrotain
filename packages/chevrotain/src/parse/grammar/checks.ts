@@ -1,4 +1,4 @@
-import * as utils from "../../utils/utils"
+import * as utils from "@chevrotain/utils"
 import {
   contains,
   every,
@@ -9,7 +9,7 @@ import {
   map,
   reduce,
   reject
-} from "../../utils/utils"
+} from "@chevrotain/utils"
 import {
   IParserAmbiguousAlternativesDefinitionError,
   IParserDuplicatesDefinitionError,

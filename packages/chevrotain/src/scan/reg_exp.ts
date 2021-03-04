@@ -10,7 +10,7 @@ import {
   isArray,
   every,
   values
-} from "../utils/utils"
+} from "@chevrotain/utils"
 import { getRegExpAst } from "./reg_exp_parser"
 import { charCodeToOptimizedIndex, minOptimizationVal } from "./lexer"
 

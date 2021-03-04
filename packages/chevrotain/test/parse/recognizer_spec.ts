@@ -5,6 +5,7 @@ import {
   CstParser
 } from "../../src/parse/parser/traits/parser_traits"
 import { EMPTY_ALT } from "../../src/parse/parser/parser"
+import { expect } from "chai"
 
 import {
   EarlyExitException,

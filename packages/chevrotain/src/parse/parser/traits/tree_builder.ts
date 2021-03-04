@@ -4,7 +4,7 @@ import {
   setNodeLocationFull,
   setNodeLocationOnlyOffset
 } from "../../cst/cst"
-import { has, isUndefined, keys, NOOP } from "../../../utils/utils"
+import { has, isUndefined, keys, NOOP } from "@chevrotain/utils"
 import {
   createBaseSemanticVisitorConstructor,
   createBaseVisitorConstructorWithDefaults

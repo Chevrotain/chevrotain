@@ -1,6 +1,6 @@
 import { RestWalker } from "./rest"
 import { first } from "./first"
-import { assign, forEach } from "../../utils/utils"
+import { assign, forEach } from "@chevrotain/utils"
 import { IN } from "../constants"
 import { Alternative, NonTerminal, Rule, Terminal } from "./gast/gast_public"
 import { IProduction, TokenType } from "../../../api"

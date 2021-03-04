@@ -1,4 +1,4 @@
-import { contains, every, has, some } from "../../../utils/utils"
+import { contains, every, has, some } from "@chevrotain/utils"
 import {
   AbstractProduction,
   Alternation,

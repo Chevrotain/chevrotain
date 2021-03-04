@@ -9,7 +9,7 @@ import {
   lookAheadSequenceFromAlternatives,
   PROD_TYPE
 } from "../../../src/parse/grammar/lookahead"
-import { map } from "../../../src/utils/utils"
+import { map } from "@chevrotain/utils"
 import {
   augmentTokenTypes,
   tokenStructuredMatcher
@@ -29,6 +29,7 @@ import {
 } from "../../../src/parse/grammar/gast/gast_public"
 import { IToken, TokenType } from "../../../api"
 import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
+import { expect } from "chai"
 
 const IdentTok = createToken({ name: "IdentTok" })
 const DotTok = createToken({ name: "DotTok" })

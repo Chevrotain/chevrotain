@@ -2,6 +2,7 @@ import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_t
 import { createRegularToken } from "../../utils/matchers"
 import { augmentTokenTypes } from "../../../src/scan/tokens"
 import { IToken } from "../../../api"
+import { expect } from "chai"
 
 describe("The Recognizer's capabilities for overriding grammar productions", () => {
   class PlusTok {

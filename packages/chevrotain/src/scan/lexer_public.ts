@@ -27,7 +27,7 @@ import {
   reject,
   timer,
   toFastProperties
-} from "../utils/utils"
+} from "@chevrotain/utils"
 import { augmentTokenTypes } from "./tokens"
 import {
   CustomPatternMatcherFunc,

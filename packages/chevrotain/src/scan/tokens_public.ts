@@ -1,4 +1,4 @@
-import { has, isString, isUndefined } from "../utils/utils"
+import { has, isString, isUndefined } from "@chevrotain/utils"
 import { Lexer } from "./lexer_public"
 import { augmentTokenTypes, tokenStructuredMatcher } from "./tokens"
 import { IToken, ITokenConfig, TokenType } from "../../api"

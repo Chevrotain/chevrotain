@@ -9,11 +9,13 @@ node_modules
 yarn-error.log
 .DS_Store
 
-# Chevrotain package ignores
+# Chevrotain packages ignores
 # as prettier --ignore-path does not support nested folders ignores
 /packages/website/docs/.vuepress/dist/
 /packages/types/dev
-/packages/chevrotain/lib
+/packages/**/lib
+/packages/**/coverage
+/packages/**/.nyc_output
 /packages/chevrotain/lib_esm
 /packages/chevrotain/.nyc_output
 /packages/chevrotain/coverage

@@ -14,7 +14,8 @@ import {
 } from "../../../src/parse/grammar/follow"
 import { setEquality } from "../../utils/matchers"
 import { Rule, Terminal } from "../../../src/parse/grammar/gast/gast_public"
-import { keys } from "../../../src/utils/utils"
+import { keys } from "@chevrotain/utils"
+import { expect } from "chai"
 
 describe("The Grammar Ast Follows model", () => {
   it("can build a followNamePrefix from a Terminal", () => {

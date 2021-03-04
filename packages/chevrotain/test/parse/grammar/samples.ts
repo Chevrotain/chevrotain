@@ -10,7 +10,7 @@ import {
 import { Alternation } from "../../../src/parse/grammar/gast/gast_public"
 import { Alternative } from "../../../src/parse/grammar/gast/gast_public"
 import { RepetitionWithSeparator } from "../../../src/parse/grammar/gast/gast_public"
-import { filter, values } from "../../../src/utils/utils"
+import { filter, values } from "@chevrotain/utils"
 import { augmentTokenTypes } from "../../../src/scan/tokens"
 import { createToken } from "../../../src/scan/tokens_public"
 

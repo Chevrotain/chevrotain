@@ -18,7 +18,7 @@ import {
   validateTooManyAlts
 } from "../../../src/parse/grammar/checks"
 import { createToken } from "../../../src/scan/tokens_public"
-import { first, forEach, map } from "../../../src/utils/utils"
+import { first, forEach, map } from "@chevrotain/utils"
 import {
   Alternation,
   Alternative,
@@ -31,6 +31,7 @@ import {
 } from "../../../src/parse/grammar/gast/gast_public"
 import { defaultGrammarValidatorErrorProvider } from "../../../src/parse/errors_public"
 import { IToken } from "../../../api"
+import { expect } from "chai"
 
 describe("the grammar validations", () => {
   it("validates every one of the TOP_RULEs in the input", () => {

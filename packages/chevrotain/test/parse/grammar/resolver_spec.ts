@@ -16,7 +16,8 @@ import { defaultGrammarResolverErrorProvider } from "../../../src/parse/errors_p
 import { assignOccurrenceIndices } from "../../../src/parse/grammar/gast/gast_resolver_public"
 import { createToken } from "../../../src/scan/tokens_public"
 import { DslMethodsCollectorVisitor } from "../../../src/parse/grammar/gast/gast"
-import { forEach, map, uniq } from "../../../src/utils/utils"
+import { forEach, map, uniq } from "@chevrotain/utils"
+import { expect } from "chai"
 
 describe("The RefResolverVisitor", () => {
   it("will fail when trying to resolve a ref to a grammar rule that does not exist", () => {

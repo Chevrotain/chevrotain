@@ -1,3 +1,4 @@
+import { expect } from "chai"
 import {
   BackTrackingParser,
   ColonTok,
@@ -10,7 +11,7 @@ import {
   RET_TYPE,
   SemiColonTok
 } from "./backtracking_parser"
-import { flatten } from "../../../src/utils/utils"
+import { flatten } from "@chevrotain/utils"
 import { createRegularToken } from "../../utils/matchers"
 
 describe("Simple backtracking example", () => {
