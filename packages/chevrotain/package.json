@@ -37,7 +37,7 @@
     "diagrams/**/*.*",
     "CHANGELOG.md"
   ],
-  "typings": "./lib/src/api.d.ts",
+  "typings": "./chevrotain.d.ts",
   "main": "./lib/src/api.js",
   "exports": {
     "require": "./lib/src/api.js",
@@ -51,7 +51,7 @@
   "scripts": {
     "---------- CI FLOWS --------": "",
     "build": "npm-run-all clean compile bundle",
-    "test": "npm-run-all coverage check-coverage",
+    "test": "npm-run-all coverage",
     "version": "tsc ./src/version.ts --outDir lib/src && node ./scripts/version-update.js",
     "---------- DEV FLOWS --------": "",
     "watch": "tsc -w",

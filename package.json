@@ -11,7 +11,7 @@
     "lerna:version": "yarn && lerna version",
     "lerna:publish": "lerna publish from-git --yes --no-verify-access",
     "ci": "npm-run-all format:validate lint:validate build test",
-    "compile": "lerna run clean && tsc --build  --verbose",
+    "compile": "lerna run clean && tsc --build",
     "compile:watch": "lerna run clean && tsc --build --watch",
     "build": "lerna run build",
     "test": "lerna run test",
