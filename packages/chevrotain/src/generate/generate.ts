@@ -10,7 +10,7 @@ import {
   Alternative,
   Repetition
 } from "../parse/grammar/gast/gast_public"
-import { IProduction, TokenType, Rule } from "../../api"
+import { IProduction, TokenType, Rule } from "@chevrotain/types"
 
 /**
  * Missing features

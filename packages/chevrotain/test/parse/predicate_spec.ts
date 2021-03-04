@@ -5,7 +5,7 @@ import {
 } from "../../src/parse/exceptions_public"
 import { augmentTokenTypes } from "../../src/scan/tokens"
 import { createRegularToken } from "../utils/matchers"
-import { IToken } from "../../api"
+import { IToken } from "@chevrotain/types"
 import { expect } from "chai"
 
 describe("The chevrotain support for custom gates/predicates on DSL production:", () => {

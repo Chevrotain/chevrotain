@@ -31,7 +31,7 @@ import {
   IProduction,
   IProductionWithOccurrence,
   TokenType
-} from "../../../api"
+} from "@chevrotain/types"
 
 export enum PROD_TYPE {
   OPTION,

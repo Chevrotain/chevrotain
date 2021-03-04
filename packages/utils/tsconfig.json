@@ -1,13 +1,9 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "module": "CommonJS",
-    "removeComments": false,
-    "target": "ES5",
+    "rootDir": ".",
     "outDir": "lib",
-    "sourceMap": true,
-    "declaration": true,
-    "lib": ["es2015"]
+    "baseUrl": "."
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": ["./src/**/*", "./test/**/*", "api.d.ts"]
 }

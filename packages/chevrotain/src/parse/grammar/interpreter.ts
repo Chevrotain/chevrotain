@@ -30,7 +30,7 @@ import {
   IToken,
   ITokenGrammarPath,
   TokenType
-} from "../../../api"
+} from "@chevrotain/types"
 
 export abstract class AbstractNextPossibleTokensWalker extends RestWalker {
   protected possibleTokTypes: TokenType[] = []

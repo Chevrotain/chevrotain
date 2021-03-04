@@ -1,5 +1,9 @@
 import { contains } from "@chevrotain/utils"
-import { IToken, IRecognitionException, IRecognizerContext } from "../../api"
+import {
+  IToken,
+  IRecognitionException,
+  IRecognizerContext
+} from "@chevrotain/types"
 
 const MISMATCHED_TOKEN_EXCEPTION = "MismatchedTokenException"
 const NO_VIABLE_ALT_EXCEPTION = "NoViableAltException"

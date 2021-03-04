@@ -1,0 +1,12 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "target": "ES5",
+    "composite": true,
+    "module": "CommonJS",
+    "removeComments": false,
+    "sourceMap": true,
+    "declaration": true,
+    "lib": ["es2015", "dom"]
+  }
+}

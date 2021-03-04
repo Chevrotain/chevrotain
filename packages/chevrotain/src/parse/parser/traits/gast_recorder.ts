@@ -13,7 +13,7 @@ import {
   OrMethodOpts,
   SubruleMethodOpts,
   TokenType
-} from "../../../../api"
+} from "@chevrotain/types"
 import {
   forEach,
   has,

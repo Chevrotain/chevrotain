@@ -6,7 +6,7 @@ import {
   IProductionWithOccurrence,
   ISerializedGast,
   TokenType
-} from "../../../../api"
+} from "@chevrotain/types"
 
 export abstract class AbstractProduction<T extends IProduction = IProduction>
   implements IProduction {

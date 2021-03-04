@@ -11,7 +11,7 @@ import {
   lookAheadSequence,
   TokenMatcher
 } from "../parser"
-import { IOrAlt, IParserConfig } from "../../../../api"
+import { IOrAlt, IParserConfig } from "@chevrotain/types"
 import {
   AT_LEAST_ONE_IDX,
   AT_LEAST_ONE_SEP_IDX,

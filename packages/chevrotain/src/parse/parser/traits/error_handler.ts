@@ -2,7 +2,7 @@ import {
   IParserConfig,
   IParserErrorMessageProvider,
   IRecognitionException
-} from "../../../../api"
+} from "@chevrotain/types"
 import {
   EarlyExitException,
   isRecognitionException,

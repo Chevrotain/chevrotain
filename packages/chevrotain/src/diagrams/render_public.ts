@@ -1,5 +1,5 @@
 import { VERSION } from "../version"
-import { ISerializedGast } from "../../api"
+import { ISerializedGast } from "@chevrotain/types"
 
 export function createSyntaxDiagramsCode(
   grammar: ISerializedGast[],

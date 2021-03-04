@@ -4,7 +4,7 @@ import {
 } from "../../../src/parse/parser/traits/parser_traits"
 import { createRegularToken } from "../../utils/matchers"
 import { augmentTokenTypes } from "../../../src/scan/tokens"
-import { IToken } from "../../../api"
+import { IToken } from "@chevrotain/types"
 import { createToken } from "../../../src/scan/tokens_public"
 import { EMPTY_ALT } from "../../../src/parse/parser/parser"
 import { expect } from "chai"

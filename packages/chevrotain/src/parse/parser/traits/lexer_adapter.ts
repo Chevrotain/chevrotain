@@ -1,5 +1,5 @@
 import { END_OF_FILE } from "../parser"
-import { IToken } from "../../../../api"
+import { IToken } from "@chevrotain/types"
 import { MixedInParser } from "./parser_traits"
 
 /**

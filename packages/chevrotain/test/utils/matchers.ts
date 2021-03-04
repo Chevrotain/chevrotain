@@ -1,4 +1,4 @@
-import { IToken } from "../../api"
+import { IToken } from "@chevrotain/types"
 import { expect } from "chai"
 
 export function setEquality(actual: any[], expected: any[]): void {

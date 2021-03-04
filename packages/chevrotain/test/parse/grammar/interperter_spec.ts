@@ -47,7 +47,7 @@ import {
   NonTerminal,
   RepetitionMandatoryWithSeparator
 } from "../../../src/parse/grammar/gast/gast_public"
-import { IToken, ITokenGrammarPath, TokenType } from "../../../api"
+import { IToken, ITokenGrammarPath, TokenType } from "@chevrotain/types"
 import { expect } from "chai"
 
 describe("The Grammar Interpeter namespace", () => {

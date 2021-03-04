@@ -1,4 +1,9 @@
-import { Rule, IParserConfig, TokenVocabulary, BaseParser } from "../../api"
+import {
+  Rule,
+  IParserConfig,
+  TokenVocabulary,
+  BaseParser
+} from "@chevrotain/types"
 import { genUmdModule, genWrapperFunction } from "./generate"
 
 export function generateParserFactory<T extends BaseParser>(options: {

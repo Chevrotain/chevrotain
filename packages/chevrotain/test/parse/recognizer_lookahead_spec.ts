@@ -1,7 +1,7 @@
 import { createToken } from "../../src/scan/tokens_public"
 import { EmbeddedActionsParser } from "../../src/parse/parser/traits/parser_traits"
 import { createRegularToken } from "../utils/matchers"
-import { IToken } from "../../api"
+import { IToken } from "@chevrotain/types"
 import { isES2015MapSupported } from "@chevrotain/utils"
 import { expect } from "chai"
 

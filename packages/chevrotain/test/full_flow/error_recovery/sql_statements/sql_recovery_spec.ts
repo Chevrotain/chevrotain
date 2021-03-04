@@ -33,7 +33,7 @@ import { NotAllInputParsedException } from "../../../../src/parse/exceptions_pub
 import { ParseTree } from "../../parse_tree"
 import { flatten } from "@chevrotain/utils"
 import { createRegularToken } from "../../../utils/matchers"
-import { IToken } from "../../../../api"
+import { IToken } from "@chevrotain/types"
 
 // for side effect if augmenting the Token classes.
 new DDLExampleRecoveryParser()

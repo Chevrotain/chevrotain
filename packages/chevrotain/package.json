@@ -37,7 +37,7 @@
     "diagrams/**/*.*",
     "CHANGELOG.md"
   ],
-  "typings": "api.d.ts",
+  "typings": "./lib/src/api.d.ts",
   "main": "./lib/src/api.js",
   "exports": {
     "require": "./lib/src/api.js",
@@ -55,15 +55,14 @@
     "version": "tsc ./src/version.ts --outDir lib/src && node ./scripts/version-update.js",
     "---------- DEV FLOWS --------": "",
     "watch": "tsc -w",
-    "unit-tests": "mocha \"./lib/test/**/*spec.js\"",
+    "unit-tests": "mocha",
     "quick-build": "tsc && yarn run bundle",
     "---------- BUILD STEPS --------": "",
     "clean": "shx rm -rf coverage dev lib lib_esm",
     "compile": "tsc && node ./scripts/fix-coverage-report.js && npm-run-all gen-esm-wrapper",
     "compile:watch": "tsc -w",
     "gen-esm-wrapper": "gen-esm-wrapper . ./lib_esm/api_esm.mjs",
-    "coverage": "nyc mocha \"./lib/test/**/*spec.js\"",
-    "check-coverage": "nyc check-coverage --lines 100 --branches 100 --statements 100 --functions 100",
+    "coverage": "nyc mocha",
     "---------- BUNDLING --------": "",
     "bundle": "npm-run-all bundle:**",
     "bundle:regular": "webpack --config webpack_release.config.js",
@@ -84,22 +83,11 @@
     "gitty": "^3.6.0",
     "jsdom": "16.4.0",
     "jsonfile": "^6.0.1",
-    "nyc": "^15.0.1",
     "require-from-string": "^2.0.2",
     "sinon": "^9.0.0",
     "sinon-chai": "^3.0.0",
-    "source-map-support": "0.5.19",
     "webpack": "5.24.3",
     "webpack-cli": "^4.1.0",
     "xregexp": "^5.0.1"
-  },
-  "mocha": {
-    "recursive": true,
-    "reporter": "spec",
-    "require": [
-      "./test/test.config",
-      "source-map-support/register"
-    ],
-    "ui": "bdd"
   }
 }

@@ -40,7 +40,7 @@ import { ParseTree } from "../../parse_tree"
 import { augmentTokenTypes } from "../../../../src/scan/tokens"
 
 import { createRegularToken } from "../../../utils/matchers"
-import { IToken, TokenType } from "../../../../api"
+import { IToken, TokenType } from "@chevrotain/types"
 
 const allTokensToUse = { ...allTokens }
 augmentTokenTypes(<any>allTokensToUse)

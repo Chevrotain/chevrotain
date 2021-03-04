@@ -1,4 +1,4 @@
-import { TokenType } from "../../api"
+import { TokenType } from "@chevrotain/types"
 import { isUndefined } from "@chevrotain/utils"
 
 export function classNameFromInstance(instance: any): string {

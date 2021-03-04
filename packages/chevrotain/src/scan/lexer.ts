@@ -37,7 +37,7 @@ import {
   IMultiModeLexerDefinition,
   IToken,
   TokenType
-} from "../../api"
+} from "@chevrotain/types"
 import { getRegExpAst } from "./reg_exp_parser"
 
 const PATTERN = "PATTERN"

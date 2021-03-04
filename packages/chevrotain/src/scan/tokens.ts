@@ -10,7 +10,7 @@ import {
   isEmpty,
   map
 } from "@chevrotain/utils"
-import { TokenType } from "../../api"
+import { TokenType } from "@chevrotain/types"
 
 export function tokenStructuredMatcher(tokInstance, tokConstructor) {
   const instanceType = tokInstance.tokenTypeIdx

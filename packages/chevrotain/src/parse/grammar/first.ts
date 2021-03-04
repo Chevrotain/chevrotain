@@ -1,7 +1,7 @@
 import { uniq, map, flatten } from "@chevrotain/utils"
 import { AbstractProduction, NonTerminal, Terminal } from "./gast/gast_public"
 import { isBranchingProd, isOptionalProd, isSequenceProd } from "./gast/gast"
-import { IProduction, TokenType } from "../../../api"
+import { IProduction, TokenType } from "@chevrotain/types"
 
 export function first(prod: IProduction): TokenType[] {
   /* istanbul ignore else */

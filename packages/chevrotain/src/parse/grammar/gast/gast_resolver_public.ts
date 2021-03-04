@@ -14,7 +14,7 @@ import {
   IParserDefinitionError,
   IProductionWithOccurrence,
   TokenType
-} from "../../../../api"
+} from "@chevrotain/types"
 
 export function resolveGrammar(options: {
   rules: Rule[]

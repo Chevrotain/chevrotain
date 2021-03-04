@@ -10,7 +10,7 @@ import {
   CstParser as CstParserConstructorImpel,
   EmbeddedActionsParser as EmbeddedActionsParserConstructorImpel
 } from "../parser"
-import * as defs from "../../../../api"
+import * as defs from "@chevrotain/types"
 import { ContentAssist } from "./context_assist"
 import { GastRecorder } from "./gast_recorder"
 import { PerformanceTracer } from "./perf_tracer"

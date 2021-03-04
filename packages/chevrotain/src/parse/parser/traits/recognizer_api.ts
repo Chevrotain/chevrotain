@@ -12,7 +12,7 @@ import {
   OrMethodOpts,
   SubruleMethodOpts,
   TokenType
-} from "../../../../api"
+} from "@chevrotain/types"
 import { contains, values } from "@chevrotain/utils"
 import { isRecognitionException } from "../../exceptions_public"
 import { DEFAULT_RULE_CONFIG, ParserDefinitionErrorType } from "../parser"

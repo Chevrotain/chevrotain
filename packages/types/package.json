@@ -25,7 +25,7 @@
     "build": "npm-run-all clean compile api-site:build",
     "postversion": "npm-run-all api-site:build api-site:upload",
     "---------- BUILD STEPS --------": "",
-    "clean": "shx rm -rf dev",
+    "clean": "shx rm -rf dev lib",
     "compile:watch": "tsc -w",
     "compile": "tsc",
     "api-site:build": "typedoc api.d.ts --out dev/docs --excludeExternals --excludePrivate",

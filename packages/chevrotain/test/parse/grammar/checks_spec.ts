@@ -30,7 +30,7 @@ import {
   Terminal
 } from "../../../src/parse/grammar/gast/gast_public"
 import { defaultGrammarValidatorErrorProvider } from "../../../src/parse/errors_public"
-import { IToken } from "../../../api"
+import { IToken } from "@chevrotain/types"
 import { expect } from "chai"
 
 describe("the grammar validations", () => {

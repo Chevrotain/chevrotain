@@ -45,7 +45,7 @@ import {
   SwitchTok
 } from "./Switchcase_recovery_tokens"
 import { assign, contains } from "@chevrotain/utils"
-import { IToken, TokenType } from "../../../../api"
+import { IToken, TokenType } from "@chevrotain/types"
 
 export interface RetType {
   [caseValue: string]: number
