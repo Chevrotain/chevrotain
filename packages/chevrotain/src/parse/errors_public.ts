@@ -9,12 +9,14 @@ import {
 } from "./grammar/gast/gast_public"
 import { getProductionDslName } from "./grammar/gast/gast"
 import {
-  IGrammarResolverErrorMessageProvider,
-  IGrammarValidatorErrorMessageProvider,
   IParserErrorMessageProvider,
   IProductionWithOccurrence,
   TokenType
 } from "@chevrotain/types"
+import {
+  IGrammarResolverErrorMessageProvider,
+  IGrammarValidatorErrorMessageProvider
+} from "./grammar/types"
 
 export const defaultParserErrorProvider: IParserErrorMessageProvider = {
   buildMismatchTokenMessage({ expected, actual, previous, ruleName }): string {

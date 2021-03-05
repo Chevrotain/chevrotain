@@ -8,13 +8,12 @@ import {
   defaultGrammarValidatorErrorProvider
 } from "../../errors_public"
 import { DslMethodsCollectorVisitor } from "./gast"
+import { IProductionWithOccurrence, TokenType } from "@chevrotain/types"
 import {
   IGrammarResolverErrorMessageProvider,
   IGrammarValidatorErrorMessageProvider,
-  IParserDefinitionError,
-  IProductionWithOccurrence,
-  TokenType
-} from "@chevrotain/types"
+  IParserDefinitionError
+} from "../types"
 
 export function resolveGrammar(options: {
   rules: Rule[]
@@ -49,16 +48,4 @@ export function validateGrammar(options: {
     options.errMsgProvider,
     options.grammarName
   )
-}
-
-export function assignOccurrenceIndices(options: { rules: Rule[] }): void {
-  forEach(options.rules, (currRule) => {
-    const methodsCollector = new DslMethodsCollectorVisitor()
-    currRule.accept(methodsCollector)
-    forEach(methodsCollector.dslMethods, (methods) => {
-      forEach(methods, (currMethod: IProductionWithOccurrence, arrIdx) => {
-        currMethod.idx = arrIdx + 1
-      })
-    })
-  })
 }

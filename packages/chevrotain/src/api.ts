@@ -13,7 +13,6 @@ export {
 export { Lexer, LexerDefinitionErrorType } from "./scan/lexer_public"
 
 // Tokens utilities
-
 export {
   createToken,
   createTokenInstance,
@@ -25,11 +24,7 @@ export {
 
 // Other Utilities
 
-export {
-  defaultGrammarResolverErrorProvider,
-  defaultGrammarValidatorErrorProvider,
-  defaultParserErrorProvider
-} from "./parse/errors_public"
+export { defaultParserErrorProvider } from "./parse/errors_public"
 
 export {
   EarlyExitException,
@@ -42,7 +37,6 @@ export {
 export { defaultLexerErrorProvider } from "./scan/lexer_errors_public"
 
 // grammar reflection API
-
 export {
   Alternation,
   Alternative,
@@ -65,12 +59,6 @@ export {
 
 export { GAstVisitor } from "./parse/grammar/gast/gast_visitor_public"
 
-export {
-  assignOccurrenceIndices,
-  resolveGrammar,
-  validateGrammar
-} from "./parse/grammar/gast/gast_resolver_public"
-
 /* istanbul ignore next */
 export function clearCache() {
   console.warn(
@@ -81,11 +69,6 @@ export function clearCache() {
 }
 
 export { createSyntaxDiagramsCode } from "./diagrams/render_public"
-
-export {
-  generateParserFactory,
-  generateParserModule
-} from "./generate/generate_public"
 
 export class Parser {
   constructor() {

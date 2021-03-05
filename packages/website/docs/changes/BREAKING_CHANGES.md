@@ -1,3 +1,18 @@
+## 9.0.0
+
+- **Custom APIs** feature has been deprecated and removed.
+  This means the following public APIs no longer exist:
+  - `resolveGrammar`
+  - `validateGrammar`
+  - `assignOccurrenceIndices`
+  - `defaultGrammarValidatorErrorProvider`
+  - `defaultGrammarResolverErrorProvider`
+  - `IGrammarValidatorErrorMessageProvider`
+  - `IGrammarResolverErrorMessageProvider`
+  - `IParserDefinitionError`
+  - `generateParserFactory`
+  - `generateParserModule`
+
 ## 8.0.0
 
 - Chevrotain now uses the package.json `exports` field, as specified in the [documentation](https://nodejs.org/api/packages.html#packages_package_entry_points):

@@ -1,22 +1,7 @@
 import { GastRefResolverVisitor } from "../../../src/parse/grammar/resolver"
 import { ParserDefinitionErrorType } from "../../../src/parse/parser/parser"
-import {
-  Alternation,
-  Alternative,
-  NonTerminal,
-  Option,
-  Repetition,
-  RepetitionMandatory,
-  RepetitionMandatoryWithSeparator,
-  RepetitionWithSeparator,
-  Rule,
-  Terminal
-} from "../../../src/parse/grammar/gast/gast_public"
+import { NonTerminal, Rule } from "../../../src/parse/grammar/gast/gast_public"
 import { defaultGrammarResolverErrorProvider } from "../../../src/parse/errors_public"
-import { assignOccurrenceIndices } from "../../../src/parse/grammar/gast/gast_resolver_public"
-import { createToken } from "../../../src/scan/tokens_public"
-import { DslMethodsCollectorVisitor } from "../../../src/parse/grammar/gast/gast"
-import { forEach, map, uniq } from "@chevrotain/utils"
 import { expect } from "chai"
 
 describe("The RefResolverVisitor", () => {
@@ -41,87 +26,5 @@ describe("The RefResolverVisitor", () => {
       ParserDefinitionErrorType.UNRESOLVED_SUBRULE_REF
     )
     expect(resolver.errors[0].ruleName).to.equal("TOP")
-  })
-})
-
-describe("The assignOccurrenceIndices utility", () => {
-  it("will correctly add indices for DSL methods", () => {
-    const A = createToken({ name: "A" })
-    const B = createToken({ name: "B" })
-
-    const rule = new Rule({
-      name: "rule",
-      definition: [
-        new Terminal({ terminalType: A }),
-        new NonTerminal({
-          nonTerminalName: "otherRule"
-        }),
-        new Option({
-          definition: [new Terminal({ terminalType: B })]
-        }),
-        new Alternation({
-          definition: [
-            new Alternative({
-              definition: [new Terminal({ terminalType: B })]
-            })
-          ]
-        }),
-        new Repetition({
-          definition: [new Terminal({ terminalType: B })]
-        }),
-        new RepetitionMandatory({
-          definition: [new Terminal({ terminalType: B })]
-        }),
-        new RepetitionWithSeparator({
-          definition: [new Terminal({ terminalType: B })],
-          separator: A
-        }),
-        new RepetitionMandatoryWithSeparator({
-          definition: [
-            new NonTerminal({
-              nonTerminalName: "otherRule"
-            })
-          ],
-          separator: A
-        }),
-        new Option({
-          definition: [new Terminal({ terminalType: B })]
-        }),
-        new Alternation({
-          definition: [
-            new Alternative({
-              definition: [new Terminal({ terminalType: B })]
-            })
-          ]
-        }),
-        new Repetition({
-          definition: [new Terminal({ terminalType: B })]
-        }),
-        new RepetitionMandatory({
-          definition: [new Terminal({ terminalType: B })]
-        }),
-        new RepetitionWithSeparator({
-          definition: [new Terminal({ terminalType: B })],
-          separator: A
-        }),
-        new RepetitionMandatoryWithSeparator({
-          definition: [
-            new NonTerminal({
-              nonTerminalName: "otherRule"
-            })
-          ],
-          separator: A
-        })
-      ]
-    })
-
-    assignOccurrenceIndices({ rules: [rule] })
-    const methodsCollector = new DslMethodsCollectorVisitor()
-    rule.accept(methodsCollector)
-
-    forEach(methodsCollector.dslMethods, (currMethodArr) => {
-      const indices = map(currMethodArr, (currMethod) => currMethod.idx)
-      expect(indices.length).to.equal(uniq(indices).length)
-    })
   })
 })

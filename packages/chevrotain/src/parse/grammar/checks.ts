@@ -40,12 +40,14 @@ import {
 } from "./gast/gast_public"
 import { GAstVisitor } from "./gast/gast_visitor_public"
 import {
-  IGrammarValidatorErrorMessageProvider,
-  IParserDefinitionError,
   IProduction,
   IProductionWithOccurrence,
   TokenType
 } from "@chevrotain/types"
+import {
+  IGrammarValidatorErrorMessageProvider,
+  IParserDefinitionError
+} from "./types"
 
 export function validateGrammar(
   topLevels: Rule[],
