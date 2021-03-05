@@ -1,9 +1,0 @@
-# Custom APIs Examples
-
-Chevrotain can be used as the underlying engine to create other **general purpose** parsing libraries.
-See: [detailed documentation](https://chevrotain.io/docs/guide/custom_apis.html).
-
-To run the tests for all the tutorial parts:
-
-- `npm install` (only once)
-- `npm test`

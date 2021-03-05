@@ -128,7 +128,6 @@ module.exports = {
             ["custom_token_patterns", "Custom Token Patterns"],
             ["syntactic_content_assist", "Syntactic Content Assist"],
             ["internals", "Internals"],
-            ["custom_apis", "Custom APIs"],
             ["resolving_grammar_errors", "Resolving Grammar Errors"],
             ["resolving_lexer_errors", "Resolving Lexer Errors"]
           ]

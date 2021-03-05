@@ -20,7 +20,6 @@ import {
 import {
   CstNode,
   IParserConfig,
-  IParserDefinitionError,
   IRecognitionException,
   IRuleConfig,
   IToken,
@@ -40,6 +39,7 @@ import { ContentAssist } from "./traits/context_assist"
 import { GastRecorder } from "./traits/gast_recorder"
 import { PerformanceTracer } from "./traits/perf_tracer"
 import { applyMixins } from "./utils/apply_mixins"
+import { IParserDefinitionError } from "../grammar/types"
 
 export const END_OF_FILE = createTokenInstance(
   EOF,

@@ -13,8 +13,6 @@ features:
     details: Implements error recovery heuristics to parse even partially invalid inputs.
   - title: Syntax Diagrams
     details: Easily generate syntax diagrams for documentation purposes.
-  - title: Custom APIs
-    details: Chevrotain even makes its own engine available to external use. This means that you can build your own parsing library on top of Chevrotain.
 
 footer: Apache V2.0 Licensed | Copyright © 2018-present SAP SE or an SAP affiliate company
 ---
