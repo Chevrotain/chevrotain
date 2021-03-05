@@ -14,7 +14,7 @@ import {
   IParserErrorMessageProvider,
   IProductionWithOccurrence,
   TokenType
-} from "../../api"
+} from "@chevrotain/types"
 
 export const defaultParserErrorProvider: IParserErrorMessageProvider = {
   buildMismatchTokenMessage({ expected, actual, previous, ruleName }): string {

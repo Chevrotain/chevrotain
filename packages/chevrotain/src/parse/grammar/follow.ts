@@ -3,7 +3,7 @@ import { first } from "./first"
 import { assign, forEach } from "@chevrotain/utils"
 import { IN } from "../constants"
 import { Alternative, NonTerminal, Rule, Terminal } from "./gast/gast_public"
-import { IProduction, TokenType } from "../../../api"
+import { IProduction, TokenType } from "@chevrotain/types"
 
 // This ResyncFollowsWalker computes all of the follows required for RESYNC
 // (skipping reference production).

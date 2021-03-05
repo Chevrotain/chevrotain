@@ -10,7 +10,7 @@ import {
   map
 } from "@chevrotain/utils"
 import { defineNameProp, functionName } from "../../lang/lang_extensions"
-import { ICstVisitor } from "../../../api"
+import { ICstVisitor } from "@chevrotain/types"
 
 export function defaultVisit<IN, OUT>(ctx: any, param: IN): OUT {
   const childrenNames = keys(ctx)

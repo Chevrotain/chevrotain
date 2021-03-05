@@ -26,7 +26,7 @@ import {
   IToken,
   TokenType,
   TokenVocabulary
-} from "../../../api"
+} from "@chevrotain/types"
 import { Recoverable } from "./traits/recoverable"
 import { LooksAhead } from "./traits/looksahead"
 import { TreeBuilder } from "./traits/tree_builder"

@@ -1,4 +1,4 @@
-import { IParserConfig } from "../../../../api"
+import { IParserConfig } from "@chevrotain/types"
 import { has, timer } from "@chevrotain/utils"
 import { MixedInParser } from "./parser_traits"
 import { DEFAULT_PARSER_CONFIG } from "../parser"

@@ -8,7 +8,7 @@ import { GAstVisitor } from "./gast/gast_visitor_public"
 import {
   IGrammarResolverErrorMessageProvider,
   IParserDefinitionError
-} from "../../../api"
+} from "@chevrotain/types"
 
 export function resolveGrammar(
   topLevels: Record<string, Rule>,

@@ -1,4 +1,4 @@
-import { CstNode, CstNodeLocation, IToken } from "../../../api"
+import { CstNode, CstNodeLocation, IToken } from "@chevrotain/types"
 
 /**
  * This nodeLocation tracking is not efficient and should only be used

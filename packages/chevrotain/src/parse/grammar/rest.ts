@@ -11,7 +11,7 @@ import {
   RepetitionWithSeparator,
   Terminal
 } from "./gast/gast_public"
-import { IProduction } from "../../../api"
+import { IProduction } from "@chevrotain/types"
 
 /**
  *  A Grammar Walker that computes the "remaining" grammar "after" a productions in the grammar.

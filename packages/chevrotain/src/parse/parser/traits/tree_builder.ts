@@ -16,7 +16,7 @@ import {
   IParserConfig,
   IToken,
   nodeLocationTrackingOptions
-} from "../../../../api"
+} from "@chevrotain/types"
 import { MixedInParser } from "./parser_traits"
 import { DEFAULT_PARSER_CONFIG } from "../parser"
 

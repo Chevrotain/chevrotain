@@ -18,7 +18,7 @@ import {
   IToken,
   ITokenGrammarPath,
   TokenType
-} from "../../../../api"
+} from "@chevrotain/types"
 import { MismatchedTokenException } from "../../exceptions_public"
 import { IN } from "../../constants"
 import { MixedInParser } from "./parser_traits"

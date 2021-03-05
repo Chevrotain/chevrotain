@@ -37,7 +37,7 @@ import {
   IMultiModeLexerDefinition,
   IToken,
   TokenType
-} from "../../api"
+} from "@chevrotain/types"
 import { defaultLexerErrorProvider } from "../scan/lexer_errors_public"
 import { clearRegExpParserCache } from "./reg_exp_parser"
 

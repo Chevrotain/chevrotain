@@ -1,7 +1,7 @@
 import { has, isString, isUndefined } from "@chevrotain/utils"
 import { Lexer } from "./lexer_public"
 import { augmentTokenTypes, tokenStructuredMatcher } from "./tokens"
-import { IToken, ITokenConfig, TokenType } from "../../api"
+import { IToken, ITokenConfig, TokenType } from "@chevrotain/types"
 
 export function tokenLabel(tokType: TokenType): string {
   if (hasTokenLabel(tokType)) {

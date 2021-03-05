@@ -1,5 +1,5 @@
 import { defaultLexerErrorProvider } from "../../src/scan/lexer_errors_public"
-import { IToken } from "../../api"
+import { IToken } from "@chevrotain/types"
 import { expect } from "chai"
 
 describe("The Chevrotain default lexer error message provider", () => {

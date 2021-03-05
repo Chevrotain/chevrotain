@@ -10,7 +10,7 @@ import {
   Rule,
   Terminal
 } from "./gast_public"
-import { IProduction } from "../../../../api"
+import { IProduction } from "@chevrotain/types"
 
 export abstract class GAstVisitor {
   public visit(node: IProduction): any {

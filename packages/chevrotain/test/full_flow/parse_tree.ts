@@ -1,5 +1,5 @@
 import { compact, isFunction, isUndefined } from "@chevrotain/utils"
-import { IToken, TokenType } from "../../api"
+import { IToken, TokenType } from "@chevrotain/types"
 
 export class ParseTree {
   getImage(): string {

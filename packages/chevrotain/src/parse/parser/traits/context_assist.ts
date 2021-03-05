@@ -3,7 +3,7 @@ import {
   IToken,
   ITokenGrammarPath,
   TokenType
-} from "../../../../api"
+} from "@chevrotain/types"
 import {
   NextAfterTokenWalker,
   nextPossibleTokensAfter

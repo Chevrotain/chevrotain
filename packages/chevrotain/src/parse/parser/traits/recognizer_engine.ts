@@ -13,7 +13,7 @@ import {
   SubruleMethodOpts,
   TokenType,
   TokenVocabulary
-} from "../../../../api"
+} from "@chevrotain/types"
 import {
   cloneArr,
   cloneObj,

@@ -18,7 +18,7 @@ import {
   augmentTokenTypes
 } from "../../src/scan/tokens"
 import { createRegularToken, setEquality } from "../utils/matchers"
-import { IMultiModeLexerDefinition, IToken, TokenType } from "../../api"
+import { IMultiModeLexerDefinition, IToken, TokenType } from "@chevrotain/types"
 
 function defineRecognizerSpecs(
   contextName,

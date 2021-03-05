@@ -3,7 +3,7 @@ import { CstParser } from "../../src/parse/parser/traits/parser_traits"
 import { tokenStructuredMatcher } from "../../src/scan/tokens"
 import { createRegularToken } from "../utils/matchers"
 import { map } from "@chevrotain/utils"
-import { CstNode, IToken, TokenType } from "../../api"
+import { CstNode, IToken, TokenType } from "@chevrotain/types"
 import { expect } from "chai"
 
 function createTokenVector(tokTypes: TokenType[]): any[] {

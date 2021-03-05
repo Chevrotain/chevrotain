@@ -45,7 +45,7 @@ import {
   IProduction,
   IProductionWithOccurrence,
   TokenType
-} from "../../../api"
+} from "@chevrotain/types"
 
 export function validateGrammar(
   topLevels: Rule[],

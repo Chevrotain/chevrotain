@@ -27,7 +27,7 @@ import {
   Rule,
   Terminal
 } from "../../../src/parse/grammar/gast/gast_public"
-import { IToken, TokenType } from "../../../api"
+import { IToken, TokenType } from "@chevrotain/types"
 import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
 import { expect } from "chai"
 

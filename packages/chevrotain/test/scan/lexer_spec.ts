@@ -32,7 +32,7 @@ import {
   IMultiModeLexerDefinition,
   ILexerErrorMessageProvider,
   IToken
-} from "../../api"
+} from "@chevrotain/types"
 import { expect } from "chai"
 
 const ORG_SUPPORT_STICKY = SUPPORT_STICKY

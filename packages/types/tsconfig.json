@@ -1,4 +1,9 @@
 {
-  "compilerOptions": {},
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "lib",
+    "baseUrl": "."
+  },
   "include": ["api.d.ts"]
 }

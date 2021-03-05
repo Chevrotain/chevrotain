@@ -1,4 +1,5 @@
 import { expect } from "chai"
+
 // the ecmaQuirks parser uses /y regExp flag
 if (typeof (<any>new RegExp("(?:)")).sticky === "boolean") {
   const parse = require("./ecma_quirks").parse
