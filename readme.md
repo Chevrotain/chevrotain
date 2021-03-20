@@ -56,7 +56,7 @@ as any other pure code without requiring any new tools or processes.
 
 ## Dependencies
 
-There is a single dependency to [regexp-to-ast](https://github.com/bd82/regexp-to-ast) library.
+There is a single dependency (outside this monorepo) to [regexp-to-ast](https://github.com/bd82/regexp-to-ast) library.
 This dependency is included in the bundled artifacts, for ease of consumption in browsers.
 
 ## Compatibility

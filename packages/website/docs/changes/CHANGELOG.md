@@ -1,3 +1,13 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Breaking Changes
+
+- [BREAKING_CHANGES For V9.0](https://chevrotain.io/docs/changes/BREAKING_CHANGES.html#_9-0-0)
+
+#### Bug Fixes
+
+- [fix: missing "./lib_esm/api_esm.mjs" file in npm package](https://github.com/chevrotain/chevrotain/issues/1441)
+
 ## 8.0.1 (2-28-2021)
 
 #### Bug Fixes

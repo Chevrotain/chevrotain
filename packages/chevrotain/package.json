@@ -24,8 +24,8 @@
   },
   "files": [
     "api.d.ts",
-    "lib_esm/**/*.js",
-    "lib_esm/**/*.js.map",
+    "lib_esm/**/*.mjs",
+    "lib_esm/**/*.mjs.map",
     "lib/src/**/*.js",
     "lib/src/**/*.js.map",
     "lib/chevrotain.d.ts",
