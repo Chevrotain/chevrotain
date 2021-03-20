@@ -1,6 +1,6 @@
 {
   "name": "@chevrotain/utils",
-  "version": "8.0.1",
+  "version": "9.0.0",
   "description": "common utilities",
   "keywords": [],
   "bugs": {
@@ -33,7 +33,6 @@
     "compile": "tsc",
     "coverage": "nyc mocha"
   },
-  "dependencies": {},
   "devDependencies": {
     "@types/chai": "^4.2.15"
   },
