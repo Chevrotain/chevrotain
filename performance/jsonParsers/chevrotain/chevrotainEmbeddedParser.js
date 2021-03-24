@@ -25,7 +25,7 @@ var ChevJsonLexer = new ChevrotainLexer(jsonTokens, {positionTracking: "onlyOffs
 
 // ----------------- parser -----------------
 
-// https://github.com/SAP/chevrotain/blob/master/docs/faq.md#Q6
+// https://chevrotain.io/docs/guide/performance.html#using-a-singleton-parser
 // (Do not create a new Parser instance for each new input.)
 var ChevrotainEmbeddedActionsParser = chevrotain.EmbeddedActionsParser ;
 
@@ -71,7 +71,7 @@ function ChevrotainJsonParser(options) {
     });
 
     $.RULE("value", function () {
-        // Perf boost: https://github.com/SAP/chevrotain/blob/master/docs/faq.md#PERFORMANCE
+        // Perf boost: https://github.com/Chevrotain/chevrotain/blob/master/docs/faq.md#PERFORMANCE
         // See "Avoid reinitializing large arrays of alternatives." section
         $.OR($.c1 || ($.c1  = [
             { ALT: function () { $.CONSUME(StringLiteral) }},

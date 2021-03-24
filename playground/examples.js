@@ -966,7 +966,7 @@ function calculatorExampleCst() {
      * of chevrotain.
      *
      * See farther details here:
-     * https://github.com/SAP/chevrotain/blob/master/docs/concrete_syntax_tree.md
+     * https://chevrotain.io/docs/guide/concrete_syntax_tree.html
      */
     const createToken = chevrotain.createToken;
     const tokenMatcher = chevrotain.tokenMatcher;
