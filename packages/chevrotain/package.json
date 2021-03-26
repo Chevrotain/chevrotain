@@ -23,7 +23,7 @@
     "name": "Shahar Soel"
   },
   "files": [
-    "api.d.ts",
+    "chevrotain.d.ts",
     "lib_esm/**/*.mjs",
     "lib_esm/**/*.mjs.map",
     "lib/src/**/*.js",
