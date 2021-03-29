@@ -13,9 +13,9 @@ result/data structure/value.
 
 This can be accomplished using two features of the Parsing DSL:
 
-- [CONSUME](https://chevrotain.io/documentation/9_0_0/classes/embeddedactionsparser.html#consume) will return
-  The [IToken](https://chevrotain.io/documentation/9_0_0/interfaces/itoken.html) object consumed.
-- [SUBRULE](https://chevrotain.io/documentation/9_0_0/classes/embeddedactionsparser.html#subrule) will return
+- [CONSUME](https://chevrotain.io/documentation/9_0_1/classes/embeddedactionsparser.html#consume) will return
+  The [IToken](https://chevrotain.io/documentation/9_0_1/interfaces/itoken.html) object consumed.
+- [SUBRULE](https://chevrotain.io/documentation/9_0_1/classes/embeddedactionsparser.html#subrule) will return
   the result of the grammar rule invoked.
 
 ### Enabling embedded actions

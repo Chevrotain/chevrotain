@@ -49,9 +49,9 @@ Therefore the missing colon will be automatically "inserted".
 
 This heuristic's behavior can be customized by the following methods:
 
-- [canTokenTypeBeInsertedInRecovery](https://chevrotain.io/documentation/9_0_0/classes/cstparser.html#cantokentypebeinsertedinrecovery)
+- [canTokenTypeBeInsertedInRecovery](https://chevrotain.io/documentation/9_0_1/classes/cstparser.html#cantokentypebeinsertedinrecovery)
 
-- [getTokenToInsert](https://chevrotain.io/documentation/9_0_0/classes/cstparser.html#gettokentoinsert)
+- [getTokenToInsert](https://chevrotain.io/documentation/9_0_1/classes/cstparser.html#gettokentoinsert)
 
 ## Single Token deletion:
 
@@ -212,17 +212,17 @@ For the following invalid json input:
 
 By default fault tolerance and error recovery heuristics are **disabled**.
 They can be enabled by passing a optional **recoveryEnabled** parameter (default true)
-To the parser's constructor [constructor](https://chevrotain.io/documentation/9_0_0/classes/cstparser.html#constructor).
+To the parser's constructor [constructor](https://chevrotain.io/documentation/9_0_1/classes/cstparser.html#constructor).
 
 Once enabled specific rules may have their re-sync recovery disabled explicitly,
-This is can be done during the definition of the grammar rule [RULE](https://chevrotain.io/documentation/9_0_0/classes/cstparser.html#rule).
+This is can be done during the definition of the grammar rule [RULE](https://chevrotain.io/documentation/9_0_1/classes/cstparser.html#rule).
 The third parameter(**config**) may contain a **resyncEnabled** property that controls whether or not re-sync is enabled for the
 **specific** rule.
 
 ## CST Integration
 
 When using [Concrete Syntax Tree](../guide/concrete_syntax_tree.md) output
-A re-synced will return a CSTNode with the boolean ["recoveredNode"](https://chevrotain.io/documentation/9_0_0/interfaces/cstnode.html#recoverednode) flag marked as true.
+A re-synced will return a CSTNode with the boolean ["recoveredNode"](https://chevrotain.io/documentation/9_0_1/interfaces/cstnode.html#recoverednode) flag marked as true.
 Additionally a recovered node **may not** have all its contents (children dictionary) filled
 as only the Terminals and None-Terminals encountered **before** the error which triggered the re-sync
 will be present. This means that code that handles the CST (CST Walker or Visitor) **must not**
@@ -237,7 +237,7 @@ from the sub-rule we have recovered from.
 By default **undefined** will be returned from a recovered rule, however this should most likely be customize
 in any but the most simple cases.
 
-Customization is done during the definition of the grammar [RULE](https://chevrotain.io/documentation/9_0_0/classes/cstparser.html#rule).
+Customization is done during the definition of the grammar [RULE](https://chevrotain.io/documentation/9_0_1/classes/cstparser.html#rule).
 The third parameter(**config**) may contain a **recoveryValueFunc** property which is a function that will be invoked to produce the returned value in
 case of re-sync recovery.
 
