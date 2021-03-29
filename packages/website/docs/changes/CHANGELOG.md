@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+- [fix: missing d.ts definitions in npm package](https://github.com/chevrotain/chevrotain/issues/1453)
+
 ## 9.0.0 (3-21-2021)
 
 #### Breaking Changes
