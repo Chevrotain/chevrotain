@@ -2671,9 +2671,9 @@ acorn@^7.1.1, acorn@^7.4.0:
   integrity sha512-nQyp0o1/mNdbTO1PO6kHkwSrmgZ0MT/jCCpNiwbUjGoRN4dlBhqJtoQuCnEOKzgTVwg0ZWiCoQy6SxMebQVh8A==
 
 acorn@^8.0.1, acorn@^8.0.4:
-  version "8.0.5"
-  resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.0.5.tgz#a3bfb872a74a6a7f661bc81b9849d9cac12601b7"
-  integrity sha512-v+DieK/HJkJOpFBETDJioequtc3PfxsWMaxIdIwujtF7FEV/MAyDQLlm6/zPvr7Mix07mLh6ccVwIsloceodlg==
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.1.0.tgz#52311fd7037ae119cbb134309e901aa46295b3fe"
+  integrity sha512-LWCF/Wn0nfHOmJ9rzQApGnxnvgfROzGilS8936rqN/lfcYkY9MYZzdMqN+2NJ4SlTc+m5HiSa+kNfDtI64dwUA==
 
 add-stream@^1.0.0:
   version "1.0.0"
@@ -5330,9 +5330,9 @@ es6-promise@^4.1.0:
   integrity sha512-HJDGx5daxeIvxdBxvG2cb9g4tEvwIk3i8+nhX0yGrYmZUzbkdg8QbDevheDB8gd0//uPj4c1EQua8Q+MViT0/w==
 
 esbuild@^0.11.1:
-  version "0.11.1"
-  resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.11.1.tgz#8b11cda40909b8736466547718e453ee146f655a"
-  integrity sha512-aqhODgreee+PW3vFG96/jtVgzGYqDoUncOk2XEwEquJH/NrfvPtigqkth1QSAMrv/44Z/7pKxmcL6RTJm2L3Og==
+  version "0.11.2"
+  resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.11.2.tgz#3b995e107f2054d9090402b98a3b79ceffd05eb6"
+  integrity sha512-8d5FCQrR+juXC2u9zjTQ3+IYiuFuaWyKYwmApFJLquTrYNbk36H/+MkRQeTuOJg7IjUchRX2Ulwo1zRYXZ1pUg==
 
 escalade@^3.1.1:
   version "3.1.1"
@@ -8746,9 +8746,9 @@ mkdirp@^1.0.3, mkdirp@^1.0.4, mkdirp@~1.0.4:
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
 
 mocha@^8.1.3:
-  version "8.3.0"
-  resolved "https://registry.yarnpkg.com/mocha/-/mocha-8.3.0.tgz#a83a7432d382ae1ca29686062d7fdc2c36f63fe5"
-  integrity sha512-TQqyC89V1J/Vxx0DhJIXlq9gbbL9XFNdeLQ1+JsnZsVaSOV1z3tWfw0qZmQJGQRIfkvZcs7snQnZnOCKoldq1Q==
+  version "8.3.2"
+  resolved "https://registry.yarnpkg.com/mocha/-/mocha-8.3.2.tgz#53406f195fa86fbdebe71f8b1c6fb23221d69fcc"
+  integrity sha512-UdmISwr/5w+uXLPKspgoV7/RXZwKRTiTjJ2/AC5ZiEztIoOYdfKb19+9jNmEInzx5pBsCyJQzarAxqIGBNYJhg==
   dependencies:
     "@ungap/promise-all-settled" "1.1.2"
     ansi-colors "4.1.1"
