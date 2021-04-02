@@ -1,3 +1,5 @@
+const defaults = require("@istanbuljs/schema").defaults
+
 module.exports = {
   reporter: ["text", "lcov"],
   "check-coverage": true,
@@ -6,5 +8,6 @@ module.exports = {
   branches: 100,
   lines: 100,
   functions: 100,
-  statements: 100
+  statements: 100,
+  exclude: ["scripts/**"].concat(defaults.nyc.exclude)
 }

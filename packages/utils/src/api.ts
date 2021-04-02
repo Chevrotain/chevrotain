@@ -29,7 +29,7 @@ export function values(obj: any): any[] {
 }
 
 export function mapValues<I, O>(
-  obj: Object,
+  obj: Record<string, I>,
   callback: (value: I, key?: string) => O
 ): O[] {
   const result: O[] = []
@@ -459,4 +459,11 @@ export function toFastProperties(toBecomeFast) {
   /* istanbul ignore next */
   // tslint:disable-next-line
   eval(toBecomeFast)
+}
+
+export function upperFirst(str: string): string {
+  if (str) {
+    return str[0].toUpperCase() + str.substring(1)
+  }
+  return str
 }

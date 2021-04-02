@@ -15,3 +15,5 @@
 /examples/implementation_languages/coffeescript/*.js
 /examples/parser/minification/gen/
 
+# prettier ignores
+/packages/cst-dts-gen/test/snapshots/**/output.d.ts
