@@ -1,14 +1,17 @@
-/packages/chevrotain/lib
-/packages/chevrotain/dev
-/packages/chevrotain/coverage
-/packages/chevrotain/scripts/gh-pages
-/examples/parser/minification/gen/
-/examples/webpack/gen/
-/examples/implementation_languages/typescript/typescript_json.js
-/examples/implementation_languages/coffeescript/coffeescript_json.js
-/packages/chevrotain/docs/.vuepress/dist
+/.idea
 **/node_modules/
+
+# build artifacts
+/packages/website/docs/.vuepress/dist/
+/packages/types/dev
+/packages/**/lib
+/packages/**/coverage
+/packages/**/.nyc_output
+/packages/**/gh-pages
+/packages/chevrotain/lib_esm
+
 /examples/webpack/lib
-/greenkeeper.json
-.nyc_output
+/examples/implementation_languages/typescript/*.js
+/examples/implementation_languages/coffeescript/*.js
+/examples/parser/minification/gen/
 

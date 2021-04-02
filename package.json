@@ -15,8 +15,8 @@
     "compile:watch": "lerna run clean && tsc --build --watch",
     "build": "lerna run build",
     "test": "lerna run test",
-    "format:fix": "prettier --ignore-path .gitignore --write \"**/*.@(ts|js|json|md|yml)\"",
-    "format:validate": "prettier --ignore-path .gitignore --check \"**/*.@(ts|js|json|md|yml)\"",
+    "format:fix": "prettier --write \"**/*.@(ts|js|json|md|yml)\"",
+    "format:validate": "prettier --check \"**/*.@(ts|js|json|md|yml)\"",
     "lint:fix": "eslint . --ext=js,ts --fix --max-warnings=0 --ignore-path=.gitignore",
     "lint:validate": "eslint . --ext=js,ts --max-warnings=0 --ignore-path=.gitignore"
   },
