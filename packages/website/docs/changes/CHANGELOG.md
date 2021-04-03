@@ -577,7 +577,7 @@ Lexer Performance oriented release.
 
 #### Breaking Changes
 
-- [Token patterns which may include line terminators must be explicitly flagged with the "line_breaks" property.](https://github.com/chevrotain/chevrotain/blob/master/docs/resolving_lexer_errors.md#LINE_BREAKS)
+- [Token patterns which may include line terminators must be explicitly flagged with the "line_breaks" property.](https://chevrotain.io/docs/guide/resolving_lexer_errors.html#LINE_BREAKS)
 
 #### Major Changes
 
@@ -718,7 +718,7 @@ Lexer Performance oriented release.
 #### Major Changes
 
 - [Automatic creation of a Concrete Syntax Tree.](https://github.com/chevrotain/chevrotain/issues/215)
-  - See [Relevant Docs](https://github.com/chevrotain/chevrotain/blob/master/docs/concrete_syntax_tree.md).
+  - See [Relevant Docs](https://chevrotain.io/docs/guide/concrete_syntax_tree.html).
 
 #### Minor Changes
 

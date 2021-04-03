@@ -1,6 +1,6 @@
 "use strict"
 // Written Docs for this tutorial step can be found here:
-// https://github.com/chevrotain/chevrotain/blob/master/docs/tutorial/step3a_adding_actions_separated.md
+// https://chevrotain.io/docs/tutorial/step3a_adding_actions_visitor.html
 
 // Tutorial Step 3a:
 

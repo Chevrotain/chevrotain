@@ -7,7 +7,7 @@
  * of chevrotain.
  *
  * See farther details here:
- * https://github.com/chevrotain/chevrotain/blob/master/docs/concrete_syntax_tree.md
+ * https://chevrotain.io/docs/guide/concrete_syntax_tree.html
  */
 const { createToken, tokenMatcher, Lexer, CstParser } = require("chevrotain")
 

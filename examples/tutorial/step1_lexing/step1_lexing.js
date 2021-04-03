@@ -1,6 +1,6 @@
 "use strict"
 // Written Docs for this tutorial step can be found here:
-// https://github.com/chevrotain/chevrotain/blob/master/docs/tutorial/step1_lexing.md
+// https://chevrotain.io/docs/tutorial/step1_lexing.html
 
 // Tutorial Step 1:
 // Implementation of A lexer for a simple SELECT statement grammar

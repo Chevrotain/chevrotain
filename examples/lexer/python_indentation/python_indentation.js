@@ -10,7 +10,7 @@
  * - To implement this the previous Ident levels will be saved in a stack.
  *
  * For additional details on custom token patterns, see the docs:
- * https://github.com/chevrotain/chevrotain/blob/master/docs/custom_token_patterns.md
+ * https://chevrotain.io/docs/guide/custom_token_patterns.html#background
  */
 
 "use strict"

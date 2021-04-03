@@ -49,7 +49,7 @@ var lexerDefinition = jsonTokens
 
 // ----------------- parser -----------------
 
-// https://github.com/chevrotain/chevrotain/blob/master/docs/faq.md#Q6
+// https://chevrotain.io/docs/guide/performance.html#using-a-singleton-parser
 // (Do not create a new Parser instance for each new input.)
 var ChevrotainParser = self.globalOptions.outputCst
   ? chevrotain.CstParser
@@ -100,7 +100,7 @@ function parser(options) {
   })
 
   $.RULE("value", function () {
-    // Perf boost: https://github.com/chevrotain/chevrotain/blob/master/docs/faq.md#PERFORMANCE
+    // https://chevrotain.io/docs/guide/performance.html#caching-arrays-of-alternatives
     // See "Avoid reinitializing large arrays of alternatives." section
     $.OR(
       // prettier-ignore
