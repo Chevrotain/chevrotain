@@ -10,7 +10,7 @@
   "author": {
     "name": "Shahar Soel"
   },
-  "typings": "api.d.ts",
+  "typings": "lib/src/api.d.ts",
   "main": "lib/src/api.js",
   "files": [
     "lib/src/api.js",
