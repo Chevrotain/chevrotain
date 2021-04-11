@@ -110,7 +110,7 @@ class CstNodeDefinitionGenerator extends GAstVisitor {
   visitTerminal(node: Terminal): PropertyTupleElement[] {
     return [
       {
-        propertyName: node.terminalType.name,
+        propertyName: node.label || node.terminalType.name,
         canBeNull: false,
         type: getType(node)
       }
@@ -120,7 +120,7 @@ class CstNodeDefinitionGenerator extends GAstVisitor {
   visitNonTerminal(node: NonTerminal): PropertyTupleElement[] {
     return [
       {
-        propertyName: node.nonTerminalName,
+        propertyName: node.label || node.nonTerminalName,
         canBeNull: false,
         type: getType(node)
       }

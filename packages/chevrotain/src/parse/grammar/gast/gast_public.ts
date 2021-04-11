@@ -31,11 +31,13 @@ export class NonTerminal
   extends AbstractProduction
   implements IProductionWithOccurrence {
   public nonTerminalName: string
+  public label?: string
   public referencedRule: Rule
   public idx: number = 1
 
   constructor(options: {
     nonTerminalName: string
+    label?: string
     referencedRule?: Rule
     idx?: number
   }) {
@@ -223,9 +225,14 @@ export class Alternation
 
 export class Terminal implements IProductionWithOccurrence {
   public terminalType: TokenType
+  public label?: string
   public idx: number = 1
 
-  constructor(options: { terminalType: TokenType; idx?: number }) {
+  constructor(options: {
+    terminalType: TokenType
+    label?: string
+    idx?: number
+  }) {
     assign(
       this,
       pick(options, (v) => v !== undefined)
