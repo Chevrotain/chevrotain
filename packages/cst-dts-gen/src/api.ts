@@ -1,4 +1,5 @@
 import { BaseParser } from "chevrotain"
+import { GenerateDtsOptions } from "../api"
 import { buildModel } from "./model"
 import { genDts, GenDtsOptions } from "./generate"
 
@@ -21,10 +22,4 @@ export function generateCstDts(
   const model = buildModel(productions)
 
   return genDts(model, effectiveOptions)
-}
-
-export type GenerateDtsOptions = {
-  includeTypes?: boolean
-  includeVisitorInterface?: boolean
-  visitorInterfaceName?: string
 }

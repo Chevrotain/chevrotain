@@ -462,8 +462,19 @@ export function toFastProperties(toBecomeFast) {
 }
 
 export function upperFirst(str: string): string {
-  if (str) {
-    return str[0].toUpperCase() + str.substring(1)
+  if (!str) {
+    return str
   }
-  return str
+
+  const firstChar = getCharacterFromCodePointAt(str, 0)
+  return firstChar.toUpperCase() + str.substring(firstChar.length)
+}
+
+const surrogatePairPattern = /[\uD800-\uDBFF][\uDC00-\uDFFF]/
+
+function getCharacterFromCodePointAt(str: string, idx: number): string {
+  const surrogatePairCandidate = str.substring(idx, idx + 1)
+  return surrogatePairPattern.test(surrogatePairCandidate)
+    ? surrogatePairCandidate
+    : str[idx]
 }

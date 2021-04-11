@@ -35,7 +35,7 @@ export function genDts(
     )
   }
 
-  return contentParts.join("\n\n")
+  return contentParts.length ? contentParts.join("\n\n") + "\n" : ""
 }
 
 function genCstNodeTypes(node: CstNodeTypeDefinition) {
