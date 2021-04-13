@@ -263,12 +263,14 @@ export interface ISerializedGastRule extends ISerializedGast {
 export interface ISerializedNonTerminal extends ISerializedGast {
   type: "NonTerminal"
   name: string
+  label?: string
   idx: number
 }
 
 export interface ISerializedTerminal extends ISerializedGast {
   type: "Terminal"
   name: string
+  terminalLabel?: string
   label?: string
   pattern?: string
   idx: number
@@ -297,11 +299,17 @@ export function serializeProduction(node: IProduction): ISerializedGast {
   }
   /* istanbul ignore else */
   if (node instanceof NonTerminal) {
-    return <ISerializedNonTerminal>{
+    const serializedNonTerminal: ISerializedNonTerminal = {
       type: "NonTerminal",
       name: node.nonTerminalName,
       idx: node.idx
     }
+
+    if (node.label) {
+      serializedNonTerminal.label = node.label
+    }
+
+    return serializedNonTerminal
   } else if (node instanceof Alternative) {
     return <ISerializedBasic>{
       type: "Alternative",
@@ -355,6 +363,10 @@ export function serializeProduction(node: IProduction): ISerializedGast {
       name: node.terminalType.name,
       label: tokenLabel(node.terminalType),
       idx: node.idx
+    }
+
+    if (node.label !== undefined) {
+      serializedTerminal.terminalLabel = node.label
     }
 
     const pattern = node.terminalType.PATTERN

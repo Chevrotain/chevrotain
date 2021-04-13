@@ -350,6 +350,18 @@ describe("GAst namespace", () => {
     })
 
     it("can serialize a Terminal with a custom label", () => {
+      const input = new Terminal({ terminalType: C, label: "someLabel" })
+      const actual = serializeProduction(input)
+      expect(actual).to.deep.equal({
+        type: "Terminal",
+        name: "C",
+        terminalLabel: "someLabel",
+        label: "C",
+        idx: 1
+      })
+    })
+
+    it("can serialize a Terminal with a custom token label", () => {
       const input = new Terminal({ terminalType: A })
       const actual = serializeProduction(input)
       expect(actual).to.deep.equal({
@@ -368,6 +380,20 @@ describe("GAst namespace", () => {
         name: "B",
         label: "B",
         pattern: "[a-zA-Z]\\w*",
+        idx: 1
+      })
+    })
+
+    it("can serialize a NonTerminal with a label", () => {
+      const input = new NonTerminal({
+        nonTerminalName: "qualifiedName",
+        label: "someLabel"
+      })
+      const actual = serializeProduction(input)
+      expect(actual).to.deep.equal({
+        type: "NonTerminal",
+        name: "qualifiedName",
+        label: "someLabel",
         idx: 1
       })
     })
