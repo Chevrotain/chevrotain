@@ -1,4 +1,11 @@
-import { assign, forEach, isRegExp, map, pick } from "@chevrotain/utils"
+import {
+  assign,
+  forEach,
+  isRegExp,
+  isString,
+  map,
+  pick
+} from "@chevrotain/utils"
 import { tokenLabel } from "../../../scan/tokens_public"
 import {
   IGASTVisitor,
@@ -305,7 +312,7 @@ export function serializeProduction(node: IProduction): ISerializedGast {
       idx: node.idx
     }
 
-    if (node.label) {
+    if (isString(node.label)) {
       serializedNonTerminal.label = node.label
     }
 
@@ -365,7 +372,7 @@ export function serializeProduction(node: IProduction): ISerializedGast {
       idx: node.idx
     }
 
-    if (node.label !== undefined) {
+    if (isString(node.label)) {
       serializedTerminal.terminalLabel = node.label
     }
 
