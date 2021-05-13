@@ -152,7 +152,7 @@ class Calculator extends EmbeddedActionsParser {
 
     $.RULE("atomicExpression", () => {
       return $.OR([
-        // categorieshesisExpression has the highest precedence and thus it appears
+        // parenthesisExpression has the highest precedence and thus it appears
         // in the "lowest" leaf in the expression ParseTree.
         { ALT: () => $.SUBRULE($.parenthesisExpression) },
         { ALT: () => parseInt($.CONSUME(NumberLiteral).image, 10) },
