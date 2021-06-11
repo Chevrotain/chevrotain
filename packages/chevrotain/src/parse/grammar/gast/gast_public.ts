@@ -1,4 +1,11 @@
-import { assign, forEach, isRegExp, map, pick } from "@chevrotain/utils"
+import {
+  assign,
+  forEach,
+  isRegExp,
+  isString,
+  map,
+  pick
+} from "@chevrotain/utils"
 import { tokenLabel } from "../../../scan/tokens_public"
 import {
   IGASTVisitor,
@@ -31,11 +38,13 @@ export class NonTerminal
   extends AbstractProduction
   implements IProductionWithOccurrence {
   public nonTerminalName: string
+  public label?: string
   public referencedRule: Rule
   public idx: number = 1
 
   constructor(options: {
     nonTerminalName: string
+    label?: string
     referencedRule?: Rule
     idx?: number
   }) {
@@ -223,9 +232,14 @@ export class Alternation
 
 export class Terminal implements IProductionWithOccurrence {
   public terminalType: TokenType
+  public label?: string
   public idx: number = 1
 
-  constructor(options: { terminalType: TokenType; idx?: number }) {
+  constructor(options: {
+    terminalType: TokenType
+    label?: string
+    idx?: number
+  }) {
     assign(
       this,
       pick(options, (v) => v !== undefined)
@@ -256,12 +270,14 @@ export interface ISerializedGastRule extends ISerializedGast {
 export interface ISerializedNonTerminal extends ISerializedGast {
   type: "NonTerminal"
   name: string
+  label?: string
   idx: number
 }
 
 export interface ISerializedTerminal extends ISerializedGast {
   type: "Terminal"
   name: string
+  terminalLabel?: string
   label?: string
   pattern?: string
   idx: number
@@ -290,11 +306,17 @@ export function serializeProduction(node: IProduction): ISerializedGast {
   }
   /* istanbul ignore else */
   if (node instanceof NonTerminal) {
-    return <ISerializedNonTerminal>{
+    const serializedNonTerminal: ISerializedNonTerminal = {
       type: "NonTerminal",
       name: node.nonTerminalName,
       idx: node.idx
     }
+
+    if (isString(node.label)) {
+      serializedNonTerminal.label = node.label
+    }
+
+    return serializedNonTerminal
   } else if (node instanceof Alternative) {
     return <ISerializedBasic>{
       type: "Alternative",
@@ -348,6 +370,10 @@ export function serializeProduction(node: IProduction): ISerializedGast {
       name: node.terminalType.name,
       label: tokenLabel(node.terminalType),
       idx: node.idx
+    }
+
+    if (isString(node.label)) {
+      serializedTerminal.terminalLabel = node.label
     }
 
     const pattern = node.terminalType.PATTERN

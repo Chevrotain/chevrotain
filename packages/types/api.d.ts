@@ -2352,10 +2352,12 @@ export declare class Rule {
  */
 export declare class NonTerminal implements IProductionWithOccurrence {
   nonTerminalName: string
+  label?: string
   referencedRule: Rule
   idx: number
   constructor(options: {
     nonTerminalName: string
+    label?: string
     referencedRule?: Rule
     idx?: number
   })
@@ -2482,8 +2484,13 @@ export declare class Alternation implements IProductionWithOccurrence {
  */
 export declare class Terminal implements IProductionWithOccurrence {
   terminalType: TokenType
+  label?: string
   idx: number
-  constructor(options: { terminalType: TokenType; idx?: number })
+  constructor(options: {
+    terminalType: TokenType
+    label?: string
+    idx?: number
+  })
   accept(visitor: IGASTVisitor): void
 }
 

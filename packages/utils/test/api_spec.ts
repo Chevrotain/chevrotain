@@ -24,7 +24,8 @@ import {
   zipObject,
   assign,
   groupBy,
-  mapValues
+  mapValues,
+  upperFirst
 } from "../src/api"
 import { expect } from "chai"
 
@@ -349,5 +350,15 @@ describe("The Utils functions namespace", () => {
     expect(
       mapValues({ key1: 1, key2: 2 }, (val: number) => val * 2)
     ).to.deep.equal([2, 4])
+  })
+
+  it("exports a upperFirst utility", () => {
+    expect(upperFirst("a")).to.equal("A")
+    expect(upperFirst("abc")).to.equal("Abc")
+    expect(upperFirst("Abc")).to.equal("Abc")
+    expect(upperFirst("aBc")).to.equal("ABc")
+    expect(upperFirst("😀Bc")).to.equal("😀Bc")
+    expect(upperFirst("åbc")).to.equal("Åbc")
+    expect(upperFirst("")).to.equal("")
   })
 })

@@ -321,6 +321,7 @@ export class GastRecorder {
     const newNoneTerminal = new NonTerminal({
       idx: occurrence,
       nonTerminalName: ruleName,
+      label: options?.LABEL,
       // The resolving of the `referencedRule` property will be done once all the Rule's GASTs have been created
       referencedRule: undefined
     })
@@ -333,7 +334,7 @@ export class GastRecorder {
     this: MixedInParser,
     tokType: TokenType,
     occurrence: number,
-    options: ConsumeMethodOpts
+    options?: ConsumeMethodOpts
   ): IToken {
     assertMethodIdxIsValid(occurrence)
     if (!hasShortKeyProperty(tokType)) {
@@ -352,7 +353,8 @@ export class GastRecorder {
     const prevProd: any = peek(this.recordingProdStack)
     const newNoneTerminal = new Terminal({
       idx: occurrence,
-      terminalType: tokType
+      terminalType: tokType,
+      label: options?.LABEL
     })
     prevProd.definition.push(newNoneTerminal)
 

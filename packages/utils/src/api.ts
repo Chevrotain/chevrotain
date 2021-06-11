@@ -29,7 +29,7 @@ export function values(obj: any): any[] {
 }
 
 export function mapValues<I, O>(
-  obj: Object,
+  obj: Record<string, I>,
   callback: (value: I, key?: string) => O
 ): O[] {
   const result: O[] = []
@@ -459,4 +459,22 @@ export function toFastProperties(toBecomeFast) {
   /* istanbul ignore next */
   // tslint:disable-next-line
   eval(toBecomeFast)
+}
+
+export function upperFirst(str: string): string {
+  if (!str) {
+    return str
+  }
+
+  const firstChar = getCharacterFromCodePointAt(str, 0)
+  return firstChar.toUpperCase() + str.substring(firstChar.length)
+}
+
+const surrogatePairPattern = /[\uD800-\uDBFF][\uDC00-\uDFFF]/
+
+function getCharacterFromCodePointAt(str: string, idx: number): string {
+  const surrogatePairCandidate = str.substring(idx, idx + 1)
+  return surrogatePairPattern.test(surrogatePairCandidate)
+    ? surrogatePairCandidate
+    : str[idx]
 }
