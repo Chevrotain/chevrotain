@@ -81,7 +81,7 @@
     "esbuild": "^0.12.8",
     "gen-esm-wrapper": "^1.1.2",
     "gitty": "^3.6.0",
-    "jsdom": "16.4.0",
+    "jsdom": "16.6.0",
     "jsonfile": "^6.0.1",
     "require-from-string": "^2.0.2",
     "sinon": "^10.0.0",
