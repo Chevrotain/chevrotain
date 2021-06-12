@@ -1,11 +1,11 @@
 {
   "name": "chevrotain_examples_parser",
-  "version": "9.0.1",
+  "version": "9.0.2",
   "scripts": {
     "test": "mocha \"!(node_modules)/**/*spec.js\""
   },
   "dependencies": {
-    "chevrotain": "^9.0.1",
+    "chevrotain": "^9.0.2",
     "lodash": "~4.17.10"
   },
   "devDependencies": {

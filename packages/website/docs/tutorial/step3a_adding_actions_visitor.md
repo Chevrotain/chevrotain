@@ -15,7 +15,7 @@ This can be accomplished using a CST (Concrete Syntax Tree) Visitor defined **ou
 
 ## Enabling CST
 
-This feature is automatically enabled when a Parser extends the Chevrotain [CstParser](https://chevrotain.io/documentation/9_0_1/classes/cstparser.html) class
+This feature is automatically enabled when a Parser extends the Chevrotain [CstParser](https://chevrotain.io/documentation/9_0_2/classes/cstparser.html) class
 
 The invocation of any grammar rule will now automatically create a CST.
 
@@ -44,7 +44,8 @@ const parserInstance = new SelectParser()
 const BaseSQLVisitor = parserInstance.getBaseCstVisitorConstructor()
 
 // This BaseVisitor include default visit methods that simply traverse the CST.
-const BaseSQLVisitorWithDefaults = parserInstance.getBaseCstVisitorConstructorWithDefaults()
+const BaseSQLVisitorWithDefaults =
+  parserInstance.getBaseCstVisitorConstructorWithDefaults()
 
 class myCustomVisitor extends BaseSQLVisitor {
   constructor() {
