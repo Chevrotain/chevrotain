@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+- [esm bundle: the export name "\_\_esModule" is reserved and cannot be used](https://github.com/Chevrotain/chevrotain/issues/1537)
+
 ## 9.0.1 (3-29-2021)
 
 #### Bug Fixes
