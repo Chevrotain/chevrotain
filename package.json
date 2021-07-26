@@ -66,7 +66,7 @@
     "shx": "^0.3.2",
     "cz-conventional-changelog": "3.3.0",
     "@commitlint/cli": "12.1.4",
-    "@commitlint/config-conventional": "12.1.4",
+    "@commitlint/config-conventional": "13.1.0",
     "eslint": "7.31.0",
     "@typescript-eslint/parser": "4.26.1",
     "@typescript-eslint/eslint-plugin": "4.28.4",
