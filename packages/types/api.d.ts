@@ -1477,18 +1477,19 @@ export interface ITokenConfig {
   pop_mode?: boolean
 
   /**
-   * The "longer_alt" property will cause the Lexer to attempt matching against another Token Type
+   * The "longer_alt" property will cause the Lexer to attempt matching against other Token Types
    * every time this Token Type has been matched.
    *
-   * This feature can be useful when two Token Types have common prefixes which
+   * This feature can be useful when two or more Token Types have common prefixes which
    * cannot be resolved (only) by the ordering of the Tokens in the lexer definition.
    *
-   * - Note that the `longer_alt` capability is **cannot be chained**, only a single longer_alt will be checked for a specific Token.
+   * - Note that the `longer_alt` capability **cannot be chained**.
+   * - Note that the **first** matched `longer_alt` takes precendence.
    *
    * For example see: https://github.com/chevrotain/chevrotain/tree/master/examples/lexer/keywords_vs_identifiers
    * For resolving the keywords vs Identifier ambiguity.
    */
-  longer_alt?: TokenType
+  longer_alt?: TokenType | TokenType[]
 
   /**
    * Can a String matching this Token Type's pattern possibly contain a line terminator?
@@ -1575,7 +1576,7 @@ export interface TokenType {
   GROUP?: string
   PATTERN?: TokenPattern
   LABEL?: string
-  LONGER_ALT?: TokenType
+  LONGER_ALT?: TokenType | TokenType[]
   POP_MODE?: boolean
   PUSH_MODE?: string
   LINE_BREAKS?: boolean

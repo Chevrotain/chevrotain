@@ -149,6 +149,14 @@ describe("The Chevrotain Tokens namespace", () => {
       expect(B.LONGER_ALT).to.equal(A)
     })
 
+    it("can define multiple LONGER_ALT via the createToken utilities", () => {
+      const A = createToken({ name: "A" })
+      const B = createToken({ name: "B" })
+      const C = createToken({ name: "C", longer_alt: [A, B] })
+      expect(C).to.haveOwnProperty("LONGER_ALT")
+      expect(C.LONGER_ALT).to.eql([A, B])
+    })
+
     it("can define a token group via the createToken utilities", () => {
       const A = createToken({
         name: "A",
