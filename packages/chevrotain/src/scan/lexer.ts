@@ -219,7 +219,9 @@ export function analyzeTokenTypes(
       const longerAltType = clazz.LONGER_ALT
 
       if (longerAltType) {
-        const longerAltIdx = indexOf(onlyRelevantTypes, longerAltType)
+        const longerAltIdx = Array.isArray(longerAltType)
+          ? map(longerAltType, (type: any) => indexOf(onlyRelevantTypes, type))
+          : [indexOf(onlyRelevantTypes, longerAltType)]
         return longerAltIdx
       }
     })

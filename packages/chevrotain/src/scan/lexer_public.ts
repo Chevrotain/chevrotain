@@ -401,8 +401,9 @@ export class Lexer {
   private tokenizeInternal(text: string, initialMode: string): ILexingResult {
     let i,
       j,
+      k,
       matchAltImage,
-      longerAltIdx,
+      longerAlt,
       matchedImage,
       payload,
       altPayload,
@@ -564,40 +565,44 @@ export class Lexer {
         if (matchedImage !== null) {
           // even though this pattern matched we must try a another longer alternative.
           // this can be used to prioritize keywords over identifiers
-          longerAltIdx = currConfig.longerAlt
-          if (longerAltIdx !== undefined) {
+          longerAlt = currConfig.longerAlt
+          if (longerAlt !== undefined) {
             // TODO: micro optimize, avoid extra prop access
             // by saving/linking longerAlt on the original config?
-            const longerAltConfig = patternIdxToConfig[longerAltIdx]
-            const longerAltPattern = longerAltConfig.pattern
-            altPayload = null
+            const longerAltLength = longerAlt.length
+            for (k = 0; k < longerAltLength; k++) {
+              const longerAltConfig = patternIdxToConfig[longerAlt[k]]
+              const longerAltPattern = longerAltConfig.pattern
+              altPayload = null
 
-            // single Char can never be a longer alt so no need to test it.
-            // manually in-lined because > 600 chars won't be in-lined in V8
-            if (longerAltConfig.isCustom === true) {
-              match = longerAltPattern.exec(
-                orgText,
-                offset,
-                matchedTokens,
-                groups
-              )
-              if (match !== null) {
-                matchAltImage = match[0]
-                if (match.payload !== undefined) {
-                  altPayload = match.payload
+              // single Char can never be a longer alt so no need to test it.
+              // manually in-lined because > 600 chars won't be in-lined in V8
+              if (longerAltConfig.isCustom === true) {
+                match = longerAltPattern.exec(
+                  orgText,
+                  offset,
+                  matchedTokens,
+                  groups
+                )
+                if (match !== null) {
+                  matchAltImage = match[0]
+                  if (match.payload !== undefined) {
+                    altPayload = match.payload
+                  }
+                } else {
+                  matchAltImage = null
                 }
               } else {
-                matchAltImage = null
+                this.updateLastIndex(longerAltPattern, offset)
+                matchAltImage = this.match(longerAltPattern, text, offset)
               }
-            } else {
-              this.updateLastIndex(longerAltPattern, offset)
-              matchAltImage = this.match(longerAltPattern, text, offset)
-            }
 
-            if (matchAltImage && matchAltImage.length > matchedImage.length) {
-              matchedImage = matchAltImage
-              payload = altPayload
-              currConfig = longerAltConfig
+              if (matchAltImage && matchAltImage.length > matchedImage.length) {
+                matchedImage = matchAltImage
+                payload = altPayload
+                currConfig = longerAltConfig
+                break
+              }
             }
           }
           break

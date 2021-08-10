@@ -1488,7 +1488,7 @@ export interface ITokenConfig {
    * For example see: https://github.com/chevrotain/chevrotain/tree/master/examples/lexer/keywords_vs_identifiers
    * For resolving the keywords vs Identifier ambiguity.
    */
-  longer_alt?: TokenType
+  longer_alt?: TokenType | TokenType[]
 
   /**
    * Can a String matching this Token Type's pattern possibly contain a line terminator?
@@ -1575,7 +1575,7 @@ export interface TokenType {
   GROUP?: string
   PATTERN?: TokenPattern
   LABEL?: string
-  LONGER_ALT?: TokenType
+  LONGER_ALT?: TokenType | TokenType[]
   POP_MODE?: boolean
   PUSH_MODE?: string
   LINE_BREAKS?: boolean
