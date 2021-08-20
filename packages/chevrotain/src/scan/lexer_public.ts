@@ -245,8 +245,8 @@ export class Lexer {
               let currAnalyzeResult
               this.TRACE_INIT(`analyzeTokenTypes`, () => {
                 currAnalyzeResult = analyzeTokenTypes(currModDef, {
-                  lineTerminatorCharacters: this.config
-                    .lineTerminatorCharacters,
+                  lineTerminatorCharacters:
+                    this.config.lineTerminatorCharacters,
                   positionTracking: config.positionTracking,
                   ensureOptimizations: config.ensureOptimizations,
                   safeMode: config.safeMode,
@@ -468,9 +468,10 @@ export class Lexer {
       ) {
         // if we try to pop the last mode there lexer will no longer have ANY mode.
         // thus the pop is ignored, an error will be created and the lexer will continue parsing in the previous mode.
-        const msg = this.config.errorMessageProvider.buildUnableToPopLexerModeMessage(
-          popToken
-        )
+        const msg =
+          this.config.errorMessageProvider.buildUnableToPopLexerModeMessage(
+            popToken
+          )
 
         errors.push({
           offset: popToken.startOffset,
@@ -487,9 +488,8 @@ export class Lexer {
         modeStack.pop()
         const newMode = last(modeStack)
         patternIdxToConfig = this.patternIdxToConfig[newMode]
-        currCharCodeToPatternIdxToConfig = this.charCodeToPatternIdxToConfig[
-          newMode
-        ]
+        currCharCodeToPatternIdxToConfig =
+          this.charCodeToPatternIdxToConfig[newMode]
         currModePatternsLength = patternIdxToConfig.length
         const modeCanBeOptimized =
           this.canModeBeOptimized[newMode] && this.config.safeMode === false
@@ -504,9 +504,8 @@ export class Lexer {
 
     function push_mode(newMode) {
       modeStack.push(newMode)
-      currCharCodeToPatternIdxToConfig = this.charCodeToPatternIdxToConfig[
-        newMode
-      ]
+      currCharCodeToPatternIdxToConfig =
+        this.charCodeToPatternIdxToConfig[newMode]
 
       patternIdxToConfig = this.patternIdxToConfig[newMode]
       currModePatternsLength = patternIdxToConfig.length

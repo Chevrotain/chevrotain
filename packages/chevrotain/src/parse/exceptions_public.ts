@@ -27,7 +27,8 @@ export function isRecognitionException(error: Error) {
 
 abstract class RecognitionException
   extends Error
-  implements IRecognitionException {
+  implements IRecognitionException
+{
   context: IRecognizerContext
   resyncedTokens = []
 

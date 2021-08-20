@@ -16,7 +16,8 @@ import {
 } from "@chevrotain/types"
 
 export abstract class AbstractProduction<T extends IProduction = IProduction>
-  implements IProduction {
+  implements IProduction
+{
   public get definition(): T[] {
     return this._definition
   }
@@ -36,7 +37,8 @@ export abstract class AbstractProduction<T extends IProduction = IProduction>
 
 export class NonTerminal
   extends AbstractProduction
-  implements IProductionWithOccurrence {
+  implements IProductionWithOccurrence
+{
   public nonTerminalName: string
   public label?: string
   public referencedRule: Rule
@@ -106,7 +108,8 @@ export class Alternative extends AbstractProduction {
 
 export class Option
   extends AbstractProduction
-  implements IProductionWithOccurrence {
+  implements IProductionWithOccurrence
+{
   public idx: number = 1
   public maxLookahead?: number
 
@@ -125,7 +128,8 @@ export class Option
 
 export class RepetitionMandatory
   extends AbstractProduction
-  implements IProductionWithOccurrence {
+  implements IProductionWithOccurrence
+{
   public idx: number = 1
   public maxLookahead?: number
 
@@ -144,7 +148,8 @@ export class RepetitionMandatory
 
 export class RepetitionMandatoryWithSeparator
   extends AbstractProduction
-  implements IProductionWithOccurrence {
+  implements IProductionWithOccurrence
+{
   public separator: TokenType
   public idx: number = 1
 
@@ -163,7 +168,8 @@ export class RepetitionMandatoryWithSeparator
 
 export class Repetition
   extends AbstractProduction
-  implements IProductionWithOccurrence {
+  implements IProductionWithOccurrence
+{
   public separator: TokenType
   public idx: number = 1
   public maxLookahead?: number
@@ -183,7 +189,8 @@ export class Repetition
 
 export class RepetitionWithSeparator
   extends AbstractProduction
-  implements IProductionWithOccurrence {
+  implements IProductionWithOccurrence
+{
   public separator: TokenType
   public idx: number = 1
 
@@ -202,7 +209,8 @@ export class RepetitionWithSeparator
 
 export class Alternation
   extends AbstractProduction<Alternative>
-  implements IProductionWithOccurrence {
+  implements IProductionWithOccurrence
+{
   public idx: number = 1
   public ignoreAmbiguities: boolean = false
   public hasPredicates: boolean = false

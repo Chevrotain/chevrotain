@@ -160,9 +160,7 @@ export class DslMethodsCollectorVisitor extends GAstVisitor {
 }
 
 const collectorVisitor = new DslMethodsCollectorVisitor()
-export function collectMethods(
-  rule: Rule
-): {
+export function collectMethods(rule: Rule): {
   option: Option[]
   alternation: Alternation[]
   repetition: Repetition[]

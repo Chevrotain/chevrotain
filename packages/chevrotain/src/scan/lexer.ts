@@ -861,8 +861,7 @@ export function performRuntimeChecks(
       message:
         `A MultiMode Lexer cannot be initialized with a ${DEFAULT_MODE}: <${lexerDefinition.defaultMode}>` +
         `which does not exist\n`,
-      type:
-        LexerDefinitionErrorType.MULTI_MODE_LEXER_DEFAULT_MODE_VALUE_DOES_NOT_EXIST
+      type: LexerDefinitionErrorType.MULTI_MODE_LEXER_DEFAULT_MODE_VALUE_DOES_NOT_EXIST
     })
   }
 
@@ -874,8 +873,7 @@ export function performRuntimeChecks(
             message:
               `A Lexer cannot be initialized using an undefined Token Type. Mode:` +
               `<${currModeName}> at index: <${currIdx}>\n`,
-            type:
-              LexerDefinitionErrorType.LEXER_DEFINITION_CANNOT_CONTAIN_UNDEFINED
+            type: LexerDefinitionErrorType.LEXER_DEFINITION_CANNOT_CONTAIN_UNDEFINED
           })
         }
       })

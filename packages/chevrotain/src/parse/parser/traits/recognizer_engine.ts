@@ -263,9 +263,8 @@ export class RecognizerEngine {
         if (this.isInCurrentRuleReSyncSet(reSyncTokType)) {
           recogError.resyncedTokens = this.reSyncTo(reSyncTokType)
           if (this.outputCst) {
-            const partialCstResult: any = this.CST_STACK[
-              this.CST_STACK.length - 1
-            ]
+            const partialCstResult: any =
+              this.CST_STACK[this.CST_STACK.length - 1]
             partialCstResult.recoveredNode = true
             return partialCstResult
           } else {
@@ -273,9 +272,8 @@ export class RecognizerEngine {
           }
         } else {
           if (this.outputCst) {
-            const partialCstResult: any = this.CST_STACK[
-              this.CST_STACK.length - 1
-            ]
+            const partialCstResult: any =
+              this.CST_STACK[this.CST_STACK.length - 1]
             partialCstResult.recoveredNode = true
             recogError.partialCstResult = partialCstResult
           }

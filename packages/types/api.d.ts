@@ -2236,7 +2236,8 @@ export declare function isRecognitionException(error: Error): boolean
  */
 export declare class MismatchedTokenException
   extends Error
-  implements IRecognitionException {
+  implements IRecognitionException
+{
   context: IRecognizerContext
   resyncedTokens: IToken[]
   token: IToken
@@ -2251,7 +2252,8 @@ export declare class MismatchedTokenException
  */
 export declare class NoViableAltException
   extends Error
-  implements IRecognitionException {
+  implements IRecognitionException
+{
   context: IRecognizerContext
   resyncedTokens: IToken[]
   token: IToken
@@ -2266,7 +2268,8 @@ export declare class NoViableAltException
  */
 export declare class NotAllInputParsedException
   extends Error
-  implements IRecognitionException {
+  implements IRecognitionException
+{
   context: IRecognizerContext
   resyncedTokens: IToken[]
   token: IToken
@@ -2280,7 +2283,8 @@ export declare class NotAllInputParsedException
  */
 export declare class EarlyExitException
   extends Error
-  implements IRecognitionException {
+  implements IRecognitionException
+{
   context: IRecognizerContext
   resyncedTokens: IToken[]
   token: IToken
@@ -2416,7 +2420,8 @@ export declare class RepetitionMandatory implements IProductionWithOccurrence {
  * The Grammar AST class representing a {@link Parser.AT_LEAST_ONE_SEP} call.
  */
 export declare class RepetitionMandatoryWithSeparator
-  implements IProductionWithOccurrence {
+  implements IProductionWithOccurrence
+{
   separator: TokenType
   idx: number
   definition: IProduction[]
@@ -2452,7 +2457,8 @@ export declare class Repetition implements IProductionWithOccurrence {
  * The Grammar AST class representing a {@link Parser.MANY_SEP} call.
  */
 export declare class RepetitionWithSeparator
-  implements IProductionWithOccurrence {
+  implements IProductionWithOccurrence
+{
   separator: TokenType
   idx: number
   definition: IProduction[]

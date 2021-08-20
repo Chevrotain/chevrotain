@@ -641,12 +641,11 @@ export class RecognizerApi {
     config: IRuleConfig<T> = DEFAULT_RULE_CONFIG
   ): (idxInCallingRule?: number, ...args: any[]) => T | any {
     if (contains(this.definedRulesNames, name)) {
-      const errMsg = defaultGrammarValidatorErrorProvider.buildDuplicateRuleNameError(
-        {
+      const errMsg =
+        defaultGrammarValidatorErrorProvider.buildDuplicateRuleNameError({
           topLevelRule: name,
           grammarName: this.className
-        }
-      )
+        })
 
       const error = {
         message: errMsg,

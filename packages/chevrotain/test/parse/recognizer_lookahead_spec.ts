@@ -1621,8 +1621,8 @@ describe("lookahead Regular Tokens Mode", () => {
       )
       expect(twoIterationsParser.rule()).to.equal(2)
 
-      const threeIterationsParser = new MultiTokenLookAheadForAtLeastOneSepParser(
-        [
+      const threeIterationsParser =
+        new MultiTokenLookAheadForAtLeastOneSepParser([
           createRegularToken(OneTok),
           createRegularToken(TwoTok),
           createRegularToken(ThreeTok),
@@ -1636,8 +1636,7 @@ describe("lookahead Regular Tokens Mode", () => {
           createRegularToken(ThreeTok),
           createRegularToken(OneTok),
           createRegularToken(TwoTok)
-        ]
-      )
+        ])
       expect(threeIterationsParser.rule()).to.equal(3)
     })
   })
@@ -1988,8 +1987,8 @@ describe("lookahead Regular Tokens Mode", () => {
       )
       expect(twoIterationsParser.rule()).to.equal(2)
 
-      const threeIterationsParser = new MultiTokenLookAheadForAtLeastOneSepParser(
-        [
+      const threeIterationsParser =
+        new MultiTokenLookAheadForAtLeastOneSepParser([
           createRegularToken(OneTok),
           createRegularToken(TwoTok),
           createRegularToken(ThreeTok),
@@ -2003,8 +2002,7 @@ describe("lookahead Regular Tokens Mode", () => {
           createRegularToken(ThreeTok),
           createRegularToken(OneTok),
           createRegularToken(TwoTok)
-        ]
-      )
+        ])
       expect(threeIterationsParser.rule()).to.equal(3)
     })
   })

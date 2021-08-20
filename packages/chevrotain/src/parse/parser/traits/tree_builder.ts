@@ -77,12 +77,14 @@ export class TreeBuilder {
           this.setNodeLocationFromToken = <any>setNodeLocationOnlyOffset
           this.setNodeLocationFromNode = <any>setNodeLocationOnlyOffset
           this.cstPostRule = NOOP
-          this.setInitialNodeLocation = this.setInitialNodeLocationOnlyOffsetRecovery
+          this.setInitialNodeLocation =
+            this.setInitialNodeLocationOnlyOffsetRecovery
         } else {
           this.setNodeLocationFromToken = NOOP
           this.setNodeLocationFromNode = NOOP
           this.cstPostRule = this.cstPostRuleOnlyOffset
-          this.setInitialNodeLocation = this.setInitialNodeLocationOnlyOffsetRegular
+          this.setInitialNodeLocation =
+            this.setInitialNodeLocationOnlyOffsetRegular
         }
       } else if (/none/i.test(this.nodeLocationTracking)) {
         this.setNodeLocationFromToken = NOOP

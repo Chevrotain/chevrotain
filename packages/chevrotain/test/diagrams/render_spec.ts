@@ -1,7 +1,7 @@
 import { expect } from "chai"
 import { VERSION } from "../../src/version"
-const createSyntaxDiagramsCode = require("../../src/api")
-  .createSyntaxDiagramsCode
+const createSyntaxDiagramsCode =
+  require("../../src/api").createSyntaxDiagramsCode
 import { DDLExampleRecoveryParser } from "../full_flow/error_recovery/sql_statements/sql_recovery_parser"
 
 const { lt } = require("semver")
@@ -11,7 +11,8 @@ describe("The Chevrotain diagrams rendering APIs", function () {
   // The JSDom tests that actually perform network traffic seem unstable...
   this.retries(4)
 
-  const serializedGrammar = new DDLExampleRecoveryParser().getSerializedGastProductions()
+  const serializedGrammar =
+    new DDLExampleRecoveryParser().getSerializedGastProductions()
 
   let skipOnBrowser = it
   if (

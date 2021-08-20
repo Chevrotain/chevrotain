@@ -14,9 +14,8 @@ for (const inputFile of inputFiles) {
   const result = api.generateCstDts(parser)
 
   const libSnapshotDir = path.dirname(inputFile)
-  const expectedOutputPath = sample_test.getOutputFileForSnapshot(
-    libSnapshotDir
-  )
+  const expectedOutputPath =
+    sample_test.getOutputFileForSnapshot(libSnapshotDir)
 
   fs.writeFileSync(expectedOutputPath, result)
 }

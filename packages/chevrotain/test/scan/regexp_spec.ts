@@ -51,10 +51,7 @@ describe("the regExp analysis", () => {
 
     it("can compute ranges", () => {
       expect(getOptimizedStartCodesIndices(/[\n-\r]/)).to.deep.equal([
-        10,
-        11,
-        12,
-        13
+        10, 11, 12, 13
       ])
     })
 
@@ -68,10 +65,7 @@ describe("the regExp analysis", () => {
 
     it("Can compute for ignore case", () => {
       expect(getOptimizedStartCodesIndices(/w|A/i)).to.deep.equal([
-        65,
-        87,
-        97,
-        119
+        65, 87, 97, 119
       ])
     })
 
@@ -85,13 +79,10 @@ describe("the regExp analysis", () => {
       expect(getOptimizedStartCodesIndices(/((ab))(c)/)).to.deep.equal([97])
       expect(getOptimizedStartCodesIndices(/((ab))?c/)).to.deep.equal([97, 99])
       expect(getOptimizedStartCodesIndices(/((a?((b?))))?c/)).to.deep.equal([
-        97,
-        98,
-        99
+        97, 98, 99
       ])
       expect(getOptimizedStartCodesIndices(/((a?((b))))c/)).to.deep.equal([
-        97,
-        98
+        97, 98
       ])
       expect(getOptimizedStartCodesIndices(/((a+((b))))c/)).to.deep.equal([97])
     })

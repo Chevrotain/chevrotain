@@ -35,15 +35,18 @@ describe("The CSTVisitor", () => {
 
   let parserInstance = new CstTerminalParserReturnVisitor([])
   let BaseVisitor = parserInstance.getBaseCstVisitorConstructor()
-  let BaseVisitorWithDefaults = parserInstance.getBaseCstVisitorConstructorWithDefaults()
+  let BaseVisitorWithDefaults =
+    parserInstance.getBaseCstVisitorConstructorWithDefaults()
 
   // to avoid issues with other tests clearing the cache
   before(() => {
     parserInstance = new CstTerminalParserReturnVisitor([])
     BaseVisitor = parserInstance.getBaseCstVisitorConstructor()
-    BaseVisitorWithDefaults = parserInstance.getBaseCstVisitorConstructorWithDefaults()
+    BaseVisitorWithDefaults =
+      parserInstance.getBaseCstVisitorConstructorWithDefaults()
     // to hit all coverage branches
-    BaseVisitorWithDefaults = parserInstance.getBaseCstVisitorConstructorWithDefaults()
+    BaseVisitorWithDefaults =
+      parserInstance.getBaseCstVisitorConstructorWithDefaults()
   })
 
   it("can execute a Visitor with a return Value", () => {

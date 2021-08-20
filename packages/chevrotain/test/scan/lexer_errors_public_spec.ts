@@ -24,9 +24,8 @@ describe("The Chevrotain default lexer error message provider", () => {
       startOffset: 3
     } as IToken // the token type is not relevant for this test
 
-    const msg = defaultLexerErrorProvider.buildUnableToPopLexerModeMessage(
-      popToken
-    )
+    const msg =
+      defaultLexerErrorProvider.buildUnableToPopLexerModeMessage(popToken)
 
     expect(msg).to.equal(
       "Unable to pop Lexer Mode after encountering Token ->EXIT_NUMBERS<- The Mode Stack is empty"

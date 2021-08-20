@@ -1299,9 +1299,7 @@ function defineRecognizerSpecs(
           "rule3"
         ])
         expect(parser.errors[0].context.ruleOccurrenceStack).to.deep.equal([
-          0,
-          1,
-          5
+          0, 1, 5
         ])
       })
 
