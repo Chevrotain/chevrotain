@@ -812,14 +812,16 @@ function noMetaChar(regExp: RegExp): boolean {
 }
 
 export function addStartOfInput(pattern: RegExp): RegExp {
-  const flags = pattern.ignoreCase ? "i" : ""
+  const baseflags = pattern.ignoreCase ? "i" : ""
+  const flags = pattern?.flags?.includes("u") ? `${baseflags}u` : baseflags
   // always wrapping in a none capturing group preceded by '^' to make sure matching can only work on start of input.
   // duplicate/redundant start of input markers have no meaning (/^^^^A/ === /^A/)
   return new RegExp(`^(?:${pattern.source})`, flags)
 }
 
 export function addStickyFlag(pattern: RegExp): RegExp {
-  const flags = pattern.ignoreCase ? "iy" : "y"
+  const baseflags = pattern.ignoreCase ? "iy" : "y"
+  const flags = pattern?.flags?.includes("u") ? `${baseflags}u` : baseflags
   // always wrapping in a none capturing group preceded by '^' to make sure matching can only work on start of input.
   // duplicate/redundant start of input markers have no meaning (/^^^^A/ === /^A/)
   return new RegExp(`${pattern.source}`, flags)

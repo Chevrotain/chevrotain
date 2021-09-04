@@ -184,6 +184,16 @@ function defineLexerSpecs(
       pattern: /bamba/i
     })
 
+    const UnicodePattern = createToken({
+      name: "UnicodePattern",
+      pattern: /\u{10334}/u
+    })
+
+    const UnicodePatternCaseInsensitivePattern = createToken({
+      name: "UnicodePatternCaseInsensitivePattern",
+      pattern: /a\u{10334}/iu
+    })
+
     const IntegerValid = createToken({
       name: "IntegerValid",
       pattern: /0\d*/
@@ -268,8 +278,14 @@ function defineLexerSpecs(
             BambaTok,
             IntegerTok,
             IdentifierTok,
-            CaseInsensitivePattern
+            CaseInsensitivePattern,
+            UnicodePatternCaseInsensitivePattern
           ])
+          expect(errors).to.be.empty
+        })
+
+        it("won't error when using unicode flag", () => {
+          const errors = findUnsupportedFlags([UnicodePattern])
           expect(errors).to.be.empty
         })
 
@@ -497,6 +513,11 @@ function defineLexerSpecs(
     WhitespaceOrAmp.LINE_BREAKS = true
 
     const PileOfPoo = createToken({ name: "PileOfPoo", pattern: /💩/ })
+
+    const UnicodeSequence = createToken({
+      name: "UnicodeSequence",
+      pattern: /\u{10334}/u
+    }) // 𐌴
 
     describe("The Simple Lexer transformations", () => {
       it("can transform a pattern to one with startOfInput mark ('^') #1 (NO OP)", () => {
@@ -1420,6 +1441,20 @@ function defineLexerSpecs(
         expect(lexResult.tokens[0].tokenType).to.equal(If)
         expect(lexResult.tokens[1].image).to.equal("💩")
         expect(lexResult.tokens[1].tokenType).to.equal(PileOfPoo)
+      })
+
+      it("can lex a unicode sequence", () => {
+        const ifElseLexer = new Lexer(
+          [If, UnicodeSequence, NewLine],
+          lexerConfig
+        )
+        const input = "if𐌴"
+        const lexResult = ifElseLexer.tokenize(input)
+
+        expect(lexResult.tokens[0].image).to.equal("if")
+        expect(lexResult.tokens[0].tokenType).to.equal(If)
+        expect(lexResult.tokens[1].image).to.equal("𐌴")
+        expect(lexResult.tokens[1].tokenType).to.equal(UnicodeSequence)
       })
 
       context("lexer modes", () => {
