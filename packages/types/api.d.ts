@@ -111,7 +111,7 @@ declare abstract class BaseParser {
   protected option<OUT>(
     idx: number,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT
+  ): OUT | undefined
 
   /**
    * Like `OR` with the numerical suffix as a parameter, e.g:
@@ -267,10 +267,9 @@ declare abstract class BaseParser {
    * @param  actionORMethodDef - The grammar action to optionally invoke once
    *                             or an "OPTIONS" object describing the grammar action and optional properties.
    */
-  // TODO: return `OUT | undefined` explicitly
   protected OPTION<OUT>(
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT
+  ): OUT | undefined
 
   /**
    * @see OPTION
@@ -278,7 +277,7 @@ declare abstract class BaseParser {
    */
   protected OPTION1<OUT>(
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT
+  ): OUT | undefined
 
   /**
    * @see OPTION
@@ -286,7 +285,7 @@ declare abstract class BaseParser {
    */
   protected OPTION2<OUT>(
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT
+  ): OUT | undefined
 
   /**
    * @see OPTION
@@ -294,7 +293,7 @@ declare abstract class BaseParser {
    */
   protected OPTION3<OUT>(
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT
+  ): OUT | undefined
 
   /**
    * @see OPTION
@@ -302,7 +301,7 @@ declare abstract class BaseParser {
    */
   protected OPTION4<OUT>(
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT
+  ): OUT | undefined
 
   /**
    * @see OPTION
@@ -310,7 +309,7 @@ declare abstract class BaseParser {
    */
   protected OPTION5<OUT>(
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT
+  ): OUT | undefined
 
   /**
    * @see OPTION
@@ -318,7 +317,7 @@ declare abstract class BaseParser {
    */
   protected OPTION6<OUT>(
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT
+  ): OUT | undefined
 
   /**
    * @see OPTION
@@ -326,7 +325,7 @@ declare abstract class BaseParser {
    */
   protected OPTION7<OUT>(
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT
+  ): OUT | undefined
 
   /**
    * @see OPTION
@@ -334,7 +333,7 @@ declare abstract class BaseParser {
    */
   protected OPTION8<OUT>(
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT
+  ): OUT | undefined
 
   /**
    * @see OPTION
@@ -342,7 +341,7 @@ declare abstract class BaseParser {
    */
   protected OPTION9<OUT>(
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT
+  ): OUT | undefined
 
   /**
    * Parsing DSL method that indicates a choice between a set of alternatives must be made.

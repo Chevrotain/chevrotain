@@ -56,7 +56,7 @@ export class RecognizerApi {
     this: MixedInParser,
     idx: number,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT {
+  ): OUT | undefined {
     return this.optionInternal(actionORMethodDef, idx)
   }
 
@@ -247,70 +247,70 @@ export class RecognizerApi {
   OPTION<OUT>(
     this: MixedInParser,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT {
+  ): OUT | undefined {
     return this.optionInternal(actionORMethodDef, 0)
   }
 
   OPTION1<OUT>(
     this: MixedInParser,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT {
+  ): OUT | undefined {
     return this.optionInternal(actionORMethodDef, 1)
   }
 
   OPTION2<OUT>(
     this: MixedInParser,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT {
+  ): OUT | undefined {
     return this.optionInternal(actionORMethodDef, 2)
   }
 
   OPTION3<OUT>(
     this: MixedInParser,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT {
+  ): OUT | undefined {
     return this.optionInternal(actionORMethodDef, 3)
   }
 
   OPTION4<OUT>(
     this: MixedInParser,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT {
+  ): OUT | undefined {
     return this.optionInternal(actionORMethodDef, 4)
   }
 
   OPTION5<OUT>(
     this: MixedInParser,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT {
+  ): OUT | undefined {
     return this.optionInternal(actionORMethodDef, 5)
   }
 
   OPTION6<OUT>(
     this: MixedInParser,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT {
+  ): OUT | undefined {
     return this.optionInternal(actionORMethodDef, 6)
   }
 
   OPTION7<OUT>(
     this: MixedInParser,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT {
+  ): OUT | undefined {
     return this.optionInternal(actionORMethodDef, 7)
   }
 
   OPTION8<OUT>(
     this: MixedInParser,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT {
+  ): OUT | undefined {
     return this.optionInternal(actionORMethodDef, 8)
   }
 
   OPTION9<OUT>(
     this: MixedInParser,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT {
+  ): OUT | undefined {
     return this.optionInternal(actionORMethodDef, 9)
   }
 

@@ -301,7 +301,7 @@ export class RecognizerEngine {
     this: MixedInParser,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
     occurrence: number
-  ): OUT {
+  ): OUT | undefined {
     const key = this.getKeyForAutomaticLookahead(OPTION_IDX, occurrence)
     return this.optionInternalLogic(actionORMethodDef, occurrence, key)
   }
@@ -311,7 +311,7 @@ export class RecognizerEngine {
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
     occurrence: number,
     key: number
-  ): OUT {
+  ): OUT | undefined {
     let lookAheadFunc = this.getLaFuncFromCache(key)
     let action
     let predicate
