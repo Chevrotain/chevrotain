@@ -98,7 +98,7 @@ tests.
 This is just another yarn task which performs the whole flow
 including linting / doc generation / d.ts API creation / ...
 
-- `yarn run ci_full_build`
+- `yarn ci`
   - Node > 4 is required to pass the coverage checks.
 
 #### Committing Changes
