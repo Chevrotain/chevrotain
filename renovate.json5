@@ -4,10 +4,10 @@
   "packageRules": [
     {
       "matchPackagePatterns": ["*"],
+      // typedoc upgrades require manually validating the generated website
+      "excludePackagePatterns": ["typedoc"],
       "matchDepTypes": ["devDependencies"],
       "matchUpdateTypes": ["minor", "patch"],
-      // typedoc upgrades require manually validating the generated website
-      "ignoreDeps": ["typedoc"],
       "groupName": "all non-major dev dependencies",
       "groupSlug": "all-dev-minor-patch"
     }
