@@ -78,16 +78,16 @@
   "devDependencies": {
     "@types/sinon-chai": "3.2.5",
     "error-stack-parser": "2.0.6",
-    "esbuild": "0.12.16",
-    "gen-esm-wrapper": "1.1.2",
+    "esbuild": "0.13.4",
+    "gen-esm-wrapper": "1.1.3",
     "gitty": "3.7.2",
-    "jsdom": "16.6.0",
+    "jsdom": "16.7.0",
     "jsonfile": "6.1.0",
     "require-from-string": "2.0.2",
-    "sinon": "11.1.1",
+    "sinon": "11.1.2",
     "sinon-chai": "3.7.0",
-    "webpack": "5.46.0",
-    "webpack-cli": "4.7.2",
-    "xregexp": "5.0.2"
+    "webpack": "5.58.1",
+    "webpack-cli": "4.9.0",
+    "xregexp": "5.1.0"
   }
 }

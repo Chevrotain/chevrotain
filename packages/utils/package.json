@@ -34,7 +34,7 @@
     "coverage": "nyc mocha"
   },
   "devDependencies": {
-    "@types/chai": "4.2.21"
+    "@types/chai": "4.2.22"
   },
   "publishConfig": {
     "access": "public"
