@@ -76,18 +76,18 @@
     "regexp-to-ast": "0.5.0"
   },
   "devDependencies": {
-    "@types/sinon-chai": "^3.2.0",
-    "error-stack-parser": "^2.0.6",
-    "esbuild": "^0.12.8",
-    "gen-esm-wrapper": "^1.1.2",
-    "gitty": "^3.6.0",
+    "@types/sinon-chai": "3.2.5",
+    "error-stack-parser": "2.0.6",
+    "esbuild": "0.12.16",
+    "gen-esm-wrapper": "1.1.2",
+    "gitty": "3.7.2",
     "jsdom": "16.6.0",
-    "jsonfile": "^6.0.1",
-    "require-from-string": "^2.0.2",
-    "sinon": "^11.1.1",
-    "sinon-chai": "^3.0.0",
+    "jsonfile": "6.1.0",
+    "require-from-string": "2.0.2",
+    "sinon": "11.1.1",
+    "sinon-chai": "3.7.0",
     "webpack": "5.46.0",
-    "webpack-cli": "^4.1.0",
-    "xregexp": "^5.0.1"
+    "webpack-cli": "4.7.2",
+    "xregexp": "5.0.2"
   }
 }

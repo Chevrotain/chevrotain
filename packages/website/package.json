@@ -17,9 +17,9 @@
     "website:upload": "./scripts/website-upload.sh"
   },
   "devDependencies": {
-    "gitty": "^3.6.0",
-    "jsonfile": "^6.1.0",
-    "lodash": "^4.17.21",
-    "vuepress": "^1.4.1"
+    "gitty": "3.7.2",
+    "jsonfile": "6.1.0",
+    "lodash": "4.17.21",
+    "vuepress": "1.8.2"
   }
 }

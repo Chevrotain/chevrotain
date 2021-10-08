@@ -35,7 +35,7 @@
     "chevrotain": "^9.0.2"
   },
   "devDependencies": {
-    "glob": "^7.1.6"
+    "glob": "7.1.7"
   },
   "publishConfig": {
     "access": "public"
