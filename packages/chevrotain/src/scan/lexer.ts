@@ -46,7 +46,7 @@ export const MODES = "modes"
 
 export interface IPatternConfig {
   pattern: IRegExpExec
-  longerAlt: number
+  longerAlt: number[]
   canLineTerminator: boolean
   isCustom: boolean
   short: number | boolean
@@ -192,7 +192,7 @@ export function analyzeTokenTypes(
 
   let patternIdxToType
   let patternIdxToGroup
-  let patternIdxToLongerAltIdx
+  let patternIdxToLongerAltIdxArr
   let patternIdxToPushMode
   let patternIdxToPopMode
   tracer("misc mapping", () => {
@@ -215,12 +215,14 @@ export function analyzeTokenTypes(
       }
     })
 
-    patternIdxToLongerAltIdx = map(onlyRelevantTypes, (clazz: any) => {
+    patternIdxToLongerAltIdxArr = map(onlyRelevantTypes, (clazz: any) => {
       const longerAltType = clazz.LONGER_ALT
 
       if (longerAltType) {
-        const longerAltIdx = indexOf(onlyRelevantTypes, longerAltType)
-        return longerAltIdx
+        const longerAltIdxArr = isArray(longerAltType)
+          ? map(longerAltType, (type: any) => indexOf(onlyRelevantTypes, type))
+          : [indexOf(onlyRelevantTypes, longerAltType)]
+        return longerAltIdxArr
       }
     })
 
@@ -278,7 +280,7 @@ export function analyzeTokenTypes(
     patternIdxToConfig = map(allTransformedPatterns, (x, idx) => {
       return {
         pattern: allTransformedPatterns[idx],
-        longerAlt: patternIdxToLongerAltIdx[idx],
+        longerAlt: patternIdxToLongerAltIdxArr[idx],
         canLineTerminator: patternIdxToCanLineTerminator[idx],
         isCustom: patternIdxToIsCustom[idx],
         short: patternIdxToShort[idx],

@@ -122,6 +122,128 @@ function defineLexerSpecs(
         expect(result.tokens[1].image).to.equal("123")
       })
 
+      it("can lex multiple longer_alts", () => {
+        const ABTok = createToken({
+          name: "AB",
+          pattern: "AB"
+        })
+        const ACTok = createToken({
+          name: "AC",
+          pattern: "AC"
+        })
+        const ATok = createToken({
+          name: "A",
+          pattern: "A",
+          longer_alt: [ABTok, ACTok]
+        })
+        const WS = createToken({
+          name: "WS",
+          pattern: /\s+/,
+          group: Lexer.SKIPPED
+        })
+
+        const myLexer = new Lexer([WS, ATok, ABTok, ACTok], {
+          positionTracking: "onlyOffset"
+        })
+        const input = "AC A AB"
+        const result = myLexer.tokenize(input)
+
+        expect(result.errors).to.be.empty
+        expect(tokenMatcher(result.tokens[0], ACTok)).to.be.true
+        expect(result.tokens[0].image).to.equal("AC")
+        expect(tokenMatcher(result.tokens[1], ATok)).to.be.true
+        expect(result.tokens[1].image).to.equal("A")
+        expect(tokenMatcher(result.tokens[2], ABTok)).to.be.true
+        expect(result.tokens[2].image).to.equal("AB")
+      })
+
+      it("can lex multiple longer_alts and pick first alternative #1", () => {
+        const ABTok = createToken({
+          name: "AB",
+          pattern: "AB"
+        })
+        const ABCTok = createToken({
+          name: "ABC",
+          pattern: "ABC"
+        })
+        const ATok = createToken({
+          name: "A",
+          pattern: "A",
+          longer_alt: [ABTok, ABCTok]
+        })
+
+        const myLexer = new Lexer([ATok, ABTok, ABCTok], {
+          positionTracking: "onlyOffset"
+        })
+        const input = "ABC"
+        const result = myLexer.tokenize(input)
+
+        expect(result.errors).to.have.lengthOf(1)
+        expect(result.errors[0].message).to.include(">C<")
+        expect(tokenMatcher(result.tokens[0], ABTok)).to.be.true
+      })
+
+      it("can lex multiple longer_alts and pick first alternative #2", () => {
+        const ABTok = createToken({
+          name: "AB",
+          pattern: "AB"
+        })
+        const ABCTok = createToken({
+          name: "ABC",
+          pattern: "ABC"
+        })
+        const ATok = createToken({
+          name: "A",
+          pattern: "A",
+          longer_alt: [ABCTok, ABTok]
+        })
+
+        const myLexer = new Lexer([ATok, ABTok, ABCTok], {
+          positionTracking: "onlyOffset"
+        })
+        const input = "ABC"
+        const result = myLexer.tokenize(input)
+
+        expect(result.errors).to.be.empty
+        expect(tokenMatcher(result.tokens[0], ABCTok)).to.be.true
+      })
+
+      it("can lex multiple longer_alts - negative", () => {
+        const ABTok = createToken({
+          name: "AB",
+          pattern: "AB"
+        })
+        const ACTok = createToken({
+          name: "AC",
+          pattern: "AC"
+        })
+        const ATok = createToken({
+          name: "A",
+          pattern: "A",
+          // Note that the 'AB' token is not one of the longer alts
+          // Therefore, reading the 'AB' sequence will still result in a lexer error
+          longer_alt: ACTok
+        })
+        const WS = createToken({
+          name: "WS",
+          pattern: /\s+/,
+          group: Lexer.SKIPPED
+        })
+
+        const myLexer = new Lexer([WS, ATok, ABTok, ACTok], {
+          positionTracking: "onlyOffset"
+        })
+        const input = "AC A AB"
+        const result = myLexer.tokenize(input)
+
+        expect(tokenMatcher(result.tokens[0], ACTok)).to.be.true
+        expect(result.tokens[0].image).to.equal("AC")
+        expect(tokenMatcher(result.tokens[1], ATok)).to.be.true
+        expect(result.tokens[1].image).to.equal("A")
+        expect(result.errors).to.have.lengthOf(1)
+        expect(result.errors[0].message).to.include(">B<")
+      })
+
       it("can create a token from a string", () => {
         const input = "6666543221231"
         const result = testLexer.tokenize(input)
