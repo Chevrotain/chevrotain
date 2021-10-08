@@ -12,7 +12,7 @@ jobs:
 
   build-node14:
     docker:
-      - image: circleci/node:14-browsers
+      - image: circleci/node:16-browsers
     working_directory: ~/repo
     steps:
       - checkout
@@ -22,7 +22,7 @@ jobs:
 
   build-node12:
     docker:
-      - image: circleci/node:12-browsers
+      - image: circleci/node:16-browsers
     working_directory: ~/repo
     steps:
       - checkout
@@ -32,7 +32,7 @@ jobs:
 
   deploy:
     docker:
-      - image: circleci/node:14-browsers
+      - image: circleci/node:16-browsers
     working_directory: ~/repo
     steps:
       - checkout
