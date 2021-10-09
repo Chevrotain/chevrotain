@@ -94,8 +94,8 @@ module.exports = {
         link: "https://chevrotain.io/performance/"
       },
       {
-        text: "Chat",
-        link: "https://gitter.im/chevrotain-parser/Lobby"
+        text: "Discussions",
+        link: "https://github.com/Chevrotain/chevrotain/discussions"
       }
     ],
     sidebar: {
