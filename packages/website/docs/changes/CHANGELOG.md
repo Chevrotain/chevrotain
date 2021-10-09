@@ -1,3 +1,10 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+- [Support multiple longer_alt tokens](https://github.com/Chevrotain/chevrotain/issues/1602)
+  - Thanks to [@msujew](https://github.com/msujew) :thumbsup
+
 ## 9.0.2 (6-13-2021)
 
 #### Bug Fixes
