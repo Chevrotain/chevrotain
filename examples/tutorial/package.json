@@ -1,11 +1,11 @@
 {
   "name": "chevrotain_examples_tutorial",
-  "version": "9.0.2",
+  "version": "9.1.0",
   "scripts": {
     "test": "mocha \"step*/*spec.js\""
   },
   "dependencies": {
-    "chevrotain": "^9.0.2"
+    "chevrotain": "^9.1.0"
   },
   "devDependencies": {
     "chai": "^4.1.2",

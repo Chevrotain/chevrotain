@@ -35,10 +35,10 @@ as any other pure code without requiring any new tools or processes.
     - `https://unpkg.com/chevrotain/lib_esm/chevrotain.mjs`
     - `https://unpkg.com/chevrotain/lib_esm/chevrotain.min.mjs`
   - Explicit version number:
-    - `https://unpkg.com/chevrotain@9.0.2/lib/chevrotain.js`
-    - `https://unpkg.com/chevrotain@9.0.2/lib/chevrotain.min.js`
-    - `https://unpkg.com/chevrotain@9.0.2/lib_esm/chevrotain.mjs`
-    - `https://unpkg.com/chevrotain@9.0.2/lib_esm/chevrotain.min.mjs`
+    - `https://unpkg.com/chevrotain@9.1.0/lib/chevrotain.js`
+    - `https://unpkg.com/chevrotain@9.1.0/lib/chevrotain.min.js`
+    - `https://unpkg.com/chevrotain@9.1.0/lib_esm/chevrotain.mjs`
+    - `https://unpkg.com/chevrotain@9.1.0/lib_esm/chevrotain.min.mjs`
 
 ## Documentation & Resources
 

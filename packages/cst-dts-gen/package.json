@@ -1,6 +1,6 @@
 {
   "name": "@chevrotain/cst-dts-gen",
-  "version": "9.0.2",
+  "version": "9.1.0",
   "description": "Generates type definitions for chevrotain CST nodes",
   "keywords": [],
   "bugs": {
@@ -31,8 +31,8 @@
     "coverage": "nyc mocha"
   },
   "dependencies": {
-    "@chevrotain/utils": "^9.0.2",
-    "chevrotain": "^9.0.2"
+    "@chevrotain/utils": "^9.1.0",
+    "chevrotain": "^9.1.0"
   },
   "devDependencies": {
     "glob": "7.2.0"
