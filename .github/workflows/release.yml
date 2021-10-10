@@ -1,13 +1,15 @@
 name: Release
-# TODO: how to do this on tag push only?
-on: [push, pull_request]
+on:
+  push:
+    tags:
+      - 'v*'
 jobs:
   release:
     name: Release to NPM
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
           node-version: 16.x
       - name: Install dependencies
@@ -15,7 +17,6 @@ jobs:
       - name: Run CI
         run: yarn run ci
       - name: init npm token
-        # TODO: how to add env variable in github actions?
         run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
       - name: Run CI
         run: yarn run lerna:publish
