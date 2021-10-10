@@ -1,4 +1,4 @@
-name: chevrotain
+name: Release
 # TODO: how to do this on tag push only?
 on: [push, pull_request]
 jobs:
