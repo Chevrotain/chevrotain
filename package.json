@@ -27,7 +27,7 @@
     "semi": false
   },
   "lint-staged": {
-    "*.{ts,js,json,md}": [
+    "*.{ts,js,json,md,yml}": [
       "prettier --write"
     ],
     "*.{ts,js}": [
