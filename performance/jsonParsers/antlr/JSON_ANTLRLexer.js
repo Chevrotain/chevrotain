@@ -2,14 +2,15 @@
 var antlr4Json;
 (function (antlr4Json) {
 
-// Generated from JSON_ANTLR.g4 by ANTLR 4.7
+// Generated from JSON_ANTLR.g4 by ANTLR 4.9.2
 // jshint ignore: start
 
 
-var serializedATN = ["\u0003\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964",
-    "\u0002\u000e\u0088\b\u0001\u0004\u0002\t\u0002\u0004\u0003\t\u0003\u0004",
-    "\u0004\t\u0004\u0004\u0005\t\u0005\u0004\u0006\t\u0006\u0004\u0007\t",
-    "\u0007\u0004\b\t\b\u0004\t\t\t\u0004\n\t\n\u0004\u000b\t\u000b\u0004",
+
+const serializedATN = ["\u0003\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786",
+    "\u5964\u0002\u000e\u0088\b\u0001\u0004\u0002\t\u0002\u0004\u0003\t\u0003",
+    "\u0004\u0004\t\u0004\u0004\u0005\t\u0005\u0004\u0006\t\u0006\u0004\u0007",
+    "\t\u0007\u0004\b\t\b\u0004\t\t\t\u0004\n\t\n\u0004\u000b\t\u000b\u0004",
     "\f\t\f\u0004\r\t\r\u0004\u000e\t\u000e\u0004\u000f\t\u000f\u0004\u0010",
     "\t\u0010\u0004\u0011\t\u0011\u0004\u0012\t\u0012\u0003\u0002\u0003\u0002",
     "\u0003\u0003\u0003\u0003\u0003\u0004\u0003\u0004\u0003\u0005\u0003\u0005",
@@ -90,18 +91,32 @@ var serializedATN = ["\u0003\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964",
     "\u0002DKMU`gjmsv}\u0080\u0084\u0003\b\u0002\u0002"].join("");
 
 
-var atn = new antlr4.atn.ATNDeserializer().deserialize(serializedATN);
+const atn = new antlr4.atn.ATNDeserializer().deserialize(serializedATN);
 
-var decisionsToDFA = atn.decisionToState.map( function(ds, index) { return new antlr4.dfa.DFA(ds, index); });
+var decisionsToDFA = atn.decisionToState.map( (ds, index) => new antlr4.dfa.DFA(ds, index) );
 
-function JSON_ANTLRLexer(input) {
-	antlr4.Lexer.call(this, input);
-    this._interp = new antlr4.atn.LexerATNSimulator(this, atn, decisionsToDFA, new antlr4.PredictionContextCache());
-    return this;
+class JSON_ANTLRLexer extends antlr4.Lexer {
+
+    static grammarFileName = "JSON_ANTLR.g4";
+    static channelNames = [ "DEFAULT_TOKEN_CHANNEL", "HIDDEN" ];
+	static modeNames = [ "DEFAULT_MODE" ];
+	static literalNames = [ null, "'{'", "','", "'}'", "':'", "'['", "']'", 
+                         "'true'", "'false'", "'null'" ];
+	static symbolicNames = [ null, null, null, null, null, null, null, null, 
+                          null, null, "WS", "STRING", "NUMBER" ];
+	static ruleNames = [ "T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", 
+                      "T__7", "T__8", "WS", "STRING", "ESC", "UNICODE", 
+                      "HEX", "NUMBER", "INT", "EXP" ];
+
+    constructor(input) {
+        super(input)
+        this._interp = new antlr4.atn.LexerATNSimulator(this, atn, decisionsToDFA, new antlr4.PredictionContextCache());
+    }
+
+    get atn() {
+        return atn;
+    }
 }
-
-JSON_ANTLRLexer.prototype = Object.create(antlr4.Lexer.prototype);
-JSON_ANTLRLexer.prototype.constructor = JSON_ANTLRLexer;
 
 JSON_ANTLRLexer.EOF = antlr4.Token.EOF;
 JSON_ANTLRLexer.T__0 = 1;
@@ -117,26 +132,8 @@ JSON_ANTLRLexer.WS = 10;
 JSON_ANTLRLexer.STRING = 11;
 JSON_ANTLRLexer.NUMBER = 12;
 
-JSON_ANTLRLexer.prototype.channelNames = [ "DEFAULT_TOKEN_CHANNEL", "HIDDEN" ];
-
-JSON_ANTLRLexer.prototype.modeNames = [ "DEFAULT_MODE" ];
-
-JSON_ANTLRLexer.prototype.literalNames = [ null, "'{'", "','", "'}'", "':'", 
-                                           "'['", "']'", "'true'", "'false'", 
-                                           "'null'" ];
-
-JSON_ANTLRLexer.prototype.symbolicNames = [ null, null, null, null, null, 
-                                            null, null, null, null, null, 
-                                            "WS", "STRING", "NUMBER" ];
-
-JSON_ANTLRLexer.prototype.ruleNames = [ "T__0", "T__1", "T__2", "T__3", 
-                                        "T__4", "T__5", "T__6", "T__7", 
-                                        "T__8", "WS", "STRING", "ESC", "UNICODE", 
-                                        "HEX", "NUMBER", "INT", "EXP" ];
-
-JSON_ANTLRLexer.prototype.grammarFileName = "JSON_ANTLR.g4";
-
-    // change to generated code: 'exporting' via ns object
-    antlr4Json.JSON_ANTLRLexer = JSON_ANTLRLexer;
+// change to generated code: 'exporting' via ns object
+antlr4Json.JSON_ANTLRLexer = JSON_ANTLRLexer;
 
 })(antlr4Json || (antlr4Json = {}));
+

@@ -6,18 +6,18 @@
     "chevrotain": "^0.31.0"
   },
   "scripts": {
-    "pack_antlr4": "browserify ./node_modules/antlr4/index.js -o ./bower_components/antlr4/antlr4.js -s antlr4"
+    "pack_antlr4": "browserify ./node_modules/antlr4/src/antlr4/index.js -o ./bower_components/antlr4/antlr4.js -s antlr4"
   },
   "devDependencies": {
     "fs-extra": "^5.0.0",
-    "antlr4": "^4.7.0",
+    "antlr4": "4.9.2",
     "browserify": "^12.0.1",
     "gitty": "^3.3.2",
     "jison": "*",
     "jison-lex": "*",
     "jsonfile": "^2.2.3",
     "lodash": "^3.10.1",
-    "nearley": "^2.16.0",
+    "nearley": "2.20.1",
     "wrench": "^1.5.8"
   },
   "private": true
