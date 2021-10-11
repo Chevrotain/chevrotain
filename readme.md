@@ -10,7 +10,7 @@
 
 Chevrotain is a [**blazing fast**][benchmark] and [**feature rich**](http://chevrotain.io/docs/features/blazing_fast.html) **Parser Building Toolkit** for **JavaScript**.
 It can be used to build parsers/compilers/interpreters for various use cases ranging from simple configuration files,
-to full fledged programing languages.
+to full fledged programing languages...
 
 A more in depth description of Chevrotain can be found in this great article on: [Parsing in JavaScript: Tools and Libraries](https://tomassetti.me/parsing-in-javascript/#chevrotain).
 
