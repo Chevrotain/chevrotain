@@ -1,7 +1,16 @@
 name: Continuous Integration
-on: [push, pull_request]
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  # See: https://github.community/t/duplicate-checks-on-push-and-pull-request-simultaneous-event/18012
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 jobs:
-  tests:
+  full_build:
     name: Full Build (node ${{ matrix.node_version }})
     runs-on: ubuntu-latest
     strategy:

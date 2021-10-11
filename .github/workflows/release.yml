@@ -5,7 +5,6 @@ on:
       - "v*"
 jobs:
   release:
-    name: Release to NPM
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -23,7 +22,7 @@ jobs:
           npm whoami
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Run CI
+      - name: Publish to NPM
         run: yarn run lerna:publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
