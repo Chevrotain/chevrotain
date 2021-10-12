@@ -13,13 +13,9 @@
 <script src="samples/1K_json.js"></script>
 
 
-<script src="lib/jsonify/jsonify.js"></script>
-<script src="jsonParsers/jsonify/jsonify_json_parser.js"></script>
 
 <script src="jsonParsers/browser/browser_json_parser.js"></script>
 
-<script src="https://unpkg.com/oboe@2.1.2/dist/oboe-browser.min.js"></script>
-<script src="jsonParsers/oboe/oboe_json_parser.js"></script>
 
 
 <script src="https://code.jquery.com/jquery-3.1.0.slim.min.js"
@@ -54,12 +50,6 @@
                     <a rel="nofollow"
                        href="https://github.com/Chevrotain/chevrotain/blob/gh-pages/performance/jsonParsers/antlr/JSON_ANTLRParser.js">generated
                         code</a>
-                </p></li>
-
-                <li><p>
-                    <a rel="nofollow" href="https://cdiggins.github.io/myna-parser/">Myna</a> Parsing Library
-                    <a rel="nofollow"
-                       href="https://github.com/Chevrotain/chevrotain/blob/gh-pages/performance/jsonParsers/myna/myna_json_parser.js">implementation</a>
                 </p></li>
 
                 <li><p>
@@ -107,34 +97,6 @@
 
             </ol>
 
-            <div class="json-only hide">
-
-                <p>These are <em>hand-built</em> JSON parsers to compare against generic generators/libraries/DSLS</p>
-
-                <ol>
-
-                    <li><p>
-                        The browser's JSON.parse() for comparison.
-                        [<a rel="nofollow"
-                            href="jsonParsers/browser/browser_json_parser.js">implementation</a>]
-                    </p></li>
-
-                    <li><p>
-                        <a rel="nofollow" href="https://github.com/jimhigson/oboe.js">Oboe</a> JSON Parser for
-                        comparison
-                        [<a rel="nofollow" href="jsonParsers/oboe/oboe_json_parser.js">implementation</a>]
-                    </p></li>
-
-                    <li><p>
-                        <a rel="nofollow" href="https://github.com/substack/jsonify">Substack Jsonify</a> JSON Parser
-                        for
-                        comparison
-                        [<a rel="nofollow" href="jsonParsers/jsonify/jsonify_json_parser.js">implementation</a>]
-                    </p></li>
-                </ol>
-
-            </div>
-
             <p>
                 The JSON Grammar was used because it is simple to implement, simple to compare and is often already
                 available as a sample grammar for most parsing tools.
@@ -151,12 +113,7 @@
                        href=" https://github.com/Chevrotain/chevrotain/tree/gh-pages/performance/README.md">benchmark methodology</a> for details
                     on what is being tested and how.
             </p>
-
-            <p>
-                The Chevrotain and Antlr Libraries can either produce a Parse Tree (with Visitor / listener) or use embedded actions
-                in the grammar. Thus they are measured in both scenarios ("-PT" means Parse Tree variant).
-            </p>
-
+            
             <p>Benchmarking is done using the <a rel="nofollow" href="https://benchmarkjs.com/">benchmark.js</a>
                 library.
             </p>
@@ -212,20 +169,6 @@
 
                     </div>
 
-                    <div class="dataRow Chevrotain-PT">
-
-                        <div class="benchName"><a rel="nofollow"
-                                                  href="https://github.com/Chevrotain/chevrotain">Chevrotain-PT</a>
-                        </div>
-                        <div class="benchRate">
-                            <div class="value">&nbsp;</div>
-                            <div class="delta">&nbsp;</div>
-                        </div>
-                        <div class="benchSpeed">&nbsp;</div>
-                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
-
-                    </div>
-
                     <div class="dataRow Parsimmon">
 
                         <div class="benchName"><a rel="nofollow" href="https://github.com/jneen/parsimmon">Parsimmon</a>
@@ -242,31 +185,6 @@
                     <div class="dataRow Antlr">
 
                         <div class="benchName"><a rel="nofollow" href="http://www.antlr.org/">ANTLR4</a></div>
-                        <div class="benchRate">
-                            <div class="value">&nbsp;</div>
-                            <div class="delta">&nbsp;</div>
-                        </div>
-                        <div class="benchSpeed">&nbsp;</div>
-                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
-
-                    </div>
-
-                    <div class="dataRow Antlr-PT">
-
-                        <div class="benchName"><a rel="nofollow" href="http://www.antlr.org/">ANTLR4-PT</a></div>
-                        <div class="benchRate">
-                            <div class="value">&nbsp;</div>
-                            <div class="delta">&nbsp;</div>
-                        </div>
-                        <div class="benchSpeed">&nbsp;</div>
-                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
-
-                    </div>
-
-                    <div class="dataRow Myna">
-
-                        <div class="benchName"><a rel="nofollow" href="https://cdiggins.github.io/myna-parser">Myna</a>
-                        </div>
                         <div class="benchRate">
                             <div class="value">&nbsp;</div>
                             <div class="delta">&nbsp;</div>
@@ -323,44 +241,6 @@
                         <div class="benchInclude"><input type="checkbox"/></div>
 
                     </div>
-
-                    <div class="dataRow Browser json-only hide">
-
-                        <div class="benchName">Browser</div>
-                        <div class="benchRate">
-                            <div class="value">&nbsp;</div>
-                            <div class="delta">&nbsp;</div>
-                        </div>
-                        <div class="benchSpeed">&nbsp;</div>
-                        <div class="benchInclude"><input type="checkbox"/></div>
-
-                    </div>
-
-                    <div class="dataRow Jsonify json-only hide">
-
-                        <div class="benchName"><a rel="nofollow" href="https://github.com/substack/jsonify">Jsonify</a>
-                        </div>
-                        <div class="benchRate">
-                            <div class="value">&nbsp;</div>
-                            <div class="delta">&nbsp;</div>
-                        </div>
-                        <div class="benchSpeed">&nbsp;</div>
-                        <div class="benchInclude"><input type="checkbox"/></div>
-
-                    </div>
-
-                    <div class="dataRow Oboe json-only hide">
-
-                        <div class="benchName"><a rel="nofollow" href="http://oboejs.com/">Oboe</a></div>
-                        <div class="benchRate">
-                            <div class="value">&nbsp;</div>
-                            <div class="delta">&nbsp;</div>
-                        </div>
-                        <div class="benchSpeed">&nbsp;</div>
-                        <div class="benchInclude"><input type="checkbox"/></div>
-
-                    </div>
-
                 </div>
             </div>
             <canvas id="parsersResultChart"></canvas>
@@ -384,11 +264,8 @@
 
     var handBuiltFrame = includeTestIFrame("handbuilt", "./jsonParsers/handbuilt/handbuilt.html")
     var chevrotainFrame = includeTestIFrame("chevrotain", "./jsonParsers/chevrotain/chevrotain.html")
-    var chevrotainFrame_cst = includeTestIFrame("chevrotain_cst", "./jsonParsers/chevrotain/chevrotain_cst.html")
     var antlrFrame = includeTestIFrame("antlr", "./jsonParsers/antlr/antlr.html")
-    var antlrPtFrame = includeTestIFrame("antlr-PT", "./jsonParsers/antlr/antlr_pt.html")
     var jisonFrame = includeTestIFrame("jison", "./jsonParsers/jison/jison.html")
-    var mynaFrame = includeTestIFrame("myna", "./jsonParsers/myna/myna.html")
     var nearleyFrame = includeTestIFrame("nearley", "./jsonParsers/nearley/nearley.html")
     var ohmFrame = includeTestIFrame("ohm", "./jsonParsers/ohm/ohm.html")
     var parsimmonFrame = includeTestIFrame("parsimmon", "./jsonParsers/parsimmon/parsimmon.html")
@@ -505,14 +382,6 @@
     }
 
     var testCases = {
-        Myna: function (suite) {
-            addTest(suite, 'Myna', mynaFrame.parse)
-        },
-
-        Browser: function (suite) {
-            addTest(suite, 'Browser', parse_json_browser)
-        },
-
         HandBuilt: function (suite) {
             addTest(suite, 'HandBuilt', handBuiltFrame.parse)
         },
@@ -521,36 +390,12 @@
             addTest(suite, 'Chevrotain', chevrotainFrame.parse)
         },
 
-        "Chevrotain-PT": function (suite) {
-            addTest(suite, 'Chevrotain-PT', chevrotainFrame_cst.parse)
-        },
-
-        Jsonify: function (suite) {
-            addTest(suite, 'Jsonify', parse_json_jsonify)
-        },
-
-        Oboe: function (suite) {
-            addTest(suite, 'Oboe', {
-                defer: true,
-                onCycle: function () {
-                    newOboe()
-                },
-                fn: function (deferred) {
-                    parse_json_oboe(json_sample1k, deferred)
-                }
-            }, true)
-        },
-
         Parsimmon: function (suite) {
             addTest(suite, 'Parsimmon', parsimmonFrame.parse)
         },
 
         Antlr: function (suite) {
             addTest(suite, 'Antlr', antlrFrame.parse)
-        },
-
-        "Antlr-PT": function (suite) {
-            addTest(suite, 'Antlr-PT', antlrPtFrame.parse)
         },
 
         Peg: function (suite) {
