@@ -53,6 +53,16 @@
                 </p></li>
 
                 <li><p>
+                    <a rel="nofollow" href="https://peggyjs.org">Peggy</a> Parser Generator
+                    <a rel="nofollow"
+                       href="https://github.com/Chevrotain/chevrotain/blob/gh-pages/performance/jsonParsers/peggy/json.peggy">grammar</a>
+                    ->
+                    <a rel="nofollow"
+                       href="https://github.com/Chevrotain/chevrotain/blob/gh-pages/performance/jsonParsers/peggy/peggy_jison_parser.js">generated
+                        code</a>
+                </p></li>
+
+                <li><p>
                     <a rel="nofollow" href="http://pegjs.org/">PEG.js</a> Parser Generator
                     <a rel="nofollow"
                        href="https://github.com/Chevrotain/chevrotain/blob/gh-pages/performance/jsonParsers/pegjs/json.pegjs">grammar</a>
@@ -113,7 +123,7 @@
                        href=" https://github.com/Chevrotain/chevrotain/tree/gh-pages/performance/README.md">benchmark methodology</a> for details
                     on what is being tested and how.
             </p>
-            
+
             <p>Benchmarking is done using the <a rel="nofollow" href="https://benchmarkjs.com/">benchmark.js</a>
                 library.
             </p>
@@ -185,6 +195,18 @@
                     <div class="dataRow Antlr">
 
                         <div class="benchName"><a rel="nofollow" href="http://www.antlr.org/">ANTLR4</a></div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                    </div>
+
+                    <div class="dataRow Peggy">
+
+                        <div class="benchName"><a rel="nofollow" href="https://peggyjs.org">Peggy</a></div>
                         <div class="benchRate">
                             <div class="value">&nbsp;</div>
                             <div class="delta">&nbsp;</div>
@@ -270,6 +292,7 @@
     var ohmFrame = includeTestIFrame("ohm", "./jsonParsers/ohm/ohm.html")
     var parsimmonFrame = includeTestIFrame("parsimmon", "./jsonParsers/parsimmon/parsimmon.html")
     var pegjsFrame = includeTestIFrame("pegjs", "./jsonParsers/pegjs/pegjs.html")
+    var peggyFrame = includeTestIFrame("peggy", "./jsonParsers/peggy/peggy.html")
 
     $("iframe").css("visibility", "hidden")
 
@@ -400,6 +423,10 @@
 
         Peg: function (suite) {
             addTest(suite, 'Peg', pegjsFrame.parse)
+        },
+
+        Peggy: function (suite) {
+            addTest(suite, 'Peggy', peggyFrame.parse)
         },
 
         Jison: function (suite) {
