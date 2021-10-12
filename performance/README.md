@@ -5,6 +5,7 @@
 The intent of the benchmark is to measure the maximum parsing speed. With Parsing is defined as:
 
 **The entire syntactic analysis flow excluding the execution of user actions/semantics.**
+  - Note this includes the lexing/tokenizing phase.
 
 It is important to note that all the steps needed to for the users to run their actions/semantics must be measured. This
 means that the grammar or implementation must **still be productive**. For example: If a parsing library must create
