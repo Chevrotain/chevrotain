@@ -1019,11 +1019,11 @@ export declare class EmbeddedActionsParser extends BaseParser {
   /**
    * Creates a Grammar Rule
    */
-  protected RULE<T>(
+  protected RULE<ARGS extends unknown[], T>(
     name: string,
-    implementation: (...implArgs: any[]) => T,
+    implementation: (...implArgs: ARGS) => T,
     config?: IRuleConfig<T>
-  ): (idxInCallingRule?: number, ...args: any[]) => T
+  ): (idxInCallingRule?: number, ...args: ARGS) => T
 
   /**
    * Overrides a Grammar Rule
@@ -1048,6 +1048,11 @@ export declare class EmbeddedActionsParser extends BaseParser {
     ruleToCall: (idx: number) => T,
     options?: SubruleMethodOpts
   ): T
+  protected subrule<ARGS extends unknown[], T>(
+    idx: number,
+    ruleToCall: (idx: number, ...args: ARGS) => T,
+    options: SubruleMethodOpts & { ARGS: ARGS }
+  ): T
 
   /**
    * The Parsing DSL Method is used by one rule to call another.
@@ -1070,6 +1075,10 @@ export declare class EmbeddedActionsParser extends BaseParser {
     ruleToCall: (idx: number) => T,
     options?: SubruleMethodOpts
   ): T
+  protected SUBRULE<ARGS extends unknown[], T>(
+    ruleToCall: (idx: number, ...args: ARGS) => T,
+    options: SubruleMethodOpts & { ARGS: ARGS }
+  ): T
 
   /**
    * @see SUBRULE
@@ -1078,6 +1087,10 @@ export declare class EmbeddedActionsParser extends BaseParser {
   protected SUBRULE1<T>(
     ruleToCall: (idx: number) => T,
     options?: SubruleMethodOpts
+  ): T
+  protected SUBRULE1<ARGS extends unknown[], T>(
+    ruleToCall: (idx: number, ...args: ARGS) => T,
+    options: SubruleMethodOpts & { ARGS: ARGS }
   ): T
 
   /**
@@ -1088,6 +1101,10 @@ export declare class EmbeddedActionsParser extends BaseParser {
     ruleToCall: (idx: number) => T,
     options?: SubruleMethodOpts
   ): T
+  protected SUBRULE2<ARGS extends unknown[], T>(
+    ruleToCall: (idx: number, ...args: ARGS) => T,
+    options: SubruleMethodOpts & { ARGS: ARGS }
+  ): T
 
   /**
    * @see SUBRULE
@@ -1096,6 +1113,10 @@ export declare class EmbeddedActionsParser extends BaseParser {
   protected SUBRULE3<T>(
     ruleToCall: (idx: number) => T,
     options?: SubruleMethodOpts
+  ): T
+  protected SUBRULE3<ARGS extends unknown[], T>(
+    ruleToCall: (idx: number, ...args: ARGS) => T,
+    options: SubruleMethodOpts & { ARGS: ARGS }
   ): T
 
   /**
@@ -1106,6 +1127,10 @@ export declare class EmbeddedActionsParser extends BaseParser {
     ruleToCall: (idx: number) => T,
     options?: SubruleMethodOpts
   ): T
+  protected SUBRULE4<ARGS extends unknown[], T>(
+    ruleToCall: (idx: number, ...args: ARGS) => T,
+    options: SubruleMethodOpts & { ARGS: ARGS }
+  ): T
 
   /**
    * @see SUBRULE
@@ -1114,6 +1139,10 @@ export declare class EmbeddedActionsParser extends BaseParser {
   protected SUBRULE5<T>(
     ruleToCall: (idx: number) => T,
     options?: SubruleMethodOpts
+  ): T
+  protected SUBRULE5<ARGS extends unknown[], T>(
+    ruleToCall: (idx: number, ...args: ARGS) => T,
+    options: SubruleMethodOpts & { ARGS: ARGS }
   ): T
 
   /**
@@ -1124,6 +1153,10 @@ export declare class EmbeddedActionsParser extends BaseParser {
     ruleToCall: (idx: number) => T,
     options?: SubruleMethodOpts
   ): T
+  protected SUBRULE6<ARGS extends unknown[], T>(
+    ruleToCall: (idx: number, ...args: ARGS) => T,
+    options: SubruleMethodOpts & { ARGS: ARGS }
+  ): T
 
   /**
    * @see SUBRULE
@@ -1132,6 +1165,10 @@ export declare class EmbeddedActionsParser extends BaseParser {
   protected SUBRULE7<T>(
     ruleToCall: (idx: number) => T,
     options?: SubruleMethodOpts
+  ): T
+  protected SUBRULE7<ARGS extends unknown[], T>(
+    ruleToCall: (idx: number, ...args: ARGS) => T,
+    options: SubruleMethodOpts & { ARGS: ARGS }
   ): T
 
   /**
@@ -1142,6 +1179,10 @@ export declare class EmbeddedActionsParser extends BaseParser {
     ruleToCall: (idx: number) => T,
     options?: SubruleMethodOpts
   ): T
+  protected SUBRULE8<ARGS extends unknown[], T>(
+    ruleToCall: (idx: number, ...args: ARGS) => T,
+    options: SubruleMethodOpts & { ARGS: ARGS }
+  ): T
 
   /**
    * @see SUBRULE
@@ -1150,6 +1191,10 @@ export declare class EmbeddedActionsParser extends BaseParser {
   protected SUBRULE9<T>(
     ruleToCall: (idx: number) => T,
     options?: SubruleMethodOpts
+  ): T
+  protected SUBRULE9<ARGS extends unknown[], T>(
+    ruleToCall: (idx: number, ...args: ARGS) => T,
+    options: SubruleMethodOpts & { ARGS: ARGS }
   ): T
 }
 

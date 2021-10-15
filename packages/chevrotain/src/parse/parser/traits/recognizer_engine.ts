@@ -230,7 +230,7 @@ export class RecognizerEngine {
 
     const wrappedGrammarRule = function (
       idxInCallingRule: number = 0,
-      args: any[]
+      ...args: any[]
     ) {
       this.ruleInvocationStateUpdate(shortName, ruleName, idxInCallingRule)
       return invokeRuleWithTry.call(this, args)
@@ -671,11 +671,23 @@ export class RecognizerEngine {
     ruleToCall: (idx: number) => T,
     idx: number,
     options?: SubruleMethodOpts
+  )
+  subruleInternal<ARGS extends unknown[], T>(
+    this: MixedInParser,
+    ruleToCall: (idx: number, ...args: ARGS) => T,
+    idx: number,
+    options?: SubruleMethodOpts & { ARGS: ARGS }
+  )
+  subruleInternal<T>(
+    this: MixedInParser,
+    ruleToCall: (idx: number) => T,
+    idx: number,
+    options?: SubruleMethodOpts
   ) {
     let ruleResult
     try {
       const args = options !== undefined ? options.ARGS : undefined
-      ruleResult = ruleToCall.call(this, idx, args)
+      ruleResult = ruleToCall.call(this, idx, ...args)
       this.cstPostNonTerminal(
         ruleResult,
         options !== undefined && options.LABEL !== undefined
