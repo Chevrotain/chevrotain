@@ -76,7 +76,7 @@ export class RecognizerEngine {
   tokensMap: { [fqn: string]: TokenType }
   gastProductionsCache: Record<string, Rule>
   shortRuleNameToFull: Record<string, string>
-  fullRuleNameToShort: Record<string, number>
+  fullRuleNameToShort: Record<string, string>
   // The shortName Index must be coded "after" the first 8bits to enable building unique lookahead keys
   ruleShortNameIdx: number
   tokenMatcher: TokenMatcher
@@ -204,14 +204,16 @@ export class RecognizerEngine {
     // this greatly improves Map access time (as much as 8% for some performance benchmarks).
     /* tslint:disable */
     const shortName =
-      this.ruleShortNameIdx << (BITS_FOR_METHOD_TYPE + BITS_FOR_OCCURRENCE_IDX)
+      "" +
+      (this.ruleShortNameIdx <<
+        (BITS_FOR_METHOD_TYPE + BITS_FOR_OCCURRENCE_IDX))
     /* tslint:enable */
 
     this.ruleShortNameIdx++
     this.shortRuleNameToFull[shortName] = ruleName
     this.fullRuleNameToShort[ruleName] = shortName
 
-    function invokeRuleWithTry(args: any[]) {
+    function invokeRuleWithTry(this: MixedInParser, args: any[]) {
       try {
         if (this.outputCst === true) {
           impl.apply(this, args)
@@ -229,6 +231,7 @@ export class RecognizerEngine {
     }
 
     const wrappedGrammarRule = function (
+      this: MixedInParser,
       idxInCallingRule: number = 0,
       args: any[]
     ) {
