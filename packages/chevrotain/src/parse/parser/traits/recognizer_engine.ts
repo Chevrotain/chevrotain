@@ -70,13 +70,13 @@ import { Rule } from "../../grammar/gast/gast_public"
 export class RecognizerEngine {
   isBackTrackingStack
   className: string
-  RULE_STACK: string[]
+  RULE_STACK: number[]
   RULE_OCCURRENCE_STACK: number[]
   definedRulesNames: string[]
   tokensMap: { [fqn: string]: TokenType }
   gastProductionsCache: Record<string, Rule>
   shortRuleNameToFull: Record<string, string>
-  fullRuleNameToShort: Record<string, string>
+  fullRuleNameToShort: Record<string, number>
   // The shortName Index must be coded "after" the first 8bits to enable building unique lookahead keys
   ruleShortNameIdx: number
   tokenMatcher: TokenMatcher
@@ -204,9 +204,7 @@ export class RecognizerEngine {
     // this greatly improves Map access time (as much as 8% for some performance benchmarks).
     /* tslint:disable */
     const shortName =
-      "" +
-      (this.ruleShortNameIdx <<
-        (BITS_FOR_METHOD_TYPE + BITS_FOR_OCCURRENCE_IDX))
+      this.ruleShortNameIdx << (BITS_FOR_METHOD_TYPE + BITS_FOR_OCCURRENCE_IDX)
     /* tslint:enable */
 
     this.ruleShortNameIdx++
@@ -816,7 +814,7 @@ export class RecognizerEngine {
 
   ruleInvocationStateUpdate(
     this: MixedInParser,
-    shortName: string,
+    shortName: number,
     fullName: string,
     idxInCallingRule: number
   ): void {
@@ -835,7 +833,7 @@ export class RecognizerEngine {
     return this.shortRuleNameToFull[shortName]
   }
 
-  shortRuleNameToFullName(this: MixedInParser, shortName: string) {
+  shortRuleNameToFullName(this: MixedInParser, shortName: number) {
     return this.shortRuleNameToFull[shortName]
   }
 
