@@ -70,7 +70,7 @@ import { Rule } from "../../grammar/gast/gast_public"
 export class RecognizerEngine {
   isBackTrackingStack
   className: string
-  RULE_STACK: string[]
+  RULE_STACK: number[]
   RULE_OCCURRENCE_STACK: number[]
   definedRulesNames: string[]
   tokensMap: { [fqn: string]: TokenType }
@@ -211,7 +211,7 @@ export class RecognizerEngine {
     this.shortRuleNameToFull[shortName] = ruleName
     this.fullRuleNameToShort[ruleName] = shortName
 
-    function invokeRuleWithTry(args: any[]) {
+    function invokeRuleWithTry(this: MixedInParser, args: any[]) {
       try {
         if (this.outputCst === true) {
           impl.apply(this, args)
@@ -229,6 +229,7 @@ export class RecognizerEngine {
     }
 
     const wrappedGrammarRule = function (
+      this: MixedInParser,
       idxInCallingRule: number = 0,
       args: any[]
     ) {
@@ -813,7 +814,7 @@ export class RecognizerEngine {
 
   ruleInvocationStateUpdate(
     this: MixedInParser,
-    shortName: string,
+    shortName: number,
     fullName: string,
     idxInCallingRule: number
   ): void {
@@ -832,7 +833,7 @@ export class RecognizerEngine {
     return this.shortRuleNameToFull[shortName]
   }
 
-  shortRuleNameToFullName(this: MixedInParser, shortName: string) {
+  shortRuleNameToFullName(this: MixedInParser, shortName: number) {
     return this.shortRuleNameToFull[shortName]
   }
 
