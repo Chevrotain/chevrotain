@@ -1,6 +1,7 @@
 {
   "extends": ["config:base"],
   "dependencyDashboard": true,
+  "labels": ["dependencies"],
   "packageRules": [
     {
       "matchPackagePatterns": ["*"],
@@ -9,7 +10,7 @@
       "matchDepTypes": ["devDependencies"],
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "all non-major dev dependencies",
-      "groupSlug": "all-dev-minor-patch"
+      "groupSlug": "all-dev-minor-patch",
     }
   ]
 }
