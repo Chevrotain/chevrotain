@@ -3,6 +3,7 @@ import {
   charCodeToOptimizedIndex,
   cloneEmptyGroups,
   DEFAULT_MODE,
+  IAnalyzeResult,
   IPatternConfig,
   LineTerminatorOptimizedTester,
   performRuntimeChecks,
@@ -96,18 +97,20 @@ export class Lexer {
   public lexerDefinitionWarning: ILexerDefinitionError[] = []
 
   protected patternIdxToConfig: Record<string, IPatternConfig[]> = {}
-  protected charCodeToPatternIdxToConfig: Record<string, IPatternConfig[][]> =
-    {}
+  protected charCodeToPatternIdxToConfig: Record<
+    string,
+    { [charCode: number]: IPatternConfig[] }
+  > = {}
 
   protected modes: string[] = []
-  protected defaultMode: string
+  protected defaultMode!: string
   protected emptyGroups: { [groupName: string]: IToken } = {}
 
   private config: Required<ILexerConfig>
   private trackStartLines: boolean = true
   private trackEndLines: boolean = true
   private hasCustom: boolean = false
-  private canModeBeOptimized: any = {}
+  private canModeBeOptimized: Record<string, boolean> = {}
 
   private traceInitPerf!: boolean | number
   private traceInitMaxIdent!: number
@@ -243,7 +246,7 @@ export class Lexer {
             if (isEmpty(this.lexerDefinitionErrors)) {
               augmentTokenTypes(currModDef)
 
-              let currAnalyzeResult
+              let currAnalyzeResult!: IAnalyzeResult
               this.TRACE_INIT(`analyzeTokenTypes`, () => {
                 currAnalyzeResult = analyzeTokenTypes(currModDef, {
                   lineTerminatorCharacters:
@@ -251,7 +254,7 @@ export class Lexer {
                   positionTracking: config.positionTracking,
                   ensureOptimizations: config.ensureOptimizations,
                   safeMode: config.safeMode,
-                  tracer: this.TRACE_INIT.bind(this)
+                  tracer: this.TRACE_INIT
                 })
               })
 
@@ -352,7 +355,7 @@ export class Lexer {
             }
             return cannotBeOptimized
           },
-          []
+          [] as string[]
         )
 
         if (config.ensureOptimizations && !isEmpty(unOptimizedModes)) {
@@ -436,19 +439,21 @@ export class Lexer {
 
     let currModePatternsLength = 0
     let patternIdxToConfig: IPatternConfig[] = []
-    let currCharCodeToPatternIdxToConfig: IPatternConfig[][] = []
+    let currCharCodeToPatternIdxToConfig: {
+      [charCode: number]: IPatternConfig[]
+    } = []
 
     const modeStack: string[] = []
 
-    const emptyArray = []
+    const emptyArray: IPatternConfig[] = []
     Object.freeze(emptyArray)
-    let getPossiblePatterns = undefined
+    let getPossiblePatterns!: (charCode: number) => IPatternConfig[]
 
     function getPossiblePatternsSlow() {
       return patternIdxToConfig
     }
 
-    function getPossiblePatternsOptimized(charCode) {
+    function getPossiblePatternsOptimized(charCode: number): IPatternConfig[] {
       const optimizedCharIdx = charCodeToOptimizedIndex(charCode)
       const possiblePatterns =
         currCharCodeToPatternIdxToConfig[optimizedCharIdx]
@@ -459,7 +464,7 @@ export class Lexer {
       }
     }
 
-    const pop_mode = (popToken) => {
+    const pop_mode = (popToken: IToken) => {
       // TODO: perhaps avoid this error in the edge case there is no more input?
       if (
         modeStack.length === 1 &&
@@ -476,18 +481,14 @@ export class Lexer {
 
         errors.push({
           offset: popToken.startOffset,
-          line:
-            popToken.startLine !== undefined ? popToken.startLine : undefined,
-          column:
-            popToken.startColumn !== undefined
-              ? popToken.startColumn
-              : undefined,
+          line: popToken.startLine,
+          column: popToken.startColumn,
           length: popToken.image.length,
           message: msg
         })
       } else {
         modeStack.pop()
-        const newMode = last(modeStack)
+        const newMode = last(modeStack)!
         patternIdxToConfig = this.patternIdxToConfig[newMode]
         currCharCodeToPatternIdxToConfig =
           this.charCodeToPatternIdxToConfig[newMode]
@@ -503,7 +504,7 @@ export class Lexer {
       }
     }
 
-    function push_mode(this: Lexer, newMode) {
+    function push_mode(this: Lexer, newMode: string) {
       modeStack.push(newMode)
       currCharCodeToPatternIdxToConfig =
         this.charCodeToPatternIdxToConfig[newMode]
@@ -526,7 +527,7 @@ export class Lexer {
     // seem to matter performance wise.
     push_mode.call(this, initialMode)
 
-    let currConfig
+    let currConfig!: IPatternConfig
 
     while (offset < orgLength) {
       matchedImage = null
@@ -548,7 +549,12 @@ export class Lexer {
             matchedImage = currPattern
           }
         } else if (currConfig.isCustom === true) {
-          match = currPattern.exec(orgText, offset, matchedTokens, groups)
+          match = (currPattern as IRegExpExec).exec(
+            orgText,
+            offset,
+            matchedTokens,
+            groups
+          )
           if (match !== null) {
             matchedImage = match[0]
             if (match.payload !== undefined) {
@@ -558,8 +564,8 @@ export class Lexer {
             matchedImage = null
           }
         } else {
-          this.updateLastIndex(currPattern, offset)
-          matchedImage = this.match(currPattern, text, offset)
+          this.updateLastIndex(currPattern as RegExp, offset)
+          matchedImage = this.match(currPattern as RegExp, text, offset)
         }
 
         if (matchedImage !== null) {
@@ -578,7 +584,7 @@ export class Lexer {
               // single Char can never be a longer alt so no need to test it.
               // manually in-lined because > 600 chars won't be in-lined in V8
               if (longerAltConfig.isCustom === true) {
-                match = longerAltPattern.exec(
+                match = (longerAltPattern as IRegExpExec).exec(
                   orgText,
                   offset,
                   matchedTokens,
@@ -593,8 +599,12 @@ export class Lexer {
                   matchAltImage = null
                 }
               } else {
-                this.updateLastIndex(longerAltPattern, offset)
-                matchAltImage = this.match(longerAltPattern, text, offset)
+                this.updateLastIndex(longerAltPattern as RegExp, offset)
+                matchAltImage = this.match(
+                  longerAltPattern as RegExp,
+                  text,
+                  offset
+                )
               }
 
               if (matchAltImage && matchAltImage.length > matchedImage.length) {
@@ -702,10 +712,14 @@ export class Lexer {
               }
             } else if (currConfig.isCustom === true) {
               foundResyncPoint =
-                currPattern.exec(orgText, offset, matchedTokens, groups) !==
-                null
+                (currPattern as IRegExpExec).exec(
+                  orgText,
+                  offset,
+                  matchedTokens,
+                  groups
+                ) !== null
             } else {
-              this.updateLastIndex(currPattern, offset)
+              this.updateLastIndex(currPattern as RegExp, offset)
               foundResyncPoint = (currPattern as RegExp).exec(text) !== null
             }
 
@@ -748,7 +762,12 @@ export class Lexer {
     }
   }
 
-  private handleModes(config, pop_mode, push_mode, newToken) {
+  private handleModes(
+    config: IPatternConfig,
+    pop_mode: (tok: IToken) => void,
+    push_mode: (this: Lexer, pushMode: string) => void,
+    newToken: IToken
+  ) {
     if (config.pop === true) {
       // need to save the PUSH_MODE property as if the mode is popped
       // patternIdxToPopMode is updated to reflect the new mode after popping the stack
@@ -762,23 +781,23 @@ export class Lexer {
     }
   }
 
-  private chopInput(text, length): string {
+  private chopInput(text: string, length: number): string {
     return text.substring(length)
   }
 
-  private updateLastIndex(regExp, newLastIndex): void {
+  private updateLastIndex(regExp: RegExp, newLastIndex: number): void {
     regExp.lastIndex = newLastIndex
   }
 
   // TODO: decrease this under 600 characters? inspect stripping comments option in TSC compiler
   private updateTokenEndLineColumnLocation(
-    newToken,
-    group,
-    lastLTIdx,
-    numOfLTsInMatch,
-    line,
-    column,
-    imageLength
+    newToken: IToken,
+    group: string | undefined,
+    lastLTIdx: number,
+    numOfLTsInMatch: number,
+    line: number,
+    column: number,
+    imageLength: number
   ): void {
     let lastCharIsLT, fixForEndingInLT
     if (group !== undefined) {
@@ -796,17 +815,20 @@ export class Lexer {
     }
   }
 
-  private computeNewColumn(oldColumn, imageLength) {
+  private computeNewColumn(oldColumn: number, imageLength: number) {
     return oldColumn + imageLength
   }
 
   // Place holder, will be replaced by the correct variant according to the locationTracking option at runtime.
   /* istanbul ignore next - place holder */
-  private createTokenInstance(...args: any[]): IToken {
-    return null
-  }
+  private createTokenInstance!: (...args: any[]) => IToken
 
-  private createOffsetOnlyToken(image, startOffset, tokenTypeIdx, tokenType) {
+  private createOffsetOnlyToken(
+    image: string,
+    startOffset: number,
+    tokenTypeIdx: number,
+    tokenType: TokenType
+  ) {
     return {
       image,
       startOffset,
@@ -816,12 +838,12 @@ export class Lexer {
   }
 
   private createStartOnlyToken(
-    image,
-    startOffset,
-    tokenTypeIdx,
-    tokenType,
-    startLine,
-    startColumn
+    image: string,
+    startOffset: number,
+    tokenTypeIdx: number,
+    tokenType: TokenType,
+    startLine: number,
+    startColumn: number
   ) {
     return {
       image,
@@ -834,14 +856,14 @@ export class Lexer {
   }
 
   private createFullToken(
-    image,
-    startOffset,
-    tokenTypeIdx,
-    tokenType,
-    startLine,
-    startColumn,
-    imageLength
-  ) {
+    image: string,
+    startOffset: number,
+    tokenTypeIdx: number,
+    tokenType: TokenType,
+    startLine: number,
+    startColumn: number,
+    imageLength: number
+  ): IToken {
     return {
       image,
       startOffset,
@@ -857,23 +879,32 @@ export class Lexer {
 
   // Place holder, will be replaced by the correct variant according to the locationTracking option at runtime.
   /* istanbul ignore next - place holder */
-  private addToken(tokenVector, index, tokenToAdd): number {
-    return 666
-  }
+  private addToken!: (
+    tokenVector: IToken[],
+    index: number,
+    tokenToAdd: IToken
+  ) => number
 
-  private addTokenUsingPush(tokenVector, index, tokenToAdd): number {
+  private addTokenUsingPush(
+    tokenVector: IToken[],
+    index: number,
+    tokenToAdd: IToken
+  ): number {
     tokenVector.push(tokenToAdd)
     return index
   }
 
-  private addTokenUsingMemberAccess(tokenVector, index, tokenToAdd): number {
+  private addTokenUsingMemberAccess(
+    tokenVector: IToken[],
+    index: number,
+    tokenToAdd: IToken
+  ): number {
     tokenVector[index] = tokenToAdd
     index++
     return index
   }
 
   // Place holder, will be replaced by the correct variant according to the hasCustom flag option at runtime.
-  /* istanbul ignore next - place holder */
   private handlePayload(token: IToken, payload: any): void {}
 
   private handlePayloadNoCustom(token: IToken, payload: any): void {}
@@ -884,12 +915,18 @@ export class Lexer {
     }
   }
 
-  /* istanbul ignore next - place holder to be replaced with chosen alternative at runtime */
-  private match(pattern: IRegExpExec, text: string, offset?: number): string {
-    return null
-  }
+  // place holder to be replaced with chosen alternative at runtime
+  private match!: (
+    pattern: RegExp,
+    text: string,
+    offset: number
+  ) => string | null | RegExpExecArray
 
-  private matchWithTest(pattern: RegExp, text: string, offset: number): string {
+  private matchWithTest(
+    pattern: RegExp,
+    text: string,
+    offset: number
+  ): string | null {
     const found = pattern.test(text)
     if (found === true) {
       return text.substring(offset, pattern.lastIndex)
@@ -897,14 +934,17 @@ export class Lexer {
     return null
   }
 
-  private matchWithExec(pattern, text): string {
+  private matchWithExec(
+    pattern: RegExp,
+    text: string
+  ): string | null | RegExpExecArray {
     const regExpArray = pattern.exec(text)
     return regExpArray !== null ? regExpArray[0] : regExpArray
   }
 
   // Duplicated from the parser's perf trace trait to allow future extraction
   // of the lexer to a separate package.
-  TRACE_INIT<T>(phaseDesc: string, phaseImpl: () => T): T {
+  TRACE_INIT = <T>(phaseDesc: string, phaseImpl: () => T): T => {
     // No need to optimize this using NOOP pattern because
     // It is not called in a hot spot...
     if (this.traceInitPerf === true) {
