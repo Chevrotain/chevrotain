@@ -3,6 +3,7 @@ import {
   charCodeToOptimizedIndex,
   cloneEmptyGroups,
   DEFAULT_MODE,
+  IPatternConfig,
   LineTerminatorOptimizedTester,
   performRuntimeChecks,
   performWarningRuntimeChecks,
@@ -38,7 +39,7 @@ import {
   IToken,
   TokenType
 } from "@chevrotain/types"
-import { defaultLexerErrorProvider } from "../scan/lexer_errors_public"
+import { defaultLexerErrorProvider } from "./lexer_errors_public"
 import { clearRegExpParserCache } from "./reg_exp_parser"
 
 export interface ILexingResult {
@@ -94,8 +95,9 @@ export class Lexer {
   public lexerDefinitionErrors: ILexerDefinitionError[] = []
   public lexerDefinitionWarning: ILexerDefinitionError[] = []
 
-  protected patternIdxToConfig: any = {}
-  protected charCodeToPatternIdxToConfig: any = {}
+  protected patternIdxToConfig: Record<string, IPatternConfig[]> = {}
+  protected charCodeToPatternIdxToConfig: Record<string, IPatternConfig[][]> =
+    {}
 
   protected modes: string[] = []
   protected defaultMode: string
@@ -391,9 +393,7 @@ export class Lexer {
       )
     }
 
-    const lexResult = this.tokenizeInternal(text, initialMode)
-
-    return lexResult
+    return this.tokenizeInternal(text, initialMode)
   }
 
   // There is quite a bit of duplication between this and "tokenizeInternalLazy"
@@ -435,10 +435,10 @@ export class Lexer {
     const lineTerminatorPattern = this.config.lineTerminatorsPattern
 
     let currModePatternsLength = 0
-    let patternIdxToConfig = []
-    let currCharCodeToPatternIdxToConfig = []
+    let patternIdxToConfig: IPatternConfig[] = []
+    let currCharCodeToPatternIdxToConfig: IPatternConfig[][] = []
 
-    const modeStack = []
+    const modeStack: string[] = []
 
     const emptyArray = []
     Object.freeze(emptyArray)
@@ -503,7 +503,7 @@ export class Lexer {
       }
     }
 
-    function push_mode(newMode) {
+    function push_mode(this: Lexer, newMode) {
       modeStack.push(newMode)
       currCharCodeToPatternIdxToConfig =
         this.charCodeToPatternIdxToConfig[newMode]
@@ -706,7 +706,7 @@ export class Lexer {
                 null
             } else {
               this.updateLastIndex(currPattern, offset)
-              foundResyncPoint = currPattern.exec(text) !== null
+              foundResyncPoint = (currPattern as RegExp).exec(text) !== null
             }
 
             if (foundResyncPoint === true) {
@@ -885,7 +885,7 @@ export class Lexer {
   }
 
   /* istanbul ignore next - place holder to be replaced with chosen alternative at runtime */
-  private match(pattern: RegExp, text: string, offset?: number): string {
+  private match(pattern: IRegExpExec, text: string, offset?: number): string {
     return null
   }
 

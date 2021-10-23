@@ -1197,7 +1197,7 @@ export declare class Lexer {
    *
    *  The current lexing mode is selected via a "mode stack".
    *  The last (peek) value in the stack will be the current mode of the lexer.
-   *  Defining entering and exiting lexer modes is done using the "push_mode" and "pop_mode" properites
+   *  Defining entering and exiting lexer modes is done using the "push_mode" and "pop_mode" properties
    *  of the {@link createToken.config} parameter.
    *
    *  - The Lexer will match the **first** pattern that matches, Therefor the order of Token Types is significant.
@@ -1360,10 +1360,10 @@ export interface ILexerErrorMessageProvider {
    *
    * @param length - Error length.
    *
-   * @param line - Line number where the error occured. (optional)
+   * @param line - Line number where the error occurred. (optional)
    *                    Will not be provided when lexer is not defined to track lines/columns
    *
-   * @param column - Column number where the error occured. (optional)
+   * @param column - Column number where the error occurred. (optional)
    *                    Will not be provided when lexer is not defined to track lines/columns
    */
   buildUnexpectedCharactersMessage(
