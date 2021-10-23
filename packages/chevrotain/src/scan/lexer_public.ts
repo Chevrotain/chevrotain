@@ -21,7 +21,6 @@ import {
   keys,
   last,
   map,
-  merge,
   NOOP,
   PRINT_WARNING,
   reduce,
@@ -103,19 +102,19 @@ export class Lexer {
   protected defaultMode: string
   protected emptyGroups: { [groupName: string]: IToken } = {}
 
-  private config: ILexerConfig = undefined
+  private config: ILexerConfig
   private trackStartLines: boolean = true
   private trackEndLines: boolean = true
   private hasCustom: boolean = false
   private canModeBeOptimized: any = {}
 
-  private traceInitPerf: boolean | number
-  private traceInitMaxIdent: number
+  private traceInitPerf!: boolean | number
+  private traceInitMaxIdent!: number
   private traceInitIndent: number
 
   constructor(
     protected lexerDefinition: TokenType[] | IMultiModeLexerDefinition,
-    config: ILexerConfig = DEFAULT_LEXER_CONFIG
+    config: Partial<ILexerConfig> = DEFAULT_LEXER_CONFIG
   ) {
     if (typeof config === "boolean") {
       throw Error(
@@ -125,7 +124,7 @@ export class Lexer {
     }
 
     // todo: defaults func?
-    this.config = merge(DEFAULT_LEXER_CONFIG, config)
+    this.config = Object.assign({}, DEFAULT_LEXER_CONFIG, config)
 
     const traceInitVal = this.config.traceInitPerf
     if (traceInitVal === true) {
@@ -138,7 +137,7 @@ export class Lexer {
     this.traceInitIndent = -1
 
     this.TRACE_INIT("Lexer Constructor", () => {
-      let actualDefinition: IMultiModeLexerDefinition
+      let actualDefinition!: IMultiModeLexerDefinition
       let hasOnlySingleMode = true
       this.TRACE_INIT("Lexer Config handling", () => {
         if (
@@ -172,11 +171,10 @@ export class Lexer {
 
         // Convert SingleModeLexerDefinition into a IMultiModeLexerDefinition.
         if (isArray(lexerDefinition)) {
-          actualDefinition = <any>{ modes: {} }
-          actualDefinition.modes[DEFAULT_MODE] = cloneArr(
-            <TokenType[]>lexerDefinition
-          )
-          actualDefinition[DEFAULT_MODE] = DEFAULT_MODE
+          actualDefinition = {
+            modes: { defaultMode: cloneArr(lexerDefinition) },
+            defaultMode: DEFAULT_MODE
+          }
         } else {
           // no conversion needed, input should already be a IMultiModeLexerDefinition
           hasOnlySingleMode = false
@@ -186,7 +184,7 @@ export class Lexer {
         }
       })
 
-      if (this.config.skipValidations === false) {
+      if (!this.config.skipValidations) {
         this.TRACE_INIT("performRuntimeChecks", () => {
           this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(
             performRuntimeChecks(
@@ -262,7 +260,8 @@ export class Lexer {
               this.charCodeToPatternIdxToConfig[currModName] =
                 currAnalyzeResult.charCodeToPatternIdxToConfig
 
-              this.emptyGroups = merge(
+              this.emptyGroups = Object.assign(
+                {},
                 this.emptyGroups,
                 currAnalyzeResult.emptyGroups
               )

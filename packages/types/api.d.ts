@@ -1246,7 +1246,7 @@ export interface ILexerConfig {
    * This can be useful when wishing to indicate lexer errors in another manner
    * than simply throwing an error (for example in an online playground).
    */
-  deferDefinitionErrorsHandling?: boolean
+  deferDefinitionErrorsHandling: boolean
 
   /**
    * "full" location information means all six combinations of /(end|start)(Line|Column|Offset)/ properties.
@@ -1258,7 +1258,7 @@ export interface ILexerConfig {
    * in edge cases where every last ounce of performance is needed.
    */
   // TODO: consider renaming this to LocationTracking to align with NodeLocationTracking option on the ParserConfig.
-  positionTracking?: "full" | "onlyStart" | "onlyOffset"
+  positionTracking: "full" | "onlyStart" | "onlyOffset"
 
   /**
    * A regExp defining custom line terminators.
@@ -1266,7 +1266,7 @@ export interface ILexerConfig {
    *
    * Note that the regExp should use the global flag, for example: /\n/g
    *
-   * The default is: /\n|\r\n?/g
+   * The default is: /\n|\r\n/g
    *
    * But some grammars have a different definition, for example in ECMAScript:
    * https://www.ecma-international.org/ecma-262/8.0/index.html#sec-line-terminators
@@ -1278,17 +1278,17 @@ export interface ILexerConfig {
    * as only a subset of the RegExp APIs is needed, {@link ILineTerminatorsTester}
    * for details.
    *
-   * keep in mind that for the default pattern: /\n|\r\n?/g an optimized implementation is already built-in.
+   * keep in mind that for the default pattern: /\n|\r\n/g an optimized implementation is already built-in.
    * This means the optimization is only relevant for lexers overriding the default pattern.
    */
-  lineTerminatorsPattern?: RegExp | ILineTerminatorsTester
+  lineTerminatorsPattern: RegExp | ILineTerminatorsTester
 
   /**
    * Characters or CharCodes that represent line terminators for this lexer.
    * This always needs to be provided when using a custom {@link ILexerConfig.lineTerminatorsPattern}.
    * In the future this duplication may be removed or reduced.
    */
-  lineTerminatorCharacters?: (number | string)[]
+  lineTerminatorCharacters: (number | string)[]
 
   /**
    * When true this flag will cause the Lexer to throw an Error
@@ -1301,14 +1301,14 @@ export interface ILexerConfig {
    * The optimizations can boost the lexer's performance anywhere from 30%
    * to 100%+ depending on the number of TokenTypes used.
    */
-  ensureOptimizations?: boolean
+  ensureOptimizations: boolean
 
   /**
    * Can be used to disable lexer optimizations
    * If there is a suspicion they are causing incorrect behavior.
    * Note that this would have negative performance implications.
    */
-  safeMode?: boolean
+  safeMode: boolean
 
   /**
    * A custom error message provider.
@@ -1317,7 +1317,7 @@ export interface ILexerConfig {
    *   - Translating the error messages to a different languages.
    *   - Changing the formatting.
    */
-  errorMessageProvider?: ILexerErrorMessageProvider
+  errorMessageProvider: ILexerErrorMessageProvider
 
   /**
    * Enabling this flag will print performance tracing logs during lexer
@@ -1333,7 +1333,7 @@ export interface ILexerConfig {
    *
    * Note that passing the boolean `true` is identical to passing the numerical value `infinity`
    */
-  traceInitPerf?: boolean | number
+  traceInitPerf: boolean | number
 
   /**
    * This flag will avoid running the Lexer validations during Lexer initialization.
@@ -1346,7 +1346,7 @@ export interface ILexerConfig {
    * So they should not be skipped during development flows.
    *   - For example: via a conditional that checks an env variable.
    */
-  skipValidations?: boolean
+  skipValidations: boolean
 }
 
 export interface ILexerErrorMessageProvider {
@@ -2300,6 +2300,7 @@ export interface IProduction {
 
 export interface IProductionWithOccurrence extends IProduction {
   idx: number
+  maxLookahead?: number
 }
 
 /**

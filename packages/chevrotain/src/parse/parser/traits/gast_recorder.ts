@@ -393,7 +393,8 @@ function recordOrProd(mainProdArg: any, occurrence: number): any {
   const prevProd: any = peek(this.recordingProdStack)
   // Only an array of alternatives
   const hasOptions = isArray(mainProdArg) === false
-  const alts = hasOptions === false ? mainProdArg : mainProdArg.DEF
+  const alts: IOrAlt<unknown>[] =
+    hasOptions === false ? mainProdArg : mainProdArg.DEF
 
   const newOrProd = new Alternation({
     definition: [],

@@ -58,7 +58,10 @@ const allTokens = [
 // file even if the tests will avoid running it.
 if (typeof (<any>new RegExp("(?:)")).sticky === "boolean") {
   forEach(allTokens, (currTokType) => {
-    currTokType.PATTERN = new RegExp(currTokType.PATTERN.source, "y")
+    currTokType.PATTERN = new RegExp(
+      (currTokType.PATTERN as RegExp).source,
+      "y"
+    )
   })
 }
 

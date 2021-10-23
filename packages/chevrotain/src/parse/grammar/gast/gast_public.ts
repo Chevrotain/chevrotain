@@ -152,6 +152,7 @@ export class RepetitionMandatoryWithSeparator
 {
   public separator: TokenType
   public idx: number = 1
+  public maxLookahead?: number
 
   constructor(options: {
     definition: IProduction[]
@@ -193,6 +194,7 @@ export class RepetitionWithSeparator
 {
   public separator: TokenType
   public idx: number = 1
+  public maxLookahead?: number
 
   constructor(options: {
     definition: IProduction[]

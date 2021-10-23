@@ -465,8 +465,8 @@ export function validateAmbiguousAlternationAlternatives(
   return errors
 }
 
-export class RepetionCollector extends GAstVisitor {
-  public allProductions: IProduction[] = []
+export class RepetitionCollector extends GAstVisitor {
+  public allProductions: IProductionWithOccurrence[] = []
 
   public visitRepetitionWithSeparator(manySep: RepetitionWithSeparator): void {
     this.allProductions.push(manySep)
@@ -524,7 +524,7 @@ export function validateSomeNonEmptyLookaheadPath(
 ): IParserDefinitionError[] {
   const errors = []
   forEach(topLevelRules, (currTopRule) => {
-    const collectorVisitor = new RepetionCollector()
+    const collectorVisitor = new RepetitionCollector()
     currTopRule.accept(collectorVisitor)
     const allRuleProductions = collectorVisitor.allProductions
     forEach(allRuleProductions, (currProd) => {
@@ -601,7 +601,7 @@ function checkAlternativesAmbiguities(
       })
       return result
     },
-    []
+    [] as { alts: number[]; path: TokenType[] }[]
   )
 
   const currErrors = utils.map(identicalAmbiguities, (currAmbDescriptor) => {
@@ -622,7 +622,7 @@ function checkAlternativesAmbiguities(
       type: ParserDefinitionErrorType.AMBIGUOUS_ALTS,
       ruleName: rule.name,
       occurrence: alternation.idx,
-      alternatives: [currAmbDescriptor.alts]
+      alternatives: currAmbDescriptor.alts
     }
   })
 

@@ -154,7 +154,7 @@ export class LooksAhead {
     prodOccurrence: number,
     prodKey: number,
     prodType: PROD_TYPE,
-    prodMaxLookahead: number,
+    prodMaxLookahead: number | undefined,
     dslMethodName: string
   ): void {
     this.TRACE_INIT(

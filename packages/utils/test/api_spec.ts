@@ -33,15 +33,12 @@ describe("The Utils functions namespace", () => {
   it("exports a last utility", () => {
     expect(last([1, 2, 3])).to.equal(3)
     expect(last([])).to.equal(undefined)
-    expect(last(null)).to.equal(undefined)
   })
 
   it("exports a forEach utility", () => {
     forEach([1, 2, 3], (item, idx) => {
       expect(item).to.equal(idx + 1)
     })
-
-    expect(() => forEach(null, (item) => {})).to.throw("non exhaustive match")
 
     forEach([], (item) => {
       throw Error("call back should not be invoked for empty array")
@@ -95,11 +92,6 @@ describe("The Utils functions namespace", () => {
         return item % 2 === 1
       })
     ).to.deep.equal([1, 3])
-    expect(
-      filter(null, (item) => {
-        return item % 2 === 1
-      })
-    ).to.deep.equal([])
   })
 
   it("exports a reject utility", () => {
@@ -128,11 +120,6 @@ describe("The Utils functions namespace", () => {
         return item % 2 === 1
       })
     ).to.deep.equal([2])
-    expect(
-      reject(null, (item) => {
-        return item % 2 === 1
-      })
-    ).to.deep.equal([])
   })
 
   it("exports a has utility", () => {
@@ -152,7 +139,7 @@ describe("The Utils functions namespace", () => {
   it("exports a cloneArr utility", () => {
     expect(cloneArr([1, 2, 3])).to.deep.equal([1, 2, 3])
     expect(cloneArr([])).to.deep.equal([])
-    const arr = []
+    const arr: never[] = []
     expect(cloneArr(arr)).to.not.equal(arr)
   })
 
@@ -182,7 +169,7 @@ describe("The Utils functions namespace", () => {
         (result, item) => {
           return result.concat([item * 2])
         },
-        []
+        [] as number[]
       )
     ).to.deep.equal([2, 4, 6])
 
@@ -192,7 +179,7 @@ describe("The Utils functions namespace", () => {
         (result, item) => {
           return result.concat([item * 2])
         },
-        []
+        [] as number[]
       )
     ).to.deep.equal([2, 4, 6])
   })
@@ -222,7 +209,7 @@ describe("The Utils functions namespace", () => {
   })
 
   it("exports a partial utility", () => {
-    const add = function (x, y) {
+    const add = function (x: number, y: number) {
       return x + y
     }
     expect(partial(add)(2, 3)).to.equal(5)
