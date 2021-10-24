@@ -4,7 +4,7 @@
 
 - This will generate chevrotain.js artifact in the lib directory.
 
-2.  open both index_dev.html and index_latest.html in your prefered browser.
+2.  open both index_dev.html and index_latest.html in your preferred browser.
 
 3.  Select the running mode (lex/parse or both) by clicking the relevant button.
     - You should run both scenarios (Dev/Latest) in the same mode

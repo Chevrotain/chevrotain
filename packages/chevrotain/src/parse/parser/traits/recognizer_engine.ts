@@ -60,7 +60,6 @@ import {
   tokenStructuredMatcher,
   tokenStructuredMatcherNoCategories
 } from "../../../scan/tokens"
-import { classNameFromInstance } from "../../../lang/lang_extensions"
 import { Rule } from "../../grammar/gast/gast_public"
 
 /**
@@ -85,7 +84,7 @@ export class RecognizerEngine {
     tokenVocabulary: TokenVocabulary,
     config: IParserConfig
   ) {
-    this.className = classNameFromInstance(this)
+    this.className = this.constructor.name
     // TODO: would using an ES6 Map or plain object be faster (CST building scenario)
     this.shortRuleNameToFull = {}
     this.fullRuleNameToShort = {}

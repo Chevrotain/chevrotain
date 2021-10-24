@@ -5,7 +5,7 @@ import {
   buildSingleAlternativeLookaheadFunction,
   PROD_TYPE
 } from "../../grammar/lookahead"
-import { forEach, has, isES2015MapSupported } from "@chevrotain/utils"
+import { forEach, has } from "@chevrotain/utils"
 import {
   DEFAULT_PARSER_CONFIG,
   lookAheadSequence,
@@ -42,19 +42,7 @@ export class LooksAhead {
       ? config.maxLookahead
       : DEFAULT_PARSER_CONFIG.maxLookahead
 
-    /* istanbul ignore next - Using plain array as dictionary will be tested on older node.js versions and IE11 */
-    this.lookAheadFuncsCache = isES2015MapSupported() ? new Map() : []
-
-    // Performance optimization on newer engines that support ES6 Map
-    // For larger Maps this is slightly faster than using a plain object (array in our case).
-    /* istanbul ignore else - The else branch will be tested on older node.js versions and IE11 */
-    if (isES2015MapSupported()) {
-      this.getLaFuncFromCache = this.getLaFuncFromMap
-      this.setLaFuncCache = this.setLaFuncCacheUsingMap
-    } else {
-      this.getLaFuncFromCache = this.getLaFuncFromObj
-      this.setLaFuncCache = this.setLaFuncUsingObj
-    }
+    this.lookAheadFuncsCache = new Map()
   }
 
   preComputeLookaheadFunctions(this: MixedInParser, rules: Rule[]): void {
@@ -220,33 +208,12 @@ export class LooksAhead {
     )
   }
 
-  /* istanbul ignore next */
   getLaFuncFromCache(this: MixedInParser, key: number): Function {
-    return undefined
-  }
-
-  getLaFuncFromMap(this: MixedInParser, key: number): Function {
     return this.lookAheadFuncsCache.get(key)
   }
 
-  /* istanbul ignore next - Using plain array as dictionary will be tested on older node.js versions and IE11 */
-  getLaFuncFromObj(this: MixedInParser, key: number): Function {
-    return this.lookAheadFuncsCache[key]
-  }
-
   /* istanbul ignore next */
-  setLaFuncCache(this: MixedInParser, key: number, value: Function): void {}
-
-  setLaFuncCacheUsingMap(
-    this: MixedInParser,
-    key: number,
-    value: Function
-  ): void {
+  setLaFuncCache(this: MixedInParser, key: number, value: Function): void {
     this.lookAheadFuncsCache.set(key, value)
-  }
-
-  /* istanbul ignore next - Using plain array as dictionary will be tested on older node.js versions and IE11 */
-  setLaFuncUsingObj(this: MixedInParser, key: number, value: Function): void {
-    this.lookAheadFuncsCache[key] = value
   }
 }

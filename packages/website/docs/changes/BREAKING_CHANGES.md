@@ -1,5 +1,11 @@
 ## 9.0.0
 
+- Dropped support for legacy ES5.1 runtimes (e.g: IE11)
+  The minimum ECMAScript version needed to run Chevrotain is now ES2015 (ES6).
+  This should not affect anyone running on a modern engine, (e.g modern NodeJS versions / major browsers).
+
+## 9.0.0
+
 - **Custom APIs** feature has been deprecated and removed.
   This means the following public APIs no longer exist:
   - `resolveGrammar`
