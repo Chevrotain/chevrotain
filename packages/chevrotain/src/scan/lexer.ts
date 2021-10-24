@@ -1087,13 +1087,15 @@ export function buildLineBreakIssueMessage(
 }
 
 function getCharCodes(charsOrCodes: (number | string)[]): number[] {
-  return map(charsOrCodes, (numOrString) => {
+  const charCodes = map(charsOrCodes, (numOrString) => {
     if (isString(numOrString)) {
       return numOrString.charCodeAt(0)
     } else {
       return numOrString
     }
   })
+
+  return charCodes
 }
 
 function addToMapOfArrays(map, key, value): void {

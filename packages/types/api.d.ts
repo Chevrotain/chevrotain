@@ -1278,7 +1278,7 @@ export interface ILexerConfig {
    * as only a subset of the RegExp APIs is needed, {@link ILineTerminatorsTester}
    * for details.
    *
-   * keep in mind that for the default pattern: /\n|\r\n/g an optimized implementation is already built-in.
+   * keep in mind that for the default pattern: /\n|\r\n?/g an optimized implementation is already built-in.
    * This means the optimization is only relevant for lexers overriding the default pattern.
    */
   lineTerminatorsPattern: RegExp | ILineTerminatorsTester
