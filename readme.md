@@ -62,8 +62,9 @@ This dependency is included in the bundled artifacts, for ease of consumption in
 
 ## Compatibility
 
-Chevrotain runs on any modern JavaScript ES5.1 runtime.
-That includes any modern nodejs version, modern browsers and even IE11.
+Chevrotain will run on any **modern** JavaScript ES2015 runtime.
+That includes nodejs maintenance/active/current version, modern major browsers,
+but **not** legacy ES5.1 runtimes such as IE11.
 
 - Uses [UMD](https://github.com/umdjs/umd) to work with common module loaders (browser global / amd / commonjs).
 

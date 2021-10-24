@@ -9,7 +9,7 @@ import {
   keys,
   map
 } from "@chevrotain/utils"
-import { defineNameProp, functionName } from "../../lang/lang_extensions"
+import { defineNameProp } from "../../lang/lang_extensions"
 import { ICstVisitor } from "@chevrotain/types"
 
 export function defaultVisit<IN, OUT>(ctx: any, param: IN): OUT {
@@ -69,9 +69,8 @@ export function createBaseSemanticVisitorConstructor(
           (currDefError) => currDefError.msg
         )
         throw Error(
-          `Errors Detected in CST Visitor <${functionName(
-            this.constructor
-          )}>:\n\t` + `${errorMessages.join("\n\n").replace(/\n/g, "\n\t")}`
+          `Errors Detected in CST Visitor <${this.constructor.name}>:\n\t` +
+            `${errorMessages.join("\n\n").replace(/\n/g, "\n\t")}`
         )
       }
     }
@@ -138,8 +137,8 @@ export function validateMissingCstMethods(
   const errors: IVisitorDefinitionError[] = map(ruleNames, (currRuleName) => {
     if (!isFunction(visitorInstance[currRuleName])) {
       return {
-        msg: `Missing visitor method: <${currRuleName}> on ${functionName(
-          <any>visitorInstance.constructor
+        msg: `Missing visitor method: <${currRuleName}> on ${<any>(
+          visitorInstance.constructor.name
         )} CST Visitor.`,
         type: CstVisitorDefinitionError.MISSING_METHOD,
         methodName: currRuleName
@@ -165,8 +164,8 @@ export function validateRedundantMethods(
     ) {
       errors.push({
         msg:
-          `Redundant visitor method: <${prop}> on ${functionName(
-            <any>visitorInstance.constructor
+          `Redundant visitor method: <${prop}> on ${<any>(
+            visitorInstance.constructor.name
           )} CST Visitor\n` +
           `There is no Grammar Rule corresponding to this method's name.\n`,
         type: CstVisitorDefinitionError.REDUNDANT_METHOD,

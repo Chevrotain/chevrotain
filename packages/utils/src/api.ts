@@ -423,10 +423,6 @@ export function PRINT_WARNING(msg) {
   }
 }
 
-export function isES2015MapSupported(): boolean {
-  return typeof Map === "function"
-}
-
 export function peek<T>(arr: T[]): T {
   return arr[arr.length - 1]
 }

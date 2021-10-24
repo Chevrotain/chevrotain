@@ -2,7 +2,6 @@ import { createToken } from "../../src/scan/tokens_public"
 import { EmbeddedActionsParser } from "../../src/parse/parser/traits/parser_traits"
 import { createRegularToken } from "../utils/matchers"
 import { IToken } from "@chevrotain/types"
-import { isES2015MapSupported } from "@chevrotain/utils"
 import { expect } from "chai"
 
 describe("lookahead Regular Tokens Mode", () => {
@@ -33,16 +32,6 @@ describe("lookahead Regular Tokens Mode", () => {
 
   describe("The implicit lookahead calculation functionality of the Recognizer For OPTION", () => {
     class OptionsImplicitLookAheadParser extends EmbeddedActionsParser {
-      public getLookAheadCacheSize(): number {
-        if (isES2015MapSupported()) {
-          // @ts-ignore
-          return this.lookAheadFuncsCache.size
-        } else {
-          // @ts-ignore
-          return Object.keys(this.lookAheadFuncsCache).length
-        }
-      }
-
       constructor(input: IToken[] = []) {
         super(ALL_TOKENS, {})
 
@@ -131,16 +120,6 @@ describe("lookahead Regular Tokens Mode", () => {
 
   describe("The implicit lookahead calculation functionality of the Recognizer For MANY", () => {
     class ManyImplicitLookAheadParser extends EmbeddedActionsParser {
-      public getLookAheadCacheSize(): number {
-        if (isES2015MapSupported()) {
-          // @ts-ignore
-          return this.lookAheadFuncsCache.size
-        } else {
-          // @ts-ignore
-          return Object.keys(this.lookAheadFuncsCache).length
-        }
-      }
-
       constructor(input: IToken[] = []) {
         super(ALL_TOKENS, {})
 
@@ -283,16 +262,6 @@ describe("lookahead Regular Tokens Mode", () => {
 
   describe("The implicit lookahead calculation functionality of the Recognizer For MANY_SEP", () => {
     class ManySepImplicitLookAheadParser extends EmbeddedActionsParser {
-      public getLookAheadCacheSize(): number {
-        if (isES2015MapSupported()) {
-          // @ts-ignore
-          return this.lookAheadFuncsCache.size
-        } else {
-          // @ts-ignore
-          return Object.keys(this.lookAheadFuncsCache).length
-        }
-      }
-
       constructor(input: IToken[] = []) {
         super(ALL_TOKENS, {})
 
@@ -459,16 +428,6 @@ describe("lookahead Regular Tokens Mode", () => {
 
   describe("The implicit lookahead calculation functionality of the Recognizer For AT_LEAST_ONE", () => {
     class AtLeastOneImplicitLookAheadParser extends EmbeddedActionsParser {
-      public getLookAheadCacheSize(): number {
-        if (isES2015MapSupported()) {
-          // @ts-ignore
-          return this.lookAheadFuncsCache.size
-        } else {
-          // @ts-ignore
-          return Object.keys(this.lookAheadFuncsCache).length
-        }
-      }
-
       constructor(input: IToken[] = []) {
         super(ALL_TOKENS, {})
 
@@ -578,16 +537,6 @@ describe("lookahead Regular Tokens Mode", () => {
 
   describe("The implicit lookahead calculation functionality of the Recognizer For AT_LEAST_ONE_SEP", () => {
     class AtLeastOneSepImplicitLookAheadParser extends EmbeddedActionsParser {
-      public getLookAheadCacheSize(): number {
-        if (isES2015MapSupported()) {
-          // @ts-ignore
-          return this.lookAheadFuncsCache.size
-        } else {
-          // @ts-ignore
-          return Object.keys(this.lookAheadFuncsCache).length
-        }
-      }
-
       constructor(input: IToken[] = []) {
         super(ALL_TOKENS, {})
 
@@ -730,16 +679,6 @@ describe("lookahead Regular Tokens Mode", () => {
 
   describe("The implicit lookahead calculation functionality of the Recognizer For OR", () => {
     class OrImplicitLookAheadParser extends EmbeddedActionsParser {
-      public getLookAheadCacheSize(): number {
-        if (isES2015MapSupported()) {
-          // @ts-ignore
-          return this.lookAheadFuncsCache.size
-        } else {
-          // @ts-ignore
-          return Object.keys(this.lookAheadFuncsCache).length
-        }
-      }
-
       constructor(input: IToken[] = []) {
         super(ALL_TOKENS, {})
 
@@ -1073,16 +1012,6 @@ describe("lookahead Regular Tokens Mode", () => {
 
   describe("The implicit lookahead calculation functionality of the Recognizer For OR (with IGNORE_AMBIGUITIES)", () => {
     class OrImplicitLookAheadParserIgnoreAmbiguities extends EmbeddedActionsParser {
-      public getLookAheadCacheSize(): number {
-        if (isES2015MapSupported()) {
-          // @ts-ignore
-          return this.lookAheadFuncsCache.size
-        } else {
-          // @ts-ignore
-          return Object.keys(this.lookAheadFuncsCache).length
-        }
-      }
-
       constructor(input: IToken[] = []) {
         super(ALL_TOKENS, {})
 
