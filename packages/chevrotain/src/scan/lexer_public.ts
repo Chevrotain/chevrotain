@@ -11,6 +11,7 @@ import {
   validatePatterns
 } from "./lexer"
 import {
+  assign,
   cloneArr,
   cloneObj,
   forEach,
@@ -124,7 +125,7 @@ export class Lexer {
     }
 
     // todo: defaults func?
-    this.config = Object.assign({}, DEFAULT_LEXER_CONFIG, config)
+    this.config = assign({}, DEFAULT_LEXER_CONFIG, config) as any
 
     const traceInitVal = this.config.traceInitPerf
     if (traceInitVal === true) {
@@ -260,11 +261,11 @@ export class Lexer {
               this.charCodeToPatternIdxToConfig[currModName] =
                 currAnalyzeResult.charCodeToPatternIdxToConfig
 
-              this.emptyGroups = Object.assign(
+              this.emptyGroups = assign(
                 {},
                 this.emptyGroups,
                 currAnalyzeResult.emptyGroups
-              )
+              ) as any
 
               this.hasCustom = currAnalyzeResult.hasCustom || this.hasCustom
 
