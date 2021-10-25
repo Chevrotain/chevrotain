@@ -86,10 +86,13 @@ export class SwitchCaseRecoveryParser extends EmbeddedActionsParser {
   //       what about a string with some random value? this could still lead to duplicate keys in the returned parse result
   private tokTypesThatCannotBeInsertedInRecovery = [IdentTok, StringTok, IntTok]
 
-  // DOCS: overriding this method allows us to customize the logic for which tokens may not be automaticaly inserted
+  // DOCS: overriding this method allows us to customize the logic for which tokens may not be automatically inserted
   // during error recovery.
   public canTokenTypeBeInsertedInRecovery(tokType: TokenType) {
-    return !contains(this.tokTypesThatCannotBeInsertedInRecovery, tokType)
+    return !contains(
+      this.tokTypesThatCannotBeInsertedInRecovery,
+      tokType as unknown
+    )
   }
 
   public parseSwitchStmt(): RetType {

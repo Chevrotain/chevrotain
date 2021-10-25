@@ -52,7 +52,7 @@ export const defaultParserErrorProvider: IParserErrorMessageProvider = {
       const allLookAheadPaths = reduce(
         expectedPathsPerAlt,
         (result, currAltPaths) => result.concat(currAltPaths),
-        []
+        [] as TokenType[][]
       )
       const nextValidTokenSequences = map(
         allLookAheadPaths,

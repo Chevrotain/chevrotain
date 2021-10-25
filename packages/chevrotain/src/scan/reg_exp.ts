@@ -107,7 +107,7 @@ export function firstCharOptimizedIndices(ast, result, ignoreCase): number[] {
                 addOptimizedIdxToResult(code, result, ignoreCase)
               } else {
                 // range
-                const range = code
+                const range = code as any
                 // cannot optimize when ignoreCase is
                 if (ignoreCase === true) {
                   for (

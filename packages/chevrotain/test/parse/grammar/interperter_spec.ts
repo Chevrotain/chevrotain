@@ -24,6 +24,7 @@ import {
   NextTerminalAfterAtLeastOneWalker,
   NextTerminalAfterManySepWalker,
   NextTerminalAfterManyWalker,
+  PartialPathAndSuffixes,
   possiblePathsFrom
 } from "../../../src/parse/grammar/interpreter"
 import { createRegularToken, setEquality } from "../../utils/matchers"
@@ -588,7 +589,7 @@ describe("The NextTerminalAfterAtLeastOneSepWalker", () => {
 })
 
 describe("The chevrotain grammar interpreter capabilities", () => {
-  function extractPartialPaths(newResultFormat) {
+  function extractPartialPaths(newResultFormat: PartialPathAndSuffixes[]) {
     return map(newResultFormat, (currItem) => currItem.partialPath)
   }
 

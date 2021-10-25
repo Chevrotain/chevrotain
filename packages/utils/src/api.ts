@@ -36,21 +36,26 @@ export function mapValues<I, O>(
   const objKeys = keys(obj)
   for (let idx = 0; idx < objKeys.length; idx++) {
     const currKey = objKeys[idx]
-    result.push(callback.call(null, obj[currKey], currKey))
+    result.push(callback(obj[currKey], currKey))
   }
   return result
 }
 
-export function map<I, O>(arr: I[], callback: (I, idx?: number) => O): O[] {
+export function map<I, O>(
+  arr: I[],
+  callback: (value: I, idx?: number) => O
+): O[] {
   const result: O[] = []
   for (let idx = 0; idx < arr.length; idx++) {
-    result.push(callback.call(null, arr[idx], idx))
+    result.push(callback(arr[idx], idx))
   }
   return result
 }
 
-export function flatten<T>(arr: any[]): T[] {
-  let result = []
+export function flatten<T>(arr: T[][]): T[]
+export function flatten(arr: any[]): any[]
+export function flatten(arr: any[]): any[] {
+  let result: any[] = []
 
   for (let idx = 0; idx < arr.length; idx++) {
     const currItem = arr[idx]
@@ -63,34 +68,42 @@ export function flatten<T>(arr: any[]): T[] {
   return result
 }
 
-export function first<T>(arr: T[]): T {
+export function first<T>(arr: T[]): T | undefined {
   return isEmpty(arr) ? undefined : arr[0]
 }
 
-export function last<T>(arr: T[]): T {
+export function last<T>(arr: T[]): T | undefined {
   const len = arr && arr.length
   return len ? arr[len - 1] : undefined
 }
 
+export function forEach<T>(
+  collection: T[],
+  iteratorCallback: (item: T, index: number) => void
+): void
+export function forEach<T>(
+  collection: Record<string, T>,
+  iteratorCallback: (value: T, key: string) => void
+): void
 export function forEach(collection: any, iteratorCallback: Function): void {
   /* istanbul ignore else */
   if (Array.isArray(collection)) {
     for (let i = 0; i < collection.length; i++) {
-      iteratorCallback.call(null, collection[i], i)
+      iteratorCallback(collection[i], i)
     }
   } else if (isObject(collection)) {
     const colKeys = keys(collection)
     for (let i = 0; i < colKeys.length; i++) {
       const key = colKeys[i]
       const value = collection[key]
-      iteratorCallback.call(null, value, key)
+      iteratorCallback(value, key)
     }
   } else {
     throw Error("non exhaustive match")
   }
 }
 
-export function isString(item: any): boolean {
+export function isString(item: any): item is string {
   return typeof item === "string"
 }
 
@@ -98,7 +111,7 @@ export function isUndefined(item: any): boolean {
   return item === undefined
 }
 
-export function isFunction(item: any): boolean {
+export function isFunction(item: any): item is (...args: any[]) => any {
   return item instanceof Function
 }
 
@@ -110,30 +123,24 @@ export function dropRight<T>(arr: T[], howMuch: number = 1): T[] {
   return arr.slice(0, arr.length - howMuch)
 }
 
-export function filter<T>(arr: T[], predicate: (T) => boolean): T[] {
-  const result = []
-  if (Array.isArray(arr)) {
-    for (let i = 0; i < arr.length; i++) {
-      const item = arr[i]
-      if (predicate.call(null, item)) {
-        result.push(item)
-      }
-    }
-  }
-  return result
+export function filter<T>(
+  arr: T[],
+  predicate: (value: T, index: number, array: T[]) => unknown
+): T[] {
+  return arr.filter(predicate)
 }
 
-export function reject<T>(arr: T[], predicate: (T) => boolean): T[] {
+export function reject<T>(arr: T[], predicate: (item: T) => boolean): T[] {
   return filter(arr, (item) => !predicate(item))
 }
 
-export function pick(obj: Object, predicate: (item) => boolean) {
+export function pick(obj: Object, predicate: (item: any) => boolean) {
   const keys = Object.keys(obj)
-  const result = {}
+  const result: any = {}
 
   for (let i = 0; i < keys.length; i++) {
     const currKey = keys[i]
-    const currItem = obj[currKey]
+    const currItem = (obj as any)[currKey]
     if (predicate(currItem)) {
       result[currKey] = currItem
     }
@@ -142,15 +149,15 @@ export function pick(obj: Object, predicate: (item) => boolean) {
   return result
 }
 
-export function has(obj: any, prop: string): boolean {
+export function has(obj: any, prop: string | number): boolean {
   if (isObject(obj)) {
     return obj.hasOwnProperty(prop)
   }
   return false
 }
 
-export function contains<T>(arr: T[], item): boolean {
-  return find(arr, (currItem) => currItem === item) !== undefined ? true : false
+export function contains<T>(arr: T[], item: T): boolean {
+  return arr.includes(item)
 }
 
 /**
@@ -168,17 +175,13 @@ export function cloneArr<T>(arr: T[]): T[] {
  * shallow clone
  */
 export function cloneObj(obj: Object): any {
-  const clonedObj = {}
-  for (const key in obj) {
-    /* istanbul ignore else */
-    if (Object.prototype.hasOwnProperty.call(obj, key)) {
-      clonedObj[key] = obj[key]
-    }
-  }
-  return clonedObj
+  return Object.assign({}, obj)
 }
 
-export function find<T>(arr: T[], predicate: (item: T) => boolean): T {
+export function find<T>(
+  arr: T[],
+  predicate: (item: T) => boolean
+): T | undefined {
   for (let i = 0; i < arr.length; i++) {
     const item = arr[i]
     if (predicate.call(null, item)) {
@@ -200,8 +203,18 @@ export function findAll<T>(arr: T[], predicate: (item: T) => boolean): T[] {
 }
 
 export function reduce<T, A>(
+  arrOrObj: Array<T>,
+  iterator: (result: A, item: T, idx: number) => A,
+  initial: A
+): A
+export function reduce<T, A>(
+  arrOrObj: Record<string, T>,
+  iterator: (result: A, item: T, idx: string) => A,
+  initial: A
+): A
+export function reduce<T, A>(
   arrOrObj: Array<T> | Object,
-  iterator: (result: A, item, idx?) => A,
+  iterator: (result: A, item: T, idx: any) => A,
   initial: A
 ): A {
   const isArr = Array.isArray(arrOrObj)
@@ -211,25 +224,20 @@ export function reduce<T, A>(
 
   let accumulator = initial
   for (let i = 0; i < vals.length; i++) {
-    accumulator = iterator.call(
-      null,
-      accumulator,
-      vals[i],
-      isArr ? i : objKeys[i]
-    )
+    accumulator = iterator(accumulator, vals[i], isArr ? i : objKeys[i])
   }
   return accumulator
 }
 
-export function compact<T>(arr: T[]): T[] {
-  return reject(arr, (item) => item === null || item === undefined)
+export function compact<T>(arr: (T | null | undefined)[]): T[] {
+  return reject(arr, (item) => item === null || item === undefined) as T[]
 }
 
 export function uniq<T>(
   arr: T[],
   identity: (item: T) => any = (item) => item
 ): T[] {
-  const identities = []
+  const identities: T[] = []
   return reduce(
     arr,
     (result, currItem) => {
@@ -241,14 +249,12 @@ export function uniq<T>(
         return result.concat(currItem)
       }
     },
-    []
+    [] as T[]
   )
 }
 
 export function partial(func: Function, ...restArgs: any[]): Function {
-  const firstArg = [null]
-  const allArgs = firstArg.concat(restArgs)
-  return Function.bind.apply(func, allArgs)
+  return func.bind(null, ...restArgs)
 }
 
 export function isArray(obj: any): obj is any[] {
@@ -265,7 +271,7 @@ export function isObject(obj: any): obj is Object {
 
 export function every<T>(
   arr: T[],
-  predicate: (item: T, idx?) => boolean
+  predicate: (item: T, idx: number) => boolean
 ): boolean {
   for (let i = 0; i < arr.length; i++) {
     if (!predicate(arr[i], i)) {
@@ -308,7 +314,7 @@ export function zipObject(keys: any[], values: any[]): Object {
     throw Error("can't zipObject with different number of keys and values!")
   }
 
-  const result = {}
+  const result: Record<string, any> = {}
   for (let i = 0; i < keys.length; i++) {
     result[keys[i]] = values[i]
   }
@@ -318,24 +324,14 @@ export function zipObject(keys: any[], values: any[]): Object {
 /**
  * mutates! (and returns) target
  */
-export function assign(target: Object, ...sources: Object[]): Object {
-  for (let i = 0; i < sources.length; i++) {
-    const curSource = sources[i]
-    const currSourceKeys = keys(curSource)
-    for (let j = 0; j < currSourceKeys.length; j++) {
-      const currKey = currSourceKeys[j]
-      target[currKey] = curSource[currKey]
-    }
-  }
-  return target
-}
+export const assign = Object.assign
 
 /**
  * mutates! (and returns) target
  */
 export function assignNoOverwrite(
-  target: Object,
-  ...sources: Object[]
+  target: Record<string, any>,
+  ...sources: Record<string, any>[]
 ): Object {
   for (let i = 0; i < sources.length; i++) {
     const curSource = sources[i]
@@ -378,7 +374,7 @@ export function groupBy<T>(
  * Merge obj2 into obj1.
  * Will overwrite existing properties with the same name
  */
-export function merge(obj1: Object, obj2: Object): any {
+export function merge(obj1: any, obj2: any): any {
   const result = cloneObj(obj1)
   const keys2 = keys(obj2)
   for (let i = 0; i < keys2.length; i++) {
@@ -392,30 +388,18 @@ export function merge(obj1: Object, obj2: Object): any {
 
 export function NOOP() {}
 
-export function IDENTITY(item) {
+export function IDENTITY<T>(item: T): T {
   return item
 }
 
-/**
- * Will return a new packed array with same values.
- */
-export function packArray<T>(holeyArr: T[]): T[] {
-  const result = []
-  for (let i = 0; i < holeyArr.length; i++) {
-    const orgValue = holeyArr[i]
-    result.push(orgValue !== undefined ? orgValue : undefined)
-  }
-  return result
-}
-
-export function PRINT_ERROR(msg) {
+export function PRINT_ERROR(msg: string) {
   /* istanbul ignore else - can't override global.console in node.js */
   if (console && console.error) {
     console.error(`Error: ${msg}`)
   }
 }
 
-export function PRINT_WARNING(msg) {
+export function PRINT_WARNING(msg: string) {
   /* istanbul ignore else - can't override global.console in node.js*/
   if (console && console.warn) {
     // TODO: modify docs accordingly
@@ -437,14 +421,17 @@ export function timer<T>(func: () => T): { time: number; value: T } {
 }
 
 // based on: https://github.com/petkaantonov/bluebird/blob/b97c0d2d487e8c5076e8bd897e0dcd4622d31846/src/util.js#L201-L216
-export function toFastProperties(toBecomeFast) {
+export function toFastProperties(toBecomeFast: any) {
   function FakeConstructor() {}
+
   // If our object is used as a constructor it would receive
   FakeConstructor.prototype = toBecomeFast
-  const fakeInstance = new FakeConstructor()
+  const fakeInstance = new (FakeConstructor as any)()
+
   function fakeAccess() {
     return typeof fakeInstance.bar
   }
+
   // help V8 understand this is a "real" prototype by actually using
   // the fake instance.
   fakeAccess()

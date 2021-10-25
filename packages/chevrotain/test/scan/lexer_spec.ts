@@ -660,7 +660,7 @@ function defineLexerSpecs(
 
           expect(allPatterns.length).to.equal(8)
           const allPatternsString = map(allPatterns, (pattern) => {
-            return isString(pattern) ? pattern : pattern.source
+            return isString(pattern) ? pattern : (pattern as RegExp).source
           })
           setEquality(allPatternsString, [
             "^(?:(\\t| ))",
@@ -690,7 +690,7 @@ function defineLexerSpecs(
       }
 
       if (!skipValidationChecks && ORG_SUPPORT_STICKY) {
-        it("can transform/analyze an array of Token Typees into matched/ignored/patternToClass - sticky", () => {
+        it("can transform/analyze an array of Token Types into matched/ignored/patternToClass - sticky", () => {
           const tokenClasses = [
             Keyword,
             If,
@@ -713,7 +713,7 @@ function defineLexerSpecs(
           )
           expect(allPatterns.length).to.equal(8)
           const allPatternsString = map(allPatterns, (pattern) => {
-            return isString(pattern) ? pattern : pattern.source
+            return isString(pattern) ? pattern : (pattern as RegExp).source
           })
           setEquality(allPatternsString, [
             "(\\t| )",

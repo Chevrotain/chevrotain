@@ -21,7 +21,6 @@ import {
   keys,
   map,
   mapValues,
-  packArray,
   PRINT_ERROR,
   reduce,
   reject
@@ -53,6 +52,7 @@ export interface IPatternConfig {
   group: any
   push: string
   pop: boolean
+  tokenType: TokenType
   tokenTypeIdx: number
 }
 
@@ -102,7 +102,7 @@ export function analyzeTokenTypes(
     initCharCodeToOptimizedIndexMap()
   })
 
-  let onlyRelevantTypes
+  let onlyRelevantTypes: TokenType[]
   tracer("Reject Lexer.NA", () => {
     onlyRelevantTypes = reject(tokenTypes, (currType) => {
       return currType[PATTERN] === Lexer.NA
@@ -250,7 +250,10 @@ export function analyzeTokenTypes(
           if (
             checkLineBreaksIssues(tokType, lineTerminatorCharCodes) === false
           ) {
-            return canMatchCharCode(lineTerminatorCharCodes, tokType.PATTERN)
+            return canMatchCharCode(
+              lineTerminatorCharCodes,
+              tokType.PATTERN as RegExp | string
+            )
           }
         }
       })
@@ -374,9 +377,6 @@ export function analyzeTokenTypes(
       )
     })
   }
-  tracer("ArrayPacking", () => {
-    charCodeToPatternIdxToConfig = packArray(charCodeToPatternIdxToConfig)
-  })
 
   return {
     emptyGroups: emptyGroups,
@@ -490,7 +490,7 @@ export function findInvalidPatterns(
   return { errors, valid }
 }
 
-const end_of_input = /[^\\][\$]/
+const end_of_input = /[^\\][$]/
 
 export function findEndOfInputAnchor(
   tokenTypes: TokenType[]
@@ -504,10 +504,10 @@ export function findEndOfInputAnchor(
   }
 
   const invalidRegex = filter(tokenTypes, (currType) => {
-    const pattern = currType[PATTERN]
+    const pattern = currType.PATTERN
 
     try {
-      const regexpAst = getRegExpAst(pattern)
+      const regexpAst = getRegExpAst(pattern as RegExp)
       const endAnchorVisitor = new EndAnchorFinder()
       endAnchorVisitor.visit(regexpAst)
 
@@ -515,7 +515,7 @@ export function findEndOfInputAnchor(
     } catch (e) {
       // old behavior in case of runtime exceptions with regexp-to-ast.
       /* istanbul ignore next - cannot ensure an error in regexp-to-ast*/
-      return end_of_input.test(pattern.source)
+      return end_of_input.test((pattern as RegExp).source)
     }
   })
 
@@ -540,7 +540,7 @@ export function findEmptyMatchRegExps(
   tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
   const matchesEmptyString = filter(tokenTypes, (currType) => {
-    const pattern = currType[PATTERN]
+    const pattern = currType.PATTERN as RegExp
     return pattern.test("")
   })
 
@@ -572,7 +572,7 @@ export function findStartOfInputAnchor(
   }
 
   const invalidRegex = filter(tokenTypes, (currType) => {
-    const pattern = currType[PATTERN]
+    const pattern = currType.PATTERN as RegExp
     try {
       const regexpAst = getRegExpAst(pattern)
       const startAnchorVisitor = new StartAnchorFinder()
@@ -919,7 +919,9 @@ export function performWarningRuntimeChecks(
             hasAnyLineBreak = true
           }
         } else {
-          if (canMatchCharCode(terminatorCharCodes, tokType.PATTERN)) {
+          if (
+            canMatchCharCode(terminatorCharCodes, tokType.PATTERN as RegExp)
+          ) {
             hasAnyLineBreak = true
           }
         }
@@ -1086,7 +1088,7 @@ export function buildLineBreakIssueMessage(
 
 function getCharCodes(charsOrCodes: (number | string)[]): number[] {
   const charCodes = map(charsOrCodes, (numOrString) => {
-    if (isString(numOrString) && numOrString.length > 0) {
+    if (isString(numOrString)) {
       return numOrString.charCodeAt(0)
     } else {
       return numOrString

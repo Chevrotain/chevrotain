@@ -166,7 +166,7 @@ export function collectMethods(rule: Rule): {
   repetition: Repetition[]
   repetitionWithSeparator: RepetitionWithSeparator[]
   repetitionMandatory: RepetitionMandatory[]
-  repetitionMandatoryWithSeparator: RepetitionMandatoryWithSeparator
+  repetitionMandatoryWithSeparator: RepetitionMandatoryWithSeparator[]
 } {
   collectorVisitor.reset()
   rule.accept(collectorVisitor)
