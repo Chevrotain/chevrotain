@@ -466,7 +466,9 @@ export function validateAmbiguousAlternationAlternatives(
 }
 
 export class RepetitionCollector extends GAstVisitor {
-  public allProductions: IProductionWithOccurrence[] = []
+  public allProductions: (IProductionWithOccurrence & {
+    maxLookahead?: number
+  })[] = []
 
   public visitRepetitionWithSeparator(manySep: RepetitionWithSeparator): void {
     this.allProductions.push(manySep)

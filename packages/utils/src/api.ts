@@ -370,6 +370,22 @@ export function groupBy<T>(
   return result
 }
 
+/**
+ * Merge obj2 into obj1.
+ * Will overwrite existing properties with the same name
+ */
+export function merge(obj1: any, obj2: any): any {
+  const result = cloneObj(obj1)
+  const keys2 = keys(obj2)
+  for (let i = 0; i < keys2.length; i++) {
+    const key = keys2[i]
+    const value = obj2[key]
+    result[key] = value
+  }
+
+  return result
+}
+
 export function NOOP() {}
 
 export function IDENTITY<T>(item: T): T {

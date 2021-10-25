@@ -71,7 +71,7 @@ export interface IRegExpExec {
   exec: CustomPatternMatcherFunc
 }
 
-const DEFAULT_LEXER_CONFIG: ILexerConfig = {
+const DEFAULT_LEXER_CONFIG: Required<ILexerConfig> = {
   deferDefinitionErrorsHandling: false,
   positionTracking: "full",
   lineTerminatorsPattern: /\n|\r\n?/g,
@@ -102,7 +102,7 @@ export class Lexer {
   protected defaultMode: string
   protected emptyGroups: { [groupName: string]: IToken } = {}
 
-  private config: ILexerConfig
+  private config: Required<ILexerConfig>
   private trackStartLines: boolean = true
   private trackEndLines: boolean = true
   private hasCustom: boolean = false
@@ -114,7 +114,7 @@ export class Lexer {
 
   constructor(
     protected lexerDefinition: TokenType[] | IMultiModeLexerDefinition,
-    config: Partial<ILexerConfig> = DEFAULT_LEXER_CONFIG
+    config: ILexerConfig = DEFAULT_LEXER_CONFIG
   ) {
     if (typeof config === "boolean") {
       throw Error(
@@ -184,7 +184,7 @@ export class Lexer {
         }
       })
 
-      if (!this.config.skipValidations) {
+      if (this.config.skipValidations === false) {
         this.TRACE_INIT("performRuntimeChecks", () => {
           this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(
             performRuntimeChecks(
