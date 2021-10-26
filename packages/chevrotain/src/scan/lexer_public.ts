@@ -97,10 +97,9 @@ export class Lexer {
   public lexerDefinitionWarning: ILexerDefinitionError[] = []
 
   protected patternIdxToConfig: Record<string, IPatternConfig[]> = {}
-  protected charCodeToPatternIdxToConfig: Record<
-    string,
-    { [charCode: number]: IPatternConfig[] }
-  > = {}
+  protected charCodeToPatternIdxToConfig: {
+    [modeName: string]: { [charCode: number]: IPatternConfig[] }
+  } = {}
 
   protected modes: string[] = []
   protected defaultMode!: string
