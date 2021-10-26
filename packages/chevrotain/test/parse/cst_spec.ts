@@ -12,7 +12,7 @@ function createTokenVector(tokTypes: TokenType[]): any[] {
   })
 }
 
-function defineTestSuit(recoveryMode) {
+function defineTestSuite(recoveryMode: boolean) {
   context(`CST Recovery: ${recoveryMode}`, () => {
     const A = createToken({ name: "A" })
     const B = createToken({ name: "B" })
@@ -815,5 +815,5 @@ function defineTestSuit(recoveryMode) {
   })
 }
 
-defineTestSuit(true)
-defineTestSuit(false)
+defineTestSuite(true)
+defineTestSuite(false)

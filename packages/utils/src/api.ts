@@ -55,12 +55,12 @@ export function map<I, O>(
 export function flatten<T>(arr: T[][]): T[]
 export function flatten(arr: any[]): any[]
 export function flatten(arr: any[]): any[] {
-  let result: any[] = []
+  const result: any[] = []
 
   for (let idx = 0; idx < arr.length; idx++) {
     const currItem = arr[idx]
     if (Array.isArray(currItem)) {
-      result = result.concat(flatten(currItem))
+      result.push(...flatten(currItem))
     } else {
       result.push(currItem)
     }
@@ -346,8 +346,8 @@ export function assignNoOverwrite(
   return target
 }
 
-export function defaults(...sources: any[]): any {
-  return assignNoOverwrite({}, ...sources)
+export function defaults<S, T>(a: S, b: T): S & T {
+  return Object.assign(b, a)
 }
 
 export function groupBy<T>(

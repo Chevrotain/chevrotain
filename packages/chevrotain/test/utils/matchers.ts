@@ -1,4 +1,4 @@
-import { IToken } from "@chevrotain/types"
+import { IToken, TokenType } from "@chevrotain/types"
 import { expect } from "chai"
 
 export function setEquality(actual: any[], expected: any[]): void {
@@ -8,14 +8,14 @@ export function setEquality(actual: any[], expected: any[]): void {
 }
 
 export function createRegularToken(
-  tokType,
+  tokType: TokenType,
   image = "",
   startOffset = 1,
-  startLine = undefined,
-  startColumn = undefined,
-  endOffset = undefined,
-  endLine = undefined,
-  endColumn = undefined
+  startLine?: number,
+  startColumn?: number,
+  endOffset?: number,
+  endLine?: number,
+  endColumn?: number
 ): IToken {
   return {
     image: image,

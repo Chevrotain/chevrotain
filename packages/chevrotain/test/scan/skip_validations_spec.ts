@@ -1,6 +1,7 @@
 import { Lexer } from "../../src/scan/lexer_public"
 import { find, flatten } from "@chevrotain/utils"
 import { expect } from "chai"
+import { SinonSpy } from "sinon/index"
 
 let skipOnBrowser = describe
 if (typeof window !== "undefined") {
@@ -8,7 +9,7 @@ if (typeof window !== "undefined") {
 }
 
 skipOnBrowser("Chevrotain's Lexer Init Performance Tracing", () => {
-  let consoleLogSpy
+  let consoleLogSpy: SinonSpy
 
   beforeEach(() => {
     // @ts-ignore

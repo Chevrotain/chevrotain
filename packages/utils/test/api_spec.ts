@@ -132,14 +132,14 @@ describe("The Utils functions namespace", () => {
   it("exports a contains utility", () => {
     expect(contains([1, 2, 3], 4)).to.be.false
     expect(contains([1, 2, 3], 2)).to.be.true
-    expect(contains([], 2)).to.be.false
+    expect(contains([] as number[], 2)).to.be.false
     expect(contains([0], 0)).to.be.true
   })
 
   it("exports a cloneArr utility", () => {
     expect(cloneArr([1, 2, 3])).to.deep.equal([1, 2, 3])
     expect(cloneArr([])).to.deep.equal([])
-    const arr: never[] = []
+    const arr: undefined[] = []
     expect(cloneArr(arr)).to.not.equal(arr)
   })
 

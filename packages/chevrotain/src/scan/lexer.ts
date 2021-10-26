@@ -44,13 +44,13 @@ export const DEFAULT_MODE = "defaultMode"
 export const MODES = "modes"
 
 export interface IPatternConfig {
-  pattern: IRegExpExec
-  longerAlt: number[]
+  pattern: IRegExpExec | string
+  longerAlt: number[] | undefined
   canLineTerminator: boolean
   isCustom: boolean
-  short: number | boolean
-  group: any
-  push: string
+  short: number | false
+  group: string | undefined | false
+  push: string | undefined
   pop: boolean
   tokenType: TokenType
   tokenTypeIdx: number
@@ -84,19 +84,19 @@ export function analyzeTokenTypes(
     // TODO: should `useSticky` be an argument here?
     useSticky?: boolean
     safeMode?: boolean
-    tracer?: (msg: string, action: Function) => void
+    tracer?: (msg: string, action: () => void) => void
   }
 ): IAnalyzeResult {
   options = defaults(options, {
     useSticky: SUPPORT_STICKY,
-    debug: false,
-    safeMode: false,
+    debug: false as boolean,
+    safeMode: false as boolean,
     positionTracking: "full",
     lineTerminatorCharacters: ["\r", "\n"],
-    tracer: (msg, action) => action()
+    tracer: (msg: string, action: Function) => action()
   })
 
-  const tracer = options.tracer
+  const tracer = options.tracer!
 
   tracer("initCharCodeToOptimizedIndexMap", () => {
     initCharCodeToOptimizedIndexMap()
@@ -110,95 +110,98 @@ export function analyzeTokenTypes(
   })
 
   let hasCustom = false
-  let allTransformedPatterns
+  let allTransformedPatterns: (IRegExpExec | string)[]
   tracer("Transform Patterns", () => {
     hasCustom = false
-    allTransformedPatterns = map(onlyRelevantTypes, (currType) => {
-      const currPattern = currType[PATTERN]
+    allTransformedPatterns = map(
+      onlyRelevantTypes,
+      (currType): IRegExpExec | string => {
+        const currPattern = currType[PATTERN]
 
-      /* istanbul ignore else */
-      if (isRegExp(currPattern)) {
-        const regExpSource = currPattern.source
-        if (
-          regExpSource.length === 1 &&
-          // only these regExp meta characters which can appear in a length one regExp
-          regExpSource !== "^" &&
-          regExpSource !== "$" &&
-          regExpSource !== "." &&
-          !currPattern.ignoreCase
-        ) {
-          return regExpSource
-        } else if (
-          regExpSource.length === 2 &&
-          regExpSource[0] === "\\" &&
-          // not a meta character
-          !contains(
-            [
-              "d",
-              "D",
-              "s",
-              "S",
-              "t",
-              "r",
-              "n",
-              "t",
-              "0",
-              "c",
-              "b",
-              "B",
-              "f",
-              "v",
-              "w",
-              "W"
-            ],
-            regExpSource[1]
-          )
-        ) {
-          // escaped meta Characters: /\+/ /\[/
-          // or redundant escaping: /\a/
-          // without the escaping "\"
-          return regExpSource[1]
-        } else {
-          return options.useSticky
-            ? addStickyFlag(currPattern)
-            : addStartOfInput(currPattern)
-        }
-      } else if (isFunction(currPattern)) {
-        hasCustom = true
-        // CustomPatternMatcherFunc - custom patterns do not require any transformations, only wrapping in a RegExp Like object
-        return { exec: currPattern }
-      } else if (has(currPattern, "exec")) {
-        hasCustom = true
-        // ICustomPattern
-        return currPattern
-      } else if (typeof currPattern === "string") {
-        if (currPattern.length === 1) {
+        /* istanbul ignore else */
+        if (isRegExp(currPattern)) {
+          const regExpSource = currPattern.source
+          if (
+            regExpSource.length === 1 &&
+            // only these regExp meta characters which can appear in a length one regExp
+            regExpSource !== "^" &&
+            regExpSource !== "$" &&
+            regExpSource !== "." &&
+            !currPattern.ignoreCase
+          ) {
+            return regExpSource
+          } else if (
+            regExpSource.length === 2 &&
+            regExpSource[0] === "\\" &&
+            // not a meta character
+            !contains(
+              [
+                "d",
+                "D",
+                "s",
+                "S",
+                "t",
+                "r",
+                "n",
+                "t",
+                "0",
+                "c",
+                "b",
+                "B",
+                "f",
+                "v",
+                "w",
+                "W"
+              ],
+              regExpSource[1]
+            )
+          ) {
+            // escaped meta Characters: /\+/ /\[/
+            // or redundant escaping: /\a/
+            // without the escaping "\"
+            return regExpSource[1]
+          } else {
+            return options.useSticky
+              ? addStickyFlag(currPattern)
+              : addStartOfInput(currPattern)
+          }
+        } else if (isFunction(currPattern)) {
+          hasCustom = true
+          // CustomPatternMatcherFunc - custom patterns do not require any transformations, only wrapping in a RegExp Like object
+          return { exec: currPattern }
+        } else if (typeof currPattern === "object") {
+          hasCustom = true
+          // ICustomPattern
           return currPattern
+        } else if (typeof currPattern === "string") {
+          if (currPattern.length === 1) {
+            return currPattern
+          } else {
+            const escapedRegExpString = currPattern.replace(
+              /[\\^$.*+?()[\]{}|]/g,
+              "\\$&"
+            )
+            const wrappedRegExp = new RegExp(escapedRegExpString)
+            return options.useSticky
+              ? addStickyFlag(wrappedRegExp)
+              : addStartOfInput(wrappedRegExp)
+          }
         } else {
-          const escapedRegExpString = currPattern.replace(
-            /[\\^$.*+?()[\]{}|]/g,
-            "\\$&"
-          )
-          const wrappedRegExp = new RegExp(escapedRegExpString)
-          return options.useSticky
-            ? addStickyFlag(wrappedRegExp)
-            : addStartOfInput(wrappedRegExp)
+          throw Error("non exhaustive match")
         }
-      } else {
-        throw Error("non exhaustive match")
       }
-    })
+    )
   })
 
-  let patternIdxToType
-  let patternIdxToGroup
-  let patternIdxToLongerAltIdxArr
-  let patternIdxToPushMode
-  let patternIdxToPopMode
+  let patternIdxToType: number[]
+  let patternIdxToGroup: (string | undefined | false)[]
+  let patternIdxToLongerAltIdxArr: (number[] | undefined)[]
+  let patternIdxToPushMode: (string | undefined)[]
+  let patternIdxToPopMode: boolean[]
   tracer("misc mapping", () => {
     patternIdxToType = map(
       onlyRelevantTypes,
-      (currType) => currType.tokenTypeIdx
+      (currType) => currType.tokenTypeIdx!
     )
 
     patternIdxToGroup = map(onlyRelevantTypes, (clazz: any) => {
@@ -236,34 +239,33 @@ export function analyzeTokenTypes(
     )
   })
 
-  let patternIdxToCanLineTerminator
+  let patternIdxToCanLineTerminator: boolean[]
   tracer("Line Terminator Handling", () => {
     const lineTerminatorCharCodes = getCharCodes(
-      options.lineTerminatorCharacters
+      options.lineTerminatorCharacters!
     )
     patternIdxToCanLineTerminator = map(onlyRelevantTypes, (tokType) => false)
     if (options.positionTracking !== "onlyOffset") {
       patternIdxToCanLineTerminator = map(onlyRelevantTypes, (tokType) => {
         if (has(tokType, "LINE_BREAKS")) {
-          return tokType.LINE_BREAKS
+          return !!tokType.LINE_BREAKS
         } else {
-          if (
-            checkLineBreaksIssues(tokType, lineTerminatorCharCodes) === false
-          ) {
-            return canMatchCharCode(
+          return (
+            checkLineBreaksIssues(tokType, lineTerminatorCharCodes) === false &&
+            canMatchCharCode(
               lineTerminatorCharCodes,
               tokType.PATTERN as RegExp | string
             )
-          }
+          )
         }
       })
     }
   })
 
-  let patternIdxToIsCustom
-  let patternIdxToShort
-  let emptyGroups
-  let patternIdxToConfig
+  let patternIdxToIsCustom: boolean[]
+  let patternIdxToShort: (number | false)[]
+  let emptyGroups!: { [groupName: string]: IToken[] }
+  let patternIdxToConfig!: IPatternConfig[]
   tracer("Misc Mapping #2", () => {
     patternIdxToIsCustom = map(onlyRelevantTypes, isCustomPattern)
     patternIdxToShort = map(allTransformedPatterns, isShortPattern)
@@ -277,27 +279,31 @@ export function analyzeTokenTypes(
         }
         return acc
       },
-      {}
+      {} as { [groupName: string]: IToken[] }
     )
 
-    patternIdxToConfig = map(allTransformedPatterns, (x, idx) => {
-      return {
-        pattern: allTransformedPatterns[idx],
-        longerAlt: patternIdxToLongerAltIdxArr[idx],
-        canLineTerminator: patternIdxToCanLineTerminator[idx],
-        isCustom: patternIdxToIsCustom[idx],
-        short: patternIdxToShort[idx],
-        group: patternIdxToGroup[idx],
-        push: patternIdxToPushMode[idx],
-        pop: patternIdxToPopMode[idx],
-        tokenTypeIdx: patternIdxToType[idx],
-        tokenType: onlyRelevantTypes[idx]
+    patternIdxToConfig = map(
+      allTransformedPatterns,
+      (x, idx): IPatternConfig => {
+        return {
+          pattern: allTransformedPatterns[idx],
+          longerAlt: patternIdxToLongerAltIdxArr[idx],
+          canLineTerminator: patternIdxToCanLineTerminator[idx],
+          isCustom: patternIdxToIsCustom[idx],
+          short: patternIdxToShort[idx],
+          group: patternIdxToGroup[idx],
+          push: patternIdxToPushMode[idx],
+          pop: patternIdxToPopMode[idx],
+          tokenTypeIdx: patternIdxToType[idx],
+          tokenType: onlyRelevantTypes[idx]
+        }
       }
-    })
+    )
   })
 
   let canBeOptimized = true
-  let charCodeToPatternIdxToConfig = []
+  let charCodeToPatternIdxToConfig: { [charCode: number]: IPatternConfig[] } =
+    []
 
   if (!options.safeMode) {
     tracer("First Char Optimization", () => {
@@ -309,7 +315,7 @@ export function analyzeTokenTypes(
             const optimizedIdx = charCodeToOptimizedIndex(charCode)
             addToMapOfArrays(result, optimizedIdx, patternIdxToConfig[idx])
           } else if (isArray(currTokType.START_CHARS_HINT)) {
-            let lastOptimizedIdx
+            let lastOptimizedIdx: number
             forEach(currTokType.START_CHARS_HINT, (charOrInt) => {
               const charCode =
                 typeof charOrInt === "string"
@@ -373,7 +379,7 @@ export function analyzeTokenTypes(
 
           return result
         },
-        []
+        [] as { [charCode: number]: IPatternConfig[] }
       )
     })
   }
@@ -391,7 +397,7 @@ export function validatePatterns(
   tokenTypes: TokenType[],
   validModesNames: string[]
 ): ILexerDefinitionError[] {
-  let errors = []
+  let errors: ILexerDefinitionError[] = []
 
   const missingResult = findMissingPatterns(tokenTypes)
   errors = errors.concat(missingResult.errors)
@@ -416,7 +422,7 @@ export function validatePatterns(
 function validateRegExpPattern(
   tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
-  let errors = []
+  let errors: ILexerDefinitionError[] = []
   const withRegExpPatterns = filter(tokenTypes, (currTokType) =>
     isRegExp(currTokType[PATTERN])
   )
@@ -498,7 +504,7 @@ export function findEndOfInputAnchor(
   class EndAnchorFinder extends BaseRegExpVisitor {
     found = false
 
-    visitEndAnchor(node) {
+    visitEndAnchor(node: unknown) {
       this.found = true
     }
   }
@@ -566,7 +572,7 @@ export function findStartOfInputAnchor(
   class StartAnchorFinder extends BaseRegExpVisitor {
     found = false
 
-    visitStartAnchor(node) {
+    visitStartAnchor(node: unknown) {
       this.found = true
     }
   }
@@ -629,13 +635,13 @@ export function findUnsupportedFlags(
 export function findDuplicatePatterns(
   tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
-  const found = []
+  const found: TokenType[] = []
   let identicalPatterns = map(tokenTypes, (outerType: any) => {
     return reduce(
       tokenTypes,
-      (result, innerType: any) => {
+      (result, innerType) => {
         if (
-          outerType.PATTERN.source === innerType.PATTERN.source &&
+          outerType.PATTERN.source === (innerType.PATTERN as RegExp).source &&
           !contains(found, innerType) &&
           innerType.PATTERN !== Lexer.NA
         ) {
@@ -647,7 +653,7 @@ export function findDuplicatePatterns(
         }
         return result
       },
-      []
+      [] as TokenType[]
     )
   })
 
@@ -730,7 +736,7 @@ export function findModesThatDoNotExist(
 export function findUnreachablePatterns(
   tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
-  const errors = []
+  const errors: ILexerDefinitionError[] = []
 
   const canBeTested = reduce(
     tokenTypes,
@@ -750,7 +756,7 @@ export function findUnreachablePatterns(
       }
       return result
     },
-    []
+    [] as { str: string; idx: number; tokenType: TokenType }[]
   )
 
   forEach(tokenTypes, (tokType, testIdx) => {
@@ -964,7 +970,7 @@ export function cloneEmptyGroups(emptyGroups: {
 }
 
 // TODO: refactor to avoid duplication
-export function isCustomPattern(tokenType: any): boolean {
+export function isCustomPattern(tokenType: TokenType): boolean {
   const pattern = tokenType.PATTERN
   /* istanbul ignore else */
   if (isRegExp(pattern)) {
@@ -982,7 +988,7 @@ export function isCustomPattern(tokenType: any): boolean {
   }
 }
 
-export function isShortPattern(pattern: any): number | boolean {
+export function isShortPattern(pattern: any): number | false {
   if (isString(pattern) && pattern.length === 1) {
     return pattern.charCodeAt(0)
   } else {
@@ -1042,7 +1048,7 @@ function checkLineBreaksIssues(
         /* istanbul ignore next - to test this we would have to mock <canMatchCharCode> to throw an error */
         return {
           issue: LexerDefinitionErrorType.IDENTIFY_TERMINATOR,
-          errMsg: e.message
+          errMsg: (e as Error).message
         }
       }
       return false
@@ -1098,7 +1104,11 @@ function getCharCodes(charsOrCodes: (number | string)[]): number[] {
   return charCodes
 }
 
-function addToMapOfArrays(map, key, value): void {
+function addToMapOfArrays<T>(
+  map: Record<number, T[]>,
+  key: number,
+  value: T
+): void {
   if (map[key] === undefined) {
     map[key] = [value]
   } else {
@@ -1109,7 +1119,7 @@ function addToMapOfArrays(map, key, value): void {
 export const minOptimizationVal = 256
 
 /**
- * We ae mapping charCode above ASCI (256) into buckets each in the size of 256.
+ * We are mapping charCode above ASCI (256) into buckets each in the size of 256.
  * This is because ASCI are the most common start chars so each one of those will get its own
  * possible token configs vector.
  *
@@ -1123,8 +1133,8 @@ export const minOptimizationVal = 256
  * note the hack for fast division integer part extraction
  * See: https://stackoverflow.com/a/4228528
  */
-let charCodeToOptimizedIdxMap = []
-export function charCodeToOptimizedIndex(charCode) {
+let charCodeToOptimizedIdxMap: number[] = []
+export function charCodeToOptimizedIndex(charCode: number): number {
   return charCode < minOptimizationVal
     ? charCode
     : charCodeToOptimizedIdxMap[charCode]

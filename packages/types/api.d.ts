@@ -1233,8 +1233,8 @@ export interface ILexingResult {
 
 export interface ILexingError {
   offset: number
-  line: number
-  column: number
+  line: number | undefined
+  column: number | undefined
   length: number
   message: string
 }
@@ -1915,7 +1915,7 @@ export interface CstNodeLocation {
 }
 
 export declare type CstChildrenDictionary = {
-  [identifier: string]: CstElement[] | undefined
+  [identifier: string]: CstElement[]
 }
 
 export declare type CstElement = IToken | CstNode
