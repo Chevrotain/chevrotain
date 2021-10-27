@@ -53,7 +53,7 @@ import {
 import { DEFAULT_RULE_CONFIG, IParserState, TokenMatcher } from "../parser"
 import { IN_RULE_RECOVERY_EXCEPTION } from "./recoverable"
 import { EOF } from "../../../scan/tokens_public"
-import { MixedInParser } from "./parser_traits"
+import { MixedInParser, ParserMethod } from "./parser_traits"
 import {
   augmentTokenTypes,
   isTokenType,
@@ -67,7 +67,7 @@ import { Rule } from "../../grammar/gast/gast_public"
  * Used by the official API (recognizer_api.ts)
  */
 export class RecognizerEngine {
-  isBackTrackingStack
+  isBackTrackingStack: boolean[]
   className: string
   RULE_STACK: number[]
   RULE_OCCURRENCE_STACK: number[]
@@ -128,13 +128,13 @@ export class RecognizerEngine {
     }
 
     if (isArray(tokenVocabulary)) {
-      this.tokensMap = <any>reduce(
-        <any>tokenVocabulary,
+      this.tokensMap = reduce(
+        tokenVocabulary,
         (acc, tokType: TokenType) => {
           acc[tokType.name] = tokType
           return acc
         },
-        {}
+        {} as { [tokenName: string]: TokenType }
       )
     } else if (
       has(tokenVocabulary, "modes") &&
@@ -148,7 +148,7 @@ export class RecognizerEngine {
           acc[tokType.name] = tokType
           return acc
         },
-        {}
+        {} as { [tokenName: string]: TokenType }
       )
     } else if (isObject(tokenVocabulary)) {
       this.tokensMap = cloneObj(tokenVocabulary)
@@ -227,18 +227,18 @@ export class RecognizerEngine {
       }
     }
 
-    const wrappedGrammarRule = function (
-      this: MixedInParser,
-      idxInCallingRule: number = 0,
-      args: any[]
-    ) {
-      this.ruleInvocationStateUpdate(shortName, ruleName, idxInCallingRule)
-      return invokeRuleWithTry.call(this, args)
-    }
+    const wrappedGrammarRule: ParserMethod<T> = Object.assign(
+      function (
+        this: MixedInParser,
+        idxInCallingRule: number = 0,
+        args: any[]
+      ) {
+        this.ruleInvocationStateUpdate(shortName, ruleName, idxInCallingRule)
+        return invokeRuleWithTry.call(this, args)
+      },
+      { ruleName: ruleName, originalGrammarAction: impl }
+    )
 
-    const ruleNamePropName = "ruleName"
-    wrappedGrammarRule[ruleNamePropName] = ruleName
-    wrappedGrammarRule["originalGrammarAction"] = impl
     return wrappedGrammarRule
   }
 
@@ -313,11 +313,11 @@ export class RecognizerEngine {
     key: number
   ): OUT {
     let lookAheadFunc = this.getLaFuncFromCache(key)
-    let action
-    let predicate
-    if ((<DSLMethodOpts<OUT>>actionORMethodDef).DEF !== undefined) {
-      action = (<DSLMethodOpts<OUT>>actionORMethodDef).DEF
-      predicate = (<DSLMethodOpts<OUT>>actionORMethodDef).GATE
+    let action: GrammarAction<OUT>
+    let predicate: (this: MixedInParser) => boolean
+    if (typeof actionORMethodDef !== "function") {
+      action = actionORMethodDef.DEF
+      predicate = actionORMethodDef.GATE
       // predicate present
       if (predicate !== undefined) {
         const orgLookaheadFunction = lookAheadFunc
@@ -360,10 +360,10 @@ export class RecognizerEngine {
     let lookAheadFunc = this.getLaFuncFromCache(key)
 
     let action
-    let predicate
-    if ((<DSLMethodOptsWithErr<OUT>>actionORMethodDef).DEF !== undefined) {
-      action = (<DSLMethodOptsWithErr<OUT>>actionORMethodDef).DEF
-      predicate = (<DSLMethodOptsWithErr<OUT>>actionORMethodDef).GATE
+    let predicate: (this: MixedInParser) => boolean
+    if (typeof actionORMethodDef !== "function") {
+      action = actionORMethodDef.DEF
+      predicate = actionORMethodDef.GATE
       // predicate present
       if (predicate !== undefined) {
         const orgLookaheadFunction = lookAheadFunc
@@ -490,10 +490,10 @@ export class RecognizerEngine {
     let lookaheadFunction = this.getLaFuncFromCache(key)
 
     let action
-    let predicate
-    if ((<DSLMethodOpts<OUT>>actionORMethodDef).DEF !== undefined) {
-      action = (<DSLMethodOpts<OUT>>actionORMethodDef).DEF
-      predicate = (<DSLMethodOpts<OUT>>actionORMethodDef).GATE
+    let predicate: (this: MixedInParser) => boolean
+    if (typeof actionORMethodDef !== "function") {
+      action = actionORMethodDef.DEF
+      predicate = actionORMethodDef.GATE
       // predicate present
       if (predicate !== undefined) {
         const orgLookaheadFunction = lookaheadFunction

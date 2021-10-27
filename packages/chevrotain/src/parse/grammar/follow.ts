@@ -8,7 +8,7 @@ import { IProduction, TokenType } from "@chevrotain/types"
 // This ResyncFollowsWalker computes all of the follows required for RESYNC
 // (skipping reference production).
 export class ResyncFollowsWalker extends RestWalker {
-  public follows = {}
+  public follows: Record<string, TokenType[]> = {}
 
   constructor(private topProd: Rule) {
     super()

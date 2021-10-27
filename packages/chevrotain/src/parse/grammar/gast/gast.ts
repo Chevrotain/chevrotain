@@ -96,7 +96,15 @@ export function getProductionDslName(prod: IProductionWithOccurrence): string {
 export class DslMethodsCollectorVisitor extends GAstVisitor {
   // A minus is never valid in an identifier name
   public separator = "-"
-  public dslMethods = {
+  public dslMethods: {
+    [subruleOrTerminalName: string]: IProductionWithOccurrence[]
+    option: Option[]
+    alternation: Alternation[]
+    repetition: Repetition[]
+    repetitionWithSeparator: RepetitionWithSeparator[]
+    repetitionMandatory: RepetitionMandatory[]
+    repetitionMandatoryWithSeparator: RepetitionMandatoryWithSeparator[]
+  } = {
     option: [],
     alternation: [],
     repetition: [],

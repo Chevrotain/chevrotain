@@ -1,17 +1,25 @@
-import { VERSION, BaseRegExpVisitor } from "regexp-to-ast"
 import {
-  flatten,
-  map,
-  forEach,
+  Alternative,
+  Atom,
+  BaseRegExpVisitor,
+  Character,
+  Disjunction,
+  Group,
+  Set,
+  Term,
+  VERSION
+} from "regexp-to-ast"
+import {
   contains,
+  every,
+  find,
+  forEach,
+  isArray,
   PRINT_ERROR,
   PRINT_WARNING,
-  find,
-  isArray,
-  every,
   values
 } from "@chevrotain/utils"
-import { getRegExpAst } from "./reg_exp_parser"
+import { ASTNode, getRegExpAst } from "./reg_exp_parser"
 import { charCodeToOptimizedIndex, minOptimizationVal } from "./lexer"
 
 const complementErrorMessage =
@@ -65,7 +73,11 @@ export function getOptimizedStartCodesIndices(
   return []
 }
 
-export function firstCharOptimizedIndices(ast, result, ignoreCase): number[] {
+export function firstCharOptimizedIndices(
+  ast: ASTNode,
+  result: { [charCode: number]: number },
+  ignoreCase: boolean
+): number[] {
   switch (ast.type) {
     case "Disjunction":
       for (let i = 0; i < ast.value.length; i++) {
@@ -184,7 +196,7 @@ export function firstCharOptimizedIndices(ast, result, ignoreCase): number[] {
 
 function addOptimizedIdxToResult(
   code: number,
-  result: number[],
+  result: { [charCode: number]: number },
   ignoreCase: boolean
 ) {
   const optimizedCharIdx = charCodeToOptimizedIndex(code)
@@ -195,7 +207,10 @@ function addOptimizedIdxToResult(
   }
 }
 
-function handleIgnoreCase(code: number, result: number[]) {
+function handleIgnoreCase(
+  code: number,
+  result: { [charCode: number]: number }
+) {
   const char = String.fromCharCode(code)
   const upperChar = char.toUpperCase()
   /* istanbul ignore else */
@@ -211,7 +226,7 @@ function handleIgnoreCase(code: number, result: number[]) {
   }
 }
 
-function findCode(setNode, targetCharCodes) {
+function findCode(setNode: Set, targetCharCodes: number[]) {
   return find(setNode.value, (codeOrRange) => {
     if (typeof codeOrRange === "number") {
       return contains(targetCharCodes, codeOrRange)
@@ -228,8 +243,8 @@ function findCode(setNode, targetCharCodes) {
   })
 }
 
-function isWholeOptional(ast) {
-  if (ast.quantifier && ast.quantifier.atLeast === 0) {
+function isWholeOptional(ast: any): boolean {
+  if ((ast as Atom).quantifier && (ast as Atom).quantifier.atLeast === 0) {
     return true
   }
 
@@ -249,7 +264,7 @@ class CharCodeFinder extends BaseRegExpVisitor {
     super()
   }
 
-  visitChildren(node) {
+  visitChildren(node: ASTNode) {
     // No need to keep looking...
     if (this.found === true) {
       return
@@ -269,13 +284,13 @@ class CharCodeFinder extends BaseRegExpVisitor {
     super.visitChildren(node)
   }
 
-  visitCharacter(node) {
+  visitCharacter(node: Character) {
     if (contains(this.targetCharCodes, node.value)) {
       this.found = true
     }
   }
 
-  visitSet(node) {
+  visitSet(node: Set) {
     if (node.complement) {
       if (findCode(node, this.targetCharCodes) === undefined) {
         this.found = true

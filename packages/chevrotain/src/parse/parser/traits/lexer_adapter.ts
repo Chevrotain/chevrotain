@@ -11,7 +11,7 @@ import { MixedInParser } from "./parser_traits"
  */
 export class LexerAdapter {
   tokVector: IToken[]
-  tokVectorLength
+  tokVectorLength: number
   currIdx: number
 
   initLexerAdapter() {

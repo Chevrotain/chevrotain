@@ -8,7 +8,7 @@ import {
 import { forEach, has } from "@chevrotain/utils"
 import {
   DEFAULT_PARSER_CONFIG,
-  lookAheadSequence,
+  LookAheadSequence,
   TokenMatcher
 } from "../parser"
 import { IOrAlt, IParserConfig } from "@chevrotain/types"
@@ -168,7 +168,7 @@ export class LooksAhead {
 
   lookAheadBuilderForOptional(
     this: MixedInParser,
-    alt: lookAheadSequence,
+    alt: LookAheadSequence,
     tokenMatcher: TokenMatcher,
     dynamicTokensEnabled: boolean
   ): () => boolean {
@@ -181,7 +181,7 @@ export class LooksAhead {
 
   lookAheadBuilderForAlternatives(
     this: MixedInParser,
-    alts: lookAheadSequence[],
+    alts: LookAheadSequence[],
     hasPredicates: boolean,
     tokenMatcher: TokenMatcher,
     dynamicTokensEnabled: boolean

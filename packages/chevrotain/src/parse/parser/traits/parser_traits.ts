@@ -8,7 +8,7 @@ import { TreeBuilder } from "./tree_builder"
 import {
   Parser as ParserConstructorImpel,
   CstParser as CstParserConstructorImpel,
-  EmbeddedActionsParser as EmbeddedActionsParserConstructorImpel
+  EmbeddedActionsParser as EmbeddedActionsParserConstructorImpl
 } from "../parser"
 import * as defs from "@chevrotain/types"
 import { ContentAssist } from "./context_assist"
@@ -35,6 +35,11 @@ export type MixedInParser = ParserConstructorImpel &
   GastRecorder &
   PerformanceTracer
 
+export type ParserMethod<T> = ((idx: number, args?: any[]) => T) & {
+  ruleName: string
+  originalGrammarAction: Function
+}
+
 interface MixedInCstParserConstructor {
   new (
     tokenVocabulary: defs.TokenVocabulary,
@@ -55,4 +60,4 @@ interface MixedInEmbeddedActionsParserConstructor {
 
 export const EmbeddedActionsParser: MixedInEmbeddedActionsParserConstructor = <
   any
->EmbeddedActionsParserConstructorImpel
+>EmbeddedActionsParserConstructorImpl

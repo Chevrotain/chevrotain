@@ -147,17 +147,18 @@ export abstract class RestWalker {
   }
 }
 
-function restForRepetitionWithSeparator(repSepProd, currRest, prevRest) {
+function restForRepetitionWithSeparator(
+  repSepProd: RepetitionWithSeparator,
+  currRest: IProduction[],
+  prevRest: IProduction[]
+) {
   const repSepRest = [
     new Option({
-      definition: [new Terminal({ terminalType: repSepProd.separator })].concat(
-        repSepProd.definition
-      )
-    })
+      definition: [
+        new Terminal({ terminalType: repSepProd.separator }) as IProduction
+      ].concat(repSepProd.definition)
+    }) as IProduction
   ]
-  const fullRepSepRest: IProduction[] = repSepRest.concat(
-    <any>currRest,
-    <any>prevRest
-  )
+  const fullRepSepRest: IProduction[] = repSepRest.concat(currRest, prevRest)
   return fullRepSepRest
 }

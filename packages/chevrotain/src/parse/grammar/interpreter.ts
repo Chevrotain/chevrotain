@@ -147,7 +147,11 @@ export interface IFirstAfterRepetition {
  * it never "follows" production refs
  */
 export class AbstractNextTerminalAfterProductionWalker extends RestWalker {
-  protected result = {
+  protected result: {
+    token: TokenType | undefined
+    occurrence: number | undefined
+    isEndOfRule: boolean | undefined
+  } = {
     token: undefined,
     occurrence: undefined,
     isEndOfRule: undefined
@@ -250,11 +254,11 @@ export interface PartialPathAndSuffixes {
 export function possiblePathsFrom(
   targetDef: IProduction[],
   maxLength: number,
-  currPath = []
+  currPath: TokenType[] = []
 ): PartialPathAndSuffixes[] {
   // avoid side effects
   currPath = cloneArr(currPath)
-  let result = []
+  let result: PartialPathAndSuffixes[] = []
   let i = 0
 
   // TODO: avoid inner funcs

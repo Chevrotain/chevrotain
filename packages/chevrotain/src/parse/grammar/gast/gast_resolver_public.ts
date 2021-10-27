@@ -23,7 +23,7 @@ export function resolveGrammar(options: {
     errMsgProvider: defaultGrammarResolverErrorProvider
   })
 
-  const topRulesTable = {}
+  const topRulesTable: { [ruleName: string]: Rule } = {}
   forEach(options.rules, (rule) => {
     topRulesTable[rule.name] = rule
   })

@@ -5,6 +5,7 @@ import {
   DSLMethodOptsWithErr,
   GrammarAction,
   IOrAlt,
+  IParserErrorMessageProvider,
   IRuleConfig,
   ISerializedGast,
   IToken,
@@ -18,8 +19,9 @@ import { isRecognitionException } from "../../exceptions_public"
 import { DEFAULT_RULE_CONFIG, ParserDefinitionErrorType } from "../parser"
 import { defaultGrammarValidatorErrorProvider } from "../../errors_public"
 import { validateRuleIsOverridden } from "../../grammar/checks"
-import { MixedInParser } from "./parser_traits"
+import { MixedInParser, ParserMethod } from "./parser_traits"
 import { Rule, serializeGrammar } from "../../grammar/gast/gast_public"
+import { IParserDefinitionError } from "../../grammar/types"
 
 /**
  * This trait is responsible for implementing the public API
@@ -46,7 +48,7 @@ export class RecognizerApi {
   subrule<T>(
     this: MixedInParser,
     idx: number,
-    ruleToCall: (idx: number) => T,
+    ruleToCall: ParserMethod<T>,
     options?: SubruleMethodOpts
   ): T {
     return this.subruleInternal(ruleToCall, idx, options)
@@ -166,7 +168,7 @@ export class RecognizerApi {
 
   SUBRULE<T>(
     this: MixedInParser,
-    ruleToCall: (idx: number) => T,
+    ruleToCall: ParserMethod<T>,
     options?: SubruleMethodOpts
   ): T {
     return this.subruleInternal(ruleToCall, 0, options)
@@ -658,7 +660,7 @@ export class RecognizerApi {
     this.definedRulesNames.push(name)
 
     const ruleImplementation = this.defineRule(name, implementation, config)
-    this[name] = ruleImplementation
+    ;(this as any)[name] = ruleImplementation
     return ruleImplementation
   }
 
@@ -668,14 +670,15 @@ export class RecognizerApi {
     impl: (...implArgs: any[]) => T,
     config: IRuleConfig<T> = DEFAULT_RULE_CONFIG
   ): (idxInCallingRule?: number, ...args: any[]) => T {
-    let ruleErrors = []
-    ruleErrors = ruleErrors.concat(
-      validateRuleIsOverridden(name, this.definedRulesNames, this.className)
+    const ruleErrors: IParserDefinitionError[] = validateRuleIsOverridden(
+      name,
+      this.definedRulesNames,
+      this.className
     )
     this.definitionErrors = this.definitionErrors.concat(ruleErrors)
 
     const ruleImplementation = this.defineRule(name, impl, config)
-    this[name] = ruleImplementation
+    ;(this as any)[name] = ruleImplementation
     return ruleImplementation
   }
 

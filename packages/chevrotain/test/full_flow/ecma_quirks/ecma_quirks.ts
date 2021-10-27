@@ -4,7 +4,7 @@ import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_t
 
 import {
   END_OF_FILE,
-  lookAheadSequence,
+  LookAheadSequence,
   TokenMatcher
 } from "../../../src/parse/parser/parser"
 import { MismatchedTokenException } from "../../../src/parse/exceptions_public"
@@ -96,8 +96,8 @@ class EcmaScriptQuirksParser extends EmbeddedActionsParser {
     ])
   })
 
-  private orgText
-  private textIdx
+  private orgText: string
+  private textIdx: number
 
   // lexer related methods
   public set textInput(newInput: string) {
@@ -193,7 +193,7 @@ class EcmaScriptQuirksParser extends EmbeddedActionsParser {
   }
 
   lookAheadBuilderForOptional(
-    alt: lookAheadSequence,
+    alt: LookAheadSequence,
     tokenMatcher: TokenMatcher,
     dynamicTokensEnabled: boolean
   ): () => boolean {
@@ -225,7 +225,7 @@ class EcmaScriptQuirksParser extends EmbeddedActionsParser {
   }
 
   lookAheadBuilderForAlternatives(
-    alts: lookAheadSequence[],
+    alts: LookAheadSequence[],
     hasPredicates: boolean,
     tokenMatcher: TokenMatcher,
     dynamicTokensEnabled: boolean
@@ -269,7 +269,7 @@ class EcmaScriptQuirksParser extends EmbeddedActionsParser {
 // reuse the same parser instance.
 const parser = new EcmaScriptQuirksParser()
 
-export function parse(text): any {
+export function parse(text: string): any {
   parser.textInput = text
   const value = parser.statement()
 

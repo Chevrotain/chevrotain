@@ -8,7 +8,7 @@ describe("The RefResolverVisitor", () => {
   it("will fail when trying to resolve a ref to a grammar rule that does not exist", () => {
     const ref = new NonTerminal({ nonTerminalName: "missingRule" })
     const topLevel = new Rule({ name: "TOP", definition: [ref] })
-    const topLevelRules = {}
+    const topLevelRules: { [ruleName: string]: Rule } = {}
     topLevelRules["TOP"] = topLevel
     const resolver = new GastRefResolverVisitor(
       topLevelRules,

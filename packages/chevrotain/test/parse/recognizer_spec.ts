@@ -4,7 +4,7 @@ import {
   EmbeddedActionsParser,
   CstParser
 } from "../../src/parse/parser/traits/parser_traits"
-import { EMPTY_ALT } from "../../src/parse/parser/parser"
+import { EMPTY_ALT, TokenMatcher } from "../../src/parse/parser/parser"
 import { expect } from "chai"
 
 import {
@@ -18,13 +18,18 @@ import {
   augmentTokenTypes
 } from "../../src/scan/tokens"
 import { createRegularToken, setEquality } from "../utils/matchers"
-import { IMultiModeLexerDefinition, IToken, TokenType } from "@chevrotain/types"
+import {
+  IMultiModeLexerDefinition,
+  IToken,
+  ITokenConfig,
+  TokenType
+} from "@chevrotain/types"
 
 function defineRecognizerSpecs(
-  contextName,
-  createToken,
-  createTokenInstance,
-  tokenMatcher
+  contextName: string,
+  createToken: (c: ITokenConfig) => TokenType,
+  createTokenInstance: typeof createRegularToken,
+  tokenMatcher: TokenMatcher
 ) {
   context("Recognizer  " + contextName, () => {
     const PlusTok = createToken({ name: "PlusTok" })
@@ -184,7 +189,7 @@ function defineRecognizerSpecs(
         })
 
         it("can match an empty alternative", () => {
-          const input = []
+          const input = [] as IToken[]
           const parser = new EmptyAltParser(input)
           expect(parser.orRule()).to.equal("EMPTY_ALT")
         })
@@ -325,7 +330,7 @@ function defineRecognizerSpecs(
           this.parseQualifiedName
         )
         public identifier = this.RULE("identifier", this.parseIdentifier)
-        public idents = []
+        public idents: string[] = []
 
         private parseQualifiedName(): string[] {
           this.idents = []
@@ -407,7 +412,7 @@ function defineRecognizerSpecs(
         )
 
         private parseQualifiedName(): string[] {
-          const idents = []
+          const idents = [] as string[]
 
           this.AT_LEAST_ONE_SEP({
             SEP: DotTok,
@@ -698,7 +703,7 @@ function defineRecognizerSpecs(
     describe("The BaseRecognizer", () => {
       it("Cannot be initialized with a token vector (pre v4.0 API) ", () => {
         expect(
-          () => new EmbeddedActionsParser([createTokenInstance(PlusTok)])
+          () => new EmbeddedActionsParser([createTokenInstance(PlusTok)] as any)
         ).to.throw(
           "The Parser constructor no longer accepts a token vector as the first argument"
         )
@@ -719,7 +724,7 @@ function defineRecognizerSpecs(
 
       it("Can skip Grammar Validations during initialization", () => {
         class SkipValidationsParser extends EmbeddedActionsParser {
-          constructor(skipValidationsValue) {
+          constructor(skipValidationsValue: boolean) {
             super(ALL_TOKENS, {
               skipValidations: skipValidationsValue
             })
@@ -848,9 +853,9 @@ function defineRecognizerSpecs(
           }
         }
 
-        expect(
-          () => (new WrongOrderOfSelfAnalysisParser().input = [])
-        ).to.throw(
+        expect(() => {
+          new WrongOrderOfSelfAnalysisParser().input = []
+        }).to.throw(
           `Missing <performSelfAnalysis> invocation at the end of the Parser's constructor.`
         )
       })
