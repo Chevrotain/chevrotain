@@ -2,6 +2,7 @@ import * as utils from "@chevrotain/utils"
 import {
   contains,
   findAll,
+  flatMap,
   flatten,
   forEach,
   isEmpty,
@@ -47,16 +48,6 @@ import {
   IGrammarValidatorErrorMessageProvider,
   IParserDefinitionError
 } from "./types"
-
-function flatMap<U, R>(arr: U[], callback: (x: U) => R[]): R[] {
-  const result: R[] = []
-
-  for (const u of arr) {
-    result.push(...callback(u))
-  }
-
-  return result
-}
 
 export function validateGrammar(
   topLevels: Rule[],

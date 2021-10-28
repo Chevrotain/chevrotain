@@ -461,3 +461,13 @@ function getCharacterFromCodePointAt(str: string, idx: number): string {
     ? surrogatePairCandidate
     : str[idx]
 }
+
+export function flatMap<U, R>(arr: U[], callback: (x: U) => R[]): R[] {
+  const result: R[] = []
+
+  for (const u of arr) {
+    result.push(...callback(u))
+  }
+
+  return result
+}
