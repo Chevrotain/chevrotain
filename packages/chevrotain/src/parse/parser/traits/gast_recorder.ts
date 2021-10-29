@@ -11,6 +11,7 @@ import {
   IToken,
   ManySepMethodOpts,
   OrMethodOpts,
+  ParserMethod,
   SubruleMethodOpts,
   TokenType
 } from "@chevrotain/types"
@@ -22,7 +23,7 @@ import {
   peek,
   some
 } from "@chevrotain/utils"
-import { MixedInParser, ParserMethod } from "./parser_traits"
+import { MixedInParser } from "./parser_traits"
 import {
   Alternation,
   Alternative,
@@ -295,12 +296,12 @@ export class GastRecorder {
     return recordOrProd.call(this, altsOrOpts, occurrence)
   }
 
-  subruleInternalRecord<T>(
+  subruleInternalRecord<ARGS extends unknown[], R>(
     this: MixedInParser,
-    ruleToCall: ParserMethod<T>,
+    ruleToCall: ParserMethod<ARGS, R>,
     occurrence: number,
     options?: SubruleMethodOpts
-  ): T | CstNode {
+  ): R | CstNode {
     assertMethodIdxIsValid(occurrence)
     if (!ruleToCall || has(ruleToCall, "ruleName") === false) {
       const error: any = new Error(

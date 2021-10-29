@@ -110,11 +110,7 @@ module.exports = function (text, mood) {
   // setting a new input will RESET the parser instance's state.
   parser.input = lexResult.tokens
 
-  // Passing the argument to the top rule.
-  // note that because we are invoking a "start rule" we must provide the arguments as the second parameter.
-  // with the first parameter provided the value <1>
-  // also note that the arguments are passed as an array
-  const cst = parser.topRule(1, [mood])
+  const cst = parser.topRule(mood)
 
   return {
     cst: cst,

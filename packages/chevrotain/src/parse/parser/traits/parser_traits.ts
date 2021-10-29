@@ -35,11 +35,6 @@ export type MixedInParser = ParserConstructorImpel &
   GastRecorder &
   PerformanceTracer
 
-export type ParserMethod<T> = ((idx: number, args?: any[]) => T) & {
-  ruleName: string
-  originalGrammarAction: Function
-}
-
 interface MixedInCstParserConstructor {
   new (
     tokenVocabulary: defs.TokenVocabulary,

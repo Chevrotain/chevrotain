@@ -2,6 +2,11 @@ export as namespace chevrotain
 
 export declare const VERSION: string
 
+export type ParserMethod<ARGS extends unknown[], R> = ((...args: ARGS) => R) & {
+  ruleName: string
+  originalGrammarAction: Function
+}
+
 /**
  * This class does not actually exists nor is exposed at runtime.
  * This is just a helper to avoid duplications in the Type Definitions
@@ -875,21 +880,21 @@ export declare class CstParser extends BaseParser {
   /**
    * Creates a Grammar Rule
    */
-  protected RULE(
+  protected RULE<ARGS extends unknown[]>(
     name: string,
-    implementation: (...implArgs: any[]) => any,
+    implementation: (...implArgs: ARGS[]) => any,
     config?: IRuleConfig<CstNode>
-  ): (idxInCallingRule?: number, ...args: any[]) => CstNode
+  ): ParserMethod<ARGS[], CstNode>
 
   /**
    * Overrides a Grammar Rule
    * See usage example in: https://github.com/chevrotain/chevrotain/blob/master/examples/parser/versioning/versioning.js
    */
-  protected OVERRIDE_RULE<T>(
+  protected OVERRIDE_RULE<ARGS extends unknown[]>(
     name: string,
     implementation: (...implArgs: any[]) => any,
     config?: IRuleConfig<CstNode>
-  ): (idxInCallingRule?: number, ...args: any[]) => CstNode
+  ): ParserMethod<ARGS[], CstNode>
 
   /**
    * Like `SUBRULE` with the numerical suffix as a parameter, e.g:
@@ -899,9 +904,9 @@ export declare class CstParser extends BaseParser {
    * ...
    * @see SUBRULE
    */
-  protected subrule(
+  protected subrule<ARGS extends unknown[]>(
     idx: number,
-    ruleToCall: (idx: number) => CstNode,
+    ruleToCall: ParserMethod<ARGS, CstNode>,
     options?: SubruleMethodOpts
   ): CstNode
 
@@ -922,8 +927,8 @@ export declare class CstParser extends BaseParser {
    * of the sub rule invocation in its rule.
    *
    */
-  protected SUBRULE(
-    ruleToCall: (idx: number) => CstNode,
+  protected SUBRULE<ARGS extends unknown[]>(
+    ruleToCall: ParserMethod<ARGS, CstNode>,
     options?: SubruleMethodOpts
   ): CstNode
 
@@ -931,8 +936,8 @@ export declare class CstParser extends BaseParser {
    * @see SUBRULE
    * @hidden
    */
-  protected SUBRULE1(
-    ruleToCall: (idx: number) => CstNode,
+  protected SUBRULE1<ARGS extends unknown[]>(
+    ruleToCall: ParserMethod<ARGS, CstNode>,
     options?: SubruleMethodOpts
   ): CstNode
 
@@ -940,8 +945,8 @@ export declare class CstParser extends BaseParser {
    * @see SUBRULE
    * @hidden
    */
-  protected SUBRULE2(
-    ruleToCall: (idx: number) => CstNode,
+  protected SUBRULE2<ARGS extends unknown[]>(
+    ruleToCall: ParserMethod<ARGS, CstNode>,
     options?: SubruleMethodOpts
   ): CstNode
 
@@ -949,8 +954,8 @@ export declare class CstParser extends BaseParser {
    * @see SUBRULE
    * @hidden
    */
-  protected SUBRULE3(
-    ruleToCall: (idx: number) => CstNode,
+  protected SUBRULE3<ARGS extends unknown[]>(
+    ruleToCall: ParserMethod<ARGS, CstNode>,
     options?: SubruleMethodOpts
   ): CstNode
 
@@ -958,8 +963,8 @@ export declare class CstParser extends BaseParser {
    * @see SUBRULE
    * @hidden
    */
-  protected SUBRULE4(
-    ruleToCall: (idx: number) => CstNode,
+  protected SUBRULE4<ARGS extends unknown[]>(
+    ruleToCall: ParserMethod<ARGS, CstNode>,
     options?: SubruleMethodOpts
   ): CstNode
 
@@ -967,8 +972,8 @@ export declare class CstParser extends BaseParser {
    * @see SUBRULE
    * @hidden
    */
-  protected SUBRULE5(
-    ruleToCall: (idx: number) => CstNode,
+  protected SUBRULE5<ARGS extends unknown[]>(
+    ruleToCall: ParserMethod<ARGS, CstNode>,
     options?: SubruleMethodOpts
   ): CstNode
 
@@ -976,8 +981,8 @@ export declare class CstParser extends BaseParser {
    * @see SUBRULE
    * @hidden
    */
-  protected SUBRULE6(
-    ruleToCall: (idx: number) => CstNode,
+  protected SUBRULE6<ARGS extends unknown[]>(
+    ruleToCall: ParserMethod<ARGS, CstNode>,
     options?: SubruleMethodOpts
   ): CstNode
 
@@ -985,8 +990,8 @@ export declare class CstParser extends BaseParser {
    * @see SUBRULE
    * @hidden
    */
-  protected SUBRULE7(
-    ruleToCall: (idx: number) => CstNode,
+  protected SUBRULE7<ARGS extends unknown[]>(
+    ruleToCall: ParserMethod<ARGS, CstNode>,
     options?: SubruleMethodOpts
   ): CstNode
 
@@ -994,8 +999,8 @@ export declare class CstParser extends BaseParser {
    * @see SUBRULE
    * @hidden
    */
-  protected SUBRULE8(
-    ruleToCall: (idx: number) => CstNode,
+  protected SUBRULE8<ARGS extends unknown[]>(
+    ruleToCall: ParserMethod<ARGS, CstNode>,
     options?: SubruleMethodOpts
   ): CstNode
 
@@ -1003,8 +1008,8 @@ export declare class CstParser extends BaseParser {
    * @see SUBRULE
    * @hidden
    */
-  protected SUBRULE9(
-    ruleToCall: (idx: number) => CstNode,
+  protected SUBRULE9<ARGS extends unknown[]>(
+    ruleToCall: ParserMethod<ARGS, CstNode>,
     options?: SubruleMethodOpts
   ): CstNode
 }
@@ -1019,21 +1024,21 @@ export declare class EmbeddedActionsParser extends BaseParser {
   /**
    * Creates a Grammar Rule
    */
-  protected RULE<T>(
+  protected RULE<ARGS extends unknown[], R>(
     name: string,
-    implementation: (...implArgs: any[]) => T,
-    config?: IRuleConfig<T>
-  ): (idxInCallingRule?: number, ...args: any[]) => T
+    implementation: (...implArgs: ARGS) => R,
+    config?: IRuleConfig<R>
+  ): ParserMethod<ARGS, R>
 
   /**
    * Overrides a Grammar Rule
    * See usage example in: https://github.com/chevrotain/chevrotain/blob/master/examples/parser/versioning/versioning.js
    */
-  protected OVERRIDE_RULE<T>(
+  protected OVERRIDE_RULE<ARGS extends unknown[], R>(
     name: string,
-    impl: (...implArgs: any[]) => T,
-    config?: IRuleConfig<T>
-  ): (idxInCallingRule?: number, ...args: any[]) => T
+    implementation: (...implArgs: ARGS) => R,
+    config?: IRuleConfig<R>
+  ): ParserMethod<ARGS, R>
 
   /**
    * Like `SUBRULE` with the numerical suffix as a parameter, e.g:
@@ -1043,11 +1048,11 @@ export declare class EmbeddedActionsParser extends BaseParser {
    * ...
    * @see SUBRULE
    */
-  protected subrule<T>(
+  protected subrule<ARGS extends unknown[], R>(
     idx: number,
-    ruleToCall: (idx: number) => T,
+    ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts
-  ): T
+  ): R
 
   /**
    * The Parsing DSL Method is used by one rule to call another.
@@ -1066,91 +1071,91 @@ export declare class EmbeddedActionsParser extends BaseParser {
    * of the sub rule invocation in its rule.
    *
    */
-  protected SUBRULE<T>(
-    ruleToCall: (idx: number) => T,
+  protected SUBRULE<ARGS extends unknown[], R>(
+    ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts
-  ): T
+  ): R
 
   /**
    * @see SUBRULE
    * @hidden
    */
-  protected SUBRULE1<T>(
-    ruleToCall: (idx: number) => T,
+  protected SUBRULE1<ARGS extends unknown[], R>(
+    ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts
-  ): T
+  ): R
 
   /**
    * @see SUBRULE
    * @hidden
    */
-  protected SUBRULE2<T>(
-    ruleToCall: (idx: number) => T,
+  protected SUBRULE2<ARGS extends unknown[], R>(
+    ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts
-  ): T
+  ): R
 
   /**
    * @see SUBRULE
    * @hidden
    */
-  protected SUBRULE3<T>(
-    ruleToCall: (idx: number) => T,
+  protected SUBRULE3<ARGS extends unknown[], R>(
+    ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts
-  ): T
+  ): R
 
   /**
    * @see SUBRULE
    * @hidden
    */
-  protected SUBRULE4<T>(
-    ruleToCall: (idx: number) => T,
+  protected SUBRULE4<ARGS extends unknown[], R>(
+    ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts
-  ): T
+  ): R
 
   /**
    * @see SUBRULE
    * @hidden
    */
-  protected SUBRULE5<T>(
-    ruleToCall: (idx: number) => T,
+  protected SUBRULE5<ARGS extends unknown[], R>(
+    ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts
-  ): T
+  ): R
 
   /**
    * @see SUBRULE
    * @hidden
    */
-  protected SUBRULE6<T>(
-    ruleToCall: (idx: number) => T,
+  protected SUBRULE6<ARGS extends unknown[], R>(
+    ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts
-  ): T
+  ): R
 
   /**
    * @see SUBRULE
    * @hidden
    */
-  protected SUBRULE7<T>(
-    ruleToCall: (idx: number) => T,
+  protected SUBRULE7<ARGS extends unknown[], R>(
+    ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts
-  ): T
+  ): R
 
   /**
    * @see SUBRULE
    * @hidden
    */
-  protected SUBRULE8<T>(
-    ruleToCall: (idx: number) => T,
+  protected SUBRULE8<ARGS extends unknown[], R>(
+    ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts
-  ): T
+  ): R
 
   /**
    * @see SUBRULE
    * @hidden
    */
-  protected SUBRULE9<T>(
-    ruleToCall: (idx: number) => T,
+  protected SUBRULE9<ARGS extends unknown[], R>(
+    ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts
-  ): T
+  ): R
 }
 
 export interface ILexerDefinitionError {
@@ -1833,12 +1838,12 @@ export interface ConsumeMethodOpts {
   LABEL?: string
 }
 
-export interface SubruleMethodOpts {
+export interface SubruleMethodOpts<ARGS = any[]> {
   /**
    * The arguments to parameterized rules, see:
    * https://github.com/chevrotain/chevrotain/blob/master/examples/parser/parametrized_rules/parametrized.js
    */
-  ARGS?: any[]
+  ARGS?: ARGS
   /**
    * A label to be used instead of the subrule's name in the created CST.
    */
