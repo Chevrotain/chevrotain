@@ -9,7 +9,7 @@ import {
 } from "@chevrotain/utils"
 import { possiblePathsFrom } from "./interpreter"
 import { RestWalker } from "./rest"
-import { Predicate, TokenMatcher, lookAheadSequence } from "../parser/parser"
+import { Predicate, TokenMatcher, LookAheadSequence } from "../parser/parser"
 import {
   tokenStructuredMatcher,
   tokenStructuredMatcherNoCategories
@@ -105,7 +105,11 @@ export function buildLookaheadFuncForOptionalProd(
   k: number,
   dynamicTokensEnabled: boolean,
   prodType: PROD_TYPE,
-  lookaheadBuilder: (lookAheadSequence, TokenMatcher, boolean) => () => boolean
+  lookaheadBuilder: (
+    lookAheadSequence: LookAheadSequence,
+    tokenMatcher: TokenMatcher,
+    dynamicTokensEnabled: boolean
+  ) => () => boolean
 ): () => boolean {
   const lookAheadPaths = getLookaheadPathsForOptionalProd(
     occurrence,
@@ -124,7 +128,7 @@ export function buildLookaheadFuncForOptionalProd(
 export type Alternative = TokenType[][]
 
 export function buildAlternativesLookAheadFunc(
-  alts: lookAheadSequence[],
+  alts: LookAheadSequence[],
   hasPredicates: boolean,
   tokenMatcher: TokenMatcher,
   dynamicTokensEnabled: boolean
@@ -244,7 +248,7 @@ export function buildAlternativesLookAheadFunc(
 }
 
 export function buildSingleAlternativeLookaheadFunction(
-  alt: lookAheadSequence,
+  alt: LookAheadSequence,
   tokenMatcher: TokenMatcher,
   dynamicTokensEnabled: boolean
 ): () => boolean {
@@ -471,7 +475,7 @@ class InsideDefinitionFinderVisitor extends GAstVisitor {
   }
 }
 
-function initializeArrayOfArrays(size): any[][] {
+function initializeArrayOfArrays(size: number): any[][] {
   const result = new Array(size)
   for (let i = 0; i < size; i++) {
     result[i] = []
@@ -534,13 +538,13 @@ function isUniquePrefixHash(
 export function lookAheadSequenceFromAlternatives(
   altsDefs: IProduction[],
   k: number
-): lookAheadSequence[] {
+): LookAheadSequence[] {
   const partialAlts = map(altsDefs, (currAlt) =>
     possiblePathsFrom([currAlt], 1)
   )
   const finalResult = initializeArrayOfArrays(partialAlts.length)
   const altsHashes = map(partialAlts, (currAltPaths) => {
-    const dict = {}
+    const dict: { [key: string]: boolean } = {}
     forEach(currAltPaths, (item) => {
       const keys = pathToHashKeys(item.partialPath)
       forEach(keys, (currKey) => {
@@ -611,7 +615,7 @@ export function getLookaheadPathsForOr(
   ruleGrammar: Rule,
   k: number,
   orProd?: Alternation
-): lookAheadSequence[] {
+): LookAheadSequence[] {
   const visitor = new InsideDefinitionFinderVisitor(
     occurrence,
     PROD_TYPE.ALTERNATION,
@@ -626,7 +630,7 @@ export function getLookaheadPathsForOptionalProd(
   ruleGrammar: Rule,
   prodType: PROD_TYPE,
   k: number
-): lookAheadSequence[] {
+): LookAheadSequence[] {
   const insideDefVisitor = new InsideDefinitionFinderVisitor(
     occurrence,
     prodType
@@ -690,7 +694,7 @@ export function isStrictPrefixOfPath(
 }
 
 export function areTokenCategoriesNotUsed(
-  lookAheadPaths: lookAheadSequence[]
+  lookAheadPaths: LookAheadSequence[]
 ): boolean {
   return every(lookAheadPaths, (singleAltPaths) =>
     every(singleAltPaths, (singlePath) =>

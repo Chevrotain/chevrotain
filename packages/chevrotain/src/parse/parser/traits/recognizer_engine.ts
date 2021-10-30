@@ -10,6 +10,7 @@ import {
   IToken,
   ManySepMethodOpts,
   OrMethodOpts,
+  ParserMethod,
   SubruleMethodOpts,
   TokenType,
   TokenVocabulary
@@ -67,7 +68,7 @@ import { Rule } from "../../grammar/gast/gast_public"
  * Used by the official API (recognizer_api.ts)
  */
 export class RecognizerEngine {
-  isBackTrackingStack
+  isBackTrackingStack: boolean[]
   className: string
   RULE_STACK: number[]
   RULE_OCCURRENCE_STACK: number[]
@@ -79,6 +80,7 @@ export class RecognizerEngine {
   // The shortName Index must be coded "after" the first 8bits to enable building unique lookahead keys
   ruleShortNameIdx: number
   tokenMatcher: TokenMatcher
+  subruleIdx: number
 
   initRecognizerEngine(
     tokenVocabulary: TokenVocabulary,
@@ -90,6 +92,7 @@ export class RecognizerEngine {
     this.fullRuleNameToShort = {}
     this.ruleShortNameIdx = 256
     this.tokenMatcher = tokenStructuredMatcherNoCategories
+    this.subruleIdx = 0
 
     this.definedRulesNames = []
     this.tokensMap = {}
@@ -128,13 +131,13 @@ export class RecognizerEngine {
     }
 
     if (isArray(tokenVocabulary)) {
-      this.tokensMap = <any>reduce(
-        <any>tokenVocabulary,
+      this.tokensMap = reduce(
+        tokenVocabulary,
         (acc, tokType: TokenType) => {
           acc[tokType.name] = tokType
           return acc
         },
-        {}
+        {} as { [tokenName: string]: TokenType }
       )
     } else if (
       has(tokenVocabulary, "modes") &&
@@ -148,7 +151,7 @@ export class RecognizerEngine {
           acc[tokType.name] = tokType
           return acc
         },
-        {}
+        {} as { [tokenName: string]: TokenType }
       )
     } else if (isObject(tokenVocabulary)) {
       this.tokensMap = cloneObj(tokenVocabulary)
@@ -180,12 +183,12 @@ export class RecognizerEngine {
     augmentTokenTypes(values(this.tokensMap))
   }
 
-  defineRule<T>(
+  defineRule<ARGS extends unknown[], R>(
     this: MixedInParser,
     ruleName: string,
-    impl: (...implArgs: any[]) => T,
-    config: IRuleConfig<T>
-  ): (idxInCallingRule?: number, ...args: any[]) => T {
+    impl: (...args: ARGS) => R,
+    config: IRuleConfig<R>
+  ): ParserMethod<ARGS, R> {
     if (this.selfAnalysisDone) {
       throw Error(
         `Grammar rule <${ruleName}> may not be defined after the 'performSelfAnalysis' method has been called'\n` +
@@ -210,35 +213,29 @@ export class RecognizerEngine {
     this.shortRuleNameToFull[shortName] = ruleName
     this.fullRuleNameToShort[ruleName] = shortName
 
-    function invokeRuleWithTry(this: MixedInParser, args: any[]) {
+    function invokeRuleWithTry(this: MixedInParser, ...args: ARGS): R {
       try {
+        this.ruleInvocationStateUpdate(shortName, ruleName, this.subruleIdx)
         if (this.outputCst === true) {
           impl.apply(this, args)
           const cst = this.CST_STACK[this.CST_STACK.length - 1]
           this.cstPostRule(cst)
-          return cst
+          return cst as unknown as R
         } else {
           return impl.apply(this, args)
         }
       } catch (e) {
-        return this.invokeRuleCatch(e, resyncEnabled, recoveryValueFunc)
+        return this.invokeRuleCatch(e, resyncEnabled, recoveryValueFunc) as R
       } finally {
         this.ruleFinallyStateUpdate()
       }
     }
 
-    const wrappedGrammarRule = function (
-      this: MixedInParser,
-      idxInCallingRule: number = 0,
-      args: any[]
-    ) {
-      this.ruleInvocationStateUpdate(shortName, ruleName, idxInCallingRule)
-      return invokeRuleWithTry.call(this, args)
-    }
+    const wrappedGrammarRule: ParserMethod<ARGS, R> = Object.assign(
+      invokeRuleWithTry as any,
+      { ruleName, originalGrammarAction: impl }
+    )
 
-    const ruleNamePropName = "ruleName"
-    wrappedGrammarRule[ruleNamePropName] = ruleName
-    wrappedGrammarRule["originalGrammarAction"] = impl
     return wrappedGrammarRule
   }
 
@@ -247,7 +244,7 @@ export class RecognizerEngine {
     e: Error,
     resyncEnabledConfig: boolean,
     recoveryValueFunc: Function
-  ): void {
+  ): unknown {
     const isFirstInvokedRule = this.RULE_STACK.length === 1
     // note the reSync is always enabled for the first rule invocation, because we must always be able to
     // reSync with EOF and just output some INVALID ParseTree
@@ -313,11 +310,11 @@ export class RecognizerEngine {
     key: number
   ): OUT {
     let lookAheadFunc = this.getLaFuncFromCache(key)
-    let action
-    let predicate
-    if ((<DSLMethodOpts<OUT>>actionORMethodDef).DEF !== undefined) {
-      action = (<DSLMethodOpts<OUT>>actionORMethodDef).DEF
-      predicate = (<DSLMethodOpts<OUT>>actionORMethodDef).GATE
+    let action: GrammarAction<OUT>
+    let predicate: (this: MixedInParser) => boolean
+    if (typeof actionORMethodDef !== "function") {
+      action = actionORMethodDef.DEF
+      predicate = actionORMethodDef.GATE
       // predicate present
       if (predicate !== undefined) {
         const orgLookaheadFunction = lookAheadFunc
@@ -360,10 +357,10 @@ export class RecognizerEngine {
     let lookAheadFunc = this.getLaFuncFromCache(key)
 
     let action
-    let predicate
-    if ((<DSLMethodOptsWithErr<OUT>>actionORMethodDef).DEF !== undefined) {
-      action = (<DSLMethodOptsWithErr<OUT>>actionORMethodDef).DEF
-      predicate = (<DSLMethodOptsWithErr<OUT>>actionORMethodDef).GATE
+    let predicate: (this: MixedInParser) => boolean
+    if (typeof actionORMethodDef !== "function") {
+      action = actionORMethodDef.DEF
+      predicate = actionORMethodDef.GATE
       // predicate present
       if (predicate !== undefined) {
         const orgLookaheadFunction = lookAheadFunc
@@ -490,10 +487,10 @@ export class RecognizerEngine {
     let lookaheadFunction = this.getLaFuncFromCache(key)
 
     let action
-    let predicate
-    if ((<DSLMethodOpts<OUT>>actionORMethodDef).DEF !== undefined) {
-      action = (<DSLMethodOpts<OUT>>actionORMethodDef).DEF
-      predicate = (<DSLMethodOpts<OUT>>actionORMethodDef).GATE
+    let predicate: (this: MixedInParser) => boolean
+    if (typeof actionORMethodDef !== "function") {
+      action = actionORMethodDef.DEF
+      predicate = actionORMethodDef.GATE
       // predicate present
       if (predicate !== undefined) {
         const orgLookaheadFunction = lookaheadFunction
@@ -633,9 +630,7 @@ export class RecognizerEngine {
     occurrence: number
   ): T {
     const laKey = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
-    const alts = isArray(altsOrOpts)
-      ? (altsOrOpts as IOrAlt<any>[])
-      : (altsOrOpts as OrMethodOpts<unknown>).DEF
+    const alts = isArray(altsOrOpts) ? altsOrOpts : altsOrOpts.DEF
 
     const laFunc = this.getLaFuncFromCache(laKey)
     const altIdxToTake = laFunc.call(this, alts)
@@ -666,25 +661,26 @@ export class RecognizerEngine {
     }
   }
 
-  subruleInternal<T>(
+  subruleInternal<ARGS extends unknown[], R>(
     this: MixedInParser,
-    ruleToCall: (idx: number) => T,
+    ruleToCall: ParserMethod<ARGS, R>,
     idx: number,
-    options?: SubruleMethodOpts
-  ) {
+    options?: SubruleMethodOpts<ARGS>
+  ): R {
     let ruleResult
     try {
       const args = options !== undefined ? options.ARGS : undefined
-      ruleResult = ruleToCall.call(this, idx, args)
+      this.subruleIdx = idx
+      ruleResult = ruleToCall.apply(this, args)
       this.cstPostNonTerminal(
         ruleResult,
         options !== undefined && options.LABEL !== undefined
           ? options.LABEL
-          : (<any>ruleToCall).ruleName
+          : ruleToCall.ruleName
       )
       return ruleResult
     } catch (e) {
-      this.subruleInternalError(e, options, (<any>ruleToCall).ruleName)
+      this.subruleInternalError(e, options, ruleToCall.ruleName)
     }
   }
 

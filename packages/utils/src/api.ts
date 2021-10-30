@@ -81,9 +81,9 @@ export function forEach<T>(
   collection: T[],
   iteratorCallback: (item: T, index: number) => void
 ): void
-export function forEach<T>(
-  collection: Record<string, T>,
-  iteratorCallback: (value: T, key: string) => void
+export function forEach<K extends string | number, T>(
+  collection: Record<K, T>,
+  iteratorCallback: (value: T, key: K) => void
 ): void
 export function forEach(collection: any, iteratorCallback: Function): void {
   /* istanbul ignore else */
@@ -460,4 +460,14 @@ function getCharacterFromCodePointAt(str: string, idx: number): string {
   return surrogatePairPattern.test(surrogatePairCandidate)
     ? surrogatePairCandidate
     : str[idx]
+}
+
+export function flatMap<U, R>(arr: U[], callback: (x: U) => R[]): R[] {
+  const result: R[] = []
+
+  for (const u of arr) {
+    result.push(...callback(u))
+  }
+
+  return result
 }

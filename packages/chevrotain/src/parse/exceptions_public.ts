@@ -30,7 +30,7 @@ abstract class RecognitionException
   implements IRecognitionException
 {
   context: IRecognizerContext
-  resyncedTokens = []
+  resyncedTokens: IToken[] = []
 
   protected constructor(message: string, public token: IToken) {
     super(message)

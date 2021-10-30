@@ -273,7 +273,7 @@ describe("lookahead Regular Tokens Mode", () => {
 
       private parseManyRule(): any {
         let total = ""
-        const separators = []
+        const separators: IToken[] = []
 
         this.MANY_SEP1({
           SEP: Comma,
@@ -559,7 +559,7 @@ describe("lookahead Regular Tokens Mode", () => {
 
       private parseAtLeastOneRule(): any {
         let total = ""
-        const separators = []
+        const separators: IToken[] = []
 
         this.AT_LEAST_ONE_SEP1({
           SEP: Comma,
@@ -1968,7 +1968,7 @@ describe("lookahead Regular Tokens Mode", () => {
       })
     }
 
-    let manyInOrBugParser
+    let manyInOrBugParser: ManyInOrBugParser
     before(() => {
       manyInOrBugParser = new ManyInOrBugParser()
     })

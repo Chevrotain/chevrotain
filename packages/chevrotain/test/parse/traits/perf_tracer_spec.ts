@@ -4,6 +4,7 @@ import {
   EmbeddedActionsParser
 } from "../../../src/parse/parser/traits/parser_traits"
 import { expect } from "chai"
+import { SinonSpy } from "sinon"
 
 let skipOnBrowser = describe
 if (typeof window !== "undefined") {
@@ -11,7 +12,7 @@ if (typeof window !== "undefined") {
 }
 
 skipOnBrowser("Chevrotain's Init Performance Tracing", () => {
-  let consoleLogSpy
+  let consoleLogSpy: SinonSpy
 
   beforeEach(() => {
     // @ts-ignore
@@ -26,7 +27,7 @@ skipOnBrowser("Chevrotain's Init Performance Tracing", () => {
   const PlusTok = createToken({ name: "PlusTok" })
 
   class TraceParser extends EmbeddedActionsParser {
-    constructor(traceInitVal) {
+    constructor(traceInitVal: boolean | number) {
       super([PlusTok], {
         traceInitPerf: traceInitVal
       })

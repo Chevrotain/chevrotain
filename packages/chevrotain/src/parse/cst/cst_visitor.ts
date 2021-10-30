@@ -10,7 +10,7 @@ import {
   map
 } from "@chevrotain/utils"
 import { defineNameProp } from "../../lang/lang_extensions"
-import { ICstVisitor } from "@chevrotain/types"
+import { CstNode, ICstVisitor } from "@chevrotain/types"
 
 export function defaultVisit<IN, OUT>(ctx: any, param: IN): OUT {
   const childrenNames = keys(ctx)
@@ -45,7 +45,7 @@ export function createBaseSemanticVisitorConstructor(
   defineNameProp(derivedConstructor, grammarName + "BaseSemantics")
 
   const semanticProto = {
-    visit: function (cstNode, param) {
+    visit: function (cstNode: CstNode | CstNode[], param: any) {
       // enables writing more concise visitor methods when CstNode has only a single child
       if (isArray(cstNode)) {
         // A CST Node's children dictionary can never have empty arrays as values
@@ -121,7 +121,7 @@ export interface IVisitorDefinitionError {
 }
 
 export function validateVisitor(
-  visitorInstance: Function,
+  visitorInstance: ICstVisitor<unknown, unknown>,
   ruleNames: string[]
 ): IVisitorDefinitionError[] {
   const missingErrors = validateMissingCstMethods(visitorInstance, ruleNames)
@@ -131,11 +131,11 @@ export function validateVisitor(
 }
 
 export function validateMissingCstMethods(
-  visitorInstance: Function,
+  visitorInstance: ICstVisitor<unknown, unknown>,
   ruleNames: string[]
 ): IVisitorDefinitionError[] {
   const errors: IVisitorDefinitionError[] = map(ruleNames, (currRuleName) => {
-    if (!isFunction(visitorInstance[currRuleName])) {
+    if (!isFunction((visitorInstance as any)[currRuleName])) {
       return {
         msg: `Missing visitor method: <${currRuleName}> on ${<any>(
           visitorInstance.constructor.name
@@ -151,14 +151,14 @@ export function validateMissingCstMethods(
 
 const VALID_PROP_NAMES = ["constructor", "visit", "validateVisitor"]
 export function validateRedundantMethods(
-  visitorInstance: Function,
+  visitorInstance: ICstVisitor<unknown, unknown>,
   ruleNames: string[]
 ): IVisitorDefinitionError[] {
   const errors = []
 
   for (const prop in visitorInstance) {
     if (
-      isFunction(visitorInstance[prop]) &&
+      isFunction((visitorInstance as any)[prop]) &&
       !contains(VALID_PROP_NAMES, prop) &&
       !contains(ruleNames, prop)
     ) {

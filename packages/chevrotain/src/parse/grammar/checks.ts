@@ -1,8 +1,8 @@
 import * as utils from "@chevrotain/utils"
 import {
   contains,
-  every,
   findAll,
+  flatMap,
   flatten,
   forEach,
   isEmpty,
@@ -56,24 +56,24 @@ export function validateGrammar(
   errMsgProvider: IGrammarValidatorErrorMessageProvider,
   grammarName: string
 ): IParserDefinitionError[] {
-  const duplicateErrors: any = utils.map(topLevels, (currTopLevel) =>
+  const duplicateErrors = flatMap(topLevels, (currTopLevel) =>
     validateDuplicateProductions(currTopLevel, errMsgProvider)
   )
-  const leftRecursionErrors: any = utils.map(topLevels, (currTopRule) =>
+  const leftRecursionErrors = flatMap(topLevels, (currTopRule) =>
     validateNoLeftRecursion(currTopRule, currTopRule, errMsgProvider)
   )
 
-  let emptyAltErrors = []
-  let ambiguousAltsErrors = []
-  let emptyRepetitionErrors = []
+  let emptyAltErrors: IParserEmptyAlternativeDefinitionError[] = []
+  let ambiguousAltsErrors: IParserAmbiguousAlternativesDefinitionError[] = []
+  let emptyRepetitionErrors: IParserDefinitionError[] = []
 
   // left recursion could cause infinite loops in the following validations.
   // It is safest to first have the user fix the left recursion errors first and only then examine Further issues.
-  if (every(leftRecursionErrors, isEmpty)) {
-    emptyAltErrors = map(topLevels, (currTopRule) =>
+  if (isEmpty(leftRecursionErrors)) {
+    emptyAltErrors = flatMap(topLevels, (currTopRule) =>
       validateEmptyOrAlternative(currTopRule, errMsgProvider)
     )
-    ambiguousAltsErrors = map(topLevels, (currTopRule) =>
+    ambiguousAltsErrors = flatMap(topLevels, (currTopRule) =>
       validateAmbiguousAlternationAlternatives(
         currTopRule,
         globalMaxLookahead,
@@ -94,11 +94,11 @@ export function validateGrammar(
     errMsgProvider
   )
 
-  const tooManyAltsErrors = map(topLevels, (curRule) =>
+  const tooManyAltsErrors = flatMap(topLevels, (curRule) =>
     validateTooManyAlts(curRule, errMsgProvider)
   )
 
-  const duplicateRulesError = map(topLevels, (curRule) =>
+  const duplicateRulesError = flatMap(topLevels, (curRule) =>
     validateRuleDoesNotAlreadyExist(
       curRule,
       topLevels,
@@ -107,18 +107,14 @@ export function validateGrammar(
     )
   )
 
-  return <any>(
-    utils.flatten(
-      duplicateErrors.concat(
-        emptyRepetitionErrors,
-        leftRecursionErrors,
-        emptyAltErrors,
-        ambiguousAltsErrors,
-        termsNamespaceConflictErrors,
-        tooManyAltsErrors,
-        duplicateRulesError
-      )
-    )
+  return (duplicateErrors as IParserDefinitionError[]).concat(
+    emptyRepetitionErrors,
+    leftRecursionErrors,
+    emptyAltErrors,
+    ambiguousAltsErrors,
+    termsNamespaceConflictErrors,
+    tooManyAltsErrors,
+    duplicateRulesError
   )
 }
 
@@ -223,7 +219,7 @@ export class OccurrenceValidationCollector extends GAstVisitor {
 export function validateRuleDoesNotAlreadyExist(
   rule: Rule,
   allRules: Rule[],
-  className,
+  className: string,
   errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserDefinitionError[] {
   const errors = []
@@ -258,7 +254,7 @@ export function validateRuleDoesNotAlreadyExist(
 export function validateRuleIsOverridden(
   ruleName: string,
   definedRulesNames: string[],
-  className
+  className: string
 ): IParserDefinitionError[] {
   const errors = []
   let errMsg
@@ -283,7 +279,7 @@ export function validateNoLeftRecursion(
   errMsgProvider: IGrammarValidatorErrorMessageProvider,
   path: Rule[] = []
 ): IParserDefinitionError[] {
-  const errors = []
+  const errors: IParserDefinitionError[] = []
   const nextNonTerminals = getFirstNoneTerminal(currRule.definition)
   if (utils.isEmpty(nextNonTerminals)) {
     return []
@@ -307,7 +303,7 @@ export function validateNoLeftRecursion(
       nextNonTerminals,
       path.concat([topRule])
     )
-    const errorsFromNextSteps = utils.map(validNextSteps, (currRefRule) => {
+    const errorsFromNextSteps = flatMap(validNextSteps, (currRefRule) => {
       const newPath = utils.cloneArr(path)
       newPath.push(currRefRule)
       return validateNoLeftRecursion(
@@ -318,12 +314,12 @@ export function validateNoLeftRecursion(
       )
     })
 
-    return errors.concat(utils.flatten(errorsFromNextSteps))
+    return errors.concat(errorsFromNextSteps)
   }
 }
 
 export function getFirstNoneTerminal(definition: IProduction[]): Rule[] {
-  let result = []
+  let result: Rule[] = []
   if (utils.isEmpty(definition)) {
     return result
   }
@@ -367,7 +363,7 @@ export function getFirstNoneTerminal(definition: IProduction[]): Rule[] {
 }
 
 class OrCollector extends GAstVisitor {
-  public alternations = []
+  public alternations: Alternation[] = []
 
   public visitAlternation(node: Alternation): void {
     this.alternations.push(node)
@@ -524,7 +520,7 @@ export function validateSomeNonEmptyLookaheadPath(
   maxLookahead: number,
   errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserDefinitionError[] {
-  const errors = []
+  const errors: IParserDefinitionError[] = []
   forEach(topLevelRules, (currTopRule) => {
     const collectorVisitor = new RepetitionCollector()
     currTopRule.accept(collectorVisitor)
@@ -568,7 +564,7 @@ function checkAlternativesAmbiguities(
   rule: Rule,
   errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserAmbiguousAlternativesDefinitionError[] {
-  const foundAmbiguousPaths = []
+  const foundAmbiguousPaths: Alternative = []
   const identicalAmbiguities = reduce(
     alternatives,
     (result, currAlt, currAltIdx) => {
@@ -636,9 +632,7 @@ export function checkPrefixAlternativesAmbiguities(
   alternation: Alternation,
   rule: Rule,
   errMsgProvider: IGrammarValidatorErrorMessageProvider
-): IAmbiguityDescriptor[] {
-  let errors = []
-
+): IParserAmbiguousAlternativesDefinitionError[] {
   // flatten
   const pathsAndIndices = reduce(
     alternatives,
@@ -648,10 +642,10 @@ export function checkPrefixAlternativesAmbiguities(
       })
       return result.concat(currPathsAndIdx)
     },
-    []
+    [] as { idx: number; path: TokenType[] }[]
   )
 
-  forEach(pathsAndIndices, (currPathAndIdx) => {
+  const errors = flatMap(pathsAndIndices, (currPathAndIdx) => {
     const alternativeGast = alternation.definition[currPathAndIdx.idx]
     // ignore (skip) ambiguities with this alternative
     if (alternativeGast.ignoreAmbiguities === true) {
@@ -678,7 +672,7 @@ export function checkPrefixAlternativesAmbiguities(
 
     const currPathPrefixErrors = map(
       prefixAmbiguitiesPathsAndIndices,
-      (currAmbPathAndIdx) => {
+      (currAmbPathAndIdx): IParserAmbiguousAlternativesDefinitionError => {
         const ambgIndices = [currAmbPathAndIdx.idx + 1, targetIdx + 1]
         const occurrence = alternation.idx === 0 ? "" : alternation.idx
 
@@ -697,7 +691,8 @@ export function checkPrefixAlternativesAmbiguities(
         }
       }
     )
-    errors = errors.concat(currPathPrefixErrors)
+
+    return currPathPrefixErrors
   })
 
   return errors
@@ -708,7 +703,7 @@ function checkTerminalAndNoneTerminalsNameSpace(
   tokenTypes: TokenType[],
   errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserDefinitionError[] {
-  const errors = []
+  const errors: IParserDefinitionError[] = []
 
   const tokenNames = map(tokenTypes, (currToken) => currToken.name)
 

@@ -10,9 +10,12 @@ import {
   isEmpty,
   map
 } from "@chevrotain/utils"
-import { TokenType } from "@chevrotain/types"
+import { IToken, TokenType } from "@chevrotain/types"
 
-export function tokenStructuredMatcher(tokInstance, tokConstructor) {
+export function tokenStructuredMatcher(
+  tokInstance: IToken,
+  tokConstructor: TokenType
+) {
   const instanceType = tokInstance.tokenTypeIdx
   if (instanceType === tokConstructor.tokenTypeIdx) {
     return true
@@ -26,12 +29,15 @@ export function tokenStructuredMatcher(tokInstance, tokConstructor) {
 
 // Optimized tokenMatcher in case our grammar does not use token categories
 // Being so tiny it is much more likely to be in-lined and this avoid the function call overhead
-export function tokenStructuredMatcherNoCategories(token, tokType) {
+export function tokenStructuredMatcherNoCategories(
+  token: IToken,
+  tokType: TokenType
+) {
   return token.tokenTypeIdx === tokType.tokenTypeIdx
 }
 
 export let tokenShortNameIdx = 1
-export const tokenIdxToClass = {}
+export const tokenIdxToClass: { [tokenIdx: number]: TokenType } = {}
 
 export function augmentTokenTypes(tokenTypes: TokenType[]): void {
   // collect the parent Token Types as well.

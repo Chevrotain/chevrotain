@@ -1695,7 +1695,7 @@ describe("issue 391 - WITH_SEP variants do not take SEP into account in lookahea
     )
     const myParser = new Issue391Parser([])
 
-    function testInput(input) {
+    function testInput(input: string) {
       const tokens = issue391Lexer.tokenize(input).tokens
       myParser.input = tokens
       myParser.topRule()

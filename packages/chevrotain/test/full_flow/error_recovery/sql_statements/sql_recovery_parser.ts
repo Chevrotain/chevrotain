@@ -91,7 +91,7 @@ export class DDLExampleRecoveryParser extends EmbeddedActionsParser {
   // DOCS: note how all the parsing rules in this example return a ParseTree, we require some output from the parser
   // to demonstrate the error recovery mechanisms. otherwise it is harder to prove we have indeed recovered.
   private parseDdl(): ParseTree {
-    const stmts = []
+    const stmts: ParseTree[] = []
 
     this.MANY(() => {
       this.OR([
@@ -167,7 +167,7 @@ export class DDLExampleRecoveryParser extends EmbeddedActionsParser {
   }
 
   private parseQualifiedName(): ParseTree {
-    const dots = []
+    const dots: IToken[] = []
     const idents = []
 
     // parse
@@ -189,8 +189,8 @@ export class DDLExampleRecoveryParser extends EmbeddedActionsParser {
   }
 
   private parseRecordValue(): ParseTree {
-    const values = []
-    const commas = []
+    const values: ParseTree[] = []
+    const commas: IToken[] = []
 
     // parse
     this.CONSUME1(LParenTok)

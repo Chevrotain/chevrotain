@@ -1,6 +1,6 @@
 const NAME = "name"
 
-export function defineNameProp(obj, nameValue): void {
+export function defineNameProp(obj: {}, nameValue: string): void {
   Object.defineProperty(obj, NAME, {
     enumerable: false,
     configurable: true,

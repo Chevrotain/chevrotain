@@ -33,6 +33,7 @@ import {
 import { augmentTokenTypes } from "./tokens"
 import {
   CustomPatternMatcherFunc,
+  CustomPatternMatcherReturn,
   ILexerConfig,
   ILexerDefinitionError,
   ILexingError,
@@ -225,7 +226,7 @@ export class Lexer {
 
       const allModeNames = keys(actualDefinition.modes)
 
-      forEach(
+      forEach<string, TokenType[]>(
         actualDefinition.modes,
         (currModDef: TokenType[], currModName) => {
           this.TRACE_INIT(`Mode: <${currModName}> processing`, () => {
@@ -234,7 +235,7 @@ export class Lexer {
             if (this.config.skipValidations === false) {
               this.TRACE_INIT(`validatePatterns`, () => {
                 this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(
-                  validatePatterns(<TokenType[]>currModDef, allModeNames)
+                  validatePatterns(currModDef, allModeNames)
                 )
               })
             }
@@ -406,7 +407,7 @@ export class Lexer {
       k,
       matchAltImage,
       longerAlt,
-      matchedImage,
+      matchedImage: string | null,
       payload,
       altPayload,
       imageLength,
@@ -545,7 +546,7 @@ export class Lexer {
         if (singleCharCode !== false) {
           if (nextCharCode === singleCharCode) {
             // single character string
-            matchedImage = currPattern
+            matchedImage = currPattern as string
           }
         } else if (currConfig.isCustom === true) {
           match = (currPattern as IRegExpExec).exec(
@@ -556,8 +557,8 @@ export class Lexer {
           )
           if (match !== null) {
             matchedImage = match[0]
-            if (match.payload !== undefined) {
-              payload = match.payload
+            if ((match as CustomPatternMatcherReturn).payload !== undefined) {
+              payload = (match as CustomPatternMatcherReturn).payload
             }
           } else {
             matchedImage = null
@@ -591,8 +592,10 @@ export class Lexer {
                 )
                 if (match !== null) {
                   matchAltImage = match[0]
-                  if (match.payload !== undefined) {
-                    altPayload = match.payload
+                  if (
+                    (match as CustomPatternMatcherReturn).payload !== undefined
+                  ) {
+                    altPayload = (match as CustomPatternMatcherReturn).payload
                   }
                 } else {
                   matchAltImage = null
@@ -791,7 +794,7 @@ export class Lexer {
   // TODO: decrease this under 600 characters? inspect stripping comments option in TSC compiler
   private updateTokenEndLineColumnLocation(
     newToken: IToken,
-    group: string | undefined,
+    group: string | false,
     lastLTIdx: number,
     numOfLTsInMatch: number,
     line: number,
@@ -919,7 +922,7 @@ export class Lexer {
     pattern: RegExp,
     text: string,
     offset: number
-  ) => string | null | RegExpExecArray
+  ) => string | null
 
   private matchWithTest(
     pattern: RegExp,
@@ -933,12 +936,9 @@ export class Lexer {
     return null
   }
 
-  private matchWithExec(
-    pattern: RegExp,
-    text: string
-  ): string | null | RegExpExecArray {
+  private matchWithExec(pattern: RegExp, text: string): string | null {
     const regExpArray = pattern.exec(text)
-    return regExpArray !== null ? regExpArray[0] : regExpArray
+    return regExpArray !== null ? regExpArray[0] : null
   }
 
   // Duplicated from the parser's perf trace trait to allow future extraction

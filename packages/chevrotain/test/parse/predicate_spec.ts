@@ -275,7 +275,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
           this.input = input
         }
 
-        public topRule = this.RULE("topRule", (param) => {
+        public topRule = this.RULE("topRule", (param?: boolean) => {
           return this.OR1([
             {
               GATE: () => param,
@@ -291,13 +291,13 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
 
       const gateOpenInputA = new PredicateWithRuleOrParser([
         createRegularToken(A, "a")
-      ]).topRule(1, [true])
+      ]).topRule(true)
       expect(gateOpenInputA).to.equal("a")
 
       // if the predicate function still kept a reference via a closure to the original param this will not work.
       const gateOpenInputB = new PredicateWithRuleOrParser([
         createRegularToken(B, "b")
-      ]).topRule(1, [false])
+      ]).topRule(false)
       expect(gateOpenInputB).to.equal("b")
     })
 
@@ -309,9 +309,14 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
           this.input = input
         }
 
-        public topRule = this.RULE("topRule", (param) => {
+        public topRule = this.RULE("topRule", (param?: boolean) => {
           let result = ""
-          result += this.CONSUME1(B).image
+          this.OPTION({
+            GATE: () => param,
+            DEF: () => {
+              result += this.CONSUME1(B).image
+            }
+          })
 
           return result
         })
@@ -320,15 +325,15 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
       const parser = new PredicateWithRuleOptionParser([
         createRegularToken(B, "b")
       ])
-      const gateOpenInputB = parser.topRule(1, [false])
-      expect(gateOpenInputB).to.equal("b")
+      const gateOpenInputB = parser.topRule(false)
+      expect(gateOpenInputB).to.equal("")
 
       // // if the predicate function still kept a reference via a closure to the original param this will not work.
       // // because the <() => param> in the OPTION will ALWAYS return false (the original param)
       // let gateOpenInputA = new PredicateWithRuleOptionParser([
       //     createRegularToken(A, "a"),
       //     createRegularToken(B, "b")
-      // ]).topRule(1, [true])
+      // ]).topRule(true)
       // expect(gateOpenInputA).to.equal("ab")
     })
 
@@ -340,7 +345,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
           this.input = input
         }
 
-        public topRule = this.RULE("topRule", (param) => {
+        public topRule = this.RULE("topRule", (param?: boolean) => {
           let result = ""
           this.MANY({
             GATE: () => param,
@@ -355,7 +360,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
 
       const gateOpenInputB = new PredicateWithRuleManyParser([
         createRegularToken(B, "b")
-      ]).topRule(1, [false])
+      ]).topRule(false)
       expect(gateOpenInputB).to.equal("b")
 
       // if the predicate function still kept a reference via a closure to the original param this will not work.
@@ -365,7 +370,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
         createRegularToken(A, "a"),
         createRegularToken(A, "a"),
         createRegularToken(B, "b")
-      ]).topRule(1, [true])
+      ]).topRule(true)
       expect(gateOpenInputA).to.equal("aaab")
     })
 
@@ -377,7 +382,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
           this.input = input
         }
 
-        public topRule = this.RULE("topRule", (param) => {
+        public topRule = this.RULE("topRule", (param?: boolean) => {
           let times = 0
 
           function gateFunc() {
@@ -405,7 +410,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
       const gateOpenInputB = new PredicateWithRuleAtLeastOneParser([
         createRegularToken(A, "a"),
         createRegularToken(B, "b")
-      ]).topRule(1, [false])
+      ]).topRule(false)
       expect(gateOpenInputB).to.equal("ab")
 
       // if the predicate function still kept a reference via a closure to the original param this will not work.
@@ -415,7 +420,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
         createRegularToken(A, "a"),
         createRegularToken(A, "a"),
         createRegularToken(B, "b")
-      ]).topRule(1, [true])
+      ]).topRule(true)
       expect(gateOpenInputA).to.equal("aaab")
     })
   })

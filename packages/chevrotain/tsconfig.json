@@ -5,7 +5,9 @@
     "outDir": "lib",
     "baseUrl": ".",
     // raises too many errors to fix at once.
-    "strict": false
+    "strict": false,
+    "skipLibCheck": true,
+    "noImplicitAny": true
   },
   "include": ["src/**/*.ts", "test/**/*.ts", "api.d.ts"]
 }

@@ -24,7 +24,8 @@ import {
   IRuleConfig,
   IToken,
   TokenType,
-  TokenVocabulary
+  TokenVocabulary,
+  ParserMethod
 } from "@chevrotain/types"
 import { Recoverable } from "./traits/recoverable"
 import { LooksAhead } from "./traits/looksahead"
@@ -55,7 +56,7 @@ Object.freeze(END_OF_FILE)
 
 export type TokenMatcher = (token: IToken, tokType: TokenType) => boolean
 
-export type lookAheadSequence = TokenType[][]
+export type LookAheadSequence = TokenType[][]
 
 export const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
   recoveryEnabled: false,
@@ -104,7 +105,7 @@ export interface IParserEmptyAlternativeDefinitionError
 
 export interface IParserAmbiguousAlternativesDefinitionError
   extends IParserDefinitionError {
-  occurrence: number
+  occurrence: number | string
   alternatives: number[]
 }
 
@@ -166,7 +167,10 @@ export class Parser {
           this.enableRecording()
           // Building the GAST
           forEach(this.definedRulesNames, (currRuleName) => {
-            const wrappedRule = this[currRuleName]
+            const wrappedRule = (this as any)[currRuleName] as ParserMethod<
+              unknown[],
+              unknown
+            >
             const originalGrammarAction = wrappedRule["originalGrammarAction"]
             let recordedRuleGast = undefined
             this.TRACE_INIT(`${currRuleName} Rule`, () => {
@@ -182,7 +186,7 @@ export class Parser {
         }
       })
 
-      let resolverErrors = []
+      let resolverErrors: IParserDefinitionError[] = []
       this.TRACE_INIT("Grammar Resolving", () => {
         resolverErrors = resolveGrammar({
           rules: values(this.gastProductionsCache)

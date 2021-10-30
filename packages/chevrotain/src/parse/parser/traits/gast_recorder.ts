@@ -11,6 +11,7 @@ import {
   IToken,
   ManySepMethodOpts,
   OrMethodOpts,
+  ParserMethod,
   SubruleMethodOpts,
   TokenType
 } from "@chevrotain/types"
@@ -102,28 +103,28 @@ export class GastRecorder {
        */
       for (let i = 0; i < 10; i++) {
         const idx = i > 0 ? i : ""
-        this[`CONSUME${idx}`] = function (arg1, arg2) {
+        this[`CONSUME${idx}` as "CONSUME"] = function (arg1, arg2) {
           return this.consumeInternalRecord(arg1, i, arg2)
         }
-        this[`SUBRULE${idx}`] = function (arg1, arg2) {
-          return this.subruleInternalRecord(arg1, i, arg2)
+        this[`SUBRULE${idx}` as "SUBRULE"] = function (arg1, arg2) {
+          return this.subruleInternalRecord(arg1, i, arg2) as any
         }
-        this[`OPTION${idx}`] = function (arg1) {
+        this[`OPTION${idx}` as "OPTION"] = function (arg1) {
           return this.optionInternalRecord(arg1, i)
         }
-        this[`OR${idx}`] = function (arg1) {
+        this[`OR${idx}` as "OR"] = function (arg1) {
           return this.orInternalRecord(arg1, i)
         }
-        this[`MANY${idx}`] = function (arg1) {
+        this[`MANY${idx}` as "MANY"] = function (arg1) {
           this.manyInternalRecord(i, arg1)
         }
-        this[`MANY_SEP${idx}`] = function (arg1) {
+        this[`MANY_SEP${idx}` as "MANY_SEP"] = function (arg1) {
           this.manySepFirstInternalRecord(i, arg1)
         }
-        this[`AT_LEAST_ONE${idx}`] = function (arg1) {
+        this[`AT_LEAST_ONE${idx}` as "AT_LEAST_ONE"] = function (arg1) {
           this.atLeastOneInternalRecord(i, arg1)
         }
-        this[`AT_LEAST_ONE_SEP${idx}`] = function (arg1) {
+        this[`AT_LEAST_ONE_SEP${idx}` as "AT_LEAST_ONE_SEP"] = function (arg1) {
           this.atLeastOneSepFirstInternalRecord(i, arg1)
         }
       }
@@ -132,8 +133,8 @@ export class GastRecorder {
       this[`consume`] = function (idx, arg1, arg2) {
         return this.consumeInternalRecord(arg1, idx, arg2)
       }
-      this[`subrule`] = <any>function (idx, arg1, arg2) {
-        return this.subruleInternalRecord(arg1, idx, arg2)
+      this[`subrule`] = function (idx, arg1, arg2) {
+        return this.subruleInternalRecord(arg1, idx, arg2) as any
       }
       this[`option`] = function (idx, arg1) {
         return this.optionInternalRecord(arg1, idx)
@@ -163,14 +164,14 @@ export class GastRecorder {
     this.TRACE_INIT("Deleting Recording methods", () => {
       for (let i = 0; i < 10; i++) {
         const idx = i > 0 ? i : ""
-        delete this[`CONSUME${idx}`]
-        delete this[`SUBRULE${idx}`]
-        delete this[`OPTION${idx}`]
-        delete this[`OR${idx}`]
-        delete this[`MANY${idx}`]
-        delete this[`MANY_SEP${idx}`]
-        delete this[`AT_LEAST_ONE${idx}`]
-        delete this[`AT_LEAST_ONE_SEP${idx}`]
+        delete (this as any)[`CONSUME${idx}`]
+        delete (this as any)[`SUBRULE${idx}`]
+        delete (this as any)[`OPTION${idx}`]
+        delete (this as any)[`OR${idx}`]
+        delete (this as any)[`MANY${idx}`]
+        delete (this as any)[`MANY_SEP${idx}`]
+        delete (this as any)[`AT_LEAST_ONE${idx}`]
+        delete (this as any)[`AT_LEAST_ONE_SEP${idx}`]
       }
 
       delete this[`consume`]
@@ -295,12 +296,12 @@ export class GastRecorder {
     return recordOrProd.call(this, altsOrOpts, occurrence)
   }
 
-  subruleInternalRecord<T>(
+  subruleInternalRecord<ARGS extends unknown[], R>(
     this: MixedInParser,
-    ruleToCall: (idx: number) => T,
+    ruleToCall: ParserMethod<ARGS, R>,
     occurrence: number,
     options?: SubruleMethodOpts
-  ): T | CstNode {
+  ): R | CstNode {
     assertMethodIdxIsValid(occurrence)
     if (!ruleToCall || has(ruleToCall, "ruleName") === false) {
       const error: any = new Error(
@@ -317,7 +318,7 @@ export class GastRecorder {
     }
 
     const prevProd: any = peek(this.recordingProdStack)
-    const ruleName = ruleToCall["ruleName"]
+    const ruleName = ruleToCall.ruleName
     const newNoneTerminal = new NonTerminal({
       idx: occurrence,
       nonTerminalName: ruleName,
@@ -431,7 +432,7 @@ function getIdxSuffix(idx: number): string {
   return idx === 0 ? "" : `${idx}`
 }
 
-function assertMethodIdxIsValid(idx): void {
+function assertMethodIdxIsValid(idx: number): void {
   if (idx < 0 || idx > MAX_METHOD_IDX) {
     const error: any = new Error(
       // The stack trace will contain all the needed details

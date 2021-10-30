@@ -10,6 +10,7 @@ import {
   IToken,
   ManySepMethodOpts,
   OrMethodOpts,
+  ParserMethod,
   SubruleMethodOpts,
   TokenType
 } from "@chevrotain/types"
@@ -20,6 +21,7 @@ import { defaultGrammarValidatorErrorProvider } from "../../errors_public"
 import { validateRuleIsOverridden } from "../../grammar/checks"
 import { MixedInParser } from "./parser_traits"
 import { Rule, serializeGrammar } from "../../grammar/gast/gast_public"
+import { IParserDefinitionError } from "../../grammar/types"
 
 /**
  * This trait is responsible for implementing the public API
@@ -43,12 +45,12 @@ export class RecognizerApi {
     return this.consumeInternal(tokType, idx, options)
   }
 
-  subrule<T>(
+  subrule<ARGS extends unknown[], R>(
     this: MixedInParser,
     idx: number,
-    ruleToCall: (idx: number) => T,
+    ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts
-  ): T {
+  ): R {
     return this.subruleInternal(ruleToCall, idx, options)
   }
 
@@ -164,83 +166,83 @@ export class RecognizerApi {
     return this.consumeInternal(tokType, 9, options)
   }
 
-  SUBRULE<T>(
+  SUBRULE<ARGS extends unknown[], R>(
     this: MixedInParser,
-    ruleToCall: (idx: number) => T,
+    ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts
-  ): T {
+  ): R {
     return this.subruleInternal(ruleToCall, 0, options)
   }
 
-  SUBRULE1<T>(
+  SUBRULE1<ARGS extends unknown[], R>(
     this: MixedInParser,
-    ruleToCall: (idx: number) => T,
-    options?: SubruleMethodOpts
-  ): T {
+    ruleToCall: ParserMethod<ARGS, R>,
+    options?: SubruleMethodOpts<ARGS>
+  ): R {
     return this.subruleInternal(ruleToCall, 1, options)
   }
 
-  SUBRULE2<T>(
+  SUBRULE2<ARGS extends unknown[], R>(
     this: MixedInParser,
-    ruleToCall: (idx: number) => T,
-    options?: SubruleMethodOpts
-  ): T {
+    ruleToCall: ParserMethod<ARGS, R>,
+    options?: SubruleMethodOpts<ARGS>
+  ): R {
     return this.subruleInternal(ruleToCall, 2, options)
   }
 
-  SUBRULE3<T>(
+  SUBRULE3<ARGS extends unknown[], R>(
     this: MixedInParser,
-    ruleToCall: (idx: number) => T,
-    options?: SubruleMethodOpts
-  ): T {
+    ruleToCall: ParserMethod<ARGS, R>,
+    options?: SubruleMethodOpts<ARGS>
+  ): R {
     return this.subruleInternal(ruleToCall, 3, options)
   }
 
-  SUBRULE4<T>(
+  SUBRULE4<ARGS extends unknown[], R>(
     this: MixedInParser,
-    ruleToCall: (idx: number) => T,
-    options?: SubruleMethodOpts
-  ): T {
+    ruleToCall: ParserMethod<ARGS, R>,
+    options?: SubruleMethodOpts<ARGS>
+  ): R {
     return this.subruleInternal(ruleToCall, 4, options)
   }
 
-  SUBRULE5<T>(
+  SUBRULE5<ARGS extends unknown[], R>(
     this: MixedInParser,
-    ruleToCall: (idx: number) => T,
-    options?: SubruleMethodOpts
-  ): T {
+    ruleToCall: ParserMethod<ARGS, R>,
+    options?: SubruleMethodOpts<ARGS>
+  ): R {
     return this.subruleInternal(ruleToCall, 5, options)
   }
 
-  SUBRULE6<T>(
+  SUBRULE6<ARGS extends unknown[], R>(
     this: MixedInParser,
-    ruleToCall: (idx: number) => T,
-    options?: SubruleMethodOpts
-  ): T {
+    ruleToCall: ParserMethod<ARGS, R>,
+    options?: SubruleMethodOpts<ARGS>
+  ): R {
     return this.subruleInternal(ruleToCall, 6, options)
   }
 
-  SUBRULE7<T>(
+  SUBRULE7<ARGS extends unknown[], R>(
     this: MixedInParser,
-    ruleToCall: (idx: number) => T,
-    options?: SubruleMethodOpts
-  ): T {
+    ruleToCall: ParserMethod<ARGS, R>,
+    options?: SubruleMethodOpts<ARGS>
+  ): R {
     return this.subruleInternal(ruleToCall, 7, options)
   }
 
-  SUBRULE8<T>(
+  SUBRULE8<ARGS extends unknown[], R>(
     this: MixedInParser,
-    ruleToCall: (idx: number) => T,
-    options?: SubruleMethodOpts
-  ): T {
+    ruleToCall: ParserMethod<ARGS, R>,
+    options?: SubruleMethodOpts<ARGS>
+  ): R {
     return this.subruleInternal(ruleToCall, 8, options)
   }
 
-  SUBRULE9<T>(
+  SUBRULE9<ARGS extends unknown[], R>(
     this: MixedInParser,
-    ruleToCall: (idx: number) => T,
-    options?: SubruleMethodOpts
-  ): T {
+    ruleToCall: ParserMethod<ARGS, R>,
+    options?: SubruleMethodOpts<ARGS>
+  ): R {
     return this.subruleInternal(ruleToCall, 9, options)
   }
 
@@ -658,7 +660,7 @@ export class RecognizerApi {
     this.definedRulesNames.push(name)
 
     const ruleImplementation = this.defineRule(name, implementation, config)
-    this[name] = ruleImplementation
+    ;(this as any)[name] = ruleImplementation
     return ruleImplementation
   }
 
@@ -668,14 +670,15 @@ export class RecognizerApi {
     impl: (...implArgs: any[]) => T,
     config: IRuleConfig<T> = DEFAULT_RULE_CONFIG
   ): (idxInCallingRule?: number, ...args: any[]) => T {
-    let ruleErrors = []
-    ruleErrors = ruleErrors.concat(
-      validateRuleIsOverridden(name, this.definedRulesNames, this.className)
+    const ruleErrors: IParserDefinitionError[] = validateRuleIsOverridden(
+      name,
+      this.definedRulesNames,
+      this.className
     )
     this.definitionErrors = this.definitionErrors.concat(ruleErrors)
 
     const ruleImplementation = this.defineRule(name, impl, config)
-    this[name] = ruleImplementation
+    ;(this as any)[name] = ruleImplementation
     return ruleImplementation
   }
 

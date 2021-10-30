@@ -2,7 +2,7 @@ import { createToken } from "../../src/scan/tokens_public"
 import { CstParser } from "../../src/parse/parser/traits/parser_traits"
 import { createRegularToken } from "../utils/matchers"
 import { keys } from "@chevrotain/utils"
-import { IToken } from "@chevrotain/types"
+import { CstChildrenDictionary, CstNode, IToken } from "@chevrotain/types"
 import { expect } from "chai"
 
 describe("The CSTVisitor", () => {
@@ -56,12 +56,12 @@ describe("The CSTVisitor", () => {
         this.validateVisitor()
       }
 
-      testRule(ctx) {
+      testRule(ctx: any) {
         expect(keys(ctx)).to.deep.equal(["A", "B", "bamba"])
         return this.visit(ctx.bamba[0])
       }
 
-      bamba(ctx) {
+      bamba(ctx: any) {
         expect(keys(ctx)).to.deep.equal(["C"])
         return 666
       }
@@ -86,12 +86,12 @@ describe("The CSTVisitor", () => {
         this.validateVisitor()
       }
 
-      testRule(ctx, param) {
+      testRule(ctx: any, param: any) {
         expect(keys(ctx)).to.deep.equal(["A", "B", "bamba"])
         return this.visit(ctx.bamba[0], param)
       }
 
-      bamba(ctx, param) {
+      bamba(ctx: any, param: any) {
         // inspecting handling of optional arguments
         expect(this.visit(ctx.missingKey)).to.be.undefined
         expect(keys(ctx)).to.deep.equal(["C"])
@@ -119,7 +119,7 @@ describe("The CSTVisitor", () => {
         this.validateVisitor()
       }
 
-      bamba(ctx) {
+      bamba(ctx: any) {
         expect(keys(ctx)).to.deep.equal(["C"])
         visited = true
       }
@@ -145,12 +145,12 @@ describe("The CSTVisitor", () => {
         this.validateVisitor()
       }
 
-      testRule(ctx, param) {
+      testRule(ctx: any, param: any) {
         expect(keys(ctx)).to.deep.equal(["A", "B", "bamba"])
         return this.visit(ctx["bamba"], param)
       }
 
-      bamba(ctx, param) {
+      bamba(ctx: any, param: any) {
         expect(keys(ctx)).to.deep.equal(["C"])
         return 666 + param
       }
@@ -176,7 +176,7 @@ describe("The CSTVisitor", () => {
         this.validateVisitor()
       }
 
-      testRule(ctx, param) {}
+      testRule(ctx: any, param: any) {}
 
       // missing "bamba" method
     }
@@ -196,11 +196,11 @@ describe("The CSTVisitor", () => {
         this.validateVisitor()
       }
 
-      testRule(ctx, param) {}
+      testRule(ctx: any, param: any) {}
 
-      bamba(ctx, param) {}
+      bamba(ctx: any, param: any) {}
 
-      oops(ctx, param) {}
+      oops(ctx: any, param: any) {}
     }
 
     expect(() => new CstVisitorValidatorRedundant()).to.throw(

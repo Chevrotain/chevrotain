@@ -29,19 +29,26 @@ import {
 import { setEquality } from "../utils/matchers"
 import { tokenStructuredMatcher } from "../../src/scan/tokens"
 import {
-  IMultiModeLexerDefinition,
+  ILexerConfig,
   ILexerErrorMessageProvider,
-  IToken
+  IMultiModeLexerDefinition,
+  IToken,
+  ITokenConfig,
+  TokenType
 } from "@chevrotain/types"
 import { expect } from "chai"
+import { MatchArray } from "xregexp"
+import { SinonSpy } from "sinon"
+import { TokenMatcher } from "../../src/parse/parser/parser"
 
 const ORG_SUPPORT_STICKY = SUPPORT_STICKY
+
 function defineLexerSpecs(
-  contextName,
-  createToken,
-  tokenMatcher,
+  contextName: string,
+  createToken: (c: ITokenConfig) => TokenType,
+  tokenMatcher: TokenMatcher,
   skipValidationChecks = false,
-  lexerConfig
+  lexerConfig: ILexerConfig
 ) {
   const testFull = lexerConfig.positionTracking === "full"
   const testStart = lexerConfig.positionTracking === "onlyStart" || testFull
@@ -284,7 +291,7 @@ function defineLexerSpecs(
     // TODO: not sure this API allows invalid stuff
     const InvalidPattern = createToken({
       name: "InvalidPattern",
-      pattern: 666
+      pattern: 666 as unknown as string
     })
     const MissingPattern = createToken({
       name: "MissingPattern",
@@ -629,8 +636,8 @@ function defineLexerSpecs(
       })
 
       it("can transform a pattern to one with startOfInput mark ('^') #2", () => {
-        const orgSource = PatternNoStart.PATTERN.source
-        const transPattern = addStartOfInput(PatternNoStart.PATTERN)
+        const orgSource = (PatternNoStart.PATTERN as RegExp).source
+        const transPattern = addStartOfInput(PatternNoStart.PATTERN as RegExp)
         expect(transPattern.source).to.equal("^(?:" + orgSource + ")")
         expect(/^\^/.test(transPattern.source)).to.equal(true)
       })
@@ -1144,12 +1151,10 @@ function defineLexerSpecs(
 
         it("Will throw an error during the creation of a Lexer if the Lexer's definition is invalid", () => {
           expect(
-            () => new Lexer([EndOfInputAnchor, If, Else]),
-            lexerConfig
+            () => new Lexer([EndOfInputAnchor, If, Else], lexerConfig)
           ).to.throw(/Errors detected in definition of Lexer/)
           expect(
-            () => new Lexer([EndOfInputAnchor, If, Else]),
-            lexerConfig
+            () => new Lexer([EndOfInputAnchor, If, Else], lexerConfig)
           ).to.throw(/EndOfInputAnchor/)
         })
 
@@ -1892,81 +1897,72 @@ function defineLexerSpecs(
           })
         })
 
-        context("custom pattern", () => {
-          function defineCustomPatternSpec(variant, customPattern) {
-            it(variant, () => {
-              let time = 1
+        it("supports custom patterns", () => {
+          let time = 1
 
-              function extraContextValidator(text, offset, tokens, groups) {
-                const result = isFunction(customPattern)
-                  ? customPattern(text, offset)
-                  : customPattern.exec(text, offset)
-                if (result !== null) {
-                  if (time === 1) {
-                    expect(tokens).to.be.empty
-                    time++
-                  } else if (time === 2) {
-                    expect(tokens).to.have.lengthOf(2)
-                    expect(groups.whitespace).to.have.lengthOf(2)
-                    time++
-                  } else {
-                    throw Error("Issue with Custom Token pattern context")
-                  }
-                }
-
-                return result
+          function extraContextValidator(
+            text: string,
+            offset: number,
+            tokens: IToken[],
+            groups: { [group: string]: IToken[] }
+          ) {
+            const result = /^B/.exec(text.substring(offset))
+            if (result !== null) {
+              if (time === 1) {
+                expect(tokens).to.be.empty
+                time++
+              } else if (time === 2) {
+                expect(tokens).to.have.lengthOf(2)
+                expect(groups.whitespace).to.have.lengthOf(2)
+                time++
+              } else {
+                throw Error("Issue with Custom Token pattern context")
               }
+            }
 
-              const A = createToken({
-                name: "A",
-                pattern: "A"
-              })
-
-              const B = createToken({
-                name: "B",
-                pattern: <any>extraContextValidator,
-                line_breaks: false
-              })
-              const WS = createToken({
-                name: "WS",
-                pattern: {
-                  exec: (text, offset) => /^\s+/.exec(text.substring(offset))
-                },
-                group: "whitespace",
-                line_breaks: true
-              })
-
-              const lexerDef: any = [WS, A, B]
-              const myLexer = new Lexer(lexerDef, lexerConfig)
-              const lexResult = myLexer.tokenize("B A\n B ")
-              expect(lexResult.tokens).to.have.length(3)
-              expect(tokenMatcher(lexResult.tokens[0], B)).to.be.true
-              expect(tokenMatcher(lexResult.tokens[1], A)).to.be.true
-              expect(tokenMatcher(lexResult.tokens[2], B)).to.be.true
-
-              const lastToken = lexResult.tokens[2]
-              expect(lastToken.startOffset).to.equal(5)
-
-              if (testStart) {
-                expect(lastToken.startLine).to.equal(2)
-                expect(lastToken.startColumn).to.equal(2)
-              }
-
-              if (testFull) {
-                expect(lastToken.endLine).to.equal(2)
-                expect(lastToken.endColumn).to.equal(2)
-                expect(lastToken.endOffset).to.equal(5)
-              }
-            })
+            return result
           }
 
-          defineCustomPatternSpec(
-            "With short function syntax",
-            (text, offset) => /^B/.exec(text.substring(offset))
-          )
-          defineCustomPatternSpec("verbose syntax", {
-            exec: (text, offset) => /^B/.exec(text.substring(offset))
+          const A = createToken({
+            name: "A",
+            pattern: "A"
           })
+
+          const B = createToken({
+            name: "B",
+            pattern: <any>extraContextValidator,
+            line_breaks: false
+          })
+          const WS = createToken({
+            name: "WS",
+            pattern: {
+              exec: (text, offset) => /^\s+/.exec(text.substring(offset))
+            },
+            group: "whitespace",
+            line_breaks: true
+          })
+
+          const lexerDef: any = [WS, A, B]
+          const myLexer = new Lexer(lexerDef, lexerConfig)
+          const lexResult = myLexer.tokenize("B A\n B ")
+          expect(lexResult.tokens).to.have.length(3)
+          expect(tokenMatcher(lexResult.tokens[0], B)).to.be.true
+          expect(tokenMatcher(lexResult.tokens[1], A)).to.be.true
+          expect(tokenMatcher(lexResult.tokens[2], B)).to.be.true
+
+          const lastToken = lexResult.tokens[2]
+          expect(lastToken.startOffset).to.equal(5)
+
+          if (testStart) {
+            expect(lastToken.startLine).to.equal(2)
+            expect(lastToken.startColumn).to.equal(2)
+          }
+
+          if (testFull) {
+            expect(lastToken.endLine).to.equal(2)
+            expect(lastToken.endColumn).to.equal(2)
+            expect(lastToken.endOffset).to.equal(5)
+          }
         })
       })
     })
@@ -1991,7 +1987,7 @@ if (typeof window !== "undefined") {
 }
 
 skipOnBrowser("debugging and messages and optimizations", () => {
-  let consoleErrorSpy, consoleWarnSpy
+  let consoleErrorSpy: SinonSpy, consoleWarnSpy: SinonSpy
 
   beforeEach(function () {
     // @ts-ignore
@@ -2106,9 +2102,9 @@ skipOnBrowser("debugging and messages and optimizations", () => {
   })
 })
 
-function wrapWithCustom(baseExtendToken) {
-  return function (...args) {
-    const newToken = baseExtendToken(...args)
+function wrapWithCustom(baseExtendToken: (c: ITokenConfig) => TokenType) {
+  return function (c: ITokenConfig) {
+    const newToken = baseExtendToken(c)
 
     const pattern = newToken.PATTERN
     if (

@@ -34,12 +34,12 @@ export interface IFollowKey {
 
 export const IN_RULE_RECOVERY_EXCEPTION = "InRuleRecoveryException"
 
-export function InRuleRecoveryException(message: string) {
-  this.name = IN_RULE_RECOVERY_EXCEPTION
-  this.message = message
+export class InRuleRecoveryException extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = IN_RULE_RECOVERY_EXCEPTION
+  }
 }
-
-InRuleRecoveryException.prototype = Error.prototype
 
 /**
  * This trait is responsible for the error recovery and fault tolerant logic
@@ -94,7 +94,7 @@ export class Recoverable {
     // TODO: can the resyncTokenType be cached?
     const reSyncTokType = this.findReSyncTokenType()
     const savedLexerState = this.exportLexerState()
-    const resyncedTokens = []
+    const resyncedTokens: IToken[] = []
     let passedResyncPoint = false
 
     const nextTokenWithoutResync = this.LA(1)
@@ -354,7 +354,7 @@ export class Recoverable {
   }
 
   reSyncTo(this: MixedInParser, tokType: TokenType): IToken[] {
-    const resyncedTokens = []
+    const resyncedTokens: IToken[] = []
     let nextTok = this.LA(1)
     while (this.tokenMatcher(nextTok, tokType) === false) {
       nextTok = this.SKIP_TOKEN()

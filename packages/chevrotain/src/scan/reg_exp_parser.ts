@@ -1,7 +1,22 @@
-import { RegExpParser, RegExpPattern } from "regexp-to-ast"
+import {
+  Alternative,
+  Assertion,
+  Atom,
+  Disjunction,
+  RegExpParser,
+  RegExpPattern
+} from "regexp-to-ast"
 
-let regExpAstCache = {}
+let regExpAstCache: { [regex: string]: RegExpPattern } = {}
 const regExpParser = new RegExpParser()
+
+// this should be moved to regexp-to-ast
+export type ASTNode =
+  | RegExpPattern
+  | Disjunction
+  | Alternative
+  | Assertion
+  | Atom
 
 export function getRegExpAst(regExp: RegExp): RegExpPattern {
   const regExpStr = regExp.toString()
