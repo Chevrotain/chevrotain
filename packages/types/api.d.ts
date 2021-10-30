@@ -2,10 +2,7 @@ export as namespace chevrotain
 
 export declare const VERSION: string
 
-export type ParserMethod<ARGS extends unknown[], R> = ((...args: ARGS) => R) & {
-  ruleName: string
-  originalGrammarAction: Function
-}
+export type ParserMethod<ARGS extends unknown[], R> = (...args: ARGS) => R
 
 /**
  * This class does not actually exists nor is exposed at runtime.

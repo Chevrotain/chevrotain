@@ -62,6 +62,7 @@ import {
   tokenStructuredMatcherNoCategories
 } from "../../../scan/tokens"
 import { Rule } from "../../grammar/gast/gast_public"
+import { ParserMethodInternal } from "../types"
 
 /**
  * This trait is responsible for the runtime parsing engine
@@ -188,7 +189,7 @@ export class RecognizerEngine {
     ruleName: string,
     impl: (...args: ARGS) => R,
     config: IRuleConfig<R>
-  ): ParserMethod<ARGS, R> {
+  ): ParserMethodInternal<ARGS, R> {
     if (this.selfAnalysisDone) {
       throw Error(
         `Grammar rule <${ruleName}> may not be defined after the 'performSelfAnalysis' method has been called'\n` +
@@ -213,25 +214,44 @@ export class RecognizerEngine {
     this.shortRuleNameToFull[shortName] = ruleName
     this.fullRuleNameToShort[ruleName] = shortName
 
-    function invokeRuleWithTry(this: MixedInParser, ...args: ARGS): R {
-      try {
-        this.ruleInvocationStateUpdate(shortName, ruleName, this.subruleIdx)
-        if (this.outputCst === true) {
+    let invokeRuleWithTry: ParserMethod<ARGS, R>
+
+    // Micro optimization, only check the condition **once** on rule definition
+    // instead of **every single** rule invocation.
+    if (this.outputCst === true) {
+      invokeRuleWithTry = function invokeRuleWithTry(
+        this: MixedInParser,
+        ...args: ARGS
+      ): R {
+        try {
+          this.ruleInvocationStateUpdate(shortName, ruleName, this.subruleIdx)
           impl.apply(this, args)
           const cst = this.CST_STACK[this.CST_STACK.length - 1]
           this.cstPostRule(cst)
           return cst as unknown as R
-        } else {
-          return impl.apply(this, args)
+        } catch (e) {
+          return this.invokeRuleCatch(e, resyncEnabled, recoveryValueFunc) as R
+        } finally {
+          this.ruleFinallyStateUpdate()
         }
-      } catch (e) {
-        return this.invokeRuleCatch(e, resyncEnabled, recoveryValueFunc) as R
-      } finally {
-        this.ruleFinallyStateUpdate()
+      }
+    } else {
+      invokeRuleWithTry = function invokeRuleWithTryCst(
+        this: MixedInParser,
+        ...args: ARGS
+      ): R {
+        try {
+          this.ruleInvocationStateUpdate(shortName, ruleName, this.subruleIdx)
+          return impl.apply(this, args)
+        } catch (e) {
+          return this.invokeRuleCatch(e, resyncEnabled, recoveryValueFunc) as R
+        } finally {
+          this.ruleFinallyStateUpdate()
+        }
       }
     }
 
-    const wrappedGrammarRule: ParserMethod<ARGS, R> = Object.assign(
+    const wrappedGrammarRule: ParserMethodInternal<ARGS, R> = Object.assign(
       invokeRuleWithTry as any,
       { ruleName, originalGrammarAction: impl }
     )
@@ -663,7 +683,7 @@ export class RecognizerEngine {
 
   subruleInternal<ARGS extends unknown[], R>(
     this: MixedInParser,
-    ruleToCall: ParserMethod<ARGS, R>,
+    ruleToCall: ParserMethodInternal<ARGS, R>,
     idx: number,
     options?: SubruleMethodOpts<ARGS>
   ): R {
