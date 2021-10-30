@@ -3,8 +3,7 @@
 Chevrotain supports passing parameters to rules.
 This means that grammar rules may accept arguments from the calling rule.
 This is often used in combination with [gates](./gates.md) to
-to represent multiple variants of the same parsing rule while avoiding code duplication.
-It can also
+represent multiple variants of the same parsing rule while avoiding code duplication.
 
 For example:
 
