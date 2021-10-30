@@ -179,7 +179,7 @@ function getExtraProductionArgument(prod: IProductionWithOccurrence): string {
 }
 
 export class OccurrenceValidationCollector extends GAstVisitor {
-  public allProductions: IProduction[] = []
+  public allProductions: IProductionWithOccurrence[] = []
 
   public visitNonTerminal(subrule: NonTerminal): void {
     this.allProductions.push(subrule)
