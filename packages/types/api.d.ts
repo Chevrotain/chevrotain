@@ -910,7 +910,7 @@ export declare class CstParser extends BaseParser {
   protected subrule<ARGS extends unknown[]>(
     idx: number,
     ruleToCall: ParserMethod<ARGS, CstNode>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): CstNode
 
   /**
@@ -932,7 +932,7 @@ export declare class CstParser extends BaseParser {
    */
   protected SUBRULE<ARGS extends unknown[]>(
     ruleToCall: ParserMethod<ARGS, CstNode>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): CstNode
 
   /**
@@ -941,7 +941,7 @@ export declare class CstParser extends BaseParser {
    */
   protected SUBRULE1<ARGS extends unknown[]>(
     ruleToCall: ParserMethod<ARGS, CstNode>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): CstNode
 
   /**
@@ -950,7 +950,7 @@ export declare class CstParser extends BaseParser {
    */
   protected SUBRULE2<ARGS extends unknown[]>(
     ruleToCall: ParserMethod<ARGS, CstNode>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): CstNode
 
   /**
@@ -959,7 +959,7 @@ export declare class CstParser extends BaseParser {
    */
   protected SUBRULE3<ARGS extends unknown[]>(
     ruleToCall: ParserMethod<ARGS, CstNode>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): CstNode
 
   /**
@@ -968,7 +968,7 @@ export declare class CstParser extends BaseParser {
    */
   protected SUBRULE4<ARGS extends unknown[]>(
     ruleToCall: ParserMethod<ARGS, CstNode>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): CstNode
 
   /**
@@ -977,7 +977,7 @@ export declare class CstParser extends BaseParser {
    */
   protected SUBRULE5<ARGS extends unknown[]>(
     ruleToCall: ParserMethod<ARGS, CstNode>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): CstNode
 
   /**
@@ -986,7 +986,7 @@ export declare class CstParser extends BaseParser {
    */
   protected SUBRULE6<ARGS extends unknown[]>(
     ruleToCall: ParserMethod<ARGS, CstNode>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): CstNode
 
   /**
@@ -995,7 +995,7 @@ export declare class CstParser extends BaseParser {
    */
   protected SUBRULE7<ARGS extends unknown[]>(
     ruleToCall: ParserMethod<ARGS, CstNode>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): CstNode
 
   /**
@@ -1004,7 +1004,7 @@ export declare class CstParser extends BaseParser {
    */
   protected SUBRULE8<ARGS extends unknown[]>(
     ruleToCall: ParserMethod<ARGS, CstNode>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): CstNode
 
   /**
@@ -1013,7 +1013,7 @@ export declare class CstParser extends BaseParser {
    */
   protected SUBRULE9<ARGS extends unknown[]>(
     ruleToCall: ParserMethod<ARGS, CstNode>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): CstNode
 }
 
@@ -1057,7 +1057,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
   protected subrule<ARGS extends unknown[], R>(
     idx: number,
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): R
 
   /**
@@ -1079,7 +1079,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    */
   protected SUBRULE<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): R
 
   /**
@@ -1088,7 +1088,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    */
   protected SUBRULE1<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): R
 
   /**
@@ -1097,7 +1097,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    */
   protected SUBRULE2<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): R
 
   /**
@@ -1106,7 +1106,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    */
   protected SUBRULE3<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): R
 
   /**
@@ -1115,7 +1115,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    */
   protected SUBRULE4<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): R
 
   /**
@@ -1124,7 +1124,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    */
   protected SUBRULE5<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): R
 
   /**
@@ -1133,7 +1133,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    */
   protected SUBRULE6<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): R
 
   /**
@@ -1142,7 +1142,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    */
   protected SUBRULE7<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): R
 
   /**
@@ -1151,7 +1151,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    */
   protected SUBRULE8<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): R
 
   /**
@@ -1160,7 +1160,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    */
   protected SUBRULE9<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): R
 }
 
@@ -1844,7 +1844,7 @@ export interface ConsumeMethodOpts {
   LABEL?: string
 }
 
-export interface SubruleMethodOpts<ARGS = any[]> {
+export interface SubruleMethodOpts<ARGS> {
   /**
    * The arguments to parameterized rules, see:
    * https://github.com/chevrotain/chevrotain/blob/master/examples/parser/parametrized_rules/parametrized.js

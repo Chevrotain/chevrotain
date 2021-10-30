@@ -687,7 +687,7 @@ export class RecognizerEngine {
   subruleInternalError(
     this: MixedInParser,
     e: any,
-    options: SubruleMethodOpts,
+    options: SubruleMethodOpts<unknown[]>,
     ruleName: string
   ): void {
     if (isRecognitionException(e) && e.partialCstResult !== undefined) {

@@ -49,7 +49,7 @@ export class RecognizerApi {
     this: MixedInParser,
     idx: number,
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): R {
     return this.subruleInternal(ruleToCall, idx, options)
   }
@@ -169,7 +169,7 @@ export class RecognizerApi {
   SUBRULE<ARGS extends unknown[], R>(
     this: MixedInParser,
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): R {
     return this.subruleInternal(ruleToCall, 0, options)
   }
