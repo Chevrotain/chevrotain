@@ -55,72 +55,107 @@ var ChevrotainParser = self.globalOptions.outputCst
   ? chevrotain.CstParser
   : chevrotain.EmbeddedActionsParser
 
-function parser(options) {
-  ChevrotainParser.call(this, jsonTokens, options)
+class parser extends ChevrotainParser {
+  constructor(options) {
+    super(jsonTokens, options)
 
-  const $ = this
-  $.C1 = []
+    const $ = this
+    $.C1 = []
 
-  $.RULE("json", function () {
-    // prettier-ignore
-    $.OR([
-            {ALT: function() {$.SUBRULE($.object)}},
-            {ALT: function() {$.SUBRULE($.array)}}
-        ])
-  })
-
-  $.RULE("object", function () {
-    $.CONSUME(LCurly)
-    $.OPTION(function () {
-      $.SUBRULE($.objectItem)
-      $.MANY(function () {
-        $.CONSUME(Comma)
-        $.SUBRULE2($.objectItem)
-      })
-    })
-    $.CONSUME(RCurly)
-  })
-
-  $.RULE("objectItem", function () {
-    $.CONSUME(StringLiteral)
-    $.CONSUME(Colon)
-    $.SUBRULE($.value)
-  })
-
-  $.RULE("array", function () {
-    $.CONSUME(LSquare)
-    $.OPTION(function () {
-      $.SUBRULE($.value)
-      $.MANY(function () {
-        $.CONSUME(Comma)
-        $.SUBRULE2($.value)
-      })
-    })
-    $.CONSUME(RSquare)
-  })
-
-  $.RULE("value", function () {
-    // https://chevrotain.io/docs/guide/performance.html#caching-arrays-of-alternatives
-    // See "Avoid reinitializing large arrays of alternatives." section
-    $.OR(
+    $.RULE("json", function () {
       // prettier-ignore
-      $.c1 || ($.c1 = [
-                {ALT: function() {$.CONSUME(StringLiteral)}},
-                {ALT: function() {$.CONSUME(NumberLiteral)}},
-                {ALT: function() {$.SUBRULE($.object)}},
-                {ALT: function() {$.SUBRULE($.array)}},
-                {ALT: function() {$.CONSUME(True)}},
-                {ALT: function() {$.CONSUME(False)}},
-                {ALT: function() {$.CONSUME(Null)}}
-            ])
-    )
-  })
+      $.OR([
+        {
+          ALT: function() {
+            $.SUBRULE($.object)
+          }
+        },
+        {
+          ALT: function() {
+            $.SUBRULE($.array)
+          }
+        }
+      ])
+    })
 
-  // very important to call this after all the rules have been setup.
-  // otherwise the parser may not work correctly as it will lack information
-  // derived from the self analysis.
-  this.performSelfAnalysis()
+    $.RULE("object", function () {
+      $.CONSUME(LCurly)
+      $.OPTION(function () {
+        $.SUBRULE($.objectItem)
+        $.MANY(function () {
+          $.CONSUME(Comma)
+          $.SUBRULE2($.objectItem)
+        })
+      })
+      $.CONSUME(RCurly)
+    })
+
+    $.RULE("objectItem", function () {
+      $.CONSUME(StringLiteral)
+      $.CONSUME(Colon)
+      $.SUBRULE($.value)
+    })
+
+    $.RULE("array", function () {
+      $.CONSUME(LSquare)
+      $.OPTION(function () {
+        $.SUBRULE($.value)
+        $.MANY(function () {
+          $.CONSUME(Comma)
+          $.SUBRULE2($.value)
+        })
+      })
+      $.CONSUME(RSquare)
+    })
+
+    $.RULE("value", function () {
+      // https://chevrotain.io/docs/guide/performance.html#caching-arrays-of-alternatives
+      // See "Avoid reinitializing large arrays of alternatives." section
+      $.OR(
+        // prettier-ignore
+        $.c1 || ($.c1 = [
+          {
+            ALT: function() {
+              $.CONSUME(StringLiteral)
+            }
+          },
+          {
+            ALT: function() {
+              $.CONSUME(NumberLiteral)
+            }
+          },
+          {
+            ALT: function() {
+              $.SUBRULE($.object)
+            }
+          },
+          {
+            ALT: function() {
+              $.SUBRULE($.array)
+            }
+          },
+          {
+            ALT: function() {
+              $.CONSUME(True)
+            }
+          },
+          {
+            ALT: function() {
+              $.CONSUME(False)
+            }
+          },
+          {
+            ALT: function() {
+              $.CONSUME(Null)
+            }
+          }
+        ])
+      )
+    })
+
+    // very important to call this after all the rules have been setup.
+    // otherwise the parser may not work correctly as it will lack information
+    // derived from the self analysis.
+    this.performSelfAnalysis()
+  }
 }
-
-parser.prototype = Object.create(ChevrotainParser.prototype)
-parser.prototype.constructor = parser

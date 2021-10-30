@@ -246,268 +246,269 @@ var ChevrotainParser = self.globalOptions.outputCst
   : chevrotain.EmbeddedActionsParser
 
 // ----------------- parser -----------------
-function parser(config) {
-  ChevrotainParser.call(this, cssTokens, config)
+class parser extends ChevrotainParser {
+  constructor(config) {
+    super(cssTokens, config)
 
-  var $ = this
+    var $ = this
 
-  this.RULE("stylesheet", function () {
-    // [ CHARSET_SYM STRING ';' ]?
-    $.OPTION(function () {
-      $.SUBRULE($.charsetHeader)
+    this.RULE("stylesheet", function () {
+      // [ CHARSET_SYM STRING ';' ]?
+      $.OPTION(function () {
+        $.SUBRULE($.charsetHeader)
+      })
+
+      // [S|CDO|CDC]*
+      $.SUBRULE($.cdcCdo)
+
+      // [ import [ CDO S* | CDC S* ]* ]*
+      $.MANY(function () {
+        $.SUBRULE($.cssImport)
+        $.SUBRULE2($.cdcCdo)
+      })
+
+      // [ [ ruleset | media | page ] [ CDO S* | CDC S* ]* ]*
+      $.MANY2(function () {
+        $.SUBRULE($.contents)
+      })
     })
 
-    // [S|CDO|CDC]*
-    $.SUBRULE($.cdcCdo)
-
-    // [ import [ CDO S* | CDC S* ]* ]*
-    $.MANY(function () {
-      $.SUBRULE($.cssImport)
-      $.SUBRULE2($.cdcCdo)
+    this.RULE("charsetHeader", function () {
+      $.CONSUME(CharsetSym)
+      $.CONSUME(StringLiteral)
+      $.CONSUME(SemiColon)
     })
 
-    // [ [ ruleset | media | page ] [ CDO S* | CDC S* ]* ]*
-    $.MANY2(function () {
-      $.SUBRULE($.contents)
-    })
-  })
-
-  this.RULE("charsetHeader", function () {
-    $.CONSUME(CharsetSym)
-    $.CONSUME(StringLiteral)
-    $.CONSUME(SemiColon)
-  })
-
-  this.RULE("contents", function () {
-    // prettier-ignore
-    $.OR([
+    this.RULE("contents", function () {
+      // prettier-ignore
+      $.OR([
             {ALT: function() {$.SUBRULE($.ruleset)}},
             {ALT: function() {$.SUBRULE($.media)}},
             {ALT: function() {$.SUBRULE($.page)}}
         ])
-    $.SUBRULE3($.cdcCdo)
-  })
+      $.SUBRULE3($.cdcCdo)
+    })
 
-  // factor out repeating pattern for cdc/cdo
-  this.RULE("cdcCdo", function () {
-    $.MANY(function () {
-      // prettier-ignore
-      $.OR([
+    // factor out repeating pattern for cdc/cdo
+    this.RULE("cdcCdo", function () {
+      $.MANY(function () {
+        // prettier-ignore
+        $.OR([
                 {ALT: function() {$.CONSUME(Cdo)}},
                 {ALT: function() {$.CONSUME(Cdc)}}
             ])
+      })
     })
-  })
 
-  // IMPORT_SYM S*
-  // [STRING|URI] S* media_list? ';' S*
-  this.RULE("cssImport", function () {
-    $.CONSUME(ImportSym)
-    // prettier-ignore
-    $.OR([
+    // IMPORT_SYM S*
+    // [STRING|URI] S* media_list? ';' S*
+    this.RULE("cssImport", function () {
+      $.CONSUME(ImportSym)
+      // prettier-ignore
+      $.OR([
             {ALT: function() {$.CONSUME(StringLiteral)}},
             {ALT: function() {$.CONSUME(Uri)}}
         ])
 
-    $.OPTION(function () {
-      $.SUBRULE($.media_list)
-    })
+      $.OPTION(function () {
+        $.SUBRULE($.media_list)
+      })
 
-    $.CONSUME(SemiColon)
-  })
-
-  // MEDIA_SYM S* media_list '{' S* ruleset* '}' S*
-  this.RULE("media", function () {
-    $.CONSUME(MediaSym)
-    $.SUBRULE($.media_list)
-    $.CONSUME(LCurly)
-    $.SUBRULE($.ruleset)
-    $.CONSUME(RCurly)
-  })
-
-  // medium [ COMMA S* medium]*
-  this.RULE("media_list", function () {
-    $.SUBRULE($.medium)
-    $.MANY_SEP({
-      SEP: Comma,
-      DEF: function () {
-        $.SUBRULE2($.medium)
-      }
-    })
-  })
-
-  // IDENT S*
-  this.RULE("medium", function () {
-    $.CONSUME(Ident)
-  })
-
-  // PAGE_SYM S* pseudo_page?
-  // '{' S* declaration? [ ';' S* declaration? ]* '}' S*
-  this.RULE("page", function () {
-    $.CONSUME(PageSym)
-    $.OPTION(function () {
-      $.SUBRULE($.pseudo_page)
-    })
-
-    $.SUBRULE($.declarationsGroup)
-  })
-
-  // '{' S* declaration? [ ';' S* declaration? ]* '}' S*
-  // factored out repeating grammar pattern
-  this.RULE("declarationsGroup", function () {
-    $.CONSUME(LCurly)
-    $.OPTION(function () {
-      $.SUBRULE($.declaration)
-    })
-
-    $.MANY(function () {
       $.CONSUME(SemiColon)
-      $.OPTION2(function () {
-        $.SUBRULE2($.declaration)
+    })
+
+    // MEDIA_SYM S* media_list '{' S* ruleset* '}' S*
+    this.RULE("media", function () {
+      $.CONSUME(MediaSym)
+      $.SUBRULE($.media_list)
+      $.CONSUME(LCurly)
+      $.SUBRULE($.ruleset)
+      $.CONSUME(RCurly)
+    })
+
+    // medium [ COMMA S* medium]*
+    this.RULE("media_list", function () {
+      $.SUBRULE($.medium)
+      $.MANY_SEP({
+        SEP: Comma,
+        DEF: function () {
+          $.SUBRULE2($.medium)
+        }
       })
     })
-    $.CONSUME(RCurly)
-  })
 
-  // ':' IDENT S*
-  this.RULE("pseudo_page", function () {
-    $.CONSUME(Colon)
-    $.CONSUME(Ident)
-  })
+    // IDENT S*
+    this.RULE("medium", function () {
+      $.CONSUME(Ident)
+    })
 
-  // '/' S* | ',' S*
-  this.RULE("operator", function () {
-    // prettier-ignore
-    $.OR([
+    // PAGE_SYM S* pseudo_page?
+    // '{' S* declaration? [ ';' S* declaration? ]* '}' S*
+    this.RULE("page", function () {
+      $.CONSUME(PageSym)
+      $.OPTION(function () {
+        $.SUBRULE($.pseudo_page)
+      })
+
+      $.SUBRULE($.declarationsGroup)
+    })
+
+    // '{' S* declaration? [ ';' S* declaration? ]* '}' S*
+    // factored out repeating grammar pattern
+    this.RULE("declarationsGroup", function () {
+      $.CONSUME(LCurly)
+      $.OPTION(function () {
+        $.SUBRULE($.declaration)
+      })
+
+      $.MANY(function () {
+        $.CONSUME(SemiColon)
+        $.OPTION2(function () {
+          $.SUBRULE2($.declaration)
+        })
+      })
+      $.CONSUME(RCurly)
+    })
+
+    // ':' IDENT S*
+    this.RULE("pseudo_page", function () {
+      $.CONSUME(Colon)
+      $.CONSUME(Ident)
+    })
+
+    // '/' S* | ',' S*
+    this.RULE("operator", function () {
+      // prettier-ignore
+      $.OR([
             {ALT: function() {$.CONSUME(Slash)}},
             {ALT: function() {$.CONSUME(Comma)}}
         ])
-  })
+    })
 
-  // '+' S* | '>' S*
-  this.RULE("combinator", function () {
-    // prettier-ignore
-    $.OR([
+    // '+' S* | '>' S*
+    this.RULE("combinator", function () {
+      // prettier-ignore
+      $.OR([
             {ALT: function() {$.CONSUME(Plus)}},
             {ALT: function() {$.CONSUME(GreaterThan)}}
         ])
-  })
+    })
 
-  // '-' | '+'
-  this.RULE("unary_operator", function () {
-    // prettier-ignore
-    $.OR([
+    // '-' | '+'
+    this.RULE("unary_operator", function () {
+      // prettier-ignore
+      $.OR([
             {ALT: function() {$.CONSUME(Minus)}},
             {ALT: function() {$.CONSUME(Plus)}}
         ])
-  })
-
-  // IDENT S*
-  this.RULE("property", function () {
-    $.CONSUME(Ident)
-  })
-
-  // selector [ ',' S* selector ]*
-  // '{' S* declaration? [ ';' S* declaration? ]* '}' S*
-  this.RULE("ruleset", function () {
-    $.MANY_SEP({
-      SEP: Comma,
-      DEF: function () {
-        $.SUBRULE($.selector)
-      }
     })
 
-    $.SUBRULE($.declarationsGroup)
-  })
+    // IDENT S*
+    this.RULE("property", function () {
+      $.CONSUME(Ident)
+    })
 
-  // simple_selector [ combinator selector | S+ [ combinator? selector ]? ]?
-  this.RULE("selector", function () {
-    $.SUBRULE($.simple_selector)
-    $.OPTION(function () {
-      $.OPTION2(function () {
-        $.SUBRULE($.combinator)
+    // selector [ ',' S* selector ]*
+    // '{' S* declaration? [ ';' S* declaration? ]* '}' S*
+    this.RULE("ruleset", function () {
+      $.MANY_SEP({
+        SEP: Comma,
+        DEF: function () {
+          $.SUBRULE($.selector)
+        }
       })
-      $.SUBRULE($.selector)
+
+      $.SUBRULE($.declarationsGroup)
     })
-  })
 
-  // element_name [ HASH | class | attrib | pseudo ]*
-  // | [ HASH | class | attrib | pseudo ]+
-  this.RULE("simple_selector", function () {
-    $.OR([
-      {
-        ALT: function () {
-          $.SUBRULE($.element_name)
-          $.MANY(function () {
-            $.SUBRULE($.simple_selector_suffix)
-          })
-        }
-      },
-      {
-        ALT: function () {
-          $.AT_LEAST_ONE(function () {
-            $.SUBRULE2($.simple_selector_suffix)
-          }, "selector suffix")
-        }
-      }
-    ])
-  })
+    // simple_selector [ combinator selector | S+ [ combinator? selector ]? ]?
+    this.RULE("selector", function () {
+      $.SUBRULE($.simple_selector)
+      $.OPTION(function () {
+        $.OPTION2(function () {
+          $.SUBRULE($.combinator)
+        })
+        $.SUBRULE($.selector)
+      })
+    })
 
-  // helper grammar rule to avoid repetition
-  // [ HASH | class | attrib | pseudo ]+
-  this.RULE("simple_selector_suffix", function () {
-    // prettier-ignore
-    $.OR([
+    // element_name [ HASH | class | attrib | pseudo ]*
+    // | [ HASH | class | attrib | pseudo ]+
+    this.RULE("simple_selector", function () {
+      $.OR([
+        {
+          ALT: function () {
+            $.SUBRULE($.element_name)
+            $.MANY(function () {
+              $.SUBRULE($.simple_selector_suffix)
+            })
+          }
+        },
+        {
+          ALT: function () {
+            $.AT_LEAST_ONE(function () {
+              $.SUBRULE2($.simple_selector_suffix)
+            }, "selector suffix")
+          }
+        }
+      ])
+    })
+
+    // helper grammar rule to avoid repetition
+    // [ HASH | class | attrib | pseudo ]+
+    this.RULE("simple_selector_suffix", function () {
+      // prettier-ignore
+      $.OR([
             {ALT: function() {$.CONSUME(Hash)}},
             {ALT: function() {$.SUBRULE($.class)}},
             {ALT: function() {$.SUBRULE($.attrib)}},
             {ALT: function() {$.SUBRULE($.pseudo)}}
         ])
-  })
+    })
 
-  // '.' IDENT
-  this.RULE("class", function () {
-    $.CONSUME(Dot)
-    $.CONSUME(Ident)
-  })
+    // '.' IDENT
+    this.RULE("class", function () {
+      $.CONSUME(Dot)
+      $.CONSUME(Ident)
+    })
 
-  // IDENT | '*'
-  this.RULE("element_name", function () {
-    // prettier-ignore
-    $.OR([
+    // IDENT | '*'
+    this.RULE("element_name", function () {
+      // prettier-ignore
+      $.OR([
             {ALT: function() {$.CONSUME(Ident)}},
             {ALT: function() {$.CONSUME(Star)}}
         ])
-  })
+    })
 
-  // '[' S* IDENT S* [ [ '=' | INCLUDES | DASHMATCH ] S* [ IDENT | STRING ] S* ]? ']'
-  this.RULE("attrib", function () {
-    $.CONSUME(LSquare)
-    $.CONSUME(Ident)
+    // '[' S* IDENT S* [ [ '=' | INCLUDES | DASHMATCH ] S* [ IDENT | STRING ] S* ]? ']'
+    this.RULE("attrib", function () {
+      $.CONSUME(LSquare)
+      $.CONSUME(Ident)
 
-    this.OPTION(function () {
-      // prettier-ignore
-      $.OR([
+      this.OPTION(function () {
+        // prettier-ignore
+        $.OR([
                 {ALT: function() {$.CONSUME(Equals)}},
                 {ALT: function() {$.CONSUME(Includes)}},
                 {ALT: function() {$.CONSUME(Dasmatch)}}
             ])
 
-      // prettier-ignore
-      $.OR2([
+        // prettier-ignore
+        $.OR2([
                 {ALT: function() {$.CONSUME2(Ident)}},
                 {ALT: function() {$.CONSUME(StringLiteral)}}
             ])
+      })
+      $.CONSUME(RSquare)
     })
-    $.CONSUME(RSquare)
-  })
 
-  // ':' [ IDENT | FUNCTION S* [IDENT S*]? ')' ]
-  this.RULE("pseudo", function () {
-    $.CONSUME(Colon)
+    // ':' [ IDENT | FUNCTION S* [IDENT S*]? ')' ]
+    this.RULE("pseudo", function () {
+      $.CONSUME(Colon)
 
-    // prettier-ignore
-    $.OR([
+      // prettier-ignore
+      $.OR([
             {ALT: function() {$.CONSUME(Ident)}},
             {
                 ALT: function() {
@@ -519,46 +520,46 @@ function parser(config) {
                 }
             }
         ])
-  })
-
-  // property ':' S* expr prio?
-  this.RULE("declaration", function () {
-    $.SUBRULE($.property)
-    $.CONSUME(Colon)
-    $.SUBRULE($.expr)
-
-    $.OPTION(function () {
-      $.SUBRULE($.prio)
     })
-  })
 
-  // IMPORTANT_SYM S*
-  this.RULE("prio", function () {
-    $.CONSUME(ImportantSym)
-  })
+    // property ':' S* expr prio?
+    this.RULE("declaration", function () {
+      $.SUBRULE($.property)
+      $.CONSUME(Colon)
+      $.SUBRULE($.expr)
 
-  // term [ operator? term ]*
-  this.RULE("expr", function () {
-    $.SUBRULE($.term)
-    $.MANY(function () {
       $.OPTION(function () {
-        $.SUBRULE($.operator)
+        $.SUBRULE($.prio)
       })
-      $.SUBRULE2($.term)
-    })
-  })
-
-  // unary_operator?
-  // [ NUMBER S* | PERCENTAGE S* | LENGTH S* | EMS S* | EXS S* | ANGLE S* |
-  // TIME S* | FREQ S* ]
-  // | STRING S* | IDENT S* | URI S* | hexcolor | function
-  this.RULE("term", function () {
-    $.OPTION(function () {
-      $.SUBRULE($.unary_operator)
     })
 
-    // prettier-ignore
-    $.OR([
+    // IMPORTANT_SYM S*
+    this.RULE("prio", function () {
+      $.CONSUME(ImportantSym)
+    })
+
+    // term [ operator? term ]*
+    this.RULE("expr", function () {
+      $.SUBRULE($.term)
+      $.MANY(function () {
+        $.OPTION(function () {
+          $.SUBRULE($.operator)
+        })
+        $.SUBRULE2($.term)
+      })
+    })
+
+    // unary_operator?
+    // [ NUMBER S* | PERCENTAGE S* | LENGTH S* | EMS S* | EXS S* | ANGLE S* |
+    // TIME S* | FREQ S* ]
+    // | STRING S* | IDENT S* | URI S* | hexcolor | function
+    this.RULE("term", function () {
+      $.OPTION(function () {
+        $.SUBRULE($.unary_operator)
+      })
+
+      // prettier-ignore
+      $.OR([
             {ALT: function() {$.CONSUME(Num)}},
             {ALT: function() {$.CONSUME(Percentage)}},
             {ALT: function() {$.CONSUME(Length)}},
@@ -573,26 +574,24 @@ function parser(config) {
             {ALT: function() {$.SUBRULE($.hexcolor)}},
             {ALT: function() {$.SUBRULE($.cssFunction)}}
         ])
-  })
+    })
 
-  // FUNCTION S* expr ')' S*
-  this.RULE("cssFunction", function () {
-    $.CONSUME(Func)
-    $.SUBRULE($.expr)
-    $.CONSUME(RParen)
-  })
+    // FUNCTION S* expr ')' S*
+    this.RULE("cssFunction", function () {
+      $.CONSUME(Func)
+      $.SUBRULE($.expr)
+      $.CONSUME(RParen)
+    })
 
-  this.RULE("hexcolor", function () {
-    $.CONSUME(Hash)
-  })
+    this.RULE("hexcolor", function () {
+      $.CONSUME(Hash)
+    })
 
-  // very important to call this after all the rules have been setup.
-  // otherwise the parser may not work correctly as it will lack information
-  // derived from the self analysis.
-  this.performSelfAnalysis()
+    // very important to call this after all the rules have been setup.
+    // otherwise the parser may not work correctly as it will lack information
+    // derived from the self analysis.
+    this.performSelfAnalysis()
+  }
 }
-
-parser.prototype = Object.create(ChevrotainParser.prototype)
-parser.prototype.constructor = parser
 
 // ----------------- wrapping it all together -----------------
