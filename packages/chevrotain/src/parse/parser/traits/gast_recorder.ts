@@ -300,7 +300,7 @@ export class GastRecorder {
     this: MixedInParser,
     ruleToCall: ParserMethod<ARGS, R>,
     occurrence: number,
-    options?: SubruleMethodOpts
+    options?: SubruleMethodOpts<ARGS>
   ): R | CstNode {
     assertMethodIdxIsValid(occurrence)
     if (!ruleToCall || has(ruleToCall, "ruleName") === false) {
