@@ -838,7 +838,7 @@ export class RecognizerEngine {
 
   public reset(this: MixedInParser): void {
     this.resetLexerState()
-
+    this.subruleIdx = 0
     this.isBackTrackingStack = []
     this.errors = []
     this.RULE_STACK = []
