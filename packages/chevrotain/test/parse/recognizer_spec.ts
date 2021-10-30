@@ -113,7 +113,7 @@ function defineRecognizerSpecs(
 
           public subRule = this.RULE(
             "subRule",
-            (numFromCaller, charFromCaller) => {
+            (numFromCaller?: number, charFromCaller?: string) => {
               this.CONSUME(PlusTok)
               this.ACTION(() => {
                 // side effect
@@ -125,7 +125,7 @@ function defineRecognizerSpecs(
 
           public subRule2 = this.RULE(
             "subRule2",
-            (numFromCaller, charFromCaller) => {
+            (numFromCaller?: number, charFromCaller?: string) => {
               this.CONSUME(PlusTok)
               this.ACTION(() => {
                 // side effect

@@ -879,22 +879,25 @@ declare abstract class BaseParser {
 export declare class CstParser extends BaseParser {
   /**
    * Creates a Grammar Rule
+   *
+   * Note that any parameters of your implementation must be optional as it will
+   * be called without parameters during the grammar recording phase.
    */
-  protected RULE<ARGS extends unknown[]>(
+  protected RULE<F extends () => void>(
     name: string,
-    implementation: (...implArgs: ARGS[]) => any,
+    implementation: F,
     config?: IRuleConfig<CstNode>
-  ): ParserMethod<ARGS[], CstNode>
+  ): ParserMethod<Parameters<F>, CstNode>
 
   /**
    * Overrides a Grammar Rule
    * See usage example in: https://github.com/chevrotain/chevrotain/blob/master/examples/parser/versioning/versioning.js
    */
-  protected OVERRIDE_RULE<ARGS extends unknown[]>(
+  protected OVERRIDE_RULE<F extends () => void>(
     name: string,
-    implementation: (...implArgs: any[]) => any,
+    implementation: F,
     config?: IRuleConfig<CstNode>
-  ): ParserMethod<ARGS[], CstNode>
+  ): ParserMethod<Parameters<F>, CstNode>
 
   /**
    * Like `SUBRULE` with the numerical suffix as a parameter, e.g:
@@ -1023,22 +1026,25 @@ export declare class CstParser extends BaseParser {
 export declare class EmbeddedActionsParser extends BaseParser {
   /**
    * Creates a Grammar Rule
+   *
+   * Note that any parameters of your implementation must be optional as it will
+   * be called without parameters during the grammar recording phase.
    */
-  protected RULE<ARGS extends unknown[], R>(
+  protected RULE<F extends () => any>(
     name: string,
-    implementation: (...implArgs: ARGS) => R,
-    config?: IRuleConfig<R>
-  ): ParserMethod<ARGS, R>
+    implementation: F,
+    config?: IRuleConfig<ReturnType<F>>
+  ): ParserMethod<Parameters<F>, ReturnType<F>>
 
   /**
    * Overrides a Grammar Rule
    * See usage example in: https://github.com/chevrotain/chevrotain/blob/master/examples/parser/versioning/versioning.js
    */
-  protected OVERRIDE_RULE<ARGS extends unknown[], R>(
+  protected OVERRIDE_RULE<F extends () => any>(
     name: string,
-    implementation: (...implArgs: ARGS) => R,
-    config?: IRuleConfig<R>
-  ): ParserMethod<ARGS, R>
+    implementation: F,
+    config?: IRuleConfig<ReturnType<F>>
+  ): ParserMethod<Parameters<F>, ReturnType<F>>
 
   /**
    * Like `SUBRULE` with the numerical suffix as a parameter, e.g:

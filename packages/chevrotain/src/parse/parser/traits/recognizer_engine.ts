@@ -186,7 +186,7 @@ export class RecognizerEngine {
   defineRule<ARGS extends unknown[], R>(
     this: MixedInParser,
     ruleName: string,
-    impl: (...args: ARGS[]) => R,
+    impl: (...args: ARGS) => R,
     config: IRuleConfig<R>
   ): ParserMethod<ARGS, R> {
     if (this.selfAnalysisDone) {
@@ -213,10 +213,9 @@ export class RecognizerEngine {
     this.shortRuleNameToFull[shortName] = ruleName
     this.fullRuleNameToShort[ruleName] = shortName
 
-    function invokeRuleWithTry(this: MixedInParser, ...args: ARGS[]): R {
+    function invokeRuleWithTry(this: MixedInParser, ...args: ARGS): R {
       try {
         this.ruleInvocationStateUpdate(shortName, ruleName, this.subruleIdx)
-        this.subruleIdx = 0
         if (this.outputCst === true) {
           impl.apply(this, args)
           const cst = this.CST_STACK[this.CST_STACK.length - 1]
@@ -814,9 +813,6 @@ export class RecognizerEngine {
     fullName: string,
     idxInCallingRule: number
   ): void {
-    if (typeof idxInCallingRule !== "number") {
-      throw new Error(typeof idxInCallingRule)
-    }
     this.RULE_OCCURRENCE_STACK.push(idxInCallingRule)
     this.RULE_STACK.push(shortName)
     // NOOP when cst is disabled
