@@ -235,10 +235,6 @@ export function partial(func: Function, ...restArgs: any[]): Function {
   return func.bind(null, ...restArgs)
 }
 
-export function isArray(obj: any): obj is any[] {
-  return Array.isArray(obj)
-}
-
 export function isRegExp(obj: any): obj is RegExp {
   return obj instanceof RegExp
 }

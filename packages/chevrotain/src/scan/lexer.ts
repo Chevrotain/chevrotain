@@ -3,6 +3,7 @@ import { IRegExpExec, Lexer, LexerDefinitionErrorType } from "./lexer_public"
 import first from "lodash/first"
 import isEmpty from "lodash/isEmpty"
 import compact from "lodash/compact"
+import isArray from "lodash/isArray"
 import {
   contains,
   defaults,
@@ -13,7 +14,6 @@ import {
   forEach,
   has,
   indexOf,
-  isArray,
   isFunction,
   isRegExp,
   isString,

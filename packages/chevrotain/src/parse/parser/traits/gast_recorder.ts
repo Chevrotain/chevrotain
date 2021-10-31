@@ -15,7 +15,8 @@ import {
   TokenType
 } from "@chevrotain/types"
 import peek from "lodash/last"
-import { forEach, has, isArray, isFunction, some } from "@chevrotain/utils"
+import isArray from "lodash/isArray"
+import { forEach, has, isFunction, some } from "@chevrotain/utils"
 import { MixedInParser } from "./parser_traits"
 import {
   Alternation,

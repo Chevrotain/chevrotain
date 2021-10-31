@@ -16,13 +16,13 @@ import {
   TokenVocabulary
 } from "@chevrotain/types"
 import isEmpty from "lodash/isEmpty"
+import isArray from "lodash/isArray"
 import {
   cloneArr,
   cloneObj,
   every,
   flatten,
   has,
-  isArray,
   isObject,
   reduce,
   uniq,

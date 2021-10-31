@@ -13,13 +13,13 @@ import {
 } from "./lexer"
 import noop from "lodash/noop"
 import isEmpty from "lodash/isEmpty"
+import isArray from "lodash/isArray"
 import {
   assign,
   cloneArr,
   cloneObj,
   forEach,
   IDENTITY,
-  isArray,
   isUndefined,
   keys,
   last,

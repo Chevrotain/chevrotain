@@ -9,12 +9,12 @@ import {
   Term,
   VERSION
 } from "regexp-to-ast"
+import isArray from "lodash/isArray"
 import {
   contains,
   every,
   find,
   forEach,
-  isArray,
   PRINT_ERROR,
   PRINT_WARNING,
   values

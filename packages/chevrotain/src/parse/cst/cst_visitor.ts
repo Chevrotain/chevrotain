@@ -1,9 +1,9 @@
 import isEmpty from "lodash/isEmpty"
 import compact from "lodash/compact"
+import isArray from "lodash/isArray"
 import {
   contains,
   forEach,
-  isArray,
   isFunction,
   isUndefined,
   keys,
