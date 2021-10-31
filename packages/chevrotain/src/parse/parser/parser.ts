@@ -24,8 +24,7 @@ import {
   IRuleConfig,
   IToken,
   TokenType,
-  TokenVocabulary,
-  ParserMethod
+  TokenVocabulary
 } from "@chevrotain/types"
 import { Recoverable } from "./traits/recoverable"
 import { LooksAhead } from "./traits/looksahead"
@@ -41,6 +40,7 @@ import { GastRecorder } from "./traits/gast_recorder"
 import { PerformanceTracer } from "./traits/perf_tracer"
 import { applyMixins } from "./utils/apply_mixins"
 import { IParserDefinitionError } from "../grammar/types"
+import { ParserMethodInternal } from "./types"
 
 export const END_OF_FILE = createTokenInstance(
   EOF,
@@ -167,10 +167,9 @@ export class Parser {
           this.enableRecording()
           // Building the GAST
           forEach(this.definedRulesNames, (currRuleName) => {
-            const wrappedRule = (this as any)[currRuleName] as ParserMethod<
-              unknown[],
-              unknown
-            >
+            const wrappedRule = (this as any)[
+              currRuleName
+            ] as ParserMethodInternal<unknown[], unknown>
             const originalGrammarAction = wrappedRule["originalGrammarAction"]
             let recordedRuleGast = undefined
             this.TRACE_INIT(`${currRuleName} Rule`, () => {

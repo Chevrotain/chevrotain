@@ -11,7 +11,6 @@ import {
   IToken,
   ManySepMethodOpts,
   OrMethodOpts,
-  ParserMethod,
   SubruleMethodOpts,
   TokenType
 } from "@chevrotain/types"
@@ -41,6 +40,7 @@ import { augmentTokenTypes, hasShortKeyProperty } from "../../../scan/tokens"
 import { createToken, createTokenInstance } from "../../../scan/tokens_public"
 import { END_OF_FILE } from "../parser"
 import { BITS_FOR_OCCURRENCE_IDX } from "../../grammar/keys"
+import { ParserMethodInternal } from "../types"
 
 type ProdWithDef = IProduction & { definition?: IProduction[] }
 const RECORDING_NULL_OBJECT = {
@@ -298,7 +298,7 @@ export class GastRecorder {
 
   subruleInternalRecord<ARGS extends unknown[], R>(
     this: MixedInParser,
-    ruleToCall: ParserMethod<ARGS, R>,
+    ruleToCall: ParserMethodInternal<ARGS, R>,
     occurrence: number,
     options?: SubruleMethodOpts<ARGS>
   ): R | CstNode {
