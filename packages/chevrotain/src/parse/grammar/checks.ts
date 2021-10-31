@@ -1,15 +1,20 @@
-import * as utils from "@chevrotain/utils"
 import first from "lodash/first"
 import isEmpty from "lodash/isEmpty"
 import {
+  cloneArr,
   contains,
+  difference,
+  drop,
   findAll,
   flatMap,
   flatten,
   forEach,
+  groupBy,
   map,
+  pick,
   reduce,
-  reject
+  reject,
+  values
 } from "@chevrotain/utils"
 import {
   IParserAmbiguousAlternativesDefinitionError,
@@ -49,6 +54,8 @@ import {
   IGrammarValidatorErrorMessageProvider,
   IParserDefinitionError
 } from "./types"
+import dropRight from "lodash/dropRight"
+import compact from "lodash/compact"
 
 export function validateGrammar(
   topLevels: Rule[],
@@ -127,16 +134,16 @@ function validateDuplicateProductions(
   topLevelRule.accept(collectorVisitor)
   const allRuleProductions = collectorVisitor.allProductions
 
-  const productionGroups = utils.groupBy(
+  const productionGroups = groupBy(
     allRuleProductions,
     identifyProductionForDuplicates
   )
 
-  const duplicates: any = utils.pick(productionGroups, (currGroup) => {
+  const duplicates: any = pick(productionGroups, (currGroup) => {
     return currGroup.length > 1
   })
 
-  const errors = utils.map(utils.values(duplicates), (currDuplicates: any) => {
+  const errors = map(values(duplicates), (currDuplicates: any) => {
     const firstProd: any = first(currDuplicates)
     const msg = errMsgProvider.buildDuplicateFoundError(
       topLevelRule,
@@ -260,7 +267,7 @@ export function validateRuleIsOverridden(
   const errors = []
   let errMsg
 
-  if (!utils.contains(definedRulesNames, ruleName)) {
+  if (!contains(definedRulesNames, ruleName)) {
     errMsg =
       `Invalid rule override, rule: ->${ruleName}<- cannot be overridden in the grammar: ->${className}<-` +
       `as it is not defined in any of the super grammars `
@@ -286,7 +293,7 @@ export function validateNoLeftRecursion(
     return []
   } else {
     const ruleName = topRule.name
-    const foundLeftRecursion = utils.contains(<any>nextNonTerminals, topRule)
+    const foundLeftRecursion = contains(<any>nextNonTerminals, topRule)
     if (foundLeftRecursion) {
       errors.push({
         message: errMsgProvider.buildLeftRecursionError({
@@ -300,12 +307,9 @@ export function validateNoLeftRecursion(
 
     // we are only looking for cyclic paths leading back to the specific topRule
     // other cyclic paths are ignored, we still need this difference to avoid infinite loops...
-    const validNextSteps = utils.difference(
-      nextNonTerminals,
-      path.concat([topRule])
-    )
+    const validNextSteps = difference(nextNonTerminals, path.concat([topRule]))
     const errorsFromNextSteps = flatMap(validNextSteps, (currRefRule) => {
-      const newPath = utils.cloneArr(path)
+      const newPath = cloneArr(path)
       newPath.push(currRefRule)
       return validateNoLeftRecursion(
         topRule,
@@ -342,8 +346,8 @@ export function getFirstNoneTerminal(definition: IProduction[]): Rule[] {
     )
   } else if (firstProd instanceof Alternation) {
     // each sub definition in alternation is a FLAT
-    result = utils.flatten(
-      utils.map(firstProd.definition, (currSubDef) =>
+    result = flatten(
+      map(firstProd.definition, (currSubDef) =>
         getFirstNoneTerminal((<AlternativeGAST>currSubDef).definition)
       )
     )
@@ -356,7 +360,7 @@ export function getFirstNoneTerminal(definition: IProduction[]): Rule[] {
   const isFirstOptional = isOptionalProd(firstProd)
   const hasMore = definition.length > 1
   if (isFirstOptional && hasMore) {
-    const rest = utils.drop(definition)
+    const rest = drop(definition)
     return result.concat(getFirstNoneTerminal(rest))
   } else {
     return result
@@ -379,11 +383,11 @@ export function validateEmptyOrAlternative(
   topLevelRule.accept(orCollector)
   const ors = orCollector.alternations
 
-  const errors = utils.reduce(
+  const errors = reduce(
     ors,
     (errors, currOr) => {
-      const exceptLast = utils.dropRight(currOr.definition)
-      const currErrors = utils.map(
+      const exceptLast = dropRight(currOr.definition)
+      const currErrors = map(
         exceptLast,
         (currAlternative: IProduction, currAltIdx) => {
           const possibleFirstInAlt = nextPossibleTokensAfter(
@@ -409,7 +413,7 @@ export function validateEmptyOrAlternative(
           }
         }
       )
-      return errors.concat(utils.compact(currErrors))
+      return errors.concat(compact(currErrors))
     },
     []
   )
@@ -430,7 +434,7 @@ export function validateAmbiguousAlternationAlternatives(
   // - https://github.com/chevrotain/chevrotain/issues/869
   ors = reject(ors, (currOr) => currOr.ignoreAmbiguities === true)
 
-  const errors = utils.reduce(
+  const errors = reduce(
     ors,
     (result, currOr: Alternation) => {
       const currOccurrence = currOr.idx
@@ -494,7 +498,7 @@ export function validateTooManyAlts(
   topLevelRule.accept(orCollector)
   const ors = orCollector.alternations
 
-  const errors = utils.reduce(
+  const errors = reduce(
     ors,
     (errors, currOr) => {
       if (currOr.definition.length > 255) {
@@ -603,7 +607,7 @@ function checkAlternativesAmbiguities(
     [] as { alts: number[]; path: TokenType[] }[]
   )
 
-  const currErrors = utils.map(identicalAmbiguities, (currAmbDescriptor) => {
+  const currErrors = map(identicalAmbiguities, (currAmbDescriptor) => {
     const ambgIndices = map(
       currAmbDescriptor.alts,
       (currAltIdx) => currAltIdx + 1

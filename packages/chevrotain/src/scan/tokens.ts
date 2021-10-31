@@ -1,7 +1,7 @@
 import isEmpty from "lodash/isEmpty"
+import compact from "lodash/compact"
 import {
   cloneArr,
-  compact,
   contains,
   difference,
   flatten,

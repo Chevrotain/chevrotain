@@ -2,8 +2,8 @@ import { BaseRegExpVisitor } from "regexp-to-ast"
 import { IRegExpExec, Lexer, LexerDefinitionErrorType } from "./lexer_public"
 import first from "lodash/first"
 import isEmpty from "lodash/isEmpty"
+import compact from "lodash/compact"
 import {
-  compact,
   contains,
   defaults,
   difference,

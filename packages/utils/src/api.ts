@@ -211,10 +211,6 @@ export function reduce<T, A>(
   return accumulator
 }
 
-export function compact<T>(arr: (T | null | undefined)[]): T[] {
-  return reject(arr, (item) => item === null || item === undefined) as T[]
-}
-
 export function uniq<T>(
   arr: T[],
   identity: (item: T) => any = (item) => item

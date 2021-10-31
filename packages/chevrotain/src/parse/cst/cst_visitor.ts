@@ -1,6 +1,6 @@
 import isEmpty from "lodash/isEmpty"
+import compact from "lodash/compact"
 import {
-  compact,
   contains,
   forEach,
   isArray,

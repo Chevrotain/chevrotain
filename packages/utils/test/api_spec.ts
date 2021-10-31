@@ -1,3 +1,4 @@
+import compact from "lodash/compact"
 import {
   last,
   forEach,
@@ -12,7 +13,6 @@ import {
   cloneObj,
   find,
   reduce,
-  compact,
   uniq,
   pick,
   partial,
