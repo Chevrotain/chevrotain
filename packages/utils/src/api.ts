@@ -14,19 +14,6 @@ export function values(obj: any): any[] {
   return vals
 }
 
-export function mapValues<I, O>(
-  obj: Record<string, I>,
-  callback: (value: I, key?: string) => O
-): O[] {
-  const result: O[] = []
-  const objKeys = keys(obj)
-  for (let idx = 0; idx < objKeys.length; idx++) {
-    const currKey = objKeys[idx]
-    result.push(callback(obj[currKey], currKey))
-  }
-  return result
-}
-
 export function map<I, O>(
   arr: I[],
   callback: (value: I, idx?: number) => O
@@ -34,22 +21,6 @@ export function map<I, O>(
   const result: O[] = []
   for (let idx = 0; idx < arr.length; idx++) {
     result.push(callback(arr[idx], idx))
-  }
-  return result
-}
-
-export function flatten<T>(arr: T[][]): T[]
-export function flatten(arr: any[]): any[]
-export function flatten(arr: any[]): any[] {
-  const result: any[] = []
-
-  for (let idx = 0; idx < arr.length; idx++) {
-    const currItem = arr[idx]
-    if (Array.isArray(currItem)) {
-      result.push(...flatten(currItem))
-    } else {
-      result.push(currItem)
-    }
   }
   return result
 }

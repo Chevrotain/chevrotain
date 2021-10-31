@@ -1,4 +1,5 @@
-import { uniq, map, flatten } from "@chevrotain/utils"
+import flatten from "lodash/flatten"
+import { uniq, map } from "@chevrotain/utils"
 import { AbstractProduction, NonTerminal, Terminal } from "./gast/gast_public"
 import { isBranchingProd, isOptionalProd, isSequenceProd } from "./gast/gast"
 import { IProduction, TokenType } from "@chevrotain/types"

@@ -1,11 +1,11 @@
 import isEmpty from "lodash/isEmpty"
 import compact from "lodash/compact"
 import isArray from "lodash/isArray"
+import flatten from "lodash/flatten"
 import {
   cloneArr,
   contains,
   difference,
-  flatten,
   forEach,
   has,
   map

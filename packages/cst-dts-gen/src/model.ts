@@ -13,20 +13,17 @@ import {
   Terminal,
   TokenType
 } from "chevrotain"
-import {
-  assign,
-  flatten,
-  groupBy,
-  map,
-  mapValues,
-  some
-} from "@chevrotain/utils"
+import map from "lodash/map"
+import flatten from "lodash/flatten"
+import values from "lodash/values"
+import { assign, groupBy, some } from "@chevrotain/utils"
 
 export function buildModel(
   productions: Record<string, Rule>
 ): CstNodeTypeDefinition[] {
   const generator = new CstNodeDefinitionGenerator()
-  return mapValues(productions, (rule) => generator.visitRule(rule))
+  const allRules = values(productions)
+  return map(allRules, (rule) => generator.visitRule(rule))
 }
 
 export type CstNodeTypeDefinition = {
@@ -52,7 +49,7 @@ class CstNodeDefinitionGenerator extends GAstVisitor {
     const rawElements = this.visitEach(node.definition)
 
     const grouped = groupBy(rawElements, (el) => el.propertyName)
-    const properties = mapValues(grouped, (group, propertyName) => {
+    const properties = map(grouped, (group, propertyName) => {
       const allNullable = !some(group, (el) => !el.canBeNull)
       return {
         name: propertyName,

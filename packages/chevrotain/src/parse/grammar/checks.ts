@@ -1,13 +1,13 @@
 import first from "lodash/first"
 import isEmpty from "lodash/isEmpty"
 import drop from "lodash/drop"
+import flatten from "lodash/flatten"
 import {
   cloneArr,
   contains,
   difference,
   findAll,
   flatMap,
-  flatten,
   forEach,
   groupBy,
   map,

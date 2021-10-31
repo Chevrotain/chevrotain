@@ -17,11 +17,11 @@ import {
 } from "@chevrotain/types"
 import isEmpty from "lodash/isEmpty"
 import isArray from "lodash/isArray"
+import flatten from "lodash/flatten"
 import {
   cloneArr,
   cloneObj,
   every,
-  flatten,
   has,
   isObject,
   reduce,

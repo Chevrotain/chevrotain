@@ -6,7 +6,8 @@ import {
 import isEmpty from "lodash/isEmpty"
 import dropRight from "lodash/dropRight"
 
-import { cloneArr, contains, find, flatten, has, map } from "@chevrotain/utils"
+import flatten from "lodash/flatten"
+import { cloneArr, contains, find, has, map } from "@chevrotain/utils"
 import {
   IParserConfig,
   IToken,

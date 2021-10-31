@@ -4,13 +4,14 @@ import first from "lodash/first"
 import isEmpty from "lodash/isEmpty"
 import compact from "lodash/compact"
 import isArray from "lodash/isArray"
+import values from "lodash/values"
+import flatten from "lodash/flatten"
 import {
   contains,
   defaults,
   difference,
   filter,
   find,
-  flatten,
   forEach,
   has,
   indexOf,
@@ -20,7 +21,6 @@ import {
   isUndefined,
   keys,
   map,
-  mapValues,
   PRINT_ERROR,
   reduce,
   reject
@@ -898,9 +898,7 @@ export function performWarningRuntimeChecks(
 ): ILexerDefinitionError[] {
   const warnings = []
   let hasAnyLineBreak = false
-  const allTokenTypes = compact(
-    flatten(mapValues(lexerDefinition.modes, (tokTypes) => tokTypes))
-  )
+  const allTokenTypes = compact(flatten(values(lexerDefinition.modes)))
 
   const concreteTokenTypes = reject(
     allTokenTypes,

@@ -31,7 +31,7 @@ import { DDLExampleRecoveryParser } from "./sql_recovery_parser"
 import { tokenMatcher } from "../../../../src/scan/tokens_public"
 import { NotAllInputParsedException } from "../../../../src/parse/exceptions_public"
 import { ParseTree } from "../../parse_tree"
-import { flatten } from "@chevrotain/utils"
+import flatten from "lodash/flatten"
 import { createRegularToken } from "../../../utils/matchers"
 import { IToken } from "@chevrotain/types"
 
