@@ -11,6 +11,7 @@ import {
   SUPPORT_STICKY,
   validatePatterns
 } from "./lexer"
+import noop from "lodash/noop"
 import {
   assign,
   cloneArr,
@@ -23,7 +24,6 @@ import {
   keys,
   last,
   map,
-  NOOP,
   PRINT_WARNING,
   reduce,
   reject,
@@ -309,12 +309,12 @@ export class Lexer {
           this.chopInput = <any>IDENTITY
           this.match = this.matchWithTest
         } else {
-          this.updateLastIndex = NOOP
+          this.updateLastIndex = noop
           this.match = this.matchWithExec
         }
 
         if (hasOnlySingleMode) {
-          this.handleModes = NOOP
+          this.handleModes = noop
         }
 
         if (this.trackStartLines === false) {
@@ -322,7 +322,7 @@ export class Lexer {
         }
 
         if (this.trackEndLines === false) {
-          this.updateTokenEndLineColumnLocation = NOOP
+          this.updateTokenEndLineColumnLocation = noop
         }
 
         if (/full/i.test(this.config.positionTracking)) {

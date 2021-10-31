@@ -4,7 +4,8 @@ import {
   setNodeLocationFull,
   setNodeLocationOnlyOffset
 } from "../../cst/cst"
-import { has, isUndefined, keys, NOOP } from "@chevrotain/utils"
+import noop from "lodash/noop"
+import { has, isUndefined, keys } from "@chevrotain/utils"
 import {
   createBaseSemanticVisitorConstructor,
   createBaseVisitorConstructorWithDefaults
@@ -54,21 +55,21 @@ export class TreeBuilder {
       : DEFAULT_PARSER_CONFIG.nodeLocationTracking
 
     if (!this.outputCst) {
-      this.cstInvocationStateUpdate = NOOP
-      this.cstFinallyStateUpdate = NOOP
-      this.cstPostTerminal = NOOP
-      this.cstPostNonTerminal = NOOP
-      this.cstPostRule = NOOP
+      this.cstInvocationStateUpdate = noop
+      this.cstFinallyStateUpdate = noop
+      this.cstPostTerminal = noop
+      this.cstPostNonTerminal = noop
+      this.cstPostRule = noop
     } else {
       if (/full/i.test(this.nodeLocationTracking)) {
         if (this.recoveryEnabled) {
           this.setNodeLocationFromToken = setNodeLocationFull
           this.setNodeLocationFromNode = setNodeLocationFull
-          this.cstPostRule = NOOP
+          this.cstPostRule = noop
           this.setInitialNodeLocation = this.setInitialNodeLocationFullRecovery
         } else {
-          this.setNodeLocationFromToken = NOOP
-          this.setNodeLocationFromNode = NOOP
+          this.setNodeLocationFromToken = noop
+          this.setNodeLocationFromNode = noop
           this.cstPostRule = this.cstPostRuleFull
           this.setInitialNodeLocation = this.setInitialNodeLocationFullRegular
         }
@@ -76,21 +77,21 @@ export class TreeBuilder {
         if (this.recoveryEnabled) {
           this.setNodeLocationFromToken = <any>setNodeLocationOnlyOffset
           this.setNodeLocationFromNode = <any>setNodeLocationOnlyOffset
-          this.cstPostRule = NOOP
+          this.cstPostRule = noop
           this.setInitialNodeLocation =
             this.setInitialNodeLocationOnlyOffsetRecovery
         } else {
-          this.setNodeLocationFromToken = NOOP
-          this.setNodeLocationFromNode = NOOP
+          this.setNodeLocationFromToken = noop
+          this.setNodeLocationFromNode = noop
           this.cstPostRule = this.cstPostRuleOnlyOffset
           this.setInitialNodeLocation =
             this.setInitialNodeLocationOnlyOffsetRegular
         }
       } else if (/none/i.test(this.nodeLocationTracking)) {
-        this.setNodeLocationFromToken = NOOP
-        this.setNodeLocationFromNode = NOOP
-        this.cstPostRule = NOOP
-        this.setInitialNodeLocation = NOOP
+        this.setNodeLocationFromToken = noop
+        this.setNodeLocationFromNode = noop
+        this.cstPostRule = noop
+        this.setInitialNodeLocation = noop
       } else {
         throw Error(
           `Invalid <nodeLocationTracking> config option: "${config.nodeLocationTracking}"`

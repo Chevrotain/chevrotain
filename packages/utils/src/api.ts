@@ -386,8 +386,6 @@ export function merge(obj1: any, obj2: any): any {
   return result
 }
 
-export function NOOP() {}
-
 export function IDENTITY<T>(item: T): T {
   return item
 }
@@ -405,10 +403,6 @@ export function PRINT_WARNING(msg: string) {
     // TODO: modify docs accordingly
     console.warn(`Warning: ${msg}`)
   }
-}
-
-export function peek<T>(arr: T[]): T {
-  return arr[arr.length - 1]
 }
 
 /* istanbul ignore next - for performance tracing*/

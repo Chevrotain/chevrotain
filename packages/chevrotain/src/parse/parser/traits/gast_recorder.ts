@@ -14,14 +14,8 @@ import {
   SubruleMethodOpts,
   TokenType
 } from "@chevrotain/types"
-import {
-  forEach,
-  has,
-  isArray,
-  isFunction,
-  peek,
-  some
-} from "@chevrotain/utils"
+import peek from "lodash/last"
+import { forEach, has, isArray, isFunction, some } from "@chevrotain/utils"
 import { MixedInParser } from "./parser_traits"
 import {
   Alternation,
