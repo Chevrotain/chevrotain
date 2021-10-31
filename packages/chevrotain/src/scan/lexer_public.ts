@@ -14,6 +14,8 @@ import {
 import noop from "lodash/noop"
 import isEmpty from "lodash/isEmpty"
 import isArray from "lodash/isArray"
+import last from "lodash/last"
+
 import {
   assign,
   cloneArr,
@@ -22,7 +24,6 @@ import {
   IDENTITY,
   isUndefined,
   keys,
-  last,
   map,
   PRINT_WARNING,
   reduce,

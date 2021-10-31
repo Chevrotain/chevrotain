@@ -1,7 +1,5 @@
 import compact from "lodash/compact"
-import drop from "lodash/isEmpty"
 import {
-  last,
   forEach,
   isString,
   filter,
@@ -28,11 +26,6 @@ import {
 import { expect } from "chai"
 
 describe("The Utils functions namespace", () => {
-  it("exports a last utility", () => {
-    expect(last([1, 2, 3])).to.equal(3)
-    expect(last([])).to.equal(undefined)
-  })
-
   it("exports a forEach utility", () => {
     forEach([1, 2, 3], (item, idx) => {
       expect(item).to.equal(idx + 1)

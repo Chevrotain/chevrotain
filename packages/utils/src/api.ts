@@ -25,11 +25,6 @@ export function map<I, O>(
   return result
 }
 
-export function last<T>(arr: T[]): T | undefined {
-  const len = arr && arr.length
-  return len ? arr[len - 1] : undefined
-}
-
 export function forEach<T>(
   collection: T[],
   iteratorCallback: (item: T, index: number) => void

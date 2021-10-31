@@ -3,8 +3,9 @@ import _first from "lodash/first"
 import isEmpty from "lodash/isEmpty"
 import dropRight from "lodash/dropRight"
 import drop from "lodash/drop"
+import last from "lodash/last"
 
-import { cloneArr, forEach, last } from "@chevrotain/utils"
+import { cloneArr, forEach } from "@chevrotain/utils"
 import { first } from "./first"
 import { TokenMatcher } from "../parser/parser"
 import {
