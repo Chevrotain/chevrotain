@@ -1,11 +1,12 @@
 import * as utils from "@chevrotain/utils"
+import first from "lodash/first"
+import isEmpty from "lodash/isEmpty"
 import {
   contains,
   findAll,
   flatMap,
   flatten,
   forEach,
-  isEmpty,
   map,
   reduce,
   reject
@@ -136,7 +137,7 @@ function validateDuplicateProductions(
   })
 
   const errors = utils.map(utils.values(duplicates), (currDuplicates: any) => {
-    const firstProd: any = utils.first(currDuplicates)
+    const firstProd: any = first(currDuplicates)
     const msg = errMsgProvider.buildDuplicateFoundError(
       topLevelRule,
       currDuplicates
@@ -281,7 +282,7 @@ export function validateNoLeftRecursion(
 ): IParserDefinitionError[] {
   const errors: IParserDefinitionError[] = []
   const nextNonTerminals = getFirstNoneTerminal(currRule.definition)
-  if (utils.isEmpty(nextNonTerminals)) {
+  if (isEmpty(nextNonTerminals)) {
     return []
   } else {
     const ruleName = topRule.name
@@ -320,10 +321,10 @@ export function validateNoLeftRecursion(
 
 export function getFirstNoneTerminal(definition: IProduction[]): Rule[] {
   let result: Rule[] = []
-  if (utils.isEmpty(definition)) {
+  if (isEmpty(definition)) {
     return result
   }
-  const firstProd = utils.first(definition)
+  const firstProd = first(definition)
 
   /* istanbul ignore else */
   if (firstProd instanceof NonTerminal) {
@@ -391,7 +392,7 @@ export function validateEmptyOrAlternative(
             null,
             1
           )
-          if (utils.isEmpty(possibleFirstInAlt)) {
+          if (isEmpty(possibleFirstInAlt)) {
             return {
               message: errMsgProvider.buildEmptyAlternationError({
                 topLevelRule: topLevelRule,

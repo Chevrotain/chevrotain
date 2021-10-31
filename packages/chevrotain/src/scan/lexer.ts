@@ -1,5 +1,7 @@
 import { BaseRegExpVisitor } from "regexp-to-ast"
 import { IRegExpExec, Lexer, LexerDefinitionErrorType } from "./lexer_public"
+import first from "lodash/first"
+import isEmpty from "lodash/isEmpty"
 import {
   compact,
   contains,
@@ -7,13 +9,11 @@ import {
   difference,
   filter,
   find,
-  first,
   flatten,
   forEach,
   has,
   indexOf,
   isArray,
-  isEmpty,
   isFunction,
   isRegExp,
   isString,

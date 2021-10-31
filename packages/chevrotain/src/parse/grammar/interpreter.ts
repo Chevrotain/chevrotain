@@ -1,13 +1,7 @@
 import { RestWalker } from "./rest"
-import {
-  cloneArr,
-  drop,
-  dropRight,
-  first as _first,
-  forEach,
-  isEmpty,
-  last
-} from "@chevrotain/utils"
+import _first from "lodash/first"
+import isEmpty from "lodash/isEmpty"
+import { cloneArr, drop, dropRight, forEach, last } from "@chevrotain/utils"
 import { first } from "./first"
 import { TokenMatcher } from "../parser/parser"
 import {

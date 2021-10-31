@@ -15,6 +15,7 @@ import {
   TokenType,
   TokenVocabulary
 } from "@chevrotain/types"
+import isEmpty from "lodash/isEmpty"
 import {
   cloneArr,
   cloneObj,
@@ -22,7 +23,6 @@ import {
   flatten,
   has,
   isArray,
-  isEmpty,
   isObject,
   reduce,
   uniq,

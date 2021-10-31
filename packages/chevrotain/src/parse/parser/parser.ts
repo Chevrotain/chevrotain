@@ -1,8 +1,8 @@
+import isEmpty from "lodash/isEmpty"
 import {
   cloneObj,
   forEach,
   has,
-  isEmpty,
   map,
   values,
   toFastProperties

@@ -1,3 +1,4 @@
+import isEmpty from "lodash/isEmpty"
 import {
   cloneArr,
   compact,
@@ -7,7 +8,6 @@ import {
   forEach,
   has,
   isArray,
-  isEmpty,
   map
 } from "@chevrotain/utils"
 import { IToken, TokenType } from "@chevrotain/types"

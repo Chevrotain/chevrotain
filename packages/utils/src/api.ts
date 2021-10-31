@@ -1,17 +1,3 @@
-/*
- Utils using lodash style API. (not necessarily 100% compliant) for functional and other utils.
- These utils should replace usage of lodash in the production code base. not because they are any better...
- but for the purpose of being a dependency free library.
-
- The hotspots in the code are already written in imperative style for performance reasons.
- so writing several dozen utils which may be slower than the original lodash, does not matter as much
- considering they will not be invoked in hotspots...
- */
-
-export function isEmpty(arr: any[]): boolean {
-  return arr && arr.length === 0
-}
-
 export function keys(obj: any): string[] {
   if (obj === undefined || obj === null) {
     return []
@@ -66,10 +52,6 @@ export function flatten(arr: any[]): any[] {
     }
   }
   return result
-}
-
-export function first<T>(arr: T[]): T | undefined {
-  return isEmpty(arr) ? undefined : arr[0]
 }
 
 export function last<T>(arr: T[]): T | undefined {

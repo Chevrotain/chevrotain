@@ -12,6 +12,7 @@ import {
   validatePatterns
 } from "./lexer"
 import noop from "lodash/noop"
+import isEmpty from "lodash/isEmpty"
 import {
   assign,
   cloneArr,
@@ -19,7 +20,6 @@ import {
   forEach,
   IDENTITY,
   isArray,
-  isEmpty,
   isUndefined,
   keys,
   last,

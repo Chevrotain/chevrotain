@@ -3,6 +3,7 @@ import {
   AbstractNextTerminalAfterProductionWalker,
   IFirstAfterRepetition
 } from "../../grammar/interpreter"
+import isEmpty from "lodash/isEmpty"
 import {
   cloneArr,
   contains,
@@ -10,7 +11,6 @@ import {
   find,
   flatten,
   has,
-  isEmpty,
   map
 } from "@chevrotain/utils"
 import {

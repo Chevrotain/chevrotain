@@ -1,9 +1,9 @@
+import isEmpty from "lodash/isEmpty"
 import {
   compact,
   contains,
   forEach,
   isArray,
-  isEmpty,
   isFunction,
   isUndefined,
   keys,
