@@ -1,10 +1,9 @@
 import compact from "lodash/compact"
+import drop from "lodash/isEmpty"
 import {
   last,
   forEach,
   isString,
-  drop,
-  dropRight,
   filter,
   reject,
   has,
@@ -50,20 +49,6 @@ describe("The Utils functions namespace", () => {
     expect(isString("bamba")).to.be.true
     expect(isString(66)).to.be.false
     expect(isString(null)).to.be.false
-  })
-
-  it("exports a drop utility", () => {
-    expect(drop([])).to.deep.equal([])
-    expect(drop([1, 2, 3])).to.deep.equal([2, 3])
-    expect(drop([1, 2, 3], 2)).to.deep.equal([3])
-    expect(drop([1, 2, 3], 3)).to.deep.equal([])
-  })
-
-  it("exports a dropRight utility", () => {
-    expect(dropRight([])).to.deep.equal([])
-    expect(dropRight([1, 2, 3])).to.deep.equal([1, 2])
-    expect(dropRight([1, 2, 3], 2)).to.deep.equal([1])
-    expect(dropRight([1, 2, 3], 3)).to.deep.equal([])
   })
 
   it("exports a filter utility", () => {

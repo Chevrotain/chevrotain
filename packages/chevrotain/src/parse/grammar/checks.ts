@@ -1,10 +1,10 @@
 import first from "lodash/first"
 import isEmpty from "lodash/isEmpty"
+import drop from "lodash/drop"
 import {
   cloneArr,
   contains,
   difference,
-  drop,
   findAll,
   flatMap,
   flatten,

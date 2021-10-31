@@ -97,14 +97,6 @@ export function isFunction(item: any): item is (...args: any[]) => any {
   return item instanceof Function
 }
 
-export function drop<T>(arr: T[], howMuch: number = 1): T[] {
-  return arr.slice(howMuch, arr.length)
-}
-
-export function dropRight<T>(arr: T[], howMuch: number = 1): T[] {
-  return arr.slice(0, arr.length - howMuch)
-}
-
 export function filter<T>(
   arr: T[],
   predicate: (value: T, index: number, array: T[]) => unknown

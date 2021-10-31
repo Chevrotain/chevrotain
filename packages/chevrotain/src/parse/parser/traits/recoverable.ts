@@ -4,15 +4,9 @@ import {
   IFirstAfterRepetition
 } from "../../grammar/interpreter"
 import isEmpty from "lodash/isEmpty"
-import {
-  cloneArr,
-  contains,
-  dropRight,
-  find,
-  flatten,
-  has,
-  map
-} from "@chevrotain/utils"
+import dropRight from "lodash/dropRight"
+
+import { cloneArr, contains, find, flatten, has, map } from "@chevrotain/utils"
 import {
   IParserConfig,
   IToken,
