@@ -1,7 +1,7 @@
 import some from "lodash/some"
 import every from "lodash/every"
 import has from "lodash/has"
-import { contains } from "@chevrotain/utils"
+import includes from "lodash/includes"
 import {
   AbstractProduction,
   Alternation,
@@ -51,7 +51,7 @@ export function isOptionalProd(
     return some((<Alternation>prod).definition, (subProd: IProduction) => {
       return isOptionalProd(subProd, alreadyVisited)
     })
-  } else if (prod instanceof NonTerminal && contains(alreadyVisited, prod)) {
+  } else if (prod instanceof NonTerminal && includes(alreadyVisited, prod)) {
     // avoiding stack overflow due to infinite recursion
     return false
   } else if (prod instanceof AbstractProduction) {

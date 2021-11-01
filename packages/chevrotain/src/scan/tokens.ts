@@ -6,7 +6,8 @@ import difference from "lodash/difference"
 import map from "lodash/map"
 import forEach from "lodash/forEach"
 import has from "lodash/has"
-import { cloneArr, contains } from "@chevrotain/utils"
+import includes from "lodash/includes"
+import clone from "lodash/clone"
 import { IToken, TokenType } from "@chevrotain/types"
 
 export function tokenStructuredMatcher(
@@ -53,7 +54,7 @@ export function augmentTokenTypes(tokenTypes: TokenType[]): void {
 }
 
 export function expandCategories(tokenTypes: TokenType[]): TokenType[] {
-  let result = cloneArr(tokenTypes)
+  let result = clone(tokenTypes)
 
   let categories = tokenTypes
   let searching = true
@@ -135,7 +136,7 @@ export function singleAssignCategoriesToksMap(
   forEach(nextNode.CATEGORIES, (nextCategory) => {
     const newPath = path.concat(nextNode)
     // avoids infinite loops due to cyclic categories.
-    if (!contains(newPath, nextCategory)) {
+    if (!includes(newPath, nextCategory)) {
       singleAssignCategoriesToksMap(newPath, nextCategory)
     }
   })

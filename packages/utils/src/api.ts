@@ -1,57 +1,3 @@
-export function keys(obj: any): string[] {
-  if (obj === undefined || obj === null) {
-    return []
-  }
-  return Object.keys(obj)
-}
-
-export function values(obj: any): any[] {
-  const vals = []
-  const keys = Object.keys(obj)
-  for (let i = 0; i < keys.length; i++) {
-    vals.push(obj[keys[i]])
-  }
-  return vals
-}
-
-export function contains<T>(arr: T[], item: T): boolean {
-  return arr.includes(item)
-}
-
-/**
- * shallow clone
- */
-export function cloneArr<T>(arr: T[]): T[] {
-  const newArr = []
-  for (let i = 0; i < arr.length; i++) {
-    newArr.push(arr[i])
-  }
-  return newArr
-}
-
-/**
- * shallow clone
- */
-export function cloneObj(obj: Object): any {
-  return Object.assign({}, obj)
-}
-
-/**
- * Merge obj2 into obj1.
- * Will overwrite existing properties with the same name
- */
-export function merge(obj1: any, obj2: any): any {
-  const result = cloneObj(obj1)
-  const keys2 = keys(obj2)
-  for (let i = 0; i < keys2.length; i++) {
-    const key = keys2[i]
-    const value = obj2[key]
-    result[key] = value
-  }
-
-  return result
-}
-
 export function PRINT_ERROR(msg: string) {
   /* istanbul ignore else - can't override global.console in node.js */
   if (console && console.error) {
@@ -116,14 +62,4 @@ function getCharacterFromCodePointAt(str: string, idx: number): string {
   return surrogatePairPattern.test(surrogatePairCandidate)
     ? surrogatePairCandidate
     : str[idx]
-}
-
-export function flatMap<U, R>(arr: U[], callback: (x: U) => R[]): R[] {
-  const result: R[] = []
-
-  for (const u of arr) {
-    result.push(...callback(u))
-  }
-
-  return result
 }

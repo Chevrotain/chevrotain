@@ -6,7 +6,7 @@ import forEach from "lodash/forEach"
 import keys from "lodash/keys"
 import isFunction from "lodash/isFunction"
 import isUndefined from "lodash/isUndefined"
-import { contains } from "@chevrotain/utils"
+import includes from "lodash/includes"
 import { defineNameProp } from "../../lang/lang_extensions"
 import { CstNode, ICstVisitor } from "@chevrotain/types"
 
@@ -157,8 +157,8 @@ export function validateRedundantMethods(
   for (const prop in visitorInstance) {
     if (
       isFunction((visitorInstance as any)[prop]) &&
-      !contains(VALID_PROP_NAMES, prop) &&
-      !contains(ruleNames, prop)
+      !includes(VALID_PROP_NAMES, prop) &&
+      !includes(ruleNames, prop)
     ) {
       errors.push({
         msg:

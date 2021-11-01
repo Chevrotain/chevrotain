@@ -21,7 +21,8 @@ import isRegExp from "lodash/isRegExp"
 import filter from "lodash/filter"
 import defaults from "lodash/defaults"
 import reduce from "lodash/reduce"
-import { contains, PRINT_ERROR } from "@chevrotain/utils"
+import includes from "lodash/includes"
+import { PRINT_ERROR } from "@chevrotain/utils"
 import {
   canMatchCharCode,
   failedOptimizationPrefixMsg,
@@ -131,7 +132,7 @@ export function analyzeTokenTypes(
             regExpSource.length === 2 &&
             regExpSource[0] === "\\" &&
             // not a meta character
-            !contains(
+            !includes(
               [
                 "d",
                 "D",
@@ -639,7 +640,7 @@ export function findDuplicatePatterns(
       (result, innerType) => {
         if (
           outerType.PATTERN.source === (innerType.PATTERN as RegExp).source &&
-          !contains(found, innerType) &&
+          !includes(found, innerType) &&
           innerType.PATTERN !== Lexer.NA
         ) {
           // this avoids duplicates in the result, each Token Type may only appear in one "set"
@@ -712,7 +713,7 @@ export function findModesThatDoNotExist(
 ): ILexerDefinitionError[] {
   const invalidModes = filter(tokenTypes, (clazz: any) => {
     return (
-      clazz.PUSH_MODE !== undefined && !contains(validModes, clazz.PUSH_MODE)
+      clazz.PUSH_MODE !== undefined && !includes(validModes, clazz.PUSH_MODE)
     )
   })
 

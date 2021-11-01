@@ -13,7 +13,9 @@ import isArray from "lodash/isArray"
 import every from "lodash/every"
 import forEach from "lodash/forEach"
 import find from "lodash/find"
-import { contains, PRINT_ERROR, PRINT_WARNING, values } from "@chevrotain/utils"
+import values from "lodash/values"
+import includes from "lodash/includes"
+import { PRINT_ERROR, PRINT_WARNING } from "@chevrotain/utils"
 import { ASTNode, getRegExpAst } from "./reg_exp_parser"
 import { charCodeToOptimizedIndex, minOptimizationVal } from "./lexer"
 
@@ -224,7 +226,7 @@ function handleIgnoreCase(
 function findCode(setNode: Set, targetCharCodes: number[]) {
   return find(setNode.value, (codeOrRange) => {
     if (typeof codeOrRange === "number") {
-      return contains(targetCharCodes, codeOrRange)
+      return includes(targetCharCodes, codeOrRange)
     } else {
       // range
       const range = <any>codeOrRange
@@ -280,7 +282,7 @@ class CharCodeFinder extends BaseRegExpVisitor {
   }
 
   visitCharacter(node: Character) {
-    if (contains(this.targetCharCodes, node.value)) {
+    if (includes(this.targetCharCodes, node.value)) {
       this.found = true
     }
   }
@@ -310,7 +312,7 @@ export function canMatchCharCode(
   } else {
     return (
       find(<any>pattern, (char) => {
-        return contains(charCodes, (<string>char).charCodeAt(0))
+        return includes(charCodes, (<string>char).charCodeAt(0))
       }) !== undefined
     )
   }

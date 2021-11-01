@@ -11,8 +11,9 @@ import groupBy from "lodash/groupBy"
 import reduce from "lodash/reduce"
 import pickBy from "lodash/pickBy"
 import values from "lodash/values"
-
-import { cloneArr, contains, flatMap } from "@chevrotain/utils"
+import includes from "lodash/includes"
+import flatMap from "lodash/flatMap"
+import clone from "lodash/clone"
 import {
   IParserAmbiguousAlternativesDefinitionError,
   IParserDuplicatesDefinitionError,
@@ -264,7 +265,7 @@ export function validateRuleIsOverridden(
   const errors = []
   let errMsg
 
-  if (!contains(definedRulesNames, ruleName)) {
+  if (!includes(definedRulesNames, ruleName)) {
     errMsg =
       `Invalid rule override, rule: ->${ruleName}<- cannot be overridden in the grammar: ->${className}<-` +
       `as it is not defined in any of the super grammars `
@@ -290,7 +291,7 @@ export function validateNoLeftRecursion(
     return []
   } else {
     const ruleName = topRule.name
-    const foundLeftRecursion = contains(<any>nextNonTerminals, topRule)
+    const foundLeftRecursion = includes(<any>nextNonTerminals, topRule)
     if (foundLeftRecursion) {
       errors.push({
         message: errMsgProvider.buildLeftRecursionError({
@@ -306,7 +307,7 @@ export function validateNoLeftRecursion(
     // other cyclic paths are ignored, we still need this difference to avoid infinite loops...
     const validNextSteps = difference(nextNonTerminals, path.concat([topRule]))
     const errorsFromNextSteps = flatMap(validNextSteps, (currRefRule) => {
-      const newPath = cloneArr(path)
+      const newPath = clone(path)
       newPath.push(currRefRule)
       return validateNoLeftRecursion(
         topRule,
@@ -647,55 +648,57 @@ export function checkPrefixAlternativesAmbiguities(
     [] as { idx: number; path: TokenType[] }[]
   )
 
-  const errors = flatMap(pathsAndIndices, (currPathAndIdx) => {
-    const alternativeGast = alternation.definition[currPathAndIdx.idx]
-    // ignore (skip) ambiguities with this alternative
-    if (alternativeGast.ignoreAmbiguities === true) {
-      return
-    }
-    const targetIdx = currPathAndIdx.idx
-    const targetPath = currPathAndIdx.path
-
-    const prefixAmbiguitiesPathsAndIndices = filter(
-      pathsAndIndices,
-      (searchPathAndIdx) => {
-        // prefix ambiguity can only be created from lower idx (higher priority) path
-        return (
-          // ignore (skip) ambiguities with this "other" alternative
-          alternation.definition[searchPathAndIdx.idx].ignoreAmbiguities !==
-            true &&
-          searchPathAndIdx.idx < targetIdx &&
-          // checking for strict prefix because identical lookaheads
-          // will be be detected using a different validation.
-          isStrictPrefixOfPath(searchPathAndIdx.path, targetPath)
-        )
+  const errors = compact(
+    flatMap(pathsAndIndices, (currPathAndIdx) => {
+      const alternativeGast = alternation.definition[currPathAndIdx.idx]
+      // ignore (skip) ambiguities with this alternative
+      if (alternativeGast.ignoreAmbiguities === true) {
+        return
       }
-    )
+      const targetIdx = currPathAndIdx.idx
+      const targetPath = currPathAndIdx.path
 
-    const currPathPrefixErrors = map(
-      prefixAmbiguitiesPathsAndIndices,
-      (currAmbPathAndIdx): IParserAmbiguousAlternativesDefinitionError => {
-        const ambgIndices = [currAmbPathAndIdx.idx + 1, targetIdx + 1]
-        const occurrence = alternation.idx === 0 ? "" : alternation.idx
-
-        const message = errMsgProvider.buildAlternationPrefixAmbiguityError({
-          topLevelRule: rule,
-          alternation: alternation,
-          ambiguityIndices: ambgIndices,
-          prefixPath: currAmbPathAndIdx.path
-        })
-        return {
-          message: message,
-          type: ParserDefinitionErrorType.AMBIGUOUS_PREFIX_ALTS,
-          ruleName: rule.name,
-          occurrence: occurrence,
-          alternatives: ambgIndices
+      const prefixAmbiguitiesPathsAndIndices = filter(
+        pathsAndIndices,
+        (searchPathAndIdx) => {
+          // prefix ambiguity can only be created from lower idx (higher priority) path
+          return (
+            // ignore (skip) ambiguities with this "other" alternative
+            alternation.definition[searchPathAndIdx.idx].ignoreAmbiguities !==
+              true &&
+            searchPathAndIdx.idx < targetIdx &&
+            // checking for strict prefix because identical lookaheads
+            // will be be detected using a different validation.
+            isStrictPrefixOfPath(searchPathAndIdx.path, targetPath)
+          )
         }
-      }
-    )
+      )
 
-    return currPathPrefixErrors
-  })
+      const currPathPrefixErrors = map(
+        prefixAmbiguitiesPathsAndIndices,
+        (currAmbPathAndIdx): IParserAmbiguousAlternativesDefinitionError => {
+          const ambgIndices = [currAmbPathAndIdx.idx + 1, targetIdx + 1]
+          const occurrence = alternation.idx === 0 ? "" : alternation.idx
+
+          const message = errMsgProvider.buildAlternationPrefixAmbiguityError({
+            topLevelRule: rule,
+            alternation: alternation,
+            ambiguityIndices: ambgIndices,
+            prefixPath: currAmbPathAndIdx.path
+          })
+          return {
+            message: message,
+            type: ParserDefinitionErrorType.AMBIGUOUS_PREFIX_ALTS,
+            ruleName: rule.name,
+            occurrence: occurrence,
+            alternatives: ambgIndices
+          }
+        }
+      )
+
+      return currPathPrefixErrors
+    })
+  )
 
   return errors
 }
@@ -711,7 +714,7 @@ function checkTerminalAndNoneTerminalsNameSpace(
 
   forEach(topLevels, (currRule) => {
     const currRuleName = currRule.name
-    if (contains(tokenNames, currRuleName)) {
+    if (includes(tokenNames, currRuleName)) {
       const errMsg = errMsgProvider.buildNamespaceConflictError(currRule)
 
       errors.push({

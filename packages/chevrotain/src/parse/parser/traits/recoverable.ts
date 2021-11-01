@@ -9,7 +9,8 @@ import flatten from "lodash/flatten"
 import map from "lodash/map"
 import find from "lodash/find"
 import has from "lodash/has"
-import { cloneArr, contains } from "@chevrotain/utils"
+import includes from "lodash/includes"
+import clone from "lodash/clone"
 import {
   IParserConfig,
   IToken,
@@ -266,7 +267,7 @@ export class Recoverable {
   ): boolean {
     const followKey = this.getCurrFollowKey()
     const currentRuleReSyncSet = this.getFollowSetFromFollowKey(followKey)
-    return contains(currentRuleReSyncSet, tokenTypeIdx)
+    return includes(currentRuleReSyncSet, tokenTypeIdx)
   }
 
   findReSyncTokenType(this: MixedInParser): TokenType {
@@ -276,7 +277,7 @@ export class Recoverable {
     let k = 2
     while (true) {
       const nextTokenType: any = nextToken.tokenType
-      if (contains(allPossibleReSyncTokTypes, nextTokenType)) {
+      if (includes(allPossibleReSyncTokTypes, nextTokenType)) {
         return nextTokenType
       }
       nextToken = this.LA(k)
@@ -381,7 +382,7 @@ export class Recoverable {
     tokIdxInRule: number
   ): ITokenGrammarPath {
     const pathRuleStack: string[] = this.getHumanReadableRuleStack()
-    const pathOccurrenceStack: number[] = cloneArr(this.RULE_OCCURRENCE_STACK)
+    const pathOccurrenceStack: number[] = clone(this.RULE_OCCURRENCE_STACK)
     const grammarPath: any = {
       ruleStack: pathRuleStack,
       occurrenceStack: pathOccurrenceStack,

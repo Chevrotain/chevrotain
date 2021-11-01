@@ -1,4 +1,4 @@
-import { contains } from "@chevrotain/utils"
+import includes from "lodash/includes"
 import {
   IToken,
   IRecognitionException,
@@ -22,7 +22,7 @@ Object.freeze(RECOGNITION_EXCEPTION_NAMES)
 // hacks to bypass no support for custom Errors in javascript/typescript
 export function isRecognitionException(error: Error) {
   // can't do instanceof on hacked custom js exceptions
-  return contains(RECOGNITION_EXCEPTION_NAMES, error.name)
+  return includes(RECOGNITION_EXCEPTION_NAMES, error.name)
 }
 
 abstract class RecognitionException

@@ -45,7 +45,7 @@ import {
   SwitchTok
 } from "./Switchcase_recovery_tokens"
 import assign from "lodash/assign"
-import { contains } from "@chevrotain/utils"
+import includes from "lodash/includes"
 import { IToken, TokenType } from "@chevrotain/types"
 
 export interface RetType {
@@ -90,7 +90,7 @@ export class SwitchCaseRecoveryParser extends EmbeddedActionsParser {
   // DOCS: overriding this method allows us to customize the logic for which tokens may not be automatically inserted
   // during error recovery.
   public canTokenTypeBeInsertedInRecovery(tokType: TokenType) {
-    return !contains(
+    return !includes(
       this.tokTypesThatCannotBeInsertedInRecovery,
       tokType as unknown
     )

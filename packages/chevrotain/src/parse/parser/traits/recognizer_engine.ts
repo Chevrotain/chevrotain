@@ -13,6 +13,7 @@ import {
   ParserMethod,
   SubruleMethodOpts,
   TokenType,
+  TokenTypeDictionary,
   TokenVocabulary
 } from "@chevrotain/types"
 import isEmpty from "lodash/isEmpty"
@@ -24,7 +25,7 @@ import isObject from "lodash/isObject"
 import has from "lodash/has"
 import values from "lodash/values"
 import reduce from "lodash/reduce"
-import { cloneArr, cloneObj } from "@chevrotain/utils"
+import clone from "lodash/clone"
 import {
   AT_LEAST_ONE_IDX,
   AT_LEAST_ONE_SEP_IDX,
@@ -152,7 +153,7 @@ export class RecognizerEngine {
         {} as { [tokenName: string]: TokenType }
       )
     } else if (isObject(tokenVocabulary)) {
-      this.tokensMap = cloneObj(tokenVocabulary)
+      this.tokensMap = clone(tokenVocabulary as TokenTypeDictionary)
     } else {
       throw new Error(
         "<tokensDictionary> argument must be An Array of Token constructors," +
@@ -810,7 +811,7 @@ export class RecognizerEngine {
   saveRecogState(this: MixedInParser): IParserState {
     // errors is a getter which will clone the errors array
     const savedErrors = this.errors
-    const savedRuleStack = cloneArr(this.RULE_STACK)
+    const savedRuleStack = clone(this.RULE_STACK)
     return {
       errors: savedErrors,
       lexerState: this.exportLexerState(),

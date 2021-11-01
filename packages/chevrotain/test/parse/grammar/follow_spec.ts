@@ -14,7 +14,7 @@ import {
 } from "../../../src/parse/grammar/follow"
 import { setEquality } from "../../utils/matchers"
 import { Rule, Terminal } from "../../../src/parse/grammar/gast/gast_public"
-import { keys } from "@chevrotain/utils"
+import keys from "lodash/keys"
 import { expect } from "chai"
 
 describe("The Grammar Ast Follows model", () => {
