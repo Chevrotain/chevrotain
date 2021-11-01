@@ -18,7 +18,8 @@ import peek from "lodash/last"
 import isArray from "lodash/isArray"
 import some from "lodash/some"
 import forEach from "lodash/forEach"
-import { has, isFunction } from "@chevrotain/utils"
+import isFunction from "lodash/isFunction"
+import has from "lodash/has"
 import { MixedInParser } from "./parser_traits"
 import {
   Alternation,

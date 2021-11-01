@@ -11,16 +11,16 @@ import difference from "lodash/difference"
 import indexOf from "lodash/indexOf"
 import map from "lodash/map"
 import forEach from "lodash/forEach"
+import isString from "lodash/isString"
+import isFunction from "lodash/isFunction"
+import isUndefined from "lodash/isUndefined"
 import {
   contains,
   defaults,
   filter,
   find,
   has,
-  isFunction,
   isRegExp,
-  isString,
-  isUndefined,
   keys,
   PRINT_ERROR,
   reduce

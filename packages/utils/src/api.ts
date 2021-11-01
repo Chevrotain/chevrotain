@@ -14,18 +14,6 @@ export function values(obj: any): any[] {
   return vals
 }
 
-export function isString(item: any): item is string {
-  return typeof item === "string"
-}
-
-export function isUndefined(item: any): boolean {
-  return item === undefined
-}
-
-export function isFunction(item: any): item is (...args: any[]) => any {
-  return item instanceof Function
-}
-
 export function filter<T>(
   arr: T[],
   predicate: (value: T, index: number, array: T[]) => unknown

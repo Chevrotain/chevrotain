@@ -1,5 +1,6 @@
 import compact from "lodash/compact"
-import { isFunction, isUndefined } from "@chevrotain/utils"
+import isFunction from "lodash/isFunction"
+import isUndefined from "lodash/isUndefined"
 import { IToken, TokenType } from "@chevrotain/types"
 
 export class ParseTree {

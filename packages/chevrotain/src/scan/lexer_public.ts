@@ -18,13 +18,13 @@ import last from "lodash/last"
 import reject from "lodash/reject"
 import map from "lodash/map"
 import forEach from "lodash/forEach"
+import keys from "lodash/keys"
+import isUndefined from "lodash/isUndefined"
 import {
   assign,
   cloneArr,
   cloneObj,
   IDENTITY,
-  isUndefined,
-  keys,
   PRINT_WARNING,
   reduce,
   timer,

@@ -5,7 +5,9 @@ import {
   setNodeLocationOnlyOffset
 } from "../../cst/cst"
 import noop from "lodash/noop"
-import { has, isUndefined, keys } from "@chevrotain/utils"
+import has from "lodash/has"
+import keys from "lodash/keys"
+import isUndefined from "lodash/isUndefined"
 import {
   createBaseSemanticVisitorConstructor,
   createBaseVisitorConstructorWithDefaults
