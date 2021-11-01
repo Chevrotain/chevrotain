@@ -127,17 +127,6 @@ export function find<T>(
   return undefined
 }
 
-export function findAll<T>(arr: T[], predicate: (item: T) => boolean): T[] {
-  const found = []
-  for (let i = 0; i < arr.length; i++) {
-    const item = arr[i]
-    if (predicate.call(null, item)) {
-      found.push(item)
-    }
-  }
-  return found
-}
-
 export function reduce<T, A>(
   arrOrObj: Array<T>,
   iterator: (result: A, item: T, idx: number) => A,
@@ -163,26 +152,6 @@ export function reduce<T, A>(
     accumulator = iterator(accumulator, vals[i], isArr ? i : objKeys[i])
   }
   return accumulator
-}
-
-export function uniq<T>(
-  arr: T[],
-  identity: (item: T) => any = (item) => item
-): T[] {
-  const identities: T[] = []
-  return reduce(
-    arr,
-    (result, currItem) => {
-      const currIdentity = identity(currItem)
-      if (contains(identities, currIdentity)) {
-        return result
-      } else {
-        identities.push(currIdentity)
-        return result.concat(currItem)
-      }
-    },
-    [] as T[]
-  )
 }
 
 export function partial(func: Function, ...restArgs: any[]): Function {

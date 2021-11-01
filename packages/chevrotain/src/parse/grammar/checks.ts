@@ -2,12 +2,13 @@ import first from "lodash/first"
 import isEmpty from "lodash/isEmpty"
 import drop from "lodash/drop"
 import flatten from "lodash/flatten"
+import filter from "lodash/filter"
 import reject from "lodash/reject"
 import difference from "lodash/difference"
+
 import {
   cloneArr,
   contains,
-  findAll,
   flatMap,
   forEach,
   groupBy,
@@ -659,7 +660,7 @@ export function checkPrefixAlternativesAmbiguities(
     const targetIdx = currPathAndIdx.idx
     const targetPath = currPathAndIdx.path
 
-    const prefixAmbiguitiesPathsAndIndices = findAll(
+    const prefixAmbiguitiesPathsAndIndices = filter(
       pathsAndIndices,
       (searchPathAndIdx) => {
         // prefix ambiguity can only be created from lower idx (higher priority) path

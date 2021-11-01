@@ -19,13 +19,13 @@ import isEmpty from "lodash/isEmpty"
 import isArray from "lodash/isArray"
 import flatten from "lodash/flatten"
 import every from "lodash/every"
+import uniq from "lodash/uniq"
 import {
   cloneArr,
   cloneObj,
   has,
   isObject,
   reduce,
-  uniq,
   values
 } from "@chevrotain/utils"
 import {
