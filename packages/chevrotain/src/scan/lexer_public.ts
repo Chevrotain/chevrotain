@@ -20,11 +20,12 @@ import map from "lodash/map"
 import forEach from "lodash/forEach"
 import keys from "lodash/keys"
 import isUndefined from "lodash/isUndefined"
+import identity from "lodash/identity"
+
 import {
   assign,
   cloneArr,
   cloneObj,
-  IDENTITY,
   PRINT_WARNING,
   reduce,
   timer,
@@ -306,7 +307,7 @@ export class Lexer {
         // These implementations should be in-lined by the JavaScript engine
         // to provide optimal performance in each scenario.
         if (SUPPORT_STICKY) {
-          this.chopInput = <any>IDENTITY
+          this.chopInput = <any>identity
           this.match = this.matchWithTest
         } else {
           this.updateLastIndex = noop
@@ -318,7 +319,7 @@ export class Lexer {
         }
 
         if (this.trackStartLines === false) {
-          this.computeNewColumn = IDENTITY
+          this.computeNewColumn = identity
         }
 
         if (this.trackEndLines === false) {

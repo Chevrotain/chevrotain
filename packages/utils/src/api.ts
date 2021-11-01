@@ -14,28 +14,6 @@ export function values(obj: any): any[] {
   return vals
 }
 
-export function filter<T>(
-  arr: T[],
-  predicate: (value: T, index: number, array: T[]) => unknown
-): T[] {
-  return arr.filter(predicate)
-}
-
-export function pick(obj: Object, predicate: (item: any) => boolean) {
-  const keys = Object.keys(obj)
-  const result: any = {}
-
-  for (let i = 0; i < keys.length; i++) {
-    const currKey = keys[i]
-    const currItem = (obj as any)[currKey]
-    if (predicate(currItem)) {
-      result[currKey] = currItem
-    }
-  }
-
-  return result
-}
-
 export function contains<T>(arr: T[], item: T): boolean {
   return arr.includes(item)
 }
@@ -56,19 +34,6 @@ export function cloneArr<T>(arr: T[]): T[] {
  */
 export function cloneObj(obj: Object): any {
   return Object.assign({}, obj)
-}
-
-export function find<T>(
-  arr: T[],
-  predicate: (item: T) => boolean
-): T | undefined {
-  for (let i = 0; i < arr.length; i++) {
-    const item = arr[i]
-    if (predicate.call(null, item)) {
-      return item
-    }
-  }
-  return undefined
 }
 
 export function reduce<T, A>(
@@ -98,29 +63,9 @@ export function reduce<T, A>(
   return accumulator
 }
 
-export function isRegExp(obj: any): obj is RegExp {
-  return obj instanceof RegExp
-}
-
-export function isObject(obj: any): obj is Object {
-  return obj instanceof Object
-}
-
 export function sortBy<T>(arr: T[], orderFunc: (item: T) => number): T[] {
   const result = cloneArr(arr)
   result.sort((a, b) => orderFunc(a) - orderFunc(b))
-  return result
-}
-
-export function zipObject(keys: any[], values: any[]): Object {
-  if (keys.length !== values.length) {
-    throw Error("can't zipObject with different number of keys and values!")
-  }
-
-  const result: Record<string, any> = {}
-  for (let i = 0; i < keys.length; i++) {
-    result[keys[i]] = values[i]
-  }
   return result
 }
 
@@ -147,10 +92,6 @@ export function merge(obj1: any, obj2: any): any {
   }
 
   return result
-}
-
-export function IDENTITY<T>(item: T): T {
-  return item
 }
 
 export function PRINT_ERROR(msg: string) {

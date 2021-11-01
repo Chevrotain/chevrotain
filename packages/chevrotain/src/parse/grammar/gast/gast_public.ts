@@ -1,7 +1,9 @@
 import map from "lodash/map"
 import forEach from "lodash/forEach"
 import isString from "lodash/isString"
-import { assign, isRegExp, pick } from "@chevrotain/utils"
+import isRegExp from "lodash/isRegExp"
+import pickBy from "lodash/pickBy"
+import { assign } from "@chevrotain/utils"
 import { tokenLabel } from "../../../scan/tokens_public"
 import {
   IGASTVisitor,
@@ -49,7 +51,7 @@ export class NonTerminal
     super([])
     assign(
       this,
-      pick(options, (v) => v !== undefined)
+      pickBy(options, (v) => v !== undefined)
     )
   }
 
@@ -82,7 +84,7 @@ export class Rule extends AbstractProduction {
     super(options.definition)
     assign(
       this,
-      pick(options, (v) => v !== undefined)
+      pickBy(options, (v) => v !== undefined)
     )
   }
 }
@@ -97,7 +99,7 @@ export class Alternative extends AbstractProduction {
     super(options.definition)
     assign(
       this,
-      pick(options, (v) => v !== undefined)
+      pickBy(options, (v) => v !== undefined)
     )
   }
 }
@@ -117,7 +119,7 @@ export class Option
     super(options.definition)
     assign(
       this,
-      pick(options, (v) => v !== undefined)
+      pickBy(options, (v) => v !== undefined)
     )
   }
 }
@@ -137,7 +139,7 @@ export class RepetitionMandatory
     super(options.definition)
     assign(
       this,
-      pick(options, (v) => v !== undefined)
+      pickBy(options, (v) => v !== undefined)
     )
   }
 }
@@ -158,7 +160,7 @@ export class RepetitionMandatoryWithSeparator
     super(options.definition)
     assign(
       this,
-      pick(options, (v) => v !== undefined)
+      pickBy(options, (v) => v !== undefined)
     )
   }
 }
@@ -179,7 +181,7 @@ export class Repetition
     super(options.definition)
     assign(
       this,
-      pick(options, (v) => v !== undefined)
+      pickBy(options, (v) => v !== undefined)
     )
   }
 }
@@ -200,7 +202,7 @@ export class RepetitionWithSeparator
     super(options.definition)
     assign(
       this,
-      pick(options, (v) => v !== undefined)
+      pickBy(options, (v) => v !== undefined)
     )
   }
 }
@@ -231,7 +233,7 @@ export class Alternation
     super(options.definition)
     assign(
       this,
-      pick(options, (v) => v !== undefined)
+      pickBy(options, (v) => v !== undefined)
     )
   }
 }
@@ -248,7 +250,7 @@ export class Terminal implements IProductionWithOccurrence {
   }) {
     assign(
       this,
-      pick(options, (v) => v !== undefined)
+      pickBy(options, (v) => v !== undefined)
     )
   }
 

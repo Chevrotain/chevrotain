@@ -8,14 +8,8 @@ import difference from "lodash/difference"
 import map from "lodash/map"
 import forEach from "lodash/forEach"
 import groupBy from "lodash/groupBy"
-import {
-  cloneArr,
-  contains,
-  flatMap,
-  pick,
-  reduce,
-  values
-} from "@chevrotain/utils"
+import pickBy from "lodash/pickBy"
+import { cloneArr, contains, flatMap, reduce, values } from "@chevrotain/utils"
 import {
   IParserAmbiguousAlternativesDefinitionError,
   IParserDuplicatesDefinitionError,
@@ -139,7 +133,7 @@ function validateDuplicateProductions(
     identifyProductionForDuplicates
   )
 
-  const duplicates: any = pick(productionGroups, (currGroup) => {
+  const duplicates: any = pickBy(productionGroups, (currGroup) => {
     return currGroup.length > 1
   })
 

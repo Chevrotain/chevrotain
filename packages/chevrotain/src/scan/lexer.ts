@@ -18,13 +18,8 @@ import find from "lodash/find"
 import has from "lodash/has"
 import keys from "lodash/keys"
 import isRegExp from "lodash/isRegExp"
-import {
-  contains,
-  defaults,
-  filter,
-  PRINT_ERROR,
-  reduce
-} from "@chevrotain/utils"
+import filter from "lodash/filter"
+import { contains, defaults, PRINT_ERROR, reduce } from "@chevrotain/utils"
 import {
   canMatchCharCode,
   failedOptimizationPrefixMsg,
