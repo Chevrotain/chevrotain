@@ -45,21 +45,3 @@ export function toFastProperties(toBecomeFast: any) {
   // tslint:disable-next-line
   eval(toBecomeFast)
 }
-
-export function upperFirst(str: string): string {
-  if (!str) {
-    return str
-  }
-
-  const firstChar = getCharacterFromCodePointAt(str, 0)
-  return firstChar.toUpperCase() + str.substring(firstChar.length)
-}
-
-const surrogatePairPattern = /[\uD800-\uDBFF][\uDC00-\uDFFF]/
-
-function getCharacterFromCodePointAt(str: string, idx: number): string {
-  const surrogatePairCandidate = str.substring(idx, idx + 1)
-  return surrogatePairPattern.test(surrogatePairCandidate)
-    ? surrogatePairCandidate
-    : str[idx]
-}
