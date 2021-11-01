@@ -154,25 +154,12 @@ export function reduce<T, A>(
   return accumulator
 }
 
-export function partial(func: Function, ...restArgs: any[]): Function {
-  return func.bind(null, ...restArgs)
-}
-
 export function isRegExp(obj: any): obj is RegExp {
   return obj instanceof RegExp
 }
 
 export function isObject(obj: any): obj is Object {
   return obj instanceof Object
-}
-
-export function indexOf<T>(arr: T[], value: T): number {
-  for (let i = 0; i < arr.length; i++) {
-    if (arr[i] === value) {
-      return i
-    }
-  }
-  return -1
 }
 
 export function sortBy<T>(arr: T[], orderFunc: (item: T) => number): T[] {

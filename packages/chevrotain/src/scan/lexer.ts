@@ -8,6 +8,7 @@ import values from "lodash/values"
 import flatten from "lodash/flatten"
 import reject from "lodash/reject"
 import difference from "lodash/difference"
+import indexOf from "lodash/indexOf"
 import {
   contains,
   defaults,
@@ -15,7 +16,6 @@ import {
   find,
   forEach,
   has,
-  indexOf,
   isFunction,
   isRegExp,
   isString,
