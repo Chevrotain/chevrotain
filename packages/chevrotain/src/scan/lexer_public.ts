@@ -21,13 +21,12 @@ import forEach from "lodash/forEach"
 import keys from "lodash/keys"
 import isUndefined from "lodash/isUndefined"
 import identity from "lodash/identity"
-
+import assign from "lodash/assign"
+import reduce from "lodash/reduce"
 import {
-  assign,
   cloneArr,
   cloneObj,
   PRINT_WARNING,
-  reduce,
   timer,
   toFastProperties
 } from "@chevrotain/utils"

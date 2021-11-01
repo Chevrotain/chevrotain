@@ -36,48 +36,6 @@ export function cloneObj(obj: Object): any {
   return Object.assign({}, obj)
 }
 
-export function reduce<T, A>(
-  arrOrObj: Array<T>,
-  iterator: (result: A, item: T, idx: number) => A,
-  initial: A
-): A
-export function reduce<T, A>(
-  arrOrObj: Record<string, T>,
-  iterator: (result: A, item: T, idx: string) => A,
-  initial: A
-): A
-export function reduce<T, A>(
-  arrOrObj: Array<T> | Object,
-  iterator: (result: A, item: T, idx: any) => A,
-  initial: A
-): A {
-  const isArr = Array.isArray(arrOrObj)
-
-  const vals: T[] = isArr ? <Array<T>>arrOrObj : values(arrOrObj)
-  const objKeys = isArr ? [] : keys(arrOrObj)
-
-  let accumulator = initial
-  for (let i = 0; i < vals.length; i++) {
-    accumulator = iterator(accumulator, vals[i], isArr ? i : objKeys[i])
-  }
-  return accumulator
-}
-
-export function sortBy<T>(arr: T[], orderFunc: (item: T) => number): T[] {
-  const result = cloneArr(arr)
-  result.sort((a, b) => orderFunc(a) - orderFunc(b))
-  return result
-}
-
-/**
- * mutates! (and returns) target
- */
-export const assign = Object.assign
-
-export function defaults<S, T>(a: S, b: T): S & T {
-  return Object.assign(b, a)
-}
-
 /**
  * Merge obj2 into obj1.
  * Will overwrite existing properties with the same name

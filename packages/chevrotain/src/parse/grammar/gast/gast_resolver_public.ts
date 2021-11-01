@@ -1,6 +1,6 @@
 import { Rule } from "./gast_public"
 import forEach from "lodash/forEach"
-import { defaults } from "@chevrotain/utils"
+import defaults from "lodash/defaults"
 import { resolveGrammar as orgResolveGrammar } from "../resolver"
 import { validateGrammar as orgValidateGrammar } from "../checks"
 import {

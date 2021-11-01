@@ -23,7 +23,8 @@ import uniq from "lodash/uniq"
 import isObject from "lodash/isObject"
 import has from "lodash/has"
 import values from "lodash/values"
-import { cloneArr, cloneObj, reduce } from "@chevrotain/utils"
+import reduce from "lodash/reduce"
+import { cloneArr, cloneObj } from "@chevrotain/utils"
 import {
   AT_LEAST_ONE_IDX,
   AT_LEAST_ONE_SEP_IDX,

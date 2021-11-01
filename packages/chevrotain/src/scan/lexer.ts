@@ -19,7 +19,9 @@ import has from "lodash/has"
 import keys from "lodash/keys"
 import isRegExp from "lodash/isRegExp"
 import filter from "lodash/filter"
-import { contains, defaults, PRINT_ERROR, reduce } from "@chevrotain/utils"
+import defaults from "lodash/defaults"
+import reduce from "lodash/reduce"
+import { contains, PRINT_ERROR } from "@chevrotain/utils"
 import {
   canMatchCharCode,
   failedOptimizationPrefixMsg,

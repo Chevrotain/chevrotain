@@ -44,7 +44,8 @@ import {
   StringTok,
   SwitchTok
 } from "./Switchcase_recovery_tokens"
-import { assign, contains } from "@chevrotain/utils"
+import assign from "lodash/assign"
+import { contains } from "@chevrotain/utils"
 import { IToken, TokenType } from "@chevrotain/types"
 
 export interface RetType {

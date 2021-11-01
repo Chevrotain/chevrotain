@@ -3,7 +3,7 @@ import forEach from "lodash/forEach"
 import isString from "lodash/isString"
 import isRegExp from "lodash/isRegExp"
 import pickBy from "lodash/pickBy"
-import { assign } from "@chevrotain/utils"
+import assign from "lodash/assign"
 import { tokenLabel } from "../../../scan/tokens_public"
 import {
   IGASTVisitor,

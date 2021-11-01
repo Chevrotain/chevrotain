@@ -1,7 +1,7 @@
 import { hasTokenLabel, tokenLabel } from "../scan/tokens_public"
 import first from "lodash/first"
 import map from "lodash/map"
-import { reduce } from "@chevrotain/utils"
+import reduce from "lodash/reduce"
 import {
   Alternation,
   NonTerminal,
