@@ -9,7 +9,8 @@ import {
 } from "../../../src/parse/parser/parser"
 import { MismatchedTokenException } from "../../../src/parse/exceptions_public"
 import flatten from "lodash/flatten"
-import { every, forEach, map } from "@chevrotain/utils"
+import every from "lodash/every"
+import { forEach, map } from "@chevrotain/utils"
 import { IOrAlt, IToken, TokenType } from "@chevrotain/types"
 import { MixedInParser } from "../../../src/parse/parser/traits/parser_traits"
 

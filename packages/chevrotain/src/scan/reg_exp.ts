@@ -10,9 +10,10 @@ import {
   VERSION
 } from "regexp-to-ast"
 import isArray from "lodash/isArray"
+import every from "lodash/every"
+
 import {
   contains,
-  every,
   find,
   forEach,
   PRINT_ERROR,

@@ -18,10 +18,10 @@ import {
 import isEmpty from "lodash/isEmpty"
 import isArray from "lodash/isArray"
 import flatten from "lodash/flatten"
+import every from "lodash/every"
 import {
   cloneArr,
   cloneObj,
-  every,
   has,
   isObject,
   reduce,

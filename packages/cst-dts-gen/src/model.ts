@@ -16,7 +16,8 @@ import {
 import map from "lodash/map"
 import flatten from "lodash/flatten"
 import values from "lodash/values"
-import { assign, groupBy, some } from "@chevrotain/utils"
+import some from "lodash/some"
+import { assign, groupBy } from "@chevrotain/utils"
 
 export function buildModel(
   productions: Record<string, Rule>

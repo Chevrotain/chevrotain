@@ -1,6 +1,7 @@
 import isEmpty from "lodash/isEmpty"
 import flatten from "lodash/flatten"
-import { map, reduce, every, forEach, has } from "@chevrotain/utils"
+import every from "lodash/every"
+import { map, reduce, forEach, has } from "@chevrotain/utils"
 import { possiblePathsFrom } from "./interpreter"
 import { RestWalker } from "./rest"
 import { Predicate, TokenMatcher, LookAheadSequence } from "../parser/parser"
