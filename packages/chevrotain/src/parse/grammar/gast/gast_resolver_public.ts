@@ -27,7 +27,7 @@ export function resolveGrammar(options: {
   forEach(options.rules, (rule) => {
     topRulesTable[rule.name] = rule
   })
-  return orgResolveGrammar(topRulesTable, options.errMsgProvider)
+  return orgResolveGrammar(topRulesTable, options.errMsgProvider!)
 }
 
 export function validateGrammar(options: {

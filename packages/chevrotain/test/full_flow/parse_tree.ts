@@ -8,11 +8,11 @@ export class ParseTree {
     return this.payload.image
   }
 
-  getLine(): number {
+  getLine(): number | undefined {
     return this.payload.startLine
   }
 
-  getColumn(): number {
+  getColumn(): number | undefined {
     return this.payload.startColumn
   }
 
@@ -30,7 +30,7 @@ export class ParseTree {
 export function PT(
   tokenOrTokenClass: TokenType | IToken,
   children: ParseTree[] = []
-): ParseTree {
+): ParseTree | null {
   const childrenCompact = compact(children)
 
   if ((<IToken>tokenOrTokenClass).image !== undefined) {

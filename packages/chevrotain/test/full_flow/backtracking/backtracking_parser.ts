@@ -91,7 +91,7 @@ export class BackTrackingParser extends EmbeddedActionsParser {
   })
 
   private parseStatement(): RET_TYPE {
-    let statementTypeFound: RET_TYPE = undefined
+    let statementTypeFound!: RET_TYPE
     this.OR([
       // both statements have the same prefix which may be of "infinite" length, this means there is no K for which
       // we can build an LL(K) parser that can distinguish the two alternatives as a negative example

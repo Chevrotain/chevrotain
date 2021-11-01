@@ -51,9 +51,8 @@ export class Recoverable {
     this.firstAfterRepMap = {}
     this.resyncFollows = {}
 
-    this.recoveryEnabled = has(config, "recoveryEnabled")
-      ? config.recoveryEnabled
-      : DEFAULT_PARSER_CONFIG.recoveryEnabled
+    this.recoveryEnabled =
+      config.recoveryEnabled ?? DEFAULT_PARSER_CONFIG.recoveryEnabled
 
     // performance optimization, NOOP will be inlined which
     // effectively means that this optional feature does not exist
@@ -145,8 +144,8 @@ export class Recoverable {
 
   shouldInRepetitionRecoveryBeTried(
     this: MixedInParser,
-    expectTokAfterLastMatch: TokenType,
-    nextTokIdx: number,
+    expectTokAfterLastMatch: TokenType | undefined,
+    nextTokIdx: number | undefined,
     notStuck: boolean | undefined
   ): boolean {
     // Edge case of arriving from a MANY repetition which is stuck

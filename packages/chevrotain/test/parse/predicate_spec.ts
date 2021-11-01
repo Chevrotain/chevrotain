@@ -281,7 +281,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
         public topRule = this.RULE("topRule", (param?: boolean) => {
           return this.OR1([
             {
-              GATE: () => param,
+              GATE: () => !!param,
               ALT: () => this.CONSUME1(A).image
             },
             {
@@ -315,7 +315,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
         public topRule = this.RULE("topRule", (param?: boolean) => {
           let result = ""
           this.OPTION({
-            GATE: () => param,
+            GATE: () => !!param,
             DEF: () => {
               result += this.CONSUME1(B).image
             }
@@ -351,7 +351,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
         public topRule = this.RULE("topRule", (param?: boolean) => {
           let result = ""
           this.MANY({
-            GATE: () => param,
+            GATE: () => !!param,
             DEF: () => {
               result += this.CONSUME1(A).image
             }
@@ -394,7 +394,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
               times++
               return true
             } else {
-              return param
+              return !!param
             }
           }
 

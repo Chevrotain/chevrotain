@@ -19,7 +19,6 @@ import {
 import { createToken } from "../../../src/scan/tokens_public"
 import first from "lodash/first"
 import map from "lodash/map"
-import forEach from "lodash/forEach"
 import {
   Alternation,
   Alternative,
@@ -34,6 +33,7 @@ import { defaultGrammarValidatorErrorProvider } from "../../../src/parse/errors_
 import { IToken, TokenType } from "@chevrotain/types"
 import { expect } from "chai"
 import { createDeferredTokenBuilder } from "../../utils/builders"
+import omit from "lodash/omit"
 
 const getIdentTok = createDeferredTokenBuilder({
   name: "IdentTok",
@@ -138,11 +138,9 @@ describe("the grammar validations", () => {
       defaultGrammarValidatorErrorProvider,
       "bamba"
     )
-    expect(actualErrors.length).to.equal(4)
-
-    forEach(actualErrors, (err) => delete err.message)
-    expect(actualErrors).to.deep.include.members(expectedErrorsNoMsg)
-    expect(expectedErrorsNoMsg).to.deep.include.members(actualErrors)
+    expect(actualErrors.map((e) => omit(e, "message"))).to.deep.equal(
+      expectedErrorsNoMsg
+    )
   })
 
   it("does not allow duplicate grammar rule names", () => {

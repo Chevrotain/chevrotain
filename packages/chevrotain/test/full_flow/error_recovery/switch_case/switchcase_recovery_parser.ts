@@ -49,7 +49,7 @@ import includes from "lodash/includes"
 import { IToken, TokenType } from "@chevrotain/types"
 
 export interface RetType {
-  [caseValue: string]: number
+  [caseValue: string]: number | undefined
 }
 
 export class SwitchCaseRecoveryParser extends EmbeddedActionsParser {

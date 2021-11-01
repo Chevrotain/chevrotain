@@ -2051,7 +2051,7 @@ export interface IParserErrorMessageProvider {
     expectedPathsPerAlt: TokenType[][][]
     actual: IToken[]
     previous: IToken
-    customUserDescription: string
+    customUserDescription: string | undefined
     ruleName: string
   }): string
   /**
@@ -2074,7 +2074,7 @@ export interface IParserErrorMessageProvider {
     expectedIterationPaths: TokenType[][]
     actual: IToken[]
     previous: IToken
-    customUserDescription: string
+    customUserDescription: string | undefined
     ruleName: string
   }): string
 }

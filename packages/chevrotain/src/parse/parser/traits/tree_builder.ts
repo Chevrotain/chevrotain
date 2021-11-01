@@ -52,9 +52,8 @@ export class TreeBuilder {
     // outputCst is no longer exposed/defined in the pubic API
     this.outputCst = (config as any).outputCst
 
-    this.nodeLocationTracking = has(config, "nodeLocationTracking")
-      ? config.nodeLocationTracking
-      : DEFAULT_PARSER_CONFIG.nodeLocationTracking
+    this.nodeLocationTracking =
+      config.nodeLocationTracking ?? DEFAULT_PARSER_CONFIG.nodeLocationTracking
 
     if (!this.outputCst) {
       this.cstInvocationStateUpdate = noop
@@ -174,7 +173,7 @@ export class TreeBuilder {
 
   cstPostRuleFull(this: MixedInParser, ruleCstNode: CstNode): void {
     const prevToken = this.LA(0)
-    const loc = ruleCstNode.location
+    const loc = ruleCstNode.location!
 
     // If this condition is true it means we consumed at least one Token
     // In this CstNode.
@@ -193,7 +192,7 @@ export class TreeBuilder {
 
   cstPostRuleOnlyOffset(this: MixedInParser, ruleCstNode: CstNode): void {
     const prevToken = this.LA(0)
-    const loc = ruleCstNode.location
+    const loc = ruleCstNode.location!
 
     // If this condition is true it means we consumed at least one Token
     // In this CstNode.
@@ -214,7 +213,7 @@ export class TreeBuilder {
     const rootCst = this.CST_STACK[this.CST_STACK.length - 1]
     addTerminalToCst(rootCst, consumedToken, key)
     // This is only used when **both** error recovery and CST Output are enabled.
-    this.setNodeLocationFromToken(rootCst.location, <any>consumedToken)
+    this.setNodeLocationFromToken(rootCst.location!, <any>consumedToken)
   }
 
   cstPostNonTerminal(
@@ -225,7 +224,7 @@ export class TreeBuilder {
     const preCstNode = this.CST_STACK[this.CST_STACK.length - 1]
     addNoneTerminalToCst(preCstNode, ruleName, ruleCstResult)
     // This is only used when **both** error recovery and CST Output are enabled.
-    this.setNodeLocationFromNode(preCstNode.location, ruleCstResult.location)
+    this.setNodeLocationFromNode(preCstNode.location!, ruleCstResult.location!)
   }
 
   getBaseCstVisitorConstructor<IN = any, OUT = any>(

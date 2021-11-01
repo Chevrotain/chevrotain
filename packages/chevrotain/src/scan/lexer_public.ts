@@ -406,7 +406,7 @@ export class Lexer {
       imageLength,
       group,
       tokType,
-      newToken,
+      newToken!: IToken,
       errLength,
       droppedChar,
       msg,
@@ -651,12 +651,12 @@ export class Lexer {
         offset = offset + imageLength
 
         // TODO: with newlines the column may be assigned twice
-        column = this.computeNewColumn(column, imageLength)
+        column = this.computeNewColumn(column!, imageLength)
 
         if (trackLines === true && currConfig.canLineTerminator === true) {
           let numOfLTsInMatch = 0
           let foundTerminator
-          let lastLTEndOffset
+          let lastLTEndOffset: number | undefined
           lineTerminatorPattern.lastIndex = 0
           do {
             foundTerminator = lineTerminatorPattern.test(matchedImage)
@@ -667,12 +667,12 @@ export class Lexer {
           } while (foundTerminator === true)
 
           if (numOfLTsInMatch !== 0) {
-            line = line + numOfLTsInMatch
-            column = imageLength - lastLTEndOffset
+            line = line! + numOfLTsInMatch
+            column = imageLength - lastLTEndOffset!
             this.updateTokenEndLineColumnLocation(
-              newToken,
+              newToken!,
               group,
-              lastLTEndOffset,
+              lastLTEndOffset!,
               numOfLTsInMatch,
               line,
               column,
@@ -787,7 +787,7 @@ export class Lexer {
   // TODO: decrease this under 600 characters? inspect stripping comments option in TSC compiler
   private updateTokenEndLineColumnLocation(
     newToken: IToken,
-    group: string | false,
+    group: string | false | undefined,
     lastLTIdx: number,
     numOfLTsInMatch: number,
     line: number,

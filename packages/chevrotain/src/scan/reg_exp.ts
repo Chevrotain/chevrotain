@@ -241,7 +241,8 @@ function findCode(setNode: Set, targetCharCodes: number[]) {
 }
 
 function isWholeOptional(ast: any): boolean {
-  if ((ast as Atom).quantifier && (ast as Atom).quantifier.atLeast === 0) {
+  const quantifier = (ast as Atom).quantifier
+  if (quantifier && quantifier.atLeast === 0) {
     return true
   }
 

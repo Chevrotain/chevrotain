@@ -172,25 +172,25 @@ export class GastRecorder {
         delete (this as any)[`AT_LEAST_ONE_SEP${idx}`]
       }
 
-      delete this[`consume`]
-      delete this[`subrule`]
-      delete this[`option`]
-      delete this[`or`]
-      delete this[`many`]
-      delete this[`atLeastOne`]
+      delete (this as any)[`consume`]
+      delete (this as any)[`subrule`]
+      delete (this as any)[`option`]
+      delete (this as any)[`or`]
+      delete (this as any)[`many`]
+      delete (this as any)[`atLeastOne`]
 
-      delete this.ACTION
-      delete this.BACKTRACK
-      delete this.LA
+      delete (this as any).ACTION
+      delete (this as any).BACKTRACK
+      delete (this as any).LA
     })
   }
 
   // TODO: is there any way to use this method to check no
   //   Parser methods are called inside an ACTION?
   //   Maybe try/catch/finally on ACTIONS while disabling the recorders state changes?
+  // @ts-ignore
   ACTION_RECORD<T>(this: MixedInParser, impl: () => T): T {
     // NO-OP during recording
-    return
   }
 
   // Executing backtracking logic will break our recording logic assumptions
@@ -412,7 +412,7 @@ function recordOrProd(mainProdArg: any, occurrence: number): any {
   forEach(alts, (currAlt) => {
     const currAltFlat = new Alternative({ definition: [] })
     newOrProd.definition.push(currAltFlat)
-    if (has(currAlt, "IGNORE_AMBIGUITIES")) {
+    if (currAlt.IGNORE_AMBIGUITIES !== undefined) {
       currAltFlat.ignoreAmbiguities = currAlt.IGNORE_AMBIGUITIES
     }
     // **implicit** ignoreAmbiguities due to usage of gate

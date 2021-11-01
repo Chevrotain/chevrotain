@@ -954,7 +954,7 @@ function defineRecognizerSpecs(
 
       it("cannot be initialized with other parameters", () => {
         expect(() => {
-          return new EmbeddedActionsParser(null)
+          return new EmbeddedActionsParser(null as any)
         }).to.throw()
 
         expect(() => {

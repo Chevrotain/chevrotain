@@ -20,7 +20,7 @@ export function tokenStructuredMatcher(
   } else {
     return (
       tokConstructor.isParent === true &&
-      tokConstructor.categoryMatchesMap[instanceType] === true
+      tokConstructor.categoryMatchesMap![instanceType] === true
     )
   }
 }
@@ -49,7 +49,7 @@ export function augmentTokenTypes(tokenTypes: TokenType[]): void {
   assignCategoriesTokensProp(tokenTypesAndParents)
 
   forEach(tokenTypesAndParents, (tokType) => {
-    tokType.isParent = tokType.categoryMatches.length > 0
+    tokType.isParent = tokType.categoryMatches!.length > 0
   })
 }
 
@@ -90,7 +90,7 @@ export function assignTokenDefaultProps(tokenTypes: TokenType[]): void {
       // &&
       // !isUndefined(currTokType.CATEGORIES.PATTERN)
     ) {
-      currTokType.CATEGORIES = [currTokType.CATEGORIES]
+      currTokType.CATEGORIES = [currTokType.CATEGORIES as unknown as TokenType]
     }
 
     if (!hasCategoriesProperty(currTokType)) {
@@ -111,9 +111,9 @@ export function assignCategoriesTokensProp(tokenTypes: TokenType[]): void {
   forEach(tokenTypes, (currTokType) => {
     // avoid duplications
     currTokType.categoryMatches = []
-    forEach(currTokType.categoryMatchesMap, (val, key) => {
-      currTokType.categoryMatches.push(
-        tokenIdxToClass[key as unknown as number].tokenTypeIdx
+    forEach(currTokType.categoryMatchesMap!, (val, key) => {
+      currTokType.categoryMatches!.push(
+        tokenIdxToClass[key as unknown as number].tokenTypeIdx!
       )
     })
   })
@@ -130,10 +130,10 @@ export function singleAssignCategoriesToksMap(
   nextNode: TokenType
 ): void {
   forEach(path, (pathNode) => {
-    nextNode.categoryMatchesMap[pathNode.tokenTypeIdx] = true
+    nextNode.categoryMatchesMap![pathNode.tokenTypeIdx!] = true
   })
 
-  forEach(nextNode.CATEGORIES, (nextCategory) => {
+  forEach(nextNode.CATEGORIES!, (nextCategory) => {
     const newPath = path.concat(nextNode)
     // avoids infinite loops due to cyclic categories.
     if (!includes(newPath, nextCategory)) {

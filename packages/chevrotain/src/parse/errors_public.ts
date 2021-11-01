@@ -44,7 +44,7 @@ export const defaultParserErrorProvider: IParserErrorMessageProvider = {
   }): string {
     const errPrefix = "Expecting: "
     // TODO: issue: No Viable Alternative Error may have incomplete details. #502
-    const actualText = first(actual).image
+    const actualText = first(actual)!.image
     const errSuffix = "\nbut found: '" + actualText + "'"
 
     if (customUserDescription) {
@@ -82,7 +82,7 @@ export const defaultParserErrorProvider: IParserErrorMessageProvider = {
   }): string {
     const errPrefix = "Expecting: "
     // TODO: issue: No Viable Alternative Error may have incomplete details. #502
-    const actualText = first(actual).image
+    const actualText = first(actual)!.image
     const errSuffix = "\nbut found: '" + actualText + "'"
 
     if (customUserDescription) {
@@ -142,7 +142,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
       }
 
       const topLevelName = topLevelRule.name
-      const duplicateProd = first(duplicateProds)
+      const duplicateProd = first(duplicateProds)!
       const index = duplicateProd.idx
       const dslName = getProductionDslName(duplicateProd)
       const extraArgument = getExtraProductionArgument(duplicateProd)

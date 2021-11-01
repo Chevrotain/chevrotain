@@ -23,7 +23,7 @@ export function setNodeLocationOnlyOffset(
   // any farther updates as the Token vector is sorted.
   // We still have to check this this condition for every new possible location info
   // because with error recovery enabled we may encounter invalid tokens (NaN location props)
-  else if (currNodeLocation.endOffset < newLocationInfo.endOffset === true) {
+  else if (currNodeLocation.endOffset! < newLocationInfo.endOffset! === true) {
     currNodeLocation.endOffset = newLocationInfo.endOffset
   }
 }
@@ -55,7 +55,7 @@ export function setNodeLocationFull(
   // any farther updates as the Token vector is sorted.
   // We still have to check this this condition for every new possible location info
   // because with error recovery enabled we may encounter invalid tokens (NaN location props)
-  else if (currNodeLocation.endOffset < newLocationInfo.endOffset === true) {
+  else if (currNodeLocation.endOffset! < newLocationInfo.endOffset! === true) {
     currNodeLocation.endOffset = newLocationInfo.endOffset
     currNodeLocation.endColumn = newLocationInfo.endColumn
     currNodeLocation.endLine = newLocationInfo.endLine
