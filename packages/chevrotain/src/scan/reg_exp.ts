@@ -11,11 +11,10 @@ import {
 } from "regexp-to-ast"
 import isArray from "lodash/isArray"
 import every from "lodash/every"
-
+import forEach from "lodash/forEach"
 import {
   contains,
   find,
-  forEach,
   PRINT_ERROR,
   PRINT_WARNING,
   values

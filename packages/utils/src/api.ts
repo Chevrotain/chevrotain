@@ -14,32 +14,6 @@ export function values(obj: any): any[] {
   return vals
 }
 
-export function forEach<T>(
-  collection: T[],
-  iteratorCallback: (item: T, index: number) => void
-): void
-export function forEach<K extends string | number, T>(
-  collection: Record<K, T>,
-  iteratorCallback: (value: T, key: K) => void
-): void
-export function forEach(collection: any, iteratorCallback: Function): void {
-  /* istanbul ignore else */
-  if (Array.isArray(collection)) {
-    for (let i = 0; i < collection.length; i++) {
-      iteratorCallback(collection[i], i)
-    }
-  } else if (isObject(collection)) {
-    const colKeys = keys(collection)
-    for (let i = 0; i < colKeys.length; i++) {
-      const key = colKeys[i]
-      const value = collection[key]
-      iteratorCallback(value, key)
-    }
-  } else {
-    throw Error("non exhaustive match")
-  }
-}
-
 export function isString(item: any): item is string {
   return typeof item === "string"
 }
@@ -176,26 +150,6 @@ export const assign = Object.assign
 
 export function defaults<S, T>(a: S, b: T): S & T {
   return Object.assign(b, a)
-}
-
-export function groupBy<T>(
-  arr: T[],
-  groupKeyFunc: (item: T) => string
-): { [groupKey: string]: T[] } {
-  const result: { [groupKey: string]: T[] } = {}
-
-  forEach(arr, (item) => {
-    const currGroupKey = groupKeyFunc(item)
-    const currGroupArr = result[currGroupKey]
-
-    if (currGroupArr) {
-      currGroupArr.push(item)
-    } else {
-      result[currGroupKey] = [item]
-    }
-  })
-
-  return result
 }
 
 /**

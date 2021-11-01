@@ -6,12 +6,12 @@ import filter from "lodash/filter"
 import reject from "lodash/reject"
 import difference from "lodash/difference"
 import map from "lodash/map"
+import forEach from "lodash/forEach"
+import groupBy from "lodash/groupBy"
 import {
   cloneArr,
   contains,
   flatMap,
-  forEach,
-  groupBy,
   pick,
   reduce,
   values

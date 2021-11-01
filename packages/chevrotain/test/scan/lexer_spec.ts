@@ -1,6 +1,7 @@
 import last from "lodash/last"
 import map from "lodash/map"
-import { forEach, isRegExp, isString, keys } from "@chevrotain/utils"
+import forEach from "lodash/forEach"
+import { isRegExp, isString, keys } from "@chevrotain/utils"
 import { createToken } from "../../src/scan/tokens_public"
 import { Lexer, LexerDefinitionErrorType } from "../../src/scan/lexer_public"
 import {

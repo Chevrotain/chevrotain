@@ -10,12 +10,12 @@ import reject from "lodash/reject"
 import difference from "lodash/difference"
 import indexOf from "lodash/indexOf"
 import map from "lodash/map"
+import forEach from "lodash/forEach"
 import {
   contains,
   defaults,
   filter,
   find,
-  forEach,
   has,
   isFunction,
   isRegExp,

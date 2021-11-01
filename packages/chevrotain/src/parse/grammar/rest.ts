@@ -1,5 +1,5 @@
 import drop from "lodash/drop"
-import { forEach } from "@chevrotain/utils"
+import forEach from "lodash/forEach"
 import {
   AbstractProduction,
   Alternation,

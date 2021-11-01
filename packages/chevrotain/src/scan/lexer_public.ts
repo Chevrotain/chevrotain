@@ -17,11 +17,11 @@ import isArray from "lodash/isArray"
 import last from "lodash/last"
 import reject from "lodash/reject"
 import map from "lodash/map"
+import forEach from "lodash/forEach"
 import {
   assign,
   cloneArr,
   cloneObj,
-  forEach,
   IDENTITY,
   isUndefined,
   keys,
@@ -226,7 +226,7 @@ export class Lexer {
 
       const allModeNames = keys(actualDefinition.modes)
 
-      forEach<string, TokenType[]>(
+      forEach(
         actualDefinition.modes,
         (currModDef: TokenType[], currModName) => {
           this.TRACE_INIT(`Mode: <${currModName}> processing`, () => {

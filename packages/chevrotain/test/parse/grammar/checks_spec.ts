@@ -20,7 +20,7 @@ import {
 import { createToken } from "../../../src/scan/tokens_public"
 import first from "lodash/first"
 import map from "lodash/map"
-import { forEach } from "@chevrotain/utils"
+import forEach from "lodash/forEach"
 import {
   Alternation,
   Alternative,

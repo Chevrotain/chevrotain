@@ -5,7 +5,8 @@ import {
   buildSingleAlternativeLookaheadFunction,
   PROD_TYPE
 } from "../../grammar/lookahead"
-import { forEach, has } from "@chevrotain/utils"
+import forEach from "lodash/forEach"
+import { has } from "@chevrotain/utils"
 import {
   DEFAULT_PARSER_CONFIG,
   LookAheadSequence,

@@ -4,7 +4,8 @@ import isArray from "lodash/isArray"
 import flatten from "lodash/flatten"
 import difference from "lodash/difference"
 import map from "lodash/map"
-import { cloneArr, contains, forEach, has } from "@chevrotain/utils"
+import forEach from "lodash/forEach"
+import { cloneArr, contains, has } from "@chevrotain/utils"
 import { IToken, TokenType } from "@chevrotain/types"
 
 export function tokenStructuredMatcher(
@@ -109,7 +110,9 @@ export function assignCategoriesTokensProp(tokenTypes: TokenType[]): void {
     // avoid duplications
     currTokType.categoryMatches = []
     forEach(currTokType.categoryMatchesMap, (val, key) => {
-      currTokType.categoryMatches.push(tokenIdxToClass[key].tokenTypeIdx)
+      currTokType.categoryMatches.push(
+        tokenIdxToClass[key as unknown as number].tokenTypeIdx
+      )
     })
   })
 }
