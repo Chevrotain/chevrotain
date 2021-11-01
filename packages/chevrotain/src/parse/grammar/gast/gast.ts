@@ -1,6 +1,7 @@
 import some from "lodash/some"
 import every from "lodash/every"
-import { contains, has } from "@chevrotain/utils"
+import has from "lodash/has"
+import { contains } from "@chevrotain/utils"
 import {
   AbstractProduction,
   Alternation,

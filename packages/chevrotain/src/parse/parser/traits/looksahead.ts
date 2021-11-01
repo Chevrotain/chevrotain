@@ -6,7 +6,7 @@ import {
   PROD_TYPE
 } from "../../grammar/lookahead"
 import forEach from "lodash/forEach"
-import { has } from "@chevrotain/utils"
+import has from "lodash/has"
 import {
   DEFAULT_PARSER_CONFIG,
   LookAheadSequence,

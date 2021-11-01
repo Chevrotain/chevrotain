@@ -8,7 +8,8 @@ import {
   isRecognitionException,
   NoViableAltException
 } from "../../exceptions_public"
-import { cloneArr, has } from "@chevrotain/utils"
+import has from "lodash/has"
+import { cloneArr } from "@chevrotain/utils"
 import {
   getLookaheadPathsForOptionalProd,
   getLookaheadPathsForOr,

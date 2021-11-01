@@ -1,7 +1,9 @@
 import isEmpty from "lodash/isEmpty"
 import map from "lodash/map"
 import forEach from "lodash/forEach"
-import { cloneObj, has, values, toFastProperties } from "@chevrotain/utils"
+import values from "lodash/values"
+import has from "lodash/has"
+import { cloneObj, toFastProperties } from "@chevrotain/utils"
 import { computeAllProdsFollows } from "../grammar/follow"
 import { createTokenInstance, EOF } from "../../scan/tokens_public"
 import {

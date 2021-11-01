@@ -14,14 +14,14 @@ import forEach from "lodash/forEach"
 import isString from "lodash/isString"
 import isFunction from "lodash/isFunction"
 import isUndefined from "lodash/isUndefined"
+import find from "lodash/find"
+import has from "lodash/has"
+import keys from "lodash/keys"
+import isRegExp from "lodash/isRegExp"
 import {
   contains,
   defaults,
   filter,
-  find,
-  has,
-  isRegExp,
-  keys,
   PRINT_ERROR,
   reduce
 } from "@chevrotain/utils"

@@ -3,7 +3,8 @@ import flatten from "lodash/flatten"
 import every from "lodash/every"
 import map from "lodash/map"
 import forEach from "lodash/forEach"
-import { reduce, has } from "@chevrotain/utils"
+import has from "lodash/has"
+import { reduce } from "@chevrotain/utils"
 import { possiblePathsFrom } from "./interpreter"
 import { RestWalker } from "./rest"
 import { Predicate, TokenMatcher, LookAheadSequence } from "../parser/parser"
@@ -200,7 +201,8 @@ export function buildAlternativesLookAheadFunc(
         })
         return result
       },
-      []
+      // TODO does changing from array to object cause a performance regression?
+      {} as Record<number, number>
     )
 
     /**

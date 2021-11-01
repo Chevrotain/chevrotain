@@ -20,14 +20,10 @@ import isArray from "lodash/isArray"
 import flatten from "lodash/flatten"
 import every from "lodash/every"
 import uniq from "lodash/uniq"
-import {
-  cloneArr,
-  cloneObj,
-  has,
-  isObject,
-  reduce,
-  values
-} from "@chevrotain/utils"
+import isObject from "lodash/isObject"
+import has from "lodash/has"
+import values from "lodash/values"
+import { cloneArr, cloneObj, reduce } from "@chevrotain/utils"
 import {
   AT_LEAST_ONE_IDX,
   AT_LEAST_ONE_SEP_IDX,
@@ -168,10 +164,11 @@ export class RecognizerEngine {
     /* tslint:disable */
     this.tokensMap["EOF"] = EOF
 
-    // TODO: This check may not be accurate for multi mode lexers
-    const noTokenCategoriesUsed = every(
-      values(tokenVocabulary),
-      (tokenConstructor) => isEmpty(tokenConstructor.categoryMatches)
+    const allTokenTypes = has(tokenVocabulary, "modes")
+      ? flatten(values((<any>tokenVocabulary).modes))
+      : values(tokenVocabulary)
+    const noTokenCategoriesUsed = every(allTokenTypes, (tokenConstructor) =>
+      isEmpty(tokenConstructor.categoryMatches)
     )
 
     this.tokenMatcher = noTokenCategoriesUsed

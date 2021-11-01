@@ -12,13 +12,8 @@ import {
 import isArray from "lodash/isArray"
 import every from "lodash/every"
 import forEach from "lodash/forEach"
-import {
-  contains,
-  find,
-  PRINT_ERROR,
-  PRINT_WARNING,
-  values
-} from "@chevrotain/utils"
+import find from "lodash/find"
+import { contains, PRINT_ERROR, PRINT_WARNING, values } from "@chevrotain/utils"
 import { ASTNode, getRegExpAst } from "./reg_exp_parser"
 import { charCodeToOptimizedIndex, minOptimizationVal } from "./lexer"
 
