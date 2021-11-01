@@ -19,7 +19,8 @@ import {
 } from "../../../src/parse/grammar/checks"
 import { createToken } from "../../../src/scan/tokens_public"
 import first from "lodash/first"
-import { forEach, map } from "@chevrotain/utils"
+import map from "lodash/map"
+import { forEach } from "@chevrotain/utils"
 import {
   Alternation,
   Alternative,

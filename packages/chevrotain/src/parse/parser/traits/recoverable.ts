@@ -5,9 +5,9 @@ import {
 } from "../../grammar/interpreter"
 import isEmpty from "lodash/isEmpty"
 import dropRight from "lodash/dropRight"
-
 import flatten from "lodash/flatten"
-import { cloneArr, contains, find, has, map } from "@chevrotain/utils"
+import map from "lodash/map"
+import { cloneArr, contains, find, has } from "@chevrotain/utils"
 import {
   IParserConfig,
   IToken,

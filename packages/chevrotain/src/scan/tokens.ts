@@ -3,7 +3,8 @@ import compact from "lodash/compact"
 import isArray from "lodash/isArray"
 import flatten from "lodash/flatten"
 import difference from "lodash/difference"
-import { cloneArr, contains, forEach, has, map } from "@chevrotain/utils"
+import map from "lodash/map"
+import { cloneArr, contains, forEach, has } from "@chevrotain/utils"
 import { IToken, TokenType } from "@chevrotain/types"
 
 export function tokenStructuredMatcher(

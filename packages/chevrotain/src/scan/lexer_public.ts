@@ -16,6 +16,7 @@ import isEmpty from "lodash/isEmpty"
 import isArray from "lodash/isArray"
 import last from "lodash/last"
 import reject from "lodash/reject"
+import map from "lodash/map"
 import {
   assign,
   cloneArr,
@@ -24,7 +25,6 @@ import {
   IDENTITY,
   isUndefined,
   keys,
-  map,
   PRINT_WARNING,
   reduce,
   timer,

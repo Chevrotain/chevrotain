@@ -1,9 +1,9 @@
 import isEmpty from "lodash/isEmpty"
+import map from "lodash/map"
 import {
   cloneObj,
   forEach,
   has,
-  map,
   values,
   toFastProperties
 } from "@chevrotain/utils"

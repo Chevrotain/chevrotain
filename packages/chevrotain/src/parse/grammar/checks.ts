@@ -5,14 +5,13 @@ import flatten from "lodash/flatten"
 import filter from "lodash/filter"
 import reject from "lodash/reject"
 import difference from "lodash/difference"
-
+import map from "lodash/map"
 import {
   cloneArr,
   contains,
   flatMap,
   forEach,
   groupBy,
-  map,
   pick,
   reduce,
   values

@@ -9,6 +9,7 @@ import flatten from "lodash/flatten"
 import reject from "lodash/reject"
 import difference from "lodash/difference"
 import indexOf from "lodash/indexOf"
+import map from "lodash/map"
 import {
   contains,
   defaults,
@@ -21,7 +22,6 @@ import {
   isString,
   isUndefined,
   keys,
-  map,
   PRINT_ERROR,
   reduce
 } from "@chevrotain/utils"

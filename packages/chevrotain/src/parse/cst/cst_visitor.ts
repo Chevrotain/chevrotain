@@ -1,13 +1,13 @@
 import isEmpty from "lodash/isEmpty"
 import compact from "lodash/compact"
 import isArray from "lodash/isArray"
+import map from "lodash/map"
 import {
   contains,
   forEach,
   isFunction,
   isUndefined,
-  keys,
-  map
+  keys
 } from "@chevrotain/utils"
 import { defineNameProp } from "../../lang/lang_extensions"
 import { CstNode, ICstVisitor } from "@chevrotain/types"

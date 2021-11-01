@@ -1,11 +1,5 @@
-import {
-  assign,
-  forEach,
-  isRegExp,
-  isString,
-  map,
-  pick
-} from "@chevrotain/utils"
+import map from "lodash/map"
+import { assign, forEach, isRegExp, isString, pick } from "@chevrotain/utils"
 import { tokenLabel } from "../../../scan/tokens_public"
 import {
   IGASTVisitor,

@@ -14,17 +14,6 @@ export function values(obj: any): any[] {
   return vals
 }
 
-export function map<I, O>(
-  arr: I[],
-  callback: (value: I, idx?: number) => O
-): O[] {
-  const result: O[] = []
-  for (let idx = 0; idx < arr.length; idx++) {
-    result.push(callback(arr[idx], idx))
-  }
-  return result
-}
-
 export function forEach<T>(
   collection: T[],
   iteratorCallback: (item: T, index: number) => void
@@ -184,26 +173,6 @@ export function zipObject(keys: any[], values: any[]): Object {
  * mutates! (and returns) target
  */
 export const assign = Object.assign
-
-/**
- * mutates! (and returns) target
- */
-export function assignNoOverwrite(
-  target: Record<string, any>,
-  ...sources: Record<string, any>[]
-): Object {
-  for (let i = 0; i < sources.length; i++) {
-    const curSource = sources[i]
-    const currSourceKeys = keys(curSource)
-    for (let j = 0; j < currSourceKeys.length; j++) {
-      const currKey = currSourceKeys[j]
-      if (!has(target, currKey)) {
-        target[currKey] = curSource[currKey]
-      }
-    }
-  }
-  return target
-}
 
 export function defaults<S, T>(a: S, b: T): S & T {
   return Object.assign(b, a)
