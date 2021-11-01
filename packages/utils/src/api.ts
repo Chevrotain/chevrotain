@@ -70,10 +70,6 @@ export function filter<T>(
   return arr.filter(predicate)
 }
 
-export function reject<T>(arr: T[], predicate: (item: T) => boolean): T[] {
-  return filter(arr, (item) => !predicate(item))
-}
-
 export function pick(obj: Object, predicate: (item: any) => boolean) {
   const keys = Object.keys(obj)
   const result: any = {}
@@ -211,10 +207,6 @@ export function every<T>(
     }
   }
   return true
-}
-
-export function difference<T>(arr: T[], values: T[]): T[] {
-  return reject(arr, (item) => contains(values, item))
 }
 
 export function some<T>(arr: T[], predicate: (item: T) => boolean): boolean {

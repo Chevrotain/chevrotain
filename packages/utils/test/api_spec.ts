@@ -3,7 +3,6 @@ import {
   forEach,
   isString,
   filter,
-  reject,
   has,
   contains,
   cloneArr,
@@ -13,7 +12,6 @@ import {
   uniq,
   pick,
   partial,
-  difference,
   some,
   every,
   indexOf,
@@ -69,34 +67,6 @@ describe("The Utils functions namespace", () => {
         return item % 2 === 1
       })
     ).to.deep.equal([1, 3])
-  })
-
-  it("exports a reject utility", () => {
-    expect(
-      reject([], (item) => {
-        return true
-      })
-    ).to.deep.equal([])
-    expect(
-      reject([1, 2, 3], (item) => {
-        return false
-      })
-    ).to.deep.equal([1, 2, 3])
-    expect(
-      reject([1, 2, 3], (item) => {
-        return true
-      })
-    ).to.deep.equal([])
-    expect(
-      reject([1, 2, 3], (item) => {
-        return item % 2 === 0
-      })
-    ).to.deep.equal([1, 3])
-    expect(
-      reject([1, 2, 3], (item) => {
-        return item % 2 === 1
-      })
-    ).to.deep.equal([2])
   })
 
   it("exports a has utility", () => {
@@ -216,13 +186,6 @@ describe("The Utils functions namespace", () => {
         return item % 2 === 0
       })
     ).to.be.true
-  })
-
-  it("exports an difference utility", () => {
-    expect(difference([1, 2, 3], [2])).to.deep.equal([1, 3])
-    expect(difference([1, 2, 3], [1, 3])).to.deep.equal([2])
-    expect(difference([1, 2, 3], [])).to.deep.equal([1, 2, 3])
-    expect(difference([], [1, 2])).to.deep.equal([])
   })
 
   it("exports an some utility", () => {

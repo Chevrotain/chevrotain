@@ -6,10 +6,11 @@ import compact from "lodash/compact"
 import isArray from "lodash/isArray"
 import values from "lodash/values"
 import flatten from "lodash/flatten"
+import reject from "lodash/reject"
+import difference from "lodash/difference"
 import {
   contains,
   defaults,
-  difference,
   filter,
   find,
   forEach,
@@ -22,8 +23,7 @@ import {
   keys,
   map,
   PRINT_ERROR,
-  reduce,
-  reject
+  reduce
 } from "@chevrotain/utils"
 import {
   canMatchCharCode,

@@ -2,10 +2,11 @@ import first from "lodash/first"
 import isEmpty from "lodash/isEmpty"
 import drop from "lodash/drop"
 import flatten from "lodash/flatten"
+import reject from "lodash/reject"
+import difference from "lodash/difference"
 import {
   cloneArr,
   contains,
-  difference,
   findAll,
   flatMap,
   forEach,
@@ -13,7 +14,6 @@ import {
   map,
   pick,
   reduce,
-  reject,
   values
 } from "@chevrotain/utils"
 import {

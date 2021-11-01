@@ -15,7 +15,7 @@ import noop from "lodash/noop"
 import isEmpty from "lodash/isEmpty"
 import isArray from "lodash/isArray"
 import last from "lodash/last"
-
+import reject from "lodash/reject"
 import {
   assign,
   cloneArr,
@@ -27,7 +27,6 @@ import {
   map,
   PRINT_WARNING,
   reduce,
-  reject,
   timer,
   toFastProperties
 } from "@chevrotain/utils"
