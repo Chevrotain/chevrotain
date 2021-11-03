@@ -39,7 +39,6 @@
   ],
   "typings": "./chevrotain.d.ts",
   "main": "./lib/chevrotain.js",
-  "module": "./lib/chevrotain.mjs",
   "exports": {
     "require": "./lib/chevrotain.js",
     "import": "./lib/chevrotain.mjs"
