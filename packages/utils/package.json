@@ -13,9 +13,9 @@
   "typings": "lib/src/api.d.ts",
   "main": "lib/src/api.js",
   "files": [
-    "lib/src/api.js",
-    "lib/src/api.ts",
-    "lib/src/api.d.ts",
+    "lib/src/**/*.js",
+    "lib/src/**/*.d.ts",
+    "lib/src/**/*.js.map",
     "README.md",
     "LICENSE.TXT"
   ],
