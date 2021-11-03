@@ -29,3 +29,5 @@ yarn-error.log
 /examples/parser/minification/gen/
 
 .rollup.cache
+
+*.tsbuildinfo
