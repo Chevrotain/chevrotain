@@ -22,29 +22,10 @@ module.exports = [
       sourcemap: true,
       dir: "lib",
       name: "chevrotain",
-      exports: "named",
-      plugins: compress
-        ? [
-            terser({
-              compress: {
-                passes: 3,
-                unsafe: true,
-                ecma: 7
-              },
-              toplevel: true,
-              mangle: {
-                properties: { regex: /^_/ }
-              }
-            })
-          ]
-        : []
+      exports: "named"
     })),
     external: Object.keys(pkg.dependencies),
-    plugins: [
-      typescriptPlugin({ typescript }),
-      nodeResolvePlugin(),
-      commonjsPlugin()
-    ],
+    plugins: [typescriptPlugin({ typescript })],
     onwarn: function (warning, warn) {
       if ("THIS_IS_UNDEFINED" === warning.code) return
       // if ('CIRCULAR_DEPENDENCY' === warning.code) return
