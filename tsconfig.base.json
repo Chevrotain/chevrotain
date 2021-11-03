@@ -3,6 +3,7 @@
   "compilerOptions": {
     "target": "ES5",
     "composite": true,
+    "newLine": "lf",
     "module": "CommonJS",
     "removeComments": false,
     "sourceMap": true,

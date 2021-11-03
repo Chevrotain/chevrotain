@@ -1,6 +1,10 @@
 module.exports = {
   recursive: true,
-  require: ["./test/test.config", "source-map-support/register"],
+  require: [
+    "./test/test.config",
+    "source-map-support/register",
+    "ts-node/register"
+  ],
   reporter: "spec",
-  spec: "./lib/test/**/*spec.js"
+  spec: "./test/**/*spec.ts"
 }

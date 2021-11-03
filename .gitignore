@@ -27,3 +27,5 @@ yarn-error.log
 /examples/implementation_languages/typescript/*.js
 /examples/implementation_languages/coffeescript/*.js
 /examples/parser/minification/gen/
+
+.rollup.cache

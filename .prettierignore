@@ -17,3 +17,5 @@
 
 # prettier ignores
 /packages/cst-dts-gen/test/snapshots/**/output.d.ts
+
+.rollup.cache
