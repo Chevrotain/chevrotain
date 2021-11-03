@@ -33,9 +33,7 @@
     "compile": "tsc",
     "coverage": "nyc mocha"
   },
-  "devDependencies": {
-    "@types/chai": "4.2.22"
-  },
+  "devDependencies": {},
   "publishConfig": {
     "access": "public"
   }

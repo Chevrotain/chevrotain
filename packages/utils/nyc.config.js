@@ -1,9 +1,12 @@
 const baseConfig = require("../nyc.config")
 
-module.exports = Object.assign(baseConfig, {
-  // TODO: evaluate effort to hit 100%* coverage
-  branches: 0,
-  lines: 0,
-  functions: 0,
-  statements: 0
-})
+module.exports = {
+  ...baseConfig,
+  exclude: [
+    ...baseConfig.exclude,
+    // possible to test using mocks but not worth it.
+    "src/print.ts",
+    // not possible to test without diving into V8 internals
+    "src/to-fast-properties.ts"
+  ]
+}
