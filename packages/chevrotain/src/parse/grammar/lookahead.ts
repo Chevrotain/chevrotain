@@ -201,7 +201,6 @@ export function buildAlternativesLookAheadFunc(
         })
         return result
       },
-      // TODO does changing from array to object cause a performance regression?
       {} as Record<number, number>
     )
 
