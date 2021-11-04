@@ -1,4 +1,6 @@
-import { has, isString, isUndefined } from "@chevrotain/utils"
+import isString from "lodash/isString"
+import has from "lodash/has"
+import isUndefined from "lodash/isUndefined"
 import { Lexer } from "./lexer_public"
 import { augmentTokenTypes, tokenStructuredMatcher } from "./tokens"
 import { IToken, ITokenConfig, TokenType } from "@chevrotain/types"

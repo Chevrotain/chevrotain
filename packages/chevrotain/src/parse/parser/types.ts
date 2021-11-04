@@ -3,7 +3,7 @@
  * Particularly useful when expending the public API
  * to include additional **internal** properties.
  */
-import { ParserMethod } from "@chevrotain/types"
+import { IParserConfig, ParserMethod } from "@chevrotain/types"
 
 export type ParserMethodInternal<ARGS extends unknown[], R> = ParserMethod<
   ARGS,
@@ -12,3 +12,5 @@ export type ParserMethodInternal<ARGS extends unknown[], R> = ParserMethod<
   ruleName: string
   originalGrammarAction: Function
 }
+
+export type IParserConfigInternal = IParserConfig & { outputCst: boolean }

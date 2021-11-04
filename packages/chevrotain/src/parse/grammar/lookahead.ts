@@ -1,12 +1,10 @@
-import {
-  map,
-  reduce,
-  every,
-  isEmpty,
-  flatten,
-  forEach,
-  has
-} from "@chevrotain/utils"
+import isEmpty from "lodash/isEmpty"
+import flatten from "lodash/flatten"
+import every from "lodash/every"
+import map from "lodash/map"
+import forEach from "lodash/forEach"
+import has from "lodash/has"
+import reduce from "lodash/reduce"
 import { possiblePathsFrom } from "./interpreter"
 import { RestWalker } from "./rest"
 import { Predicate, TokenMatcher, LookAheadSequence } from "../parser/parser"
@@ -203,7 +201,7 @@ export function buildAlternativesLookAheadFunc(
         })
         return result
       },
-      []
+      {} as Record<number, number>
     )
 
     /**

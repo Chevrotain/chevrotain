@@ -29,7 +29,7 @@ import {
 } from "../../../src/parse/grammar/interpreter"
 import { createRegularToken, setEquality } from "../../utils/matchers"
 import { createToken } from "../../../src/scan/tokens_public"
-import { map } from "@chevrotain/utils"
+import map from "lodash/map"
 import { Lexer } from "../../../src/scan/lexer_public"
 import {
   augmentTokenTypes,

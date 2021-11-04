@@ -1,16 +1,16 @@
 {
   "references": [
     {
-      "path": "./packages/chevrotain"
+      "path": "./packages/utils"
     },
     {
       "path": "./packages/types"
     },
     {
-      "path": "./packages/utils"
+      "path": "./packages/cst-dts-gen"
     },
     {
-      "path": "./packages/cst-dts-gen"
+      "path": "./packages/chevrotain"
     }
   ],
   // needed to avoid trying to compile other .ts files in this repo

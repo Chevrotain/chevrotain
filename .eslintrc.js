@@ -28,7 +28,7 @@ module.exports = {
       parserOptions: {
         // The `ecmaVersion` should align to the supported features of our target runtimes (browsers / nodejs / others)
         // Consult with: https://kangax.github.io/compat-table/es2016plus/
-        ecmaVersion: 2017
+        ecmaVersion: 2018
       },
       rules: {
         // conflicts with some prettier settings in UMD sources.
@@ -38,7 +38,7 @@ module.exports = {
     {
       // For sub-packages using TypeScript (libraries/VSCode Exts) && TypeScript definitions (d.ts)
       files: ["*.ts"],
-      plugins: ["@typescript-eslint"],
+      plugins: ["@typescript-eslint", "lodash"],
       parser: "@typescript-eslint/parser",
       parserOptions: {
         // project: ["./tsconfig.base.json", "./tsconfig.json"],
@@ -48,6 +48,7 @@ module.exports = {
         // "plugin:@typescript-eslint/recommended-requiring-type-checking",
       ],
       rules: {
+        "lodash/import-scope": ["error", "method"],
         "@typescript-eslint/no-use-before-define": [
           "error",
           // These can be safely used before they are defined due to function hoisting in EcmaScript

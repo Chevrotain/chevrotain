@@ -1,13 +1,11 @@
 import { RestWalker } from "./rest"
-import {
-  cloneArr,
-  drop,
-  dropRight,
-  first as _first,
-  forEach,
-  isEmpty,
-  last
-} from "@chevrotain/utils"
+import _first from "lodash/first"
+import isEmpty from "lodash/isEmpty"
+import dropRight from "lodash/dropRight"
+import drop from "lodash/drop"
+import last from "lodash/last"
+import forEach from "lodash/forEach"
+import clone from "lodash/clone"
 import { first } from "./first"
 import { TokenMatcher } from "../parser/parser"
 import {
@@ -54,8 +52,8 @@ export abstract class AbstractNextPossibleTokensWalker extends RestWalker {
     }
 
     // immutable for the win
-    this.ruleStack = cloneArr(this.path.ruleStack).reverse() // intelij bug requires assertion
-    this.occurrenceStack = cloneArr(this.path.occurrenceStack).reverse() // intelij bug requires assertion
+    this.ruleStack = clone(this.path.ruleStack).reverse() // intelij bug requires assertion
+    this.occurrenceStack = clone(this.path.occurrenceStack).reverse() // intelij bug requires assertion
 
     // already verified that the first production is valid, we now seek the 2nd production
     this.ruleStack.pop()
@@ -257,7 +255,7 @@ export function possiblePathsFrom(
   currPath: TokenType[] = []
 ): PartialPathAndSuffixes[] {
   // avoid side effects
-  currPath = cloneArr(currPath)
+  currPath = clone(currPath)
   let result: PartialPathAndSuffixes[] = []
   let i = 0
 
@@ -447,10 +445,10 @@ export function nextPossibleTokensAfter(
         throw Error("non exhaustive match")
       }
     } else if (prod instanceof NonTerminal) {
-      const newRuleStack = cloneArr(currRuleStack)
+      const newRuleStack = clone(currRuleStack)
       newRuleStack.push(prod.nonTerminalName)
 
-      const newOccurrenceStack = cloneArr(currOccurrenceStack)
+      const newOccurrenceStack = clone(currOccurrenceStack)
       newOccurrenceStack.push(prod.idx)
 
       const nextPath = {
@@ -600,10 +598,10 @@ function expandTopLevelRule(
   currRuleStack: string[],
   currOccurrenceStack: number[]
 ): IPathToExamine {
-  const newRuleStack = cloneArr(currRuleStack)
+  const newRuleStack = clone(currRuleStack)
   newRuleStack.push(topRule.name)
 
-  const newCurrOccurrenceStack = cloneArr(currOccurrenceStack)
+  const newCurrOccurrenceStack = clone(currOccurrenceStack)
   // top rule is always assumed to have been called with occurrence index 1
   newCurrOccurrenceStack.push(1)
 

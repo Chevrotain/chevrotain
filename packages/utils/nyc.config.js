@@ -1,10 +1,12 @@
 const baseConfig = require("../nyc.config")
 
-module.exports = Object.assign(baseConfig, {
-  // coverage was reduced due to the extraction from the main chevrotain package.
-  // consider writing additional tests
-  branches: 63,
-  lines: 70,
-  functions: 59,
-  statements: 70
-})
+module.exports = {
+  ...baseConfig,
+  exclude: [
+    ...baseConfig.exclude,
+    // possible to test using mocks but not worth it.
+    "src/print.ts",
+    // not possible to test without diving into V8 internals
+    "src/to-fast-properties.ts"
+  ]
+}

@@ -8,7 +8,8 @@ import {
   isRecognitionException,
   NoViableAltException
 } from "../../exceptions_public"
-import { cloneArr, has } from "@chevrotain/utils"
+import has from "lodash/has"
+import clone from "lodash/clone"
 import {
   getLookaheadPathsForOptionalProd,
   getLookaheadPathsForOr,
@@ -38,7 +39,7 @@ export class ErrorHandler {
     if (isRecognitionException(error)) {
       error.context = {
         ruleStack: this.getHumanReadableRuleStack(),
-        ruleOccurrenceStack: cloneArr(this.RULE_OCCURRENCE_STACK)
+        ruleOccurrenceStack: clone(this.RULE_OCCURRENCE_STACK)
       }
       this._errors.push(error)
       return error
@@ -48,7 +49,7 @@ export class ErrorHandler {
   }
 
   get errors(): IRecognitionException[] {
-    return cloneArr(this._errors)
+    return clone(this._errors)
   }
 
   set errors(newErrors: IRecognitionException[]) {

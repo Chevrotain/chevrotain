@@ -25,13 +25,13 @@
     "---------- DEV FLOWS --------": "",
     "update-snapshots": "node ./scripts/update-snapshots.js",
     "---------- BUILD STEPS --------": "",
-    "clean": "shx rm -rf dev",
+    "clean": "shx rm -rf lib coverage",
     "compile:watch": "tsc -w",
     "compile": "tsc",
     "coverage": "nyc mocha"
   },
   "dependencies": {
-    "@chevrotain/utils": "^9.1.0",
+    "lodash": "4.17.21",
     "chevrotain": "^9.1.0"
   },
   "devDependencies": {

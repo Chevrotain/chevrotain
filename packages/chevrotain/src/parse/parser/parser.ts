@@ -1,12 +1,10 @@
-import {
-  cloneObj,
-  forEach,
-  has,
-  isEmpty,
-  map,
-  values,
-  toFastProperties
-} from "@chevrotain/utils"
+import isEmpty from "lodash/isEmpty"
+import map from "lodash/map"
+import forEach from "lodash/forEach"
+import values from "lodash/values"
+import has from "lodash/has"
+import clone from "lodash/clone"
+import { toFastProperties } from "@chevrotain/utils"
 import { computeAllProdsFollows } from "../grammar/follow"
 import { createTokenInstance, EOF } from "../../scan/tokens_public"
 import {
@@ -40,7 +38,7 @@ import { GastRecorder } from "./traits/gast_recorder"
 import { PerformanceTracer } from "./traits/perf_tracer"
 import { applyMixins } from "./utils/apply_mixins"
 import { IParserDefinitionError } from "../grammar/types"
-import { ParserMethodInternal } from "./types"
+import { IParserConfigInternal, ParserMethodInternal } from "./types"
 
 export const END_OF_FILE = createTokenInstance(
   EOF,
@@ -58,7 +56,7 @@ export type TokenMatcher = (token: IToken, tokType: TokenType) => boolean
 
 export type LookAheadSequence = TokenType[][]
 
-export const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
+export const DEFAULT_PARSER_CONFIG: IParserConfigInternal = Object.freeze({
   recoveryEnabled: false,
   maxLookahead: 3,
   dynamicTokensEnabled: false,
@@ -289,9 +287,9 @@ applyMixins(Parser, [
 export class CstParser extends Parser {
   constructor(
     tokenVocabulary: TokenVocabulary,
-    config: IParserConfig = DEFAULT_PARSER_CONFIG
+    config: IParserConfigInternal = DEFAULT_PARSER_CONFIG
   ) {
-    const configClone = cloneObj(config)
+    const configClone = clone(config)
     configClone.outputCst = true
     super(tokenVocabulary, configClone)
   }
@@ -300,9 +298,9 @@ export class CstParser extends Parser {
 export class EmbeddedActionsParser extends Parser {
   constructor(
     tokenVocabulary: TokenVocabulary,
-    config: IParserConfig = DEFAULT_PARSER_CONFIG
+    config: IParserConfigInternal = DEFAULT_PARSER_CONFIG
   ) {
-    const configClone = cloneObj(config)
+    const configClone = clone(config)
     configClone.outputCst = false
     super(tokenVocabulary, configClone)
   }

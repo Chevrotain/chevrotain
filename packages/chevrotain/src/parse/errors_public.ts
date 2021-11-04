@@ -1,6 +1,7 @@
 import { hasTokenLabel, tokenLabel } from "../scan/tokens_public"
-import * as utils from "@chevrotain/utils"
-import { first, map, reduce } from "@chevrotain/utils"
+import first from "lodash/first"
+import map from "lodash/map"
+import reduce from "lodash/reduce"
 import {
   Alternation,
   NonTerminal,
@@ -281,7 +282,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
       leftRecursionPath: Rule[]
     }): string {
       const ruleName = options.topLevelRule.name
-      const pathNames = utils.map(
+      const pathNames = map(
         options.leftRecursionPath,
         (currRule) => currRule.name
       )

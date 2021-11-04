@@ -1,4 +1,7 @@
-import { map, upperFirst, flatten } from "@chevrotain/utils"
+import flatten from "lodash/flatten"
+import map from "lodash/map"
+import upperFirst from "lodash/upperFirst"
+
 import {
   CstNodeTypeDefinition,
   PropertyTypeDefinition,

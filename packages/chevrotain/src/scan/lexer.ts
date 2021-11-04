@@ -1,30 +1,28 @@
 import { BaseRegExpVisitor } from "regexp-to-ast"
 import { IRegExpExec, Lexer, LexerDefinitionErrorType } from "./lexer_public"
-import {
-  compact,
-  contains,
-  defaults,
-  difference,
-  filter,
-  find,
-  first,
-  flatten,
-  forEach,
-  has,
-  indexOf,
-  isArray,
-  isEmpty,
-  isFunction,
-  isRegExp,
-  isString,
-  isUndefined,
-  keys,
-  map,
-  mapValues,
-  PRINT_ERROR,
-  reduce,
-  reject
-} from "@chevrotain/utils"
+import first from "lodash/first"
+import isEmpty from "lodash/isEmpty"
+import compact from "lodash/compact"
+import isArray from "lodash/isArray"
+import values from "lodash/values"
+import flatten from "lodash/flatten"
+import reject from "lodash/reject"
+import difference from "lodash/difference"
+import indexOf from "lodash/indexOf"
+import map from "lodash/map"
+import forEach from "lodash/forEach"
+import isString from "lodash/isString"
+import isFunction from "lodash/isFunction"
+import isUndefined from "lodash/isUndefined"
+import find from "lodash/find"
+import has from "lodash/has"
+import keys from "lodash/keys"
+import isRegExp from "lodash/isRegExp"
+import filter from "lodash/filter"
+import defaults from "lodash/defaults"
+import reduce from "lodash/reduce"
+import includes from "lodash/includes"
+import { PRINT_ERROR } from "@chevrotain/utils"
 import {
   canMatchCharCode,
   failedOptimizationPrefixMsg,
@@ -134,7 +132,7 @@ export function analyzeTokenTypes(
             regExpSource.length === 2 &&
             regExpSource[0] === "\\" &&
             // not a meta character
-            !contains(
+            !includes(
               [
                 "d",
                 "D",
@@ -642,7 +640,7 @@ export function findDuplicatePatterns(
       (result, innerType) => {
         if (
           outerType.PATTERN.source === (innerType.PATTERN as RegExp).source &&
-          !contains(found, innerType) &&
+          !includes(found, innerType) &&
           innerType.PATTERN !== Lexer.NA
         ) {
           // this avoids duplicates in the result, each Token Type may only appear in one "set"
@@ -715,7 +713,7 @@ export function findModesThatDoNotExist(
 ): ILexerDefinitionError[] {
   const invalidModes = filter(tokenTypes, (clazz: any) => {
     return (
-      clazz.PUSH_MODE !== undefined && !contains(validModes, clazz.PUSH_MODE)
+      clazz.PUSH_MODE !== undefined && !includes(validModes, clazz.PUSH_MODE)
     )
   })
 
@@ -898,9 +896,7 @@ export function performWarningRuntimeChecks(
 ): ILexerDefinitionError[] {
   const warnings = []
   let hasAnyLineBreak = false
-  const allTokenTypes = compact(
-    flatten(mapValues(lexerDefinition.modes, (tokTypes) => tokTypes))
-  )
+  const allTokenTypes = compact(flatten(values(lexerDefinition.modes)))
 
   const concreteTokenTypes = reject(
     allTokenTypes,

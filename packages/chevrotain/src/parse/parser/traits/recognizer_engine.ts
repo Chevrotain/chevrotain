@@ -13,21 +13,19 @@ import {
   ParserMethod,
   SubruleMethodOpts,
   TokenType,
+  TokenTypeDictionary,
   TokenVocabulary
 } from "@chevrotain/types"
-import {
-  cloneArr,
-  cloneObj,
-  every,
-  flatten,
-  has,
-  isArray,
-  isEmpty,
-  isObject,
-  reduce,
-  uniq,
-  values
-} from "@chevrotain/utils"
+import isEmpty from "lodash/isEmpty"
+import isArray from "lodash/isArray"
+import flatten from "lodash/flatten"
+import every from "lodash/every"
+import uniq from "lodash/uniq"
+import isObject from "lodash/isObject"
+import has from "lodash/has"
+import values from "lodash/values"
+import reduce from "lodash/reduce"
+import clone from "lodash/clone"
 import {
   AT_LEAST_ONE_IDX,
   AT_LEAST_ONE_SEP_IDX,
@@ -155,7 +153,7 @@ export class RecognizerEngine {
         {} as { [tokenName: string]: TokenType }
       )
     } else if (isObject(tokenVocabulary)) {
-      this.tokensMap = cloneObj(tokenVocabulary)
+      this.tokensMap = clone(tokenVocabulary as TokenTypeDictionary)
     } else {
       throw new Error(
         "<tokensDictionary> argument must be An Array of Token constructors," +
@@ -168,10 +166,11 @@ export class RecognizerEngine {
     /* tslint:disable */
     this.tokensMap["EOF"] = EOF
 
-    // TODO: This check may not be accurate for multi mode lexers
-    const noTokenCategoriesUsed = every(
-      values(tokenVocabulary),
-      (tokenConstructor) => isEmpty(tokenConstructor.categoryMatches)
+    const allTokenTypes = has(tokenVocabulary, "modes")
+      ? flatten(values((<any>tokenVocabulary).modes))
+      : values(tokenVocabulary)
+    const noTokenCategoriesUsed = every(allTokenTypes, (tokenConstructor) =>
+      isEmpty(tokenConstructor.categoryMatches)
     )
 
     this.tokenMatcher = noTokenCategoriesUsed
@@ -812,7 +811,7 @@ export class RecognizerEngine {
   saveRecogState(this: MixedInParser): IParserState {
     // errors is a getter which will clone the errors array
     const savedErrors = this.errors
-    const savedRuleStack = cloneArr(this.RULE_STACK)
+    const savedRuleStack = clone(this.RULE_STACK)
     return {
       errors: savedErrors,
       lexerState: this.exportLexerState(),

@@ -13,7 +13,8 @@ import {
   SubruleMethodOpts,
   TokenType
 } from "@chevrotain/types"
-import { contains, values } from "@chevrotain/utils"
+import values from "lodash/values"
+import includes from "lodash/includes"
 import { isRecognitionException } from "../../exceptions_public"
 import { DEFAULT_RULE_CONFIG, ParserDefinitionErrorType } from "../parser"
 import { defaultGrammarValidatorErrorProvider } from "../../errors_public"
@@ -642,7 +643,7 @@ export class RecognizerApi {
     implementation: (...implArgs: any[]) => T,
     config: IRuleConfig<T> = DEFAULT_RULE_CONFIG
   ): (idxInCallingRule?: number, ...args: any[]) => T | any {
-    if (contains(this.definedRulesNames, name)) {
+    if (includes(this.definedRulesNames, name)) {
       const errMsg =
         defaultGrammarValidatorErrorProvider.buildDuplicateRuleNameError({
           topLevelRule: name,

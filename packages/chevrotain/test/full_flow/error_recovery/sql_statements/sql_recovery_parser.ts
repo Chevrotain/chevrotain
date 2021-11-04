@@ -5,6 +5,7 @@
  * INSERT (32, "SHAHAR") INTO schema2.Persons
  * DELETE (31, "SHAHAR") FROM schema2.Persons
  */
+import values from "lodash/values"
 import { EmbeddedActionsParser } from "../../../../src/parse/parser/traits/parser_traits"
 import * as allTokens from "./sql_recovery_tokens"
 import {
@@ -43,7 +44,7 @@ import { createRegularToken } from "../../../utils/matchers"
 import { IToken, TokenType } from "@chevrotain/types"
 
 const allTokensToUse = { ...allTokens }
-augmentTokenTypes(<any>allTokensToUse)
+augmentTokenTypes(values(allTokensToUse))
 
 // DOCS: to enable error recovery functionality one must extend BaseErrorRecoveryRecognizer
 export class DDLExampleRecoveryParser extends EmbeddedActionsParser {

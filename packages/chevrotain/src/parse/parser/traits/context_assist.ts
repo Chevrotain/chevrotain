@@ -8,7 +8,8 @@ import {
   NextAfterTokenWalker,
   nextPossibleTokensAfter
 } from "../../grammar/interpreter"
-import { first, isUndefined } from "@chevrotain/utils"
+import first from "lodash/first"
+import isUndefined from "lodash/isUndefined"
 import { MixedInParser } from "./parser_traits"
 
 export class ContentAssist {

@@ -4,6 +4,7 @@
     "target": "ES5",
     "composite": true,
     "module": "CommonJS",
+    "esModuleInterop": true,
     "removeComments": false,
     "sourceMap": true,
     "declaration": true,

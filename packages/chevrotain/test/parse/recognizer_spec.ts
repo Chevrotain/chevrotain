@@ -666,9 +666,6 @@ function defineRecognizerSpecs(
 
         const parser = new OrExpressionParser([])
 
-        parser.input = [createTokenInstance(MinusTok)]
-        expect(parser.orRule()).to.equal(666)
-
         parser.input = [createTokenInstance(PlusTok)]
         expect(parser.orRule()).to.equal("bamba")
       })

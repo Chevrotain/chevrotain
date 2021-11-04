@@ -11,25 +11,20 @@ import {
   SUPPORT_STICKY,
   validatePatterns
 } from "./lexer"
-import {
-  assign,
-  cloneArr,
-  cloneObj,
-  forEach,
-  IDENTITY,
-  isArray,
-  isEmpty,
-  isUndefined,
-  keys,
-  last,
-  map,
-  NOOP,
-  PRINT_WARNING,
-  reduce,
-  reject,
-  timer,
-  toFastProperties
-} from "@chevrotain/utils"
+import noop from "lodash/noop"
+import isEmpty from "lodash/isEmpty"
+import isArray from "lodash/isArray"
+import last from "lodash/last"
+import reject from "lodash/reject"
+import map from "lodash/map"
+import forEach from "lodash/forEach"
+import keys from "lodash/keys"
+import isUndefined from "lodash/isUndefined"
+import identity from "lodash/identity"
+import assign from "lodash/assign"
+import reduce from "lodash/reduce"
+import clone from "lodash/clone"
+import { PRINT_WARNING, timer, toFastProperties } from "@chevrotain/utils"
 import { augmentTokenTypes } from "./tokens"
 import {
   CustomPatternMatcherFunc,
@@ -176,15 +171,13 @@ export class Lexer {
         // Convert SingleModeLexerDefinition into a IMultiModeLexerDefinition.
         if (isArray(lexerDefinition)) {
           actualDefinition = {
-            modes: { defaultMode: cloneArr(lexerDefinition) },
+            modes: { defaultMode: clone(lexerDefinition) },
             defaultMode: DEFAULT_MODE
           }
         } else {
           // no conversion needed, input should already be a IMultiModeLexerDefinition
           hasOnlySingleMode = false
-          actualDefinition = cloneObj(
-            <IMultiModeLexerDefinition>lexerDefinition
-          )
+          actualDefinition = clone(<IMultiModeLexerDefinition>lexerDefinition)
         }
       })
 
@@ -226,7 +219,7 @@ export class Lexer {
 
       const allModeNames = keys(actualDefinition.modes)
 
-      forEach<string, TokenType[]>(
+      forEach(
         actualDefinition.modes,
         (currModDef: TokenType[], currModName) => {
           this.TRACE_INIT(`Mode: <${currModName}> processing`, () => {
@@ -306,23 +299,23 @@ export class Lexer {
         // These implementations should be in-lined by the JavaScript engine
         // to provide optimal performance in each scenario.
         if (SUPPORT_STICKY) {
-          this.chopInput = <any>IDENTITY
+          this.chopInput = <any>identity
           this.match = this.matchWithTest
         } else {
-          this.updateLastIndex = NOOP
+          this.updateLastIndex = noop
           this.match = this.matchWithExec
         }
 
         if (hasOnlySingleMode) {
-          this.handleModes = NOOP
+          this.handleModes = noop
         }
 
         if (this.trackStartLines === false) {
-          this.computeNewColumn = IDENTITY
+          this.computeNewColumn = identity
         }
 
         if (this.trackEndLines === false) {
-          this.updateTokenEndLineColumnLocation = NOOP
+          this.updateTokenEndLineColumnLocation = noop
         }
 
         if (/full/i.test(this.config.positionTracking)) {

@@ -1,15 +1,13 @@
-import {
-  cloneArr,
-  compact,
-  contains,
-  difference,
-  flatten,
-  forEach,
-  has,
-  isArray,
-  isEmpty,
-  map
-} from "@chevrotain/utils"
+import isEmpty from "lodash/isEmpty"
+import compact from "lodash/compact"
+import isArray from "lodash/isArray"
+import flatten from "lodash/flatten"
+import difference from "lodash/difference"
+import map from "lodash/map"
+import forEach from "lodash/forEach"
+import has from "lodash/has"
+import includes from "lodash/includes"
+import clone from "lodash/clone"
 import { IToken, TokenType } from "@chevrotain/types"
 
 export function tokenStructuredMatcher(
@@ -56,7 +54,7 @@ export function augmentTokenTypes(tokenTypes: TokenType[]): void {
 }
 
 export function expandCategories(tokenTypes: TokenType[]): TokenType[] {
-  let result = cloneArr(tokenTypes)
+  let result = clone(tokenTypes)
 
   let categories = tokenTypes
   let searching = true
@@ -114,7 +112,9 @@ export function assignCategoriesTokensProp(tokenTypes: TokenType[]): void {
     // avoid duplications
     currTokType.categoryMatches = []
     forEach(currTokType.categoryMatchesMap, (val, key) => {
-      currTokType.categoryMatches.push(tokenIdxToClass[key].tokenTypeIdx)
+      currTokType.categoryMatches.push(
+        tokenIdxToClass[key as unknown as number].tokenTypeIdx
+      )
     })
   })
 }
@@ -136,7 +136,7 @@ export function singleAssignCategoriesToksMap(
   forEach(nextNode.CATEGORIES, (nextCategory) => {
     const newPath = path.concat(nextNode)
     // avoids infinite loops due to cyclic categories.
-    if (!contains(newPath, nextCategory)) {
+    if (!includes(newPath, nextCategory)) {
       singleAssignCategoriesToksMap(newPath, nextCategory)
     }
   })
