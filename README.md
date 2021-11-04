@@ -11,7 +11,7 @@
 
 Chevrotain is a [**blazing fast**][benchmark] and [**feature rich**](http://chevrotain.io/docs/features/blazing_fast.html) **Parser Building Toolkit** for **JavaScript**.
 It can be used to build parsers/compilers/interpreters for various use cases ranging from simple configuration files,
-to full fledged programing languages.
+to full-fledged programing languages.
 
 A more in depth description of Chevrotain can be found in this great article on: [Parsing in JavaScript: Tools and Libraries](https://tomassetti.me/parsing-in-javascript/#chevrotain).
 
@@ -54,11 +54,6 @@ as any other pure code without requiring any new tools or processes.
 - **[HTML API docs](https://chevrotain.io/documentation).**
 
   - [The Parsing DSL Docs](https://chevrotain.io/documentation/8_0_1/classes/parser.html#at_least_one).
-
-## Dependencies
-
-There is a single dependency (outside this monorepo) to [regexp-to-ast](https://github.com/bd82/regexp-to-ast) library.
-This dependency is included in the bundled artifacts, for ease of consumption in browsers.
 
 ## Compatibility
 
