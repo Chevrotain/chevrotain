@@ -1500,10 +1500,8 @@ function defineLexerSpecs(
         expect(tokenMatcher(lexResult.tokens[0], If)).to.be.true
 
         expect(lexResult.groups).to.have.property("comments")
-        // tslint:disable
         expect(lexResult.groups["comments"]).to.have.length(1)
         const comment = lexResult.groups["comments"][0]
-        // tslint:enable
         expect(comment.image).to.equal("//else")
         expect(comment.startOffset).to.equal(2)
         if (testStart) {
@@ -1523,16 +1521,12 @@ function defineLexerSpecs(
         let lexResult = ifElseLexer.tokenize(input)
 
         expect(lexResult.groups).to.have.property("comments")
-        // tslint:disable
         expect(lexResult.groups["comments"]).to.have.length(1)
-        // tslint:enable
 
         // 2th time
         lexResult = ifElseLexer.tokenize(input)
         expect(lexResult.groups).to.have.property("comments")
-        // tslint:disable
         expect(lexResult.groups["comments"]).to.have.length(1)
-        // tslint:enable
       })
 
       it("can lex a pile of poo", () => {

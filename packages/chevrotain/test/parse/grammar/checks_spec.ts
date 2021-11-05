@@ -32,7 +32,7 @@ import {
   Terminal
 } from "../../../src/parse/grammar/gast/gast_public"
 import { defaultGrammarValidatorErrorProvider } from "../../../src/parse/errors_public"
-import { IToken } from "@chevrotain/types"
+import { IToken, TokenType } from "@chevrotain/types"
 import { expect } from "chai"
 
 describe("the grammar validations", () => {
@@ -237,23 +237,29 @@ describe("OccurrenceValidationCollector GASTVisitor class", () => {
   })
 })
 
-class DummyToken {
-  static PATTERN = /NA/
-}
-const dummyRule = new Rule({
-  name: "dummyRule",
-  definition: [new Terminal({ terminalType: DummyToken })]
-})
-const dummyRule2 = new Rule({
-  name: "dummyRule2",
-  definition: [new Terminal({ terminalType: DummyToken })]
-})
-const dummyRule3 = new Rule({
-  name: "dummyRule3",
-  definition: [new Terminal({ terminalType: DummyToken })]
-})
-
 describe("the getFirstNoneTerminal function", () => {
+  let dummyRule: Rule
+  let dummyRule2: Rule
+  let dummyRule3: Rule
+
+  before(() => {
+    class DummyToken {
+      static PATTERN = /NA/
+    }
+    dummyRule = new Rule({
+      name: "dummyRule",
+      definition: [new Terminal({ terminalType: DummyToken })]
+    })
+    dummyRule2 = new Rule({
+      name: "dummyRule2",
+      definition: [new Terminal({ terminalType: DummyToken })]
+    })
+    dummyRule3 = new Rule({
+      name: "dummyRule3",
+      definition: [new Terminal({ terminalType: DummyToken })]
+    })
+  })
+
   it("can find the firstNoneTerminal of an empty sequence", () => {
     expect(getFirstNoneTerminal([])).to.be.empty
   })
@@ -412,6 +418,39 @@ describe("the getFirstNoneTerminal function", () => {
     const resultRuleNames = map(result, (currItem) => currItem.name)
     expect(resultRuleNames).to.include.members(["dummyRule"])
   })
+
+  // This test was moved here from a different `describe` because of a a dependency to `dummyRule` variable
+  it("will throw an error when there are too many alternatives in an alternation", () => {
+    const alternatives = []
+    for (let i = 0; i < 256; i++) {
+      alternatives.push(
+        new Alternative({
+          definition: [
+            new NonTerminal({
+              nonTerminalName: "dummyRule",
+              referencedRule: dummyRule
+            })
+          ]
+        })
+      )
+    }
+
+    const ruleWithTooManyAlts = new Rule({
+      name: "blah",
+      definition: [new Alternation({ definition: alternatives })]
+    })
+
+    const actual = validateTooManyAlts(
+      ruleWithTooManyAlts,
+      defaultGrammarValidatorErrorProvider
+    )
+    expect(actual).to.have.lengthOf(1)
+    expect(actual[0].type).to.equal(ParserDefinitionErrorType.TOO_MANY_ALTS)
+    expect(actual[0].ruleName).to.equal("blah")
+    expect(actual[0].message).to.contain(
+      "An Alternation cannot have more than 256 alternatives"
+    )
+  })
 })
 
 export class PlusTok {
@@ -426,36 +465,15 @@ export class StarTok {
   static PATTERN = /NA/
 }
 
-class ErroneousOccurrenceNumUsageParser2 extends EmbeddedActionsParser {
-  constructor(input: IToken[] = []) {
-    super([PlusTok])
-    this.performSelfAnalysis()
-    this.input = input
-  }
-
-  public duplicateTerminal = this.RULE("duplicateTerminal", () => {
-    this.CONSUME3(PlusTok)
-    this.CONSUME3(PlusTok)
-  })
-}
-
-const myToken = createToken({ name: "myToken" })
-const myOtherToken = createToken({ name: "myOtherToken" })
-
-class ValidOccurrenceNumUsageParser extends EmbeddedActionsParser {
-  constructor(input: IToken[] = []) {
-    super([myToken, myOtherToken])
-    this.performSelfAnalysis()
-    this.input = input
-  }
-
-  public anonymousTokens = this.RULE("anonymousTokens", () => {
-    this.CONSUME1(myToken)
-    this.CONSUME1(myOtherToken)
-  })
-}
-
 describe("The duplicate occurrence validations full flow", () => {
+  let myToken: TokenType
+  let myOtherToken: TokenType
+
+  before(() => {
+    myToken = createToken({ name: "myToken" })
+    myOtherToken = createToken({ name: "myOtherToken" })
+  })
+
   it("will throw errors on duplicate Terminals consumption in the same top level rule", () => {
     class ErroneousOccurrenceNumUsageParser1 extends EmbeddedActionsParser {
       constructor(input: IToken[] = []) {
@@ -483,6 +501,19 @@ describe("The duplicate occurrence validations full flow", () => {
   })
 
   it("will throw errors on duplicate Subrules references in the same top level rule", () => {
+    class ErroneousOccurrenceNumUsageParser2 extends EmbeddedActionsParser {
+      constructor(input: IToken[] = []) {
+        super([PlusTok])
+        this.performSelfAnalysis()
+        this.input = input
+      }
+
+      public duplicateTerminal = this.RULE("duplicateTerminal", () => {
+        this.CONSUME3(PlusTok)
+        this.CONSUME3(PlusTok)
+      })
+    }
+
     expect(() => new ErroneousOccurrenceNumUsageParser2()).to.throw("CONSUME")
     expect(() => new ErroneousOccurrenceNumUsageParser2()).to.throw("3")
     expect(() => new ErroneousOccurrenceNumUsageParser2()).to.throw("PlusTok")
@@ -519,12 +550,26 @@ describe("The duplicate occurrence validations full flow", () => {
   })
 
   it("won't detect issues in a Parser using Tokens created by extendToken(...) utility (anonymous)", () => {
-    //noinspection JSUnusedLocalSymbols
+    class ValidOccurrenceNumUsageParser extends EmbeddedActionsParser {
+      constructor(input: IToken[] = []) {
+        super([myToken, myOtherToken])
+        this.performSelfAnalysis()
+        this.input = input
+      }
+
+      public anonymousTokens = this.RULE("anonymousTokens", () => {
+        this.CONSUME1(myToken)
+        this.CONSUME1(myOtherToken)
+      })
+    }
     const parser = new ValidOccurrenceNumUsageParser()
   })
 })
 
 describe("The Recorder runtime checks full flow", () => {
+  const myToken = createToken({ name: "myToken" })
+  const myOtherToken = createToken({ name: "myOtherToken" })
+
   it("will return EOF for LA calls during recording phase", () => {
     class LookAheadParser extends EmbeddedActionsParser {
       constructor(input: IToken[] = []) {
@@ -824,6 +869,9 @@ describe("The Recorder runtime checks full flow", () => {
 })
 
 describe("The reference resolver validation full flow", () => {
+  const myToken = createToken({ name: "myToken" })
+  const myOtherToken = createToken({ name: "myOtherToken" })
+
   it(
     "won't throw an error when trying to init a parser with definition errors but with a flag active to defer handling" +
       "of definition errors",
@@ -854,29 +902,26 @@ describe("The reference resolver validation full flow", () => {
   )
 })
 
-class DuplicateRulesParser extends EmbeddedActionsParser {
-  constructor(input: IToken[] = []) {
-    super([myToken, myOtherToken])
-    this.performSelfAnalysis()
-    this.input = input
-  }
-
-  public one = this.RULE("oops_duplicate", () => {})
-  public two = this.RULE("oops_duplicate", () => {})
-}
-
-class InvalidRuleNameParser extends EmbeddedActionsParser {
-  constructor(input: IToken[] = []) {
-    super([myToken, myOtherToken])
-    this.performSelfAnalysis()
-    this.input = input
-  }
-
-  public one = this.RULE("שלום", () => {})
-}
-
 describe("The rule names validation full flow", () => {
+  let myToken: TokenType
+  let myOtherToken: TokenType
+
+  before(() => {
+    myToken = createToken({ name: "myToken" })
+    myOtherToken = createToken({ name: "myOtherToken" })
+  })
+
   it("will throw an error when trying to init a parser with duplicate ruleNames", () => {
+    class DuplicateRulesParser extends EmbeddedActionsParser {
+      constructor(input: IToken[] = []) {
+        super([myToken, myOtherToken])
+        this.performSelfAnalysis()
+        this.input = input
+      }
+
+      public one = this.RULE("oops_duplicate", () => {})
+      public two = this.RULE("oops_duplicate", () => {})
+    }
     expect(() => new DuplicateRulesParser()).to.throw(
       "is already defined in the grammar"
     )
@@ -888,6 +933,25 @@ describe("The rule names validation full flow", () => {
     "won't throw an errors when trying to init a parser with definition errors but with a flag active to defer handling" +
       "of definition errors (ruleName validation",
     () => {
+      class InvalidRuleNameParser extends EmbeddedActionsParser {
+        constructor(input: IToken[] = []) {
+          super([myToken, myOtherToken])
+          this.performSelfAnalysis()
+          this.input = input
+        }
+
+        public one = this.RULE("שלום", () => {})
+      }
+      class DuplicateRulesParser extends EmbeddedActionsParser {
+        constructor(input: IToken[] = []) {
+          super([myToken, myOtherToken])
+          this.performSelfAnalysis()
+          this.input = input
+        }
+
+        public one = this.RULE("oops_duplicate", () => {})
+        public two = this.RULE("oops_duplicate", () => {})
+      }
       Object.getPrototypeOf(
         EmbeddedActionsParser
       ).DEFER_DEFINITION_ERRORS_HANDLING = true
@@ -1521,38 +1585,6 @@ describe("The no non-empty lookahead validation", () => {
     )
     expect(() => new EmptyLookaheadParserManySep()).to.throw(
       "within Rule <someRule>"
-    )
-  })
-
-  it("will throw an error when there are too many alternatives in an alternation", () => {
-    const alternatives = []
-    for (let i = 0; i < 256; i++) {
-      alternatives.push(
-        new Alternative({
-          definition: [
-            new NonTerminal({
-              nonTerminalName: "dummyRule",
-              referencedRule: dummyRule
-            })
-          ]
-        })
-      )
-    }
-
-    const ruleWithTooManyAlts = new Rule({
-      name: "blah",
-      definition: [new Alternation({ definition: alternatives })]
-    })
-
-    const actual = validateTooManyAlts(
-      ruleWithTooManyAlts,
-      defaultGrammarValidatorErrorProvider
-    )
-    expect(actual).to.have.lengthOf(1)
-    expect(actual[0].type).to.equal(ParserDefinitionErrorType.TOO_MANY_ALTS)
-    expect(actual[0].ruleName).to.equal("blah")
-    expect(actual[0].message).to.contain(
-      "An Alternation cannot have more than 256 alternatives"
     )
   })
 })

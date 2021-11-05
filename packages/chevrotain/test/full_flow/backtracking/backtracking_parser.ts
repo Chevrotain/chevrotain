@@ -4,8 +4,8 @@
 // generally one should avoid having to use backtracking, and this specific example can be resolved by parsing
 // both statements in a single rule and only distinguishing between them later, but lets see an example of using backtracking :)
 
-import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
 import { IParserConfig } from "@chevrotain/types"
+import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
 
 export enum RET_TYPE {
   WITH_DEFAULT,

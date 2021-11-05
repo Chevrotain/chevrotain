@@ -1,4 +1,4 @@
-import { END_OF_FILE, Parser } from "../../../src/parse/parser/parser"
+import { END_OF_FILE } from "../../../src/parse/parser/parser"
 import { createToken } from "../../../src/scan/tokens_public"
 import {
   buildAlternativesLookAheadFunc,
@@ -30,343 +30,8 @@ import {
 import { IToken, TokenType } from "@chevrotain/types"
 import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
 import { expect } from "chai"
-
-const IdentTok = createToken({ name: "IdentTok" })
-const DotTok = createToken({ name: "DotTok" })
-const DotDotTok = createToken({ name: "DotDotTok" })
-const ColonTok = createToken({ name: "ColonTok" })
-const LSquareTok = createToken({ name: "LSquareTok" })
-const RSquareTok = createToken({ name: "RSquareTok" })
-const ActionTok = createToken({ name: "ActionTok" })
-const LParenTok = createToken({ name: "LParenTok" })
-const RParenTok = createToken({ name: "RParenTok" })
-const CommaTok = createToken({ name: "CommaTok" })
-const SemicolonTok = createToken({ name: "SemicolonTok" })
-const UnsignedIntegerLiteralTok = createToken({
-  name: "UnsignedIntegerLiteralTok"
-})
-const DefaultTok = createToken({ name: "DefaultTok" })
-const AsteriskTok = createToken({ name: "AsteriskTok" })
-const EntityTok = createToken({ name: "EntityTok" })
-const KeyTok = createToken({ name: "KeyTok" })
-
-const atLeastOneRule = new Rule({
-  name: "atLeastOneRule",
-  definition: [
-    new RepetitionMandatory({
-      definition: [
-        new RepetitionMandatory({
-          definition: [
-            new RepetitionMandatory({
-              definition: [new Terminal({ terminalType: EntityTok })],
-              idx: 3
-            }),
-            new Terminal({ terminalType: CommaTok })
-          ],
-          idx: 2
-        }),
-        new Terminal({ terminalType: DotTok, idx: 1 })
-      ]
-    }),
-    new Terminal({ terminalType: DotTok, idx: 2 })
-  ]
-})
-
-const atLeastOneSepRule = new Rule({
-  name: "atLeastOneSepRule",
-  definition: [
-    new RepetitionMandatoryWithSeparator({
-      definition: [
-        new RepetitionMandatoryWithSeparator({
-          definition: [
-            new RepetitionMandatoryWithSeparator({
-              definition: [new Terminal({ terminalType: EntityTok })],
-              separator: SemicolonTok,
-              idx: 3
-            }),
-            new Terminal({ terminalType: CommaTok })
-          ],
-          separator: SemicolonTok,
-          idx: 2
-        }),
-        new Terminal({ terminalType: DotTok, idx: 1 })
-      ],
-      separator: SemicolonTok
-    }),
-    new Terminal({ terminalType: DotTok, idx: 2 })
-  ]
-})
-
-const qualifiedName = new Rule({
-  name: "qualifiedName",
-  definition: [
-    new Terminal({ terminalType: IdentTok }),
-    new Repetition({
-      definition: [
-        new Terminal({ terminalType: DotTok }),
-        new Terminal({ terminalType: IdentTok, idx: 2 })
-      ]
-    })
-  ]
-})
-
-const qualifiedNameSep = new Rule({
-  name: "qualifiedNameSep",
-  definition: [
-    new RepetitionMandatoryWithSeparator({
-      definition: [new Terminal({ terminalType: IdentTok, idx: 1 })],
-      separator: DotTok
-    })
-  ]
-})
-
-const paramSpec = new Rule({
-  name: "paramSpec",
-  definition: [
-    new Terminal({ terminalType: IdentTok }),
-    new Terminal({ terminalType: ColonTok }),
-    new NonTerminal({
-      nonTerminalName: "qualifiedName",
-      referencedRule: qualifiedName
-    }),
-    new Option({
-      definition: [
-        new Terminal({ terminalType: LSquareTok }),
-        new Terminal({ terminalType: RSquareTok })
-      ]
-    })
-  ]
-})
-
-const actionDec = new Rule({
-  name: "actionDec",
-  definition: [
-    new Terminal({ terminalType: ActionTok }),
-    new Terminal({ terminalType: IdentTok }),
-    new Terminal({ terminalType: LParenTok }),
-    new Option({
-      definition: [
-        new NonTerminal({
-          nonTerminalName: "paramSpec",
-          referencedRule: paramSpec
-        }),
-        new Repetition({
-          definition: [
-            new Terminal({ terminalType: CommaTok }),
-            new NonTerminal({
-              nonTerminalName: "paramSpec",
-              referencedRule: paramSpec,
-              idx: 2
-            })
-          ]
-        })
-      ]
-    }),
-    new Terminal({ terminalType: RParenTok }),
-    new Option({
-      definition: [
-        new Terminal({ terminalType: ColonTok }),
-        new NonTerminal({
-          nonTerminalName: "qualifiedName",
-          referencedRule: qualifiedName
-        })
-      ],
-      idx: 2
-    }),
-    new Terminal({ terminalType: SemicolonTok })
-  ]
-})
-
-const actionDecSep = new Rule({
-  name: "actionDecSep",
-  definition: [
-    new Terminal({ terminalType: ActionTok }),
-    new Terminal({ terminalType: IdentTok }),
-    new Terminal({ terminalType: LParenTok }),
-
-    new RepetitionWithSeparator({
-      definition: [
-        new NonTerminal({
-          nonTerminalName: "paramSpec",
-          referencedRule: paramSpec,
-          idx: 2
-        })
-      ],
-      separator: CommaTok
-    }),
-
-    new Terminal({ terminalType: RParenTok }),
-    new Option({
-      definition: [
-        new Terminal({ terminalType: ColonTok }),
-        new NonTerminal({
-          nonTerminalName: "qualifiedName",
-          referencedRule: qualifiedName
-        })
-      ],
-      idx: 2
-    }),
-    new Terminal({ terminalType: SemicolonTok })
-  ]
-})
-
-const manyActions = new Rule({
-  name: "manyActions",
-  definition: [
-    new Repetition({
-      definition: [
-        new NonTerminal({
-          nonTerminalName: "actionDec",
-          referencedRule: actionDec,
-          idx: 1
-        })
-      ]
-    })
-  ]
-})
-
-const cardinality = new Rule({
-  name: "cardinality",
-  definition: [
-    new Terminal({ terminalType: LSquareTok }),
-    new Terminal({ terminalType: UnsignedIntegerLiteralTok }),
-    new Terminal({ terminalType: DotDotTok }),
-    new Alternation({
-      definition: [
-        new Alternative({
-          definition: [
-            new Terminal({
-              terminalType: UnsignedIntegerLiteralTok,
-              idx: 2
-            })
-          ]
-        }),
-        new Alternative({
-          definition: [new Terminal({ terminalType: AsteriskTok })]
-        })
-      ]
-    }),
-    new Terminal({ terminalType: RSquareTok })
-  ]
-})
-
-const assignedTypeSpec = new Rule({
-  name: "assignedTypeSpec",
-  definition: [
-    new Terminal({ terminalType: ColonTok }),
-    new NonTerminal({ nonTerminalName: "assignedType" }),
-
-    new Option({
-      definition: [new NonTerminal({ nonTerminalName: "enumClause" })]
-    }),
-
-    new Option({
-      definition: [
-        new Terminal({ terminalType: DefaultTok }),
-        new NonTerminal({ nonTerminalName: "expression" })
-      ],
-      idx: 2
-    })
-  ]
-})
-
-const lotsOfOrs = new Rule({
-  name: "lotsOfOrs",
-  definition: [
-    new Alternation({
-      definition: [
-        new Alternative({
-          definition: [
-            new Alternation({
-              definition: [
-                new Alternative({
-                  definition: [
-                    new Terminal({
-                      terminalType: CommaTok,
-                      idx: 1
-                    })
-                  ]
-                }),
-                new Alternative({
-                  definition: [
-                    new Terminal({
-                      terminalType: KeyTok,
-                      idx: 1
-                    })
-                  ]
-                })
-              ],
-              idx: 2
-            })
-          ]
-        }),
-        new Alternative({
-          definition: [
-            new Terminal({
-              terminalType: EntityTok,
-              idx: 1
-            })
-          ]
-        })
-      ]
-    }),
-    new Alternation({
-      definition: [
-        new Alternative({
-          definition: [
-            new Terminal({
-              terminalType: DotTok,
-              idx: 1
-            })
-          ]
-        })
-      ],
-      idx: 3
-    })
-  ]
-})
-
-const emptyAltOr = new Rule({
-  name: "emptyAltOr",
-  definition: [
-    new Alternation({
-      definition: [
-        new Alternative({
-          definition: [
-            new Terminal({
-              terminalType: KeyTok,
-              idx: 1
-            })
-          ]
-        }),
-        new Alternative({
-          definition: [
-            new Terminal({
-              terminalType: EntityTok,
-              idx: 1
-            })
-          ]
-        }),
-        new Alternative({ definition: [] }) // an empty alternative
-      ]
-    })
-  ]
-})
-
-const callArguments = new Rule({
-  name: "callArguments",
-  definition: [
-    new RepetitionWithSeparator({
-      definition: [new Terminal({ terminalType: IdentTok, idx: 1 })],
-      separator: CommaTok
-    }),
-    new RepetitionWithSeparator({
-      definition: [new Terminal({ terminalType: IdentTok, idx: 2 })],
-      separator: CommaTok,
-      idx: 2
-    })
-  ]
-})
+import { AST } from "eslint"
+import Token = AST.Token
 
 describe("getProdType", () => {
   it("handles `Option`", () => {
@@ -409,60 +74,240 @@ describe("getProdType", () => {
 })
 
 context("lookahead specs", () => {
-  class ColonParserMock extends EmbeddedActionsParser {
-    constructor() {
-      super([ColonTok])
-    }
+  let ColonParserMockVar: any
+  let IdentParserMockVar: any
+  let CommaParserMockVar: any
+  let KeyParserMockVar: any
+  let EntityParserMockVar: any
+  let actionDec: Rule
+  let lotsOfOrs: Rule
+  let emptyAltOr: Rule
 
-    LA(): IToken {
-      return createRegularToken(ColonTok, ":")
-    }
-  }
+  before(() => {
+    const IdentTok = createToken({ name: "IdentTok" })
+    const DotTok = createToken({ name: "DotTok" })
+    const ColonTok = createToken({ name: "ColonTok" })
+    const LSquareTok = createToken({ name: "LSquareTok" })
+    const RSquareTok = createToken({ name: "RSquareTok" })
+    const ActionTok = createToken({ name: "ActionTok" })
+    const LParenTok = createToken({ name: "LParenTok" })
+    const RParenTok = createToken({ name: "RParenTok" })
+    const CommaTok = createToken({ name: "CommaTok" })
+    const SemicolonTok = createToken({ name: "SemicolonTok" })
+    const EntityTok = createToken({ name: "EntityTok" })
+    const KeyTok = createToken({ name: "KeyTok" })
 
-  class IdentParserMock extends EmbeddedActionsParser {
-    constructor() {
-      super([IdentTok])
-    }
+    const qualifiedName = new Rule({
+      name: "qualifiedName",
+      definition: [
+        new Terminal({ terminalType: IdentTok }),
+        new Repetition({
+          definition: [
+            new Terminal({ terminalType: DotTok }),
+            new Terminal({ terminalType: IdentTok, idx: 2 })
+          ]
+        })
+      ]
+    })
+    const paramSpec = new Rule({
+      name: "paramSpec",
+      definition: [
+        new Terminal({ terminalType: IdentTok }),
+        new Terminal({ terminalType: ColonTok }),
+        new NonTerminal({
+          nonTerminalName: "qualifiedName",
+          referencedRule: qualifiedName
+        }),
+        new Option({
+          definition: [
+            new Terminal({ terminalType: LSquareTok }),
+            new Terminal({ terminalType: RSquareTok })
+          ]
+        })
+      ]
+    })
+    actionDec = new Rule({
+      name: "actionDec",
+      definition: [
+        new Terminal({ terminalType: ActionTok }),
+        new Terminal({ terminalType: IdentTok }),
+        new Terminal({ terminalType: LParenTok }),
+        new Option({
+          definition: [
+            new NonTerminal({
+              nonTerminalName: "paramSpec",
+              referencedRule: paramSpec
+            }),
+            new Repetition({
+              definition: [
+                new Terminal({ terminalType: CommaTok }),
+                new NonTerminal({
+                  nonTerminalName: "paramSpec",
+                  referencedRule: paramSpec,
+                  idx: 2
+                })
+              ]
+            })
+          ]
+        }),
+        new Terminal({ terminalType: RParenTok }),
+        new Option({
+          definition: [
+            new Terminal({ terminalType: ColonTok }),
+            new NonTerminal({
+              nonTerminalName: "qualifiedName",
+              referencedRule: qualifiedName
+            })
+          ],
+          idx: 2
+        }),
+        new Terminal({ terminalType: SemicolonTok })
+      ]
+    })
 
-    LA(): IToken {
-      return createRegularToken(IdentTok, "bamba")
-    }
-  }
+    lotsOfOrs = new Rule({
+      name: "lotsOfOrs",
+      definition: [
+        new Alternation({
+          definition: [
+            new Alternative({
+              definition: [
+                new Alternation({
+                  definition: [
+                    new Alternative({
+                      definition: [
+                        new Terminal({
+                          terminalType: CommaTok,
+                          idx: 1
+                        })
+                      ]
+                    }),
+                    new Alternative({
+                      definition: [
+                        new Terminal({
+                          terminalType: KeyTok,
+                          idx: 1
+                        })
+                      ]
+                    })
+                  ],
+                  idx: 2
+                })
+              ]
+            }),
+            new Alternative({
+              definition: [
+                new Terminal({
+                  terminalType: EntityTok,
+                  idx: 1
+                })
+              ]
+            })
+          ]
+        }),
+        new Alternation({
+          definition: [
+            new Alternative({
+              definition: [
+                new Terminal({
+                  terminalType: DotTok,
+                  idx: 1
+                })
+              ]
+            })
+          ],
+          idx: 3
+        })
+      ]
+    })
 
-  class CommaParserMock extends EmbeddedActionsParser {
-    constructor() {
-      super([CommaTok])
-    }
+    emptyAltOr = new Rule({
+      name: "emptyAltOr",
+      definition: [
+        new Alternation({
+          definition: [
+            new Alternative({
+              definition: [
+                new Terminal({
+                  terminalType: KeyTok,
+                  idx: 1
+                })
+              ]
+            }),
+            new Alternative({
+              definition: [
+                new Terminal({
+                  terminalType: EntityTok,
+                  idx: 1
+                })
+              ]
+            }),
+            new Alternative({ definition: [] }) // an empty alternative
+          ]
+        })
+      ]
+    })
 
-    LA(): IToken {
-      return createRegularToken(CommaTok, ",")
-    }
-  }
+    class ColonParserMock extends EmbeddedActionsParser {
+      constructor() {
+        super([ColonTok])
+      }
 
-  class EntityParserMock extends EmbeddedActionsParser {
-    constructor() {
-      super([EntityTok])
+      LA(): IToken {
+        return createRegularToken(ColonTok, ":")
+      }
     }
+    ColonParserMockVar = ColonParserMock
 
-    LA(): IToken {
-      return createRegularToken(EntityTok, ",")
-    }
-  }
+    class IdentParserMock extends EmbeddedActionsParser {
+      constructor() {
+        super([IdentTok])
+      }
 
-  class KeyParserMock extends EmbeddedActionsParser {
-    constructor() {
-      super([KeyTok])
+      LA(): IToken {
+        return createRegularToken(IdentTok, "bamba")
+      }
     }
+    IdentParserMockVar = IdentParserMock
 
-    LA(): IToken {
-      return createRegularToken(KeyTok, ",")
+    class CommaParserMock extends EmbeddedActionsParser {
+      constructor() {
+        super([CommaTok])
+      }
+
+      LA(): IToken {
+        return createRegularToken(CommaTok, ",")
+      }
     }
-  }
+    CommaParserMockVar = CommaParserMock
+
+    class EntityParserMock extends EmbeddedActionsParser {
+      constructor() {
+        super([EntityTok])
+      }
+
+      LA(): IToken {
+        return createRegularToken(EntityTok, ",")
+      }
+    }
+    EntityParserMockVar = EntityParserMock
+
+    class KeyParserMock extends EmbeddedActionsParser {
+      constructor() {
+        super([KeyTok])
+      }
+
+      LA(): IToken {
+        return createRegularToken(KeyTok, ",")
+      }
+    }
+    KeyParserMockVar = KeyParserMock
+  })
 
   describe("The Grammar Lookahead namespace", () => {
     it("can compute the lookahead function for the first OPTION in ActionDec", () => {
-      const colonMock = new ColonParserMock()
-      const indentMock = new IdentParserMock()
+      const colonMock = new ColonParserMockVar()
+      const indentMock = new IdentParserMockVar()
 
       const laFunc = buildLookaheadFuncForOptionalProd(
         1,
@@ -478,8 +323,8 @@ context("lookahead specs", () => {
     })
 
     it("can compute the lookahead function for the second OPTION in ActionDec", () => {
-      const colonParserMock = new ColonParserMock()
-      const identParserMock = new IdentParserMock()
+      const colonParserMock = new ColonParserMockVar()
+      const identParserMock = new IdentParserMockVar()
 
       const laFunc = buildLookaheadFuncForOptionalProd(
         2,
@@ -532,8 +377,8 @@ context("lookahead specs", () => {
     })
 
     it("can compute the lookahead function for the first MANY in ActionDec", () => {
-      const identParserMock = new IdentParserMock()
-      const commaParserMock = new CommaParserMock()
+      const identParserMock = new IdentParserMockVar()
+      const commaParserMock = new CommaParserMockVar()
 
       const laFunc = buildLookaheadFuncForOptionalProd(
         1,
@@ -549,10 +394,10 @@ context("lookahead specs", () => {
     })
 
     it("can compute the lookahead function for lots of ORs sample", () => {
-      const keyParserMock = new KeyParserMock()
-      const entityParserMock = new EntityParserMock()
-      const colonParserMock = new ColonParserMock()
-      const commaParserMock = new CommaParserMock()
+      const keyParserMock = new KeyParserMockVar()
+      const entityParserMock = new EntityParserMockVar()
+      const colonParserMock = new ColonParserMockVar()
+      const commaParserMock = new CommaParserMockVar()
 
       const laFunc = buildLookaheadFuncForOr(
         1,
@@ -620,9 +465,9 @@ context("lookahead specs", () => {
     })
 
     it("can compute the lookahead function for EMPTY OR sample", () => {
-      const commaParserMock = new CommaParserMock()
-      const keyParserMock = new KeyParserMock()
-      const entityParserMock = new EntityParserMock()
+      const commaParserMock = new CommaParserMockVar()
+      const keyParserMock = new KeyParserMockVar()
+      const entityParserMock = new EntityParserMockVar()
 
       const laFunc = buildLookaheadFuncForOr(
         1,
@@ -641,21 +486,30 @@ context("lookahead specs", () => {
   })
 
   describe("The chevrotain grammar lookahead capabilities", () => {
-    const Alpha = createToken({ name: "Alpha" })
-    const ExtendsAlpha = createToken({
-      name: "ExtendsAlpha",
-      categories: Alpha
-    })
-    const ExtendsAlphaAlpha = createToken({
-      name: "ExtendsAlphaAlpha",
-      categories: ExtendsAlpha
-    })
-    const Beta = createToken({ name: "Beta" })
-    const Charlie = createToken({ name: "Charlie" })
-    const Delta = createToken({ name: "Delta" })
-    const Gamma = createToken({ name: "Gamma" })
+    let Alpha: TokenType
+    let ExtendsAlpha: TokenType
+    let ExtendsAlphaAlpha: TokenType
+    let Beta: TokenType
+    let Charlie: TokenType
+    let Delta: TokenType
+    let Gamma: TokenType
 
-    augmentTokenTypes([Alpha, Beta, Delta, Gamma, Charlie, ExtendsAlphaAlpha])
+    before(() => {
+      Alpha = createToken({ name: "Alpha" })
+      ExtendsAlpha = createToken({
+        name: "ExtendsAlpha",
+        categories: Alpha
+      })
+      ExtendsAlphaAlpha = createToken({
+        name: "ExtendsAlphaAlpha",
+        categories: ExtendsAlpha
+      })
+      Beta = createToken({ name: "Beta" })
+      Charlie = createToken({ name: "Charlie" })
+      Delta = createToken({ name: "Delta" })
+      Gamma = createToken({ name: "Gamma" })
+      augmentTokenTypes([Alpha, Beta, Delta, Gamma, Charlie, ExtendsAlphaAlpha])
+    })
 
     context("computing lookahead sequences for", () => {
       it("two simple one token alternatives", () => {

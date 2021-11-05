@@ -609,7 +609,9 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     static PATTERN = /NA/
   }
 
-  augmentTokenTypes([Alpha, Beta, Gamma, Comma])
+  before(() => {
+    augmentTokenTypes([Alpha, Beta, Gamma, Comma])
+  })
 
   context("can calculate the next possible paths in a", () => {
     it("Sequence", () => {

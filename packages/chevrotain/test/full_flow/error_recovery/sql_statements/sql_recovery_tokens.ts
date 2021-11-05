@@ -51,7 +51,6 @@ export class DotTok {
   static PATTERN = /NA/
 }
 
-/* tslint:disable:class-name */
 // virtual tokens for Building the parseTree, these just give a "type/specification/categorization" to a ParseTree
 export class STATEMENTS extends VirtualToken {}
 export class CREATE_STMT extends VirtualToken {}
@@ -69,4 +68,3 @@ export class INVALID_CREATE_STMT extends CREATE_STMT {}
 export class INVALID_INSERT_STMT extends INSERT_STMT {}
 export class INVALID_DELETE_STMT extends DELETE_STMT {}
 export class INVALID_QUALIFIED_NAME extends QUALIFIED_NAME {}
-/* tslint:enable:class-name */
