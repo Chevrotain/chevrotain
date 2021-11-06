@@ -1,12 +1,4 @@
 import { first } from "../../../src/parse/grammar/first"
-import {
-  EntityTok,
-  CommaTok,
-  NamespaceTok,
-  TypeTok,
-  ColonTok,
-  ConstTok
-} from "./samples"
 import { setEquality } from "../../utils/matchers"
 import {
   Alternative,
@@ -15,9 +7,12 @@ import {
   Alternation
 } from "../../../src/parse/grammar/gast/gast_public"
 import { expect } from "chai"
+import { createToken } from "../../../src/scan/tokens_public"
 
 describe("The Grammar Ast first model", () => {
   it("can compute the first for a terminal", () => {
+    const CommaTok = createToken({ name: "CommaTok", pattern: /NA/ })
+    const EntityTok = createToken({ name: "EntityTok", pattern: /NA/ })
     const terminal = new Terminal({ terminalType: EntityTok })
     const actual = first(terminal)
     expect(actual.length).to.equal(1)
@@ -30,6 +25,8 @@ describe("The Grammar Ast first model", () => {
   })
 
   it("can compute the first for a Sequence production ", () => {
+    const EntityTok = createToken({ name: "EntityTok", pattern: /NA/ })
+    const NamespaceTok = createToken({ name: "NamespaceTok", pattern: /NA/ })
     const seqProduction = new Alternative({
       definition: [new Terminal({ terminalType: EntityTok })]
     })
@@ -51,6 +48,9 @@ describe("The Grammar Ast first model", () => {
   })
 
   it("can compute the first for an alternatives production ", () => {
+    const EntityTok = createToken({ name: "EntityTok", pattern: /NA/ })
+    const NamespaceTok = createToken({ name: "NamespaceTok", pattern: /NA/ })
+    const TypeTok = createToken({ name: "TypeTok", pattern: /NA/ })
     const altProduction = new Alternation({
       definition: [
         new Alternative({
@@ -72,6 +72,11 @@ describe("The Grammar Ast first model", () => {
   })
 
   it("can compute the first for an production with optional prefix", () => {
+    const EntityTok = createToken({ name: "EntityTok", pattern: /NA/ })
+    const NamespaceTok = createToken({ name: "NamespaceTok", pattern: /NA/ })
+    const ConstTok = createToken({ name: "ConstTok", pattern: /NA/ })
+    const ColonTok = createToken({ name: "ColonTok", pattern: /NA/ })
+
     const withOptionalPrefix = new Alternative({
       definition: [
         new Option({

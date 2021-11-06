@@ -7,7 +7,6 @@ import {
   END_OF_FILE,
   ParserDefinitionErrorType
 } from "../../../src/parse/parser/parser"
-import { actionDec, DotTok, IdentTok, qualifiedName } from "./samples"
 import {
   getFirstNoneTerminal,
   identifyProductionForDuplicates,
@@ -34,6 +33,31 @@ import {
 import { defaultGrammarValidatorErrorProvider } from "../../../src/parse/errors_public"
 import { IToken, TokenType } from "@chevrotain/types"
 import { expect } from "chai"
+import { createDeferredTokenBuilder } from "../../utils/builders"
+
+const getIdentTok = createDeferredTokenBuilder({
+  name: "IdentTok",
+  pattern: /NA/
+})
+const getDotTok = createDeferredTokenBuilder({
+  name: "DotTok",
+  pattern: /NA/
+})
+
+function buildQualifiedName(): Rule {
+  return new Rule({
+    name: "qualifiedName",
+    definition: [
+      new Terminal({ terminalType: getIdentTok() }),
+      new Repetition({
+        definition: [
+          new Terminal({ terminalType: getDotTok() }),
+          new Terminal({ terminalType: getIdentTok(), idx: 2 })
+        ]
+      })
+    ]
+  })
+}
 
 describe("the grammar validations", () => {
   it("validates every one of the TOP_RULEs in the input", () => {
@@ -70,12 +94,12 @@ describe("the grammar validations", () => {
     const qualifiedNameErr1 = new Rule({
       name: "qualifiedNameErr1",
       definition: [
-        new Terminal({ terminalType: IdentTok, idx: 1 }),
+        new Terminal({ terminalType: getIdentTok(), idx: 1 }),
         new Repetition({
           definition: [
-            new Terminal({ terminalType: DotTok }),
+            new Terminal({ terminalType: getDotTok() }),
             new Terminal({
-              terminalType: IdentTok,
+              terminalType: getIdentTok(),
               idx: 1
             }) // duplicate Terminal IdentTok with occurrence index 1
           ]
@@ -86,21 +110,21 @@ describe("the grammar validations", () => {
     const qualifiedNameErr2 = new Rule({
       name: "qualifiedNameErr2",
       definition: [
-        new Terminal({ terminalType: IdentTok, idx: 1 }),
+        new Terminal({ terminalType: getIdentTok(), idx: 1 }),
         new Repetition({
           definition: [
-            new Terminal({ terminalType: DotTok }),
+            new Terminal({ terminalType: getDotTok() }),
             new Terminal({
-              terminalType: IdentTok,
+              terminalType: getIdentTok(),
               idx: 2
             })
           ]
         }),
         new Repetition({
           definition: [
-            new Terminal({ terminalType: DotTok }),
+            new Terminal({ terminalType: getDotTok() }),
             new Terminal({
-              terminalType: IdentTok,
+              terminalType: getIdentTok(),
               idx: 2
             })
           ]
@@ -215,16 +239,86 @@ describe("identifyProductionForDuplicates function", () => {
 
   it("generates DSL code for a Terminal", () => {
     const dslCode = identifyProductionForDuplicates(
-      new Terminal({ terminalType: IdentTok, idx: 4 })
+      new Terminal({ terminalType: getIdentTok(), idx: 4 })
     )
     expect(dslCode).to.equal("CONSUME_#_4_#_IdentTok")
   })
 })
 
 describe("OccurrenceValidationCollector GASTVisitor class", () => {
+  let actionDec: Rule
+
+  before(() => {
+    const LParenTok = createToken({ name: "LParenTok", pattern: /NA/ })
+    const RParenTok = createToken({ name: "RParenTok", pattern: /NA/ })
+    const LSquareTok = createToken({ name: "LSquareTok", pattern: /NA/ })
+    const RSquareTok = createToken({ name: "RSquareTok", pattern: /NA/ })
+    const ColonTok = createToken({ name: "ColonTok", pattern: /NA/ })
+
+    const paramSpec = new Rule({
+      name: "paramSpec",
+      definition: [
+        new Terminal({ terminalType: getIdentTok() }),
+        new Terminal({ terminalType: ColonTok }),
+        new NonTerminal({
+          nonTerminalName: "qualifiedName",
+          referencedRule: buildQualifiedName()
+        }),
+        new Option({
+          definition: [
+            new Terminal({ terminalType: LSquareTok }),
+            new Terminal({ terminalType: RSquareTok })
+          ]
+        })
+      ]
+    })
+
+    const SemicolonTok = createToken({ name: "SemicolonTok", pattern: /NA/ })
+    const CommaTok = createToken({ name: "CommaTok", pattern: /NA/ })
+    const ActionTok = createToken({ name: "ActionTok", pattern: /NA/ })
+
+    actionDec = new Rule({
+      name: "actionDec",
+      definition: [
+        new Terminal({ terminalType: ActionTok }),
+        new Terminal({ terminalType: getIdentTok() }),
+        new Terminal({ terminalType: LParenTok }),
+        new Option({
+          definition: [
+            new NonTerminal({
+              nonTerminalName: "paramSpec",
+              referencedRule: paramSpec
+            }),
+            new Repetition({
+              definition: [
+                new Terminal({ terminalType: CommaTok }),
+                new NonTerminal({
+                  nonTerminalName: "paramSpec",
+                  referencedRule: paramSpec,
+                  idx: 2
+                })
+              ]
+            })
+          ]
+        }),
+        new Terminal({ terminalType: RParenTok }),
+        new Option({
+          definition: [
+            new Terminal({ terminalType: ColonTok }),
+            new NonTerminal({
+              nonTerminalName: "qualifiedName",
+              referencedRule: buildQualifiedName()
+            })
+          ],
+          idx: 2
+        }),
+        new Terminal({ terminalType: SemicolonTok })
+      ]
+    })
+  })
   it("collects all the productions relevant to occurrence validation", () => {
     const qualifiedNameVisitor = new OccurrenceValidationCollector()
-    qualifiedName.accept(qualifiedNameVisitor)
+    buildQualifiedName().accept(qualifiedNameVisitor)
     expect(qualifiedNameVisitor.allProductions.length).to.equal(4)
 
     // TODO: check set equality
