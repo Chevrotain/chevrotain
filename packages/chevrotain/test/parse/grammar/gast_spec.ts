@@ -15,6 +15,7 @@ import {
   serializeGrammar
 } from "../../../src/parse/grammar/gast/gast_public"
 import { expect } from "chai"
+import { TokenType } from "@chevrotain/types"
 
 describe("GAst namespace", () => {
   describe("the ProdRef class", () => {
@@ -92,15 +93,24 @@ describe("GAst namespace", () => {
   })
 
   describe("the GAst serialization capabilities", () => {
-    const A = createToken({ name: "A" })
-    A.LABEL = "bamba"
-    const B = createToken({ name: "B", pattern: /[a-zA-Z]\w*/ })
-    const C = createToken({ name: "C" })
-    const D = createToken({ name: "D" })
-    const Comma = createToken({ name: "Comma" })
-    const WithLiteral = createToken({
-      name: "WithLiteral",
-      pattern: "bamba"
+    let A: TokenType
+    let B: TokenType
+    let C: TokenType
+    let D: TokenType
+    let Comma: TokenType
+    let WithLiteral: TokenType
+
+    before(() => {
+      A = createToken({ name: "A" })
+      A.LABEL = "bamba"
+      B = createToken({ name: "B", pattern: /[a-zA-Z]\w*/ })
+      C = createToken({ name: "C" })
+      D = createToken({ name: "D" })
+      Comma = createToken({ name: "Comma" })
+      WithLiteral = createToken({
+        name: "WithLiteral",
+        pattern: "bamba"
+      })
     })
 
     it("can serialize a NonTerminal", () => {

@@ -43,8 +43,12 @@ import { augmentTokenTypes } from "../../../../src/scan/tokens"
 import { createRegularToken } from "../../../utils/matchers"
 import { IToken, TokenType } from "@chevrotain/types"
 
-const allTokensToUse = { ...allTokens }
-augmentTokenTypes(values(allTokensToUse))
+// deferred execution to only run "inside" a test
+function initTokens() {
+  const allTokensToUse = { ...allTokens }
+  augmentTokenTypes(values(allTokensToUse))
+  return allTokensToUse
+}
 
 // DOCS: to enable error recovery functionality one must extend BaseErrorRecoveryRecognizer
 export class DDLExampleRecoveryParser extends EmbeddedActionsParser {
@@ -52,7 +56,7 @@ export class DDLExampleRecoveryParser extends EmbeddedActionsParser {
     // DOCS: note the first parameter in the super class. this is the namespace in which the token constructors are defined.
     //       it is mandatory to provide this map to be able to perform self analysis
     //       and allow the framework to "understand" the implemented grammar.
-    super(allTokensToUse, {
+    super(initTokens(), {
       recoveryEnabled: isRecoveryEnabled
     })
     // DOCS: The call to performSelfAnalysis needs to happen after all the RULEs have been defined
@@ -239,11 +243,10 @@ export function WRAP_IN_PT(toks: IToken[]): ParseTree[] {
   return parseTrees
 }
 
-/* tslint:disable:class-name */
 export class INVALID_INPUT extends VirtualToken {
   static PATTERN = /NA/
 }
-/* tslint:enable:class-name */
+
 export function INVALID(tokType: TokenType = INVALID_INPUT): () => ParseTree {
   // virtual invalid tokens should have no parameters...
   return () => {

@@ -163,7 +163,6 @@ export class RecognizerEngine {
 
     // always add EOF to the tokenNames -> constructors map. it is useful to assure all the input has been
     // parsed with a clear error message ("expecting EOF but found ...")
-    /* tslint:disable */
     this.tokensMap["EOF"] = EOF
 
     const allTokenTypes = has(tokenVocabulary, "modes")
@@ -204,10 +203,8 @@ export class RecognizerEngine {
 
     // performance optimization: Use small integers as keys for the longer human readable "full" rule names.
     // this greatly improves Map access time (as much as 8% for some performance benchmarks).
-    /* tslint:disable */
     const shortName =
       this.ruleShortNameIdx << (BITS_FOR_METHOD_TYPE + BITS_FOR_OCCURRENCE_IDX)
-    /* tslint:enable */
 
     this.ruleShortNameIdx++
     this.shortRuleNameToFull[shortName] = ruleName

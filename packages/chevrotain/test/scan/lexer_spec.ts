@@ -34,7 +34,6 @@ import {
   TokenType
 } from "@chevrotain/types"
 import { expect } from "chai"
-import { MatchArray } from "xregexp"
 import { SinonSpy } from "sinon"
 import { TokenMatcher } from "../../src/parse/parser/parser"
 
@@ -51,34 +50,41 @@ function defineLexerSpecs(
   const testStart = lexerConfig.positionTracking === "onlyStart" || testFull
 
   function lexerSpecs() {
-    const IntegerTok = createToken({
-      name: "IntegerTok",
-      pattern: /[1-9]\d*/
-    })
-    const IdentifierTok = createToken({
-      name: "IdentifierTok",
-      pattern: /[A-Za-z_]\w*/
-    })
-    const BambaTok = createToken({ name: "BambaTok", pattern: /bamba/ })
+    let IntegerTok: TokenType
+    let IdentifierTok: TokenType
+    let BambaTok: TokenType
+    let SingleCharacterWithIgnoreCaseFlagTok: TokenType
+    let testLexer: Lexer
 
-    const SingleCharacterWithIgnoreCaseFlagTok = createToken({
-      name: "SingleCharacterWithIgnoreCaseFlagTok",
-      pattern: /a/i
+    before(() => {
+      IntegerTok = createToken({
+        name: "IntegerTok",
+        pattern: /[1-9]\d*/
+      })
+      IdentifierTok = createToken({
+        name: "IdentifierTok",
+        pattern: /[A-Za-z_]\w*/
+      })
+      BambaTok = createToken({ name: "BambaTok", pattern: /bamba/ })
+      BambaTok.LONGER_ALT = IdentifierTok
+
+      SingleCharacterWithIgnoreCaseFlagTok = createToken({
+        name: "SingleCharacterWithIgnoreCaseFlagTok",
+        pattern: /a/i
+      })
+
+      testLexer = new Lexer(
+        [
+          SingleCharacterWithIgnoreCaseFlagTok,
+          BambaTok,
+          IntegerTok,
+          IdentifierTok
+        ],
+        {
+          positionTracking: "onlyOffset"
+        }
+      )
     })
-
-    BambaTok.LONGER_ALT = IdentifierTok
-
-    const testLexer = new Lexer(
-      [
-        SingleCharacterWithIgnoreCaseFlagTok,
-        BambaTok,
-        IntegerTok,
-        IdentifierTok
-      ],
-      {
-        positionTracking: "onlyOffset"
-      }
-    )
 
     describe("The Chevrotain Lexers", () => {
       it("can create a token from a string with priority to the First Token Type with the longest match #1", () => {
@@ -1500,10 +1506,8 @@ function defineLexerSpecs(
         expect(tokenMatcher(lexResult.tokens[0], If)).to.be.true
 
         expect(lexResult.groups).to.have.property("comments")
-        // tslint:disable
         expect(lexResult.groups["comments"]).to.have.length(1)
         const comment = lexResult.groups["comments"][0]
-        // tslint:enable
         expect(comment.image).to.equal("//else")
         expect(comment.startOffset).to.equal(2)
         if (testStart) {
@@ -1523,16 +1527,12 @@ function defineLexerSpecs(
         let lexResult = ifElseLexer.tokenize(input)
 
         expect(lexResult.groups).to.have.property("comments")
-        // tslint:disable
         expect(lexResult.groups["comments"]).to.have.length(1)
-        // tslint:enable
 
         // 2th time
         lexResult = ifElseLexer.tokenize(input)
         expect(lexResult.groups).to.have.property("comments")
-        // tslint:disable
         expect(lexResult.groups["comments"]).to.have.length(1)
-        // tslint:enable
       })
 
       it("can lex a pile of poo", () => {
@@ -1978,12 +1978,7 @@ function defineLexerSpecs(
   }
 }
 
-let skipOnBrowser = describe
-if (typeof window !== "undefined") {
-  skipOnBrowser = <any>describe.skip
-}
-
-skipOnBrowser("debugging and messages and optimizations", () => {
+describe("debugging and messages and optimizations", () => {
   let consoleErrorSpy: SinonSpy, consoleWarnSpy: SinonSpy
 
   beforeEach(function () {

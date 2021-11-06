@@ -8,37 +8,42 @@ import { Lexer } from "../../src/scan/lexer_public"
 import { createTokenInstance } from "../../src/scan/tokens_public"
 import { singleAssignCategoriesToksMap } from "../../src/scan/tokens"
 import { expect } from "chai"
+import { TokenType } from "@chevrotain/types"
 
 describe("The Chevrotain Tokens namespace", () => {
   context("createToken", () => {
-    const TrueLiteral = createToken({ name: "TrueLiteral" })
-    class FalseLiteral {}
+    let TrueLiteral: TokenType
+    let A: TokenType
+    let B: TokenType
+    let C: TokenType
+    let D: TokenType
+    let Plus: TokenType
+
+    before(() => {
+      TrueLiteral = createToken({ name: "TrueLiteral" })
+      A = createToken({ name: "A" })
+      B = createToken({ name: "B", categories: A })
+      B.GROUP = "Special"
+      C = createToken({
+        name: "C",
+        pattern: /\d+/,
+        categories: B
+      })
+      D = createToken({
+        name: "D",
+        pattern: /\w+/,
+        categories: B
+      })
+      Plus = createToken({ name: "Plus", pattern: /\+/ })
+      Plus.LABEL = "+"
+    })
 
     it("assigns `name` property to tokenTypes", () => {
       // FalseLiteral was created with an anonymous function as its constructor yet tokenName(...)
       // should still work correctly on it if the 'tokenName' property has been set on its constructor.
-      expect(FalseLiteral.name).to.equal("FalseLiteral")
       expect(TrueLiteral.name).to.equal("TrueLiteral")
       expect(tokenName(TrueLiteral)).to.equal("TrueLiteral")
     })
-
-    const A = createToken({ name: "A" })
-    const B = createToken({ name: "B", categories: A })
-
-    B.GROUP = "Special"
-
-    const C = createToken({
-      name: "C",
-      pattern: /\d+/,
-      categories: B
-    })
-    const D = createToken({
-      name: "D",
-      pattern: /\w+/,
-      categories: B
-    })
-    const Plus = createToken({ name: "Plus", pattern: /\+/ })
-    Plus.LABEL = "+"
 
     it("provides an createTokenInstance utility - creating an instance", () => {
       const aInstance = createTokenInstance(A, "Hello", 0, 4, 1, 1, 1, 5)

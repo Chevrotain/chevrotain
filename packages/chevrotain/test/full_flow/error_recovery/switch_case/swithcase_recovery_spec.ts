@@ -1,6 +1,3 @@
-// long lines for token init seems more readable to me than to break them up into multiple line.
-/* tslint:disable:max-line-length  */
-
 import {
   SwitchTok,
   LParenTok,
@@ -24,8 +21,10 @@ import { createRegularToken } from "../../../utils/matchers"
 import { expect } from "chai"
 
 describe("Error Recovery switch-case Example", () => {
-  // called for side effect of augmenting
-  new SwitchCaseRecoveryParser([])
+  before(() => {
+    // called for side effect of augmenting
+    new SwitchCaseRecoveryParser([])
+  })
 
   it("can parse a valid text successfully", () => {
     const input = [

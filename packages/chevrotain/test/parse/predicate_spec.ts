@@ -5,7 +5,7 @@ import {
 } from "../../src/parse/exceptions_public"
 import { augmentTokenTypes } from "../../src/scan/tokens"
 import { createRegularToken } from "../utils/matchers"
-import { IToken } from "@chevrotain/types"
+import { IToken, TokenType } from "@chevrotain/types"
 import { expect } from "chai"
 
 describe("The chevrotain support for custom gates/predicates on DSL production:", () => {
@@ -21,8 +21,11 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
     static PATTERN = /a/
   }
 
-  const ALL_TOKENS = [A, B, C]
-  augmentTokenTypes(ALL_TOKENS)
+  let ALL_TOKENS: TokenType[]
+  before(() => {
+    ALL_TOKENS = [A, B, C]
+    augmentTokenTypes(ALL_TOKENS)
+  })
 
   it("OPTION", () => {
     function gateFunc() {

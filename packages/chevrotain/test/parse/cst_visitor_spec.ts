@@ -2,44 +2,50 @@ import { createToken } from "../../src/scan/tokens_public"
 import { CstParser } from "../../src/parse/parser/traits/parser_traits"
 import { createRegularToken } from "../utils/matchers"
 import keys from "lodash/keys"
-import { IToken } from "@chevrotain/types"
+import { IToken, TokenType } from "@chevrotain/types"
 import { expect } from "chai"
 
 describe("The CSTVisitor", () => {
-  const A = createToken({ name: "A" })
-  const B = createToken({ name: "B" })
-  const C = createToken({ name: "C" })
-
-  const ALL_TOKENS = [A, B, C]
-
-  class CstTerminalParserReturnVisitor extends CstParser {
-    constructor(input: IToken[] = []) {
-      super(ALL_TOKENS, {})
-      this.performSelfAnalysis()
-    }
-
-    public testRule = this.RULE("testRule", () => {
-      this.CONSUME(A)
-      this.CONSUME(B)
-      this.OPTION({
-        DEF: () => {
-          this.SUBRULE(this.bamba)
-        }
-      })
-    })
-
-    public bamba = this.RULE("bamba", () => {
-      this.CONSUME(C)
-    })
-  }
-
-  let parserInstance = new CstTerminalParserReturnVisitor([])
-  let BaseVisitor = parserInstance.getBaseCstVisitorConstructor()
-  let BaseVisitorWithDefaults =
-    parserInstance.getBaseCstVisitorConstructorWithDefaults()
+  let BaseVisitor: any
+  let parserInstance: any
+  let BaseVisitorWithDefaults: any
+  let A: TokenType
+  let B: TokenType
+  let C: TokenType
 
   // to avoid issues with other tests clearing the cache
   before(() => {
+    A = createToken({ name: "A" })
+    B = createToken({ name: "B" })
+    C = createToken({ name: "C" })
+
+    const ALL_TOKENS = [A, B, C]
+
+    class CstTerminalParserReturnVisitor extends CstParser {
+      constructor(input: IToken[] = []) {
+        super(ALL_TOKENS, {})
+        this.performSelfAnalysis()
+      }
+
+      public testRule = this.RULE("testRule", () => {
+        this.CONSUME(A)
+        this.CONSUME(B)
+        this.OPTION({
+          DEF: () => {
+            this.SUBRULE(this.bamba)
+          }
+        })
+      })
+
+      public bamba = this.RULE("bamba", () => {
+        this.CONSUME(C)
+      })
+    }
+
+    parserInstance = new CstTerminalParserReturnVisitor([])
+    BaseVisitor = parserInstance.getBaseCstVisitorConstructor()
+    BaseVisitorWithDefaults =
+      parserInstance.getBaseCstVisitorConstructorWithDefaults()
     parserInstance = new CstTerminalParserReturnVisitor([])
     BaseVisitor = parserInstance.getBaseCstVisitorConstructor()
     BaseVisitorWithDefaults =

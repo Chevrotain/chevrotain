@@ -15,87 +15,102 @@ import forEach from "lodash/forEach"
 import { IOrAlt, IToken, TokenType } from "@chevrotain/types"
 import { MixedInParser } from "../../../src/parse/parser/traits/parser_traits"
 
-const Return = createToken({
-  name: "Return",
-  pattern: /return/
-})
+declare type QuirksTokens = {
+  Return: TokenType
+  DivisionOperator: TokenType
+  RegExpLiteral: TokenType
+  NumberLiteral: TokenType
+  WhiteSpace: TokenType
+  Semicolon: TokenType
+}
+let t: QuirksTokens
 
-const DivisionOperator = createToken({
-  name: "DivisionOperator",
-  pattern: /\//
-})
-
-const RegExpLiteral = createToken({
-  name: "RegExpLiteral",
-  pattern: /\/\d+\//
-})
-
-const NumberLiteral = createToken({
-  name: "NumberLiteral",
-  pattern: /\d+/
-})
-
-// todo differentiate line terminators and other whitespace?
-const WhiteSpace = createToken({
-  name: "WhiteSpace",
-  pattern: /\s+/,
-  group: Lexer.SKIPPED,
-  line_breaks: true
-})
-
-const Semicolon = createToken({
-  name: "Semicolon",
-  pattern: /;/
-})
-
-const allTokens = [
-  WhiteSpace,
-  NumberLiteral,
-  Return,
-  DivisionOperator,
-  RegExpLiteral,
-  Semicolon
-]
-
-// Avoids errors in browser tests where the bundled specs will execute this
-// file even if the tests will avoid running it.
-if (typeof (<any>new RegExp("(?:)")).sticky === "boolean") {
-  forEach(allTokens, (currTokType) => {
-    currTokType.PATTERN = new RegExp(
-      (currTokType.PATTERN as RegExp).source,
-      "y"
-    )
+function deferredInitTokens() {
+  const Return = createToken({
+    name: "Return",
+    pattern: /return/
   })
+
+  const DivisionOperator = createToken({
+    name: "DivisionOperator",
+    pattern: /\//
+  })
+
+  const RegExpLiteral = createToken({
+    name: "RegExpLiteral",
+    pattern: /\/\d+\//
+  })
+
+  const NumberLiteral = createToken({
+    name: "NumberLiteral",
+    pattern: /\d+/
+  })
+
+  // todo differentiate line terminators and other whitespace?
+  const WhiteSpace = createToken({
+    name: "WhiteSpace",
+    pattern: /\s+/,
+    group: Lexer.SKIPPED,
+    line_breaks: true
+  })
+
+  const Semicolon = createToken({
+    name: "Semicolon",
+    pattern: /;/
+  })
+
+  const allTokens = {
+    WhiteSpace,
+    NumberLiteral,
+    Return,
+    DivisionOperator,
+    RegExpLiteral,
+    Semicolon
+  }
+
+  // Avoids errors in browser tests where the bundled specs will execute this
+  // file even if the tests will avoid running it.
+  if (typeof (<any>new RegExp("(?:)")).sticky === "boolean") {
+    forEach(allTokens, (currTokType) => {
+      currTokType.PATTERN = new RegExp(
+        (currTokType.PATTERN as RegExp).source,
+        "y"
+      )
+    })
+  }
+
+  t = allTokens
+  return allTokens
 }
 
 const ErrorToken = createToken({ name: "ErrorToken" })
 
 class EcmaScriptQuirksParser extends EmbeddedActionsParser {
   constructor() {
-    super(allTokens)
+    super(deferredInitTokens())
     this.performSelfAnalysis()
   }
 
   public statement = this.RULE("statement", () => {
-    this.CONSUME(Return)
+    this.CONSUME(t.Return)
     this.OPTION7(() => {
       this.SUBRULE(this.expression)
     })
-    this.CONSUME(Semicolon)
+    this.CONSUME(t.Semicolon)
   })
 
   public expression = this.RULE("expression", () => {
     this.SUBRULE(this.atomic)
     this.MANY(() => {
-      this.CONSUME(DivisionOperator)
+      this.CONSUME(t.DivisionOperator)
       this.SUBRULE2(this.atomic)
     })
   })
 
   public atomic = this.RULE("atomic", () => {
     this.OR6([
-      { ALT: () => this.CONSUME(RegExpLiteral) },
-      { ALT: () => this.CONSUME(NumberLiteral) }
+      { ALT: () => this.CONSUME(t.RegExpLiteral) },
+      { ALT: () => this.CONSUME(t.NumberLiteral) }
     ])
   })
 
@@ -128,7 +143,7 @@ class EcmaScriptQuirksParser extends EmbeddedActionsParser {
   }
 
   private skipWhitespace(): void {
-    const wsPattern = WhiteSpace.PATTERN as RegExp
+    const wsPattern = t.WhiteSpace.PATTERN as RegExp
     wsPattern.lastIndex = this.textIdx
     const wsMatch = wsPattern.exec(this.orgText)
     if (wsMatch !== null) {
@@ -270,9 +285,12 @@ class EcmaScriptQuirksParser extends EmbeddedActionsParser {
 }
 
 // reuse the same parser instance.
-const parser = new EcmaScriptQuirksParser()
+let parser: EcmaScriptQuirksParser
 
 export function parse(text: string): any {
+  if (parser === undefined) {
+    parser = new EcmaScriptQuirksParser()
+  }
   parser.textInput = text
   const value = parser.statement()
 

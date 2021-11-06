@@ -13,7 +13,9 @@ describe("The Recognizer's capabilities for overriding grammar productions", () 
     static PATTERN = /-/
   }
 
-  augmentTokenTypes(<any>[PlusTok, MinusTok])
+  before(() => {
+    augmentTokenTypes(<any>[PlusTok, MinusTok])
+  })
 
   it("Can override an existing rule", () => {
     class SuperOverrideParser extends EmbeddedActionsParser {

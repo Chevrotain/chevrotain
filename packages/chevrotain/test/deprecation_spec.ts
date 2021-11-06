@@ -1,5 +1,4 @@
 import { expect } from "chai"
-
 import { createToken, Parser } from "../src/api"
 import { CstParser } from "../src/parse/parser/traits/parser_traits"
 

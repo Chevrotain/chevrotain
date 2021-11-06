@@ -19,13 +19,22 @@ const tokenStructuredMatcher = tokenStructuredMatcherStrict as (
 
 function defineTestSuite(recoveryMode: boolean) {
   context(`CST Recovery: ${recoveryMode}`, () => {
-    const A = createToken({ name: "A" })
-    const B = createToken({ name: "B" })
-    const C = createToken({ name: "C" })
-    const D = createToken({ name: "D" })
-    const E = createToken({ name: "E" })
+    let A: TokenType
+    let B: TokenType
+    let C: TokenType
+    let D: TokenType
+    let E: TokenType
+    let ALL_TOKENS: TokenType[]
 
-    const ALL_TOKENS = [A, B, C, D, E]
+    before(() => {
+      A = createToken({ name: "A" })
+      B = createToken({ name: "B" })
+      C = createToken({ name: "C" })
+      D = createToken({ name: "D" })
+      E = createToken({ name: "E" })
+
+      ALL_TOKENS = [A, B, C, D, E]
+    })
 
     it("Can output a CST for a flat structure", () => {
       class CstTerminalParser extends CstParser {

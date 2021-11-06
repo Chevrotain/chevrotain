@@ -1148,9 +1148,7 @@ function initCharCodeToOptimizedIndexMap() {
   if (isEmpty(charCodeToOptimizedIdxMap)) {
     charCodeToOptimizedIdxMap = new Array(65536)
     for (let i = 0; i < 65536; i++) {
-      /* tslint:disable */
       charCodeToOptimizedIdxMap[i] = i > 255 ? 255 + ~~(i / 255) : i
-      /* tslint:enable */
     }
   }
 }

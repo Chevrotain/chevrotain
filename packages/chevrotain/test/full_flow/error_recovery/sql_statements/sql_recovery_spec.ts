@@ -1,7 +1,3 @@
-// long lines for token init seems more readable to me than to break them up
-// into multiple line.
-/* tslint:disable:max-line-length  */
-
 import { expect } from "chai"
 import {
   INVALID_DDL,
@@ -35,31 +31,32 @@ import flatten from "lodash/flatten"
 import { createRegularToken } from "../../../utils/matchers"
 import { IToken } from "@chevrotain/types"
 
-// for side effect if augmenting the Token classes.
-new DDLExampleRecoveryParser()
 describe("Error Recovery SQL DDL Example", () => {
-  const schemaFQN = [
-    createRegularToken(IdentTok, "schema2"),
-    createRegularToken(DotTok),
-    createRegularToken(IdentTok, "Persons")
-  ]
-  /* tslint:disable:quotemark  */
-  const shahar32Record = [
-    createRegularToken(LParenTok),
-    createRegularToken(IntTok, "32"),
-    createRegularToken(CommaTok),
-    createRegularToken(StringTok, "SHAHAR"),
-    createRegularToken(RParenTok)
-  ]
+  let schemaFQN: IToken[], shahar32Record: IToken[], shahar31Record: IToken[]
+  before(() => {
+    // for side effect if augmenting the Token classes.
+    new DDLExampleRecoveryParser()
 
-  const shahar31Record = [
-    createRegularToken(LParenTok),
-    createRegularToken(IntTok, "31"),
-    createRegularToken(CommaTok),
-    createRegularToken(StringTok, '"SHAHAR"'),
-    createRegularToken(RParenTok)
-  ]
-  /* tslint:enable:quotemark  */
+    schemaFQN = [
+      createRegularToken(IdentTok, "schema2"),
+      createRegularToken(DotTok),
+      createRegularToken(IdentTok, "Persons")
+    ]
+    shahar32Record = [
+      createRegularToken(LParenTok),
+      createRegularToken(IntTok, "32"),
+      createRegularToken(CommaTok),
+      createRegularToken(StringTok, "SHAHAR"),
+      createRegularToken(RParenTok)
+    ]
+    shahar31Record = [
+      createRegularToken(LParenTok),
+      createRegularToken(IntTok, "31"),
+      createRegularToken(CommaTok),
+      createRegularToken(StringTok, '"SHAHAR"'),
+      createRegularToken(RParenTok)
+    ]
+  })
 
   it("can parse a series of three statements successfully", () => {
     const input: any = flatten([
@@ -90,24 +87,28 @@ describe("Error Recovery SQL DDL Example", () => {
   })
 
   describe("Single Token insertion recovery mechanism", () => {
-    const input: any = flatten([
-      // CREATE TABLE schema2.Persons
-      createRegularToken(CreateTok),
-      createRegularToken(TableTok),
-      schemaFQN,
-      createRegularToken(SemiColonTok),
-      // INSERT (32, "SHAHAR") INTO schema2.Persons
-      createRegularToken(InsertTok),
-      shahar32Record,
-      createRegularToken(IntoTok),
-      schemaFQN /*createRegularToken(SemiColonTok), <-- missing semicolon!*/,
-      // DELETE (31, "SHAHAR") FROM schema2.Persons
-      createRegularToken(DeleteTok),
-      shahar31Record,
-      createRegularToken(FromTok),
-      schemaFQN,
-      createRegularToken(SemiColonTok)
-    ])
+    let input: IToken[]
+
+    before(() => {
+      input = flatten([
+        // CREATE TABLE schema2.Persons
+        createRegularToken(CreateTok),
+        createRegularToken(TableTok),
+        schemaFQN,
+        createRegularToken(SemiColonTok),
+        // INSERT (32, "SHAHAR") INTO schema2.Persons
+        createRegularToken(InsertTok),
+        shahar32Record,
+        createRegularToken(IntoTok),
+        schemaFQN /*createRegularToken(SemiColonTok), <-- missing semicolon!*/,
+        // DELETE (31, "SHAHAR") FROM schema2.Persons
+        createRegularToken(DeleteTok),
+        shahar31Record,
+        createRegularToken(FromTok),
+        schemaFQN,
+        createRegularToken(SemiColonTok)
+      ])
+    })
 
     it("can perform single token insertion for a missing semicolon", () => {
       const parser = new DDLExampleRecoveryParser()
@@ -135,26 +136,30 @@ describe("Error Recovery SQL DDL Example", () => {
   })
 
   describe("Single Token deletion recovery mechanism", () => {
-    const input: any = flatten([
-      // CREATE TABLE schema2.Persons
-      createRegularToken(CreateTok),
-      createRegularToken(TableTok),
-      schemaFQN,
-      createRegularToken(SemiColonTok),
-      // INSERT (32, "SHAHAR") INTO INTO schema2.Persons
-      createRegularToken(InsertTok),
-      shahar32Record,
-      createRegularToken(IntoTok),
-      createRegularToken(IntoTok),
-      /* <-- "INTO INTO" oops */ schemaFQN,
-      createRegularToken(SemiColonTok),
-      // DELETE (31, "SHAHAR") FROM schema2.Persons
-      createRegularToken(DeleteTok),
-      shahar31Record,
-      createRegularToken(FromTok),
-      schemaFQN,
-      createRegularToken(SemiColonTok)
-    ])
+    let input: IToken[]
+
+    before(() => {
+      input = flatten([
+        // CREATE TABLE schema2.Persons
+        createRegularToken(CreateTok),
+        createRegularToken(TableTok),
+        schemaFQN,
+        createRegularToken(SemiColonTok),
+        // INSERT (32, "SHAHAR") INTO INTO schema2.Persons
+        createRegularToken(InsertTok),
+        shahar32Record,
+        createRegularToken(IntoTok),
+        createRegularToken(IntoTok),
+        /* <-- "INTO INTO" oops */ schemaFQN,
+        createRegularToken(SemiColonTok),
+        // DELETE (31, "SHAHAR") FROM schema2.Persons
+        createRegularToken(DeleteTok),
+        shahar31Record,
+        createRegularToken(FromTok),
+        schemaFQN,
+        createRegularToken(SemiColonTok)
+      ])
+    })
 
     it("can perform single token deletion for a redundant keyword", () => {
       const parser = new DDLExampleRecoveryParser()
@@ -178,6 +183,41 @@ describe("Error Recovery SQL DDL Example", () => {
   })
 
   describe("resync recovery mechanism", () => {
+    let badShahar32Record: IToken[], input: IToken[]
+
+    before(() => {
+      // (32, "SHAHAR" ( <-- wrong parenthesis
+      badShahar32Record = [
+        createRegularToken(LParenTok),
+        createRegularToken(IntTok, "32"),
+        createRegularToken(CommaTok),
+        createRegularToken(StringTok, '"SHAHAR"'),
+        createRegularToken(LParenTok)
+      ]
+
+      input = flatten([
+        // CREATE TABLE schema2.Persons
+        createRegularToken(CreateTok),
+        createRegularToken(TableTok),
+        schemaFQN,
+        createRegularToken(SemiColonTok),
+        // issues:
+        // 1. FromTok instead of IntoTok so this rule also includes a bug
+        // 2. using the bad/invalid record Token.
+        createRegularToken(InsertTok),
+        badShahar32Record,
+        createRegularToken(FromTok),
+        schemaFQN,
+        createRegularToken(SemiColonTok),
+        // DELETE (31, "SHAHAR") FROM schema2.Persons
+        createRegularToken(DeleteTok),
+        shahar31Record,
+        createRegularToken(FromTok),
+        schemaFQN,
+        createRegularToken(SemiColonTok)
+      ])
+    })
+
     it("can perform re-sync recovery and only 'lose' part of the input", () => {
       const input: any = flatten([
         // CREATE TABLE schema2.Persons
@@ -225,36 +265,6 @@ describe("Error Recovery SQL DDL Example", () => {
         INVALID_DELETE_STMT
       )
     })
-    // (32, "SHAHAR" ( <-- wrong parenthesis
-    const badShahar32Record = [
-      createRegularToken(LParenTok),
-      createRegularToken(IntTok, "32"),
-      createRegularToken(CommaTok),
-      createRegularToken(StringTok, '"SHAHAR"'),
-      createRegularToken(LParenTok)
-    ]
-
-    const input: any = flatten([
-      // CREATE TABLE schema2.Persons
-      createRegularToken(CreateTok),
-      createRegularToken(TableTok),
-      schemaFQN,
-      createRegularToken(SemiColonTok),
-      // issues:
-      // 1. FromTok instead of IntoTok so this rule also includes a bug
-      // 2. using the bad/invalid record Token.
-      createRegularToken(InsertTok),
-      badShahar32Record,
-      createRegularToken(FromTok),
-      schemaFQN,
-      createRegularToken(SemiColonTok),
-      // DELETE (31, "SHAHAR") FROM schema2.Persons
-      createRegularToken(DeleteTok),
-      shahar31Record,
-      createRegularToken(FromTok),
-      schemaFQN,
-      createRegularToken(SemiColonTok)
-    ])
 
     it("can perform re-sync recovery and only 'lose' part of the input even when re-syncing to two rules 'above'", () => {
       const parser = new DDLExampleRecoveryParser()

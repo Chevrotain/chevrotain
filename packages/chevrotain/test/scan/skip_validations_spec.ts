@@ -4,12 +4,7 @@ import find from "lodash/find"
 import { expect } from "chai"
 import { SinonSpy } from "sinon/index"
 
-let skipOnBrowser = describe
-if (typeof window !== "undefined") {
-  skipOnBrowser = <any>describe.skip
-}
-
-skipOnBrowser("Chevrotain's Lexer Init Performance Tracing", () => {
+describe("Chevrotain's Lexer Init Performance Tracing", () => {
   let consoleLogSpy: SinonSpy
 
   beforeEach(() => {
