@@ -7,20 +7,17 @@ import {
   MismatchedTokenException
 } from "../../src/parse/exceptions_public"
 import { expect } from "chai"
+import { IToken } from "@chevrotain/types"
 
 describe("Chevrotain's Parsing Exceptions", () => {
   describe("the exception instance subclasses Error with the right properties for: ", () => {
-    const currentToken = createTokenInstance(EOF, "cur", -1, -1, -1, -1, -1, -1)
-    const previousToken = createTokenInstance(
-      EOF,
-      "prv",
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1
-    )
+    let currentToken: IToken
+    let previousToken: IToken
+
+    before(() => {
+      currentToken = createTokenInstance(EOF, "cur", -1, -1, -1, -1, -1, -1)
+      previousToken = createTokenInstance(EOF, "prv", -1, -1, -1, -1, -1, -1)
+    })
 
     it("EarlyExitException", () => {
       const exceptionInstance = new EarlyExitException(

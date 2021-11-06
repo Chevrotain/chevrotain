@@ -1,9 +1,6 @@
 import { EOF, createToken } from "../../src/scan/tokens_public"
 import { Lexer } from "../../src/scan/lexer_public"
-import {
-  EmbeddedActionsParser,
-  CstParser
-} from "../../src/parse/parser/traits/parser_traits"
+import { EmbeddedActionsParser } from "../../src/parse/parser/traits/parser_traits"
 import { EMPTY_ALT, TokenMatcher } from "../../src/parse/parser/parser"
 import { expect } from "chai"
 
@@ -32,15 +29,23 @@ function defineRecognizerSpecs(
   tokenMatcher: TokenMatcher
 ) {
   context("Recognizer  " + contextName, () => {
-    const PlusTok = createToken({ name: "PlusTok" })
-    PlusTok.LABEL = "+"
-    const MinusTok = createToken({ name: "MinusTok" })
-    const IntTok = createToken({ name: "IntTok" })
-    const DotTok = createToken({ name: "DotTok" })
-    const IdentTok = createToken({ name: "IdentTok" })
+    let PlusTok: TokenType
+    let MinusTok: TokenType
+    let IntTok: TokenType
+    let DotTok: TokenType
+    let IdentTok: TokenType
+    let ALL_TOKENS: TokenType[]
 
-    const ALL_TOKENS = [PlusTok, MinusTok, IntTok, IdentTok, DotTok]
-    augmentTokenTypes(ALL_TOKENS)
+    before(() => {
+      PlusTok = createToken({ name: "PlusTok" })
+      PlusTok.LABEL = "+"
+      MinusTok = createToken({ name: "MinusTok" })
+      IntTok = createToken({ name: "IntTok" })
+      DotTok = createToken({ name: "DotTok" })
+      IdentTok = createToken({ name: "IdentTok" })
+      ALL_TOKENS = [PlusTok, MinusTok, IntTok, IdentTok, DotTok]
+      augmentTokenTypes(ALL_TOKENS)
+    })
 
     describe("The Parsing DSL", () => {
       it("provides a production SUBRULE1-5 that invokes another rule", () => {

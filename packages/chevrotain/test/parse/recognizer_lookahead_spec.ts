@@ -1,34 +1,50 @@
 import { createToken } from "../../src/scan/tokens_public"
 import { EmbeddedActionsParser } from "../../src/parse/parser/traits/parser_traits"
 import { createRegularToken } from "../utils/matchers"
-import { IToken } from "@chevrotain/types"
+import { IToken, TokenType } from "@chevrotain/types"
 import { expect } from "chai"
 
 describe("lookahead Regular Tokens Mode", () => {
-  const OneTok = createToken({ name: "OneTok" })
-  const TwoTok = createToken({ name: "TwoTok" })
-  const ThreeTok = createToken({ name: "ThreeTok" })
-  const FourTok = createToken({ name: "FourTok" })
-  const FiveTok = createToken({ name: "FiveTok" })
-  const SixTok = createToken({ name: "SixTok" })
-  const SevenTok = createToken({ name: "SevenTok" })
-  const EightTok = createToken({ name: "EightTok" })
-  const NineTok = createToken({ name: "NineTok" })
-  const TenTok = createToken({ name: "TenTok" })
-  const Comma = createToken({ name: "Comma" })
+  let OneTok: TokenType
+  let TwoTok: TokenType
+  let ThreeTok: TokenType
+  let FourTok: TokenType
+  let FiveTok: TokenType
+  let SixTok: TokenType
+  let SevenTok: TokenType
+  let EightTok: TokenType
+  let NineTok: TokenType
+  let TenTok: TokenType
+  let Comma: TokenType
 
-  const ALL_TOKENS = [
-    OneTok,
-    TwoTok,
-    ThreeTok,
-    FourTok,
-    FiveTok,
-    SixTok,
-    SevenTok,
-    EightTok,
-    NineTok,
-    Comma
-  ]
+  let ALL_TOKENS: TokenType[]
+
+  before(() => {
+    OneTok = createToken({ name: "OneTok" })
+    TwoTok = createToken({ name: "TwoTok" })
+    ThreeTok = createToken({ name: "ThreeTok" })
+    FourTok = createToken({ name: "FourTok" })
+    FiveTok = createToken({ name: "FiveTok" })
+    SixTok = createToken({ name: "SixTok" })
+    SevenTok = createToken({ name: "SevenTok" })
+    EightTok = createToken({ name: "EightTok" })
+    NineTok = createToken({ name: "NineTok" })
+    TenTok = createToken({ name: "TenTok" })
+    Comma = createToken({ name: "Comma" })
+
+    ALL_TOKENS = [
+      OneTok,
+      TwoTok,
+      ThreeTok,
+      FourTok,
+      FiveTok,
+      SixTok,
+      SevenTok,
+      EightTok,
+      NineTok,
+      Comma
+    ]
+  })
 
   describe("The implicit lookahead calculation functionality of the Recognizer For OPTION", () => {
     class OptionsImplicitLookAheadParser extends EmbeddedActionsParser {
