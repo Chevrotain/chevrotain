@@ -88,7 +88,7 @@
     "require-from-string": "2.0.2",
     "sinon": "12.0.1",
     "sinon-chai": "3.7.0",
-    "webpack": "5.61.0",
+    "webpack": "5.62.1",
     "webpack-cli": "4.9.1",
     "xregexp": "5.1.0"
   }
