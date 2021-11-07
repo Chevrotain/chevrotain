@@ -2204,7 +2204,8 @@ export declare const EOF: TokenType
  *    ])
  *  ```
  */
-export declare function EMPTY_ALT<T>(value?: T): () => T
+export declare function EMPTY_ALT(): () => undefined
+export declare function EMPTY_ALT<T>(value: T): () => T
 
 /**
  * This is the default logic Chevrotain uses to construct error messages.
