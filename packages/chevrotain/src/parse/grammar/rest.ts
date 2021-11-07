@@ -1,7 +1,6 @@
 import drop from "lodash/drop"
 import forEach from "lodash/forEach"
 import {
-  AbstractProduction,
   Alternation,
   Alternative,
   NonTerminal,
@@ -11,14 +10,14 @@ import {
   RepetitionMandatoryWithSeparator,
   RepetitionWithSeparator,
   Terminal
-} from "./gast/gast_public"
+} from "@chevrotain/gast"
 import { IProduction } from "@chevrotain/types"
 
 /**
  *  A Grammar Walker that computes the "remaining" grammar "after" a productions in the grammar.
  */
 export abstract class RestWalker {
-  walk(prod: AbstractProduction, prevRest: any[] = []): void {
+  walk(prod: { definition: IProduction[] }, prevRest: any[] = []): void {
     forEach(prod.definition, (subProd: IProduction, index) => {
       const currRest = drop(prod.definition, index + 1)
       /* istanbul ignore else */

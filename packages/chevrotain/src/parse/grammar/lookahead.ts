@@ -13,7 +13,6 @@ import {
   tokenStructuredMatcherNoCategories
 } from "../../scan/tokens"
 import {
-  AbstractProduction,
   Alternation,
   Alternative as AlternativeGAST,
   Option,
@@ -22,8 +21,8 @@ import {
   RepetitionMandatoryWithSeparator,
   RepetitionWithSeparator,
   Rule
-} from "./gast/gast_public"
-import { GAstVisitor } from "./gast/gast_visitor_public"
+} from "@chevrotain/gast"
+import { GAstVisitor } from "@chevrotain/gast"
 import {
   IOrAlt,
   IProduction,
@@ -332,7 +331,7 @@ class RestDefinitionFinderWalker extends RestWalker {
   }
 
   private checkIsTarget(
-    node: AbstractProduction & IProductionWithOccurrence,
+    node: IProductionWithOccurrence,
     expectedProdType: PROD_TYPE,
     currRest: IProduction[],
     prevRest: IProduction[]
@@ -437,7 +436,7 @@ class InsideDefinitionFinderVisitor extends GAstVisitor {
   }
 
   private checkIsTarget(
-    node: AbstractProduction & IProductionWithOccurrence,
+    node: { definition: IProduction[] } & IProductionWithOccurrence,
     expectedProdName: PROD_TYPE
   ): void {
     if (

@@ -48,16 +48,13 @@ export {
   RepetitionWithSeparator,
   Rule,
   Terminal
-} from "./parse/grammar/gast/gast_public"
+} from "@chevrotain/gast"
 
 // GAST Utilities
 
-export {
-  serializeGrammar,
-  serializeProduction
-} from "./parse/grammar/gast/gast_public"
+export { serializeGrammar, serializeProduction } from "@chevrotain/gast"
 
-export { GAstVisitor } from "./parse/grammar/gast/gast_visitor_public"
+export { GAstVisitor } from "@chevrotain/gast"
 
 /* istanbul ignore next */
 export function clearCache() {

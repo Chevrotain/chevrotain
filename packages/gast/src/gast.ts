@@ -18,7 +18,9 @@ import {
 import { GAstVisitor } from "./gast_visitor_public"
 import { IProduction, IProductionWithOccurrence } from "@chevrotain/types"
 
-export function isSequenceProd(prod: IProduction): boolean {
+export function isSequenceProd(
+  prod: IProduction
+): prod is { definition: IProduction[] } & IProduction {
   return (
     prod instanceof Alternative ||
     prod instanceof Option ||
@@ -69,7 +71,9 @@ export function isOptionalProd(
   }
 }
 
-export function isBranchingProd(prod: IProduction): boolean {
+export function isBranchingProd(
+  prod: IProduction
+): prod is { definition: IProduction[] } & IProduction {
   return prod instanceof Alternation
 }
 

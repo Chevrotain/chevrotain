@@ -23,8 +23,8 @@ import {
   OR_IDX
 } from "../../grammar/keys"
 import { MixedInParser } from "./parser_traits"
-import { Rule } from "../../grammar/gast/gast_public"
-import { collectMethods, getProductionDslName } from "../../grammar/gast/gast"
+import { Rule } from "@chevrotain/gast"
+import { collectMethods, getProductionDslName } from "@chevrotain/gast"
 
 /**
  * Trait responsible for the lookahead related utilities and optimizations.

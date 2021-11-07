@@ -1,4 +1,4 @@
-import { Rule } from "./gast_public"
+import { Rule } from "@chevrotain/gast"
 import forEach from "lodash/forEach"
 import defaults from "lodash/defaults"
 import { resolveGrammar as orgResolveGrammar } from "../resolver"
@@ -7,8 +7,7 @@ import {
   defaultGrammarResolverErrorProvider,
   defaultGrammarValidatorErrorProvider
 } from "../../errors_public"
-import { DslMethodsCollectorVisitor } from "./gast"
-import { IProductionWithOccurrence, TokenType } from "@chevrotain/types"
+import { TokenType } from "@chevrotain/types"
 import {
   IGrammarResolverErrorMessageProvider,
   IGrammarValidatorErrorMessageProvider,

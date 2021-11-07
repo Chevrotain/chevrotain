@@ -1,4 +1,4 @@
-import { getProductionDslName } from "../../../src/parse/grammar/gast/gast"
+import { getProductionDslName } from "@chevrotain/gast"
 import { createToken } from "../../../src/scan/tokens_public"
 import {
   Alternation,
@@ -13,7 +13,7 @@ import {
   Alternative,
   Rule,
   serializeGrammar
-} from "../../../src/parse/grammar/gast/gast_public"
+} from "@chevrotain/gast"
 import { expect } from "chai"
 import { TokenType } from "@chevrotain/types"
 

@@ -28,7 +28,7 @@ import {
   RepetitionMandatory,
   Rule,
   Terminal
-} from "../../../src/parse/grammar/gast/gast_public"
+} from "@chevrotain/gast"
 import { defaultGrammarValidatorErrorProvider } from "../../../src/parse/errors_public"
 import { IToken, TokenType } from "@chevrotain/types"
 import { expect } from "chai"

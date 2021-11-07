@@ -3,7 +3,7 @@ import { first } from "./first"
 import forEach from "lodash/forEach"
 import assign from "lodash/assign"
 import { IN } from "../constants"
-import { Alternative, NonTerminal, Rule, Terminal } from "./gast/gast_public"
+import { Alternative, NonTerminal, Rule, Terminal } from "@chevrotain/gast"
 import { IProduction, TokenType } from "@chevrotain/types"
 
 // This ResyncFollowsWalker computes all of the follows required for RESYNC

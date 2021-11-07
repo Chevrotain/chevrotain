@@ -20,7 +20,7 @@ import { DEFAULT_RULE_CONFIG, ParserDefinitionErrorType } from "../parser"
 import { defaultGrammarValidatorErrorProvider } from "../../errors_public"
 import { validateRuleIsOverridden } from "../../grammar/checks"
 import { MixedInParser } from "./parser_traits"
-import { Rule, serializeGrammar } from "../../grammar/gast/gast_public"
+import { Rule, serializeGrammar } from "@chevrotain/gast"
 import { IParserDefinitionError } from "../../grammar/types"
 import { ParserMethodInternal } from "../types"
 

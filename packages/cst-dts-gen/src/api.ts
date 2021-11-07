@@ -1,4 +1,4 @@
-import { BaseParser } from "chevrotain"
+import { BaseParser } from "@chevrotain/types"
 import { GenerateDtsOptions } from "../api"
 import { buildModel } from "./model"
 import { genDts, GenDtsOptions } from "./generate"

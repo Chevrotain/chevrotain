@@ -26,7 +26,7 @@ import {
   RepetitionWithSeparator,
   Rule,
   Terminal
-} from "../../../src/parse/grammar/gast/gast_public"
+} from "@chevrotain/gast"
 import { IToken, TokenType } from "@chevrotain/types"
 import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
 import { expect } from "chai"

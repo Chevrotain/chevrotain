@@ -1,7 +1,6 @@
 import flatten from "lodash/flatten"
 import map from "lodash/map"
 import upperFirst from "lodash/upperFirst"
-
 import {
   CstNodeTypeDefinition,
   PropertyTypeDefinition,
@@ -22,6 +21,7 @@ export function genDts(
 
   if (options.includeTypes || options.includeVisitorInterface) {
     contentParts = contentParts.concat(
+      // TODO: should these imports be from `@chevrotain/types`
       `import type { CstNode, ICstVisitor, IToken } from "chevrotain";`
     )
   }
