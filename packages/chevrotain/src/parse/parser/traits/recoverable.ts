@@ -51,8 +51,9 @@ export class Recoverable {
     this.firstAfterRepMap = {}
     this.resyncFollows = {}
 
-    this.recoveryEnabled =
-      config.recoveryEnabled ?? DEFAULT_PARSER_CONFIG.recoveryEnabled
+    this.recoveryEnabled = has(config, "recoveryEnabled")
+      ? (config.recoveryEnabled as boolean) // assumes end user provides the correct config value/type
+      : DEFAULT_PARSER_CONFIG.recoveryEnabled
 
     // performance optimization, NOOP will be inlined which
     // effectively means that this optional feature does not exist
@@ -144,18 +145,13 @@ export class Recoverable {
 
   shouldInRepetitionRecoveryBeTried(
     this: MixedInParser,
-    expectTokAfterLastMatch: TokenType | undefined,
-    nextTokIdx: number | undefined,
+    expectTokAfterLastMatch: TokenType,
+    nextTokIdx: number,
     notStuck: boolean | undefined
   ): boolean {
     // Edge case of arriving from a MANY repetition which is stuck
     // Attempting recovery in this case could cause an infinite loop
     if (notStuck === false) {
-      return false
-    }
-
-    // arguments to try and perform resync into the next iteration of the many are missing
-    if (expectTokAfterLastMatch === undefined || nextTokIdx === undefined) {
       return false
     }
 
@@ -407,7 +403,7 @@ export function attemptInRepetitionRecovery(
   prodOccurrence: number,
   nextToksWalker: typeof AbstractNextTerminalAfterProductionWalker,
   notStuck?: boolean
-) {
+): void {
   const key = this.getKeyForAutomaticLookahead(dslMethodIdx, prodOccurrence)
   let firstAfterRepInfo = this.firstAfterRepMap[key]
   if (firstAfterRepInfo === undefined) {
@@ -434,6 +430,12 @@ export function attemptInRepetitionRecovery(
     nextTokIdx = 1
   }
 
+  // We don't have anything to re-sync to...
+  // this condition was extracted from `shouldInRepetitionRecoveryBeTried` to act as a type-guard
+  if (expectTokAfterLastMatch === undefined || nextTokIdx === undefined) {
+    return
+  }
+
   if (
     this.shouldInRepetitionRecoveryBeTried(
       expectTokAfterLastMatch,
@@ -448,7 +450,6 @@ export function attemptInRepetitionRecovery(
       prodFunc,
       args,
       lookaheadFunc,
-      // @ts-expect-error -- TODO: need to investigate if `expectTokAfterLastMatch` can be undefined here.
       expectTokAfterLastMatch
     )
   }
