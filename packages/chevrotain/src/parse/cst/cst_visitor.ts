@@ -3,15 +3,15 @@ import compact from "lodash/compact"
 import isArray from "lodash/isArray"
 import map from "lodash/map"
 import forEach from "lodash/forEach"
+import filter from "lodash/filter"
 import keys from "lodash/keys"
 import isFunction from "lodash/isFunction"
 import isUndefined from "lodash/isUndefined"
 import includes from "lodash/includes"
 import { defineNameProp } from "../../lang/lang_extensions"
 import { CstNode, ICstVisitor } from "@chevrotain/types"
-import flatMap from "lodash/flatMap"
 
-export function defaultVisit<IN, OUT>(ctx: any, param: IN): void {
+export function defaultVisit<IN>(ctx: any, param: IN): void {
   const childrenNames = keys(ctx)
   const childrenNamesLength = childrenNames.length
   for (let i = 0; i < childrenNamesLength; i++) {
@@ -132,23 +132,24 @@ export function validateMissingCstMethods(
   visitorInstance: ICstVisitor<unknown, unknown>,
   ruleNames: string[]
 ): IVisitorDefinitionError[] {
-  const errors = flatMap(ruleNames, (currRuleName) => {
-    if (!isFunction((visitorInstance as any)[currRuleName])) {
-      return [
-        {
-          msg: `Missing visitor method: <${currRuleName}> on ${<any>(
-            visitorInstance.constructor.name
-          )} CST Visitor.`,
-          type: CstVisitorDefinitionError.MISSING_METHOD,
-          methodName: currRuleName
-        }
-      ]
-    } else {
-      return []
-    }
+  const missingRuleNames = filter(ruleNames, (currRuleName) => {
+    return isFunction((visitorInstance as any)[currRuleName]) === false
   })
 
-  return errors
+  const errors: IVisitorDefinitionError[] = map(
+    missingRuleNames,
+    (currRuleName) => {
+      return {
+        msg: `Missing visitor method: <${currRuleName}> on ${<any>(
+          visitorInstance.constructor.name
+        )} CST Visitor.`,
+        type: CstVisitorDefinitionError.MISSING_METHOD,
+        methodName: currRuleName
+      }
+    }
+  )
+
+  return compact<IVisitorDefinitionError>(errors)
 }
 
 const VALID_PROP_NAMES = ["constructor", "visit", "validateVisitor"]
