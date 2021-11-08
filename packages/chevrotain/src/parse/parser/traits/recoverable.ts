@@ -435,7 +435,6 @@ export function attemptInRepetitionRecovery(
   }
 
   if (
-    expectTokAfterLastMatch !== undefined &&
     this.shouldInRepetitionRecoveryBeTried(
       expectTokAfterLastMatch,
       nextTokIdx,
@@ -449,6 +448,7 @@ export function attemptInRepetitionRecovery(
       prodFunc,
       args,
       lookaheadFunc,
+      // @ts-expect-error -- TODO: need to investigate if `expectTokAfterLastMatch` can be undefined here.
       expectTokAfterLastMatch
     )
   }
