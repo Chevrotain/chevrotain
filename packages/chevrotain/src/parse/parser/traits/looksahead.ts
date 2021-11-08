@@ -35,11 +35,13 @@ export class LooksAhead {
   dynamicTokensEnabled: boolean
 
   initLooksAhead(config: IParserConfig) {
-    this.dynamicTokensEnabled =
-      config.dynamicTokensEnabled ?? DEFAULT_PARSER_CONFIG.dynamicTokensEnabled
+    this.dynamicTokensEnabled = has(config, "dynamicTokensEnabled")
+      ? (config.dynamicTokensEnabled as boolean) // assumes end user provides the correct config value/type
+      : DEFAULT_PARSER_CONFIG.dynamicTokensEnabled
 
-    this.maxLookahead =
-      config.maxLookahead ?? DEFAULT_PARSER_CONFIG.maxLookahead
+    this.maxLookahead = has(config, "maxLookahead")
+      ? (config.maxLookahead as number) // assumes end user provides the correct config value/type
+      : DEFAULT_PARSER_CONFIG.maxLookahead
 
     this.lookAheadFuncsCache = new Map()
   }
