@@ -15,11 +15,14 @@ import {
   IParserDefinitionError
 } from "../types"
 
-export function resolveGrammar(options: {
+type ResolveGrammarOpts = {
   rules: Rule[]
   errMsgProvider?: IGrammarResolverErrorMessageProvider
-}): IParserDefinitionError[] {
-  options = defaults(options, {
+}
+export function resolveGrammar(
+  options: ResolveGrammarOpts
+): IParserDefinitionError[] {
+  const actualOptions: Required<ResolveGrammarOpts> = defaults(options, {
     errMsgProvider: defaultGrammarResolverErrorProvider
   })
 
@@ -27,7 +30,7 @@ export function resolveGrammar(options: {
   forEach(options.rules, (rule) => {
     topRulesTable[rule.name] = rule
   })
-  return orgResolveGrammar(topRulesTable, options.errMsgProvider!)
+  return orgResolveGrammar(topRulesTable, actualOptions.errMsgProvider)
 }
 
 export function validateGrammar(options: {
