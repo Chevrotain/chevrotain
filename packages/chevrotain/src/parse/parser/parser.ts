@@ -57,16 +57,17 @@ export type TokenMatcher = (token: IToken, tokType: TokenType) => boolean
 
 export type LookAheadSequence = TokenType[][]
 
-export const DEFAULT_PARSER_CONFIG: IParserConfigInternal = Object.freeze({
-  recoveryEnabled: false,
-  maxLookahead: 3,
-  dynamicTokensEnabled: false,
-  outputCst: true,
-  errorMessageProvider: defaultParserErrorProvider,
-  nodeLocationTracking: "none",
-  traceInitPerf: false,
-  skipValidations: false
-})
+export const DEFAULT_PARSER_CONFIG: Required<IParserConfigInternal> =
+  Object.freeze({
+    recoveryEnabled: false,
+    maxLookahead: 3,
+    dynamicTokensEnabled: false,
+    outputCst: true,
+    errorMessageProvider: defaultParserErrorProvider,
+    nodeLocationTracking: "none",
+    traceInitPerf: false,
+    skipValidations: false
+  })
 
 export const DEFAULT_RULE_CONFIG: Required<IRuleConfig<any>> = Object.freeze({
   recoveryValueFunc: () => undefined,

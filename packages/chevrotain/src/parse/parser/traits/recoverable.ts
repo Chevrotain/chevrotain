@@ -435,6 +435,7 @@ export function attemptInRepetitionRecovery(
   }
 
   if (
+    expectTokAfterLastMatch !== undefined &&
     this.shouldInRepetitionRecoveryBeTried(
       expectTokAfterLastMatch,
       nextTokIdx,

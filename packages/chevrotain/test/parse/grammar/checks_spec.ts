@@ -364,7 +364,7 @@ describe("the getFirstNoneTerminal function", () => {
       })
     ])
     expect(result).to.have.length(1)
-    expect(first(result).name).to.equal("dummyRule")
+    expect(first(result)!.name).to.equal("dummyRule")
   })
 
   it("can find the firstNoneTerminal of a sequence with two items", () => {
@@ -380,7 +380,7 @@ describe("the getFirstNoneTerminal function", () => {
     ]
     const result = getFirstNoneTerminal(sqeuence)
     expect(result).to.have.length(1)
-    expect(first(result).name).to.equal("dummyRule")
+    expect(first(result)!.name).to.equal("dummyRule")
   })
 
   it("can find the firstNoneTerminal of a sequence with two items where the first is optional", () => {
@@ -763,7 +763,7 @@ describe("The Recorder runtime checks full flow", () => {
       }
 
       public one = this.RULE("two", () => {
-        this.CONSUME3(null)
+        this.CONSUME3(null as unknown as TokenType)
       })
     }
 
@@ -800,6 +800,7 @@ describe("The Recorder runtime checks full flow", () => {
       })
 
       it("subrule", () => {
+        const ATok = createToken({ name: "A" })
         class InvalidIdxParser extends CstParser {
           constructor(input: IToken[] = []) {
             super([myToken, myOtherToken])
@@ -812,7 +813,7 @@ describe("The Recorder runtime checks full flow", () => {
           })
 
           public two = this.RULE("two", () => {
-            this.consume(1, null)
+            this.consume(1, ATok)
           })
         }
 
