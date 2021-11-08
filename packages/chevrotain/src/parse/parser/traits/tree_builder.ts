@@ -52,8 +52,9 @@ export class TreeBuilder {
     // outputCst is no longer exposed/defined in the pubic API
     this.outputCst = (config as any).outputCst
 
-    this.nodeLocationTracking =
-      config.nodeLocationTracking ?? DEFAULT_PARSER_CONFIG.nodeLocationTracking
+    this.nodeLocationTracking = has(config, "nodeLocationTracking")
+      ? (config.nodeLocationTracking as nodeLocationTrackingOptions)
+      : DEFAULT_PARSER_CONFIG.nodeLocationTracking
 
     if (!this.outputCst) {
       this.cstInvocationStateUpdate = noop
@@ -172,8 +173,9 @@ export class TreeBuilder {
   }
 
   cstPostRuleFull(this: MixedInParser, ruleCstNode: CstNode): void {
-    const prevToken = this.LA(0)
-    const loc = ruleCstNode.location!
+    // casts to `required<CstNodeLocation>` are safe because `cstPostRuleFull` should only be invoked when full location is enabled
+    const prevToken = this.LA(0) as Required<CstNodeLocation>
+    const loc = ruleCstNode.location as Required<CstNodeLocation>
 
     // If this condition is true it means we consumed at least one Token
     // In this CstNode.
@@ -192,6 +194,7 @@ export class TreeBuilder {
 
   cstPostRuleOnlyOffset(this: MixedInParser, ruleCstNode: CstNode): void {
     const prevToken = this.LA(0)
+    // `location' is not null because `cstPostRuleOnlyOffset` will only be invoked when location tracking is enabled.
     const loc = ruleCstNode.location!
 
     // If this condition is true it means we consumed at least one Token
