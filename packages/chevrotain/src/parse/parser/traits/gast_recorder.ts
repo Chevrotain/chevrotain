@@ -160,35 +160,36 @@ export class GastRecorder {
     // This seems to get rid of any incorrect optimizations that V8 may
     // do during the recording phase.
     this.TRACE_INIT("Deleting Recording methods", () => {
+      const that: any = this
+
       for (let i = 0; i < 10; i++) {
         const idx = i > 0 ? i : ""
-        delete (this as any)[`CONSUME${idx}`]
-        delete (this as any)[`SUBRULE${idx}`]
-        delete (this as any)[`OPTION${idx}`]
-        delete (this as any)[`OR${idx}`]
-        delete (this as any)[`MANY${idx}`]
-        delete (this as any)[`MANY_SEP${idx}`]
-        delete (this as any)[`AT_LEAST_ONE${idx}`]
-        delete (this as any)[`AT_LEAST_ONE_SEP${idx}`]
+        delete that[`CONSUME${idx}`]
+        delete that[`SUBRULE${idx}`]
+        delete that[`OPTION${idx}`]
+        delete that[`OR${idx}`]
+        delete that[`MANY${idx}`]
+        delete that[`MANY_SEP${idx}`]
+        delete that[`AT_LEAST_ONE${idx}`]
+        delete that[`AT_LEAST_ONE_SEP${idx}`]
       }
 
-      delete (this as any)[`consume`]
-      delete (this as any)[`subrule`]
-      delete (this as any)[`option`]
-      delete (this as any)[`or`]
-      delete (this as any)[`many`]
-      delete (this as any)[`atLeastOne`]
+      delete that[`consume`]
+      delete that[`subrule`]
+      delete that[`option`]
+      delete that[`or`]
+      delete that[`many`]
+      delete that[`atLeastOne`]
 
-      delete (this as any).ACTION
-      delete (this as any).BACKTRACK
-      delete (this as any).LA
+      delete that.ACTION
+      delete that.BACKTRACK
+      delete that.LA
     })
   }
 
-  // TODO: is there any way to use this method to check no
   //   Parser methods are called inside an ACTION?
   //   Maybe try/catch/finally on ACTIONS while disabling the recorders state changes?
-  // @ts-ignore
+  // @ts-expect-error -- noop place holder
   ACTION_RECORD<T>(this: MixedInParser, impl: () => T): T {
     // NO-OP during recording
   }
@@ -412,8 +413,8 @@ function recordOrProd(mainProdArg: any, occurrence: number): any {
   forEach(alts, (currAlt) => {
     const currAltFlat = new Alternative({ definition: [] })
     newOrProd.definition.push(currAltFlat)
-    if (currAlt.IGNORE_AMBIGUITIES !== undefined) {
-      currAltFlat.ignoreAmbiguities = currAlt.IGNORE_AMBIGUITIES
+    if (has(currAlt, "IGNORE_AMBIGUITIES")) {
+      currAltFlat.ignoreAmbiguities = currAlt.IGNORE_AMBIGUITIES as boolean // assumes end user provides the correct config value/type
     }
     // **implicit** ignoreAmbiguities due to usage of gate
     else if (has(currAlt, "GATE")) {
