@@ -9,7 +9,7 @@ import { CstNode, CstNodeLocation, IToken } from "@chevrotain/types"
  */
 export function setNodeLocationOnlyOffset(
   currNodeLocation: CstNodeLocation,
-  newLocationInfo: IToken
+  newLocationInfo: Required<Pick<IToken, "startOffset" | "endOffset">>
 ): void {
   // First (valid) update for this cst node
   if (isNaN(currNodeLocation.startOffset) === true) {
@@ -23,7 +23,7 @@ export function setNodeLocationOnlyOffset(
   // any farther updates as the Token vector is sorted.
   // We still have to check this this condition for every new possible location info
   // because with error recovery enabled we may encounter invalid tokens (NaN location props)
-  else if (currNodeLocation.endOffset! < newLocationInfo.endOffset! === true) {
+  else if (currNodeLocation.endOffset! < newLocationInfo.endOffset === true) {
     currNodeLocation.endOffset = newLocationInfo.endOffset
   }
 }
