@@ -194,10 +194,12 @@ export class RecognizerEngine {
           `Make sure that all grammar rule definitions are done before 'performSelfAnalysis' is called.`
       )
     }
-    const resyncEnabled =
-      config.resyncEnabled ?? DEFAULT_RULE_CONFIG.resyncEnabled
-    const recoveryValueFunc =
-      config.recoveryValueFunc ?? DEFAULT_RULE_CONFIG.recoveryValueFunc
+    const resyncEnabled: boolean = has(config, "resyncEnabled")
+      ? (config.resyncEnabled as boolean) // assumes end user provides the correct config value/type
+      : DEFAULT_RULE_CONFIG.resyncEnabled
+    const recoveryValueFunc = has(config, "recoveryValueFunc")
+      ? (config.recoveryValueFunc as () => R) // assumes end user provides the correct config value/type
+      : DEFAULT_RULE_CONFIG.recoveryValueFunc
 
     // performance optimization: Use small integers as keys for the longer human readable "full" rule names.
     // this greatly improves Map access time (as much as 8% for some performance benchmarks).
@@ -325,15 +327,14 @@ export class RecognizerEngine {
   ): OUT | undefined {
     let lookAheadFunc = this.getLaFuncFromCache(key)
     let action: GrammarAction<OUT>
-    let predicate: ((this: MixedInParser) => boolean) | undefined
     if (typeof actionORMethodDef !== "function") {
       action = actionORMethodDef.DEF
-      predicate = actionORMethodDef.GATE
+      const predicate = actionORMethodDef.GATE
       // predicate present
       if (predicate !== undefined) {
         const orgLookaheadFunction = lookAheadFunc
         lookAheadFunc = () => {
-          return predicate!.call(this) && orgLookaheadFunction.call(this)
+          return predicate.call(this) && orgLookaheadFunction.call(this)
         }
       }
     } else {
@@ -369,30 +370,31 @@ export class RecognizerEngine {
     key: number
   ): void {
     let lookAheadFunc = this.getLaFuncFromCache(key)
-
     let action
-    let predicate: ((this: MixedInParser) => boolean) | undefined
     if (typeof actionORMethodDef !== "function") {
       action = actionORMethodDef.DEF
-      predicate = actionORMethodDef.GATE
+      const predicate = actionORMethodDef.GATE
       // predicate present
       if (predicate !== undefined) {
         const orgLookaheadFunction = lookAheadFunc
         lookAheadFunc = () => {
-          return predicate!.call(this) && orgLookaheadFunction.call(this)
+          return predicate.call(this) && orgLookaheadFunction.call(this)
         }
       }
     } else {
       action = actionORMethodDef
     }
 
-    if (lookAheadFunc.call(this) === true) {
+    if ((<Function>lookAheadFunc).call(this) === true) {
       let notStuck = this.doSingleRepetition(action)
-      while (lookAheadFunc.call(this) === true && notStuck === true) {
+      while (
+        (<Function>lookAheadFunc).call(this) === true &&
+        notStuck === true
+      ) {
         notStuck = this.doSingleRepetition(action)
       }
     } else {
-      this.raiseEarlyExitException(
+      throw this.raiseEarlyExitException(
         prodOccurrence,
         PROD_TYPE.REPETITION_MANDATORY,
         (<DSLMethodOptsWithErr<OUT>>actionORMethodDef).ERR_MSG
@@ -472,7 +474,7 @@ export class RecognizerEngine {
         NextTerminalAfterAtLeastOneSepWalker
       )
     } else {
-      this.raiseEarlyExitException(
+      throw this.raiseEarlyExitException(
         prodOccurrence,
         PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR,
         options.ERR_MSG
@@ -496,17 +498,15 @@ export class RecognizerEngine {
     key: number
   ) {
     let lookaheadFunction = this.getLaFuncFromCache(key)
-
     let action
-    let predicate: ((this: MixedInParser) => boolean) | undefined
     if (typeof actionORMethodDef !== "function") {
       action = actionORMethodDef.DEF
-      predicate = actionORMethodDef.GATE
+      const predicate = actionORMethodDef.GATE
       // predicate present
       if (predicate !== undefined) {
         const orgLookaheadFunction = lookaheadFunction
         lookaheadFunction = () => {
-          return predicate!.call(this) && orgLookaheadFunction.call(this)
+          return predicate.call(this) && orgLookaheadFunction.call(this)
         }
       }
     } else {
@@ -635,11 +635,11 @@ export class RecognizerEngine {
     return afterIteration > beforeIteration
   }
 
-  orInternal<OUT>(
+  orInternal<T>(
     this: MixedInParser,
     altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>,
     occurrence: number
-  ): OUT {
+  ): T {
     const laKey = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
     const alts = isArray(altsOrOpts) ? altsOrOpts : altsOrOpts.DEF
 
@@ -691,7 +691,7 @@ export class RecognizerEngine {
       )
       return ruleResult
     } catch (e) {
-      this.subruleInternalError(e, options, ruleToCall.ruleName)
+      throw this.subruleInternalError(e, options, ruleToCall.ruleName)
     }
   }
 
@@ -700,7 +700,7 @@ export class RecognizerEngine {
     e: any,
     options: SubruleMethodOpts<unknown[]> | undefined,
     ruleName: string
-  ): never {
+  ): void {
     if (isRecognitionException(e) && e.partialCstResult !== undefined) {
       this.cstPostNonTerminal(
         e.partialCstResult,
@@ -720,7 +720,7 @@ export class RecognizerEngine {
     idx: number,
     options: ConsumeMethodOpts | undefined
   ): IToken {
-    let consumedToken
+    let consumedToken!: IToken
     try {
       const nextToken = this.LA(1)
       if (this.tokenMatcher(nextToken, tokType) === true) {
@@ -751,7 +751,7 @@ export class RecognizerEngine {
     tokType: TokenType,
     nextToken: IToken,
     options: ConsumeMethodOpts | undefined
-  ): never {
+  ): void {
     let msg
     const previousToken = this.LA(0)
     if (options !== undefined && options.ERR_MSG) {
