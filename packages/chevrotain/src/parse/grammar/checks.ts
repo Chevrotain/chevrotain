@@ -54,6 +54,7 @@ import {
 } from "./types"
 import dropRight from "lodash/dropRight"
 import compact from "lodash/compact"
+import { tokenStructuredMatcher } from "../../scan/tokens"
 
 export function validateGrammar(
   topLevels: Rule[],
@@ -389,7 +390,7 @@ export function validateEmptyOrAlternative(
         const possibleFirstInAlt = nextPossibleTokensAfter(
           [currAlternative],
           [],
-          undefined,
+          tokenStructuredMatcher,
           1
         )
         if (isEmpty(possibleFirstInAlt)) {

@@ -356,7 +356,7 @@ interface IPathToExamine {
 export function nextPossibleTokensAfter(
   initialDef: IProduction[],
   tokenVector: IToken[],
-  tokMatcher: TokenMatcher | undefined,
+  tokMatcher: TokenMatcher,
   maxLookAhead: number
 ): ISyntacticContentAssistPath[] {
   const EXIT_NON_TERMINAL: any = "EXIT_NONE_TERMINAL"
