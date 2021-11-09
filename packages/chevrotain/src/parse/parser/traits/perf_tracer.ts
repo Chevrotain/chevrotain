@@ -21,7 +21,7 @@ export class PerformanceTracer {
         : Infinity
       this.traceInitPerf = traceIsNumber
         ? userTraceInitPerf > 0
-        : userTraceInitPerf
+        : (userTraceInitPerf as boolean) // assumes end user provides the correct config value/type
     } else {
       this.traceInitMaxIdent = 0
       this.traceInitPerf = DEFAULT_PARSER_CONFIG.traceInitPerf

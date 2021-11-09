@@ -194,11 +194,11 @@ export class RecognizerEngine {
           `Make sure that all grammar rule definitions are done before 'performSelfAnalysis' is called.`
       )
     }
-    const resyncEnabled = has(config, "resyncEnabled")
-      ? config.resyncEnabled
+    const resyncEnabled: boolean = has(config, "resyncEnabled")
+      ? (config.resyncEnabled as boolean) // assumes end user provides the correct config value/type
       : DEFAULT_RULE_CONFIG.resyncEnabled
     const recoveryValueFunc = has(config, "recoveryValueFunc")
-      ? config.recoveryValueFunc
+      ? (config.recoveryValueFunc as () => R) // assumes end user provides the correct config value/type
       : DEFAULT_RULE_CONFIG.recoveryValueFunc
 
     // performance optimization: Use small integers as keys for the longer human readable "full" rule names.
@@ -314,7 +314,7 @@ export class RecognizerEngine {
     this: MixedInParser,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
     occurrence: number
-  ): OUT {
+  ): OUT | undefined {
     const key = this.getKeyForAutomaticLookahead(OPTION_IDX, occurrence)
     return this.optionInternalLogic(actionORMethodDef, occurrence, key)
   }
@@ -324,13 +324,12 @@ export class RecognizerEngine {
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
     occurrence: number,
     key: number
-  ): OUT {
+  ): OUT | undefined {
     let lookAheadFunc = this.getLaFuncFromCache(key)
     let action: GrammarAction<OUT>
-    let predicate: (this: MixedInParser) => boolean
     if (typeof actionORMethodDef !== "function") {
       action = actionORMethodDef.DEF
-      predicate = actionORMethodDef.GATE
+      const predicate = actionORMethodDef.GATE
       // predicate present
       if (predicate !== undefined) {
         const orgLookaheadFunction = lookAheadFunc
@@ -371,12 +370,10 @@ export class RecognizerEngine {
     key: number
   ): void {
     let lookAheadFunc = this.getLaFuncFromCache(key)
-
     let action
-    let predicate: (this: MixedInParser) => boolean
     if (typeof actionORMethodDef !== "function") {
       action = actionORMethodDef.DEF
-      predicate = actionORMethodDef.GATE
+      const predicate = actionORMethodDef.GATE
       // predicate present
       if (predicate !== undefined) {
         const orgLookaheadFunction = lookAheadFunc
@@ -501,12 +498,10 @@ export class RecognizerEngine {
     key: number
   ) {
     let lookaheadFunction = this.getLaFuncFromCache(key)
-
     let action
-    let predicate: (this: MixedInParser) => boolean
     if (typeof actionORMethodDef !== "function") {
       action = actionORMethodDef.DEF
-      predicate = actionORMethodDef.GATE
+      const predicate = actionORMethodDef.GATE
       // predicate present
       if (predicate !== undefined) {
         const orgLookaheadFunction = lookaheadFunction
@@ -696,14 +691,14 @@ export class RecognizerEngine {
       )
       return ruleResult
     } catch (e) {
-      this.subruleInternalError(e, options, ruleToCall.ruleName)
+      throw this.subruleInternalError(e, options, ruleToCall.ruleName)
     }
   }
 
   subruleInternalError(
     this: MixedInParser,
     e: any,
-    options: SubruleMethodOpts<unknown[]>,
+    options: SubruleMethodOpts<unknown[]> | undefined,
     ruleName: string
   ): void {
     if (isRecognitionException(e) && e.partialCstResult !== undefined) {
@@ -723,9 +718,9 @@ export class RecognizerEngine {
     this: MixedInParser,
     tokType: TokenType,
     idx: number,
-    options: ConsumeMethodOpts
+    options: ConsumeMethodOpts | undefined
   ): IToken {
-    let consumedToken
+    let consumedToken!: IToken
     try {
       const nextToken = this.LA(1)
       if (this.tokenMatcher(nextToken, tokType) === true) {
@@ -755,7 +750,7 @@ export class RecognizerEngine {
     this: MixedInParser,
     tokType: TokenType,
     nextToken: IToken,
-    options: ConsumeMethodOpts
+    options: ConsumeMethodOpts | undefined
   ): void {
     let msg
     const previousToken = this.LA(0)

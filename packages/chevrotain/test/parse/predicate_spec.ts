@@ -278,7 +278,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
           this.input = input
         }
 
-        public topRule = this.RULE("topRule", (param?: boolean) => {
+        public topRule = this.RULE("topRule", (param: boolean) => {
           return this.OR1([
             {
               GATE: () => param,
@@ -312,7 +312,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
           this.input = input
         }
 
-        public topRule = this.RULE("topRule", (param?: boolean) => {
+        public topRule = this.RULE("topRule", (param: boolean) => {
           let result = ""
           this.OPTION({
             GATE: () => param,
@@ -348,7 +348,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
           this.input = input
         }
 
-        public topRule = this.RULE("topRule", (param?: boolean) => {
+        public topRule = this.RULE("topRule", (param: boolean) => {
           let result = ""
           this.MANY({
             GATE: () => param,
@@ -385,7 +385,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
           this.input = input
         }
 
-        public topRule = this.RULE("topRule", (param?: boolean) => {
+        public topRule = this.RULE("topRule", (param: boolean) => {
           let times = 0
 
           function gateFunc() {

@@ -52,7 +52,7 @@ export class Recoverable {
     this.resyncFollows = {}
 
     this.recoveryEnabled = has(config, "recoveryEnabled")
-      ? config.recoveryEnabled
+      ? (config.recoveryEnabled as boolean) // assumes end user provides the correct config value/type
       : DEFAULT_PARSER_CONFIG.recoveryEnabled
 
     // performance optimization, NOOP will be inlined which
@@ -152,11 +152,6 @@ export class Recoverable {
     // Edge case of arriving from a MANY repetition which is stuck
     // Attempting recovery in this case could cause an infinite loop
     if (notStuck === false) {
-      return false
-    }
-
-    // arguments to try and perform resync into the next iteration of the many are missing
-    if (expectTokAfterLastMatch === undefined || nextTokIdx === undefined) {
       return false
     }
 
@@ -408,7 +403,7 @@ export function attemptInRepetitionRecovery(
   prodOccurrence: number,
   nextToksWalker: typeof AbstractNextTerminalAfterProductionWalker,
   notStuck?: boolean
-) {
+): void {
   const key = this.getKeyForAutomaticLookahead(dslMethodIdx, prodOccurrence)
   let firstAfterRepInfo = this.firstAfterRepMap[key]
   if (firstAfterRepInfo === undefined) {
@@ -433,6 +428,12 @@ export function attemptInRepetitionRecovery(
   ) {
     expectTokAfterLastMatch = EOF
     nextTokIdx = 1
+  }
+
+  // We don't have anything to re-sync to...
+  // this condition was extracted from `shouldInRepetitionRecoveryBeTried` to act as a type-guard
+  if (expectTokAfterLastMatch === undefined || nextTokIdx === undefined) {
+    return
   }
 
   if (

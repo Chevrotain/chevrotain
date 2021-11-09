@@ -394,6 +394,8 @@ export class Lexer {
 
   // There is quite a bit of duplication between this and "tokenizeInternalLazy"
   // This is intentional due to performance considerations.
+  // this method also used quite a bit of `!` none null assertions because it is too optimized
+  // for `tsc` to always understand it is "safe"
   private tokenizeInternal(text: string, initialMode: string): ILexingResult {
     let i,
       j,
@@ -406,7 +408,7 @@ export class Lexer {
       imageLength,
       group,
       tokType,
-      newToken,
+      newToken: IToken,
       errLength,
       droppedChar,
       msg,
@@ -651,12 +653,12 @@ export class Lexer {
         offset = offset + imageLength
 
         // TODO: with newlines the column may be assigned twice
-        column = this.computeNewColumn(column, imageLength)
+        column = this.computeNewColumn(column!, imageLength)
 
         if (trackLines === true && currConfig.canLineTerminator === true) {
           let numOfLTsInMatch = 0
           let foundTerminator
-          let lastLTEndOffset
+          let lastLTEndOffset: number
           lineTerminatorPattern.lastIndex = 0
           do {
             foundTerminator = lineTerminatorPattern.test(matchedImage)
@@ -667,12 +669,12 @@ export class Lexer {
           } while (foundTerminator === true)
 
           if (numOfLTsInMatch !== 0) {
-            line = line + numOfLTsInMatch
-            column = imageLength - lastLTEndOffset
+            line = line! + numOfLTsInMatch
+            column = imageLength - lastLTEndOffset!
             this.updateTokenEndLineColumnLocation(
-              newToken,
-              group,
-              lastLTEndOffset,
+              newToken!,
+              group!,
+              lastLTEndOffset!,
               numOfLTsInMatch,
               line,
               column,
@@ -681,7 +683,7 @@ export class Lexer {
           }
         }
         // will be NOOP if no modes present
-        this.handleModes(currConfig, pop_mode, push_mode, newToken)
+        this.handleModes(currConfig, pop_mode, push_mode, newToken!)
       } else {
         // error recovery, drop characters until we identify a valid token's start point
         const errorStartOffset = offset

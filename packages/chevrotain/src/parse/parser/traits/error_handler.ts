@@ -28,7 +28,7 @@ export class ErrorHandler {
   initErrorHandler(config: IParserConfig) {
     this._errors = []
     this.errorMessageProvider = has(config, "errorMessageProvider")
-      ? config.errorMessageProvider
+      ? (config.errorMessageProvider as IParserErrorMessageProvider) // assumes end user provides the correct config value/type
       : DEFAULT_PARSER_CONFIG.errorMessageProvider
   }
 
@@ -61,8 +61,8 @@ export class ErrorHandler {
     this: MixedInParser,
     occurrence: number,
     prodType: PROD_TYPE,
-    userDefinedErrMsg: string
-  ): void {
+    userDefinedErrMsg: string | undefined
+  ): never {
     const ruleName = this.getCurrRuleFullName()
     const ruleGrammar = this.getGAstProductions()[ruleName]
     const lookAheadPathsPerAlternative = getLookaheadPathsForOptionalProd(
@@ -91,8 +91,8 @@ export class ErrorHandler {
   raiseNoAltException(
     this: MixedInParser,
     occurrence: number,
-    errMsgTypes: string
-  ): void {
+    errMsgTypes: string | undefined
+  ): never {
     const ruleName = this.getCurrRuleFullName()
     const ruleGrammar = this.getGAstProductions()[ruleName]
     // TODO: getLookaheadPathsForOr can be slow for large enough maxLookahead and certain grammars, consider caching ?

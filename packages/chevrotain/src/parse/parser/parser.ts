@@ -38,6 +38,7 @@ import { GastRecorder } from "./traits/gast_recorder"
 import { PerformanceTracer } from "./traits/perf_tracer"
 import { applyMixins } from "./utils/apply_mixins"
 import { IParserDefinitionError } from "../grammar/types"
+import { Rule } from "../grammar/gast/gast_public"
 import { IParserConfigInternal, ParserMethodInternal } from "./types"
 
 export const END_OF_FILE = createTokenInstance(
@@ -56,18 +57,19 @@ export type TokenMatcher = (token: IToken, tokType: TokenType) => boolean
 
 export type LookAheadSequence = TokenType[][]
 
-export const DEFAULT_PARSER_CONFIG: IParserConfigInternal = Object.freeze({
-  recoveryEnabled: false,
-  maxLookahead: 3,
-  dynamicTokensEnabled: false,
-  outputCst: true,
-  errorMessageProvider: defaultParserErrorProvider,
-  nodeLocationTracking: "none",
-  traceInitPerf: false,
-  skipValidations: false
-})
+export const DEFAULT_PARSER_CONFIG: Required<IParserConfigInternal> =
+  Object.freeze({
+    recoveryEnabled: false,
+    maxLookahead: 3,
+    dynamicTokensEnabled: false,
+    outputCst: true,
+    errorMessageProvider: defaultParserErrorProvider,
+    nodeLocationTracking: "none",
+    traceInitPerf: false,
+    skipValidations: false
+  })
 
-export const DEFAULT_RULE_CONFIG: IRuleConfig<any> = Object.freeze({
+export const DEFAULT_RULE_CONFIG: Required<IRuleConfig<any>> = Object.freeze({
   recoveryValueFunc: () => undefined,
   resyncEnabled: true
 })
@@ -121,7 +123,9 @@ export interface IParserState {
 
 export type Predicate = () => boolean
 
-export function EMPTY_ALT<T>(value: T = undefined): () => T {
+export function EMPTY_ALT(): () => undefined
+export function EMPTY_ALT<T>(value: T): () => T
+export function EMPTY_ALT(value: any = undefined) {
   return function () {
     return value
   }
@@ -169,7 +173,7 @@ export class Parser {
               currRuleName
             ] as ParserMethodInternal<unknown[], unknown>
             const originalGrammarAction = wrappedRule["originalGrammarAction"]
-            let recordedRuleGast = undefined
+            let recordedRuleGast!: Rule
             this.TRACE_INIT(`${currRuleName} Rule`, () => {
               recordedRuleGast = this.topLevelRuleRecord(
                 currRuleName,
@@ -266,7 +270,7 @@ export class Parser {
     }
 
     this.skipValidations = has(config, "skipValidations")
-      ? config.skipValidations
+      ? (config.skipValidations as boolean) // casting assumes the end user passing the correct type
       : DEFAULT_PARSER_CONFIG.skipValidations
   }
 }

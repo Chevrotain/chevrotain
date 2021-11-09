@@ -108,12 +108,12 @@ declare abstract class BaseParser {
    * option(1, X) === OPTION1(X)
    * option(2, X) === OPTION2(X)
    * ...
-   * @see SUBRULE
+   * @see OPTION
    */
   protected option<OUT>(
     idx: number,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT
+  ): OUT | undefined
 
   /**
    * Like `OR` with the numerical suffix as a parameter, e.g:
@@ -268,11 +268,13 @@ declare abstract class BaseParser {
    *
    * @param  actionORMethodDef - The grammar action to optionally invoke once
    *                             or an "OPTIONS" object describing the grammar action and optional properties.
+   *
+   * @returns The `GrammarAction` return value (OUT) if the optional syntax is encountered
+   *          or `undefined` if not.
    */
-  // TODO: return `OUT | undefined` explicitly
   protected OPTION<OUT>(
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT
+  ): OUT | undefined
 
   /**
    * @see OPTION
@@ -280,7 +282,7 @@ declare abstract class BaseParser {
    */
   protected OPTION1<OUT>(
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT
+  ): OUT | undefined
 
   /**
    * @see OPTION
@@ -288,7 +290,7 @@ declare abstract class BaseParser {
    */
   protected OPTION2<OUT>(
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT
+  ): OUT | undefined
 
   /**
    * @see OPTION
@@ -296,7 +298,7 @@ declare abstract class BaseParser {
    */
   protected OPTION3<OUT>(
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT
+  ): OUT | undefined
 
   /**
    * @see OPTION
@@ -304,7 +306,7 @@ declare abstract class BaseParser {
    */
   protected OPTION4<OUT>(
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT
+  ): OUT | undefined
 
   /**
    * @see OPTION
@@ -312,7 +314,7 @@ declare abstract class BaseParser {
    */
   protected OPTION5<OUT>(
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT
+  ): OUT | undefined
 
   /**
    * @see OPTION
@@ -320,7 +322,7 @@ declare abstract class BaseParser {
    */
   protected OPTION6<OUT>(
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT
+  ): OUT | undefined
 
   /**
    * @see OPTION
@@ -328,7 +330,7 @@ declare abstract class BaseParser {
    */
   protected OPTION7<OUT>(
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT
+  ): OUT | undefined
 
   /**
    * @see OPTION
@@ -336,7 +338,7 @@ declare abstract class BaseParser {
    */
   protected OPTION8<OUT>(
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT
+  ): OUT | undefined
 
   /**
    * @see OPTION
@@ -344,7 +346,7 @@ declare abstract class BaseParser {
    */
   protected OPTION9<OUT>(
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-  ): OUT
+  ): OUT | undefined
 
   /**
    * Parsing DSL method that indicates a choice between a set of alternatives must be made.
@@ -1027,7 +1029,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    * Note that any parameters of your implementation must be optional as it will
    * be called without parameters during the grammar recording phase.
    */
-  protected RULE<F extends () => any>(
+  protected RULE<F extends (...args: any[]) => any>(
     name: string,
     implementation: F,
     config?: IRuleConfig<ReturnType<F>>
@@ -1037,7 +1039,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    * Overrides a Grammar Rule
    * See usage example in: https://github.com/chevrotain/chevrotain/blob/master/examples/parser/versioning/versioning.js
    */
-  protected OVERRIDE_RULE<F extends () => any>(
+  protected OVERRIDE_RULE<F extends (...args: any[]) => any>(
     name: string,
     implementation: F,
     config?: IRuleConfig<ReturnType<F>>
@@ -2051,7 +2053,7 @@ export interface IParserErrorMessageProvider {
     expectedPathsPerAlt: TokenType[][][]
     actual: IToken[]
     previous: IToken
-    customUserDescription: string
+    customUserDescription?: string
     ruleName: string
   }): string
   /**
@@ -2074,7 +2076,7 @@ export interface IParserErrorMessageProvider {
     expectedIterationPaths: TokenType[][]
     actual: IToken[]
     previous: IToken
-    customUserDescription: string
+    customUserDescription?: string
     ruleName: string
   }): string
 }
@@ -2204,7 +2206,8 @@ export declare const EOF: TokenType
  *    ])
  *  ```
  */
-export declare function EMPTY_ALT<T>(value?: T): () => T
+export declare function EMPTY_ALT(): () => undefined
+export declare function EMPTY_ALT<T>(value: T): () => T
 
 /**
  * This is the default logic Chevrotain uses to construct error messages.

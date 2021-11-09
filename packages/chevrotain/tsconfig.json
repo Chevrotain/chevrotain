@@ -6,6 +6,7 @@
     "baseUrl": ".",
     // raises too many errors to fix at once.
     "strict": false,
+    "strictNullChecks": true,
     "skipLibCheck": true,
     "noImplicitAny": true,
     "strictFunctionTypes": true

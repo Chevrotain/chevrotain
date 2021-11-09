@@ -54,6 +54,7 @@ import {
 } from "./types"
 import dropRight from "lodash/dropRight"
 import compact from "lodash/compact"
+import { tokenStructuredMatcher } from "../../scan/tokens"
 
 export function validateGrammar(
   topLevels: Rule[],
@@ -381,21 +382,20 @@ export function validateEmptyOrAlternative(
   topLevelRule.accept(orCollector)
   const ors = orCollector.alternations
 
-  const errors = reduce(
+  const errors = flatMap<Alternation, IParserEmptyAlternativeDefinitionError>(
     ors,
-    (errors, currOr) => {
+    (currOr) => {
       const exceptLast = dropRight(currOr.definition)
-      const currErrors = map(
-        exceptLast,
-        (currAlternative: IProduction, currAltIdx) => {
-          const possibleFirstInAlt = nextPossibleTokensAfter(
-            [currAlternative],
-            [],
-            null,
-            1
-          )
-          if (isEmpty(possibleFirstInAlt)) {
-            return {
+      return flatMap(exceptLast, (currAlternative, currAltIdx) => {
+        const possibleFirstInAlt = nextPossibleTokensAfter(
+          [currAlternative],
+          [],
+          tokenStructuredMatcher,
+          1
+        )
+        if (isEmpty(possibleFirstInAlt)) {
+          return [
+            {
               message: errMsgProvider.buildEmptyAlternationError({
                 topLevelRule: topLevelRule,
                 alternation: currOr,
@@ -406,14 +406,12 @@ export function validateEmptyOrAlternative(
               occurrence: currOr.idx,
               alternative: currAltIdx + 1
             }
-          } else {
-            return null
-          }
+          ]
+        } else {
+          return []
         }
-      )
-      return errors.concat(compact(currErrors))
-    },
-    []
+      })
+    }
   )
 
   return errors
@@ -432,34 +430,30 @@ export function validateAmbiguousAlternationAlternatives(
   // - https://github.com/chevrotain/chevrotain/issues/869
   ors = reject(ors, (currOr) => currOr.ignoreAmbiguities === true)
 
-  const errors = reduce(
-    ors,
-    (result, currOr: Alternation) => {
-      const currOccurrence = currOr.idx
-      const actualMaxLookahead = currOr.maxLookahead || globalMaxLookahead
-      const alternatives = getLookaheadPathsForOr(
-        currOccurrence,
-        topLevelRule,
-        actualMaxLookahead,
-        currOr
-      )
-      const altsAmbiguityErrors = checkAlternativesAmbiguities(
-        alternatives,
-        currOr,
-        topLevelRule,
-        errMsgProvider
-      )
-      const altsPrefixAmbiguityErrors = checkPrefixAlternativesAmbiguities(
-        alternatives,
-        currOr,
-        topLevelRule,
-        errMsgProvider
-      )
+  const errors = flatMap(ors, (currOr: Alternation) => {
+    const currOccurrence = currOr.idx
+    const actualMaxLookahead = currOr.maxLookahead || globalMaxLookahead
+    const alternatives = getLookaheadPathsForOr(
+      currOccurrence,
+      topLevelRule,
+      actualMaxLookahead,
+      currOr
+    )
+    const altsAmbiguityErrors = checkAlternativesAmbiguities(
+      alternatives,
+      currOr,
+      topLevelRule,
+      errMsgProvider
+    )
+    const altsPrefixAmbiguityErrors = checkPrefixAlternativesAmbiguities(
+      alternatives,
+      currOr,
+      topLevelRule,
+      errMsgProvider
+    )
 
-      return result.concat(altsAmbiguityErrors, altsPrefixAmbiguityErrors)
-    },
-    []
-  )
+    return altsAmbiguityErrors.concat(altsPrefixAmbiguityErrors)
+  })
 
   return errors
 }
@@ -496,11 +490,10 @@ export function validateTooManyAlts(
   topLevelRule.accept(orCollector)
   const ors = orCollector.alternations
 
-  const errors = reduce(
-    ors,
-    (errors, currOr) => {
-      if (currOr.definition.length > 255) {
-        errors.push({
+  const errors = flatMap(ors, (currOr) => {
+    if (currOr.definition.length > 255) {
+      return [
+        {
           message: errMsgProvider.buildTooManyAlternativesError({
             topLevelRule: topLevelRule,
             alternation: currOr
@@ -508,12 +501,12 @@ export function validateTooManyAlts(
           type: ParserDefinitionErrorType.TOO_MANY_ALTS,
           ruleName: topLevelRule.name,
           occurrence: currOr.idx
-        })
-      }
-      return errors
-    },
-    []
-  )
+        }
+      ]
+    } else {
+      return []
+    }
+  })
 
   return errors
 }
@@ -653,7 +646,7 @@ export function checkPrefixAlternativesAmbiguities(
       const alternativeGast = alternation.definition[currPathAndIdx.idx]
       // ignore (skip) ambiguities with this alternative
       if (alternativeGast.ignoreAmbiguities === true) {
-        return
+        return []
       }
       const targetIdx = currPathAndIdx.idx
       const targetPath = currPathAndIdx.path

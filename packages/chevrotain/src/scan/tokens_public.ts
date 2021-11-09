@@ -17,8 +17,10 @@ export function tokenName(tokType: TokenType): string {
   return tokType.name
 }
 
-export function hasTokenLabel(obj: TokenType): boolean {
-  return isString((<any>obj).LABEL) && (<any>obj).LABEL !== ""
+export function hasTokenLabel(
+  obj: TokenType
+): obj is TokenType & Pick<Required<TokenType>, "LABEL"> {
+  return isString(obj.LABEL) && obj.LABEL !== ""
 }
 
 const PARENT = "parent"

@@ -26,7 +26,7 @@ export function createRegularToken(
     endOffset: endOffset,
     endLine: endLine,
     endColumn: endColumn,
-    tokenTypeIdx: tokType.tokenTypeIdx,
+    tokenTypeIdx: tokType.tokenTypeIdx!,
     tokenType: tokType
   }
 }

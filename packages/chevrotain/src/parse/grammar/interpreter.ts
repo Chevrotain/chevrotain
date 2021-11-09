@@ -97,8 +97,8 @@ export abstract class AbstractNextPossibleTokensWalker extends RestWalker {
       this.nextProductionOccurrence = 0
       this.isAtEndOfPath = true
     } else {
-      this.nextProductionName = this.ruleStack.pop()
-      this.nextProductionOccurrence = this.occurrenceStack.pop()
+      this.nextProductionName = this.ruleStack.pop()!
+      this.nextProductionOccurrence = this.occurrenceStack.pop()!
     }
   }
 }
@@ -135,9 +135,9 @@ export class NextAfterTokenWalker extends AbstractNextPossibleTokensWalker {
 export type AlternativesFirstTokens = TokenType[][]
 
 export interface IFirstAfterRepetition {
-  token: TokenType
-  occurrence: number
-  isEndOfRule: boolean
+  token: TokenType | undefined
+  occurrence: number | undefined
+  isEndOfRule: boolean | undefined
 }
 
 /**
@@ -145,11 +145,7 @@ export interface IFirstAfterRepetition {
  * it never "follows" production refs
  */
 export class AbstractNextTerminalAfterProductionWalker extends RestWalker {
-  protected result: {
-    token: TokenType | undefined
-    occurrence: number | undefined
-    isEndOfRule: boolean | undefined
-  } = {
+  protected result: IFirstAfterRepetition = {
     token: undefined,
     occurrence: undefined,
     isEndOfRule: undefined
@@ -383,13 +379,13 @@ export function nextPossibleTokensAfter(
   })
 
   while (!isEmpty(possiblePaths)) {
-    const currPath = possiblePaths.pop()
+    const currPath = possiblePaths.pop()!
 
     // skip alternatives if no more results can be found (assuming deterministic grammar with fixed lookahead)
     if (currPath === EXIT_ALTERNATIVE) {
       if (
         foundCompletePath &&
-        last(possiblePaths).idx <= minimalAlternativesIndex
+        last(possiblePaths)!.idx <= minimalAlternativesIndex
       ) {
         // remove irrelevant alternative
         possiblePaths.pop()
@@ -422,7 +418,7 @@ export function nextPossibleTokensAfter(
       if (currIdx < tokenVectorLength - 1) {
         const nextIdx = currIdx + 1
         const actualToken = tokenVector[nextIdx]
-        if (tokMatcher(actualToken, prod.terminalType)) {
+        if (tokMatcher!(actualToken, prod.terminalType)) {
           const nextPath = {
             idx: nextIdx,
             def: drop(currDef),

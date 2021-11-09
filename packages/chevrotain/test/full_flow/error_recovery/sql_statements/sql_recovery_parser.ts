@@ -212,7 +212,7 @@ export class DDLExampleRecoveryParser extends EmbeddedActionsParser {
   }
 
   private parseValue(): ParseTree {
-    let value = null
+    let value!: IToken
     this.OR([
       {
         ALT: () => {

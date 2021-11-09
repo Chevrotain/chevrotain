@@ -31,7 +31,6 @@ import { IToken, TokenType } from "@chevrotain/types"
 import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
 import { expect } from "chai"
 import { AST } from "eslint"
-import Token = AST.Token
 
 describe("getProdType", () => {
   it("handles `Option`", () => {
@@ -52,7 +51,10 @@ describe("getProdType", () => {
   it("handles `RepetitionWithSeparator`", () => {
     expect(
       getProdType(
-        new RepetitionWithSeparator({ definition: [], separator: null })
+        new RepetitionWithSeparator({
+          definition: [],
+          separator: createToken({ name: "Comma" })
+        })
       )
     ).to.equal(PROD_TYPE.REPETITION_WITH_SEPARATOR)
   })
@@ -61,7 +63,7 @@ describe("getProdType", () => {
       getProdType(
         new RepetitionMandatoryWithSeparator({
           definition: [],
-          separator: null
+          separator: createToken({ name: "Comma" })
         })
       )
     ).to.equal(PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR)

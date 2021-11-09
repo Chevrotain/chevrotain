@@ -40,7 +40,7 @@ export class ContentAssist {
     this: MixedInParser,
     grammarPath: ITokenGrammarPath
   ): TokenType[] {
-    const topRuleName = first(grammarPath.ruleStack)
+    const topRuleName = first(grammarPath.ruleStack)!
     const gastProductions = this.getGAstProductions()
     const topProduction = gastProductions[topRuleName]
     const nextPossibleTokenTypes = new NextAfterTokenWalker(
