@@ -133,7 +133,7 @@ export function singleAssignCategoriesToksMap(
     nextNode.categoryMatchesMap![pathNode.tokenTypeIdx!] = true
   })
 
-  forEach(nextNode.CATEGORIES!, (nextCategory) => {
+  forEach(nextNode.CATEGORIES, (nextCategory) => {
     const newPath = path.concat(nextNode)
     // avoids infinite loops due to cyclic categories.
     if (!includes(newPath, nextCategory)) {

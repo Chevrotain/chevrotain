@@ -394,7 +394,7 @@ export class Lexer {
 
   // There is quite a bit of duplication between this and "tokenizeInternalLazy"
   // This is intentional due to performance considerations.
-  // this method also used quite a bit of `!` none null assertions because it is too optimized to
+  // this method also used quite a bit of `!` none null assertions because it is too optimized
   // for `tsc` to always understand it is "safe"
   private tokenizeInternal(text: string, initialMode: string): ILexingResult {
     let i,

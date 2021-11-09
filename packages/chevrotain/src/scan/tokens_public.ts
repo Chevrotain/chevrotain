@@ -19,7 +19,7 @@ export function tokenName(tokType: TokenType): string {
 
 export function hasTokenLabel(
   obj: TokenType
-): obj is TokenType & { LABEL: string } {
+): obj is TokenType & Pick<Required<TokenType>, "LABEL"> {
   return isString(obj.LABEL) && obj.LABEL !== ""
 }
 
