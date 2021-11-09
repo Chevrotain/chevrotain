@@ -1029,7 +1029,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    * Note that any parameters of your implementation must be optional as it will
    * be called without parameters during the grammar recording phase.
    */
-  protected RULE<F extends () => any>(
+  protected RULE<F extends (...args: any[]) => any>(
     name: string,
     implementation: F,
     config?: IRuleConfig<ReturnType<F>>
@@ -1039,7 +1039,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    * Overrides a Grammar Rule
    * See usage example in: https://github.com/chevrotain/chevrotain/blob/master/examples/parser/versioning/versioning.js
    */
-  protected OVERRIDE_RULE<F extends () => any>(
+  protected OVERRIDE_RULE<F extends (...args: any[]) => any>(
     name: string,
     implementation: F,
     config?: IRuleConfig<ReturnType<F>>
