@@ -394,6 +394,8 @@ export class Lexer {
 
   // There is quite a bit of duplication between this and "tokenizeInternalLazy"
   // This is intentional due to performance considerations.
+  // this method also used quite a bit of `!` none null assertions because it is too optimized to
+  // for `tsc` to always understand it is "safe"
   private tokenizeInternal(text: string, initialMode: string): ILexingResult {
     let i,
       j,
@@ -406,7 +408,7 @@ export class Lexer {
       imageLength,
       group,
       tokType,
-      newToken!: IToken,
+      newToken: IToken,
       errLength,
       droppedChar,
       msg,
@@ -656,7 +658,7 @@ export class Lexer {
         if (trackLines === true && currConfig.canLineTerminator === true) {
           let numOfLTsInMatch = 0
           let foundTerminator
-          let lastLTEndOffset: number | undefined
+          let lastLTEndOffset: number
           lineTerminatorPattern.lastIndex = 0
           do {
             foundTerminator = lineTerminatorPattern.test(matchedImage)
@@ -671,7 +673,7 @@ export class Lexer {
             column = imageLength - lastLTEndOffset!
             this.updateTokenEndLineColumnLocation(
               newToken!,
-              group,
+              group!,
               lastLTEndOffset!,
               numOfLTsInMatch,
               line,
@@ -681,7 +683,7 @@ export class Lexer {
           }
         }
         // will be NOOP if no modes present
-        this.handleModes(currConfig, pop_mode, push_mode, newToken)
+        this.handleModes(currConfig, pop_mode, push_mode, newToken!)
       } else {
         // error recovery, drop characters until we identify a valid token's start point
         const errorStartOffset = offset
@@ -787,7 +789,7 @@ export class Lexer {
   // TODO: decrease this under 600 characters? inspect stripping comments option in TSC compiler
   private updateTokenEndLineColumnLocation(
     newToken: IToken,
-    group: string | false | undefined,
+    group: string | false,
     lastLTIdx: number,
     numOfLTsInMatch: number,
     line: number,

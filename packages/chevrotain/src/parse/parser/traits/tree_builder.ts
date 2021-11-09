@@ -53,7 +53,7 @@ export class TreeBuilder {
     this.outputCst = (config as any).outputCst
 
     this.nodeLocationTracking = has(config, "nodeLocationTracking")
-      ? (config.nodeLocationTracking as nodeLocationTrackingOptions)
+      ? (config.nodeLocationTracking as nodeLocationTrackingOptions) // assumes end user provides the correct config value/type
       : DEFAULT_PARSER_CONFIG.nodeLocationTracking
 
     if (!this.outputCst) {
