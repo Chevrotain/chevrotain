@@ -23,7 +23,7 @@ function createDummyToken(opts: ITokenConfig): TokenType {
   }
 }
 
-describe("GAst namespace", () => {
+describe("the gast model", () => {
   describe("the ProdRef class", () => {
     it("will always return a valid empty definition, even if it's ref is unresolved", () => {
       const prodRef = new NonTerminal({

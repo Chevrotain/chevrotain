@@ -14,8 +14,8 @@ import {
   RepetitionWithSeparator,
   Rule,
   Terminal
-} from "./gast_public"
-import { GAstVisitor } from "./gast_visitor_public"
+} from "./model"
+import { GAstVisitor } from "./visitor"
 import { IProduction, IProductionWithOccurrence } from "@chevrotain/types"
 
 export function isSequenceProd(

@@ -29,7 +29,7 @@
     "clean": "shx rm -rf lib coverage",
     "compile:watch": "tsc -w",
     "compile": "tsc",
-    "coverage": "mocha"
+    "coverage": "nyc mocha"
   },
   "dependencies": {
     "lodash": "4.17.21",

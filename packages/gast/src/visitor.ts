@@ -9,7 +9,7 @@ import {
   RepetitionWithSeparator,
   Rule,
   Terminal
-} from "./gast_public"
+} from "./model"
 import { IProduction } from "@chevrotain/types"
 
 export abstract class GAstVisitor {

@@ -11,9 +11,9 @@ export {
   Alternative,
   serializeGrammar,
   serializeProduction
-} from "./gast_public"
+} from "./model"
 
-export { GAstVisitor } from "./gast_visitor_public"
+export { GAstVisitor } from "./visitor"
 
 export {
   getProductionDslName,
@@ -21,4 +21,4 @@ export {
   isOptionalProd,
   isBranchingProd,
   isSequenceProd
-} from "./gast"
+} from "./helpers"
