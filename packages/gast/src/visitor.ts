@@ -42,25 +42,35 @@ export abstract class GAstVisitor {
     }
   }
 
+  /* istanbul ignore next - testing the fact a NOOP function exists is non-trivial  */
   public visitNonTerminal(node: NonTerminal): any {}
 
+  /* istanbul ignore next - testing the fact a NOOP function exists is non-trivial  */
   public visitAlternative(node: Alternative): any {}
 
+  /* istanbul ignore next - testing the fact a NOOP function exists is non-trivial  */
   public visitOption(node: Option): any {}
 
+  /* istanbul ignore next - testing the fact a NOOP function exists is non-trivial  */
   public visitRepetition(node: Repetition): any {}
 
+  /* istanbul ignore next - testing the fact a NOOP function exists is non-trivial  */
   public visitRepetitionMandatory(node: RepetitionMandatory): any {}
 
+  /* istanbul ignore next - testing the fact a NOOP function exists is non-trivial  */
   public visitRepetitionMandatoryWithSeparator(
     node: RepetitionMandatoryWithSeparator
   ): any {}
 
+  /* istanbul ignore next - testing the fact a NOOP function exists is non-trivial  */
   public visitRepetitionWithSeparator(node: RepetitionWithSeparator): any {}
 
+  /* istanbul ignore next - testing the fact a NOOP function exists is non-trivial  */
   public visitAlternation(node: Alternation): any {}
 
+  /* istanbul ignore next - testing the fact a NOOP function exists is non-trivial  */
   public visitTerminal(node: Terminal): any {}
 
+  /* istanbul ignore next - testing the fact a NOOP function exists is non-trivial  */
   public visitRule(node: Rule): any {}
 }
