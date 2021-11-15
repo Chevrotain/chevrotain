@@ -17,3 +17,6 @@
 
 # prettier ignores
 /packages/cst-dts-gen/test/snapshots/**/output.d.ts
+
+# used to hold "current" master version for relative performance tests.
+/packages/chevrotain/benchmark_web/chevrotain.js

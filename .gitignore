@@ -27,3 +27,6 @@ yarn-error.log
 /examples/implementation_languages/typescript/*.js
 /examples/implementation_languages/coffeescript/*.js
 /examples/parser/minification/gen/
+
+# used to hold "current" master version for relative performance tests.
+/packages/chevrotain/benchmark_web/chevrotain.js

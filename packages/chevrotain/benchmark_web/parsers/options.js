@@ -6,14 +6,14 @@ const options = {
     // this path seems to be relative to the `worker_impel.js` file
     // where this path will be imported using `WorkerGlobalScope.importScripts()`
     bundle: "../../lib/chevrotain.js",
-    parser: {
+    parserConfig: {
       maxLookahead: 2,
       outputCst: false
     }
   },
   current: {
     bundle: "https://unpkg.com/chevrotain/lib/chevrotain.js",
-    parser: {
+    parserConfig: {
       maxLookahead: 2,
       outputCst: false
     }
