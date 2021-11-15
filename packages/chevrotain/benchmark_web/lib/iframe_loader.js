@@ -1,9 +1,9 @@
 var lexerOnly = false
 var parserOnly = false
 
-function includeTestIFrame(id, url) {
+function includeTestIFrame(id, url, mode) {
   var iframe = document.createElement("iframe")
-  iframe.src = url
+  iframe.src = url + `?mode=${mode}`
   iframe.id = id
   iframe.style = "visibility: hidden;"
   document.body.appendChild(iframe)

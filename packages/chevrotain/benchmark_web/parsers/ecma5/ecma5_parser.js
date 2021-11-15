@@ -2,7 +2,7 @@
 
 const chevrotain = self.chevrotain
 
-const Parser = self.globalOptions.outputCst
+var ChevrotainParser = self.parserConfig.outputCst
   ? chevrotain.CstParser
   : chevrotain.EmbeddedActionsParser
 const tokenMatcher = chevrotain.tokenMatcher
@@ -15,7 +15,7 @@ const ENABLE_SEMICOLON_INSERTION = true
 const DISABLE_SEMICOLON_INSERTION = false
 
 // as defined in https://www.ecma-international.org/ecma-262/5.1/index.html
-class ECMAScript5Parser extends Parser {
+class ECMAScript5Parser extends ChevrotainParser {
   set orgText(newText) {
     this._orgText = newText
   }

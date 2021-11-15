@@ -12,11 +12,10 @@
       // relative to the worker impel file
       initWorker({
         startRule: "Program",
-        parserConfig: window.globalOptions.dev,
+        parserConfig: window.globalOptions.parserConfig,
         importScripts: [
-          "../../lib/chevrotain.js",
+          window.globalOptions.bundle,
           "https://unpkg.com/acorn@5.1.2/dist/acorn.js",
-          "./options.js",
           "./ecma5/ecma5_tokens.js",
           "./ecma5/ecma5_lexer.js",
           "./ecma5/ecma5_parser.js",

@@ -51,7 +51,7 @@ var lexerDefinition = jsonTokens
 
 // https://chevrotain.io/docs/guide/performance.html#using-a-singleton-parser
 // (Do not create a new Parser instance for each new input.)
-var ChevrotainParser = self.globalOptions.outputCst
+var ChevrotainParser = self.parserConfig.outputCst
   ? chevrotain.CstParser
   : chevrotain.EmbeddedActionsParser
 

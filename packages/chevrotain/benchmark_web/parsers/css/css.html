@@ -12,11 +12,10 @@
       // relative to the worker impel file
       initWorker({
         startRule: "stylesheet",
-        parserConfig: window.globalOptions.latest,
+        parserConfig: window.globalOptions.parserConfig,
         importScripts: [
-          "https://unpkg.com/chevrotain/lib/chevrotain.js",
+          window.globalOptions.bundle,
           "https://unpkg.com/xregexp@3.2.0/xregexp-all.js",
-          "./options.js",
           "./css/css_parser.js",
           "./css/1K_css.js",
           "./api.js"

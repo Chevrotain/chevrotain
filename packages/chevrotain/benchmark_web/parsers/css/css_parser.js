@@ -241,7 +241,7 @@ var Minus = createToken({ name: "Minus", pattern: /-/ })
 
 var lexerDefinition = cssTokens
 
-var ChevrotainParser = self.globalOptions.outputCst
+var ChevrotainParser = self.parserConfig.outputCst
   ? chevrotain.CstParser
   : chevrotain.EmbeddedActionsParser
 

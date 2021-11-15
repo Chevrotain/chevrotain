@@ -12,10 +12,9 @@
       // relative to the worker impel file
       initWorker({
         startRule: "json",
-        parserConfig: window.globalOptions.latest,
+        parserConfig: window.globalOptions.parserConfig,
         importScripts: [
-          "https://unpkg.com/chevrotain/lib/chevrotain.js",
-          "./options.js",
+          window.globalOptions.bundle,
           "./json/json_parser.js",
           "./json/1K_json.js",
           "./api.js"

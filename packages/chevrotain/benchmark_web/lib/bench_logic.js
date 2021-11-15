@@ -92,7 +92,7 @@ function onRunAll(options) {
       data.datasets[0].data.push(rate)
 
       try {
-        if (isLatest) {
+        if (self.mode === "current") {
           // store latest released version results to compare with dev version
           // in the other window.
           localStorage.setItem(suite.name, suite.hz)
@@ -100,7 +100,7 @@ function onRunAll(options) {
           var cell = $("." + suite.name + " .benchSpeed")
           cell.html("100%")
         }
-        if (isDev) {
+        if (self.mode === "next") {
           var cell = $("." + suite.name + " .benchSpeed")
           var storedLatestHz = localStorage.getItem(suite.name)
           if (storedLatestHz) {
