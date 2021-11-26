@@ -23,6 +23,8 @@ export abstract class AbstractProduction<T extends IProduction = IProduction>
     this._definition = value
   }
 
+  atnState: any
+
   constructor(protected _definition: T[]) {}
 
   accept(visitor: IGASTVisitor): void {
@@ -305,7 +307,7 @@ export type ISerializedGastAny =
   | ISerializedTerminalWithSeparator
 
 export function serializeGrammar(topRules: Rule[]): ISerializedGast[] {
-  return map(topRules, serializeProduction)
+  return map(topRules, rule => serializeProduction(rule))
 }
 
 export function serializeProduction(node: IProduction): ISerializedGast {
