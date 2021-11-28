@@ -14,7 +14,7 @@ SELECT name, age FROM persons WHERE age > 100
 ...
 ```
 
-A Lexer transforms a string input into a [Token](https://chevrotain.io/documentation/9_1_0/interfaces/itoken.html) vector.
+A Lexer transforms a string input into a [Token](https://chevrotain.io/documentation/9_1_0/interfaces/IToken.html) vector.
 Chevrotain has a built in Lexer engine based on Javascript Regular Expressions.
 
 ## Our First Token
