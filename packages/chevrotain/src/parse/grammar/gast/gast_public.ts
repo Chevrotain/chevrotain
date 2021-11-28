@@ -245,6 +245,8 @@ export class Terminal implements IProductionWithOccurrence {
   public label?: string
   public idx: number = 1
 
+  atnState: any
+
   constructor(options: {
     terminalType: TokenType
     label?: string
