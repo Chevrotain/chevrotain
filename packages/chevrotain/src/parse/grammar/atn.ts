@@ -494,7 +494,7 @@ function tokenRef(atn: ATN, rule: Rule, terminal: Terminal): ATNHandle {
 	const right = newState<BasicState>(atn, rule, {
 		type: ATN_BASIC
 	})
-	left.transitions.push(new AtomTransition(right, terminal.terminalType))
+	addTransition(left, new AtomTransition(right, terminal.terminalType))
 	terminal.atnState = left
 	return {
 		left,
@@ -514,7 +514,7 @@ function ruleRef(atn: ATN, currentRule: Rule, nonTerminal: NonTerminal): ATNHand
 	})
 
 	const call = new RuleTransition(start, rule, 0, right)
-	left.transitions.push(call)
+	addTransition(left, call)
 
 	nonTerminal.atnState = left;
 	return {
@@ -524,7 +524,7 @@ function ruleRef(atn: ATN, currentRule: Rule, nonTerminal: NonTerminal): ATNHand
 }
 
 function addFollowLink(atn: ATN, rule: Rule, right: ATNState): void {
-	const stop = atn.ruleToStartState.get(rule)!
+	const stop = atn.ruleToStopState.get(rule)!
 	epsilon(stop, right)
 }
 
@@ -550,13 +550,9 @@ function buildRuleHandle(atn: ATN, rule: Rule, block: ATNHandle): ATNHandle {
 	return handle
 }
 
-function epsilon(a: ATNBaseState, b: ATNBaseState, prepend = false): void {
+function epsilon(a: ATNBaseState, b: ATNBaseState): void {
 	const transition = new EpsilonTransition(b as ATNState);
-	if (prepend) {
-		a.transitions.unshift(transition)
-	} else {
-		a.transitions.push(transition)
-	}
+	addTransition(a, transition)
 }
 
 function newState<T extends ATNState>(atn: ATN, rule: Rule, partial: Partial<T>): T {
@@ -571,6 +567,15 @@ function newState<T extends ATNState>(atn: ATN, rule: Rule, partial: Partial<T>)
 	} as unknown as T
 	atn.states.push(t)
 	return t
+}
+
+function addTransition(state: ATNBaseState, transition: Transition) {
+	if (state.transitions.length === 0) {
+		state.epsilonOnlyTransitions = transition.isEpsilon()
+	} else if (state.epsilonOnlyTransitions !== transition.isEpsilon()) {
+		state.epsilonOnlyTransitions = false
+	}
+	state.transitions.push(transition)
 }
 
 function removeState(atn: ATN, state: ATNState): void {
