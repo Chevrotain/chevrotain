@@ -23,6 +23,7 @@ export const DFA_ERROR = {} as DFAState
 export interface ATNConfig {
 	state: ATNState
 	alt: number
+	followState?: ATNState
 }
 
 export class ATNConfigSet {

@@ -1,5 +1,5 @@
 import { IToken } from "@chevrotain/types";
-import { EOF } from "src/api";
+import { EOF } from "../../scan/tokens_public";
 import { TokenMatcher } from "../parser/parser";
 import { MixedInParser } from "../parser/traits/parser_traits";
 import { ATN, ATNState, ATN_RULE_STOP, AtomTransition, EpsilonTransition, RuleTransition, Transition } from "./atn";
@@ -39,6 +39,7 @@ export class ATNSimulator {
 		if (start === undefined) {
 			const closure = this.computeStartState(dfa.atnStartState as ATNState)
 			start = this.addDFAState(dfa, this.newDFAState(closure))
+			dfa.start = start
 		}
 
 		const alt = this.execATN(dfa, start)
@@ -104,9 +105,7 @@ export class ATNSimulator {
 
 		for (const c of closure.elements) {
 			if (c.state.type === ATN_RULE_STOP) {
-				if (tokenEOF) {
-					skippedStopStates.push(c)
-				}
+				skippedStopStates.push(c)
 				continue
 			}
 			const transitionLength = c.state.transitions.length
@@ -116,7 +115,8 @@ export class ATNSimulator {
 				if (target !== undefined) {
 					intermediate.add({
 						state: target,
-						alt: c.alt
+						alt: c.alt,
+						followState: c.followState
 					})
 				}
 			}
@@ -124,7 +124,7 @@ export class ATNSimulator {
 
 		let reach: ATNConfigSet | undefined
 
-		if (skippedStopStates.length === 0 && tokenEOF) {
+		if (skippedStopStates.length === 0 && !tokenEOF) {
 			if (intermediate.size === 1) {
 				reach = intermediate
 			} else if (this.getUniqueAlt(intermediate) !== undefined) {
@@ -217,8 +217,21 @@ export class ATNSimulator {
 		return configs
 	}
 
-	closure(config: ATNConfig, configs: ATNConfigSet, closureBusy: Set<ATNConfig>, treatEofAsEpsilon: boolean) {
+	closure(config: ATNConfig, configs: ATNConfigSet, closureBusy: Set<ATNConfig>, treatEofAsEpsilon: boolean): void {
 		const p = config.state
+
+		if (p.type === ATN_RULE_STOP) {
+			if (config.followState) {
+				const followState = config.followState
+				const followConfig: ATNConfig = {
+					state: followState,
+					alt: config.alt
+				}
+				this.closure(followConfig, configs, closureBusy, treatEofAsEpsilon)
+			}
+			return
+		}
+
 		if (!p.epsilonOnlyTransitions) {
 			configs.add(config)
 		}
@@ -228,8 +241,8 @@ export class ATNSimulator {
 			const transition = p.transitions[i]
 			const c = this.getEpsilonTarget(config, transition, treatEofAsEpsilon)
 
-			if (c !== undefined && transition.isEpsilon() && closureBusy.has(c)) {
-				if (transition.isEpsilon() && closureBusy.has(c)) {
+			if (c !== undefined) {
+				if (!transition.isEpsilon() && closureBusy.has(c)) {
 					// avoid infinite recursion for EOF* and EOF+
 					continue
 				}
@@ -242,16 +255,18 @@ export class ATNSimulator {
 	getEpsilonTarget(config: ATNConfig, transition: Transition, treatEofAsEpsilon: boolean): ATNConfig | undefined {
 		if (transition instanceof EpsilonTransition) {
 			return {
-				state: config.state,
-				alt: config.alt
+				state: transition.target,
+				alt: config.alt,
+				followState: config.followState
 			}
 		} else if (transition instanceof RuleTransition) {
 			return this.ruleTransition(config, transition)
 		} else if (transition instanceof AtomTransition) {
 			if (treatEofAsEpsilon && EOF === transition.tokenType) {
 				return {
-					state: config.state,
-					alt: config.alt
+					state: transition.target,
+					alt: config.alt,
+					followState: config.followState
 				}
 			}
 		}
@@ -261,8 +276,9 @@ export class ATNSimulator {
 	ruleTransition(config: ATNConfig, transition: RuleTransition): ATNConfig {
 		// const returnState = transition.followState
 		return {
-			state: config.state,
-			alt: config.alt
+			state: transition.target,
+			alt: config.alt,
+			followState: transition.followState 
 		}
 	}
 }

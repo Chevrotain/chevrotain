@@ -57,6 +57,8 @@ export type TokenMatcher = (token: IToken, tokType: TokenType) => boolean
 
 export type LookAheadSequence = TokenType[][]
 
+export type LL1Sequence = TokenType[]
+
 export const DEFAULT_PARSER_CONFIG: Required<IParserConfigInternal> =
   Object.freeze({
     recoveryEnabled: false,

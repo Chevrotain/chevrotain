@@ -13,6 +13,151 @@ import {
 } from "../../../src/parse/grammar/gast/gast_public"
 import { ATN, ATNState, ATN_RULE_STOP, AtomTransition, createATN, EpsilonTransition, RuleTransition, Transition } from "../../../src/parse/grammar/atn"
 import * as fs from 'fs'
+import { EmbeddedActionsParser, MixedInParser } from "../../../src/parse/parser/traits/parser_traits"
+import { Lexer } from "../../../src/scan/lexer_public"
+import { createATNSimulator } from "../../../src/parse/grammar/atn_simulator"
+import { tokenStructuredMatcher } from "../../../src/scan/tokens"
+import { expect } from "chai"
+import { DFA, DFAState, DFA_ERROR } from "../../../src/parse/grammar/dfa"
+
+describe("atn-dfa transformation", () => {
+
+	const A = createToken({ name: "A", pattern: "a" })
+	const B = createToken({ name: "B", pattern: "b" })
+	const C = createToken({ name: "C", pattern: "c" })
+
+	const tokens = [A, B, C]
+
+	class Parser extends EmbeddedActionsParser {
+		constructor() {
+			super(tokens, {
+				skipValidations: true
+			})
+			this.performSelfAnalysis()
+		}
+
+		RuleA = this.RULE("RuleA", () => {
+			this.MANY(() => {
+				this.CONSUME(A)
+			})
+		})
+
+		RuleB = this.RULE("RuleB", () => {
+			this.CONSUME(B)
+		})
+
+		Rule = this.RULE("Rule", () => {
+			this.OR([
+				{
+					ALT: () => {
+						this.SUBRULE1(this.RuleA)
+						this.CONSUME(A)
+					}
+				},
+				{
+					ALT: () => {
+						this.SUBRULE2(this.RuleA)
+						this.CONSUME(B)
+					}
+				}
+			])
+			// this.OPTION({
+			// 	DEF: () => {
+			// 		this.CONSUME(B)
+			// 	}
+			// })
+			this.CONSUME(C)
+		})
+	}
+
+	it("test", () => {
+		const lexer = new Lexer(tokens)
+		const inputA = "aaaaaac"
+		const inputB = "aaaaabc"
+		console.time('parser')
+		const parser = new Parser()
+		const mixedParser = parser as any as MixedInParser
+		console.timeEnd('parser')
+		console.time('lexing')
+		parser.input = lexer.tokenize(inputA).tokens
+		console.timeEnd('lexing')
+		const rules = Object.values(parser.getGAstProductions()) as Rule[]
+		console.time('atn-builder')
+		const atn = createATN(rules)
+		console.timeEnd('atn-builder')
+		printATN(atn, rules)
+		const simulator = createATNSimulator(mixedParser, atn, tokenStructuredMatcher)
+		console.time('dfa-prediction')
+		const prediction = simulator.adaptivePredict(2)
+		console.timeEnd('dfa-prediction')
+		printDFA(simulator.decisionToDFA[2])
+		console.time('dfa-prediction2')
+		simulator.adaptivePredict(0)
+		console.timeEnd('dfa-prediction2')
+		console.time('dfa-prediction3')
+		simulator.adaptivePredict(0)
+		console.timeEnd('dfa-prediction3')
+		expect(prediction).to.be.equal(0)
+		console.time('parse')
+		parser.Rule()
+		console.timeEnd('parse')
+	})
+
+})
+
+function printDFA(dfa: DFA) {
+	let text = "digraph G {\nnode_error[label=\"error\"]\n"
+	if (dfa.start) {
+		iterateOverDFAStates(dfa.start, (state) => text += buildDFAState(state))
+		iterateOverDFATransitions(dfa.start, (state, transition) => text += buildDFATransition(state, transition))
+	}
+	text += "}"
+	fs.writeFileSync('./dfa.dot', text)
+}
+
+function iterateOverDFAStates(atnState: DFAState, action: (state: DFAState) => void, visited: Set<DFAState> = new Set()): void {
+	action(atnState)
+	for (const nextState of Array.from(atnState.edges.values())) {
+		if (nextState !== DFA_ERROR && !visited.has(nextState)) {
+			visited.add(nextState)
+			iterateOverDFAStates(nextState, action, visited)
+		}
+	}
+}
+
+function iterateOverDFATransitions(atnState: DFAState, action: (startState: DFAState, transition: any[]) => void, visited: Set<DFAState> = new Set()): void {
+	for (const transition of Array.from(atnState.edges.entries())) {
+		action(atnState, transition)
+	}
+	for (const nextState of Array.from(atnState.edges.values())) {
+		if (nextState !== DFA_ERROR && !visited.has(nextState)) {
+			visited.add(nextState)
+			iterateOverDFATransitions(nextState, action, visited)
+		}
+	}
+}
+
+function buildDFATransition(state: DFAState, transition: any[]): string {
+	if (state === DFA_ERROR) {
+		return ""
+	}
+	const name = state.stateNumber.toString()
+	const nextState = transition[1]
+	if (!('stateNumber' in nextState)) {
+		return `node_${name} -> node_error\n`
+	}
+	const targetName = nextState.stateNumber.toString() as string
+	const transitionName = transition[0].name as string
+	return `node_${name} -> node_${targetName} [label="${transitionName}"]\n`
+}
+
+function buildDFAState(state: DFAState): string {
+	if (state === DFA_ERROR) {
+		return ""
+	}
+	const name = state.stateNumber.toString()
+	return `node_${name}[label="${name}"]\n`
+}
 
 describe("successful ATN creation", () => {
 
@@ -182,7 +327,7 @@ describe("successful ATN creation", () => {
 		})
 		const rules = [qualifiedName, paramSpec, actionDec, lotsOfOrs, emptyAltOr]
 		const atn = createATN(rules)
-		printATN(atn, rules)
+		// printATN(atn, rules)
 	})
 
 })
