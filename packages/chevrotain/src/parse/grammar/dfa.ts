@@ -4,7 +4,7 @@ import { ATNState, DecisionState } from "./atn";
 
 export interface DFA {
 	start?: DFAState
-	states: Map<DFAState, DFAState>
+	states: Map<string, DFAState>
 	decision: number
 	atnStartState: DecisionState
 	precedenceDfa: boolean
@@ -60,6 +60,10 @@ export class ATNConfigSet {
 
 	private atnConfigToString(config: ATNConfig) {
 		return `${config.state.stateNumber}_${config.alt}`
+	}
+
+	get key(): string {
+		return Array.from(this.map.keys()).join(':')
 	}
 
 }

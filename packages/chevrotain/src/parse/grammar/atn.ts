@@ -2,7 +2,7 @@ import map from "lodash/map";
 import some from "lodash/some";
 import { IProduction, IToken, TokenType } from "@chevrotain/types";
 import { TokenMatcher } from "../parser/parser";
-import { Alternation, NonTerminal, Rule, Option, RepetitionMandatory, Repetition, Terminal, AbstractProduction, Alternative } from "./gast/gast_public";
+import { Alternation, NonTerminal, Rule, Option, RepetitionMandatory, Repetition, Terminal, AbstractProduction, Alternative, RepetitionWithSeparator, RepetitionMandatoryWithSeparator } from "./gast/gast_public";
 import filter from "lodash/filter";
 
 export interface ATN {
@@ -295,8 +295,12 @@ function atom(atn: ATN, rule: Rule, production: IProduction): ATNHandle | undefi
 		return option(atn, rule, production)
 	} else if (production instanceof Repetition) {
 		return repetition(atn, rule, production)
+	} else if (production instanceof RepetitionWithSeparator) {
+		return repetitionSep(atn, rule, production)
 	} else if (production instanceof RepetitionMandatory) {
 		return repetitionMandatory(atn, rule, production)
+	} else if (production instanceof RepetitionMandatoryWithSeparator) {
+		return repetitionMandatorySep(atn, rule, production)
 	} else if (production instanceof Alternative || production instanceof Rule) {
 		return block(atn, rule, production)
 	} else {
@@ -313,6 +317,16 @@ function repetition(atn: ATN, rule: Rule, repetition: Repetition): ATNHandle {
 	return star(atn, rule, repetition, handle)
 }
 
+function repetitionSep(atn: ATN, rule: Rule, repetition: RepetitionWithSeparator): ATNHandle {
+	const starState = newState<StarBlockStartState>(atn, rule, {
+		type: ATN_STAR_BLOCK_START
+	})
+	defineDecisionState(atn, starState)
+	const handle = makeAlts(atn, rule, starState, repetition, block(atn, rule, repetition))
+	const sep = tokenRef(atn, rule, repetition.separator)
+	return star(atn, rule, repetition, handle, sep)
+}
+
 function repetitionMandatory(atn: ATN, rule: Rule, repetition: RepetitionMandatory): ATNHandle {
 	const plusState = newState<PlusBlockStartState>(atn, rule, {
 		type: ATN_PLUS_BLOCK_START
@@ -320,6 +334,16 @@ function repetitionMandatory(atn: ATN, rule: Rule, repetition: RepetitionMandato
 	defineDecisionState(atn, plusState)
 	const handle = makeAlts(atn, rule, plusState, repetition, block(atn, rule, repetition))
 	return plus(atn, rule, repetition, handle)
+}
+
+function repetitionMandatorySep(atn: ATN, rule: Rule, repetition: RepetitionMandatoryWithSeparator): ATNHandle {
+	const plusState = newState<PlusBlockStartState>(atn, rule, {
+		type: ATN_PLUS_BLOCK_START
+	})
+	defineDecisionState(atn, plusState)
+	const handle = makeAlts(atn, rule, plusState, repetition, block(atn, rule, repetition))
+	const sep = tokenRef(atn, rule, repetition.separator)
+	return plus(atn, rule, repetition, handle, sep)
 }
 
 function alternation(atn: ATN, rule: Rule, alternation: Alternation): ATNHandle {
@@ -352,32 +376,38 @@ function block(atn: ATN, rule: Rule, block: AbstractProduction): ATNHandle | und
 	}
 }
 
-function plus(atn: ATN, rule: Rule, plus: RepetitionMandatory, handle: ATNHandle): ATNHandle {
-	const start = handle.left as PlusBlockStartState
-	const end = handle.right
+function plus(atn: ATN, rule: Rule, plus: IProduction, handle: ATNHandle, sep?: ATNHandle): ATNHandle {
+	const blkStart = handle.left as PlusBlockStartState
+	const blkEnd = handle.right
 
 	const loop = newState<PlusLoopbackState>(atn, rule, {
 		type: ATN_PLUS_LOOP_BACK
 	})
 	defineDecisionState(atn, loop)
-	const loopEnd = newState<LoopEndState>(atn, rule, {
+	const end = newState<LoopEndState>(atn, rule, {
 		type: ATN_LOOP_END
 	})
-	start.loopback = loop
-	loopEnd.loopback = loop
+	blkStart.loopback = loop
+	end.loopback = loop
 	plus.atnState = loop
-	epsilon(end, loop) // block can see loop back
+	epsilon(blkEnd, loop) // block can see loop back
 
-	epsilon(loop, loopEnd) // exit
-	epsilon(loop, end) // loop back to start
+	if (sep === undefined) {
+		epsilon(loop, blkStart) // loop back to start
+	} else {
+		// loop back to start with separator
+		epsilon(loop, sep.right)
+		epsilon(sep.left, blkStart)
+	}
+	epsilon(loop, end) // exit
 
 	return {
-		left: start,
-		right: loopEnd
+		left: blkStart,
+		right: end
 	}
 }
 
-function star(atn: ATN, rule: Rule, star: Repetition, handle: ATNHandle): ATNHandle {
+function star(atn: ATN, rule: Rule, star: IProduction, handle: ATNHandle, sep?: ATNHandle): ATNHandle {
 	const start = handle.left
 	const end = handle.right
 
@@ -394,10 +424,17 @@ function star(atn: ATN, rule: Rule, star: Repetition, handle: ATNHandle): ATNHan
 	entry.loopback = loop
 	loopEnd.loopback = loop
 
-	epsilon(entry, loopEnd) // bypass loop edge (alt 1)
 	epsilon(entry, start) // loop enter edge (alt 2)
+	epsilon(entry, loopEnd) // bypass loop edge (alt 1)
 	epsilon(end, loop) // block end hits loop back
-	epsilon(loop, entry) // loop back to entry/exit decision
+	if (sep === undefined) {
+		epsilon(loop, entry) // loop back to entry/exit decision
+	} else {
+		// loop back to start of handle
+		epsilon(loop, sep.left)
+		epsilon(sep.right, start)
+	}
+	
 
 	star.atnState = entry
 	return {
@@ -465,13 +502,13 @@ function makeBlock(atn: ATN, alts: ATNHandle[]): ATNHandle {
 			&& transition !== undefined
 			&& (isRuleTransition && ruleTransition.followState === handle.right || transition.target === handle.right)) {
 
-			if (isRuleTransition) { // we can avoid epsilon edge to next el
+			if (isRuleTransition) { // we can avoid epsilon edge to next element
 				ruleTransition.followState = alts[i + 1].left
 			} else {
 				transition.target = alts[i + 1].left
 			}
 			removeState(atn, handle.right) // we skipped over this state
-		} else { // need epsilon if previous block's right end node is complicated
+		} else { // need epsilon if previous block's right end node is complex
 			epsilon(handle.right, alts[i + 1].left)
 		}
 	}
@@ -487,15 +524,14 @@ function makeBlock(atn: ATN, alts: ATNHandle[]): ATNHandle {
 	}
 }
 
-function tokenRef(atn: ATN, rule: Rule, terminal: Terminal): ATNHandle {
+function tokenRef(atn: ATN, rule: Rule, terminal: Terminal | TokenType): ATNHandle {
 	const left = newState<BasicState>(atn, rule, {
 		type: ATN_BASIC
 	})
 	const right = newState<BasicState>(atn, rule, {
 		type: ATN_BASIC
 	})
-	addTransition(left, new AtomTransition(right, terminal.terminalType))
-	terminal.atnState = left
+	addTransition(left, new AtomTransition(right, terminal instanceof Terminal ? terminal.terminalType : terminal))
 	return {
 		left,
 		right

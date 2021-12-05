@@ -16,9 +16,9 @@ import * as fs from 'fs'
 import { EmbeddedActionsParser, MixedInParser } from "../../../src/parse/parser/traits/parser_traits"
 import { Lexer } from "../../../src/scan/lexer_public"
 import { createATNSimulator } from "../../../src/parse/grammar/atn_simulator"
-import { tokenStructuredMatcher } from "../../../src/scan/tokens"
 import { expect } from "chai"
 import { DFA, DFAState, DFA_ERROR } from "../../../src/parse/grammar/dfa"
+import { EMPTY_ALT } from "../../../src/parse/parser/parser"
 
 describe("atn-dfa transformation", () => {
 
@@ -51,14 +51,20 @@ describe("atn-dfa transformation", () => {
 				{
 					ALT: () => {
 						this.SUBRULE1(this.RuleA)
-						this.CONSUME(A)
+						this.CONSUME(B)
+						this.SUBRULE1(this.RuleA)
 					}
 				},
 				{
 					ALT: () => {
 						this.SUBRULE2(this.RuleA)
 						this.CONSUME(B)
+						this.SUBRULE1(this.RuleA)
+						this.CONSUME(B)
 					}
+				},
+				{
+					ALT: EMPTY_ALT
 				}
 			])
 			// this.OPTION({
@@ -72,21 +78,22 @@ describe("atn-dfa transformation", () => {
 
 	it("test", () => {
 		const lexer = new Lexer(tokens)
-		const inputA = "aaaaaac"
-		const inputB = "aaaaabc"
+		const inputA = "aaabaaac"
+		const inputB = "aaabaaabc"
+		const inputC = "c"
 		console.time('parser')
 		const parser = new Parser()
 		const mixedParser = parser as any as MixedInParser
 		console.timeEnd('parser')
 		console.time('lexing')
-		parser.input = lexer.tokenize(inputA).tokens
+		parser.input = lexer.tokenize(inputC).tokens
 		console.timeEnd('lexing')
 		const rules = Object.values(parser.getGAstProductions()) as Rule[]
 		console.time('atn-builder')
 		const atn = createATN(rules)
 		console.timeEnd('atn-builder')
 		printATN(atn, rules)
-		const simulator = createATNSimulator(mixedParser, atn, tokenStructuredMatcher)
+		const simulator = createATNSimulator(mixedParser, atn)
 		console.time('dfa-prediction')
 		const prediction = simulator.adaptivePredict(2)
 		console.timeEnd('dfa-prediction')
@@ -97,7 +104,7 @@ describe("atn-dfa transformation", () => {
 		console.time('dfa-prediction3')
 		simulator.adaptivePredict(0)
 		console.timeEnd('dfa-prediction3')
-		expect(prediction).to.be.equal(0)
+		expect(prediction).to.be.equal(2)
 		console.time('parse')
 		parser.Rule()
 		console.timeEnd('parse')
@@ -116,22 +123,22 @@ function printDFA(dfa: DFA) {
 }
 
 function iterateOverDFAStates(atnState: DFAState, action: (state: DFAState) => void, visited: Set<DFAState> = new Set()): void {
+	visited.add(atnState)
 	action(atnState)
 	for (const nextState of Array.from(atnState.edges.values())) {
 		if (nextState !== DFA_ERROR && !visited.has(nextState)) {
-			visited.add(nextState)
 			iterateOverDFAStates(nextState, action, visited)
 		}
 	}
 }
 
 function iterateOverDFATransitions(atnState: DFAState, action: (startState: DFAState, transition: any[]) => void, visited: Set<DFAState> = new Set()): void {
+	visited.add(atnState)
 	for (const transition of Array.from(atnState.edges.entries())) {
 		action(atnState, transition)
 	}
 	for (const nextState of Array.from(atnState.edges.values())) {
 		if (nextState !== DFA_ERROR && !visited.has(nextState)) {
-			visited.add(nextState)
 			iterateOverDFATransitions(nextState, action, visited)
 		}
 	}
@@ -156,7 +163,11 @@ function buildDFAState(state: DFAState): string {
 		return ""
 	}
 	const name = state.stateNumber.toString()
-	return `node_${name}[label="${name}"]\n`
+	let attributes = ""
+	if (state.isAcceptState) {
+		attributes = " peripheries=2"
+	}
+	return `node_${name}[label="${name}"${attributes}]\n`
 }
 
 describe("successful ATN creation", () => {

@@ -1,11 +1,13 @@
-import { IToken } from "@chevrotain/types";
+import { IToken, TokenType } from "@chevrotain/types";
+import { tokenStructuredMatcher } from "../../scan/tokens";
 import { EOF } from "../../scan/tokens_public";
-import { TokenMatcher } from "../parser/parser";
 import { MixedInParser } from "../parser/traits/parser_traits";
 import { ATN, ATNState, ATN_RULE_STOP, AtomTransition, EpsilonTransition, RuleTransition, Transition } from "./atn";
 import { ATNConfig, ATNConfigSet, DFA, DFAState, DFA_ERROR } from "./dfa";
+import { Rule } from "./gast/gast_public";
+import * as fs from 'fs';
 
-export function createATNSimulator(parser: MixedInParser, atn: ATN, tokenMatcher: TokenMatcher): ATNSimulator {
+export function createATNSimulator(parser: MixedInParser, atn: ATN): ATNSimulator {
 	const decisionLength = atn.decisionStates.length
 	const decisionToDFA: DFA[] = Array(decisionLength)
 	for (let i = 0; i < decisionLength; i++) {
@@ -16,7 +18,7 @@ export function createATNSimulator(parser: MixedInParser, atn: ATN, tokenMatcher
 			states: new Map()
 		}
 	}
-	return new ATNSimulator(parser, atn, tokenMatcher, decisionToDFA)
+	return new ATNSimulator(parser, atn, decisionToDFA)
 }
 
 export class ATNSimulator {
@@ -24,12 +26,10 @@ export class ATNSimulator {
 	parser: MixedInParser
 	atn: ATN
 	decisionToDFA: DFA[]
-	tokenMatcher: TokenMatcher
 
-	constructor(parser: MixedInParser, atn: ATN, tokenMatcher: TokenMatcher, decisionToDFA: DFA[]) {
+	constructor(parser: MixedInParser, atn: ATN, decisionToDFA: DFA[]) {
 		this.parser = parser
 		this.atn = atn
-		this.tokenMatcher = tokenMatcher
 		this.decisionToDFA = decisionToDFA
 	}
 
@@ -77,28 +77,28 @@ export class ATNSimulator {
 
 	computeTargetState(dfa: DFA, previousD: DFAState, token: IToken): DFAState {
 		const reach = this.computeReachSet(previousD.configs, token)
-		if (reach === undefined) {
+		if (reach.size === 0) {
 			this.addDFAEdge(dfa, previousD, token, DFA_ERROR)
 			return DFA_ERROR
 		}
 
-		const d = this.newDFAState(reach)
+		let newState = this.newDFAState(reach)
 		const predictedAlt = this.getUniqueAlt(reach)
 
 		if (predictedAlt !== undefined) {
-			d.isAcceptState = true
-			d.prediction = predictedAlt
-			d.configs.uniqueAlt = predictedAlt
-		} 
+			newState.isAcceptState = true
+			newState.prediction = predictedAlt
+			newState.configs.uniqueAlt = predictedAlt
+		}
 		// else if (hasConflictTerminatingPrediction(reach)) {
 
 		// }
 
-		this.addDFAEdge(dfa, previousD, token, d)
-		return d
+		newState = this.addDFAEdge(dfa, previousD, token, newState)
+		return newState
 	}
 
-	computeReachSet(closure: ATNConfigSet, token: IToken): ATNConfigSet | undefined {
+	computeReachSet(closure: ATNConfigSet, token: IToken): ATNConfigSet {
 		const intermediate = new ATNConfigSet()
 		const skippedStopStates: ATNConfig[] = []
 		const tokenEOF = token.tokenType == EOF
@@ -114,7 +114,7 @@ export class ATNSimulator {
 				const target = this.getReachableTarget(transition, token)
 				if (target !== undefined) {
 					intermediate.add({
-						state: target,
+						state: target.state,
 						alt: c.alt,
 						followState: c.followState
 					})
@@ -148,15 +148,15 @@ export class ATNSimulator {
 			}
 		}
 
-		if (reach.size === 0) {
-			return undefined
-		}
 		return reach
 	}
 
-	getReachableTarget(transition: Transition, token: IToken): ATNState | undefined {
-		if (transition.matches(token, this.tokenMatcher)) {
-			return transition.target
+	getReachableTarget(transition: Transition, token: IToken): { state: ATNState, type: TokenType } | undefined {
+		if (transition instanceof AtomTransition && tokenStructuredMatcher(token, transition.tokenType)) {
+			return {
+				state: transition.target,
+				type: transition.tokenType
+			}
 		}
 		return undefined
 	}
@@ -183,21 +183,25 @@ export class ATNSimulator {
 		}
 	}
 
-	addDFAEdge(dfa: DFA, from: DFAState, token: IToken, to: DFAState): void {
+	addDFAEdge(dfa: DFA, from: DFAState, token: IToken, to: DFAState): DFAState {
 		to = this.addDFAState(dfa, to)
 		from.edges.set(token.tokenType, to)
+		return to
 	}
 
 	addDFAState(dfa: DFA, state: DFAState): DFAState {
 		if (state === DFA_ERROR) {
 			return state
 		}
-		const existing = dfa.states.get(state)
+		// Repetitions have the same config set
+		// Therefore, storing the key of the config in a map allows us to create a loop in our DFA
+		const mapKey = state.configs.key
+		const existing = dfa.states.get(mapKey)
 		if (existing !== undefined) {
 			return existing
 		}
 		state.stateNumber = dfa.states.size
-		dfa.states.set(state, state)
+		dfa.states.set(mapKey, state)
 		return state
 	}
 
@@ -221,13 +225,16 @@ export class ATNSimulator {
 		const p = config.state
 
 		if (p.type === ATN_RULE_STOP) {
-			if (config.followState) {
+			if (config.followState !== undefined) {
 				const followState = config.followState
 				const followConfig: ATNConfig = {
 					state: followState,
 					alt: config.alt
 				}
 				this.closure(followConfig, configs, closureBusy, treatEofAsEpsilon)
+			} else {
+				// Dipping into outer context, simply return a single alternative
+				configs.add(config)
 			}
 			return
 		}

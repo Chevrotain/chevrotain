@@ -30,6 +30,7 @@ import {
   IProductionWithOccurrence,
   TokenType
 } from "@chevrotain/types"
+import { ATNSimulator } from "./atn_simulator"
 
 export enum PROD_TYPE {
   OPTION,
@@ -57,6 +58,29 @@ export function getProdType(prod: IProduction): PROD_TYPE {
   } else {
     throw Error("non exhaustive match")
   }
+}
+
+export function buildDFALookaheadFuncForOr(
+	atnSimulator: ATNSimulator,
+	decisionIndex: number,
+	maxLookahead: number,
+	hasPredicates: boolean,
+	dynamicTokensEnabled: boolean
+): (orAlts?: IOrAlt<any>[]) => number | undefined {
+	return function() {
+		return atnSimulator.adaptivePredict(decisionIndex)
+	}
+}
+
+export function buildDFALookaheadFuncForOptionalProd(
+	atnSimulator: ATNSimulator,
+	decisionIndex: number,
+	maxLookahead: number,
+	dynamicTokensEnabled: boolean
+): () => boolean {
+	return function() {
+		return atnSimulator.adaptivePredict(decisionIndex) === 0
+	}
 }
 
 export function buildLookaheadFuncForOr(
