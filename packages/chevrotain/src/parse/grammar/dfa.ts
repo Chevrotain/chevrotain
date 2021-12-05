@@ -13,7 +13,7 @@ export interface DFA {
 export interface DFAState {
 	stateNumber: number
 	configs: ATNConfigSet
-	edges: Map<TokenType, DFAState>
+	edges: Map<number, DFAState>
 	isAcceptState: boolean
 	prediction: number
 }

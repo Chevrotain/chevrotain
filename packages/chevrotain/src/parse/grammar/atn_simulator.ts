@@ -5,7 +5,8 @@ import { MixedInParser } from "../parser/traits/parser_traits";
 import { ATN, ATNState, ATN_RULE_STOP, AtomTransition, EpsilonTransition, RuleTransition, Transition } from "./atn";
 import { ATNConfig, ATNConfigSet, DFA, DFAState, DFA_ERROR } from "./dfa";
 import { Rule } from "./gast/gast_public";
-import * as fs from 'fs';
+import min from 'lodash/min'
+import map from 'lodash/map'
 
 export function createATNSimulator(parser: MixedInParser, atn: ATN): ATNSimulator {
 	const decisionLength = atn.decisionStates.length
@@ -58,7 +59,7 @@ export class ATNSimulator {
 				d = this.computeTargetState(dfa, previousD, t)
 			}
 
-			if (d === DFA_ERROR) {
+			if (d === DFA_ERROR || t.tokenType === EOF) {
 				return undefined
 			}
 
@@ -72,7 +73,7 @@ export class ATNSimulator {
 	}
 
 	getExistingTargetState(state: DFAState, token: IToken): DFAState | undefined {
-		return state.edges.get(token.tokenType)
+		return state.edges.get(token.tokenTypeIdx)
 	}
 
 	computeTargetState(dfa: DFA, previousD: DFAState, token: IToken): DFAState {
@@ -90,9 +91,12 @@ export class ATNSimulator {
 			newState.prediction = predictedAlt
 			newState.configs.uniqueAlt = predictedAlt
 		}
-		// else if (hasConflictTerminatingPrediction(reach)) {
-
-		// }
+		else if (hasConflictTerminatingPrediction(reach)) {
+			const prediction = min(map(reach.elements, e => e.alt))!
+			newState.isAcceptState = true
+			newState.prediction = prediction
+			newState.configs.uniqueAlt = prediction
+		}
 
 		newState = this.addDFAEdge(dfa, previousD, token, newState)
 		return newState
@@ -185,7 +189,7 @@ export class ATNSimulator {
 
 	addDFAEdge(dfa: DFA, from: DFAState, token: IToken, to: DFAState): DFAState {
 		to = this.addDFAState(dfa, to)
-		from.edges.set(token.tokenType, to)
+		from.edges.set(token.tokenTypeIdx, to)
 		return to
 	}
 
@@ -299,15 +303,22 @@ function hasConfigInRuleStopState(configs: ATNConfigSet): boolean {
 	return false
 }
 
-// function hasConflictTerminatingPrediction(configs: ATNConfigSet): boolean {
-// 	if (allConfigsInRuleStopStates(configs)) {
-// 		return true
-// 	}
+function hasConflictTerminatingPrediction(configs: ATNConfigSet): boolean {
+	if (allConfigsInRuleStopStates(configs)) {
+		return true
+	}
 
-// 	const alts = getConflictingAltSubsets(configs)
-// 	const heuristic = hasConflictingAltSet(alts) && !hasStateAssociatedWithOneAlt(configs)
-// 	return heuristic
-// }
+	const atnMap = new Set<number>()
+
+	for (const element of configs.elements) {
+		if (atnMap.has(element.state.stateNumber)) {
+			return true
+		} else {
+			atnMap.add(element.state.stateNumber)
+		}
+	}
+	return false
+}
 
 // function getConflictingAltSubsets(configs: ATNConfigSet): number[] {
 // 	const alts = new Set<number>()

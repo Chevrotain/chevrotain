@@ -10,8 +10,6 @@ export interface ATN {
 	decisionStates: DecisionState[]
 	ruleToStartState: Map<Rule, RuleStartState>
 	ruleToStopState: Map<Rule, RuleStopState>
-	maxTokenType: number
-	ruleToTokenType: Map<Rule, number>
 }
 
 export const ATN_INVALID_TYPE = 0
@@ -113,7 +111,6 @@ export interface Transition {
 	target: ATNState
 	label(): TokenType[]
 	isEpsilon(): boolean
-	matches(token: IToken, tokenMatcher: TokenMatcher): boolean
 }
 
 export abstract class AbstractTransition implements Transition {
@@ -131,10 +128,6 @@ export abstract class AbstractTransition implements Transition {
 	isEpsilon() {
 		return false
 	}
-
-	matches(_token: IToken, _tokenMatcher: TokenMatcher): boolean {
-		return false
-	}
 }
 
 export class AtomTransition extends AbstractTransition {
@@ -148,10 +141,6 @@ export class AtomTransition extends AbstractTransition {
 
 	label(): TokenType[] {
 		return [this.tokenType]
-	}
-
-	matches(token: IToken, tokenMatcher: TokenMatcher): boolean {
-		return tokenMatcher(token, this.tokenType)
 	}
 
 }
@@ -188,58 +177,6 @@ export class RuleTransition extends AbstractTransition {
 	}
 }
 
-export class SetTransition extends AbstractTransition {
-
-	set: TokenType[]
-
-	constructor(target: ATNState, set: TokenType[]) {
-		super(target)
-		this.set = set
-	}
-
-	label(): TokenType[] {
-		return this.set
-	}
-
-	matches(token: IToken, tokenMatcher: TokenMatcher) {
-		return some(this.set, tokenType => tokenMatcher(token, tokenType))
-	}
-}
-
-export type Predicate = () => boolean
-
-export class PredicateTransition extends AbstractTransition {
-
-	rule: Rule
-	predicate: Predicate
-	isCtxDependent: boolean
-
-	constructor(target: ATNState, rule: Rule, predicate: Predicate, isCtxDependent: boolean) {
-		super(target)
-		this.rule = rule
-		this.predicate = predicate
-		this.isCtxDependent = isCtxDependent
-	}
-
-	isEpsilon() {
-		return true
-	}
-}
-
-export class PredencePredicateTransition extends AbstractTransition {
-
-	precendence: number
-
-	constructor(target: ATNState, precedence: number) {
-		super(target)
-		this.precendence = precedence
-	}
-
-	isEpsilon() {
-		return true
-	}
-}
-
 export interface ATNHandle {
 	left: ATNState
 	right: ATNState
@@ -248,10 +185,8 @@ export interface ATNHandle {
 export function createATN(rules: Rule[]): ATN {
 	const atn: ATN = {
 		decisionStates: [],
-		maxTokenType: 0,
 		ruleToStartState: new Map(),
 		ruleToStopState: new Map(),
-		ruleToTokenType: new Map(),
 		states: []
 	}
 	createRuleStartAndStopATNStates(atn, rules)
@@ -430,7 +365,7 @@ function star(atn: ATN, rule: Rule, star: IProduction, handle: ATNHandle, sep?: 
 	if (sep === undefined) {
 		epsilon(loop, entry) // loop back to entry/exit decision
 	} else {
-		// loop back to start of handle
+		// loop back to start of handle using separator
 		epsilon(loop, sep.left)
 		epsilon(sep.right, start)
 	}
@@ -587,7 +522,7 @@ function buildRuleHandle(atn: ATN, rule: Rule, block: ATNHandle): ATNHandle {
 }
 
 function epsilon(a: ATNBaseState, b: ATNBaseState): void {
-	const transition = new EpsilonTransition(b as ATNState);
+	const transition = new EpsilonTransition(b as ATNState)
 	addTransition(a, transition)
 }
 

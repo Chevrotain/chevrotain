@@ -29,7 +29,7 @@ import { Rule } from "../../grammar/gast/gast_public"
 import { collectMethods, getProductionDslName } from "../../grammar/gast/gast"
 import { ATN, ATNState, ATN_RULE_STOP, AtomTransition, createATN, DecisionState, EpsilonTransition, RuleTransition, Transition } from "../../grammar/atn"
 import { ATNSimulator, createATNSimulator } from "../../grammar/atn_simulator"
-import * as fs from 'fs'
+// import * as fs from 'fs'
 
 /**
  * Trait responsible for the lookahead related utilities and optimizations.
@@ -53,7 +53,7 @@ export class LooksAhead {
 
   preComputeLookaheadFunctions(this: MixedInParser, rules: Rule[]): void {
 	  const atn = createATN(rules)
-    printATN(atn, rules)
+    // printATN(atn, rules)
     const atnSimulator = createATNSimulator(this, atn)
 	  forEach(rules, (currRule) => {
 		  const {
@@ -229,7 +229,7 @@ function printATN(atn: ATN, rules: Rule[]) {
 		iterateOverTransitions(startState, (state, transition, index) => text += buildTransition(atn, i, state, transition, index))
 	})
 	text += "}"
-	fs.writeFileSync('/workspace/chevrotain/atn.dot', text)
+	// fs.writeFileSync('/workspace/chevrotain/atn.dot', text)
 }
 
 function iterateOverStates(atnState: ATNState, action: (state: ATNState) => void, visited: Set<ATNState> = new Set()): void {
