@@ -33,7 +33,7 @@
 				"--timeout",
 				"999999",
 				"--colors",
-				"${workspaceFolder}/examples/grammars/**/ecma5_spec.js",
+				"${workspaceFolder}/examples/grammars/**/*_spec.js",
 			],
 			"cwd": "${workspaceFolder}/packages/chevrotain",
 			"console": "integratedTerminal",

@@ -68,7 +68,7 @@ export class LooksAhead {
       forEach(alternation, (currProd) => {
         const atnState = currProd.atnState as DecisionState
         const decisionIndex = atnState.decision
-        const laFunc = buildDFALookaheadFuncForOr(atnSimulator, decisionIndex, currProd.maxLookahead || this.maxLookahead, currProd.hasPredicates, this.dynamicTokensEnabled)
+        const laFunc = buildDFALookaheadFuncForOr(atnSimulator, decisionIndex, currProd, currProd.maxLookahead || this.maxLookahead, currProd.hasPredicates, this.dynamicTokensEnabled)
         const key = getKeyForAutomaticLookahead(
           this.fullRuleNameToShort[currRule.name],
           OR_IDX,
@@ -84,6 +84,7 @@ export class LooksAhead {
           currProd,
           currProd.idx,
           MANY_IDX,
+		      PROD_TYPE.REPETITION,
           currProd.maxLookahead,
           getProductionDslName(currProd)
         )
@@ -96,6 +97,7 @@ export class LooksAhead {
           currProd,
           currProd.idx,
           OPTION_IDX,
+		      PROD_TYPE.OPTION,
           currProd.maxLookahead,
           getProductionDslName(currProd)
         )
@@ -108,6 +110,7 @@ export class LooksAhead {
           currProd,
           currProd.idx,
           AT_LEAST_ONE_IDX,
+		      PROD_TYPE.REPETITION_MANDATORY,
           currProd.maxLookahead,
           getProductionDslName(currProd)
         )
@@ -120,6 +123,7 @@ export class LooksAhead {
           currProd,
           currProd.idx,
           AT_LEAST_ONE_SEP_IDX,
+		      PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR,
           currProd.maxLookahead,
           getProductionDslName(currProd)
         )
@@ -132,6 +136,7 @@ export class LooksAhead {
           currProd,
           currProd.idx,
           MANY_SEP_IDX,
+		      PROD_TYPE.REPETITION_WITH_SEPARATOR,
           currProd.maxLookahead,
           getProductionDslName(currProd)
         )
@@ -143,9 +148,10 @@ export class LooksAhead {
     this: MixedInParser,
     atnSimulator: ATNSimulator,
     rule: Rule,
-    prod: IProduction,
-    prodKey: number,
+	  prod: IProduction,
     prodOccurrence: number,
+    prodKey: number,
+    prodType: PROD_TYPE,
     prodMaxLookahead: number | undefined,
     dslMethodName: string
   ): void {
@@ -155,8 +161,11 @@ export class LooksAhead {
         const atnState = prod.atnState as DecisionState
         const laFunc = buildDFALookaheadFuncForOptionalProd(
           atnSimulator,
+          rule,
+          prodOccurrence,
+          prodType,
           atnState.decision,
-          prodMaxLookahead || this.maxLookahead,
+          prodMaxLookahead ?? this.maxLookahead,
           this.dynamicTokensEnabled
         )
         const key = getKeyForAutomaticLookahead(
