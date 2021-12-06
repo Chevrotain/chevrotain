@@ -4,7 +4,6 @@ import { EOF } from "../../scan/tokens_public";
 import { MixedInParser } from "../parser/traits/parser_traits";
 import { ATN, ATNState, ATN_RULE_STOP, AtomTransition, EpsilonTransition, RuleTransition, Transition } from "./atn";
 import { ATNConfig, ATNConfigSet, DFA, DFAState, DFA_ERROR } from "./dfa";
-import { Rule } from "./gast/gast_public";
 import min from 'lodash/min'
 import map from 'lodash/map'
 
@@ -91,7 +90,7 @@ export class ATNSimulator {
 			newState.prediction = predictedAlt
 			newState.configs.uniqueAlt = predictedAlt
 		}
-		else if (hasConflictTerminatingPrediction(reach)) {
+		else if (allConfigsInRuleStopStates(reach)) {
 			const prediction = min(map(reach.elements, e => e.alt))!
 			newState.isAcceptState = true
 			newState.prediction = prediction
@@ -117,6 +116,7 @@ export class ATNSimulator {
 				const transition = c.state.transitions[i]
 				const target = this.getReachableTarget(transition, token)
 				if (target !== undefined) {
+					// intermediate.tokenTypes.add(target.type)
 					intermediate.add({
 						state: target.state,
 						alt: c.alt,
@@ -308,30 +308,8 @@ function hasConflictTerminatingPrediction(configs: ATNConfigSet): boolean {
 		return true
 	}
 
-	const atnMap = new Set<number>()
-
-	for (const element of configs.elements) {
-		if (atnMap.has(element.state.stateNumber)) {
-			return true
-		} else {
-			atnMap.add(element.state.stateNumber)
-		}
-	}
 	return false
 }
-
-// function getConflictingAltSubsets(configs: ATNConfigSet): number[] {
-// 	const alts = new Set<number>()
-// 	const configToAlts = new Map<ATNConfig, number[]>()
-// 	for (const c of configs.elements) {
-// 		let cAlts = configToAlts.get(c)
-// 		if (cAlts === undefined) {
-// 			cAlts = []
-// 			configToAlts.set(c, cAlts)
-// 		}
-// 		cAlts
-// 	}
-// }
 
 function allConfigsInRuleStopStates(configs: ATNConfigSet): boolean {
 	for (const c of configs.elements) {
