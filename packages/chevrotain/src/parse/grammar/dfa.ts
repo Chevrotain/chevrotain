@@ -1,4 +1,3 @@
-import { TokenType } from "@chevrotain/types";
 import map from "lodash/map";
 import { ATNState, DecisionState } from "./atn";
 
@@ -7,7 +6,6 @@ export interface DFA {
 	states: Map<string, DFAState>
 	decision: number
 	atnStartState: DecisionState
-	precedenceDfa: boolean
 }
 
 export interface DFAState {
@@ -19,6 +17,31 @@ export interface DFAState {
 }
 
 export const DFA_ERROR = {} as DFAState
+
+export class PredicateSet {
+
+	private predicates: boolean[] = []
+	
+	get size(): number {
+		return this.predicates.length
+	}
+
+	is(index: number): boolean {
+		return index >= this.predicates.length === true ? true : this.predicates[index]
+	}
+
+	set(index: number, value: boolean) {
+		this.predicates[index] = value
+	}
+
+	toString(): string {
+		let value = ""
+		for (const predicate of this.predicates) {
+			value += predicate ? '1' : '0'
+		}
+		return value
+	}
+}
 
 export interface ATNConfig {
 	state: ATNState

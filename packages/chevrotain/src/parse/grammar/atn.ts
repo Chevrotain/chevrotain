@@ -1,9 +1,7 @@
-import map from "lodash/map";
-import some from "lodash/some";
-import { IProduction, IToken, TokenType } from "@chevrotain/types";
-import { TokenMatcher } from "../parser/parser";
-import { Alternation, NonTerminal, Rule, Option, RepetitionMandatory, Repetition, Terminal, AbstractProduction, Alternative, RepetitionWithSeparator, RepetitionMandatoryWithSeparator } from "./gast/gast_public";
-import filter from "lodash/filter";
+import map from "lodash/map"
+import filter from "lodash/filter"
+import { IProduction, TokenType } from "@chevrotain/types"
+import { Alternation, NonTerminal, Rule, Option, RepetitionMandatory, Repetition, Terminal, AbstractProduction, Alternative, RepetitionWithSeparator, RepetitionMandatoryWithSeparator } from "./gast/gast_public"
 
 export interface ATN {
 	states: ATNState[]
@@ -400,18 +398,14 @@ function makeAlts(atn: ATN, rule: Rule, start: BlockStartState, production: IPro
 		start
 	})
 	start.end = end
-	let hasEpsilonTransition = false
 	for (const alt of alts) {
 		if (alt !== undefined) {
 			// hook alts up to decision block
 			epsilon(start, alt.left)
 			epsilon(alt.right, end)
 		} else {
-			hasEpsilonTransition = true
+			epsilon(start, end)
 		}
-	}
-	if (hasEpsilonTransition === true) {
-		epsilon(start, end)
 	}
 
 	const handle: ATNHandle = {
@@ -450,9 +444,6 @@ function makeBlock(atn: ATN, alts: ATNHandle[]): ATNHandle {
 
 	const first = alts[0]
 	const last = alts[altsLength - 1]
-	if (first === undefined || last === undefined) {
-		throw new Error('element list has first|last == null')
-	}
 	return {
 		left: first.left,
 		right: last.right

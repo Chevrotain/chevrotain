@@ -29,6 +29,9 @@ describe("atn-dfa transformation", () => {
 	const tokens = [A, B, C]
 
 	class Parser extends EmbeddedActionsParser {
+
+		gate = true
+
 		constructor() {
 			super(tokens, {
 				skipValidations: true
@@ -49,6 +52,7 @@ describe("atn-dfa transformation", () => {
 		Rule = this.RULE("Rule", () => {
 			this.OR([
 				{
+					GATE: () => this.gate,
 					ALT: () => {
 						this.SUBRULE1(this.RuleA)
 						this.CONSUME(B)
@@ -93,21 +97,35 @@ describe("atn-dfa transformation", () => {
 		const atn = createATN(rules)
 		console.timeEnd('atn-builder')
 		printATN(atn, rules)
-		const simulator = createATNSimulator(mixedParser, atn)
-		console.time('dfa-prediction')
-		const prediction = simulator.adaptivePredict(2)
-		console.timeEnd('dfa-prediction')
-		printDFA(simulator.decisionToDFA[2])
-		console.time('dfa-prediction2')
-		simulator.adaptivePredict(0)
-		console.timeEnd('dfa-prediction2')
-		console.time('dfa-prediction3')
-		simulator.adaptivePredict(0)
-		console.timeEnd('dfa-prediction3')
-		expect(prediction).to.be.equal(2)
-		console.time('parse')
+		// const simulator = createATNSimulator(mixedParser, atn)
+		// console.time('dfa-prediction')
+		// const prediction = simulator.adaptivePredict(2, 0)
+		// console.timeEnd('dfa-prediction')
+		// console.time('dfa-prediction')
+		// const prediction = simulator.adaptivePredict(2, 1)
+		// console.timeEnd('dfa-prediction')
+		// printDFA(simulator.decisionToDFA[2](0))
+		// console.time('dfa-prediction2')
+		// simulator.adaptivePredict(0, 0)
+		// console.timeEnd('dfa-prediction2')
+		// console.time('dfa-prediction3')
+		// simulator.adaptivePredict(0, 0)
+		// console.timeEnd('dfa-prediction3')
+		// expect(prediction).to.be.equal(2)
+		console.time('parse1')
 		parser.Rule()
-		console.timeEnd('parse')
+		console.timeEnd('parse1')
+		parser.gate = false
+		console.time('parse2')
+		parser.Rule()
+		console.timeEnd('parse2')
+		console.time('parse3')
+		parser.Rule()
+		console.timeEnd('parse3')
+		parser.gate = true
+		console.time('parse4')
+		parser.Rule()
+		console.timeEnd('parse4')
 	})
 
 })

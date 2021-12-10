@@ -31,6 +31,7 @@ import {
   TokenType
 } from "@chevrotain/types"
 import { ATNSimulator } from "./atn_simulator"
+import { PredicateSet } from "./dfa"
 
 export enum PROD_TYPE {
   OPTION,
@@ -59,6 +60,8 @@ export function getProdType(prod: IProduction): PROD_TYPE {
     throw Error("non exhaustive match")
   }
 }
+
+const EMPTY_PREDICATE_SET = new PredicateSet()
 
 export function buildDFALookaheadFuncForOr(
   atnSimulator: ATNSimulator,
@@ -99,9 +102,21 @@ export function buildDFALookaheadFuncForOr(
       const nextToken = this.LA(1)
       return choiceToAlt[nextToken.tokenTypeIdx]
     }
+  } else if (hasPredicates) {
+    return function (orAlts) {
+      const predicateSet = new PredicateSet()
+      if (orAlts !== undefined) {
+        const length = orAlts.length
+        for (let i = 0; i < length; i++) {
+          const alt = orAlts[i]
+          predicateSet.set(i, alt.GATE === undefined || alt.GATE.call(this))
+        }
+      }
+      return atnSimulator.adaptivePredict(decisionIndex, predicateSet)
+    }
   } else {
     return function () {
-      return atnSimulator.adaptivePredict(decisionIndex)
+      return atnSimulator.adaptivePredict(decisionIndex, EMPTY_PREDICATE_SET)
     }
   }
 }
@@ -159,9 +174,8 @@ export function buildDFALookaheadFuncForOptionalProd(
       }
     }
   }
-
   return function() {
-    return atnSimulator.adaptivePredict(decisionIndex) === 0
+    return atnSimulator.adaptivePredict(decisionIndex, EMPTY_PREDICATE_SET) === 0
   }
 }
 

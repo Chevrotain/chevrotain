@@ -1,40 +1,56 @@
-import { IToken, TokenType } from "@chevrotain/types";
-import { tokenStructuredMatcher } from "../../scan/tokens";
-import { EOF } from "../../scan/tokens_public";
-import { MixedInParser } from "../parser/traits/parser_traits";
-import { ATN, ATNState, ATN_RULE_STOP, AtomTransition, EpsilonTransition, RuleTransition, Transition } from "./atn";
-import { ATNConfig, ATNConfigSet, DFA, DFAState, DFA_ERROR } from "./dfa";
-import min from 'lodash/min'
-import map from 'lodash/map'
+import { IToken, TokenType } from "@chevrotain/types"
+import { tokenStructuredMatcher } from "../../scan/tokens"
+import { EOF } from "../../scan/tokens_public"
+import { MixedInParser } from "../parser/traits/parser_traits"
+import { ATN, ATNState, ATN_RULE_STOP, AtomTransition, DecisionState, EpsilonTransition, RuleTransition, Transition } from "./atn"
+import { ATNConfig, ATNConfigSet, DFA, DFAState, DFA_ERROR, PredicateSet } from "./dfa"
+import min from "lodash/min"
+import map from "lodash/map"
 
 export function createATNSimulator(parser: MixedInParser, atn: ATN): ATNSimulator {
 	const decisionLength = atn.decisionStates.length
-	const decisionToDFA: DFA[] = Array(decisionLength)
+	const decisionToDFA: DFACache[] = Array(decisionLength)
 	for (let i = 0; i < decisionLength; i++) {
-		decisionToDFA[i] = {
-			atnStartState: atn.decisionStates[i],
-			decision: i,
-			precedenceDfa: false,
-			states: new Map()
-		}
+		decisionToDFA[i] = createDFAFactory(atn.decisionStates[i], i)
 	}
 	return new ATNSimulator(parser, atn, decisionToDFA)
+}
+
+export type DFACache = (predicateSet: PredicateSet) => DFA
+
+function createDFAFactory(startState: DecisionState, decision: number): DFACache {
+	const map = new Map<string, DFA>()
+	return (predicateSet) => {
+		const key = predicateSet.toString()
+		let existing = map.get(key)
+		if (existing !== undefined) {
+			return existing
+		} else {
+			existing = {
+				atnStartState: startState,
+				decision,
+				states: new Map()
+			}
+			map.set(key, existing)
+			return existing
+		}
+	}
 }
 
 export class ATNSimulator {
 
 	parser: MixedInParser
 	atn: ATN
-	decisionToDFA: DFA[]
+	decisionToDFA: DFACache[]
 
-	constructor(parser: MixedInParser, atn: ATN, decisionToDFA: DFA[]) {
+	constructor(parser: MixedInParser, atn: ATN, decisionToDFA: DFACache[]) {
 		this.parser = parser
 		this.atn = atn
 		this.decisionToDFA = decisionToDFA
 	}
 
-	adaptivePredict(decision: number) {
-		const dfa = this.decisionToDFA[decision]
+	adaptivePredict(decision: number, predicateSet: PredicateSet) {
+		const dfa = this.decisionToDFA[decision](predicateSet)
 		let start = dfa.start;
 		if (start === undefined) {
 			const closure = this.computeStartState(dfa.atnStartState as ATNState)
@@ -42,11 +58,11 @@ export class ATNSimulator {
 			dfa.start = start
 		}
 
-		const alt = this.execATN(dfa, start)
+		const alt = this.execATN(dfa, start, predicateSet)
 		return alt
 	}
 
-	execATN(dfa: DFA, s0: DFAState): number | undefined {
+	execATN(dfa: DFA, s0: DFAState, predicateSet: PredicateSet): number | undefined {
 		let previousD = s0
 
 		let i = 1
@@ -55,15 +71,19 @@ export class ATNSimulator {
 		while (true) {
 			let d = this.getExistingTargetState(previousD, t)
 			if (d === undefined) {
-				d = this.computeTargetState(dfa, previousD, t)
+				d = this.computeTargetState(dfa, previousD, t, predicateSet)
 			}
 
-			if (d === DFA_ERROR || t.tokenType === EOF) {
+			if (d === DFA_ERROR) {
 				return undefined
 			}
 
 			if (d.isAcceptState === true) {
 				return d.prediction
+			} else if (t.tokenType === EOF) {
+				// If EOF does not result in an accepting state
+				// return undefined which will result in a NoViableAltException
+				return undefined
 			}
 
 			previousD = d
@@ -75,15 +95,15 @@ export class ATNSimulator {
 		return state.edges.get(token.tokenTypeIdx)
 	}
 
-	computeTargetState(dfa: DFA, previousD: DFAState, token: IToken): DFAState {
-		const reach = this.computeReachSet(previousD.configs, token)
+	computeTargetState(dfa: DFA, previousD: DFAState, token: IToken, predicateSet: PredicateSet): DFAState {
+		const reach = this.computeReachSet(previousD.configs, token, predicateSet)
 		if (reach.size === 0) {
 			this.addDFAEdge(dfa, previousD, token, DFA_ERROR)
 			return DFA_ERROR
 		}
 
 		let newState = this.newDFAState(reach)
-		const predictedAlt = this.getUniqueAlt(reach)
+		const predictedAlt = this.getUniqueAlt(reach, predicateSet)
 
 		if (predictedAlt !== undefined) {
 			newState.isAcceptState = true
@@ -101,7 +121,7 @@ export class ATNSimulator {
 		return newState
 	}
 
-	computeReachSet(closure: ATNConfigSet, token: IToken): ATNConfigSet {
+	computeReachSet(closure: ATNConfigSet, token: IToken, predicateSet: PredicateSet): ATNConfigSet {
 		const intermediate = new ATNConfigSet()
 		const skippedStopStates: ATNConfig[] = []
 		const tokenEOF = token.tokenType == EOF
@@ -116,7 +136,6 @@ export class ATNSimulator {
 				const transition = c.state.transitions[i]
 				const target = this.getReachableTarget(transition, token)
 				if (target !== undefined) {
-					// intermediate.tokenTypes.add(target.type)
 					intermediate.add({
 						state: target.state,
 						alt: c.alt,
@@ -131,7 +150,7 @@ export class ATNSimulator {
 		if (skippedStopStates.length === 0 && !tokenEOF) {
 			if (intermediate.size === 1) {
 				reach = intermediate
-			} else if (this.getUniqueAlt(intermediate) !== undefined) {
+			} else if (this.getUniqueAlt(intermediate, predicateSet) !== undefined) {
 				reach = intermediate
 			}
 		}
@@ -143,8 +162,6 @@ export class ATNSimulator {
 				this.closure(c, reach, closureBusy, tokenEOF)
 			}
 		}
-
-		// TODO add EOF case
 
 		if (skippedStopStates.length > 0 && !hasConfigInRuleStopState(reach)) {
 			for (const c of skippedStopStates) {
@@ -165,7 +182,26 @@ export class ATNSimulator {
 		return undefined
 	}
 
-	getUniqueAlt(configs: ATNConfigSet): number | undefined {
+	getUniqueAlt(configs: ATNConfigSet, predicateSet: PredicateSet): number | undefined {
+		return predicateSet.size === 0 ? this.getUniqueAltNoPredicates(configs) : this.getUniqueAltWithPredicates(configs, predicateSet)
+	}
+
+	getUniqueAltWithPredicates(configs: ATNConfigSet, predicateSet: PredicateSet): number | undefined {
+		let alt: number | undefined
+		for (const c of configs.elements) {
+			const predicate = predicateSet.is(c.alt)
+			if (predicate === true) {
+				if (alt === undefined) {
+					alt = c.alt
+				} else if (alt !== c.alt) {
+					return undefined
+				}
+			}
+		}
+		return alt
+	}
+
+	getUniqueAltNoPredicates(configs: ATNConfigSet): number | undefined {
 		let alt: number | undefined
 		for (const c of configs.elements) {
 			if (alt === undefined) {
@@ -237,7 +273,8 @@ export class ATNSimulator {
 				}
 				this.closure(followConfig, configs, closureBusy, treatEofAsEpsilon)
 			} else {
-				// Dipping into outer context, simply return a single alternative
+				// Dipping into outer context, simply add the config
+				// This will stop computation once every config is at the rule stop state
 				configs.add(config)
 			}
 			return
@@ -254,7 +291,7 @@ export class ATNSimulator {
 
 			if (c !== undefined) {
 				if (!transition.isEpsilon() && closureBusy.has(c)) {
-					// avoid infinite recursion for EOF* and EOF+
+					// avoid infinite recursion for Epsilon* and Epsilon+
 					continue
 				}
 				closureBusy.add(c)
@@ -271,7 +308,11 @@ export class ATNSimulator {
 				followState: config.followState
 			}
 		} else if (transition instanceof RuleTransition) {
-			return this.ruleTransition(config, transition)
+			return {
+				state: transition.target,
+				alt: config.alt,
+				followState: transition.followState 
+			}
 		} else if (transition instanceof AtomTransition) {
 			if (treatEofAsEpsilon && EOF === transition.tokenType) {
 				return {
@@ -283,15 +324,6 @@ export class ATNSimulator {
 		}
 		return undefined
 	}
-
-	ruleTransition(config: ATNConfig, transition: RuleTransition): ATNConfig {
-		// const returnState = transition.followState
-		return {
-			state: transition.target,
-			alt: config.alt,
-			followState: transition.followState 
-		}
-	}
 }
 
 function hasConfigInRuleStopState(configs: ATNConfigSet): boolean {
@@ -300,14 +332,6 @@ function hasConfigInRuleStopState(configs: ATNConfigSet): boolean {
 			return true
 		}
 	}
-	return false
-}
-
-function hasConflictTerminatingPrediction(configs: ATNConfigSet): boolean {
-	if (allConfigsInRuleStopStates(configs)) {
-		return true
-	}
-
 	return false
 }
 
