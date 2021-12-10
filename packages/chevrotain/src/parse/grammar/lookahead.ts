@@ -71,9 +71,8 @@ export function buildDFALookaheadFuncForOr(
   hasPredicates: boolean,
   dynamicTokensEnabled: boolean
 ): (orAlts?: IOrAlt<any>[]) => number | undefined {
-
   const partialAlts = map(alternation.definition, (currAlt) =>
-    map(possiblePathsFrom([currAlt], 1), e => e.partialPath[0])
+    map(possiblePathsFrom([currAlt], 1), (e) => e.partialPath[0])
   )
 
   if (isLL1Sequence(partialAlts) && !dynamicTokensEnabled) {
@@ -141,10 +140,12 @@ export function buildDFALookaheadFuncForOptionalProd(
   maxLookahead: number,
   dynamicTokensEnabled: boolean
 ): () => boolean {
-
-  const alts = map(getLookaheadPathsForOptionalProd(occurrence, rule, prodType, 1), e => {
-    return map(e, g => g[0])
-  })
+  const alts = map(
+    getLookaheadPathsForOptionalProd(occurrence, rule, prodType, 1),
+    (e) => {
+      return map(e, (g) => g[0])
+    }
+  )
 
   // const lookAheadPaths = getLookaheadPathsForOr(
   //   occurrence,
@@ -185,8 +186,10 @@ export function buildDFALookaheadFuncForOptionalProd(
       }
     }
   }
-  return function() {
-    return atnSimulator.adaptivePredict(decisionIndex, EMPTY_PREDICATE_SET) === 0
+  return function () {
+    return (
+      atnSimulator.adaptivePredict(decisionIndex, EMPTY_PREDICATE_SET) === 0
+    )
   }
 }
 

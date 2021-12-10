@@ -309,7 +309,7 @@ export type ISerializedGastAny =
   | ISerializedTerminalWithSeparator
 
 export function serializeGrammar(topRules: Rule[]): ISerializedGast[] {
-  return map(topRules, rule => serializeProduction(rule))
+  return map(topRules, (rule) => serializeProduction(rule))
 }
 
 export function serializeProduction(node: IProduction): ISerializedGast {
