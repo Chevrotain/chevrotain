@@ -95,12 +95,23 @@ export function buildDFALookaheadFuncForOr(
       {} as Record<number, number>
     )
 
-    /**
-     * @returns {number} - The chosen alternative index
-     */
-    return function (): number {
-      const nextToken = this.LA(1)
-      return choiceToAlt[nextToken.tokenTypeIdx]
+    if (hasPredicates) {
+      return function (orAlts) {
+        const nextToken = this.LA(1)
+        const prediction: number = choiceToAlt[nextToken.tokenTypeIdx]
+        if (orAlts !== undefined) {
+          const gate = orAlts[prediction].GATE
+          if (gate !== undefined && gate.call(this) === false) {
+            return undefined
+          }
+        }
+        return prediction
+      }
+    } else {
+      return function (): number {
+        const nextToken = this.LA(1)
+        return choiceToAlt[nextToken.tokenTypeIdx]
+      }
     }
   } else if (hasPredicates) {
     return function (orAlts) {

@@ -15,7 +15,7 @@
 				"--timeout",
 				"999999",
 				"--colors",
-				"${workspaceFolder}/packages/chevrotain/test/**/atn_spec.ts",
+				"${workspaceFolder}/packages/chevrotain/test/**/interperter_spec.ts",
 			],
 			"cwd": "${workspaceFolder}/packages/chevrotain",
 			"console": "integratedTerminal",

@@ -238,7 +238,7 @@ function printATN(atn: ATN, rules: Rule[]) {
 		iterateOverTransitions(startState, (state, transition, index) => text += buildTransition(atn, i, state, transition, index))
 	})
 	text += "}"
-	// fs.writeFileSync('/workspace/chevrotain/atn.dot', text)
+	console.log(text)
 }
 
 function iterateOverStates(atnState: ATNState, action: (state: ATNState) => void, visited: Set<ATNState> = new Set()): void {

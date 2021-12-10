@@ -107,7 +107,6 @@ export interface RuleStopState extends ATNBaseState {
 
 export interface Transition {
 	target: ATNState
-	label(): TokenType[]
 	isEpsilon(): boolean
 }
 
@@ -117,10 +116,6 @@ export abstract class AbstractTransition implements Transition {
 
 	constructor(target: ATNState) {
 		this.target = target
-	}
-
-	label(): TokenType[] {
-		return []
 	}
 
 	isEpsilon() {
@@ -135,10 +130,6 @@ export class AtomTransition extends AbstractTransition {
 	constructor(target: ATNState, tokenType: TokenType) {
 		super(target)
 		this.tokenType = tokenType
-	}
-
-	label(): TokenType[] {
-		return [this.tokenType]
 	}
 
 }
@@ -324,15 +315,18 @@ function plus(atn: ATN, rule: Rule, plus: IProduction, handle: ATNHandle, sep?: 
 	end.loopback = loop
 	plus.atnState = loop
 	epsilon(blkEnd, loop) // block can see loop back
-
+	
+	// Depending on whether we have a separator we put the exit transition at index 1 or 0
+	// This influences the chosen option in the lookahead DFA
 	if (sep === undefined) {
 		epsilon(loop, blkStart) // loop back to start
+		epsilon(loop, end) // exit
 	} else {
+		epsilon(loop, end) // exit
 		// loop back to start with separator
-		epsilon(loop, sep.right)
-		epsilon(sep.left, blkStart)
+		epsilon(loop, sep.left)
+		epsilon(sep.right, blkStart)
 	}
-	epsilon(loop, end) // exit
 
 	return {
 		left: blkStart,
@@ -360,14 +354,13 @@ function star(atn: ATN, rule: Rule, star: IProduction, handle: ATNHandle, sep?: 
 	epsilon(entry, start) // loop enter edge (alt 2)
 	epsilon(entry, loopEnd) // bypass loop edge (alt 1)
 	epsilon(end, loop) // block end hits loop back
-	if (sep === undefined) {
-		epsilon(loop, entry) // loop back to entry/exit decision
-	} else {
+	epsilon(loop, entry) // loop back to entry/exit decision
+
+	if (sep !== undefined) {
 		// loop back to start of handle using separator
 		epsilon(loop, sep.left)
 		epsilon(sep.right, start)
 	}
-	
 
 	star.atnState = entry
 	return {
