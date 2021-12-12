@@ -294,7 +294,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
         `rule: <${ruleName}> can be invoked from itself (directly or indirectly)\n` +
         `without consuming any Tokens. The grammar path that causes this is: \n ${leftRecursivePath}\n` +
         ` To fix this refactor your grammar to remove the left recursion.\n` +
-        `see: https://en.wikipedia.org/wiki/LL_parser#Left_Factoring.`
+        `see: https://en.wikipedia.org/wiki/LL_parser#Left_factoring.`
 
       return errMsg
     },
