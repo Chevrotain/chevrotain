@@ -67,7 +67,7 @@ export function addTerminalToCst(
   token: IToken,
   tokenTypeName: string
 ): void {
-  if (node.children[tokenTypeName] === undefined) {
+  if (!node.children.hasOwnProperty(tokenTypeName)) {
     node.children[tokenTypeName] = [token]
   } else {
     node.children[tokenTypeName].push(token)
