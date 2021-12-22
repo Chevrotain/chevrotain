@@ -157,7 +157,7 @@ declare abstract class BaseParser {
    * A Parsing DSL method use to consume a single Token.
    * In EBNF terms this is equivalent to a Terminal.
    *
-   * A Token will be consumed, IFF the next token in the token vector matches <tokType>.
+   * A Token will be consumed, IFF the next token in the token vector matches `tokType`.
    * otherwise the parser may attempt to perform error recovery (if enabled).
    *
    * The index in the method name indicates the unique occurrence of a terminal consumption
