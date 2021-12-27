@@ -93,10 +93,12 @@ export class Rule extends AbstractProduction {
 
 export class Alternative extends AbstractProduction {
   public ignoreAmbiguities: boolean = false
+  public predicate: (() => boolean) | undefined
 
   constructor(options: {
     definition: IProduction[]
     ignoreAmbiguities?: boolean
+    predicate?: () => boolean
   }) {
     super(options.definition)
     assign(

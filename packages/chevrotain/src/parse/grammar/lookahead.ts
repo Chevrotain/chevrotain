@@ -31,7 +31,6 @@ import {
   TokenType
 } from "@chevrotain/types"
 import { ATNSimulator } from "./atn_simulator"
-import { PredicateSet } from "./dfa"
 
 export enum PROD_TYPE {
   OPTION,
@@ -61,8 +60,6 @@ export function getProdType(prod: IProduction): PROD_TYPE {
   }
 }
 
-const EMPTY_PREDICATE_SET = new PredicateSet()
-
 export function buildDFALookaheadFuncForOr(
   atnSimulator: ATNSimulator,
   decisionIndex: number,
@@ -75,7 +72,7 @@ export function buildDFALookaheadFuncForOr(
     map(possiblePathsFrom([currAlt], 1), (e) => e.partialPath[0])
   )
 
-  if (isLL1Sequence(partialAlts) && !dynamicTokensEnabled) {
+  if (isLL1Sequence(partialAlts, false) && !dynamicTokensEnabled) {
     const choiceToAlt = reduce(
       partialAlts,
       (result, currAlt, idx) => {
@@ -112,21 +109,9 @@ export function buildDFALookaheadFuncForOr(
         return choiceToAlt[nextToken.tokenTypeIdx]
       }
     }
-  } else if (hasPredicates) {
-    return function (orAlts) {
-      const predicateSet = new PredicateSet()
-      if (orAlts !== undefined) {
-        const length = orAlts.length
-        for (let i = 0; i < length; i++) {
-          const alt = orAlts[i]
-          predicateSet.set(i, alt.GATE === undefined || alt.GATE.call(this))
-        }
-      }
-      return atnSimulator.adaptivePredict(decisionIndex, predicateSet)
-    }
   } else {
     return function () {
-      return atnSimulator.adaptivePredict(decisionIndex, EMPTY_PREDICATE_SET)
+      return atnSimulator.adaptivePredict(decisionIndex, hasPredicates)
     }
   }
 }
@@ -171,10 +156,12 @@ export function buildDFALookaheadFuncForOptionalProd(
       const choiceToAlt = reduce(
         singleTokensTypes,
         (result, currTokType, idx) => {
-          result[currTokType.tokenTypeIdx!] = true
-          forEach(currTokType.categoryMatches!, (currExtendingType) => {
-            result[currExtendingType] = true
-          })
+          if (currTokType !== undefined) {
+            result[currTokType.tokenTypeIdx!] = true
+            forEach(currTokType.categoryMatches, (currExtendingType) => {
+              result[currExtendingType] = true
+            })
+          }
           return result
         },
         [] as boolean[]
@@ -187,29 +174,31 @@ export function buildDFALookaheadFuncForOptionalProd(
     }
   }
   return function () {
-    return (
-      atnSimulator.adaptivePredict(decisionIndex, EMPTY_PREDICATE_SET) === 0
-    )
+    return atnSimulator.adaptivePredict(decisionIndex, false) === 0
   }
 }
 
-function isLL1Sequence(sequences: TokenType[][]): boolean {
-  const overallSet = new Set<number>()
+function isLL1Sequence(sequences: TokenType[][], allowEmpty = true): boolean {
+  const fullSet = new Set<number>()
 
   for (const alt of sequences) {
+    if (allowEmpty === false && alt[0] === undefined) {
+      return false
+    }
     const altSet = new Set<number>()
     for (const tokType of alt) {
       if (tokType === undefined) {
-        return false
+        // Epsilon production encountered
+        break
       }
       const indices = [tokType.tokenTypeIdx!].concat(tokType.categoryMatches!)
       for (const index of indices) {
-        if (overallSet.has(index)) {
+        if (fullSet.has(index)) {
           if (!altSet.has(index)) {
             return false
           }
         } else {
-          overallSet.add(index)
+          fullSet.add(index)
           altSet.add(index)
         }
       }

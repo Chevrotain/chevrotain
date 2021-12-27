@@ -1,4 +1,5 @@
 import map from "lodash/map"
+import { Predicate } from "../parser/parser"
 import { ATNState, DecisionState } from "./atn"
 
 export interface DFA {
@@ -10,6 +11,7 @@ export interface DFA {
 
 export interface DFAState {
   stateNumber: number
+  predicates?: (Predicate | undefined)[]
   configs: ATNConfigSet
   edges: Map<number, DFAState>
   isAcceptState: boolean
@@ -17,32 +19,6 @@ export interface DFAState {
 }
 
 export const DFA_ERROR = {} as DFAState
-
-export class PredicateSet {
-  private predicates: boolean[] = []
-
-  get size(): number {
-    return this.predicates.length
-  }
-
-  is(index: number): boolean {
-    return index >= this.predicates.length === true
-      ? true
-      : this.predicates[index]
-  }
-
-  set(index: number, value: boolean) {
-    this.predicates[index] = value
-  }
-
-  toString(): string {
-    let value = ""
-    for (const predicate of this.predicates) {
-      value += predicate ? "1" : "0"
-    }
-    return value
-  }
-}
 
 export interface ATNConfig {
   state: ATNState
