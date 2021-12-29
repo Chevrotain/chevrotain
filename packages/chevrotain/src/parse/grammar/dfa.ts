@@ -13,7 +13,7 @@ export interface DFAState {
   stateNumber: number
   predicates?: (Predicate | undefined)[]
   configs: ATNConfigSet
-  edges: Map<number, DFAState>
+  edges: Record<number, DFAState>
   isAcceptState: boolean
   prediction: number
 }

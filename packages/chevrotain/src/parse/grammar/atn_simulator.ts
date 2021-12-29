@@ -92,7 +92,7 @@ export class ATNSimulator {
   }
 
   getExistingTargetState(state: DFAState, token: IToken): DFAState | undefined {
-    return state.edges.get(token.tokenTypeIdx)
+    return state.edges[token.tokenTypeIdx]
   }
 
   computeTargetState(
@@ -240,7 +240,7 @@ export class ATNSimulator {
   newDFAState(closure: ATNConfigSet): DFAState {
     return {
       configs: closure,
-      edges: new Map(),
+      edges: {},
       isAcceptState: false,
       prediction: -1,
       stateNumber: -1
@@ -249,7 +249,7 @@ export class ATNSimulator {
 
   addDFAEdge(dfa: DFA, from: DFAState, token: IToken, to: DFAState): DFAState {
     to = this.addDFAState(dfa, to)
-    from.edges.set(token.tokenTypeIdx, to)
+    from.edges[token.tokenTypeIdx] = to
     return to
   }
 

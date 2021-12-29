@@ -134,74 +134,74 @@ describe("atn-dfa transformation", () => {
   })
 })
 
-function printDFA(dfa: DFA) {
-  let text = 'digraph G {\nnode_error[label="error"]\n'
-  if (dfa.start) {
-    iterateOverDFAStates(dfa.start, (state) => (text += buildDFAState(state)))
-    iterateOverDFATransitions(
-      dfa.start,
-      (state, transition) => (text += buildDFATransition(state, transition))
-    )
-  }
-  text += "}"
-  fs.writeFileSync("./dfa.dot", text)
-}
+// function printDFA(dfa: DFA) {
+//   let text = 'digraph G {\nnode_error[label="error"]\n'
+//   if (dfa.start) {
+//     iterateOverDFAStates(dfa.start, (state) => (text += buildDFAState(state)))
+//     iterateOverDFATransitions(
+//       dfa.start,
+//       (state, transition) => (text += buildDFATransition(state, transition))
+//     )
+//   }
+//   text += "}"
+//   fs.writeFileSync("./dfa.dot", text)
+// }
 
-function iterateOverDFAStates(
-  atnState: DFAState,
-  action: (state: DFAState) => void,
-  visited: Set<DFAState> = new Set()
-): void {
-  visited.add(atnState)
-  action(atnState)
-  for (const nextState of Array.from(atnState.edges.values())) {
-    if (nextState !== DFA_ERROR && !visited.has(nextState)) {
-      iterateOverDFAStates(nextState, action, visited)
-    }
-  }
-}
+// function iterateOverDFAStates(
+//   atnState: DFAState,
+//   action: (state: DFAState) => void,
+//   visited: Set<DFAState> = new Set()
+// ): void {
+//   visited.add(atnState)
+//   action(atnState)
+//   for (const nextState of Array.from(atnState.edges.values())) {
+//     if (nextState !== DFA_ERROR && !visited.has(nextState)) {
+//       iterateOverDFAStates(nextState, action, visited)
+//     }
+//   }
+// }
 
-function iterateOverDFATransitions(
-  atnState: DFAState,
-  action: (startState: DFAState, transition: any[]) => void,
-  visited: Set<DFAState> = new Set()
-): void {
-  visited.add(atnState)
-  for (const transition of Array.from(atnState.edges.entries())) {
-    action(atnState, transition)
-  }
-  for (const nextState of Array.from(atnState.edges.values())) {
-    if (nextState !== DFA_ERROR && !visited.has(nextState)) {
-      iterateOverDFATransitions(nextState, action, visited)
-    }
-  }
-}
+// function iterateOverDFATransitions(
+//   atnState: DFAState,
+//   action: (startState: DFAState, transition: any[]) => void,
+//   visited: Set<DFAState> = new Set()
+// ): void {
+//   visited.add(atnState)
+//   for (const transition of Array.from(atnState.edges.entries())) {
+//     action(atnState, transition)
+//   }
+//   for (const nextState of Array.from(atnState.edges.values())) {
+//     if (nextState !== DFA_ERROR && !visited.has(nextState)) {
+//       iterateOverDFATransitions(nextState, action, visited)
+//     }
+//   }
+// }
 
-function buildDFATransition(state: DFAState, transition: any[]): string {
-  if (state === DFA_ERROR) {
-    return ""
-  }
-  const name = state.stateNumber.toString()
-  const nextState = transition[1]
-  if (!("stateNumber" in nextState)) {
-    return `node_${name} -> node_error\n`
-  }
-  const targetName = nextState.stateNumber.toString() as string
-  const transitionName = transition[0].name as string
-  return `node_${name} -> node_${targetName} [label="${transitionName}"]\n`
-}
+// function buildDFATransition(state: DFAState, transition: any[]): string {
+//   if (state === DFA_ERROR) {
+//     return ""
+//   }
+//   const name = state.stateNumber.toString()
+//   const nextState = transition[1]
+//   if (!("stateNumber" in nextState)) {
+//     return `node_${name} -> node_error\n`
+//   }
+//   const targetName = nextState.stateNumber.toString() as string
+//   const transitionName = transition[0].name as string
+//   return `node_${name} -> node_${targetName} [label="${transitionName}"]\n`
+// }
 
-function buildDFAState(state: DFAState): string {
-  if (state === DFA_ERROR) {
-    return ""
-  }
-  const name = state.stateNumber.toString()
-  let attributes = ""
-  if (state.isAcceptState) {
-    attributes = " peripheries=2"
-  }
-  return `node_${name}[label="${name}"${attributes}]\n`
-}
+// function buildDFAState(state: DFAState): string {
+//   if (state === DFA_ERROR) {
+//     return ""
+//   }
+//   const name = state.stateNumber.toString()
+//   let attributes = ""
+//   if (state.isAcceptState) {
+//     attributes = " peripheries=2"
+//   }
+//   return `node_${name}[label="${name}"${attributes}]\n`
+// }
 
 describe("successful ATN creation", () => {
   const IdentTok = createToken({ name: "IdentTok" })
