@@ -827,7 +827,7 @@ export class RecognizerEngine {
     this.RULE_OCCURRENCE_STACK.push(idxInCallingRule)
     this.RULE_STACK.push(shortName)
     // NOOP when cst is disabled
-    this.cstInvocationStateUpdate(fullName, shortName)
+    this.cstInvocationStateUpdate(fullName)
   }
 
   isBackTracking(this: MixedInParser): boolean {

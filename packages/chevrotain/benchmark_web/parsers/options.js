@@ -12,6 +12,7 @@ const options = {
     }
   },
   current: {
+    // bundle: "../chevrotain.js",
     bundle: "https://unpkg.com/chevrotain/lib/chevrotain.js",
     parserConfig: {
       maxLookahead: 2,

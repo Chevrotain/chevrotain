@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+- [CST naming conflicts with built-in Object prototype props](https://github.com/Chevrotain/chevrotain/issues/1724)
+
 ## 9.1.0 (10-9-2021)
 
 #### Minor Changes

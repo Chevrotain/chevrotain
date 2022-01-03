@@ -154,14 +154,10 @@ export class TreeBuilder {
     }
   }
 
-  cstInvocationStateUpdate(
-    this: MixedInParser,
-    fullRuleName: string,
-    shortName: string | number
-  ): void {
+  cstInvocationStateUpdate(this: MixedInParser, fullRuleName: string): void {
     const cstNode: CstNode = {
       name: fullRuleName,
-      children: {}
+      children: Object.create(null)
     }
 
     this.setInitialNodeLocation(cstNode)

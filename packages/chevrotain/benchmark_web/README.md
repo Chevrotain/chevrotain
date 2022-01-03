@@ -33,7 +33,7 @@ With the **Next** version (locally built version on current branch).
 
    - JS Engines, hotspots optimizations can slightly improve the results on concurrent runs.
 
-8. Inspect the `Relative Speed` column in `index_next.html`, e.g
+8. Inspect the `Relative Speed` column in `index_next.html`, e.g:
    - If it is 105%, there is likely a small performance improvement.
    - If it is 80% there is a large performance regression.
 
