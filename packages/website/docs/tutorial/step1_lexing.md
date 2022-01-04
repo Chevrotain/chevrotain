@@ -28,7 +28,7 @@ const createToken = chevrotain.createToken
 const From = createToken({ name: "From", pattern: /FROM/ })
 ```
 
-There is nothing much to it. We simply use the [**createToken** API](https://chevrotain.io/documentation/9_1_0/modules.html#createtoken)
+There is nothing much to it. We simply use the [**createToken** API](https://chevrotain.io/documentation/9_1_0/modules.html#createToken)
 to define the tokens, and provide it with a `name` property and a `pattern` property which is a RegExp which will be used when splitting up the input string
 into separate Tokens.
 
