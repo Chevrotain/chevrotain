@@ -1917,7 +1917,7 @@ export interface CstNode {
  */
 export interface CstNodeLocation {
   startOffset: number
-  startLine: number
+  startLine?: number
   startColumn?: number
   endOffset?: number
   endLine?: number
