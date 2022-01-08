@@ -29,6 +29,7 @@ import {
   IProductionWithOccurrence,
   TokenType
 } from "@chevrotain/types"
+import { ATNSimulator } from "./atn_simulator"
 
 export enum PROD_TYPE {
   OPTION,
@@ -56,6 +57,153 @@ export function getProdType(prod: IProduction): PROD_TYPE {
   } else {
     throw Error("non exhaustive match")
   }
+}
+
+export function buildDFALookaheadFuncForOr(
+  atnSimulator: ATNSimulator,
+  decisionIndex: number,
+  alternation: Alternation,
+  maxLookahead: number,
+  hasPredicates: boolean,
+  dynamicTokensEnabled: boolean
+): (orAlts?: IOrAlt<any>[]) => number | undefined {
+  const partialAlts = map(alternation.definition, (currAlt) =>
+    map(possiblePathsFrom([currAlt], 1), (e) => e.partialPath[0])
+  )
+
+  if (isLL1Sequence(partialAlts, false) && !dynamicTokensEnabled) {
+    const choiceToAlt = reduce(
+      partialAlts,
+      (result, currAlt, idx) => {
+        forEach(currAlt, (currTokType) => {
+          if (!has(result, currTokType.tokenTypeIdx!)) {
+            result[currTokType.tokenTypeIdx!] = idx
+          }
+          forEach(currTokType.categoryMatches!, (currExtendingType) => {
+            if (!has(result, currExtendingType)) {
+              result[currExtendingType] = idx
+            }
+          })
+        })
+        return result
+      },
+      {} as Record<number, number>
+    )
+
+    if (hasPredicates) {
+      return function (orAlts) {
+        const nextToken = this.LA(1)
+        const prediction: number = choiceToAlt[nextToken.tokenTypeIdx]
+        if (orAlts !== undefined) {
+          const gate = orAlts[prediction].GATE
+          if (gate !== undefined && gate.call(this) === false) {
+            return undefined
+          }
+        }
+        return prediction
+      }
+    } else {
+      return function (): number {
+        const nextToken = this.LA(1)
+        return choiceToAlt[nextToken.tokenTypeIdx]
+      }
+    }
+  } else {
+    return function () {
+      return atnSimulator.adaptivePredict(decisionIndex, hasPredicates)
+    }
+  }
+}
+
+export function buildDFALookaheadFuncForOptionalProd(
+  atnSimulator: ATNSimulator,
+  rule: Rule,
+  occurrence: number,
+  prodType: PROD_TYPE,
+  decisionIndex: number,
+  maxLookahead: number,
+  dynamicTokensEnabled: boolean
+): () => boolean {
+  const alts = map(
+    getLookaheadPathsForOptionalProd(occurrence, rule, prodType, 1),
+    (e) => {
+      return map(e, (g) => g[0])
+    }
+  )
+
+  // const lookAheadPaths = getLookaheadPathsForOr(
+  //   occurrence,
+  //   ruleGrammar,
+  //   1
+  // )
+
+  if (isLL1Sequence(alts) && !dynamicTokensEnabled) {
+    const alt = alts[0]
+    const singleTokensTypes = flatten(alt)
+
+    if (
+      singleTokensTypes.length === 1 &&
+      isEmpty((<any>singleTokensTypes[0]).categoryMatches)
+    ) {
+      const expectedTokenType = singleTokensTypes[0]
+      const expectedTokenUniqueKey = (<any>expectedTokenType).tokenTypeIdx
+
+      return function (): boolean {
+        return this.LA(1).tokenTypeIdx === expectedTokenUniqueKey
+      }
+    } else {
+      const choiceToAlt = reduce(
+        singleTokensTypes,
+        (result, currTokType, idx) => {
+          if (currTokType !== undefined) {
+            result[currTokType.tokenTypeIdx!] = true
+            forEach(currTokType.categoryMatches, (currExtendingType) => {
+              result[currExtendingType] = true
+            })
+          }
+          return result
+        },
+        [] as boolean[]
+      )
+
+      return function (): boolean {
+        const nextToken = this.LA(1)
+        return choiceToAlt[nextToken.tokenTypeIdx] === true
+      }
+    }
+  }
+  return function () {
+    return atnSimulator.adaptivePredict(decisionIndex, false) === 0
+  }
+}
+
+function isLL1Sequence(sequences: TokenType[][], allowEmpty = true): boolean {
+  const fullSet = new Set<number>()
+
+  for (const alt of sequences) {
+    if (allowEmpty === false && alt[0] === undefined) {
+      return false
+    }
+    const altSet = new Set<number>()
+    for (const tokType of alt) {
+      if (tokType === undefined) {
+        // Epsilon production encountered
+        break
+      }
+      const indices = [tokType.tokenTypeIdx!].concat(tokType.categoryMatches!)
+      for (const index of indices) {
+        if (fullSet.has(index)) {
+          if (!altSet.has(index)) {
+            return false
+          }
+        } else {
+          fullSet.add(index)
+          altSet.add(index)
+        }
+      }
+    }
+  }
+  return true
 }
 
 export function buildLookaheadFuncForOr(

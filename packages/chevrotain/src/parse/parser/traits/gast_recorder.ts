@@ -411,7 +411,10 @@ function recordOrProd(mainProdArg: any, occurrence: number): any {
   prevProd.definition.push(newOrProd)
 
   forEach(alts, (currAlt) => {
-    const currAltFlat = new Alternative({ definition: [] })
+    const currAltFlat = new Alternative({
+      definition: [],
+      predicate: currAlt.GATE
+    })
     newOrProd.definition.push(currAltFlat)
     if (has(currAlt, "IGNORE_AMBIGUITIES")) {
       currAltFlat.ignoreAmbiguities = currAlt.IGNORE_AMBIGUITIES as boolean // assumes end user provides the correct config value/type

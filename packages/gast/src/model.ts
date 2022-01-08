@@ -38,6 +38,8 @@ export abstract class AbstractProduction<T extends IProduction = IProduction>
     this._definition = value
   }
 
+  atnState: any
+
   constructor(protected _definition: T[]) {}
 
   accept(visitor: IGASTVisitor): void {
@@ -106,10 +108,12 @@ export class Rule extends AbstractProduction {
 
 export class Alternative extends AbstractProduction {
   public ignoreAmbiguities: boolean = false
+  public predicate: (() => boolean) | undefined
 
   constructor(options: {
     definition: IProduction[]
     ignoreAmbiguities?: boolean
+    predicate?: () => boolean
   }) {
     super(options.definition)
     assign(
@@ -258,6 +262,8 @@ export class Terminal implements IProductionWithOccurrence {
   public label?: string
   public idx: number = 1
 
+  atnState: any
+
   constructor(options: {
     terminalType: TokenType
     label?: string
@@ -320,7 +326,7 @@ export type ISerializedGastAny =
   | ISerializedTerminalWithSeparator
 
 export function serializeGrammar(topRules: Rule[]): ISerializedGast[] {
-  return map(topRules, serializeProduction)
+  return map(topRules, (rule) => serializeProduction(rule))
 }
 
 export function serializeProduction(node: IProduction): ISerializedGast {

@@ -2306,6 +2306,7 @@ export declare class EarlyExitException
 }
 
 export interface IProduction {
+  atnState?: any
   accept(visitor: IGASTVisitor): void
 }
 
