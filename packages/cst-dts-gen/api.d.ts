@@ -1,6 +1,7 @@
 import type { BaseParser } from "chevrotain"
 
 export declare function generateCstDts(
+  // TODO: avoid dep on BaseParser, use `Record<string, Rule>` instead
   parser: BaseParser,
   options?: GenerateDtsOptions
 ): string

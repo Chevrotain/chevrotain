@@ -2560,3 +2560,5 @@ export declare function createSyntaxDiagramsCode(
   grammar: ISerializedGast[],
   config?: ICreateSyntaxDiagramsConfig
 ): string
+
+// TODO: expose cst generation function here

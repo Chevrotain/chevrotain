@@ -12,7 +12,8 @@ import {
   Option,
   NonTerminal,
   isSequenceProd,
-  isOptionalProd
+  isOptionalProd,
+  isBranchingProd
 } from "../src/api"
 
 function createDummyToken(opts: ITokenConfig): TokenType {
@@ -99,6 +100,12 @@ describe("the gast helper utilities", () => {
     context("negative for", () => {
       it("NonTerminal", () => {
         const prod = new NonTerminal({ nonTerminalName: "bar" })
+        const result = isSequenceProd(prod)
+        expect(result).to.be.false
+      })
+
+      it("Alternation", () => {
+        const prod = new Alternation({ definition: [] })
         const result = isSequenceProd(prod)
         expect(result).to.be.false
       })
@@ -214,6 +221,86 @@ describe("the gast helper utilities", () => {
         })
         recursiveRule.definition = [recursiveNonTerminal]
         const result = isOptionalProd(recursiveNonTerminal)
+        expect(result).to.be.false
+      })
+    })
+  })
+
+  context("isBranchingProd()", () => {
+    context("positive for", () => {
+      it("Alternation", () => {
+        const prod = new Alternation({ definition: [] })
+        const result = isBranchingProd(prod)
+        expect(result).to.be.true
+      })
+    })
+
+    context("negative for", () => {
+      it("NonTerminal", () => {
+        const prod = new NonTerminal({ nonTerminalName: "bar" })
+        const result = isBranchingProd(prod)
+        expect(result).to.be.false
+      })
+
+      it("Alternative", () => {
+        const prod = new Alternative({ definition: [] })
+        const result = isBranchingProd(prod)
+        expect(result).to.be.false
+      })
+
+      it("Option", () => {
+        const prod = new Option({ definition: [] })
+        const result = isBranchingProd(prod)
+        expect(result).to.be.false
+      })
+
+      it("Option", () => {
+        const prod = new Option({ definition: [] })
+        const result = isBranchingProd(prod)
+        expect(result).to.be.false
+      })
+
+      it("Repetition", () => {
+        const prod = new Repetition({ definition: [] })
+        const result = isBranchingProd(prod)
+        expect(result).to.be.false
+      })
+
+      it("RepetitionMandatory", () => {
+        const prod = new RepetitionMandatory({ definition: [] })
+        const result = isBranchingProd(prod)
+        expect(result).to.be.false
+      })
+
+      it("RepetitionMandatoryWithSeparator", () => {
+        const prod = new RepetitionMandatoryWithSeparator({
+          definition: [],
+          separator: A
+        })
+        const result = isBranchingProd(prod)
+        expect(result).to.be.false
+      })
+
+      it("RepetitionWithSeparator", () => {
+        const prod = new RepetitionWithSeparator({
+          definition: [],
+          separator: A
+        })
+        const result = isBranchingProd(prod)
+        expect(result).to.be.false
+      })
+
+      it("Terminal", () => {
+        const prod = new Terminal({
+          terminalType: A
+        })
+        const result = isBranchingProd(prod)
+        expect(result).to.be.false
+      })
+
+      it("Rule", () => {
+        const prod = new Rule({ name: "foo", definition: [] })
+        const result = isBranchingProd(prod)
         expect(result).to.be.false
       })
     })

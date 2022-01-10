@@ -17,7 +17,6 @@ export { GAstVisitor } from "./visitor"
 
 export {
   getProductionDslName,
-  collectMethods,
   isOptionalProd,
   isBranchingProd,
   isSequenceProd
