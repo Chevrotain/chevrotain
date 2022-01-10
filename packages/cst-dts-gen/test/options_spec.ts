@@ -1,4 +1,4 @@
-import { GenerateDtsOptions } from "../api"
+import { GenerateDtsOptions } from "@chevrotain/types"
 import { generateCstDts } from "../src/api"
 import { CstParser, createToken } from "chevrotain"
 import { expect } from "chai"
@@ -48,7 +48,8 @@ describe("The DTS generator", () => {
 
   function genDts(options: GenerateDtsOptions) {
     const parser = new TestParser()
-    return generateCstDts(parser, options)
+    const productions = parser.getGAstProductions()
+    return generateCstDts(productions, options)
   }
 })
 

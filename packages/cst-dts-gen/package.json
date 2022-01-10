@@ -7,10 +7,10 @@
     "url": "https://github.com/Chevrotain/chevrotain/issues"
   },
   "license": "Apache-2.0",
-  "typings": "api.d.ts",
+  "typings": "libapi.d.ts",
   "main": "lib/src/api.js",
   "files": [
-    "api.d.ts",
+    "lib/src/**/*.ts",
     "lib/src/**/*.js",
     "lib/src/**/*.js.map"
   ],
@@ -31,11 +31,12 @@
     "coverage": "nyc mocha"
   },
   "dependencies": {
-    "lodash": "4.17.21",
-    "@chevrotain/gast": "^9.1.0"
+    "@chevrotain/types": "^9.1.0",
+    "@chevrotain/gast": "^9.1.0",
+    "lodash": "4.17.21"
   },
   "devDependencies": {
-    "@chevrotain/types": "^9.1.0",
+    "chevrotain": "^9.1.0",
     "glob": "7.2.0"
   },
   "publishConfig": {

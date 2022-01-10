@@ -2561,4 +2561,13 @@ export declare function createSyntaxDiagramsCode(
   config?: ICreateSyntaxDiagramsConfig
 ): string
 
-// TODO: expose cst generation function here
+export declare type GenerateDtsOptions = {
+  includeTypes?: boolean
+  includeVisitorInterface?: boolean
+  visitorInterfaceName?: string
+}
+
+export declare function generateCstDts(
+  rules: Record<string, Rule>,
+  options?: GenerateDtsOptions
+): string

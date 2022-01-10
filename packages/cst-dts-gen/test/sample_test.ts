@@ -6,7 +6,8 @@ import { generateCstDts } from "../src/api"
 
 export function executeSampleTest(dirPath: string, parser: BaseParser): void {
   it("Can generate type definition", () => {
-    const result = generateCstDts(parser)
+    const productions = parser.getGAstProductions()
+    const result = generateCstDts(productions)
     const expectedOutputPath = getOutputFileForSnapshot(dirPath)
     const expectedOutput = readFileSync(expectedOutputPath).toString("utf8")
     const simpleNewLinesOutput = expectedOutput.replace(/\r\n/g, "\n")

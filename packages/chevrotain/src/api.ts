@@ -52,9 +52,13 @@ export {
 
 // GAST Utilities
 
-export { serializeGrammar, serializeProduction } from "@chevrotain/gast"
+export {
+  serializeGrammar,
+  serializeProduction,
+  GAstVisitor
+} from "@chevrotain/gast"
 
-export { GAstVisitor } from "@chevrotain/gast"
+export { generateCstDts } from "@chevrotain/cst-dts-gen"
 
 /* istanbul ignore next */
 export function clearCache() {

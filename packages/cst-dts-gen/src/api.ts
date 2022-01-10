@@ -1,5 +1,4 @@
-import { BaseParser } from "@chevrotain/types"
-import { GenerateDtsOptions } from "../api"
+import { Rule, GenerateDtsOptions } from "@chevrotain/types"
 import { buildModel } from "./model"
 import { genDts, GenDtsOptions } from "./generate"
 
@@ -10,7 +9,7 @@ const defaultOptions: GenDtsOptions = {
 }
 
 export function generateCstDts(
-  parser: BaseParser,
+  productions: Record<string, Rule>,
   options?: GenerateDtsOptions
 ): string {
   const effectiveOptions: GenDtsOptions = {
@@ -18,7 +17,6 @@ export function generateCstDts(
     ...options
   }
 
-  const productions = parser.getGAstProductions()
   const model = buildModel(productions)
 
   return genDts(model, effectiveOptions)
