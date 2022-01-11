@@ -10,10 +10,10 @@
       "path": "./packages/gast"
     },
     {
-      "path": "./packages/cst-dts-gen"
+      "path": "./packages/chevrotain"
     },
     {
-      "path": "./packages/chevrotain"
+      "path": "./packages/cst-dts-gen"
     }
   ],
   // needed to avoid trying to compile other .ts files in this repo

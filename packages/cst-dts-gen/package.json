@@ -7,7 +7,7 @@
     "url": "https://github.com/Chevrotain/chevrotain/issues"
   },
   "license": "Apache-2.0",
-  "typings": "libapi.d.ts",
+  "typings": "lib/src/api.d.ts",
   "main": "lib/src/api.js",
   "files": [
     "lib/src/**/*.ts",
@@ -36,7 +36,6 @@
     "lodash": "4.17.21"
   },
   "devDependencies": {
-    "chevrotain": "^9.1.0",
     "glob": "7.2.0"
   },
   "publishConfig": {
