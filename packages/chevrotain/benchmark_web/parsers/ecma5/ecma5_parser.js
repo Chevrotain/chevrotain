@@ -360,7 +360,19 @@ class ECMAScript5Parser extends ChevrotainParser {
             { ALT: () => $.SUBRULE($.EmptyStatement) },
             // "LabelledStatement" must appear before "ExpressionStatement" due to common lookahead prefix ("inner :" vs "inner")
             { ALT: () => $.SUBRULE($.LabelledStatement) },
-            { ALT: () => $.SUBRULE($.ExpressionStatement) },
+            // The ambiguity is resolved by using a syntactic predicate
+            // See: https://ecma-international.org/ecma-262/5.1/#sec-12.4
+            //   - [lookahead ∉ {{, function}]
+            {
+              GATE: () => {
+                var token = this.LA(1)
+                return (
+                  token.tokenTypeIdx !== t.LCurly.tokenTypeIdx &&
+                  token.tokenTypeIdx !== t.FunctionTok.tokenTypeIdx
+                )
+              },
+              ALT: () => $.SUBRULE($.ExpressionStatement)
+            },
             { ALT: () => $.SUBRULE($.IfStatement) },
             { ALT: () => $.SUBRULE($.IterationStatement) },
             { ALT: () => $.SUBRULE($.ContinueStatement) },
@@ -782,14 +794,22 @@ class ECMAScript5Parser extends ChevrotainParser {
     // this inlines SourceElementRule rule from the spec
     $.RULE("SourceElements", () => {
       $.MANY(() => {
-        // FunctionDeclaration appearing before statement implements [lookahead != {{, function}] in ExpressionStatement
-        // See Function  https://www.ecma-international.org/ecma-262/5.1/index.html#sec-12.4Declaration
         $.OR([
+          // FunctionDeclaration appearing before statement implements [lookahead != {{, function}] in ExpressionStatement
+          // See https://www.ecma-international.org/ecma-262/5.1/index.html#sec-12.4Declaration
           {
-            ALT: () => $.SUBRULE($.FunctionDeclaration),
-            IGNORE_AMBIGUITIES: true
+            ALT: () => $.SUBRULE($.FunctionDeclaration)
           },
-          { ALT: () => $.SUBRULE($.Statement) }
+          {
+            GATE: () => {
+              var token = this.LA(1)
+              return (
+                token.tokenTypeIdx !== t.LCurly.tokenTypeIdx &&
+                token.tokenTypeIdx !== t.FunctionTok.tokenTypeIdx
+              )
+            },
+            ALT: () => $.SUBRULE($.Statement)
+          }
         ])
       })
     })

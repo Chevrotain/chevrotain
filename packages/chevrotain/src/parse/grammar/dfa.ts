@@ -11,7 +11,6 @@ export interface DFA {
 
 export interface DFAState {
   stateNumber: number
-  predicates?: (Predicate | undefined)[]
   configs: ATNConfigSet
   edges: Record<number, DFAState>
   isAcceptState: boolean
@@ -23,7 +22,7 @@ export const DFA_ERROR = {} as DFAState
 export interface ATNConfig {
   state: ATNState
   alt: number
-  followState?: ATNState
+  stack: ATNState[]
 }
 
 export class ATNConfigSet {

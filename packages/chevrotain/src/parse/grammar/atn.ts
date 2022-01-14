@@ -179,19 +179,6 @@ export class RuleTransition extends AbstractTransition {
   }
 }
 
-export class PredicateTransition extends AbstractTransition {
-  predicate: () => boolean
-
-  constructor(target: ATNState, predicate: () => boolean) {
-    super(target)
-    this.predicate = predicate
-  }
-
-  isEpsilon() {
-    return true
-  }
-}
-
 export interface ATNHandle {
   left: ATNState
   right: ATNState
@@ -255,36 +242,11 @@ function atom(
     return repetitionMandatory(atn, rule, production)
   } else if (production instanceof RepetitionMandatoryWithSeparator) {
     return repetitionMandatorySep(atn, rule, production)
-  } else if (production instanceof Alternative) {
-    return alternative(atn, rule, production)
-  } else if (production instanceof Rule) {
+  } else if (production instanceof Rule || production instanceof Alternative) {
     return block(atn, rule, production)
   } else {
     throw new Error("Invalid atom")
   }
-}
-
-function alternative(
-  atn: ATN,
-  rule: Rule,
-  alternative: Alternative
-): ATNHandle | undefined {
-  const handle = block(atn, rule, alternative)
-  if (alternative.predicate !== undefined && handle !== undefined) {
-    const { left, right } = handle
-    const predicateState = newState<BasicState>(atn, rule, {
-      type: ATN_BASIC
-    })
-    addTransition(
-      predicateState,
-      new PredicateTransition(left, alternative.predicate)
-    )
-    return {
-      left: predicateState,
-      right: right
-    }
-  }
-  return handle
 }
 
 function repetition(atn: ATN, rule: Rule, repetition: Repetition): ATNHandle {
