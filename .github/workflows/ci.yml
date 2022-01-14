@@ -1,14 +1,11 @@
 name: Continuous Integration
 on:
-  # Trigger the workflow on push or pull request,
-  # but only for the main branch
-  # See: https://github.community/t/duplicate-checks-on-push-and-pull-request-simultaneous-event/18012
   push:
     branches:
-      - master
+      - master*
   pull_request:
     branches:
-      - master
+      - master*
 jobs:
   full_build:
     name: Full Build (node ${{ matrix.node_version }})
