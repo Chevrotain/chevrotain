@@ -1,16 +1,14 @@
 import map from "lodash/map"
-import { Predicate } from "../parser/parser"
 import { ATNState, DecisionState } from "./atn"
 
 export interface DFA {
   start?: DFAState
-  states: Map<string, DFAState>
+  states: Record<string, DFAState>
   decision: number
   atnStartState: DecisionState
 }
 
 export interface DFAState {
-  stateNumber: number
   configs: ATNConfigSet
   edges: Record<number, DFAState>
   isAcceptState: boolean
@@ -26,7 +24,7 @@ export interface ATNConfig {
 }
 
 export class ATNConfigSet {
-  private map = new Map<string, number>()
+  private map: Record<string, number> = {}
   private configs: ATNConfig[] = []
 
   uniqueAlt: number | undefined
@@ -36,7 +34,7 @@ export class ATNConfigSet {
   }
 
   add(config: ATNConfig): void {
-    this.map.set(this.atnConfigToString(config), this.configs.length)
+    this.map[getATNConfigKey(config)] = this.configs.length
     this.configs.push(config)
   }
 
@@ -56,11 +54,15 @@ export class ATNConfigSet {
     return map(this.configs, (e) => e.alt)
   }
 
-  private atnConfigToString(config: ATNConfig) {
-    return `${config.state.stateNumber}_${config.alt}`
-  }
-
   get key(): string {
-    return Array.from(this.map.keys()).join(":")
+    let value = ""
+    for (const k in this.map) {
+      value += k + ":"
+    }
+    return value
   }
+}
+
+export function getATNConfigKey(config: ATNConfig) {
+	return `${config.state.stateNumber}_${config.alt}:${config.stack.map(e => e.stateNumber.toString()).join('_')}`;
 }

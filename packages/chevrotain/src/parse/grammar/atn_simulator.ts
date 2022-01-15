@@ -12,10 +12,9 @@ import {
   RuleTransition,
   Transition
 } from "./atn"
-import { ATNConfig, ATNConfigSet, DFA, DFAState, DFA_ERROR } from "./dfa"
+import { ATNConfig, ATNConfigSet, DFA, DFAState, DFA_ERROR, getATNConfigKey } from "./dfa"
 import min from "lodash/min"
 import map from "lodash/map"
-import { Predicate } from "../parser/parser"
 
 export function createATNSimulator(
   parser: MixedInParser,
@@ -24,7 +23,7 @@ export function createATNSimulator(
   const decisionLength = atn.decisionStates.length
   const decisionToDFA: DFACache[] = Array(decisionLength)
   for (let i = 0; i < decisionLength; i++) {
-    decisionToDFA[i] = createDFAFactory(atn.decisionStates[i], i)
+    decisionToDFA[i] = createDFACache(atn.decisionStates[i], i)
   }
   return new ATNSimulator(parser, atn, decisionToDFA)
 }
@@ -37,9 +36,7 @@ export class PredicateSet {
   }
 
   is(index: number): boolean {
-    return index >= this.predicates.length === true
-      ? true
-      : this.predicates[index]
+    return index >= this.predicates.length || this.predicates[index]
   }
 
   set(index: number, value: boolean) {
@@ -48,8 +45,9 @@ export class PredicateSet {
 
   toString(): string {
     let value = ""
-    for (const predicate of this.predicates) {
-      value += predicate ? "1" : "0"
+    const size = this.predicates.length
+    for (let i = 0; i < size; i++) {
+      value += this.predicates[i] === true ? "1" : "0"
     }
     return value
   }
@@ -57,23 +55,20 @@ export class PredicateSet {
 
 export type DFACache = (predicateSet: PredicateSet) => DFA
 
-function createDFAFactory(
-  startState: DecisionState,
-  decision: number
-): DFACache {
-  const map = new Map<string, DFA>()
+function createDFACache(startState: DecisionState, decision: number): DFACache {
+  const map: Record<string, DFA | undefined> = {}
   return (predicateSet) => {
     const key = predicateSet.toString()
-    let existing = map.get(key)
+    let existing = map[key]
     if (existing !== undefined) {
       return existing
     } else {
       existing = {
         atnStartState: startState,
         decision,
-        states: new Map()
+        states: {}
       }
-      map.set(key, existing)
+      map[key] = existing
       return existing
     }
   }
@@ -248,9 +243,30 @@ export class ATNSimulator {
     configs: ATNConfigSet,
     predicateSet: PredicateSet
   ): number | undefined {
+    return predicateSet.size === 0
+      ? this.getUniqueAltUnpredicated(configs)
+      : this.getUniqueAltPredicated(configs, predicateSet)
+  }
+
+  getUniqueAltUnpredicated(configs: ATNConfigSet): number | undefined {
     let alt: number | undefined
     for (const c of configs.elements) {
-      if (predicateSet.is(c.alt)) {
+      if (alt === undefined) {
+        alt = c.alt
+      } else if (alt !== c.alt) {
+        return undefined
+      }
+    }
+    return alt
+  }
+
+  getUniqueAltPredicated(
+    configs: ATNConfigSet,
+    predicateSet: PredicateSet
+  ): number | undefined {
+    let alt: number | undefined
+    for (const c of configs.elements) {
+      if (predicateSet.is(c.alt) === true) {
         if (alt === undefined) {
           alt = c.alt
         } else if (alt !== c.alt) {
@@ -266,8 +282,7 @@ export class ATNSimulator {
       configs: closure,
       edges: {},
       isAcceptState: false,
-      prediction: -1,
-      stateNumber: -1
+      prediction: -1
     }
   }
 
@@ -284,12 +299,11 @@ export class ATNSimulator {
     // Repetitions have the same config set
     // Therefore, storing the key of the config in a map allows us to create a loop in our DFA
     const mapKey = state.configs.key
-    const existing = dfa.states.get(mapKey)
+    const existing = dfa.states[mapKey]
     if (existing !== undefined) {
       return existing
     }
-    state.stateNumber = dfa.states.size
-    dfa.states.set(mapKey, state)
+    dfa.states[mapKey] = state
     return state
   }
 
@@ -429,16 +443,6 @@ function getConflictingAltSets(
     alts[c.alt] = true
   }
   return configToAlts
-}
-
-function getATNConfigKey(config: ATNConfig): string {
-  // Add the full rule stack to the config key
-  // That way, we don't accidentally generate false positives with the heuristic
-  return (
-    config.state.stateNumber +
-    "_" +
-    config.stack.map((e) => e.stateNumber.toString()).join("_")
-  )
 }
 
 function hasConflictingAltSet(

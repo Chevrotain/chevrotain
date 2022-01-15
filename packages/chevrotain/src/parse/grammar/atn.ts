@@ -9,11 +9,10 @@ import {
   RepetitionMandatory,
   Repetition,
   Terminal,
-  AbstractProduction,
   Alternative,
   RepetitionWithSeparator,
   RepetitionMandatoryWithSeparator
-} from "./gast/gast_public"
+} from "@chevrotain/gast"
 
 export interface ATN {
   states: ATNState[]
@@ -349,7 +348,7 @@ function option(atn: ATN, rule: Rule, option: Option): ATNHandle {
 function block(
   atn: ATN,
   rule: Rule,
-  block: AbstractProduction
+  block: { definition: IProduction[] }
 ): ATNHandle | undefined {
   const handles = filter(
     map(block.definition, (e) => atom(atn, rule, e)),

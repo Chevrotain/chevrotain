@@ -111,10 +111,11 @@ export function buildDFALookaheadFuncForOr(
       }
     }
   } else if (hasPredicates) {
+    const length = alternation.definition.length
     return function (orAlts) {
       if (orAlts) {
         const predicates = new PredicateSet()
-        for (let i = 0; i < orAlts.length; i++) {
+        for (let i = 0; i < length; i++) {
           const gate = orAlts[i].GATE
           predicates.set(i, gate === undefined || gate.call(this))
         }

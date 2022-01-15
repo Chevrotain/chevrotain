@@ -35,7 +35,7 @@ import {
   RepetitionWithSeparator,
   Rule
 } from "@chevrotain/gast"
-import { collectMethods, getProductionDslName } from "@chevrotain/gast"
+import { getProductionDslName } from "@chevrotain/gast"
 import {
   ATN,
   ATNState,
