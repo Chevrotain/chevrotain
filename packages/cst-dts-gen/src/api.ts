@@ -1,9 +1,8 @@
 import { Rule, GenerateDtsOptions } from "@chevrotain/types"
 import { buildModel } from "./model"
-import { genDts, GenDtsOptions } from "./generate"
+import { genDts } from "./generate"
 
-const defaultOptions: GenDtsOptions = {
-  includeTypes: true,
+const defaultOptions: Required<GenerateDtsOptions> = {
   includeVisitorInterface: true,
   visitorInterfaceName: "ICstNodeVisitor"
 }
@@ -12,7 +11,7 @@ export function generateCstDts(
   productions: Record<string, Rule>,
   options?: GenerateDtsOptions
 ): string {
-  const effectiveOptions: GenDtsOptions = {
+  const effectiveOptions = {
     ...defaultOptions,
     ...options
   }

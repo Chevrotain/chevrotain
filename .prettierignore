@@ -12,6 +12,7 @@
 
 /examples/webpack/lib
 /examples/implementation_languages/typescript/*.js
+/examples/implementation_languages/typescript/*.d.ts
 /examples/implementation_languages/coffeescript/*.js
 /examples/parser/minification/gen/
 

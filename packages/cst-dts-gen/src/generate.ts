@@ -1,36 +1,26 @@
 import flatten from "lodash/flatten"
 import map from "lodash/map"
 import upperFirst from "lodash/upperFirst"
+import { GenerateDtsOptions } from "@chevrotain/types"
 import {
   CstNodeTypeDefinition,
   PropertyTypeDefinition,
   PropertyArrayType
 } from "./model"
 
-export type GenDtsOptions = {
-  includeTypes: boolean
-  includeVisitorInterface: boolean
-  visitorInterfaceName: string
-}
-
 export function genDts(
   model: CstNodeTypeDefinition[],
-  options: GenDtsOptions
+  options: Required<GenerateDtsOptions>
 ): string {
   let contentParts: string[] = []
 
-  if (options.includeTypes || options.includeVisitorInterface) {
-    contentParts = contentParts.concat(
-      // TODO: should these imports be from `@chevrotain/types`
-      `import type { CstNode, ICstVisitor, IToken } from "chevrotain";`
-    )
-  }
+  contentParts = contentParts.concat(
+    `import type { CstNode, ICstVisitor, IToken } from "chevrotain";`
+  )
 
-  if (options.includeTypes) {
-    contentParts = contentParts.concat(
-      flatten(map(model, (node) => genCstNodeTypes(node)))
-    )
-  }
+  contentParts = contentParts.concat(
+    flatten(map(model, (node) => genCstNodeTypes(node)))
+  )
 
   if (options.includeVisitorInterface) {
     contentParts = contentParts.concat(
@@ -38,7 +28,7 @@ export function genDts(
     )
   }
 
-  return contentParts.length ? contentParts.join("\n\n") + "\n" : ""
+  return contentParts.join("\n\n") + "\n"
 }
 
 function genCstNodeTypes(node: CstNodeTypeDefinition) {

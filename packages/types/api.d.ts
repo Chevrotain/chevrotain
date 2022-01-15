@@ -2561,13 +2561,35 @@ export declare function createSyntaxDiagramsCode(
   config?: ICreateSyntaxDiagramsConfig
 ): string
 
-export declare type GenerateDtsOptions = {
-  includeTypes?: boolean
-  includeVisitorInterface?: boolean
-  visitorInterfaceName?: string
-}
-
+/**
+ * Will generate TypeScript definitions source code (text).
+ * For a set of {@link Rule}.
+ *
+ * This set of Rules can be obtained from a Parser **instance** via the
+ * {@link BaseParser.getGAstProductions} method.
+ *
+ * Note that this function produces a **string** the output.
+ * It is the responsibility of the end-user to create the signatures files.
+ *   - e.g: via `fs.writeFileSync()`
+ *
+ * TODO: create and link to markdown docs on website.
+ */
 export declare function generateCstDts(
   rules: Record<string, Rule>,
   options?: GenerateDtsOptions
 ): string
+
+export declare type GenerateDtsOptions = {
+  /**
+   * `true` by default.
+   * Disable this to prevent the generation of the CSTVisitor interface.
+   * For example, if a different traversal method on the CST has been implemented
+   * by the end-user and the Chevrotain CST Visitor apis are not used.
+   */
+  includeVisitorInterface?: boolean
+  /**
+   * The generated visitor interface will be called `ICstNodeVisitor` by default
+   * This parameter enables giving it a more specific name, for example: `MyCstVisitor` or `JohnDoe`
+   */
+  visitorInterfaceName?: string
+}
