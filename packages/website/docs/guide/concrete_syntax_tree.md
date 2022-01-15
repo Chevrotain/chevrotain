@@ -196,8 +196,8 @@ $.RULE("statements", () => {
 })
 ```
 
-Some of the Terminals and Non-Terminals are used in **both** alternatives.
-It is possible to check for the existence of distinguishing terminals such as the "Let" and "Select".
+Some Terminals and Non-Terminals are used in **both** alternatives.
+It is possible to check for the existence of "distinguishing" terminals such as the "Let" and "Select".
 But this is not a robust approach.
 
 ```javascript
@@ -231,7 +231,7 @@ will become too difficult to understand and maintain due to verbosity.
 
 Sometimes the information regarding the textual location (range) of each CstNode is needed.
 This information is normally **already present** on the CstNodes **nested** children simply because the CstNode's children
-include the Tokens provided by the Lexer. However by default this information is not easily accessible
+include the Tokens provided by the Lexer. However, by default this information is not easily accessible
 as we would have to fully traverse a CstNode to understands its full location range information.
 
 The feature for providing CstNode location directly on the CstNodes objects is available since version 4.7.0.
@@ -273,16 +273,16 @@ Caveats
 - This feature has a slight performance and memory cost,
   this performance impact is **linear** and was measured at 5-10% for a full lexing + parsing flow.
   In general the more complex a grammar is (in terms of more CstNodes created per N tokens)
-  the higher the impact. Additionally if the Parser has activated the error recovery capabilities
+  the higher the impact. Additionally, if the Parser has activated the error recovery capabilities
   of Chevrotain the impact would be at the high end of the given range,
-  as the location tracking logic is more complex when some of the Tokens may be virtual/invalid.
+  as the location tracking logic is more complex when some Tokens may be virtual/invalid.
 
 ## Fault Tolerance
 
 CST output is also supported in combination with automatic error recovery.
 This combination is actually stronger than regular error recovery because
 even partially formed CstNodes will be present on the CST output and be marked
-using the **recoveredNode"** boolean property.
+using the `recoveredNode` boolean property.
 
 For example given this grammar and assuming the parser re-synced after a token mismatch at
 the "Where" token:
@@ -321,7 +321,7 @@ for example: offering auto-fix suggestions or provide better error messages.
 
 ## Traversing
 
-So we now know how to create a CST and it's internal structure.
+So, we now know how to create a CST, and it's internal structure.
 But how do we traverse this structure and perform semantic actions?
 Some examples for such semantic actions:
 
@@ -376,7 +376,7 @@ This is a valid approach, however it can be somewhat error prone:
 
 For the impatient, See a full runnable example: [Calculator Grammar with CSTVisitor interpreter](https://github.com/chevrotain/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js)
 
-Chevrotain provides a CSTVisitor class which can make traversing the CST less error prone.
+Chevrotain provides a CSTVisitor class which can make traversing the CST less error-prone.
 
 ```javascript
 // The base Visitor Class can be accessed via a Parser **instance**.
@@ -465,6 +465,58 @@ It is not possible to return values from the visit methods because
 the default implementation does not return any value, only traverses the CST
 thus the chain of returned values will be broken.
 
+## Generating TypeScript Signatures(d.ts) for CST constructs.
+
+In the sections above we have seen that implementing a Chevrotain `CstParser` would also **implicitly** define
+several data structures and APIs:
+
+1. A CSTNode for each grammar rule.
+2. A CST-Visitor API for the whole set of rules
+
+But what if we want **explicit** definitions for these data structures and APIs?
+
+- For example to easily implement our CST Visitors in TypeScript instead of over-using the `any` type...
+
+This capability is provided via the [generateCstDts](https://chevrotain.io/documentation/9_1_0/modules.html#generateCstDts) function.
+Which given a set of grammar `Rules` will generate the **source text** for the corresponding TypeScript signatures.
+
+For example, given the Parser rules for **arrays** in JSON.
+
+```typescript
+class JSONParser extends CstParser {
+  private array = this.RULE("array", () => {
+    this.CONSUME(LSquare)
+    this.MANY_SEP({
+      SEP: Comma,
+      DEF: () => {
+        this.SUBRULE(this.value)
+      }
+    })
+    this.CONSUME(RSquare)
+  })
+}
+```
+
+It would produce the following signatures:
+
+```typescript
+export interface ArrayCstNode extends CstNode {
+  name: "array"
+  children: ArrayCstChildren
+}
+
+export type ArrayCstChildren = {
+  LSquare: IToken[]
+  value?: ValueCstNode[]
+  Comma?: IToken[]
+  RSquare: IToken[]
+}
+```
+
+Note that the [generateCstDts](https://chevrotain.io/documentation/9_1_0/modules.html#generateCstDts) function
+only produces the **source text** of the TypeScript signatures, and it is the end-user's responsibility to save
+the contents to a file, see: minimal [generation script example](https://github.com/Chevrotain/chevrotain/tree/master/examples/implementation_languages/typescript/scripts/gen_dts_signatures.js).
+
 ## Performance
 
 On V8 (Chrome/Node) building the CST was measured at anywhere from 35%-90% of the performance
@@ -482,6 +534,6 @@ This may be substantial yet please consider:
 - Parsing is usually just one step in a larger flow, so the overall impact even in the slower edge cases
   would be reduced.
 
-It is therefore recommended to use the CST creation capabilities
+It is therefore recommended using the CST creation capabilities
 as its benefits (modularity / ease of maintenance) by far outweigh the costs (potentially reduced performance).
 except in unique edge cases.
