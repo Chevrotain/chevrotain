@@ -1,8 +1,15 @@
-## 9.0.0
+## 10.0.0
 
 - Dropped support for legacy ES5.1 runtimes (e.g: IE11)
   The minimum ECMAScript version needed to run Chevrotain is now ES2015 (ES6).
-  This should not affect anyone running on a modern engine, (e.g modern NodeJS versions / major browsers).
+  This should not affect anyone running on a modern engine,  
+  meaning modern NodeJS versions or popular evergreen browsers.
+
+- Various TypeScript signatures are now more accurate and strict which could potentially
+  cause compilation errors with some grammars implemented in TypeScript, e.g:
+  - `OPTION` methods now return `OUT | undefined` instead of just `OUT`.
+  - A `RULE` implementation function in `CstParser` is now defined as returning `void`.
+  - The `ARGS` for `SubruleMethodOpts` options type is now better enforced via generics in the `subrule` definition.
 
 ## 9.0.0
 

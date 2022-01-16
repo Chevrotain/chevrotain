@@ -1,5 +1,16 @@
 ## X.Y.Z (INSERT_DATE_HERE)
 
+#### Breaking Changes
+
+- [BREAKING_CHANGES For V10](https://chevrotain.io/docs/changes/BREAKING_CHANGES.html#_10-0-0)
+
+#### Minor Changes
+
+- [Generating TypeScript Signatures(d.ts) for CST constructs.](TODO: figure out link)
+- [refactor(utils): replace with lodash 3rd party dep](https://github.com/Chevrotain/chevrotain/pull/1694)
+  - This was done to reduce the amount of code being maintained, but at the cost of increased bundle size,
+    for example: `chevrotain.min.js` is now 189kb instead of 156kb.
+
 #### Bug Fixes
 
 - [CST naming conflicts with built-in Object prototype props](https://github.com/Chevrotain/chevrotain/issues/1724)
