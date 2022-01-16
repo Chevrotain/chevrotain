@@ -1,6 +1,6 @@
 import { GastRefResolverVisitor } from "../../../src/parse/grammar/resolver"
 import { ParserDefinitionErrorType } from "../../../src/parse/parser/parser"
-import { NonTerminal, Rule } from "../../../src/parse/grammar/gast/gast_public"
+import { NonTerminal, Rule } from "@chevrotain/gast"
 import { defaultGrammarResolverErrorProvider } from "../../../src/parse/errors_public"
 import { expect } from "chai"
 

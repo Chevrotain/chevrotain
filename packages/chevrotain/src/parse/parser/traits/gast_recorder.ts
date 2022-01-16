@@ -32,7 +32,7 @@ import {
   RepetitionWithSeparator,
   Rule,
   Terminal
-} from "../../grammar/gast/gast_public"
+} from "@chevrotain/gast"
 import { Lexer } from "../../../scan/lexer_public"
 import { augmentTokenTypes, hasShortKeyProperty } from "../../../scan/tokens"
 import { createToken, createTokenInstance } from "../../../scan/tokens_public"

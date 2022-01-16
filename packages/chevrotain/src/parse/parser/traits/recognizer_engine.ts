@@ -59,7 +59,7 @@ import {
   tokenStructuredMatcher,
   tokenStructuredMatcherNoCategories
 } from "../../../scan/tokens"
-import { Rule } from "../../grammar/gast/gast_public"
+import { Rule } from "@chevrotain/gast"
 import { ParserMethodInternal } from "../types"
 
 /**

@@ -23,8 +23,17 @@ import {
   OR_IDX
 } from "../../grammar/keys"
 import { MixedInParser } from "./parser_traits"
-import { Rule } from "../../grammar/gast/gast_public"
-import { collectMethods, getProductionDslName } from "../../grammar/gast/gast"
+import {
+  Alternation,
+  GAstVisitor,
+  Option,
+  Repetition,
+  RepetitionMandatory,
+  RepetitionMandatoryWithSeparator,
+  RepetitionWithSeparator,
+  Rule
+} from "@chevrotain/gast"
+import { getProductionDslName } from "@chevrotain/gast"
 
 /**
  * Trait responsible for the lookahead related utilities and optimizations.
@@ -217,4 +226,76 @@ export class LooksAhead {
   setLaFuncCache(this: MixedInParser, key: number, value: Function): void {
     this.lookAheadFuncsCache.set(key, value)
   }
+}
+
+class DslMethodsCollectorVisitor extends GAstVisitor {
+  public dslMethods: {
+    option: Option[]
+    alternation: Alternation[]
+    repetition: Repetition[]
+    repetitionWithSeparator: RepetitionWithSeparator[]
+    repetitionMandatory: RepetitionMandatory[]
+    repetitionMandatoryWithSeparator: RepetitionMandatoryWithSeparator[]
+  } = {
+    option: [],
+    alternation: [],
+    repetition: [],
+    repetitionWithSeparator: [],
+    repetitionMandatory: [],
+    repetitionMandatoryWithSeparator: []
+  }
+
+  reset() {
+    this.dslMethods = {
+      option: [],
+      alternation: [],
+      repetition: [],
+      repetitionWithSeparator: [],
+      repetitionMandatory: [],
+      repetitionMandatoryWithSeparator: []
+    }
+  }
+
+  public visitOption(option: Option): void {
+    this.dslMethods.option.push(option)
+  }
+
+  public visitRepetitionWithSeparator(manySep: RepetitionWithSeparator): void {
+    this.dslMethods.repetitionWithSeparator.push(manySep)
+  }
+
+  public visitRepetitionMandatory(atLeastOne: RepetitionMandatory): void {
+    this.dslMethods.repetitionMandatory.push(atLeastOne)
+  }
+
+  public visitRepetitionMandatoryWithSeparator(
+    atLeastOneSep: RepetitionMandatoryWithSeparator
+  ): void {
+    this.dslMethods.repetitionMandatoryWithSeparator.push(atLeastOneSep)
+  }
+
+  public visitRepetition(many: Repetition): void {
+    this.dslMethods.repetition.push(many)
+  }
+
+  public visitAlternation(or: Alternation): void {
+    this.dslMethods.alternation.push(or)
+  }
+}
+
+const collectorVisitor = new DslMethodsCollectorVisitor()
+export function collectMethods(rule: Rule): {
+  option: Option[]
+  alternation: Alternation[]
+  repetition: Repetition[]
+  repetitionWithSeparator: RepetitionWithSeparator[]
+  repetitionMandatory: RepetitionMandatory[]
+  repetitionMandatoryWithSeparator: RepetitionMandatoryWithSeparator[]
+} {
+  collectorVisitor.reset()
+  rule.accept(collectorVisitor)
+  const dslMethods = collectorVisitor.dslMethods
+  // avoid uncleaned references
+  collectorVisitor.reset()
+  return <any>dslMethods
 }

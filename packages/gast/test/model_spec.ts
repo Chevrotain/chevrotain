@@ -1,6 +1,7 @@
-import { getProductionDslName } from "../../../src/parse/grammar/gast/gast"
-import { createToken } from "../../../src/scan/tokens_public"
+import { expect } from "chai"
+import { ITokenConfig, TokenType } from "@chevrotain/types"
 import {
+  getProductionDslName,
   Alternation,
   NonTerminal,
   RepetitionMandatory,
@@ -13,11 +14,16 @@ import {
   Alternative,
   Rule,
   serializeGrammar
-} from "../../../src/parse/grammar/gast/gast_public"
-import { expect } from "chai"
-import { TokenType } from "@chevrotain/types"
+} from "../src/api"
 
-describe("GAst namespace", () => {
+function createDummyToken(opts: ITokenConfig): TokenType {
+  return {
+    name: opts.name,
+    PATTERN: opts.pattern
+  }
+}
+
+describe("the gast model", () => {
   describe("the ProdRef class", () => {
     it("will always return a valid empty definition, even if it's ref is unresolved", () => {
       const prodRef = new NonTerminal({
@@ -101,13 +107,13 @@ describe("GAst namespace", () => {
     let WithLiteral: TokenType
 
     before(() => {
-      A = createToken({ name: "A" })
+      A = createDummyToken({ name: "A" })
       A.LABEL = "bamba"
-      B = createToken({ name: "B", pattern: /[a-zA-Z]\w*/ })
-      C = createToken({ name: "C" })
-      D = createToken({ name: "D" })
-      Comma = createToken({ name: "Comma" })
-      WithLiteral = createToken({
+      B = createDummyToken({ name: "B", pattern: /[a-zA-Z]\w*/ })
+      C = createDummyToken({ name: "C" })
+      D = createDummyToken({ name: "D" })
+      Comma = createDummyToken({ name: "Comma" })
+      WithLiteral = createDummyToken({
         name: "WithLiteral",
         pattern: "bamba"
       })

@@ -1,11 +1,6 @@
 import { first } from "../../../src/parse/grammar/first"
 import { setEquality } from "../../utils/matchers"
-import {
-  Alternative,
-  Terminal,
-  Option,
-  Alternation
-} from "../../../src/parse/grammar/gast/gast_public"
+import { Alternative, Terminal, Option, Alternation } from "@chevrotain/gast"
 import { expect } from "chai"
 import { createToken } from "../../../src/scan/tokens_public"
 

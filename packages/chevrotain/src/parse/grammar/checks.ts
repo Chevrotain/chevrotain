@@ -20,7 +20,7 @@ import {
   IParserEmptyAlternativeDefinitionError,
   ParserDefinitionErrorType
 } from "../parser/parser"
-import { getProductionDslName, isOptionalProd } from "./gast/gast"
+import { getProductionDslName, isOptionalProd } from "@chevrotain/gast"
 import {
   Alternative,
   containsPath,
@@ -41,8 +41,8 @@ import {
   RepetitionWithSeparator,
   Rule,
   Terminal
-} from "./gast/gast_public"
-import { GAstVisitor } from "./gast/gast_visitor_public"
+} from "@chevrotain/gast"
+import { GAstVisitor } from "@chevrotain/gast"
 import {
   IProduction,
   IProductionWithOccurrence,

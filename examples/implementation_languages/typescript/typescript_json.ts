@@ -1,4 +1,4 @@
-import { createToken, Lexer, CstParser } from "chevrotain"
+import { createToken, Lexer, CstParser, Rule } from "chevrotain"
 
 const True = createToken({ name: "True", pattern: /true/ })
 const False = createToken({ name: "False", pattern: /false/ })
@@ -101,6 +101,8 @@ class JsonParserTypeScript extends CstParser {
 
 // reuse the same parser instance.
 const parser = new JsonParserTypeScript()
+
+export const productions: Record<string, Rule> = parser.getGAstProductions()
 
 export function parseJson(text) {
   const lexResult = JsonLexer.tokenize(text)

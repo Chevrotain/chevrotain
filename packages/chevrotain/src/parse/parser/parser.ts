@@ -38,7 +38,7 @@ import { GastRecorder } from "./traits/gast_recorder"
 import { PerformanceTracer } from "./traits/perf_tracer"
 import { applyMixins } from "./utils/apply_mixins"
 import { IParserDefinitionError } from "../grammar/types"
-import { Rule } from "../grammar/gast/gast_public"
+import { Rule } from "@chevrotain/gast"
 import { IParserConfigInternal, ParserMethodInternal } from "./types"
 
 export const END_OF_FILE = createTokenInstance(

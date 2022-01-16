@@ -30,7 +30,7 @@ import {
   RepetitionMandatory,
   NonTerminal,
   RepetitionMandatoryWithSeparator
-} from "../../../src/parse/grammar/gast/gast_public"
+} from "@chevrotain/gast"
 import { createDeferredTokenBuilder } from "../../utils/builders"
 
 // ugly utilities to deffer execution of productive code until the relevant tests have started

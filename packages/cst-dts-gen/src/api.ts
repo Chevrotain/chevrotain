@@ -1,24 +1,21 @@
-import { BaseParser } from "chevrotain"
-import { GenerateDtsOptions } from "../api"
+import { Rule, GenerateDtsOptions } from "@chevrotain/types"
 import { buildModel } from "./model"
-import { genDts, GenDtsOptions } from "./generate"
+import { genDts } from "./generate"
 
-const defaultOptions: GenDtsOptions = {
-  includeTypes: true,
+const defaultOptions: Required<GenerateDtsOptions> = {
   includeVisitorInterface: true,
   visitorInterfaceName: "ICstNodeVisitor"
 }
 
 export function generateCstDts(
-  parser: BaseParser,
+  productions: Record<string, Rule>,
   options?: GenerateDtsOptions
 ): string {
-  const effectiveOptions: GenDtsOptions = {
+  const effectiveOptions = {
     ...defaultOptions,
     ...options
   }
 
-  const productions = parser.getGAstProductions()
   const model = buildModel(productions)
 
   return genDts(model, effectiveOptions)

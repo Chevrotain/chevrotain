@@ -11,7 +11,7 @@ import {
   Repetition,
   Rule,
   Terminal
-} from "../../../src/parse/grammar/gast/gast_public"
+} from "@chevrotain/gast"
 import keys from "lodash/keys"
 import { expect } from "chai"
 import { createToken } from "../../../src/scan/tokens_public"

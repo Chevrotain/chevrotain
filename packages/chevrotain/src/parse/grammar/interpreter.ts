@@ -9,7 +9,6 @@ import clone from "lodash/clone"
 import { first } from "./first"
 import { TokenMatcher } from "../parser/parser"
 import {
-  AbstractProduction,
   Alternation,
   Alternative,
   NonTerminal,
@@ -20,7 +19,7 @@ import {
   RepetitionWithSeparator,
   Rule,
   Terminal
-} from "./gast/gast_public"
+} from "@chevrotain/gast"
 import {
   IGrammarPath,
   IProduction,
@@ -65,7 +64,10 @@ export abstract class AbstractNextPossibleTokensWalker extends RestWalker {
     return this.possibleTokTypes
   }
 
-  walk(prod: AbstractProduction, prevRest: IProduction[] = []): void {
+  walk(
+    prod: { definition: IProduction[] },
+    prevRest: IProduction[] = []
+  ): void {
     // stop scanning once we found the path
     if (!this.found) {
       super.walk(prod, prevRest)

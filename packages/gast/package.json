@@ -1,7 +1,7 @@
 {
-  "name": "@chevrotain/cst-dts-gen",
+  "name": "@chevrotain/gast",
   "version": "9.1.0",
-  "description": "Generates type definitions for chevrotain CST nodes",
+  "description": "Grammar AST structure for Chevrotain Parsers",
   "keywords": [],
   "bugs": {
     "url": "https://github.com/Chevrotain/chevrotain/issues"
@@ -10,9 +10,10 @@
   "typings": "lib/src/api.d.ts",
   "main": "lib/src/api.js",
   "files": [
-    "lib/src/**/*.ts",
+    "api.d.ts",
     "lib/src/**/*.js",
-    "lib/src/**/*.js.map"
+    "lib/src/**/*.js.map",
+    "lib/src/**/*.d.ts"
   ],
   "repository": {
     "type": "git",
@@ -31,13 +32,10 @@
     "coverage": "nyc mocha"
   },
   "dependencies": {
-    "@chevrotain/types": "^9.1.0",
-    "@chevrotain/gast": "^9.1.0",
-    "lodash": "4.17.21"
+    "lodash": "4.17.21",
+    "@chevrotain/types": "^9.1.0"
   },
-  "devDependencies": {
-    "glob": "7.2.0"
-  },
+  "devDependencies": {},
   "publishConfig": {
     "access": "public"
   }

@@ -1,9 +1,7 @@
-import {
+import type {
   Alternation,
   Alternative,
-  GAstVisitor,
   IProduction,
-  NonTerminal,
   Option,
   Repetition,
   RepetitionMandatory,
@@ -12,7 +10,8 @@ import {
   Rule,
   Terminal,
   TokenType
-} from "chevrotain"
+} from "@chevrotain/types"
+import { NonTerminal, GAstVisitor } from "@chevrotain/gast"
 import map from "lodash/map"
 import flatten from "lodash/flatten"
 import values from "lodash/values"

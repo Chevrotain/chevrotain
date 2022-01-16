@@ -1,8 +1,12 @@
 import flatten from "lodash/flatten"
 import uniq from "lodash/uniq"
 import map from "lodash/map"
-import { AbstractProduction, NonTerminal, Terminal } from "./gast/gast_public"
-import { isBranchingProd, isOptionalProd, isSequenceProd } from "./gast/gast"
+import { NonTerminal, Terminal } from "@chevrotain/gast"
+import {
+  isBranchingProd,
+  isOptionalProd,
+  isSequenceProd
+} from "@chevrotain/gast"
 import { IProduction, TokenType } from "@chevrotain/types"
 
 export function first(prod: IProduction): TokenType[] {
@@ -20,15 +24,17 @@ export function first(prod: IProduction): TokenType[] {
   } else if (prod instanceof Terminal) {
     return firstForTerminal(<Terminal>prod)
   } else if (isSequenceProd(prod)) {
-    return firstForSequence(<AbstractProduction>prod)
+    return firstForSequence(prod)
   } else if (isBranchingProd(prod)) {
-    return firstForBranching(<AbstractProduction>prod)
+    return firstForBranching(prod)
   } else {
     throw Error("non exhaustive match")
   }
 }
 
-export function firstForSequence(prod: AbstractProduction): TokenType[] {
+export function firstForSequence(prod: {
+  definition: IProduction[]
+}): TokenType[] {
   let firstSet: TokenType[] = []
   const seq = prod.definition
   let nextSubProdIdx = 0
@@ -48,7 +54,9 @@ export function firstForSequence(prod: AbstractProduction): TokenType[] {
   return uniq(firstSet)
 }
 
-export function firstForBranching(prod: AbstractProduction): TokenType[] {
+export function firstForBranching(prod: {
+  definition: IProduction[]
+}): TokenType[] {
   const allAlternativesFirsts: TokenType[][] = map(
     prod.definition,
     (innerProd) => {

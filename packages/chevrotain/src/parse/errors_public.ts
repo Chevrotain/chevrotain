@@ -2,13 +2,8 @@ import { hasTokenLabel, tokenLabel } from "../scan/tokens_public"
 import first from "lodash/first"
 import map from "lodash/map"
 import reduce from "lodash/reduce"
-import {
-  Alternation,
-  NonTerminal,
-  Rule,
-  Terminal
-} from "./grammar/gast/gast_public"
-import { getProductionDslName } from "./grammar/gast/gast"
+import { Alternation, NonTerminal, Rule, Terminal } from "@chevrotain/gast"
+import { getProductionDslName } from "@chevrotain/gast"
 import {
   IParserErrorMessageProvider,
   IProductionWithOccurrence,

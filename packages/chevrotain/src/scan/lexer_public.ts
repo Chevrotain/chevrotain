@@ -902,7 +902,7 @@ export class Lexer {
   }
 
   // Place holder, will be replaced by the correct variant according to the hasCustom flag option at runtime.
-  private handlePayload(token: IToken, payload: any): void {}
+  private handlePayload: (token: IToken, payload: any) => void
 
   private handlePayloadNoCustom(token: IToken, payload: any): void {}
 

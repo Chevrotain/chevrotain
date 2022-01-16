@@ -4,7 +4,6 @@ import isString from "lodash/isString"
 import isRegExp from "lodash/isRegExp"
 import pickBy from "lodash/pickBy"
 import assign from "lodash/assign"
-import { tokenLabel } from "../../../scan/tokens_public"
 import {
   IGASTVisitor,
   IProduction,
@@ -12,6 +11,22 @@ import {
   ISerializedGast,
   TokenType
 } from "@chevrotain/types"
+
+// TODO: duplicated code to avoid extracting another sub-package -- how to avoid?
+function tokenLabel(tokType: TokenType): string {
+  if (hasTokenLabel(tokType)) {
+    return tokType.LABEL
+  } else {
+    return tokType.name
+  }
+}
+
+// TODO: duplicated code to avoid extracting another sub-package -- how to avoid?
+function hasTokenLabel(
+  obj: TokenType
+): obj is TokenType & Pick<Required<TokenType>, "LABEL"> {
+  return isString(obj.LABEL) && obj.LABEL !== ""
+}
 
 export abstract class AbstractProduction<T extends IProduction = IProduction>
   implements IProduction
@@ -37,9 +52,9 @@ export class NonTerminal
   extends AbstractProduction
   implements IProductionWithOccurrence
 {
-  public nonTerminalName: string
+  public nonTerminalName!: string
   public label?: string
-  public referencedRule: Rule
+  public referencedRule!: Rule
   public idx: number = 1
 
   constructor(options: {
@@ -73,7 +88,7 @@ export class NonTerminal
 }
 
 export class Rule extends AbstractProduction {
-  public name: string
+  public name!: string
   public orgText: string = ""
 
   constructor(options: {
@@ -148,7 +163,7 @@ export class RepetitionMandatoryWithSeparator
   extends AbstractProduction
   implements IProductionWithOccurrence
 {
-  public separator: TokenType
+  public separator!: TokenType
   public idx: number = 1
   public maxLookahead?: number
 
@@ -169,7 +184,7 @@ export class Repetition
   extends AbstractProduction
   implements IProductionWithOccurrence
 {
-  public separator: TokenType
+  public separator!: TokenType
   public idx: number = 1
   public maxLookahead?: number
 
@@ -190,7 +205,7 @@ export class RepetitionWithSeparator
   extends AbstractProduction
   implements IProductionWithOccurrence
 {
-  public separator: TokenType
+  public separator!: TokenType
   public idx: number = 1
   public maxLookahead?: number
 
@@ -239,7 +254,7 @@ export class Alternation
 }
 
 export class Terminal implements IProductionWithOccurrence {
-  public terminalType: TokenType
+  public terminalType!: TokenType
   public label?: string
   public idx: number = 1
 
