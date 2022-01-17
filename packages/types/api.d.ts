@@ -2572,7 +2572,7 @@ export declare function createSyntaxDiagramsCode(
  * It is the responsibility of the end-user to create the signatures files.
  *   - e.g: via `fs.writeFileSync()`
  *
- * See: https://chevrotain.io/docs/guide/concrete_syntax_tree.html##cst-typescript-signatures
+ * See: https://chevrotain.io/docs/guide/concrete_syntax_tree.html#cst-typescript-signatures
  */
 export declare function generateCstDts(
   productions: Record<string, Rule>,

@@ -465,7 +465,7 @@ It is not possible to return values from the visit methods because
 the default implementation does not return any value, only traverses the CST
 thus the chain of returned values will be broken.
 
-## Generating TypeScript Signatures(d.ts) for CST constructs.
+## CST TypeScript Signatures
 
 In the sections above we have seen that implementing a Chevrotain `CstParser` would also **implicitly** define
 several data structures and APIs:
