@@ -8,7 +8,7 @@ and at some point understand the implementation details may become necessary.
 #### TLDR
 
 Wrap any semantic actions that cause runtime errors during the recording phase
-or have global side effects with the [ACTION DSL method](https://chevrotain.io/documentation/9_1_0/classes/BaseParser.html#ACTION) to
+or have global side effects with the [ACTION DSL method](https://chevrotain.io/documentation/10_0_0/classes/BaseParser.html#ACTION) to
 resolve issues.
 
 ### The Problem
@@ -40,7 +40,7 @@ $.RULE("value", () => {
 
 Chevrotain solves the problem of "understanding" the grammar structure by running the Parser in a "Recording Mode"
 with **alternative implementations** of the parsing methods (OR/MANY/OPTION/...), the results of these "recordings" are saved
-on the Parser instance and are accessible via the [getGastProductions](https://chevrotain.io/documentation/9_1_0/classes/BaseParser.html#getGAstProductions)
+on the Parser instance and are accessible via the [getGastProductions](https://chevrotain.io/documentation/10_0_0/classes/BaseParser.html#getGAstProductions)
 method. However for this to work successfully there are a couple of implicit assumptions..
 
 ### Assumption 1 - The Parser won't throw errors during recording.
@@ -163,7 +163,7 @@ class JsonParser extends CstParser {
 #### The Solution
 
 The solution is to simply **avoid executing any code that could raise such exceptions during the recording phase**.
-This can be easily accomplished by wrapping the relevant semantic actions with the [ACTION DSL method](https://chevrotain.io/documentation/9_1_0/classes/BaseParser.html#ACTION)
+This can be easily accomplished by wrapping the relevant semantic actions with the [ACTION DSL method](https://chevrotain.io/documentation/10_0_0/classes/BaseParser.html#ACTION)
 for example lets resolve the two scenarios shown above:
 
 ```javascript
@@ -256,7 +256,7 @@ console.log(counter) // -> 1
 #### Solutions
 
 As before one of the solutions will be to wrap the relevant embedded semantic action using the
-[ACTION DSL method](https://chevrotain.io/documentation/9_1_0/classes/BaseParser.html#ACTION).
+[ACTION DSL method](https://chevrotain.io/documentation/10_0_0/classes/BaseParser.html#ACTION).
 This is normally most suitable for handling **global state** outside the Parser's instance.
 
 ```javascript
@@ -270,7 +270,7 @@ $.RULE("myRule", () => {
 ```
 
 Because we are dealing with state here there is another option which is to override the Parser's
-[reset method](https://chevrotain.io/documentation/9_1_0/classes/CstParser.html#reset).
+[reset method](https://chevrotain.io/documentation/10_0_0/classes/CstParser.html#reset).
 This is normally suitable for state that needs to be reset every time **new input** provided to the parser.
 
 ```javascript
@@ -302,4 +302,4 @@ Due to the execution of the Parser rules during the "recording phase".
 Some break points inside Chevrotain Parsers will be hit during the Parser's initialization.
 
 It is possible to workaround this issue by using **conditional breakpoints** that inspect that the
-[RECORDING_PHASE flag](https://chevrotain.io/documentation/9_1_0/classes/BaseParser.html#RECORDING_PHASE) is disabled.
+[RECORDING_PHASE flag](https://chevrotain.io/documentation/10_0_0/classes/BaseParser.html#RECORDING_PHASE) is disabled.
