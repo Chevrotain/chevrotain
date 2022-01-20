@@ -115,7 +115,7 @@ $.RULE("selectClause", () => {
   $.AT_LEAST_ONE_SEP({
     SEP: Comma,
     DEF: () => {
-      // accessing a token's string via getImage utility
+      // accessing a token's original text via the `image` property
       columns.push($.CONSUME(Identifier).image)
     }
   })

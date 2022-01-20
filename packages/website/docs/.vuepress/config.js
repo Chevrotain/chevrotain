@@ -64,7 +64,7 @@ module.exports = {
   },
   themeConfig: {
     repo: "chevrotain/chevrotain",
-    docsDir: "packages/chevrotain/docs",
+    docsDir: "packages/website/docs",
     docsBranch: "master",
     algolia: {
       apiKey: "3f49ee33a1bc4d674ff8c03ab99c3c1e",
