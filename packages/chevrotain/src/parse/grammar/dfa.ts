@@ -33,9 +33,19 @@ export class ATNConfigSet {
     return this.configs.length
   }
 
+  finalize(): void {
+    // Empties the map to free up memory
+    this.map = {}
+  }
+
   add(config: ATNConfig): void {
-    this.map[getATNConfigKey(config)] = this.configs.length
-    this.configs.push(config)
+    const key = getATNConfigKey(config)
+    // Only add configs which don't exist in our map already
+    // While this does not influence the actual algorithm, adding them anyway would massively increase memory consumption
+    if (!(key in this.map)) {
+      this.map[key] = this.configs.length
+      this.configs.push(config)
+    }
   }
 
   get(index: number): ATNConfig {
@@ -64,5 +74,7 @@ export class ATNConfigSet {
 }
 
 export function getATNConfigKey(config: ATNConfig) {
-	return `${config.state.stateNumber}_${config.alt}:${config.stack.map(e => e.stateNumber.toString()).join('_')}`;
+  return `${config.state.stateNumber}_${config.alt}:${config.stack
+    .map((e) => e.stateNumber.toString())
+    .join("_")}`
 }

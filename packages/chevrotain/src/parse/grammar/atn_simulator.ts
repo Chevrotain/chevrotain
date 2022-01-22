@@ -12,7 +12,14 @@ import {
   RuleTransition,
   Transition
 } from "./atn"
-import { ATNConfig, ATNConfigSet, DFA, DFAState, DFA_ERROR, getATNConfigKey } from "./dfa"
+import {
+  ATNConfig,
+  ATNConfigSet,
+  DFA,
+  DFAState,
+  DFA_ERROR,
+  getATNConfigKey
+} from "./dfa"
 import min from "lodash/min"
 import map from "lodash/map"
 
@@ -188,7 +195,7 @@ export class ATNSimulator {
         const target = this.getReachableTarget(transition, token)
         if (target !== undefined) {
           intermediate.add({
-            state: target.state,
+            state: target,
             alt: c.alt,
             stack: c.stack
           })
@@ -226,15 +233,12 @@ export class ATNSimulator {
   getReachableTarget(
     transition: Transition,
     token: IToken
-  ): { state: ATNState; type: TokenType } | undefined {
+  ): ATNState | undefined {
     if (
       transition instanceof AtomTransition &&
       tokenStructuredMatcher(token, transition.tokenType)
     ) {
-      return {
-        state: transition.target,
-        type: transition.tokenType
-      }
+      return transition.target
     }
     return undefined
   }
@@ -303,6 +307,7 @@ export class ATNSimulator {
     if (existing !== undefined) {
       return existing
     }
+    state.configs.finalize()
     dfa.states[mapKey] = state
     return state
   }
