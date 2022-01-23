@@ -38,7 +38,11 @@ export type PropertyTypeDefinition = {
   optional: boolean
 }
 
-export type PropertyArrayType = TokenArrayType | RuleArrayType
+export type PropertyArrayType =
+  | TokenArrayType
+  | RuleArrayType
+  | (TokenArrayType | RuleArrayType)[]
+
 export type TokenArrayType = { kind: "token" }
 export type RuleArrayType = {
   kind: "rule"
@@ -52,9 +56,19 @@ class CstNodeDefinitionGenerator extends GAstVisitor {
     const grouped = groupBy(rawElements, (el) => el.propertyName)
     const properties = map(grouped, (group, propertyName) => {
       const allNullable = !some(group, (el) => !el.canBeNull)
+
+      // In an alternation with a label a property name can have
+      // multiple types.
+      let type: PropertyArrayType = group[0].type
+      if (group.length > 1) {
+        type = map(group, (g) => {
+          return g.type
+        })
+      }
+
       return {
         name: propertyName,
-        type: group[0].type,
+        type,
         optional: allNullable
       } as PropertyTypeDefinition
     })
@@ -148,12 +162,12 @@ class CstNodeDefinitionGenerator extends GAstVisitor {
 type PropertyTupleElement = {
   propertyName: string
   canBeNull: boolean
-  type: PropertyArrayType
+  type: TokenArrayType | RuleArrayType
 }
 
 function getType(
   production: Terminal | NonTerminal | TokenType
-): PropertyArrayType {
+): TokenArrayType | RuleArrayType {
   if (production instanceof NonTerminal) {
     return {
       kind: "rule",

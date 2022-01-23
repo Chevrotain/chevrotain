@@ -1,11 +1,16 @@
 import flatten from "lodash/flatten"
+import isArray from "lodash/isArray"
 import map from "lodash/map"
+import reduce from "lodash/reduce"
+import uniq from "lodash/uniq"
 import upperFirst from "lodash/upperFirst"
 import { GenerateDtsOptions } from "@chevrotain/types"
 import {
   CstNodeTypeDefinition,
   PropertyTypeDefinition,
-  PropertyArrayType
+  PropertyArrayType,
+  TokenArrayType,
+  RuleArrayType
 } from "./model"
 
 export function genDts(
@@ -57,7 +62,7 @@ function genNodeChildrenType(node: CstNodeTypeDefinition) {
 }
 
 function genChildProperty(prop: PropertyTypeDefinition) {
-  const typeName = getTypeString(prop.type)
+  const typeName = buildTypeString(prop.type)
   return `${prop.name}${prop.optional ? "?" : ""}: ${typeName}[];`
 }
 
@@ -72,7 +77,17 @@ function genVisitorFunction(node: CstNodeTypeDefinition) {
   return `${node.name}(children: ${childrenTypeName}, param?: IN): OUT;`
 }
 
-function getTypeString(type: PropertyArrayType) {
+function buildTypeString(type: PropertyArrayType) {
+  if (isArray(type)) {
+    const typeNames = uniq(map(type, (t) => getTypeString(t)))
+    const typeString = reduce(typeNames, (sum, t) => sum + " | " + t)
+    return "(" + typeString + ")"
+  } else {
+    return getTypeString(type)
+  }
+}
+
+function getTypeString(type: TokenArrayType | RuleArrayType) {
   if (type.kind === "token") {
     return "IToken"
   }
