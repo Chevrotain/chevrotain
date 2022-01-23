@@ -34,7 +34,7 @@ function. But with a small constraint.
 - A custom pattern should behave as though the RegExp [sticky flag](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/sticky) has been set.
   This means that attempted matches must begin at the offset argument, **not** at the start of the input.
 
-The basic syntax for supplying a custom pattern is defined by the [ICustomPattern](https://chevrotain.io/documentation/10_0_0/interfaces/icustompattern.html) interface.
+The basic syntax for supplying a custom pattern is defined by the [ICustomPattern](https://chevrotain.io/documentation/10_0_0/interfaces/ICustomPattern.html) interface.
 Example:
 
 ```javascript
