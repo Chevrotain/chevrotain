@@ -61,9 +61,7 @@ class CstNodeDefinitionGenerator extends GAstVisitor {
       // multiple types.
       let type: PropertyArrayType = group[0].type
       if (group.length > 1) {
-        type = map(group, (g) => {
-          return g.type
-        })
+        type = map(group, (g) => g.type)
       }
 
       return {
