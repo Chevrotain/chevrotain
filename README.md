@@ -53,7 +53,7 @@ as any other pure code without requiring any new tools or processes.
 
 - **[HTML API docs](https://chevrotain.io/documentation).**
 
-  - [The Parsing DSL Docs](https://chevrotain.io/documentation/8_0_1/classes/parser.html#at_least_one).
+  - [The Parsing DSL Docs](https://chevrotain.io/documentation/10_0_0/classes/BaseParser.html#AT_LEAST_ONE).
 
 ## Compatibility
 
