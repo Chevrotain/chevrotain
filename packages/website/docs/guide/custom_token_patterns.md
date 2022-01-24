@@ -155,4 +155,4 @@ Note:
   - Capturing groups from a regExp exec method's results.
   - The "groups" property of an regExp exec method's result (If [Named Capturing Groups are used](https://github.com/tc39/proposal-regexp-named-groups)).
 
-Additional examples can be found [here](See: [**Runnable example for custom payloads**](https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/custom_patterns/custom_patterns_payloads.js)).
+Additional examples can be found here: [**Runnable example for custom payloads**](https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/custom_patterns/custom_patterns_payloads.js).
