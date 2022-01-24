@@ -59,14 +59,14 @@ class CstNodeDefinitionGenerator extends GAstVisitor {
 
       // In an alternation with a label a property name can have
       // multiple types.
-      let type: PropertyArrayType = group[0].type
+      let propertyType: PropertyArrayType = group[0].type
       if (group.length > 1) {
-        type = map(group, (g) => g.type)
+        propertyType = map(group, (g) => g.type)
       }
 
       return {
         name: propertyName,
-        type,
+        type: propertyType,
         optional: allNullable
       } as PropertyTypeDefinition
     })
