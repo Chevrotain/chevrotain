@@ -8,7 +8,7 @@
 
 - [Generating TypeScript Signatures(d.ts) for CST constructs.](https://chevrotain.io/docs/guide/concrete_syntax_tree.html#cst-typescript-signatures)
   - See [relevant documentation](https://chevrotain.io/docs/guide/concrete_syntax_tree.html#cst-typescript-signatures)
-  - Thanks to [@mbett7](https://github.com/mbett7) :thumbsup
+  - Thanks to [@mbett7](https://github.com/mbett7) :thumbsup:
 - [refactor(utils): replace internal utils with lodash](https://github.com/Chevrotain/chevrotain/pull/1694)
   - This adds a new **3rd party** dependency (lodash).
   - This was done to reduce the amount of code being maintained, but at the cost of increased bundle size,
@@ -23,7 +23,7 @@
 #### Minor Changes
 
 - [Support multiple longer_alt tokens](https://github.com/Chevrotain/chevrotain/issues/1602)
-  - Thanks to [@msujew](https://github.com/msujew) :thumbsup
+  - Thanks to [@msujew](https://github.com/msujew) :thumbsup:
 
 ## 9.0.2 (6-13-2021)
 
