@@ -842,6 +842,12 @@ declare abstract class BaseParser {
   protected canTokenTypeBeInsertedInRecovery(tokType: TokenType): boolean
 
   /**
+   * By default all token types may be deleted. This behavior may be overridden in inheriting parsers.
+   * The method receives the expected token type.
+   */
+  protected canTokenTypeBeDeletedInRecovery(tokType: TokenType): boolean
+
+  /**
    * @deprecated - will be removed in the future
    */
   protected getNextPossibleTokenTypes(
