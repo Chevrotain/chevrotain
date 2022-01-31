@@ -275,7 +275,7 @@ export class Recoverable {
     let nextToken = this.LA(1)
     let k = 2
     while (true) {
-      const foundMatch = allPossibleReSyncTokTypes.find((resyncTokType) => {
+      const foundMatch = find(allPossibleReSyncTokTypes, (resyncTokType) => {
         const canMatch = tokenMatcher(nextToken, resyncTokType)
         return canMatch
       })
