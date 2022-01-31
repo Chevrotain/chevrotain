@@ -1,4 +1,8 @@
-import { createTokenInstance, EOF } from "../../../scan/tokens_public"
+import {
+  createTokenInstance,
+  EOF,
+  tokenMatcher
+} from "../../../scan/tokens_public"
 import {
   AbstractNextTerminalAfterProductionWalker,
   IFirstAfterRepetition
@@ -271,9 +275,12 @@ export class Recoverable {
     let nextToken = this.LA(1)
     let k = 2
     while (true) {
-      const nextTokenType: any = nextToken.tokenType
-      if (includes(allPossibleReSyncTokTypes, nextTokenType)) {
-        return nextTokenType
+      const foundMatch = find(allPossibleReSyncTokTypes, (resyncTokType) => {
+        const canMatch = tokenMatcher(nextToken, resyncTokType)
+        return canMatch
+      })
+      if (foundMatch !== undefined) {
+        return foundMatch
       }
       nextToken = this.LA(k)
       k++
