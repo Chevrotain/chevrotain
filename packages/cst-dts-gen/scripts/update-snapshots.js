@@ -11,7 +11,7 @@ const inputFiles = glob.sync("../lib/test/snapshots/**/input.js", {
 
 for (const inputFile of inputFiles) {
   const parser = require(inputFile).parser
-  const result = api.generateCstDts(parser)
+  const result = api.generateCstDts(parser.getGAstProductions())
 
   const libSnapshotDir = path.dirname(inputFile)
   const expectedOutputPath =
