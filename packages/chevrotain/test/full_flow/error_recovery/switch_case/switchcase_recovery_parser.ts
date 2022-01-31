@@ -89,6 +89,15 @@ export class SwitchCaseRecoveryParser extends EmbeddedActionsParser {
     )
   }
 
+  // a property with which the single token deletion recovery can be explicitly disabled for testing purposes
+  public singleTokenDeletionEnabled = true
+
+  // DOCS: overriding this method allows us to customize the logic for which tokens may not be automatically deleted
+  // during error recovery.
+  public canTokenTypeBeDeletedInRecovery(tokType: TokenType) {
+    return this.singleTokenDeletionEnabled
+  }
+
   public parseSwitchStmt(): RetType {
     // house keeping so the invalid property names will not be dependent on
     // previous grammar rule invocations.
