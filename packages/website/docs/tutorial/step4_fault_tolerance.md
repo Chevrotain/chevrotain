@@ -85,6 +85,10 @@ If we try parsing the "bad" example, after consuming:
 
 Therefore the redundant right brackets "}" will be skipped (deleted) and the parser will consume the number token.
 
+This heuristic's behavior can be customized by the following method:
+
+- [canTokenTypeBeDeletedInRecovery](https://chevrotain.io/documentation/10_0_0/classes/CstParser.html#canTokenTypeBeDeletedInRecovery)
+
 ## Re-Sync Recovery
 
 The following re-sync recovery examples use this sample json like grammar:

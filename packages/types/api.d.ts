@@ -843,7 +843,7 @@ declare abstract class BaseParser {
 
   /**
    * By default all token types may be deleted. This behavior may be overridden in inheriting parsers.
-   * The method receives the expected token type.
+   * The method receives the expected token type. The token that would be deleted can be received with {@link LA|LA(1)}.
    */
   protected canTokenTypeBeDeletedInRecovery(tokType: TokenType): boolean
 
