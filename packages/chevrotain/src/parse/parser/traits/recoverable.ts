@@ -82,7 +82,7 @@ export class Recoverable {
     return true
   }
 
-  public canTokenTypeBeDeletedInRecovery(tokType: TokenType) {
+  public canTokenTypeBeDeletedInRecovery(tokType: TokenType): boolean {
     return true
   }
 
