@@ -301,7 +301,6 @@ describe("Error Recovery switch-case Example", () => {
     parser.singleTokenDeletionEnabled = false
 
     const parseResult = parser.switchStmt()
-    console.log(parser.errors)
     expect(parser.errors.length).to.equal(1)
     expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException)
     expect(parseResult).to.deep.equal({ invalid1: undefined })
