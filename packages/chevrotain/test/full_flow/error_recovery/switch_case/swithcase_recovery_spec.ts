@@ -259,25 +259,11 @@ describe("Error Recovery switch-case Example", () => {
       // case "Terry" : return 2;
       createRegularToken(CaseTok),
       createRegularToken(StringTok, "Terry"),
+      createRegularToken(ColonTok), // <-- the redundant token to be deleted
       createRegularToken(ColonTok),
       createRegularToken(ReturnTok),
       createRegularToken(IntTok, "2"),
       createRegularToken(SemiColonTok),
-      // case "Robert" : return 4;
-      createRegularToken(CaseTok),
-      createRegularToken(StringTok, "Robert"),
-      createRegularToken(ColonTok),
-      createRegularToken(ReturnTok),
-      createRegularToken(IntTok, "4"),
-      createRegularToken(SemiColonTok),
-      // case "Brandon" : return 6;
-      createRegularToken(CaseTok),
-      createRegularToken(StringTok, "Brandon"),
-      createRegularToken(ColonTok),
-      createRegularToken(ReturnTok),
-      createRegularToken(IntTok, "6"),
-      createRegularToken(SemiColonTok),
-      createRegularToken(SemiColonTok), // <-- the redundant token to be deleted
       createRegularToken(RCurlyTok)
     ]
 
@@ -286,11 +272,38 @@ describe("Error Recovery switch-case Example", () => {
 
     const parseResult = parser.switchStmt()
     expect(parser.errors.length).to.equal(1)
-    expect(parseResult).to.deep.equal({
-      Terry: 2,
-      Robert: 4,
-      Brandon: 6
-    })
+    expect(parseResult).to.deep.equal({ Terry: 2 })
+  })
+
+  it("can disable single token deletion recovery", () => {
+    const input = [
+      // switch (name) {
+      createRegularToken(SwitchTok),
+      createRegularToken(LParenTok),
+      createRegularToken(IdentTok, "name"),
+      createRegularToken(RParenTok),
+      createRegularToken(LCurlyTok),
+      // case "Terry" : return 2;
+      createRegularToken(CaseTok),
+      createRegularToken(StringTok, "Terry"),
+      createRegularToken(ColonTok), // <-- the redundant token
+      createRegularToken(ColonTok),
+      createRegularToken(ReturnTok),
+      createRegularToken(IntTok, "2"),
+      createRegularToken(SemiColonTok),
+      createRegularToken(RCurlyTok)
+    ]
+
+    const parser = new SwitchCaseRecoveryParser()
+    parser.input = input
+
+    // disable the single token deletion recovery explicitly
+    parser.singleTokenDeletionEnabled = false
+
+    const parseResult = parser.switchStmt()
+    expect(parser.errors.length).to.equal(1)
+    expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException)
+    expect(parseResult).to.deep.equal({ invalid1: undefined })
   })
 
   it("will perform single token insertion for a missing colon", () => {

@@ -86,6 +86,10 @@ export class Recoverable {
     return true
   }
 
+  public canTokenTypeBeDeletedInRecovery(tokType: TokenType): boolean {
+    return true
+  }
+
   tryInRepetitionRecovery(
     this: MixedInParser,
     grammarRule: Function,
@@ -253,6 +257,10 @@ export class Recoverable {
     this: MixedInParser,
     expectedTokType: TokenType
   ): boolean {
+    if (!this.canTokenTypeBeDeletedInRecovery(expectedTokType)) {
+      return false
+    }
+
     const isNextTokenWhatIsExpected = this.tokenMatcher(
       this.LA(2),
       expectedTokType
