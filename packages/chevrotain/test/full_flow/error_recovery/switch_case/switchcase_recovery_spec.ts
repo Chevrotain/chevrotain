@@ -11,7 +11,7 @@ import {
   IntTok,
   RCurlyTok,
   SemiColonTok
-} from "./Switchcase_recovery_tokens"
+} from "./switchcase_recovery_tokens"
 import { SwitchCaseRecoveryParser } from "./switchcase_recovery_parser"
 import {
   EarlyExitException,

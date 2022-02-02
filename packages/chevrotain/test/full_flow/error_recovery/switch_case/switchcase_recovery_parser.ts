@@ -29,7 +29,7 @@
  */
 
 import { EmbeddedActionsParser } from "../../../../src/parse/parser/traits/parser_traits"
-import * as allTokens from "./Switchcase_recovery_tokens"
+import * as allTokens from "./switchcase_recovery_tokens"
 import {
   CaseTok,
   ColonTok,
@@ -43,7 +43,7 @@ import {
   SemiColonTok,
   StringTok,
   SwitchTok
-} from "./Switchcase_recovery_tokens"
+} from "./switchcase_recovery_tokens"
 import assign from "lodash/assign"
 import includes from "lodash/includes"
 import { IToken, TokenType } from "@chevrotain/types"
