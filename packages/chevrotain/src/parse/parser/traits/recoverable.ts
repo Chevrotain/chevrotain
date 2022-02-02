@@ -82,7 +82,7 @@ export class Recoverable {
     return tokToInsert
   }
 
-  public canTokenTypeBeInsertedInRecovery(tokType: TokenType) {
+  public canTokenTypeBeInsertedInRecovery(tokType: TokenType): boolean {
     return true
   }
 
