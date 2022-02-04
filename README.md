@@ -70,28 +70,28 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
 ## Where used
 
-Some interesting samples:
+A small curated list:
 
-- [Prettier Java Plugin Parser][sample_prettier_java]
-- [JHipster Domain Language][sample_jhipster]
-- [Metabase BI expression Parser][sample_metabase].
-- [Three.js VRML Parser][sample_threejs]
-- [Argdown Parser][sample_argdown]
-- [Stardog Union Parsers (GraphQL/SPARQL/and more...)][sample_stardog]
-- [Bombadil Toml Parser][sample_bombadil]
-- [Eve Interactive Programing Language Parser][sample_eve].
-- [BioModelAnalyzer's ChatBot Parser][sample_biomodel].
+1. [HyperFormula](https://github.com/handsontable/hyperformula)
 
-[benchmark]: https://chevrotain.io/performance/
-[sample_metabase]: https://github.com/metabase/metabase/blob/136dfb17954f4e4302b3bf2fee99ff7b7b12fd7c/frontend/src/metabase/lib/expressions/parser.js
-[sample_jhipster]: https://github.com/jhipster/jhipster-core/blob/master/lib/dsl/jdl_parser.js
-[sample_eve]: https://github.com/witheve/Eve/blob/master/src/parser/parser.ts
-[sample_biomodel]: https://github.com/Microsoft/BioModelAnalyzer/blob/master/ChatBot/src/NLParser/NLParser.ts
-[sample_bombadil]: https://github.com/sgarciac/bombadil/blob/master/src/parser.ts
-[sample_argdown]: https://github.com/christianvoigt/argdown/blob/master/packages/argdown-core/src/parser.ts
-[sample_threejs]: https://github.com/mrdoob/three.js/blob/dev/examples/js/loaders/VRMLLoader.js
-[sample_prettier_java]: https://github.com/jhipster/prettier-java/tree/master/packages/java-parser/src/productions
-[sample_stardog]: https://github.com/stardog-union/millan/tree/master/src
-[languages]: https://github.com/chevrotain/chevrotain/tree/master/examples/implementation_languages
-[backtracking]: https://github.com/chevrotain/chevrotain/blob/master/examples/parser/backtracking/backtracking.js
-[custom_apis]: https://chevrotain.io/docs/guide/custom_apis.html
+   - HyperFormula is an open source, spreadsheet-like calculation engine
+   - [source](https://github.com/handsontable/hyperformula/blob/5749f9ce57a3006109ccadc4a2e7d064c846ff78/src/parser/FormulaParser.ts)
+
+2. [Langium](https://github.com/langium/langium)
+
+   - Langium is a language engineering tool with built-in support for the Language Server Protocol.
+
+3. [Prettier-Java](https://github.com/jhipster/prettier-java)
+
+   - A Prettier Plugin for Java
+   - [source](https://github.com/jhipster/prettier-java/tree/main/packages/java-parser)
+
+4. [JHipster Domain Language](https://www.jhipster.tech/jdl/intro)
+
+   - The JDL is a JHipster-specific domain language where you can describe all your applications, deployments, entities
+     and their relationships in a single file (or more than one) with a user-friendly syntax.
+   - [source](https://github.com/jhipster/generator-jhipster/tree/main/jdl/parsing)
+
+5. [Argdown](https://github.com/christianvoigt/argdown)
+   - Argdown is a simple syntax for analyzing complex argumentation.
+   - [source](https://github.com/christianvoigt/argdown/blob/master/packages/argdown-core/src/parser.ts)
