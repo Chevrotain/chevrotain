@@ -1618,17 +1618,29 @@ interface ICustomPattern {
 export interface IToken {
   /** The textual representation of the Token as it appeared in the text. */
   image: string
-  /** Offset of the first character of the Token. */
+  /** Offset of the first character of the Token. 0-indexed. */
   startOffset: number
-  /** Line of the first character of the Token. */
+  /** Line of the first character of the Token. 1-indexed. */
   startLine?: number
-  /** Column of the first character of the Token. */
+  /**
+   * Column of the first character of the Token. 1-indexed.
+   *
+   * For token foo in the following line, startColumn will be 3 and endColumn will be 5.
+   * ```
+   * a foo
+   * 123456
+   * ```
+   */
   startColumn?: number
-  /** Offset of the last character of the Token. */
+  /**
+   * Offset of the last character of the Token. 0-indexed.
+   * Note that this points at the last character, not the end of the token, so the original image would be
+   * `input.substring(token.startOffset, token.endOffset + 1)`.
+   */
   endOffset?: number
-  /** Line of the last character of the Token. */
+  /** Line of the last character of the Token. 1-indexed. Will be the same as startLine for single-line tokens.*/
   endLine?: number
-  /** Column of the last character of the Token. */
+  /** Column of the last character of the Token. 1-indexed. See also startColumn. */
   endColumn?: number
   /** this marks if a Token does not really exist and has been inserted "artificially" during parsing in rule error recovery. */
   isInsertedInRecovery?: boolean
