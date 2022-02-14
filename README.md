@@ -9,7 +9,7 @@
 
 ## Introduction
 
-Chevrotain is a [**blazing fast**][https://chevrotain.io/performance/] and [**feature rich**](http://chevrotain.io/docs/features/blazing_fast.html) **Parser Building Toolkit** for **JavaScript**.
+Chevrotain is a [**blazing fast**](https://chevrotain.io/performance/) and [**feature rich**](http://chevrotain.io/docs/features/blazing_fast.html) **Parser Building Toolkit** for **JavaScript**.
 It can be used to build parsers/compilers/interpreters for various use cases ranging from simple configuration files,
 to full-fledged programing languages.
 
@@ -22,7 +22,7 @@ as any other pure code without requiring any new tools or processes.
 
 - [**Online Playground**](https://chevrotain.io/playground/)
 - **[Getting Started Tutorial](https://chevrotain.io/docs/tutorial/step0_introduction.html)**
-- [**Performance benchmark**][https://chevrotain.io/performance/]
+- [**Performance benchmark**](https://chevrotain.io/performance/)
 
 ## Installation
 
