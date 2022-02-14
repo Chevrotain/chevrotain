@@ -20,6 +20,6 @@
     "gitty": "3.7.2",
     "jsonfile": "6.1.0",
     "lodash": "4.17.21",
-    "vuepress": "1.9.5"
+    "vuepress": "1.9.7"
   }
 }
