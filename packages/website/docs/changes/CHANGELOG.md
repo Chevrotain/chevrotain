@@ -1,3 +1,26 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+- [customizing automatic token deletion recovery by exposing `canRecoverWithSingleTokenDeletion` API](https://github.com/Chevrotain/chevrotain/issues/1753)
+  - Thanks to [@medihack](https://github.com/medihack) :thumbsup:
+
+#### Bug Fixes
+
+- [Wrong CST d.ts type generation with same label for different alternatives](https://github.com/Chevrotain/chevrotain/issues/1745)
+  - Thanks to [@medihack](https://github.com/medihack) :thumbsup:
+
+- [Recovery Re-Sync logic ignores Token Categories](https://github.com/Chevrotain/chevrotain/issues/1055)
+  - Thanks to [@medihack](https://github.com/medihack) :thumbsup:
+  
+#### Documentation
+
+- [various fixes to broken links in docs](https://github.com/Chevrotain/chevrotain/commits?author=kevinkhill&since=2022-01-24&until=2022-01-24)
+  - Thanks to [@kevinkhill](https://github.com/kevinkhill) :thumbsup:
+- [Update the "where used" list ](https://github.com/Chevrotain/chevrotain/issues/1711)
+- [additional description on token location attributes](https://github.com/Chevrotain/chevrotain/pull/1762)
+  - Thanks to [@NaridaL](https://github.com/NaridaL) :thumbsup:
+
 ## 10.0.0 (1-17-2022)
 
 #### Breaking Changes
