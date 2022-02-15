@@ -8,11 +8,12 @@
 #### Bug Fixes
 
 - [Wrong CST d.ts type generation with same label for different alternatives](https://github.com/Chevrotain/chevrotain/issues/1745)
+
   - Thanks to [@medihack](https://github.com/medihack) :thumbsup:
 
 - [Recovery Re-Sync logic ignores Token Categories](https://github.com/Chevrotain/chevrotain/issues/1055)
   - Thanks to [@medihack](https://github.com/medihack) :thumbsup:
-  
+
 #### Documentation
 
 - [various fixes to broken links in docs](https://github.com/Chevrotain/chevrotain/commits?author=kevinkhill&since=2022-01-24&until=2022-01-24)
