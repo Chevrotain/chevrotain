@@ -5,7 +5,7 @@ const path = require("path")
 const versionPath = path.join(__dirname, "../src/version.ts")
 const packagePath = path.join(__dirname, "../package.json")
 
-const mainReadmePath = path.join(__dirname, "../../../readme.md")
+const mainReadmePath = path.join(__dirname, "../../../README.md")
 
 const pkgJson = jf.readFileSync(packagePath)
 const apiString = fs.readFileSync(versionPath, "utf8").toString()
