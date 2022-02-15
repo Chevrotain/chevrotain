@@ -8,7 +8,7 @@
     ]
   },
   "scripts": {
-    "lerna:version": "yarn && lerna version",
+    "lerna:version": "yarn && lerna version --force-publish",
     "lerna:publish": "lerna publish from-git --yes --no-verify-access",
     "ci": "npm-run-all format:validate lint:validate build test",
     "compile": "lerna run clean && tsc --build",
