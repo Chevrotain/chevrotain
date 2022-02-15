@@ -1,6 +1,6 @@
 {
   "name": "@chevrotain/website",
-  "version": "10.0.0",
+  "version": "10.1.0",
   "private": true,
   "description": "source Code for https://chevrotain.io/docs/",
   "license": "Apache-2.0",
