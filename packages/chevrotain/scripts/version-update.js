@@ -2,7 +2,7 @@ const config = require("./version-config")
 const git = require("gitty")
 const fs = require("fs")
 
-const myRepo = git("")
+const myRepo = git("../../")
 
 const newVersion = config.currVersion
 const oldVersion = require("../lib/src/version").VERSION
