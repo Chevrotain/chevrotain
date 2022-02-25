@@ -29,7 +29,7 @@ import {
   IProductionWithOccurrence,
   TokenType
 } from "@chevrotain/types"
-import { ATNSimulator } from "./atn_simulator"
+import { ATNSimulator, PredicateSet } from "./atn_simulator"
 
 export enum PROD_TYPE {
   OPTION,
@@ -58,6 +58,8 @@ export function getProdType(prod: IProduction): PROD_TYPE {
     throw Error("non exhaustive match")
   }
 }
+
+const EMPTY_PREDICATES = new PredicateSet()
 
 export function buildDFALookaheadFuncForOr(
   atnSimulator: ATNSimulator,
@@ -108,9 +110,23 @@ export function buildDFALookaheadFuncForOr(
         return choiceToAlt[nextToken.tokenTypeIdx]
       }
     }
+  } else if (hasPredicates) {
+    const length = alternation.definition.length
+    return function (orAlts) {
+      if (orAlts) {
+        const predicates = new PredicateSet()
+        for (let i = 0; i < length; i++) {
+          const gate = orAlts[i].GATE
+          predicates.set(i, gate === undefined || gate.call(this))
+        }
+        return atnSimulator.adaptivePredict(decisionIndex, predicates)
+      } else {
+        return atnSimulator.adaptivePredict(decisionIndex, EMPTY_PREDICATES)
+      }
+    }
   } else {
     return function () {
-      return atnSimulator.adaptivePredict(decisionIndex, hasPredicates)
+      return atnSimulator.adaptivePredict(decisionIndex, EMPTY_PREDICATES)
     }
   }
 }
@@ -130,12 +146,6 @@ export function buildDFALookaheadFuncForOptionalProd(
       return map(e, (g) => g[0])
     }
   )
-
-  // const lookAheadPaths = getLookaheadPathsForOr(
-  //   occurrence,
-  //   ruleGrammar,
-  //   1
-  // )
 
   if (isLL1Sequence(alts) && !dynamicTokensEnabled) {
     const alt = alts[0]
@@ -173,7 +183,7 @@ export function buildDFALookaheadFuncForOptionalProd(
     }
   }
   return function () {
-    return atnSimulator.adaptivePredict(decisionIndex, false) === 0
+    return atnSimulator.adaptivePredict(decisionIndex, EMPTY_PREDICATES) === 0
   }
 }
 
