@@ -9,45 +9,91 @@ import {
   AtomTransition,
   DecisionState,
   EpsilonTransition,
-  PredicateTransition,
   RuleTransition,
   Transition
 } from "./atn"
-import { ATNConfig, ATNConfigSet, DFA, DFAState, DFA_ERROR } from "./dfa"
+import {
+  ATNConfig,
+  ATNConfigSet,
+  DFA,
+  DFAState,
+  DFA_ERROR,
+  getATNConfigKey
+} from "./dfa"
 import min from "lodash/min"
 import map from "lodash/map"
-import { Predicate } from "../parser/parser"
-import every from "lodash/every"
 
 export function createATNSimulator(
   parser: MixedInParser,
   atn: ATN
 ): ATNSimulator {
   const decisionLength = atn.decisionStates.length
-  const decisionToDFA: DFA[] = Array(decisionLength)
+  const decisionToDFA: DFACache[] = Array(decisionLength)
   for (let i = 0; i < decisionLength; i++) {
-    decisionToDFA[i] = {
-      atnStartState: atn.decisionStates[i],
-      decision: i,
-      states: new Map()
-    }
+    decisionToDFA[i] = createDFACache(atn.decisionStates[i], i)
   }
   return new ATNSimulator(parser, atn, decisionToDFA)
+}
+
+export class PredicateSet {
+  private predicates: boolean[] = []
+
+  get size(): number {
+    return this.predicates.length
+  }
+
+  is(index: number): boolean {
+    return index >= this.predicates.length || this.predicates[index]
+  }
+
+  set(index: number, value: boolean) {
+    this.predicates[index] = value
+  }
+
+  toString(): string {
+    let value = ""
+    const size = this.predicates.length
+    for (let i = 0; i < size; i++) {
+      value += this.predicates[i] === true ? "1" : "0"
+    }
+    return value
+  }
+}
+
+export type DFACache = (predicateSet: PredicateSet) => DFA
+
+function createDFACache(startState: DecisionState, decision: number): DFACache {
+  const map: Record<string, DFA | undefined> = {}
+  return (predicateSet) => {
+    const key = predicateSet.toString()
+    let existing = map[key]
+    if (existing !== undefined) {
+      return existing
+    } else {
+      existing = {
+        atnStartState: startState,
+        decision,
+        states: {}
+      }
+      map[key] = existing
+      return existing
+    }
+  }
 }
 
 export class ATNSimulator {
   parser: MixedInParser
   atn: ATN
-  decisionToDFA: DFA[]
+  decisionToDFA: DFACache[]
 
-  constructor(parser: MixedInParser, atn: ATN, decisionToDFA: DFA[]) {
+  constructor(parser: MixedInParser, atn: ATN, decisionToDFA: DFACache[]) {
     this.parser = parser
     this.atn = atn
     this.decisionToDFA = decisionToDFA
   }
 
-  adaptivePredict(decision: number, hasPredicates: boolean) {
-    const dfa = this.decisionToDFA[decision]
+  adaptivePredict(decision: number, predicateSet: PredicateSet) {
+    const dfa = this.decisionToDFA[decision](predicateSet)
     let start = dfa.start
     if (start === undefined) {
       const closure = this.computeStartState(dfa.atnStartState as ATNState)
@@ -55,11 +101,15 @@ export class ATNSimulator {
       dfa.start = start
     }
 
-    const alt = this.execATN(dfa, start, hasPredicates)
+    const alt = this.execATN(dfa, start, predicateSet)
     return alt
   }
 
-  execATN(dfa: DFA, s0: DFAState, hasPredicates: boolean): number | undefined {
+  execATN(
+    dfa: DFA,
+    s0: DFAState,
+    predicateSet: PredicateSet
+  ): number | undefined {
     let previousD = s0
 
     let i = 1
@@ -68,7 +118,7 @@ export class ATNSimulator {
     while (true) {
       let d = this.getExistingTargetState(previousD, t)
       if (d === undefined) {
-        d = this.computeTargetState(dfa, previousD, t, hasPredicates)
+        d = this.computeTargetState(dfa, previousD, t, predicateSet)
       }
 
       if (d === DFA_ERROR) {
@@ -76,10 +126,7 @@ export class ATNSimulator {
       }
 
       if (d.isAcceptState === true) {
-        if (d.predicates === undefined) {
-          return d.prediction
-        }
-        return this.evaluatePredicates(d.predicates)
+        return d.prediction
       } else if (t.tokenType === EOF) {
         // If EOF does not result in an accepting state
         // return undefined which will result in a NoViableAltException
@@ -99,16 +146,16 @@ export class ATNSimulator {
     dfa: DFA,
     previousD: DFAState,
     token: IToken,
-    hasPredicates: boolean
+    predicateSet: PredicateSet
   ): DFAState {
-    const reach = this.computeReachSet(previousD.configs, token)
+    const reach = this.computeReachSet(previousD.configs, token, predicateSet)
     if (reach.size === 0) {
       this.addDFAEdge(dfa, previousD, token, DFA_ERROR)
       return DFA_ERROR
     }
 
     let newState = this.newDFAState(reach)
-    const predictedAlt = this.getUniqueAlt(reach)
+    const predictedAlt = this.getUniqueAlt(reach, predicateSet)
 
     if (predictedAlt !== undefined) {
       newState.isAcceptState = true
@@ -121,49 +168,23 @@ export class ATNSimulator {
       newState.configs.uniqueAlt = prediction
     }
 
-    if (hasPredicates && newState.isAcceptState) {
-      this.predicateDFAState(newState, dfa.atnStartState as ATNState)
-    }
-
     newState = this.addDFAEdge(dfa, previousD, token, newState)
     return newState
   }
 
-  evaluatePredicates(
-    predicates: (Predicate | undefined)[]
-  ): number | undefined {
-    const size = predicates.length
-    for (let i = 0; i < size; i++) {
-      const pred = predicates[i]
-      if (pred !== undefined && pred.call(this.parser) === true) {
-        return i
-      }
-    }
-    return undefined
-  }
-
-  predicateDFAState(state: DFAState, decision: ATNState): void {
-    const nalts = decision.transitions.length
-    const predictedAlts = new Set(state.configs.alts)
-    const predicates: (Predicate | undefined)[] = []
-    for (let i = 0; i < nalts; i++) {
-      // The predicated transition "hides" behind the target of the epsilon transition
-      const transition = decision.transitions[i].target.transitions[0]
-      if (predictedAlts.has(i) && transition instanceof PredicateTransition) {
-        predicates[i] = transition.predicate
-      }
-    }
-    if (predicates.length > 0) {
-      state.predicates = predicates
-    }
-  }
-
-  computeReachSet(closure: ATNConfigSet, token: IToken): ATNConfigSet {
+  computeReachSet(
+    closure: ATNConfigSet,
+    token: IToken,
+    predicateSet: PredicateSet
+  ): ATNConfigSet {
     const intermediate = new ATNConfigSet()
     const skippedStopStates: ATNConfig[] = []
     const tokenEOF = token.tokenType == EOF
 
     for (const c of closure.elements) {
+      if (predicateSet.is(c.alt) === false) {
+        continue
+      }
       if (c.state.type === ATN_RULE_STOP) {
         skippedStopStates.push(c)
         continue
@@ -174,9 +195,9 @@ export class ATNSimulator {
         const target = this.getReachableTarget(transition, token)
         if (target !== undefined) {
           intermediate.add({
-            state: target.state,
+            state: target,
             alt: c.alt,
-            followState: c.followState
+            stack: c.stack
           })
         }
       }
@@ -187,7 +208,7 @@ export class ATNSimulator {
     if (skippedStopStates.length === 0 && !tokenEOF) {
       if (intermediate.size === 1) {
         reach = intermediate
-      } else if (this.getUniqueAlt(intermediate) !== undefined) {
+      } else if (this.getUniqueAlt(intermediate, predicateSet) !== undefined) {
         reach = intermediate
       }
     }
@@ -212,20 +233,26 @@ export class ATNSimulator {
   getReachableTarget(
     transition: Transition,
     token: IToken
-  ): { state: ATNState; type: TokenType } | undefined {
+  ): ATNState | undefined {
     if (
       transition instanceof AtomTransition &&
       tokenStructuredMatcher(token, transition.tokenType)
     ) {
-      return {
-        state: transition.target,
-        type: transition.tokenType
-      }
+      return transition.target
     }
     return undefined
   }
 
-  getUniqueAlt(configs: ATNConfigSet): number | undefined {
+  getUniqueAlt(
+    configs: ATNConfigSet,
+    predicateSet: PredicateSet
+  ): number | undefined {
+    return predicateSet.size === 0
+      ? this.getUniqueAltUnpredicated(configs)
+      : this.getUniqueAltPredicated(configs, predicateSet)
+  }
+
+  getUniqueAltUnpredicated(configs: ATNConfigSet): number | undefined {
     let alt: number | undefined
     for (const c of configs.elements) {
       if (alt === undefined) {
@@ -237,13 +264,29 @@ export class ATNSimulator {
     return alt
   }
 
+  getUniqueAltPredicated(
+    configs: ATNConfigSet,
+    predicateSet: PredicateSet
+  ): number | undefined {
+    let alt: number | undefined
+    for (const c of configs.elements) {
+      if (predicateSet.is(c.alt) === true) {
+        if (alt === undefined) {
+          alt = c.alt
+        } else if (alt !== c.alt) {
+          return undefined
+        }
+      }
+    }
+    return alt
+  }
+
   newDFAState(closure: ATNConfigSet): DFAState {
     return {
       configs: closure,
       edges: {},
       isAcceptState: false,
-      prediction: -1,
-      stateNumber: -1
+      prediction: -1
     }
   }
 
@@ -260,12 +303,12 @@ export class ATNSimulator {
     // Repetitions have the same config set
     // Therefore, storing the key of the config in a map allows us to create a loop in our DFA
     const mapKey = state.configs.key
-    const existing = dfa.states.get(mapKey)
+    const existing = dfa.states[mapKey]
     if (existing !== undefined) {
       return existing
     }
-    state.stateNumber = dfa.states.size
-    dfa.states.set(mapKey, state)
+    state.configs.finalize()
+    dfa.states[mapKey] = state
     return state
   }
 
@@ -277,7 +320,8 @@ export class ATNSimulator {
       const target = atnState.transitions[i].target
       const config: ATNConfig = {
         state: target,
-        alt: i
+        alt: i,
+        stack: []
       }
       this.closure(config, configs, new Set(), false)
     }
@@ -294,11 +338,13 @@ export class ATNSimulator {
     const p = config.state
 
     if (p.type === ATN_RULE_STOP) {
-      if (config.followState !== undefined) {
-        const followState = config.followState
+      if (config.stack.length > 0) {
+        const atnStack = [...config.stack]
+        const followState = atnStack.pop()!
         const followConfig: ATNConfig = {
           state: followState,
-          alt: config.alt
+          alt: config.alt,
+          stack: atnStack
         }
         this.closure(followConfig, configs, closureBusy, treatEofAsEpsilon)
       } else {
@@ -334,27 +380,25 @@ export class ATNSimulator {
     transition: Transition,
     treatEofAsEpsilon: boolean
   ): ATNConfig | undefined {
-    if (
-      transition instanceof EpsilonTransition ||
-      transition instanceof PredicateTransition
-    ) {
+    if (transition instanceof EpsilonTransition) {
       return {
         state: transition.target,
         alt: config.alt,
-        followState: config.followState
+        stack: config.stack
       }
     } else if (transition instanceof RuleTransition) {
+      const stack = [...config.stack, transition.followState]
       return {
         state: transition.target,
         alt: config.alt,
-        followState: transition.followState
+        stack
       }
     } else if (transition instanceof AtomTransition) {
       if (treatEofAsEpsilon && EOF === transition.tokenType) {
         return {
           state: transition.target,
           alt: config.alt,
-          followState: config.followState
+          stack: config.stack
         }
       }
     }
@@ -392,13 +436,14 @@ function hasConflictTerminatingPrediction(configs: ATNConfigSet): boolean {
 
 function getConflictingAltSets(
   configs: ATNConfig[]
-): Map<number, Record<number, boolean>> {
-  const configToAlts = new Map<number, Record<number, boolean>>()
+): Map<string, Record<number, boolean>> {
+  const configToAlts = new Map<string, Record<number, boolean>>()
   for (const c of configs) {
-    let alts = configToAlts.get(c.state.stateNumber)
+    const key = getATNConfigKey(c)
+    let alts = configToAlts.get(key)
     if (alts === undefined) {
       alts = {}
-      configToAlts.set(c.state.stateNumber, alts)
+      configToAlts.set(key, alts)
     }
     alts[c.alt] = true
   }
@@ -406,7 +451,7 @@ function getConflictingAltSets(
 }
 
 function hasConflictingAltSet(
-  altSets: Map<number, Record<number, boolean>>
+  altSets: Map<string, Record<number, boolean>>
 ): boolean {
   for (const value of Array.from(altSets.values())) {
     if (Object.keys(value).length > 1) {
@@ -417,7 +462,7 @@ function hasConflictingAltSet(
 }
 
 function hasStateAssociatedWithOneAlt(
-  altSets: Map<number, Record<number, boolean>>
+  altSets: Map<string, Record<number, boolean>>
 ): boolean {
   for (const value of Array.from(altSets.values())) {
     if (Object.keys(value).length === 1) {

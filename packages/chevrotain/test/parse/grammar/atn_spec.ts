@@ -7,7 +7,7 @@ import {
   Repetition,
   Rule,
   Terminal
-} from "../../../src/parse/grammar/gast/gast_public"
+} from "@chevrotain/gast"
 import {
   ATN,
   ATNState,
