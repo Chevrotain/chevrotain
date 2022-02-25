@@ -29,7 +29,6 @@ import {
   IProductionWithOccurrence,
   TokenType
 } from "@chevrotain/types"
-import { ATNSimulator, PredicateSet } from "./atn_simulator"
 
 export enum PROD_TYPE {
   OPTION,
@@ -39,6 +38,31 @@ export enum PROD_TYPE {
   REPETITION_WITH_SEPARATOR,
   ALTERNATION
 }
+
+export class PredicateSet {
+	private predicates: boolean[] = []
+  
+	get size(): number {
+	  return this.predicates.length
+	}
+  
+	is(index: number): boolean {
+	  return index >= this.predicates.length || this.predicates[index]
+	}
+  
+	set(index: number, value: boolean) {
+	  this.predicates[index] = value
+	}
+  
+	toString(): string {
+	  let value = ""
+	  const size = this.predicates.length
+	  for (let i = 0; i < size; i++) {
+		value += this.predicates[i] === true ? "1" : "0"
+	  }
+	  return value
+	}
+  }
 
 export function getProdType(prod: IProduction): PROD_TYPE {
   /* istanbul ignore else */
@@ -62,10 +86,8 @@ export function getProdType(prod: IProduction): PROD_TYPE {
 const EMPTY_PREDICATES = new PredicateSet()
 
 export function buildDFALookaheadFuncForOr(
-  atnSimulator: ATNSimulator,
   decisionIndex: number,
   alternation: Alternation,
-  maxLookahead: number,
   hasPredicates: boolean,
   dynamicTokensEnabled: boolean
 ): (orAlts?: IOrAlt<any>[]) => number | undefined {
@@ -119,20 +141,19 @@ export function buildDFALookaheadFuncForOr(
           const gate = orAlts[i].GATE
           predicates.set(i, gate === undefined || gate.call(this))
         }
-        return atnSimulator.adaptivePredict(decisionIndex, predicates)
+        return this.adaptivePredict(decisionIndex, predicates)
       } else {
-        return atnSimulator.adaptivePredict(decisionIndex, EMPTY_PREDICATES)
+        return this.adaptivePredict(decisionIndex, EMPTY_PREDICATES)
       }
     }
   } else {
     return function () {
-      return atnSimulator.adaptivePredict(decisionIndex, EMPTY_PREDICATES)
+      return this.adaptivePredict(decisionIndex, EMPTY_PREDICATES)
     }
   }
 }
 
 export function buildDFALookaheadFuncForOptionalProd(
-  atnSimulator: ATNSimulator,
   rule: Rule,
   occurrence: number,
   prodType: PROD_TYPE,
@@ -147,16 +168,16 @@ export function buildDFALookaheadFuncForOptionalProd(
     }
   )
 
-  if (isLL1Sequence(alts) && !dynamicTokensEnabled) {
+  if (isLL1Sequence(alts) && alts[0][0] && !dynamicTokensEnabled) {
     const alt = alts[0]
     const singleTokensTypes = flatten(alt)
 
     if (
       singleTokensTypes.length === 1 &&
-      isEmpty((<any>singleTokensTypes[0]).categoryMatches)
+      isEmpty(singleTokensTypes[0].categoryMatches)
     ) {
       const expectedTokenType = singleTokensTypes[0]
-      const expectedTokenUniqueKey = (<any>expectedTokenType).tokenTypeIdx
+      const expectedTokenUniqueKey = expectedTokenType.tokenTypeIdx
 
       return function (): boolean {
         return this.LA(1).tokenTypeIdx === expectedTokenUniqueKey
@@ -164,7 +185,7 @@ export function buildDFALookaheadFuncForOptionalProd(
     } else {
       const choiceToAlt = reduce(
         singleTokensTypes,
-        (result, currTokType, idx) => {
+        (result, currTokType) => {
           if (currTokType !== undefined) {
             result[currTokType.tokenTypeIdx!] = true
             forEach(currTokType.categoryMatches, (currExtendingType) => {
@@ -173,7 +194,7 @@ export function buildDFALookaheadFuncForOptionalProd(
           }
           return result
         },
-        [] as boolean[]
+        {} as Record<number, boolean>
       )
 
       return function (): boolean {
@@ -183,7 +204,7 @@ export function buildDFALookaheadFuncForOptionalProd(
     }
   }
   return function () {
-    return atnSimulator.adaptivePredict(decisionIndex, EMPTY_PREDICATES) === 0
+    return this.adaptivePredict(decisionIndex, EMPTY_PREDICATES) === 0
   }
 }
 

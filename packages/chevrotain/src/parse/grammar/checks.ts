@@ -71,7 +71,6 @@ export function validateGrammar(
   )
 
   let emptyAltErrors: IParserEmptyAlternativeDefinitionError[] = []
-  let ambiguousAltsErrors: IParserAmbiguousAlternativesDefinitionError[] = []
   let emptyRepetitionErrors: IParserDefinitionError[] = []
 
   // left recursion could cause infinite loops in the following validations.
@@ -79,13 +78,6 @@ export function validateGrammar(
   if (isEmpty(leftRecursionErrors)) {
     emptyAltErrors = flatMap(topLevels, (currTopRule) =>
       validateEmptyOrAlternative(currTopRule, errMsgProvider)
-    )
-    ambiguousAltsErrors = flatMap(topLevels, (currTopRule) =>
-      validateAmbiguousAlternationAlternatives(
-        currTopRule,
-        globalMaxLookahead,
-        errMsgProvider
-      )
     )
 
     emptyRepetitionErrors = validateSomeNonEmptyLookaheadPath(
@@ -118,7 +110,6 @@ export function validateGrammar(
     emptyRepetitionErrors,
     leftRecursionErrors,
     emptyAltErrors,
-    ambiguousAltsErrors,
     termsNamespaceConflictErrors,
     tooManyAltsErrors,
     duplicateRulesError
@@ -417,47 +408,6 @@ export function validateEmptyOrAlternative(
   return errors
 }
 
-export function validateAmbiguousAlternationAlternatives(
-  topLevelRule: Rule,
-  globalMaxLookahead: number,
-  errMsgProvider: IGrammarValidatorErrorMessageProvider
-): IParserAmbiguousAlternativesDefinitionError[] {
-  const orCollector = new OrCollector()
-  topLevelRule.accept(orCollector)
-  let ors = orCollector.alternations
-
-  // New Handling of ignoring ambiguities
-  // - https://github.com/chevrotain/chevrotain/issues/869
-  ors = reject(ors, (currOr) => currOr.ignoreAmbiguities === true)
-
-  const errors = flatMap(ors, (currOr: Alternation) => {
-    const currOccurrence = currOr.idx
-    const actualMaxLookahead = currOr.maxLookahead || globalMaxLookahead
-    const alternatives = getLookaheadPathsForOr(
-      currOccurrence,
-      topLevelRule,
-      actualMaxLookahead,
-      currOr
-    )
-    const altsAmbiguityErrors = checkAlternativesAmbiguities(
-      alternatives,
-      currOr,
-      topLevelRule,
-      errMsgProvider
-    )
-    const altsPrefixAmbiguityErrors = checkPrefixAlternativesAmbiguities(
-      alternatives,
-      currOr,
-      topLevelRule,
-      errMsgProvider
-    )
-
-    return altsAmbiguityErrors.concat(altsPrefixAmbiguityErrors)
-  })
-
-  return errors
-}
-
 export class RepetitionCollector extends GAstVisitor {
   public allProductions: (IProductionWithOccurrence & {
     maxLookahead?: number
@@ -545,153 +495,6 @@ export function validateSomeNonEmptyLookaheadPath(
       }
     })
   })
-
-  return errors
-}
-
-export interface IAmbiguityDescriptor {
-  alts: number[]
-  path: TokenType[]
-}
-
-function checkAlternativesAmbiguities(
-  alternatives: Alternative[],
-  alternation: Alternation,
-  rule: Rule,
-  errMsgProvider: IGrammarValidatorErrorMessageProvider
-): IParserAmbiguousAlternativesDefinitionError[] {
-  const foundAmbiguousPaths: Alternative = []
-  const identicalAmbiguities = reduce(
-    alternatives,
-    (result, currAlt, currAltIdx) => {
-      // ignore (skip) ambiguities with this alternative
-      if (alternation.definition[currAltIdx].ignoreAmbiguities === true) {
-        return result
-      }
-
-      forEach(currAlt, (currPath) => {
-        const altsCurrPathAppearsIn = [currAltIdx]
-        forEach(alternatives, (currOtherAlt, currOtherAltIdx) => {
-          if (
-            currAltIdx !== currOtherAltIdx &&
-            containsPath(currOtherAlt, currPath) &&
-            // ignore (skip) ambiguities with this "other" alternative
-            alternation.definition[currOtherAltIdx].ignoreAmbiguities !== true
-          ) {
-            altsCurrPathAppearsIn.push(currOtherAltIdx)
-          }
-        })
-
-        if (
-          altsCurrPathAppearsIn.length > 1 &&
-          !containsPath(foundAmbiguousPaths, currPath)
-        ) {
-          foundAmbiguousPaths.push(currPath)
-          result.push({
-            alts: altsCurrPathAppearsIn,
-            path: currPath
-          })
-        }
-      })
-      return result
-    },
-    [] as { alts: number[]; path: TokenType[] }[]
-  )
-
-  const currErrors = map(identicalAmbiguities, (currAmbDescriptor) => {
-    const ambgIndices = map(
-      currAmbDescriptor.alts,
-      (currAltIdx) => currAltIdx + 1
-    )
-
-    const currMessage = errMsgProvider.buildAlternationAmbiguityError({
-      topLevelRule: rule,
-      alternation: alternation,
-      ambiguityIndices: ambgIndices,
-      prefixPath: currAmbDescriptor.path
-    })
-
-    return {
-      message: currMessage,
-      type: ParserDefinitionErrorType.AMBIGUOUS_ALTS,
-      ruleName: rule.name,
-      occurrence: alternation.idx,
-      alternatives: currAmbDescriptor.alts
-    }
-  })
-
-  return currErrors
-}
-
-export function checkPrefixAlternativesAmbiguities(
-  alternatives: Alternative[],
-  alternation: Alternation,
-  rule: Rule,
-  errMsgProvider: IGrammarValidatorErrorMessageProvider
-): IParserAmbiguousAlternativesDefinitionError[] {
-  // flatten
-  const pathsAndIndices = reduce(
-    alternatives,
-    (result, currAlt, idx) => {
-      const currPathsAndIdx = map(currAlt, (currPath) => {
-        return { idx: idx, path: currPath }
-      })
-      return result.concat(currPathsAndIdx)
-    },
-    [] as { idx: number; path: TokenType[] }[]
-  )
-
-  const errors = compact(
-    flatMap(pathsAndIndices, (currPathAndIdx) => {
-      const alternativeGast = alternation.definition[currPathAndIdx.idx]
-      // ignore (skip) ambiguities with this alternative
-      if (alternativeGast.ignoreAmbiguities === true) {
-        return []
-      }
-      const targetIdx = currPathAndIdx.idx
-      const targetPath = currPathAndIdx.path
-
-      const prefixAmbiguitiesPathsAndIndices = filter(
-        pathsAndIndices,
-        (searchPathAndIdx) => {
-          // prefix ambiguity can only be created from lower idx (higher priority) path
-          return (
-            // ignore (skip) ambiguities with this "other" alternative
-            alternation.definition[searchPathAndIdx.idx].ignoreAmbiguities !==
-              true &&
-            searchPathAndIdx.idx < targetIdx &&
-            // checking for strict prefix because identical lookaheads
-            // will be be detected using a different validation.
-            isStrictPrefixOfPath(searchPathAndIdx.path, targetPath)
-          )
-        }
-      )
-
-      const currPathPrefixErrors = map(
-        prefixAmbiguitiesPathsAndIndices,
-        (currAmbPathAndIdx): IParserAmbiguousAlternativesDefinitionError => {
-          const ambgIndices = [currAmbPathAndIdx.idx + 1, targetIdx + 1]
-          const occurrence = alternation.idx === 0 ? "" : alternation.idx
-
-          const message = errMsgProvider.buildAlternationPrefixAmbiguityError({
-            topLevelRule: rule,
-            alternation: alternation,
-            ambiguityIndices: ambgIndices,
-            prefixPath: currAmbPathAndIdx.path
-          })
-          return {
-            message: message,
-            type: ParserDefinitionErrorType.AMBIGUOUS_PREFIX_ALTS,
-            ruleName: rule.name,
-            occurrence: occurrence,
-            alternatives: ambgIndices
-          }
-        }
-      )
-
-      return currPathPrefixErrors
-    })
-  )
 
   return errors
 }

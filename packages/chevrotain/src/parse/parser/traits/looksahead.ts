@@ -37,17 +37,9 @@ import {
 } from "@chevrotain/gast"
 import { getProductionDslName } from "@chevrotain/gast"
 import {
-  ATN,
-  ATNState,
-  ATN_RULE_STOP,
-  AtomTransition,
   createATN,
   DecisionState,
-  EpsilonTransition,
-  RuleTransition,
-  Transition
 } from "../../grammar/atn"
-import { ATNSimulator, createATNSimulator } from "../../grammar/atn_simulator"
 
 /**
  * Trait responsible for the lookahead related utilities and optimizations.
@@ -71,8 +63,7 @@ export class LooksAhead {
 
   preComputeLookaheadFunctions(this: MixedInParser, rules: Rule[]): void {
     const atn = createATN(rules)
-    // printATN(atn, rules)
-    const atnSimulator = createATNSimulator(this, atn)
+    this.initATNSimulator(atn)
     forEach(rules, (currRule) => {
       const {
         alternation,
@@ -87,10 +78,8 @@ export class LooksAhead {
         const atnState = currProd.atnState as DecisionState
         const decisionIndex = atnState.decision
         const laFunc = buildDFALookaheadFuncForOr(
-          atnSimulator,
           decisionIndex,
           currProd,
-          currProd.maxLookahead || this.maxLookahead,
           currProd.hasPredicates,
           this.dynamicTokensEnabled
         )
@@ -104,7 +93,6 @@ export class LooksAhead {
 
       forEach(repetition, (currProd) => {
         this.computeLookaheadFunc(
-          atnSimulator,
           currRule,
           currProd,
           currProd.idx,
@@ -117,7 +105,6 @@ export class LooksAhead {
 
       forEach(option, (currProd) => {
         this.computeLookaheadFunc(
-          atnSimulator,
           currRule,
           currProd,
           currProd.idx,
@@ -130,7 +117,6 @@ export class LooksAhead {
 
       forEach(repetitionMandatory, (currProd) => {
         this.computeLookaheadFunc(
-          atnSimulator,
           currRule,
           currProd,
           currProd.idx,
@@ -143,7 +129,6 @@ export class LooksAhead {
 
       forEach(repetitionMandatoryWithSeparator, (currProd) => {
         this.computeLookaheadFunc(
-          atnSimulator,
           currRule,
           currProd,
           currProd.idx,
@@ -156,7 +141,6 @@ export class LooksAhead {
 
       forEach(repetitionWithSeparator, (currProd) => {
         this.computeLookaheadFunc(
-          atnSimulator,
           currRule,
           currProd,
           currProd.idx,
@@ -171,7 +155,6 @@ export class LooksAhead {
 
   computeLookaheadFunc(
     this: MixedInParser,
-    atnSimulator: ATNSimulator,
     rule: Rule,
     prod: IProduction,
     prodOccurrence: number,
@@ -185,7 +168,6 @@ export class LooksAhead {
       () => {
         const atnState = prod.atnState as DecisionState
         const laFunc = buildDFALookaheadFuncForOptionalProd(
-          atnSimulator,
           rule,
           prodOccurrence,
           prodType,
@@ -200,34 +182,6 @@ export class LooksAhead {
         )
         this.setLaFuncCache(key, laFunc)
       }
-    )
-  }
-
-  lookAheadBuilderForOptional(
-    this: MixedInParser,
-    alt: LookAheadSequence,
-    tokenMatcher: TokenMatcher,
-    dynamicTokensEnabled: boolean
-  ): () => boolean {
-    return buildSingleAlternativeLookaheadFunction(
-      alt,
-      tokenMatcher,
-      dynamicTokensEnabled
-    )
-  }
-
-  lookAheadBuilderForAlternatives(
-    this: MixedInParser,
-    alts: LookAheadSequence[],
-    hasPredicates: boolean,
-    tokenMatcher: TokenMatcher,
-    dynamicTokensEnabled: boolean
-  ): (orAlts: IOrAlt<any>[]) => number | undefined {
-    return buildAlternativesLookAheadFunc(
-      alts,
-      hasPredicates,
-      tokenMatcher,
-      dynamicTokensEnabled
     )
   }
 

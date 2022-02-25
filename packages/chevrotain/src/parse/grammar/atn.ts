@@ -24,7 +24,6 @@ export interface ATN {
 export const ATN_INVALID_TYPE = 0
 export const ATN_BASIC = 1
 export const ATN_RULE_START = 2
-export const ATN_BLOCK_START = 3
 export const ATN_PLUS_BLOCK_START = 4
 export const ATN_STAR_BLOCK_START = 5
 // Currently unused as the ATN is not used for lexing
@@ -67,7 +66,7 @@ export interface BlockStartState extends DecisionState {
 }
 
 export interface BasicBlockStartState extends BlockStartState {
-  type: typeof ATN_BLOCK_START
+  type: typeof ATN_BASIC
 }
 
 export interface PlusBlockStartState extends BlockStartState {
@@ -89,7 +88,6 @@ export interface StarLoopbackState extends ATNBaseState {
 
 export interface StarLoopEntryState extends DecisionState {
   loopback: StarLoopbackState
-  isPrecedenceDecision: boolean
   type: typeof ATN_STAR_LOOP_ENTRY
 }
 
@@ -100,7 +98,6 @@ export interface BlockEndState extends ATNBaseState {
 
 export interface DecisionState extends ATNBaseState {
   decision: number
-  nonGreedy: boolean
 }
 
 export interface LoopEndState extends ATNBaseState {
@@ -178,7 +175,7 @@ export class RuleTransition extends AbstractTransition {
   }
 }
 
-export interface ATNHandle {
+interface ATNHandle {
   left: ATNState
   right: ATNState
 }
@@ -200,7 +197,6 @@ export function createATN(rules: Rule[]): ATN {
     }
     buildRuleHandle(atn, rule, ruleBlock)
   }
-  addRuleFollowLinks(atn)
   return atn
 }
 
@@ -243,8 +239,6 @@ function atom(
     return repetitionMandatorySep(atn, rule, production)
   } else if (production instanceof Rule || production instanceof Alternative) {
     return block(atn, rule, production)
-  } else {
-    throw new Error("Invalid atom")
   }
 }
 
@@ -328,7 +322,7 @@ function alternation(
   alternation: Alternation
 ): ATNHandle {
   const start = newState<BasicBlockStartState>(atn, rule, {
-    type: ATN_BLOCK_START
+    type: ATN_BASIC
   })
   defineDecisionState(atn, start)
   const alts = map(alternation.definition, (e) => atom(atn, rule, e))
@@ -338,7 +332,7 @@ function alternation(
 
 function option(atn: ATN, rule: Rule, option: Option): ATNHandle {
   const start = newState<BasicBlockStartState>(atn, rule, {
-    type: ATN_BLOCK_START
+    type: ATN_BASIC
   })
   defineDecisionState(atn, start)
   const handle = makeAlts(atn, rule, start, option, block(atn, rule, option))
@@ -502,6 +496,7 @@ function makeBlock(atn: ATN, alts: ATNHandle[]): ATNHandle {
     }
     const isRuleTransition = transition instanceof RuleTransition
     const ruleTransition = transition as RuleTransition
+    const next = alts[i + 1].left
     if (
       handle.left.type === ATN_BASIC &&
       handle.right.type === ATN_BASIC &&
@@ -509,16 +504,16 @@ function makeBlock(atn: ATN, alts: ATNHandle[]): ATNHandle {
       ((isRuleTransition && ruleTransition.followState === handle.right) ||
         transition.target === handle.right)
     ) {
+      // we can avoid epsilon edge to next element
       if (isRuleTransition) {
-        // we can avoid epsilon edge to next element
-        ruleTransition.followState = alts[i + 1].left
+        ruleTransition.followState = next
       } else {
-        transition.target = alts[i + 1].left
+        transition.target = next
       }
       removeState(atn, handle.right) // we skipped over this state
     } else {
       // need epsilon if previous block's right end node is complex
-      epsilon(handle.right, alts[i + 1].left)
+      epsilon(handle.right, next)
     }
   }
 
@@ -562,10 +557,10 @@ function ruleRef(
   const rule = nonTerminal.referencedRule
   const start = atn.ruleToStartState.get(rule)!
   const left = newState<BasicBlockStartState>(atn, currentRule, {
-    type: ATN_BLOCK_START
+    type: ATN_BASIC
   })
   const right = newState<BasicBlockStartState>(atn, currentRule, {
-    type: ATN_BLOCK_START
+    type: ATN_BASIC
   })
 
   const call = new RuleTransition(start, rule, 0, right)
@@ -575,24 +570,6 @@ function ruleRef(
   return {
     left,
     right
-  }
-}
-
-function addFollowLink(atn: ATN, rule: Rule, right: ATNState): void {
-  const stop = atn.ruleToStopState.get(rule)!
-  epsilon(stop, right)
-}
-
-function addRuleFollowLinks(atn: ATN): void {
-  for (const state of atn.states) {
-    if (
-      state.type === ATN_BASIC &&
-      state.transitions.length === 1 &&
-      state.transitions[0] instanceof RuleTransition
-    ) {
-      const ruleTransition = state.transitions[0] as RuleTransition
-      addFollowLink(atn, ruleTransition.rule, ruleTransition.followState)
-    }
   }
 }
 

@@ -170,54 +170,6 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
       return errMsg
     },
 
-    buildAlternationPrefixAmbiguityError(options: {
-      topLevelRule: Rule
-      prefixPath: TokenType[]
-      ambiguityIndices: number[]
-      alternation: Alternation
-    }): string {
-      const pathMsg = map(options.prefixPath, (currTok) =>
-        tokenLabel(currTok)
-      ).join(", ")
-      const occurrence =
-        options.alternation.idx === 0 ? "" : options.alternation.idx
-      const errMsg =
-        `Ambiguous alternatives: <${options.ambiguityIndices.join(
-          " ,"
-        )}> due to common lookahead prefix\n` +
-        `in <OR${occurrence}> inside <${options.topLevelRule.name}> Rule,\n` +
-        `<${pathMsg}> may appears as a prefix path in all these alternatives.\n` +
-        `See: https://chevrotain.io/docs/guide/resolving_grammar_errors.html#COMMON_PREFIX\n` +
-        `For Further details.`
-
-      return errMsg
-    },
-
-    buildAlternationAmbiguityError(options: {
-      topLevelRule: Rule
-      prefixPath: TokenType[]
-      ambiguityIndices: number[]
-      alternation: Alternation
-    }): string {
-      const pathMsg = map(options.prefixPath, (currtok) =>
-        tokenLabel(currtok)
-      ).join(", ")
-      const occurrence =
-        options.alternation.idx === 0 ? "" : options.alternation.idx
-      let currMessage =
-        `Ambiguous Alternatives Detected: <${options.ambiguityIndices.join(
-          " ,"
-        )}> in <OR${occurrence}>` +
-        ` inside <${options.topLevelRule.name}> Rule,\n` +
-        `<${pathMsg}> may appears as a prefix path in all these alternatives.\n`
-
-      currMessage =
-        currMessage +
-        `See: https://chevrotain.io/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES\n` +
-        `For Further details.`
-      return currMessage
-    },
-
     buildEmptyRepetitionError(options: {
       topLevelRule: Rule
       repetition: IProductionWithOccurrence

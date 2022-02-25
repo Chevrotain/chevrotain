@@ -48,16 +48,8 @@ export class ATNConfigSet {
     }
   }
 
-  get(index: number): ATNConfig {
-    return this.configs[index]
-  }
-
-  get elements(): ATNConfig[] {
+  get elements(): readonly ATNConfig[] {
     return this.configs
-  }
-
-  get states(): ATNState[] {
-    return map(this.configs, (e) => e.state)
   }
 
   get alts(): number[] {
@@ -73,8 +65,8 @@ export class ATNConfigSet {
   }
 }
 
-export function getATNConfigKey(config: ATNConfig) {
-  return `${config.state.stateNumber}_${config.alt}:${config.stack
+export function getATNConfigKey(config: ATNConfig, alt = true) {
+  return `${alt ? `a${config.alt}` : ''}s${config.state.stateNumber}:${config.stack
     .map((e) => e.stateNumber.toString())
     .join("_")}`
 }

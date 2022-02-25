@@ -34,13 +34,13 @@ export interface IGrammarValidatorErrorMessageProvider {
     duplicateProds: IProductionWithOccurrence[]
   ): string
   buildNamespaceConflictError(topLevelRule: Rule): string
-  buildAlternationPrefixAmbiguityError(options: {
+  buildAlternationPrefixAmbiguityError?(options: {
     topLevelRule: Rule
     prefixPath: TokenType[]
     ambiguityIndices: number[]
     alternation: Alternation
   }): string
-  buildAlternationAmbiguityError(options: {
+  buildAlternationAmbiguityError?(options: {
     topLevelRule: Rule
     prefixPath: TokenType[]
     ambiguityIndices: number[]
