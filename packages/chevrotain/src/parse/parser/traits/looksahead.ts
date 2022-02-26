@@ -1,20 +1,12 @@
 import {
-  buildAlternativesLookAheadFunc,
-  buildDFALookaheadFuncForOptionalProd,
-  buildDFALookaheadFuncForOr,
   buildLookaheadFuncForOptionalProd,
   buildLookaheadFuncForOr,
-  buildSingleAlternativeLookaheadFunction,
   PROD_TYPE
 } from "../../grammar/lookahead"
 import forEach from "lodash/forEach"
 import has from "lodash/has"
-import {
-  DEFAULT_PARSER_CONFIG,
-  LookAheadSequence,
-  TokenMatcher
-} from "../parser"
-import { IOrAlt, IParserConfig, IProduction } from "@chevrotain/types"
+import { DEFAULT_PARSER_CONFIG } from "../parser"
+import { IParserConfig, IProduction } from "@chevrotain/types"
 import {
   AT_LEAST_ONE_IDX,
   AT_LEAST_ONE_SEP_IDX,
@@ -36,10 +28,7 @@ import {
   Rule
 } from "@chevrotain/gast"
 import { getProductionDslName } from "@chevrotain/gast"
-import {
-  createATN,
-  DecisionState,
-} from "../../grammar/atn"
+import { createATN, DecisionState } from "../../grammar/atn"
 
 /**
  * Trait responsible for the lookahead related utilities and optimizations.
@@ -77,9 +66,10 @@ export class LooksAhead {
       forEach(alternation, (currProd) => {
         const atnState = currProd.atnState as DecisionState
         const decisionIndex = atnState.decision
-        const laFunc = buildDFALookaheadFuncForOr(
+        const laFunc = buildLookaheadFuncForOr(
+          currRule,
+          currProd.idx,
           decisionIndex,
-          currProd,
           currProd.hasPredicates,
           this.dynamicTokensEnabled
         )
@@ -98,7 +88,6 @@ export class LooksAhead {
           currProd.idx,
           MANY_IDX,
           PROD_TYPE.REPETITION,
-          currProd.maxLookahead,
           getProductionDslName(currProd)
         )
       })
@@ -110,7 +99,6 @@ export class LooksAhead {
           currProd.idx,
           OPTION_IDX,
           PROD_TYPE.OPTION,
-          currProd.maxLookahead,
           getProductionDslName(currProd)
         )
       })
@@ -122,7 +110,6 @@ export class LooksAhead {
           currProd.idx,
           AT_LEAST_ONE_IDX,
           PROD_TYPE.REPETITION_MANDATORY,
-          currProd.maxLookahead,
           getProductionDslName(currProd)
         )
       })
@@ -134,7 +121,6 @@ export class LooksAhead {
           currProd.idx,
           AT_LEAST_ONE_SEP_IDX,
           PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR,
-          currProd.maxLookahead,
           getProductionDslName(currProd)
         )
       })
@@ -146,7 +132,6 @@ export class LooksAhead {
           currProd.idx,
           MANY_SEP_IDX,
           PROD_TYPE.REPETITION_WITH_SEPARATOR,
-          currProd.maxLookahead,
           getProductionDslName(currProd)
         )
       })
@@ -160,19 +145,17 @@ export class LooksAhead {
     prodOccurrence: number,
     prodKey: number,
     prodType: PROD_TYPE,
-    prodMaxLookahead: number | undefined,
     dslMethodName: string
   ): void {
     this.TRACE_INIT(
       `${dslMethodName}${prodOccurrence === 0 ? "" : prodOccurrence}`,
       () => {
         const atnState = prod.atnState as DecisionState
-        const laFunc = buildDFALookaheadFuncForOptionalProd(
+        const laFunc = buildLookaheadFuncForOptionalProd(
           rule,
           prodOccurrence,
           prodType,
           atnState.decision,
-          prodMaxLookahead ?? this.maxLookahead,
           this.dynamicTokensEnabled
         )
         const key = getKeyForAutomaticLookahead(

@@ -141,7 +141,6 @@ export class AtomTransition extends AbstractTransition {
 }
 
 export class EpsilonTransition extends AbstractTransition {
-
   constructor(target: ATNState) {
     super(target)
   }
@@ -155,11 +154,7 @@ export class RuleTransition extends AbstractTransition {
   rule: Rule
   followState: ATNState
 
-  constructor(
-    ruleStart: RuleStartState,
-    rule: Rule,
-    followState: ATNState
-  ) {
+  constructor(ruleStart: RuleStartState, rule: Rule, followState: ATNState) {
     super(ruleStart)
     this.rule = rule
     this.followState = followState

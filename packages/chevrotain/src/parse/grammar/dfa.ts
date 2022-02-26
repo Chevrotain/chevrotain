@@ -66,7 +66,7 @@ export class ATNConfigSet {
 }
 
 export function getATNConfigKey(config: ATNConfig, alt = true) {
-  return `${alt ? `a${config.alt}` : ''}s${config.state.stateNumber}:${config.stack
-    .map((e) => e.stateNumber.toString())
-    .join("_")}`
+  return `${alt ? `a${config.alt}` : ""}s${
+    config.state.stateNumber
+  }:${config.stack.map((e) => e.stateNumber.toString()).join("_")}`
 }
