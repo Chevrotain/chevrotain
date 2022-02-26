@@ -59,12 +59,6 @@ export interface IGrammarValidatorErrorMessageProvider {
     tokenType: TokenType
     expectedPattern: RegExp
   }): any
-
-  buildEmptyAlternationError(options: {
-    topLevelRule: Rule
-    alternation: Alternation
-    emptyChoiceIdx: number
-  }): any
   buildTooManyAlternativesError(options: {
     topLevelRule: Rule
     alternation: Alternation

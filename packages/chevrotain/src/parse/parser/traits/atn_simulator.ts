@@ -1,6 +1,5 @@
 import { IToken } from "@chevrotain/types"
 import { tokenStructuredMatcher } from "../../../scan/tokens"
-import { EOF } from "../../../scan/tokens_public"
 import { PredicateSet } from "../../../parse/grammar/lookahead"
 import { MixedInParser } from "./parser_traits"
 import {
@@ -22,7 +21,6 @@ import {
 	getATNConfigKey
 } from "../../grammar/dfa"
 import min from "lodash/min"
-import map from "lodash/map"
 
 type DFACache = (predicateSet: PredicateSet) => DFA
 
@@ -166,12 +164,8 @@ function computeReachSet(
 
 	let reach: ATNConfigSet | undefined
 
-	if (skippedStopStates.length === 0) {
-		if (intermediate.size === 1) {
-			reach = intermediate
-		} else if (getUniqueAlt(intermediate, predicateSet) !== undefined) {
-			reach = intermediate
-		}
+	if (skippedStopStates.length === 0 && intermediate.size === 1) {
+		reach = intermediate
 	}
 
 	if (reach === undefined) {
@@ -204,27 +198,6 @@ function getReachableTarget(
 }
 
 function getUniqueAlt(
-	configs: ATNConfigSet,
-	predicateSet: PredicateSet
-): number | undefined {
-	return predicateSet.size === 0
-		? getUniqueAltUnpredicated(configs)
-		: getUniqueAltPredicated(configs, predicateSet)
-}
-
-function getUniqueAltUnpredicated(configs: ATNConfigSet): number | undefined {
-	let alt: number | undefined
-	for (const c of configs.elements) {
-		if (alt === undefined) {
-			alt = c.alt
-		} else if (alt !== c.alt) {
-			return undefined
-		}
-	}
-	return alt
-}
-
-function getUniqueAltPredicated(
 	configs: ATNConfigSet,
 	predicateSet: PredicateSet
 ): number | undefined {

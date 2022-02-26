@@ -141,11 +141,9 @@ export class AtomTransition extends AbstractTransition {
 }
 
 export class EpsilonTransition extends AbstractTransition {
-  outermostPrecedenceReturn: number
 
-  constructor(target: ATNState, outermostPrecedenceReturn = -1) {
+  constructor(target: ATNState) {
     super(target)
-    this.outermostPrecedenceReturn = outermostPrecedenceReturn
   }
 
   isEpsilon() {
@@ -155,18 +153,15 @@ export class EpsilonTransition extends AbstractTransition {
 
 export class RuleTransition extends AbstractTransition {
   rule: Rule
-  precedence: number
   followState: ATNState
 
   constructor(
     ruleStart: RuleStartState,
     rule: Rule,
-    precedence: number,
     followState: ATNState
   ) {
     super(ruleStart)
     this.rule = rule
-    this.precedence = precedence
     this.followState = followState
   }
 
@@ -237,8 +232,8 @@ function atom(
     return repetitionMandatory(atn, rule, production)
   } else if (production instanceof RepetitionMandatoryWithSeparator) {
     return repetitionMandatorySep(atn, rule, production)
-  } else if (production instanceof Rule || production instanceof Alternative) {
-    return block(atn, rule, production)
+  } else {
+    return block(atn, rule, production as Alternative)
   }
 }
 
@@ -563,7 +558,7 @@ function ruleRef(
     type: ATN_BASIC
   })
 
-  const call = new RuleTransition(start, rule, 0, right)
+  const call = new RuleTransition(start, rule, right)
   addTransition(left, call)
 
   nonTerminal.atnState = left
@@ -610,10 +605,10 @@ function newState<T extends ATNState>(
 }
 
 function addTransition(state: ATNBaseState, transition: Transition) {
+  // A single ATN state can only contain epsilon transitions or non-epsilon transitions
+  // Because they are never mixed, only setting the property for the first transition is fine
   if (state.transitions.length === 0) {
     state.epsilonOnlyTransitions = transition.isEpsilon()
-  } else if (state.epsilonOnlyTransitions !== transition.isEpsilon()) {
-    state.epsilonOnlyTransitions = false
   }
   state.transitions.push(transition)
 }

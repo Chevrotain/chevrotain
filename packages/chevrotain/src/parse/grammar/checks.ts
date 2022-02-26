@@ -70,16 +70,11 @@ export function validateGrammar(
     validateNoLeftRecursion(currTopRule, currTopRule, errMsgProvider)
   )
 
-  let emptyAltErrors: IParserEmptyAlternativeDefinitionError[] = []
   let emptyRepetitionErrors: IParserDefinitionError[] = []
 
   // left recursion could cause infinite loops in the following validations.
   // It is safest to first have the user fix the left recursion errors first and only then examine Further issues.
   if (isEmpty(leftRecursionErrors)) {
-    emptyAltErrors = flatMap(topLevels, (currTopRule) =>
-      validateEmptyOrAlternative(currTopRule, errMsgProvider)
-    )
-
     emptyRepetitionErrors = validateSomeNonEmptyLookaheadPath(
       topLevels,
       globalMaxLookahead,
@@ -109,7 +104,6 @@ export function validateGrammar(
   return (duplicateErrors as IParserDefinitionError[]).concat(
     emptyRepetitionErrors,
     leftRecursionErrors,
-    emptyAltErrors,
     termsNamespaceConflictErrors,
     tooManyAltsErrors,
     duplicateRulesError
@@ -363,49 +357,6 @@ class OrCollector extends GAstVisitor {
   public visitAlternation(node: Alternation): void {
     this.alternations.push(node)
   }
-}
-
-export function validateEmptyOrAlternative(
-  topLevelRule: Rule,
-  errMsgProvider: IGrammarValidatorErrorMessageProvider
-): IParserEmptyAlternativeDefinitionError[] {
-  const orCollector = new OrCollector()
-  topLevelRule.accept(orCollector)
-  const ors = orCollector.alternations
-
-  const errors = flatMap<Alternation, IParserEmptyAlternativeDefinitionError>(
-    ors,
-    (currOr) => {
-      const exceptLast = dropRight(currOr.definition)
-      return flatMap(exceptLast, (currAlternative, currAltIdx) => {
-        const possibleFirstInAlt = nextPossibleTokensAfter(
-          [currAlternative],
-          [],
-          tokenStructuredMatcher,
-          1
-        )
-        if (isEmpty(possibleFirstInAlt)) {
-          return [
-            {
-              message: errMsgProvider.buildEmptyAlternationError({
-                topLevelRule: topLevelRule,
-                alternation: currOr,
-                emptyChoiceIdx: currAltIdx
-              }),
-              type: ParserDefinitionErrorType.NONE_LAST_EMPTY_ALT,
-              ruleName: topLevelRule.name,
-              occurrence: currOr.idx,
-              alternative: currAltIdx + 1
-            }
-          ]
-        } else {
-          return []
-        }
-      })
-    }
-  )
-
-  return errors
 }
 
 export class RepetitionCollector extends GAstVisitor {

@@ -196,19 +196,6 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
       return "deprecated"
     },
 
-    buildEmptyAlternationError(options: {
-      topLevelRule: Rule
-      alternation: Alternation
-      emptyChoiceIdx: number
-    }): string {
-      const errMsg =
-        `Ambiguous empty alternative: <${options.emptyChoiceIdx + 1}>` +
-        ` in <OR${options.alternation.idx}> inside <${options.topLevelRule.name}> Rule.\n` +
-        `Only the last alternative may be an empty alternative.`
-
-      return errMsg
-    },
-
     buildTooManyAlternativesError(options: {
       topLevelRule: Rule
       alternation: Alternation
