@@ -10,10 +10,11 @@
   "typings": "lib/src/api.d.ts",
   "main": "lib/src/api.js",
   "files": [
-    "api.d.ts",
+    "src/**/*.ts",
     "lib/src/**/*.js",
+    "lib/src/**/*.d.ts",
     "lib/src/**/*.js.map",
-    "lib/src/**/*.d.ts"
+    "api.d.ts"
   ],
   "repository": {
     "type": "git",
