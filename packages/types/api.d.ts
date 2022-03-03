@@ -45,12 +45,12 @@ declare abstract class BaseParser {
    */
   reset(): void
 
-  getBaseCstVisitorConstructor(): {
-    new (...args: any[]): ICstVisitor<any, any>
+  getBaseCstVisitorConstructor<IN = any, OUT = any>(): {
+    new (...args: any[]): ICstVisitor<IN, OUT>
   }
 
-  getBaseCstVisitorConstructorWithDefaults(): {
-    new (...args: any[]): ICstVisitor<any, any>
+  getBaseCstVisitorConstructorWithDefaults<IN = any, OUT = any>(): {
+    new (...args: any[]): ICstVisitor<IN, OUT>
   }
 
   getGAstProductions(): Record<string, Rule>
