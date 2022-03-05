@@ -7,11 +7,7 @@ import has from "lodash/has"
 import reduce from "lodash/reduce"
 import { possiblePathsFrom } from "./interpreter"
 import { RestWalker } from "./rest"
-import { Predicate, TokenMatcher, LookAheadSequence } from "../parser/parser"
-import {
-  tokenStructuredMatcher,
-  tokenStructuredMatcherNoCategories
-} from "../../scan/tokens"
+import { LookAheadSequence } from "../parser/parser"
 import {
   Alternation,
   Alternative as AlternativeGAST,
@@ -29,6 +25,7 @@ import {
   IProductionWithOccurrence,
   TokenType
 } from "@chevrotain/types"
+import { MixedInParser } from "../parser/traits/parser_traits"
 
 export enum PROD_TYPE {
   OPTION,
@@ -98,13 +95,9 @@ export function buildLookaheadFuncForOr(
       partialAlts,
       (result, currAlt, idx) => {
         forEach(currAlt, (currTokType) => {
-          if (!has(result, currTokType.tokenTypeIdx!)) {
-            result[currTokType.tokenTypeIdx!] = idx
-          }
+          result[currTokType.tokenTypeIdx!] = idx
           forEach(currTokType.categoryMatches!, (currExtendingType) => {
-            if (!has(result, currExtendingType)) {
-              result[currExtendingType] = idx
-            }
+            result[currExtendingType] = idx
           })
         })
         return result
@@ -131,7 +124,7 @@ export function buildLookaheadFuncForOr(
       }
     }
   } else if (hasPredicates) {
-    return function (orAlts) {
+    return function (this: MixedInParser, orAlts) {
       const predicates = new PredicateSet()
       const length = orAlts === undefined ? 0 : orAlts.length
       for (let i = 0; i < length; i++) {
@@ -141,7 +134,7 @@ export function buildLookaheadFuncForOr(
       return this.adaptivePredict(decisionIndex, predicates)
     }
   } else {
-    return function () {
+    return function (this: MixedInParser) {
       return this.adaptivePredict(decisionIndex, EMPTY_PREDICATES)
     }
   }
@@ -196,7 +189,7 @@ export function buildLookaheadFuncForOptionalProd(
       }
     }
   }
-  return function () {
+  return function (this: MixedInParser) {
     return this.adaptivePredict(decisionIndex, EMPTY_PREDICATES) === 0
   }
 }
@@ -593,20 +586,4 @@ export function containsPath(
   }
 
   return false
-}
-
-export function isStrictPrefixOfPath(
-  prefix: TokenType[],
-  other: TokenType[]
-): boolean {
-  return (
-    prefix.length < other.length &&
-    every(prefix, (tokType, idx) => {
-      const otherTokType = other[idx]
-      return (
-        tokType === otherTokType ||
-        otherTokType.categoryMatchesMap![tokType.tokenTypeIdx!]
-      )
-    })
-  )
 }

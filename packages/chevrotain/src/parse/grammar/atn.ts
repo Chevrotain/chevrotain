@@ -2,6 +2,7 @@ import map from "lodash/map"
 import filter from "lodash/filter"
 import {
   IProduction,
+  IProductionWithDecision,
   IProductionWithOccurrence,
   TokenType
 } from "@chevrotain/types"
@@ -355,7 +356,7 @@ function block(
 function plus(
   atn: ATN,
   rule: Rule,
-  plus: IProductionWithOccurrence,
+  plus: IProductionWithDecision,
   handle: ATNHandle,
   sep?: ATNHandle
 ): ATNHandle {
@@ -371,7 +372,7 @@ function plus(
   })
   blkStart.loopback = loop
   end.loopback = loop
-  plus.atnState = loop
+  plus.decisionIdx = loop.decision
   epsilon(blkEnd, loop) // block can see loop back
 
   // Depending on whether we have a separator we put the exit transition at index 1 or 0
@@ -395,7 +396,7 @@ function plus(
 function star(
   atn: ATN,
   rule: Rule,
-  star: IProductionWithOccurrence,
+  star: IProductionWithDecision,
   handle: ATNHandle,
   sep?: ATNHandle
 ): ATNHandle {
@@ -428,7 +429,7 @@ function star(
     epsilon(loop, entry) // loop back to entry/exit decision
   }
 
-  star.atnState = entry
+  star.decisionIdx = entry.decision
   return {
     left: entry,
     right: loopEnd
@@ -436,12 +437,12 @@ function star(
 }
 
 function optional(optional: Option, handle: ATNHandle): ATNHandle {
-  const start = handle.left
+  const start = handle.left as DecisionState
   const end = handle.right
 
   epsilon(start, end)
 
-  optional.atnState = start
+  optional.decisionIdx = start.decision
   return handle
 }
 
@@ -455,7 +456,7 @@ function makeAlts(
   atn: ATN,
   rule: Rule,
   start: BlockStartState,
-  production: IProductionWithOccurrence,
+  production: IProductionWithDecision,
   ...alts: (ATNHandle | undefined)[]
 ): ATNHandle {
   const end = newState<BlockEndState>(atn, rule, production, {
@@ -477,7 +478,7 @@ function makeAlts(
     left: start as ATNState,
     right: end
   }
-  production.atnState = start
+  production.decisionIdx = start.decision
   return handle
 }
 
@@ -556,7 +557,6 @@ function ruleRef(
   const call = new RuleTransition(start, rule, right)
   addTransition(left, call)
 
-  nonTerminal.atnState = left
   return {
     left,
     right
@@ -572,7 +572,6 @@ function buildRuleHandle(atn: ATN, rule: Rule, block: ATNHandle): ATNHandle {
     left: start,
     right: stop
   }
-  rule.atnState = start
   return handle
 }
 

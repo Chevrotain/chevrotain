@@ -6,7 +6,11 @@ import {
 import forEach from "lodash/forEach"
 import has from "lodash/has"
 import { DEFAULT_PARSER_CONFIG } from "../parser"
-import { IParserConfig, IProduction } from "@chevrotain/types"
+import {
+  IParserConfig,
+  IProduction,
+  IProductionWithDecision
+} from "@chevrotain/types"
 import {
   AT_LEAST_ONE_IDX,
   AT_LEAST_ONE_SEP_IDX,
@@ -64,12 +68,10 @@ export class LooksAhead {
       } = collectMethods(currRule)
 
       forEach(alternation, (currProd) => {
-        const atnState = currProd.atnState as DecisionState
-        const decisionIndex = atnState.decision
         const laFunc = buildLookaheadFuncForOr(
           currRule,
           currProd.idx,
-          decisionIndex,
+          currProd.decisionIdx,
           currProd.hasPredicates,
           this.dynamicTokensEnabled
         )
@@ -141,7 +143,7 @@ export class LooksAhead {
   computeLookaheadFunc(
     this: MixedInParser,
     rule: Rule,
-    prod: IProduction,
+    prod: IProductionWithDecision,
     prodOccurrence: number,
     prodKey: number,
     prodType: PROD_TYPE,
@@ -150,12 +152,11 @@ export class LooksAhead {
     this.TRACE_INIT(
       `${dslMethodName}${prodOccurrence === 0 ? "" : prodOccurrence}`,
       () => {
-        const atnState = prod.atnState as DecisionState
         const laFunc = buildLookaheadFuncForOptionalProd(
           rule,
           prodOccurrence,
           prodType,
-          atnState.decision,
+          prod.decisionIdx,
           this.dynamicTokensEnabled
         )
         const key = getKeyForAutomaticLookahead(

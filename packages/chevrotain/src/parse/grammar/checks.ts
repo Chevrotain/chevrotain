@@ -2,8 +2,6 @@ import first from "lodash/first"
 import isEmpty from "lodash/isEmpty"
 import drop from "lodash/drop"
 import flatten from "lodash/flatten"
-import filter from "lodash/filter"
-import reject from "lodash/reject"
 import difference from "lodash/difference"
 import map from "lodash/map"
 import forEach from "lodash/forEach"
@@ -15,21 +13,11 @@ import includes from "lodash/includes"
 import flatMap from "lodash/flatMap"
 import clone from "lodash/clone"
 import {
-  IParserAmbiguousAlternativesDefinitionError,
   IParserDuplicatesDefinitionError,
-  IParserEmptyAlternativeDefinitionError,
   ParserDefinitionErrorType
 } from "../parser/parser"
 import { getProductionDslName, isOptionalProd } from "@chevrotain/gast"
-import {
-  Alternative,
-  containsPath,
-  getLookaheadPathsForOptionalProd,
-  getLookaheadPathsForOr,
-  getProdType,
-  isStrictPrefixOfPath
-} from "./lookahead"
-import { nextPossibleTokensAfter } from "./interpreter"
+import { getLookaheadPathsForOptionalProd, getProdType } from "./lookahead"
 import {
   Alternation,
   Alternative as AlternativeGAST,
@@ -52,9 +40,6 @@ import {
   IGrammarValidatorErrorMessageProvider,
   IParserDefinitionError
 } from "./types"
-import dropRight from "lodash/dropRight"
-import compact from "lodash/compact"
-import { tokenStructuredMatcher } from "../../scan/tokens"
 
 export function validateGrammar(
   topLevels: Rule[],

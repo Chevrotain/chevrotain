@@ -157,6 +157,12 @@ describe("ATN Simulator", () => {
               return 1
             },
             GATE: () => (pred === undefined ? true : !pred)
+          },
+          {
+            ALT: () => {
+              this.CONSUME(B)
+              return 2
+            }
           }
         ])
       })
@@ -215,6 +221,7 @@ describe("ATN Simulator", () => {
       const resultAutomatic = parser.AltRuleWithPred(undefined)
       // Automatically resolving the ambiguity should return `0`
       expect(resultAutomatic).to.be.equal(0)
+      // It should also create an ambiguity report
       expect(parser.ambiguityReports[0]).to.include("<0, 1> in <OR>")
       parser.ambiguityReports = []
       parser.input = [createRegularToken(A)]
@@ -223,6 +230,14 @@ describe("ATN Simulator", () => {
       parser.input = [createRegularToken(A)]
       const resultFalse = parser.AltRuleWithPred(false)
       expect(resultFalse).to.be.equal(1)
+      expect(parser.ambiguityReports).to.be.empty
+    })
+
+    it("Should pick non-ambigious alternative inside of ambigious, predicated alternation", () => {
+      const parser = new AmbigiousParser()
+      parser.input = [createRegularToken(B)]
+      const result = parser.AltRuleWithPred(undefined)
+      expect(result).to.be.equal(2)
       expect(parser.ambiguityReports).to.be.empty
     })
   })
