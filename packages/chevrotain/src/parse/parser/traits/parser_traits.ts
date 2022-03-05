@@ -14,6 +14,7 @@ import * as defs from "@chevrotain/types"
 import { ContentAssist } from "./context_assist"
 import { GastRecorder } from "./gast_recorder"
 import { PerformanceTracer } from "./perf_tracer"
+import { ATNSimulator } from "./atn_simulator"
 
 /**
  * This Type combines all the Parser traits.
@@ -33,7 +34,8 @@ export type MixedInParser = ParserConstructorImpel &
   TreeBuilder &
   ContentAssist &
   GastRecorder &
-  PerformanceTracer
+  PerformanceTracer &
+  ATNSimulator
 
 interface MixedInCstParserConstructor {
   new (

@@ -1,20 +1,16 @@
 import {
-  buildAlternativesLookAheadFunc,
-  buildDFALookaheadFuncForOptionalProd,
-  buildDFALookaheadFuncForOr,
   buildLookaheadFuncForOptionalProd,
   buildLookaheadFuncForOr,
-  buildSingleAlternativeLookaheadFunction,
   PROD_TYPE
 } from "../../grammar/lookahead"
 import forEach from "lodash/forEach"
 import has from "lodash/has"
+import { DEFAULT_PARSER_CONFIG } from "../parser"
 import {
-  DEFAULT_PARSER_CONFIG,
-  LookAheadSequence,
-  TokenMatcher
-} from "../parser"
-import { IOrAlt, IParserConfig, IProduction } from "@chevrotain/types"
+  IParserConfig,
+  IProduction,
+  IProductionWithDecision
+} from "@chevrotain/types"
 import {
   AT_LEAST_ONE_IDX,
   AT_LEAST_ONE_SEP_IDX,
@@ -36,18 +32,7 @@ import {
   Rule
 } from "@chevrotain/gast"
 import { getProductionDslName } from "@chevrotain/gast"
-import {
-  ATN,
-  ATNState,
-  ATN_RULE_STOP,
-  AtomTransition,
-  createATN,
-  DecisionState,
-  EpsilonTransition,
-  RuleTransition,
-  Transition
-} from "../../grammar/atn"
-import { ATNSimulator, createATNSimulator } from "../../grammar/atn_simulator"
+import { createATN, DecisionState } from "../../grammar/atn"
 
 /**
  * Trait responsible for the lookahead related utilities and optimizations.
@@ -71,8 +56,7 @@ export class LooksAhead {
 
   preComputeLookaheadFunctions(this: MixedInParser, rules: Rule[]): void {
     const atn = createATN(rules)
-    // printATN(atn, rules)
-    const atnSimulator = createATNSimulator(this, atn)
+    this.initATNSimulator(atn)
     forEach(rules, (currRule) => {
       const {
         alternation,
@@ -84,13 +68,10 @@ export class LooksAhead {
       } = collectMethods(currRule)
 
       forEach(alternation, (currProd) => {
-        const atnState = currProd.atnState as DecisionState
-        const decisionIndex = atnState.decision
-        const laFunc = buildDFALookaheadFuncForOr(
-          atnSimulator,
-          decisionIndex,
-          currProd,
-          currProd.maxLookahead || this.maxLookahead,
+        const laFunc = buildLookaheadFuncForOr(
+          currRule,
+          currProd.idx,
+          currProd.decisionIdx,
           currProd.hasPredicates,
           this.dynamicTokensEnabled
         )
@@ -104,65 +85,55 @@ export class LooksAhead {
 
       forEach(repetition, (currProd) => {
         this.computeLookaheadFunc(
-          atnSimulator,
           currRule,
           currProd,
           currProd.idx,
           MANY_IDX,
           PROD_TYPE.REPETITION,
-          currProd.maxLookahead,
           getProductionDslName(currProd)
         )
       })
 
       forEach(option, (currProd) => {
         this.computeLookaheadFunc(
-          atnSimulator,
           currRule,
           currProd,
           currProd.idx,
           OPTION_IDX,
           PROD_TYPE.OPTION,
-          currProd.maxLookahead,
           getProductionDslName(currProd)
         )
       })
 
       forEach(repetitionMandatory, (currProd) => {
         this.computeLookaheadFunc(
-          atnSimulator,
           currRule,
           currProd,
           currProd.idx,
           AT_LEAST_ONE_IDX,
           PROD_TYPE.REPETITION_MANDATORY,
-          currProd.maxLookahead,
           getProductionDslName(currProd)
         )
       })
 
       forEach(repetitionMandatoryWithSeparator, (currProd) => {
         this.computeLookaheadFunc(
-          atnSimulator,
           currRule,
           currProd,
           currProd.idx,
           AT_LEAST_ONE_SEP_IDX,
           PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR,
-          currProd.maxLookahead,
           getProductionDslName(currProd)
         )
       })
 
       forEach(repetitionWithSeparator, (currProd) => {
         this.computeLookaheadFunc(
-          atnSimulator,
           currRule,
           currProd,
           currProd.idx,
           MANY_SEP_IDX,
           PROD_TYPE.REPETITION_WITH_SEPARATOR,
-          currProd.maxLookahead,
           getProductionDslName(currProd)
         )
       })
@@ -171,26 +142,21 @@ export class LooksAhead {
 
   computeLookaheadFunc(
     this: MixedInParser,
-    atnSimulator: ATNSimulator,
     rule: Rule,
-    prod: IProduction,
+    prod: IProductionWithDecision,
     prodOccurrence: number,
     prodKey: number,
     prodType: PROD_TYPE,
-    prodMaxLookahead: number | undefined,
     dslMethodName: string
   ): void {
     this.TRACE_INIT(
       `${dslMethodName}${prodOccurrence === 0 ? "" : prodOccurrence}`,
       () => {
-        const atnState = prod.atnState as DecisionState
-        const laFunc = buildDFALookaheadFuncForOptionalProd(
-          atnSimulator,
+        const laFunc = buildLookaheadFuncForOptionalProd(
           rule,
           prodOccurrence,
           prodType,
-          atnState.decision,
-          prodMaxLookahead ?? this.maxLookahead,
+          prod.decisionIdx,
           this.dynamicTokensEnabled
         )
         const key = getKeyForAutomaticLookahead(
@@ -200,34 +166,6 @@ export class LooksAhead {
         )
         this.setLaFuncCache(key, laFunc)
       }
-    )
-  }
-
-  lookAheadBuilderForOptional(
-    this: MixedInParser,
-    alt: LookAheadSequence,
-    tokenMatcher: TokenMatcher,
-    dynamicTokensEnabled: boolean
-  ): () => boolean {
-    return buildSingleAlternativeLookaheadFunction(
-      alt,
-      tokenMatcher,
-      dynamicTokensEnabled
-    )
-  }
-
-  lookAheadBuilderForAlternatives(
-    this: MixedInParser,
-    alts: LookAheadSequence[],
-    hasPredicates: boolean,
-    tokenMatcher: TokenMatcher,
-    dynamicTokensEnabled: boolean
-  ): (orAlts: IOrAlt<any>[]) => number | undefined {
-    return buildAlternativesLookAheadFunc(
-      alts,
-      hasPredicates,
-      tokenMatcher,
-      dynamicTokensEnabled
     )
   }
 

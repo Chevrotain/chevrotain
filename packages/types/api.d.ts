@@ -2324,12 +2324,15 @@ export declare class EarlyExitException
 }
 
 export interface IProduction {
-  atnState?: any
   accept(visitor: IGASTVisitor): void
 }
 
 export interface IProductionWithOccurrence extends IProduction {
   idx: number
+}
+
+export interface IProductionWithDecision extends IProductionWithOccurrence {
+  decisionIdx: number
 }
 
 /**
@@ -2418,8 +2421,9 @@ export declare class Alternative {
 /**
  * The Grammar AST class representing a {@link Parser.OPTION} call.
  */
-export declare class Option implements IProductionWithOccurrence {
+export declare class Option implements IProductionWithDecision {
   idx: number
+  decisionIdx: number
   definition: IProduction[]
 
   constructor(options: {
@@ -2434,8 +2438,9 @@ export declare class Option implements IProductionWithOccurrence {
 /**
  * The Grammar AST class representing a {@link Parser.AT_LEAST_ONE} call.
  */
-export declare class RepetitionMandatory implements IProductionWithOccurrence {
+export declare class RepetitionMandatory implements IProductionWithDecision {
   idx: number
+  decisionIdx: number
   definition: IProduction[]
 
   constructor(options: {
@@ -2451,10 +2456,11 @@ export declare class RepetitionMandatory implements IProductionWithOccurrence {
  * The Grammar AST class representing a {@link Parser.AT_LEAST_ONE_SEP} call.
  */
 export declare class RepetitionMandatoryWithSeparator
-  implements IProductionWithOccurrence
+  implements IProductionWithDecision
 {
   separator: TokenType
   idx: number
+  decisionIdx: number
   definition: IProduction[]
 
   constructor(options: {
@@ -2470,9 +2476,10 @@ export declare class RepetitionMandatoryWithSeparator
 /**
  * The Grammar AST class representing a {@link Parser.MANY} call.
  */
-export declare class Repetition implements IProductionWithOccurrence {
+export declare class Repetition implements IProductionWithDecision {
   separator: TokenType
   idx: number
+  decisionIdx: number
   definition: IProduction[]
 
   constructor(options: {
@@ -2488,10 +2495,11 @@ export declare class Repetition implements IProductionWithOccurrence {
  * The Grammar AST class representing a {@link Parser.MANY_SEP} call.
  */
 export declare class RepetitionWithSeparator
-  implements IProductionWithOccurrence
+  implements IProductionWithDecision
 {
   separator: TokenType
   idx: number
+  decisionIdx: number
   definition: IProduction[]
 
   constructor(options: {
@@ -2507,8 +2515,9 @@ export declare class RepetitionWithSeparator
 /**
  * The Grammar AST class representing a {@link Parser.OR} call.
  */
-export declare class Alternation implements IProductionWithOccurrence {
+export declare class Alternation implements IProductionWithDecision {
   idx: number
+  decisionIdx: number
   definition: IProduction[]
 
   constructor(options: { definition: IProduction[]; idx?: number })

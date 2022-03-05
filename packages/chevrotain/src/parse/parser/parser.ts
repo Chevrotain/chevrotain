@@ -40,6 +40,7 @@ import { applyMixins } from "./utils/apply_mixins"
 import { IParserDefinitionError } from "../grammar/types"
 import { Rule } from "@chevrotain/gast"
 import { IParserConfigInternal, ParserMethodInternal } from "./types"
+import { ATNSimulator } from "./traits/atn_simulator"
 
 export const END_OF_FILE = createTokenInstance(
   EOF,
@@ -285,7 +286,8 @@ applyMixins(Parser, [
   ErrorHandler,
   ContentAssist,
   GastRecorder,
-  PerformanceTracer
+  PerformanceTracer,
+  ATNSimulator
 ])
 
 export class CstParser extends Parser {

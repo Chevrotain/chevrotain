@@ -1,13 +1,12 @@
 import { END_OF_FILE } from "../../../src/parse/parser/parser"
-import { createToken } from "../../../src/scan/tokens_public"
+import { createToken, EOF } from "../../../src/scan/tokens_public"
 import {
-  buildAlternativesLookAheadFunc,
-  buildLookaheadFuncForOptionalProd,
-  buildLookaheadFuncForOr,
-  buildSingleAlternativeLookaheadFunction,
   getProdType,
   lookAheadSequenceFromAlternatives,
-  PROD_TYPE
+  buildLookaheadFuncForOptionalProd,
+  PROD_TYPE,
+  PredicateSet,
+  buildLookaheadFuncForOr
 } from "../../../src/parse/grammar/lookahead"
 import map from "lodash/map"
 import {
@@ -27,10 +26,12 @@ import {
   Rule,
   Terminal
 } from "@chevrotain/gast"
-import { IToken, TokenType } from "@chevrotain/types"
-import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
+import { IProduction, IToken, TokenType } from "@chevrotain/types"
+import {
+  EmbeddedActionsParser,
+  MixedInParser
+} from "../../../src/parse/parser/traits/parser_traits"
 import { expect } from "chai"
-import { AST } from "eslint"
 
 describe("getProdType", () => {
   it("handles `Option`", () => {
@@ -75,29 +76,92 @@ describe("getProdType", () => {
   })
 })
 
+describe("PredicateSet", () => {
+  it("Should set and get predicates correctly", () => {
+    const preds = new PredicateSet()
+    preds.set(0, true)
+    preds.set(1, false)
+    preds.set(2, true)
+    expect(preds.is(0)).to.be.true
+    expect(preds.is(1)).to.be.false
+    expect(preds.is(2)).to.be.true
+  })
+  it("Indices out of range should return true", () => {
+    const preds = new PredicateSet()
+    preds.set(0, false)
+    expect(preds.is(0)).to.be.false
+    expect(preds.is(1)).to.be.true
+    expect(preds.is(2)).to.be.true
+  })
+  it("toString() creates identifier of set", () => {
+    const emptySet = new PredicateSet()
+    expect(emptySet.toString()).to.be.equal("")
+    const preds1 = new PredicateSet()
+    preds1.set(0, true)
+    preds1.set(1, false)
+    preds1.set(2, true)
+    expect(preds1.toString()).to.be.equal("101")
+  })
+})
+
 context("lookahead specs", () => {
-  let ColonParserMockVar: any
-  let IdentParserMockVar: any
-  let CommaParserMockVar: any
-  let KeyParserMockVar: any
-  let EntityParserMockVar: any
+  let MockParserVar: new (
+    tokens: TokenType[],
+    rules: Rule[],
+    tokenTypes?: TokenType[]
+  ) => MixedInParser
   let actionDec: Rule
   let lotsOfOrs: Rule
   let emptyAltOr: Rule
 
+  let IdentTok: TokenType
+  let DotTok: TokenType
+  let ColonTok: TokenType
+  let LSquareTok: TokenType
+  let RSquareTok: TokenType
+  let ActionTok: TokenType
+  let LParenTok: TokenType
+  let RParenTok: TokenType
+  let CommaTok: TokenType
+  let SemicolonTok: TokenType
+  let EntityTok: TokenType
+  let KeyTok: TokenType
+
   before(() => {
-    const IdentTok = createToken({ name: "IdentTok" })
-    const DotTok = createToken({ name: "DotTok" })
-    const ColonTok = createToken({ name: "ColonTok" })
-    const LSquareTok = createToken({ name: "LSquareTok" })
-    const RSquareTok = createToken({ name: "RSquareTok" })
-    const ActionTok = createToken({ name: "ActionTok" })
-    const LParenTok = createToken({ name: "LParenTok" })
-    const RParenTok = createToken({ name: "RParenTok" })
-    const CommaTok = createToken({ name: "CommaTok" })
-    const SemicolonTok = createToken({ name: "SemicolonTok" })
-    const EntityTok = createToken({ name: "EntityTok" })
-    const KeyTok = createToken({ name: "KeyTok" })
+    IdentTok = createToken({ name: "IdentTok" })
+    DotTok = createToken({ name: "DotTok" })
+    ColonTok = createToken({ name: "ColonTok" })
+    LSquareTok = createToken({ name: "LSquareTok" })
+    RSquareTok = createToken({ name: "RSquareTok" })
+    ActionTok = createToken({ name: "ActionTok" })
+    LParenTok = createToken({ name: "LParenTok" })
+    RParenTok = createToken({ name: "RParenTok" })
+    CommaTok = createToken({ name: "CommaTok" })
+    SemicolonTok = createToken({ name: "SemicolonTok" })
+    EntityTok = createToken({ name: "EntityTok" })
+    KeyTok = createToken({ name: "KeyTok" })
+
+    class MockParser extends EmbeddedActionsParser {
+      constructor(
+        private tokens: TokenType[],
+        rules: Rule[],
+        tokenTypes?: TokenType[]
+      ) {
+        super(tokenTypes ?? tokens)
+        const mixedIn = this as unknown as MixedInParser
+        mixedIn.preComputeLookaheadFunctions(rules)
+      }
+
+      LA(offset: number) {
+        if (offset > this.tokens.length) {
+          return createRegularToken(EOF)
+        } else {
+          return createRegularToken(this.tokens[offset - 1])
+        }
+      }
+    }
+
+    MockParserVar = MockParser as any
 
     const qualifiedName = new Rule({
       name: "qualifiedName",
@@ -249,75 +313,18 @@ context("lookahead specs", () => {
         })
       ]
     })
-
-    class ColonParserMock extends EmbeddedActionsParser {
-      constructor() {
-        super([ColonTok])
-      }
-
-      LA(): IToken {
-        return createRegularToken(ColonTok, ":")
-      }
-    }
-    ColonParserMockVar = ColonParserMock
-
-    class IdentParserMock extends EmbeddedActionsParser {
-      constructor() {
-        super([IdentTok])
-      }
-
-      LA(): IToken {
-        return createRegularToken(IdentTok, "bamba")
-      }
-    }
-    IdentParserMockVar = IdentParserMock
-
-    class CommaParserMock extends EmbeddedActionsParser {
-      constructor() {
-        super([CommaTok])
-      }
-
-      LA(): IToken {
-        return createRegularToken(CommaTok, ",")
-      }
-    }
-    CommaParserMockVar = CommaParserMock
-
-    class EntityParserMock extends EmbeddedActionsParser {
-      constructor() {
-        super([EntityTok])
-      }
-
-      LA(): IToken {
-        return createRegularToken(EntityTok, ",")
-      }
-    }
-    EntityParserMockVar = EntityParserMock
-
-    class KeyParserMock extends EmbeddedActionsParser {
-      constructor() {
-        super([KeyTok])
-      }
-
-      LA(): IToken {
-        return createRegularToken(KeyTok, ",")
-      }
-    }
-    KeyParserMockVar = KeyParserMock
   })
 
   describe("The Grammar Lookahead namespace", () => {
     it("can compute the lookahead function for the first OPTION in ActionDec", () => {
-      const colonMock = new ColonParserMockVar()
-      const indentMock = new IdentParserMockVar()
-
+      const colonMock = new MockParserVar([ColonTok], [actionDec])
+      const indentMock = new MockParserVar([IdentTok], [actionDec])
       const laFunc = buildLookaheadFuncForOptionalProd(
-        1,
         actionDec,
         1,
-        false,
         PROD_TYPE.OPTION,
-        buildSingleAlternativeLookaheadFunction
+        0,
+        false
       )
 
       expect(laFunc.call(colonMock)).to.equal(false)
@@ -325,20 +332,18 @@ context("lookahead specs", () => {
     })
 
     it("can compute the lookahead function for the second OPTION in ActionDec", () => {
-      const colonParserMock = new ColonParserMockVar()
-      const identParserMock = new IdentParserMockVar()
-
+      const colonMock = new MockParserVar([ColonTok], [actionDec])
+      const indentMock = new MockParserVar([IdentTok], [actionDec])
       const laFunc = buildLookaheadFuncForOptionalProd(
-        2,
         actionDec,
-        1,
-        false,
+        2,
         PROD_TYPE.OPTION,
-        buildSingleAlternativeLookaheadFunction
+        3,
+        false
       )
 
-      expect(laFunc.call(colonParserMock)).to.equal(true)
-      expect(laFunc.call(identParserMock)).to.equal(false)
+      expect(laFunc.call(colonMock)).to.equal(true)
+      expect(laFunc.call(indentMock)).to.equal(false)
     })
 
     it("can compute the lookahead function for OPTION with categories", () => {
@@ -359,36 +364,30 @@ context("lookahead specs", () => {
         ]
       })
 
+      const mockParser = new MockParserVar([C], [optionRule])
+
       const laFunc = buildLookaheadFuncForOptionalProd(
-        1,
         optionRule,
         1,
-        false,
         PROD_TYPE.OPTION,
-        buildSingleAlternativeLookaheadFunction
+        0,
+        false
       )
 
-      const laMock = {
-        LA(): IToken {
-          return createRegularToken(C, "c")
-        }
-      }
-
       // C can match B (2nd alternative) due to its categories definition
-      expect(laFunc.call(laMock)).to.be.true
+      expect(laFunc.call(mockParser)).to.be.true
     })
 
     it("can compute the lookahead function for the first MANY in ActionDec", () => {
-      const identParserMock = new IdentParserMockVar()
-      const commaParserMock = new CommaParserMockVar()
+      const identParserMock = new MockParserVar([IdentTok], [actionDec])
+      const commaParserMock = new MockParserVar([CommaTok], [actionDec])
 
       const laFunc = buildLookaheadFuncForOptionalProd(
-        1,
         actionDec,
         1,
-        false,
         PROD_TYPE.REPETITION,
-        buildSingleAlternativeLookaheadFunction
+        2,
+        false
       )
 
       expect(laFunc.call(commaParserMock)).to.equal(true)
@@ -396,19 +395,12 @@ context("lookahead specs", () => {
     })
 
     it("can compute the lookahead function for lots of ORs sample", () => {
-      const keyParserMock = new KeyParserMockVar()
-      const entityParserMock = new EntityParserMockVar()
-      const colonParserMock = new ColonParserMockVar()
-      const commaParserMock = new CommaParserMockVar()
+      const keyParserMock = new MockParserVar([KeyTok], [lotsOfOrs])
+      const entityParserMock = new MockParserVar([EntityTok], [lotsOfOrs])
+      const colonParserMock = new MockParserVar([ColonTok], [lotsOfOrs])
+      const commaParserMock = new MockParserVar([CommaTok], [lotsOfOrs])
 
-      const laFunc = buildLookaheadFuncForOr(
-        1,
-        lotsOfOrs,
-        1,
-        false,
-        false,
-        buildAlternativesLookAheadFunc
-      )
+      const laFunc = buildLookaheadFuncForOr(lotsOfOrs, 1, 0, false, false)
 
       expect(laFunc.call(commaParserMock)).to.equal(0)
       expect(laFunc.call(keyParserMock)).to.equal(0)
@@ -447,39 +439,19 @@ context("lookahead specs", () => {
         ]
       })
 
-      const laFunc = buildLookaheadFuncForOr(
-        1,
-        orRule,
-        1,
-        false,
-        false,
-        buildAlternativesLookAheadFunc
-      )
+      const mockParser = new MockParserVar([C], [orRule])
 
-      const laMock = {
-        LA(): IToken {
-          return createRegularToken(C, "c")
-        }
-      }
+      const laFunc = buildLookaheadFuncForOr(orRule, 1, 0, false, false)
 
       // C can match B (2nd alternative) due to its categories definition
-      expect(laFunc.call(laMock)).to.equal(1)
+      expect(laFunc.call(mockParser)).to.equal(1)
     })
 
     it("can compute the lookahead function for EMPTY OR sample", () => {
-      const commaParserMock = new CommaParserMockVar()
-      const keyParserMock = new KeyParserMockVar()
-      const entityParserMock = new EntityParserMockVar()
-
-      const laFunc = buildLookaheadFuncForOr(
-        1,
-        emptyAltOr,
-        1,
-        false,
-        false,
-        buildAlternativesLookAheadFunc
-      )
-
+      const keyParserMock = new MockParserVar([KeyTok], [emptyAltOr])
+      const entityParserMock = new MockParserVar([EntityTok], [emptyAltOr])
+      const commaParserMock = new MockParserVar([CommaTok], [emptyAltOr])
+      const laFunc = buildLookaheadFuncForOr(emptyAltOr, 1, 0, false, false)
       expect(laFunc.call(keyParserMock)).to.equal(0)
       expect(laFunc.call(entityParserMock)).to.equal(1)
       // none matches so the last empty alternative should be taken (idx 2)
@@ -731,286 +703,426 @@ context("lookahead specs", () => {
     })
 
     context("computing lookahead functions for", () => {
-      class MockParser {
-        public input: IToken[]
-
-        constructor(public inputConstructors: TokenType[]) {
-          this.input = map(inputConstructors, (currConst) =>
-            createRegularToken(currConst)
+      function buildAltRule(alternatives: TokenType[][][]): Rule {
+        const def: Alternative[] = []
+        let alternationIdx = 0
+        let terminalIdx = 0
+        const rule = new Rule({
+          name: "altRule",
+          definition: [
+            new Alternation({
+              definition: def,
+              idx: alternationIdx++
+            })
+          ]
+        })
+        for (const alt of alternatives) {
+          const innerAlts: Alternative[] = []
+          def.push(
+            new Alternative({
+              definition: [
+                new Alternation({
+                  definition: innerAlts,
+                  idx: alternationIdx++
+                })
+              ]
+            })
           )
-        }
-
-        LA(howMuch: number): IToken {
-          if (this.input.length <= howMuch - 1) {
-            return END_OF_FILE
-          } else {
-            return this.input[howMuch - 1]
+          for (const path of alt) {
+            const terminals: Terminal[] = []
+            innerAlts.push(
+              new Alternative({
+                definition: terminals
+              })
+            )
+            for (const token of path) {
+              terminals.push(
+                new Terminal({ terminalType: token, idx: terminalIdx++ })
+              )
+            }
           }
         }
+        return rule
+      }
+
+      function buildOptionRule(options: TokenType[][]): Rule {
+        const def: Alternative[] = []
+        let optionIdx = 0
+        let terminalIdx = 0
+        const rule = new Rule({
+          name: "optionRule",
+          definition: [
+            new Option({
+              definition: [
+                new Alternation({
+                  definition: def
+                })
+              ],
+              idx: optionIdx++
+            })
+          ]
+        })
+        for (const path of options) {
+          const terminals: Terminal[] = []
+          def.push(
+            new Alternative({
+              definition: terminals
+            })
+          )
+          for (const token of path) {
+            terminals.push(
+              new Terminal({ terminalType: token, idx: terminalIdx++ })
+            )
+          }
+        }
+        return rule
       }
 
       it("inheritance Alternative alternatives - positive", () => {
-        const alternatives = [
+        const rule = buildAltRule([
           [[ExtendsAlphaAlpha]], // 0
           [[ExtendsAlpha]], // 1
           [[Alpha]] // 2
-        ]
-        const laFunc = buildAlternativesLookAheadFunc(
-          alternatives,
-          false,
-          tokenStructuredMatcher,
-          false
+        ])
+        const tokenTypes = [Alpha, ExtendsAlpha, ExtendsAlphaAlpha]
+        const alphaMockParser = new MockParserVar([Alpha], [rule], tokenTypes)
+        const extendsAlphaMockParser = new MockParserVar(
+          [ExtendsAlpha],
+          [rule],
+          tokenTypes
+        )
+        const extendsAlphaAlphaMockParser = new MockParserVar(
+          [ExtendsAlphaAlpha],
+          [rule],
+          tokenTypes
         )
 
-        expect(laFunc.call(new MockParser([Alpha]))).to.equal(2)
-        expect(laFunc.call(new MockParser([ExtendsAlpha]))).to.equal(1)
-        expect(laFunc.call(new MockParser([ExtendsAlphaAlpha]))).to.equal(0)
+        const laFunc = buildLookaheadFuncForOr(rule, 0, 0, false, false)
+
+        expect(laFunc.call(alphaMockParser)).to.equal(2)
+        expect(laFunc.call(extendsAlphaMockParser)).to.equal(1)
+        expect(laFunc.call(extendsAlphaAlphaMockParser)).to.equal(0)
       })
 
       it("simple alternatives - positive", () => {
-        const alternatives = [
+        const rule = buildAltRule([
           [[Alpha], [Beta]], // 0
           [[Delta], [Gamma]], // 1
           [[Charlie]] // 2
-        ]
-        const laFunc = buildAlternativesLookAheadFunc(
-          alternatives,
-          false,
-          tokenStructuredMatcher,
-          false
-        )
+        ])
+        const tokenTypes = [Alpha, Beta, Delta, Gamma, Charlie]
+        const alphaMock = new MockParserVar([Alpha], [rule], tokenTypes)
+        const betaMock = new MockParserVar([Beta], [rule], tokenTypes)
+        const deltaMock = new MockParserVar([Delta], [rule], tokenTypes)
+        const gammaMock = new MockParserVar([Gamma], [rule], tokenTypes)
+        const charlieMock = new MockParserVar([Charlie], [rule], tokenTypes)
+        const laFunc = buildLookaheadFuncForOr(rule, 0, 0, false, false)
 
-        expect(laFunc.call(new MockParser([Alpha]))).to.equal(0)
-        expect(laFunc.call(new MockParser([Beta]))).to.equal(0)
-        expect(laFunc.call(new MockParser([Delta]))).to.equal(1)
-        expect(laFunc.call(new MockParser([Gamma]))).to.equal(1)
-        expect(laFunc.call(new MockParser([Charlie]))).to.equal(2)
+        expect(laFunc.call(alphaMock)).to.equal(0)
+        expect(laFunc.call(betaMock)).to.equal(0)
+        expect(laFunc.call(deltaMock)).to.equal(1)
+        expect(laFunc.call(gammaMock)).to.equal(1)
+        expect(laFunc.call(charlieMock)).to.equal(2)
       })
 
       it("simple alternatives - negative", () => {
-        const alternatives = [
+        const rule = buildAltRule([
           [[Alpha], [Beta]], // 0
           [[Delta], [Gamma]] // 1
-        ]
-        const laFunc = buildAlternativesLookAheadFunc(
-          alternatives,
-          false,
-          tokenStructuredMatcher,
-          false
-        )
+        ])
+        const tokenTypes = [Alpha, Beta, Delta, Gamma, Charlie]
+        const emptyMock = new MockParserVar([], [rule], tokenTypes)
+        const charlieMock = new MockParserVar([Charlie], [rule], tokenTypes)
+        const laFunc = buildLookaheadFuncForOr(rule, 0, 0, false, false)
 
-        expect(laFunc.call(new MockParser([]))).to.be.undefined
-        expect(laFunc.call(new MockParser([Charlie]))).to.be.undefined
+        expect(laFunc.call(emptyMock)).to.be.undefined
+        expect(laFunc.call(charlieMock)).to.be.undefined
       })
 
       it("complex alternatives - positive", () => {
-        const alternatives = [
+        const rule = buildAltRule([
           [
             [Alpha, Beta, Gamma],
             [Alpha, Beta, Delta]
           ], // 0
           [[Alpha, Beta, Beta]], // 1
           [[Alpha, Beta]] // 2 - Prefix of '1' alternative
-        ]
-        const laFunc = buildAlternativesLookAheadFunc(
-          alternatives,
-          false,
-          tokenStructuredMatcher,
-          false
+        ])
+        const tokenTypes = [Alpha, Beta, Delta, Gamma, Charlie]
+        const parser1 = new MockParserVar(
+          [Alpha, Beta, Gamma],
+          [rule],
+          tokenTypes
         )
+        const parser2 = new MockParserVar(
+          [Alpha, Beta, Gamma, Delta],
+          [rule],
+          tokenTypes
+        )
+        const parser3 = new MockParserVar(
+          [Alpha, Beta, Delta],
+          [rule],
+          tokenTypes
+        )
+        const parser4 = new MockParserVar(
+          [Alpha, Beta, Beta],
+          [rule],
+          tokenTypes
+        )
+        const parser5 = new MockParserVar(
+          [Alpha, Beta, Charlie],
+          [rule],
+          tokenTypes
+        )
+        const laFunc = buildLookaheadFuncForOr(rule, 0, 0, false, false)
 
-        expect(laFunc.call(new MockParser([Alpha, Beta, Gamma]))).to.equal(0)
-        expect(
-          laFunc.call(new MockParser([Alpha, Beta, Gamma, Delta]))
-        ).to.equal(0)
-        expect(laFunc.call(new MockParser([Alpha, Beta, Delta]))).to.equal(0)
-        expect(laFunc.call(new MockParser([Alpha, Beta, Beta]))).to.equal(1)
-        expect(laFunc.call(new MockParser([Alpha, Beta, Charlie]))).to.equal(2)
+        expect(laFunc.call(parser1)).to.equal(0)
+        expect(laFunc.call(parser2)).to.equal(0)
+        expect(laFunc.call(parser3)).to.equal(0)
+        expect(laFunc.call(parser4)).to.equal(1)
+        expect(laFunc.call(parser5)).to.equal(2)
       })
 
       it("complex alternatives - negative", () => {
-        const alternatives = [
+        const rule = buildAltRule([
           [
             [Alpha, Beta, Gamma],
             [Alpha, Beta, Delta]
           ], // 0
           [[Alpha, Beta, Beta]], // 1
           [[Alpha, Beta], [Gamma]] // 2
-        ]
-        const laFunc = buildAlternativesLookAheadFunc(
-          alternatives,
-          false,
-          tokenStructuredMatcher,
-          false
+        ])
+        const tokenTypes = [Alpha, Beta, Delta, Gamma, Charlie]
+        const emptyMock = new MockParserVar([], [rule], tokenTypes)
+        const alphaMock = new MockParserVar(
+          [Alpha, Gamma, Gamma],
+          [rule],
+          tokenTypes
         )
+        const charlieMock = new MockParserVar([Charlie], [rule], tokenTypes)
+        const betaMock = new MockParserVar(
+          [Beta, Alpha, Beta, Gamma],
+          [rule],
+          tokenTypes
+        )
+        const laFunc = buildLookaheadFuncForOr(rule, 0, 0, false, false)
 
-        expect(laFunc.call(new MockParser([]))).to.be.undefined
-        expect(laFunc.call(new MockParser([Alpha, Gamma, Gamma]))).to.be
-          .undefined
-        expect(laFunc.call(new MockParser([Charlie]))).to.be.undefined
-        expect(laFunc.call(new MockParser([Beta, Alpha, Beta, Gamma]))).to.be
-          .undefined
+        expect(laFunc.call(emptyMock)).to.be.undefined
+        expect(laFunc.call(alphaMock)).to.be.undefined
+        expect(laFunc.call(charlieMock)).to.be.undefined
+        expect(laFunc.call(betaMock)).to.be.undefined
       })
 
       it("complex alternatives with inheritance - positive", () => {
-        const alternatives = [
+        const rule = buildAltRule([
           [[ExtendsAlpha, Beta]], // 0
           [[Alpha, Beta]] // 1
-        ]
+        ])
 
-        const laFunc = buildAlternativesLookAheadFunc(
-          alternatives,
-          false,
-          tokenStructuredMatcher,
-          false
+        const tokenTypes = [Alpha, Beta, Delta, Gamma, Charlie]
+        const alphaMock = new MockParserVar([Alpha, Beta], [rule], tokenTypes)
+        const extendsAlphaMock = new MockParserVar(
+          [ExtendsAlpha, Beta],
+          [rule],
+          tokenTypes
         )
+        const extendsAlphaAlphaMock = new MockParserVar(
+          [ExtendsAlphaAlpha, Beta],
+          [rule],
+          tokenTypes
+        )
+        const laFunc = buildLookaheadFuncForOr(rule, 0, 0, false, false)
 
-        expect(laFunc.call(new MockParser([Alpha, Beta]))).to.equal(1)
-        expect(laFunc.call(new MockParser([ExtendsAlphaAlpha, Beta]))).to.equal(
-          0
-        )
-        // expect(
-        //     laFunc.call(new MockParser([ExtendsAlpha, Beta]))
-        // ).to.equal(0)
+        expect(laFunc.call(alphaMock)).to.equal(1)
+        expect(laFunc.call(extendsAlphaMock)).to.equal(0)
+        expect(laFunc.call(extendsAlphaAlphaMock)).to.equal(0)
       })
 
       it("complex alternatives with inheritance - negative", () => {
-        const alternatives = [
+        const rule = buildAltRule([
           [[ExtendsAlpha, Beta]], // 0
           [[Alpha, Gamma]] // 1
+        ])
+
+        const tokenTypes = [
+          Alpha,
+          Beta,
+          Delta,
+          Gamma,
+          ExtendsAlpha,
+          ExtendsAlphaAlpha
         ]
-
-        const laFunc = buildAlternativesLookAheadFunc(
-          alternatives,
-          false,
-          tokenStructuredMatcher,
-          false
+        const extendsAlphaMock = new MockParserVar(
+          [ExtendsAlpha, Delta],
+          [rule],
+          tokenTypes
         )
+        const extendsAlphaAlphaMock = new MockParserVar(
+          [ExtendsAlphaAlpha, Delta],
+          [rule],
+          tokenTypes
+        )
+        const laFunc = buildLookaheadFuncForOr(rule, 0, 0, false, false)
 
-        expect(laFunc.call(new MockParser([Alpha, Beta]))).to.be.undefined
-        expect(laFunc.call(new MockParser([ExtendsAlphaAlpha, Delta]))).to.be
-          .undefined
+        expect(laFunc.call(extendsAlphaMock)).to.be.undefined
+        expect(laFunc.call(extendsAlphaAlphaMock)).to.be.undefined
       })
 
       it("Empty alternatives", () => {
-        const alternatives = [
+        const rule = buildAltRule([
           [[Alpha]], // 0
           [[]] // 1
-        ]
-        const laFunc = buildAlternativesLookAheadFunc(
-          alternatives,
-          false,
-          tokenStructuredMatcher,
-          false
-        )
+        ])
+        const tokenTypes = [Alpha, Delta]
+        const alphaMock = new MockParserVar([Alpha], [rule], tokenTypes)
+        const emptyMock = new MockParserVar([], [rule], tokenTypes)
+        const deltaMock = new MockParserVar([Delta], [rule], tokenTypes)
+        const laFunc = buildLookaheadFuncForOr(rule, 0, 0, false, false)
 
-        expect(laFunc.call(new MockParser([Alpha]))).to.equal(0)
-        expect(laFunc.call(new MockParser([]))).to.equal(1) // empty alternative always matches
-        expect(laFunc.call(new MockParser([Delta]))).to.equal(1) // empty alternative always matches
+        expect(laFunc.call(alphaMock)).to.equal(0)
+        expect(laFunc.call(emptyMock)).to.equal(1) // empty alternative always matches
+        expect(laFunc.call(deltaMock)).to.equal(1) // empty alternative always matches
       })
 
       it("simple optional - positive", () => {
-        const alternative = [[Alpha], [Beta], [Charlie]]
-        const laFunc = buildSingleAlternativeLookaheadFunction(
-          alternative,
-          tokenStructuredMatcher,
+        const rule = buildOptionRule([[Alpha], [Beta], [Charlie]])
+        const tokenTypes = [Alpha, Beta, Charlie]
+        const alphaMock = new MockParserVar([Alpha], [rule], tokenTypes)
+        const betaMock = new MockParserVar([Beta], [rule], tokenTypes)
+        const charlieMock = new MockParserVar([Charlie], [rule], tokenTypes)
+        const laFunc = buildLookaheadFuncForOptionalProd(
+          rule,
+          0,
+          PROD_TYPE.OPTION,
+          0,
           false
         )
 
-        expect(laFunc.call(new MockParser([Alpha]))).to.be.true
-        expect(laFunc.call(new MockParser([Beta]))).to.be.true
-        expect(laFunc.call(new MockParser([Charlie]))).to.be.true
+        expect(laFunc.call(alphaMock)).to.be.true
+        expect(laFunc.call(betaMock)).to.be.true
+        expect(laFunc.call(charlieMock)).to.be.true
       })
 
       it("simple optional - negative", () => {
-        const alternative = [[Alpha], [Beta], [Charlie]]
-        const laFunc = buildSingleAlternativeLookaheadFunction(
-          alternative,
-          tokenStructuredMatcher,
+        const rule = buildOptionRule([[Alpha], [Beta], [Charlie]])
+        const tokenTypes = [Alpha, Beta, Charlie, Delta, Gamma]
+        const deltaMock = new MockParserVar([Delta], [rule], tokenTypes)
+        const gammaMock = new MockParserVar([Gamma], [rule], tokenTypes)
+        const laFunc = buildLookaheadFuncForOptionalProd(
+          rule,
+          0,
+          PROD_TYPE.OPTION,
+          0,
           false
         )
 
-        expect(laFunc.call(new MockParser([Delta]))).to.be.false
-        expect(laFunc.call(new MockParser([Gamma]))).to.be.false
+        expect(laFunc.call(deltaMock)).to.be.false
+        expect(laFunc.call(gammaMock)).to.be.false
       })
 
       it("complex optional - positive", () => {
-        const alternative = [[Alpha, Beta, Gamma], [Beta], [Charlie, Delta]]
-        const laFunc = buildSingleAlternativeLookaheadFunction(
-          alternative,
-          tokenStructuredMatcher,
+        const rule = buildOptionRule([
+          [Alpha, Beta, Gamma],
+          [Beta],
+          [Charlie, Delta]
+        ])
+        const tokenTypes = [Alpha, Beta, Charlie, Delta, Gamma]
+        const alphaMock = new MockParserVar(
+          [Alpha, Beta, Gamma],
+          [rule],
+          tokenTypes
+        )
+        const betaMock = new MockParserVar([Beta], [rule], tokenTypes)
+        const charlieMock = new MockParserVar(
+          [Charlie, Delta],
+          [rule],
+          tokenTypes
+        )
+        const laFunc = buildLookaheadFuncForOptionalProd(
+          rule,
+          0,
+          PROD_TYPE.OPTION,
+          0,
           false
         )
 
-        expect(laFunc.call(new MockParser([Alpha, Beta, Gamma]))).to.be.true
-        expect(laFunc.call(new MockParser([Beta]))).to.be.true
-        expect(laFunc.call(new MockParser([Charlie, Delta]))).to.be.true
+        expect(laFunc.call(alphaMock)).to.be.true
+        expect(laFunc.call(betaMock)).to.be.true
+        expect(laFunc.call(charlieMock)).to.be.true
       })
 
-      it("complex optional - Negative", () => {
-        const alternative = [[Alpha, Beta, Gamma], [Beta], [Charlie, Delta]]
-        const laFunc = buildSingleAlternativeLookaheadFunction(
-          alternative,
-          tokenStructuredMatcher,
+      it("complex optional - negative", () => {
+        const rule = buildOptionRule([
+          [Alpha, Beta, Gamma],
+          [Beta],
+          [Charlie, Delta]
+        ])
+        const tokenTypes = [Alpha, Beta, Charlie, Delta, Gamma]
+        const deltaLongMock = new MockParserVar(
+          [Delta, Beta, Gamma],
+          [rule],
+          tokenTypes
+        )
+        const deltaMock = new MockParserVar([Delta], [rule], tokenTypes)
+        const laFunc = buildLookaheadFuncForOptionalProd(
+          rule,
+          0,
+          PROD_TYPE.OPTION,
+          0,
           false
         )
 
-        expect(laFunc.call(new MockParser([Alpha, Charlie, Gamma]))).to.be.false
-        expect(laFunc.call(new MockParser([Charlie]))).to.be.false
-        expect(laFunc.call(new MockParser([Charlie, Beta]))).to.be.false
+        expect(laFunc.call(deltaLongMock)).to.be.false
+        expect(laFunc.call(deltaMock)).to.be.false
       })
 
       it("complex optional with inheritance - positive", () => {
-        const alternative = [[Alpha, ExtendsAlpha, ExtendsAlphaAlpha]]
-        const laFunc = buildSingleAlternativeLookaheadFunction(
-          alternative,
-          tokenStructuredMatcher,
+        const rule = buildOptionRule([[Alpha]])
+
+        const tokenTypes = [Alpha, ExtendsAlpha, ExtendsAlphaAlpha]
+        const alphaMock = new MockParserVar(
+          [Alpha, ExtendsAlpha, ExtendsAlphaAlpha],
+          [rule],
+          tokenTypes
+        )
+        const extendsAlphaMock = new MockParserVar(
+          [ExtendsAlpha],
+          [rule],
+          tokenTypes
+        )
+        const extendsAlphaAlphaMock = new MockParserVar(
+          [ExtendsAlphaAlpha],
+          [rule],
+          tokenTypes
+        )
+        const laFunc = buildLookaheadFuncForOptionalProd(
+          rule,
+          0,
+          PROD_TYPE.OPTION,
+          0,
           false
         )
 
-        expect(
-          laFunc.call(new MockParser([Alpha, ExtendsAlpha, ExtendsAlphaAlpha]))
-        ).to.be.true
-        expect(
-          laFunc.call(
-            new MockParser([ExtendsAlpha, ExtendsAlpha, ExtendsAlphaAlpha])
-          )
-        ).to.be.true
-        expect(
-          laFunc.call(
-            new MockParser([ExtendsAlphaAlpha, ExtendsAlpha, ExtendsAlphaAlpha])
-          )
-        ).to.be.true
-        expect(
-          laFunc.call(
-            new MockParser([
-              ExtendsAlphaAlpha,
-              ExtendsAlphaAlpha,
-              ExtendsAlphaAlpha
-            ])
-          )
-        ).to.be.true
+        expect(laFunc.call(alphaMock)).to.be.true
+        expect(laFunc.call(extendsAlphaMock)).to.be.true
+        expect(laFunc.call(extendsAlphaAlphaMock)).to.be.true
       })
 
       it("complex optional with inheritance - negative", () => {
-        const alternative = [[Alpha, ExtendsAlpha, ExtendsAlphaAlpha]]
-        const laFunc = buildSingleAlternativeLookaheadFunction(
-          alternative,
-          tokenStructuredMatcher,
+        const rule = buildOptionRule([[ExtendsAlpha]])
+
+        const tokenTypes = [Alpha, Gamma, ExtendsAlpha, ExtendsAlphaAlpha]
+        const alphaMock = new MockParserVar([Alpha], [rule], tokenTypes)
+        const gammaMock = new MockParserVar([Gamma], [rule], tokenTypes)
+        const laFunc = buildLookaheadFuncForOptionalProd(
+          rule,
+          0,
+          PROD_TYPE.OPTION,
+          0,
           false
         )
-
-        expect(
-          laFunc.call(new MockParser([Gamma, ExtendsAlpha, ExtendsAlphaAlpha]))
-        ).to.be.false
-        expect(
-          laFunc.call(new MockParser([ExtendsAlpha, Alpha, ExtendsAlphaAlpha]))
-        ).to.be.false
-        expect(
-          laFunc.call(
-            new MockParser([ExtendsAlphaAlpha, ExtendsAlpha, ExtendsAlpha])
-          )
-        ).to.be.false
+        expect(laFunc.call(alphaMock)).to.be.false
+        expect(laFunc.call(gammaMock)).to.be.false
       })
     })
   })

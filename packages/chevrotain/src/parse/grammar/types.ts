@@ -34,17 +34,17 @@ export interface IGrammarValidatorErrorMessageProvider {
     duplicateProds: IProductionWithOccurrence[]
   ): string
   buildNamespaceConflictError(topLevelRule: Rule): string
-  buildAlternationPrefixAmbiguityError(options: {
+  buildAlternationPrefixAmbiguityError?(options: {
     topLevelRule: Rule
     prefixPath: TokenType[]
     ambiguityIndices: number[]
     alternation: Alternation
   }): string
-  buildAlternationAmbiguityError(options: {
+  buildAmbiguityError?(options: {
     topLevelRule: Rule
     prefixPath: TokenType[]
     ambiguityIndices: number[]
-    alternation: Alternation
+    production: IProductionWithOccurrence
   }): string
   buildEmptyRepetitionError(options: {
     topLevelRule: Rule
@@ -58,12 +58,6 @@ export interface IGrammarValidatorErrorMessageProvider {
   buildTokenNameError(options: {
     tokenType: TokenType
     expectedPattern: RegExp
-  }): any
-
-  buildEmptyAlternationError(options: {
-    topLevelRule: Rule
-    alternation: Alternation
-    emptyChoiceIdx: number
   }): any
   buildTooManyAlternativesError(options: {
     topLevelRule: Rule
