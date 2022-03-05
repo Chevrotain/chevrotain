@@ -40,11 +40,11 @@ export interface IGrammarValidatorErrorMessageProvider {
     ambiguityIndices: number[]
     alternation: Alternation
   }): string
-  buildAlternationAmbiguityError?(options: {
+  buildAmbiguityError?(options: {
     topLevelRule: Rule
     prefixPath: TokenType[]
     ambiguityIndices: number[]
-    alternation: Alternation
+    production: IProductionWithOccurrence
   }): string
   buildEmptyRepetitionError(options: {
     topLevelRule: Rule

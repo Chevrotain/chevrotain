@@ -1,6 +1,7 @@
-import { IToken } from "@chevrotain/types"
+import { IToken, TokenType } from "@chevrotain/types"
 import { tokenStructuredMatcher } from "../../../scan/tokens"
 import { PredicateSet } from "../../../parse/grammar/lookahead"
+import { defaultGrammarValidatorErrorProvider } from "../../../parse/errors_public"
 import { MixedInParser } from "./parser_traits"
 import {
   ATN,
@@ -67,11 +68,11 @@ export class ATNSimulator {
       dfa.start = start
     }
 
-    const alt = this.execATN(dfa, start, predicateSet)
+    const alt = this.performLookahead(dfa, start, predicateSet)
     return alt
   }
 
-  execATN(
+  performLookahead(
     this: MixedInParser,
     dfa: DFA,
     s0: DFAState,
@@ -85,7 +86,7 @@ export class ATNSimulator {
     while (true) {
       let d = getExistingTargetState(previousD, t)
       if (d === undefined) {
-        d = computeTargetState(dfa, previousD, t, predicateSet)
+        d = this.computeLookaheadTarget(dfa, previousD, t, i, predicateSet)
       }
 
       if (d === DFA_ERROR) {
@@ -100,6 +101,65 @@ export class ATNSimulator {
       t = this.LA(i++)
     }
   }
+
+  computeLookaheadTarget(
+    this: MixedInParser,
+    dfa: DFA,
+    previousD: DFAState,
+    token: IToken,
+    lookahead: number,
+    predicateSet: PredicateSet
+  ): DFAState {
+    const reach = computeReachSet(previousD.configs, token, predicateSet)
+    if (reach.size === 0) {
+      addDFAEdge(dfa, previousD, token, DFA_ERROR)
+      return DFA_ERROR
+    }
+
+    let newState = newDFAState(reach)
+    const predictedAlt = getUniqueAlt(reach, predicateSet)
+
+    if (predictedAlt !== undefined) {
+      newState.isAcceptState = true
+      newState.prediction = predictedAlt
+      newState.configs.uniqueAlt = predictedAlt
+    } else if (hasConflictTerminatingPrediction(reach)) {
+      const prediction = min(reach.alts)!
+      newState.isAcceptState = true
+      newState.prediction = prediction
+      newState.configs.uniqueAlt = prediction
+      this.reportLookaheadAmbiguity(dfa, lookahead, reach.alts)
+    }
+
+    newState = addDFAEdge(dfa, previousD, token, newState)
+    return newState
+  }
+
+  reportLookaheadAmbiguity(
+    this: MixedInParser,
+    dfa: DFA,
+    lookahead: number,
+    ambiguityIndices: number[]
+  ) {
+    const prefixPath: TokenType[] = []
+    for (let i = 1; i <= lookahead; i++) {
+      prefixPath.push(this.LA(i).tokenType)
+    }
+    const atnState = dfa.atnStartState
+    const topLevelRule = atnState.rule
+    const production = atnState.production
+    const message = defaultGrammarValidatorErrorProvider.buildAmbiguityError!({
+      topLevelRule,
+      ambiguityIndices,
+      production,
+      prefixPath
+    })
+    this.logLookaheadAmbiguity(message)
+  }
+
+  logLookaheadAmbiguity(message: string): void {
+    console.log(message)
+  }
 }
 
 function getExistingTargetState(
@@ -107,36 +167,6 @@ function getExistingTargetState(
   token: IToken
 ): DFAState | undefined {
   return state.edges[token.tokenTypeIdx]
-}
-
-function computeTargetState(
-  dfa: DFA,
-  previousD: DFAState,
-  token: IToken,
-  predicateSet: PredicateSet
-): DFAState {
-  const reach = computeReachSet(previousD.configs, token, predicateSet)
-  if (reach.size === 0) {
-    addDFAEdge(dfa, previousD, token, DFA_ERROR)
-    return DFA_ERROR
-  }
-
-  let newState = newDFAState(reach)
-  const predictedAlt = getUniqueAlt(reach, predicateSet)
-
-  if (predictedAlt !== undefined) {
-    newState.isAcceptState = true
-    newState.prediction = predictedAlt
-    newState.configs.uniqueAlt = predictedAlt
-  } else if (hasConflictTerminatingPrediction(reach)) {
-    const prediction = min(reach.alts)!
-    newState.isAcceptState = true
-    newState.prediction = prediction
-    newState.configs.uniqueAlt = prediction
-  }
-
-  newState = addDFAEdge(dfa, previousD, token, newState)
-  return newState
 }
 
 function computeReachSet(

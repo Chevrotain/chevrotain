@@ -1,6 +1,10 @@
 import map from "lodash/map"
 import filter from "lodash/filter"
-import { IProduction, TokenType } from "@chevrotain/types"
+import {
+  IProduction,
+  IProductionWithOccurrence,
+  TokenType
+} from "@chevrotain/types"
 import {
   Alternation,
   NonTerminal,
@@ -50,6 +54,7 @@ export type ATNState =
 
 export interface ATNBaseState {
   atn: ATN
+  production: IProductionWithOccurrence
   stateNumber: number
   rule: Rule
   epsilonOnlyTransitions: boolean
@@ -194,10 +199,10 @@ function createRuleStartAndStopATNStates(atn: ATN, rules: Rule[]): void {
   const ruleLength = rules.length
   for (let i = 0; i < ruleLength; i++) {
     const rule = rules[i]
-    const start = newState<RuleStartState>(atn, rule, {
+    const start = newState<RuleStartState>(atn, rule, undefined, {
       type: ATN_RULE_START
     })
-    const stop = newState<RuleStopState>(atn, rule, {
+    const stop = newState<RuleStopState>(atn, rule, undefined, {
       type: ATN_RULE_STOP
     })
     start.stop = stop
@@ -212,7 +217,7 @@ function atom(
   production: IProduction
 ): ATNHandle | undefined {
   if (production instanceof Terminal) {
-    return tokenRef(atn, rule, production)
+    return tokenRef(atn, rule, production.terminalType, production)
   } else if (production instanceof NonTerminal) {
     return ruleRef(atn, rule, production)
   } else if (production instanceof Alternation) {
@@ -233,7 +238,7 @@ function atom(
 }
 
 function repetition(atn: ATN, rule: Rule, repetition: Repetition): ATNHandle {
-  const starState = newState<StarBlockStartState>(atn, rule, {
+  const starState = newState<StarBlockStartState>(atn, rule, repetition, {
     type: ATN_STAR_BLOCK_START
   })
   defineDecisionState(atn, starState)
@@ -252,7 +257,7 @@ function repetitionSep(
   rule: Rule,
   repetition: RepetitionWithSeparator
 ): ATNHandle {
-  const starState = newState<StarBlockStartState>(atn, rule, {
+  const starState = newState<StarBlockStartState>(atn, rule, repetition, {
     type: ATN_STAR_BLOCK_START
   })
   defineDecisionState(atn, starState)
@@ -263,7 +268,7 @@ function repetitionSep(
     repetition,
     block(atn, rule, repetition)
   )
-  const sep = tokenRef(atn, rule, repetition.separator)
+  const sep = tokenRef(atn, rule, repetition.separator, repetition)
   return star(atn, rule, repetition, handle, sep)
 }
 
@@ -272,7 +277,7 @@ function repetitionMandatory(
   rule: Rule,
   repetition: RepetitionMandatory
 ): ATNHandle {
-  const plusState = newState<PlusBlockStartState>(atn, rule, {
+  const plusState = newState<PlusBlockStartState>(atn, rule, repetition, {
     type: ATN_PLUS_BLOCK_START
   })
   defineDecisionState(atn, plusState)
@@ -291,7 +296,7 @@ function repetitionMandatorySep(
   rule: Rule,
   repetition: RepetitionMandatoryWithSeparator
 ): ATNHandle {
-  const plusState = newState<PlusBlockStartState>(atn, rule, {
+  const plusState = newState<PlusBlockStartState>(atn, rule, repetition, {
     type: ATN_PLUS_BLOCK_START
   })
   defineDecisionState(atn, plusState)
@@ -302,7 +307,7 @@ function repetitionMandatorySep(
     repetition,
     block(atn, rule, repetition)
   )
-  const sep = tokenRef(atn, rule, repetition.separator)
+  const sep = tokenRef(atn, rule, repetition.separator, repetition)
   return plus(atn, rule, repetition, handle, sep)
 }
 
@@ -311,7 +316,7 @@ function alternation(
   rule: Rule,
   alternation: Alternation
 ): ATNHandle {
-  const start = newState<BasicBlockStartState>(atn, rule, {
+  const start = newState<BasicBlockStartState>(atn, rule, alternation, {
     type: ATN_BASIC
   })
   defineDecisionState(atn, start)
@@ -321,7 +326,7 @@ function alternation(
 }
 
 function option(atn: ATN, rule: Rule, option: Option): ATNHandle {
-  const start = newState<BasicBlockStartState>(atn, rule, {
+  const start = newState<BasicBlockStartState>(atn, rule, option, {
     type: ATN_BASIC
   })
   defineDecisionState(atn, start)
@@ -350,18 +355,18 @@ function block(
 function plus(
   atn: ATN,
   rule: Rule,
-  plus: IProduction,
+  plus: IProductionWithOccurrence,
   handle: ATNHandle,
   sep?: ATNHandle
 ): ATNHandle {
   const blkStart = handle.left as PlusBlockStartState
   const blkEnd = handle.right
 
-  const loop = newState<PlusLoopbackState>(atn, rule, {
+  const loop = newState<PlusLoopbackState>(atn, rule, plus, {
     type: ATN_PLUS_LOOP_BACK
   })
   defineDecisionState(atn, loop)
-  const end = newState<LoopEndState>(atn, rule, {
+  const end = newState<LoopEndState>(atn, rule, plus, {
     type: ATN_LOOP_END
   })
   blkStart.loopback = loop
@@ -390,21 +395,21 @@ function plus(
 function star(
   atn: ATN,
   rule: Rule,
-  star: IProduction,
+  star: IProductionWithOccurrence,
   handle: ATNHandle,
   sep?: ATNHandle
 ): ATNHandle {
   const start = handle.left
   const end = handle.right
 
-  const entry = newState<StarLoopEntryState>(atn, rule, {
+  const entry = newState<StarLoopEntryState>(atn, rule, star, {
     type: ATN_STAR_LOOP_ENTRY
   })
   defineDecisionState(atn, entry)
-  const loopEnd = newState<LoopEndState>(atn, rule, {
+  const loopEnd = newState<LoopEndState>(atn, rule, star, {
     type: ATN_LOOP_END
   })
-  const loop = newState<StarLoopbackState>(atn, rule, {
+  const loop = newState<StarLoopbackState>(atn, rule, star, {
     type: ATN_STAR_LOOP_BACK
   })
   entry.loopback = loop
@@ -450,10 +455,10 @@ function makeAlts(
   atn: ATN,
   rule: Rule,
   start: BlockStartState,
-  production: IProduction,
+  production: IProductionWithOccurrence,
   ...alts: (ATNHandle | undefined)[]
 ): ATNHandle {
-  const end = newState<BlockEndState>(atn, rule, {
+  const end = newState<BlockEndState>(atn, rule, production, {
     type: ATN_BLOCK_END,
     start
   })
@@ -518,21 +523,16 @@ function makeBlock(atn: ATN, alts: ATNHandle[]): ATNHandle {
 function tokenRef(
   atn: ATN,
   rule: Rule,
-  terminal: Terminal | TokenType
+  tokenType: TokenType,
+  production: IProductionWithOccurrence
 ): ATNHandle {
-  const left = newState<BasicState>(atn, rule, {
+  const left = newState<BasicState>(atn, rule, production, {
     type: ATN_BASIC
   })
-  const right = newState<BasicState>(atn, rule, {
+  const right = newState<BasicState>(atn, rule, production, {
     type: ATN_BASIC
   })
-  addTransition(
-    left,
-    new AtomTransition(
-      right,
-      terminal instanceof Terminal ? terminal.terminalType : terminal
-    )
-  )
+  addTransition(left, new AtomTransition(right, tokenType))
   return {
     left,
     right
@@ -546,10 +546,10 @@ function ruleRef(
 ): ATNHandle {
   const rule = nonTerminal.referencedRule
   const start = atn.ruleToStartState.get(rule)!
-  const left = newState<BasicBlockStartState>(atn, currentRule, {
+  const left = newState<BasicBlockStartState>(atn, currentRule, nonTerminal, {
     type: ATN_BASIC
   })
-  const right = newState<BasicBlockStartState>(atn, currentRule, {
+  const right = newState<BasicBlockStartState>(atn, currentRule, nonTerminal, {
     type: ATN_BASIC
   })
 
@@ -584,10 +584,12 @@ function epsilon(a: ATNBaseState, b: ATNBaseState): void {
 function newState<T extends ATNState>(
   atn: ATN,
   rule: Rule,
+  production: IProductionWithOccurrence | undefined,
   partial: Partial<T>
 ): T {
   const t: T = {
     atn,
+    production,
     epsilonOnlyTransitions: false,
     rule,
     transitions: [],

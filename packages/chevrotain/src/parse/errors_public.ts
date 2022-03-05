@@ -170,6 +170,31 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
       return errMsg
     },
 
+    buildAmbiguityError(options: {
+      topLevelRule: Rule
+      prefixPath: TokenType[]
+      ambiguityIndices: number[]
+      production: IProductionWithOccurrence
+    }): string {
+      const pathMsg = map(options.prefixPath, (currtok) =>
+        tokenLabel(currtok)
+      ).join(", ")
+      const occurrence =
+        options.production.idx === 0 ? "" : options.production.idx
+      let currMessage =
+        `Ambiguous Alternatives Detected: <${options.ambiguityIndices.join(
+          ", "
+        )}> in <${getProductionDslName(options.production)}${occurrence}>` +
+        ` inside <${options.topLevelRule.name}> Rule,\n` +
+        `<${pathMsg}> may appears as a prefix path in all these alternatives.\n`
+
+      currMessage =
+        currMessage +
+        `See: https://chevrotain.io/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES\n` +
+        `For Further details.`
+      return currMessage
+    },
+
     buildEmptyRepetitionError(options: {
       topLevelRule: Rule
       repetition: IProductionWithOccurrence
