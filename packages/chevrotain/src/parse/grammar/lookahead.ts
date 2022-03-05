@@ -7,11 +7,7 @@ import has from "lodash/has"
 import reduce from "lodash/reduce"
 import { possiblePathsFrom } from "./interpreter"
 import { RestWalker } from "./rest"
-import { Predicate, TokenMatcher, LookAheadSequence } from "../parser/parser"
-import {
-  tokenStructuredMatcher,
-  tokenStructuredMatcherNoCategories
-} from "../../scan/tokens"
+import { LookAheadSequence } from "../parser/parser"
 import {
   Alternation,
   Alternative as AlternativeGAST,
@@ -29,7 +25,7 @@ import {
   IProductionWithOccurrence,
   TokenType
 } from "@chevrotain/types"
-import { ATNSimulator, PredicateSet } from "./atn_simulator"
+import { MixedInParser } from "../parser/traits/parser_traits"
 
 export enum PROD_TYPE {
   OPTION,
@@ -38,6 +34,27 @@ export enum PROD_TYPE {
   REPETITION_MANDATORY_WITH_SEPARATOR,
   REPETITION_WITH_SEPARATOR,
   ALTERNATION
+}
+
+export class PredicateSet {
+  private predicates: boolean[] = []
+
+  is(index: number): boolean {
+    return index >= this.predicates.length || this.predicates[index]
+  }
+
+  set(index: number, value: boolean) {
+    this.predicates[index] = value
+  }
+
+  toString(): string {
+    let value = ""
+    const size = this.predicates.length
+    for (let i = 0; i < size; i++) {
+      value += this.predicates[i] === true ? "1" : "0"
+    }
+    return value
+  }
 }
 
 export function getProdType(prod: IProduction): PROD_TYPE {
@@ -61,16 +78,16 @@ export function getProdType(prod: IProduction): PROD_TYPE {
 
 const EMPTY_PREDICATES = new PredicateSet()
 
-export function buildDFALookaheadFuncForOr(
-  atnSimulator: ATNSimulator,
+export function buildLookaheadFuncForOr(
+  rule: Rule,
+  occurrence: number,
   decisionIndex: number,
-  alternation: Alternation,
-  maxLookahead: number,
   hasPredicates: boolean,
   dynamicTokensEnabled: boolean
 ): (orAlts?: IOrAlt<any>[]) => number | undefined {
-  const partialAlts = map(alternation.definition, (currAlt) =>
-    map(possiblePathsFrom([currAlt], 1), (e) => e.partialPath[0])
+  const partialAlts = map(
+    getLookaheadPathsForOr(occurrence, rule, 1),
+    (currAlt) => map(currAlt, (path) => path[0])
   )
 
   if (isLL1Sequence(partialAlts, false) && !dynamicTokensEnabled) {
@@ -78,13 +95,9 @@ export function buildDFALookaheadFuncForOr(
       partialAlts,
       (result, currAlt, idx) => {
         forEach(currAlt, (currTokType) => {
-          if (!has(result, currTokType.tokenTypeIdx!)) {
-            result[currTokType.tokenTypeIdx!] = idx
-          }
+          result[currTokType.tokenTypeIdx!] = idx
           forEach(currTokType.categoryMatches!, (currExtendingType) => {
-            if (!has(result, currExtendingType)) {
-              result[currExtendingType] = idx
-            }
+            result[currExtendingType] = idx
           })
         })
         return result
@@ -111,33 +124,27 @@ export function buildDFALookaheadFuncForOr(
       }
     }
   } else if (hasPredicates) {
-    const length = alternation.definition.length
-    return function (orAlts) {
-      if (orAlts) {
-        const predicates = new PredicateSet()
-        for (let i = 0; i < length; i++) {
-          const gate = orAlts[i].GATE
-          predicates.set(i, gate === undefined || gate.call(this))
-        }
-        return atnSimulator.adaptivePredict(decisionIndex, predicates)
-      } else {
-        return atnSimulator.adaptivePredict(decisionIndex, EMPTY_PREDICATES)
+    return function (this: MixedInParser, orAlts) {
+      const predicates = new PredicateSet()
+      const length = orAlts === undefined ? 0 : orAlts.length
+      for (let i = 0; i < length; i++) {
+        const gate = orAlts?.[i].GATE
+        predicates.set(i, gate === undefined || gate.call(this))
       }
+      return this.adaptivePredict(decisionIndex, predicates)
     }
   } else {
-    return function () {
-      return atnSimulator.adaptivePredict(decisionIndex, EMPTY_PREDICATES)
+    return function (this: MixedInParser) {
+      return this.adaptivePredict(decisionIndex, EMPTY_PREDICATES)
     }
   }
 }
 
-export function buildDFALookaheadFuncForOptionalProd(
-  atnSimulator: ATNSimulator,
+export function buildLookaheadFuncForOptionalProd(
   rule: Rule,
   occurrence: number,
   prodType: PROD_TYPE,
   decisionIndex: number,
-  maxLookahead: number,
   dynamicTokensEnabled: boolean
 ): () => boolean {
   const alts = map(
@@ -147,16 +154,16 @@ export function buildDFALookaheadFuncForOptionalProd(
     }
   )
 
-  if (isLL1Sequence(alts) && !dynamicTokensEnabled) {
+  if (isLL1Sequence(alts) && alts[0][0] && !dynamicTokensEnabled) {
     const alt = alts[0]
     const singleTokensTypes = flatten(alt)
 
     if (
       singleTokensTypes.length === 1 &&
-      isEmpty((<any>singleTokensTypes[0]).categoryMatches)
+      isEmpty(singleTokensTypes[0].categoryMatches)
     ) {
       const expectedTokenType = singleTokensTypes[0]
-      const expectedTokenUniqueKey = (<any>expectedTokenType).tokenTypeIdx
+      const expectedTokenUniqueKey = expectedTokenType.tokenTypeIdx
 
       return function (): boolean {
         return this.LA(1).tokenTypeIdx === expectedTokenUniqueKey
@@ -164,7 +171,7 @@ export function buildDFALookaheadFuncForOptionalProd(
     } else {
       const choiceToAlt = reduce(
         singleTokensTypes,
-        (result, currTokType, idx) => {
+        (result, currTokType) => {
           if (currTokType !== undefined) {
             result[currTokType.tokenTypeIdx!] = true
             forEach(currTokType.categoryMatches, (currExtendingType) => {
@@ -173,7 +180,7 @@ export function buildDFALookaheadFuncForOptionalProd(
           }
           return result
         },
-        [] as boolean[]
+        {} as Record<number, boolean>
       )
 
       return function (): boolean {
@@ -182,8 +189,8 @@ export function buildDFALookaheadFuncForOptionalProd(
       }
     }
   }
-  return function () {
-    return atnSimulator.adaptivePredict(decisionIndex, EMPTY_PREDICATES) === 0
+  return function (this: MixedInParser) {
+    return this.adaptivePredict(decisionIndex, EMPTY_PREDICATES) === 0
   }
 }
 
@@ -214,262 +221,6 @@ function isLL1Sequence(sequences: TokenType[][], allowEmpty = true): boolean {
     }
   }
   return true
-}
-
-export function buildLookaheadFuncForOr(
-  occurrence: number,
-  ruleGrammar: Rule,
-  maxLookahead: number,
-  hasPredicates: boolean,
-  dynamicTokensEnabled: boolean,
-  laFuncBuilder: Function
-): (orAlts?: IOrAlt<any>[]) => number {
-  const lookAheadPaths = getLookaheadPathsForOr(
-    occurrence,
-    ruleGrammar,
-    maxLookahead
-  )
-
-  const tokenMatcher = areTokenCategoriesNotUsed(lookAheadPaths)
-    ? tokenStructuredMatcherNoCategories
-    : tokenStructuredMatcher
-
-  return laFuncBuilder(
-    lookAheadPaths,
-    hasPredicates,
-    tokenMatcher,
-    dynamicTokensEnabled
-  )
-}
-
-/**
- *  When dealing with an Optional production (OPTION/MANY/2nd iteration of AT_LEAST_ONE/...) we need to compare
- *  the lookahead "inside" the production and the lookahead immediately "after" it in the same top level rule (context free).
- *
- *  Example: given a production:
- *  ABC(DE)?DF
- *
- *  The optional '(DE)?' should only be entered if we see 'DE'. a single Token 'D' is not sufficient to distinguish between the two
- *  alternatives.
- *
- *  @returns A Lookahead function which will return true IFF the parser should parse the Optional production.
- */
-export function buildLookaheadFuncForOptionalProd(
-  occurrence: number,
-  ruleGrammar: Rule,
-  k: number,
-  dynamicTokensEnabled: boolean,
-  prodType: PROD_TYPE,
-  lookaheadBuilder: (
-    lookAheadSequence: LookAheadSequence,
-    tokenMatcher: TokenMatcher,
-    dynamicTokensEnabled: boolean
-  ) => () => boolean
-): () => boolean {
-  const lookAheadPaths = getLookaheadPathsForOptionalProd(
-    occurrence,
-    ruleGrammar,
-    prodType,
-    k
-  )
-
-  const tokenMatcher = areTokenCategoriesNotUsed(lookAheadPaths)
-    ? tokenStructuredMatcherNoCategories
-    : tokenStructuredMatcher
-
-  return lookaheadBuilder(lookAheadPaths[0], tokenMatcher, dynamicTokensEnabled)
-}
-
-export type Alternative = TokenType[][]
-
-export function buildAlternativesLookAheadFunc(
-  alts: LookAheadSequence[],
-  hasPredicates: boolean,
-  tokenMatcher: TokenMatcher,
-  dynamicTokensEnabled: boolean
-): (orAlts: IOrAlt<any>[]) => number | undefined {
-  const numOfAlts = alts.length
-  const areAllOneTokenLookahead = every(alts, (currAlt) => {
-    return every(currAlt, (currPath) => {
-      return currPath.length === 1
-    })
-  })
-
-  // This version takes into account the predicates as well.
-  if (hasPredicates) {
-    /**
-     * @returns {number} - The chosen alternative index
-     */
-    return function (orAlts: IOrAlt<any>[]): number | undefined {
-      // unfortunately the predicates must be extracted every single time
-      // as they cannot be cached due to references to parameters(vars) which are no longer valid.
-      // note that in the common case of no predicates, no cpu time will be wasted on this (see else block)
-      const predicates: (Predicate | undefined)[] = map(
-        orAlts,
-        (currAlt) => currAlt.GATE
-      )
-
-      for (let t = 0; t < numOfAlts; t++) {
-        const currAlt = alts[t]
-        const currNumOfPaths = currAlt.length
-
-        const currPredicate = predicates[t]
-        if (currPredicate !== undefined && currPredicate.call(this) === false) {
-          // if the predicate does not match there is no point in checking the paths
-          continue
-        }
-        nextPath: for (let j = 0; j < currNumOfPaths; j++) {
-          const currPath = currAlt[j]
-          const currPathLength = currPath.length
-          for (let i = 0; i < currPathLength; i++) {
-            const nextToken = this.LA(i + 1)
-            if (tokenMatcher(nextToken, currPath[i]) === false) {
-              // mismatch in current path
-              // try the next pth
-              continue nextPath
-            }
-          }
-          // found a full path that matches.
-          // this will also work for an empty ALT as the loop will be skipped
-          return t
-        }
-        // none of the paths for the current alternative matched
-        // try the next alternative
-      }
-      // none of the alternatives could be matched
-      return undefined
-    }
-  } else if (areAllOneTokenLookahead && !dynamicTokensEnabled) {
-    // optimized (common) case of all the lookaheads paths requiring only
-    // a single token lookahead. These Optimizations cannot work if dynamically defined Tokens are used.
-    const singleTokenAlts = map(alts, (currAlt) => {
-      return flatten(currAlt)
-    })
-
-    const choiceToAlt = reduce(
-      singleTokenAlts,
-      (result, currAlt, idx) => {
-        forEach(currAlt, (currTokType) => {
-          if (!has(result, currTokType.tokenTypeIdx!)) {
-            result[currTokType.tokenTypeIdx!] = idx
-          }
-          forEach(currTokType.categoryMatches!, (currExtendingType) => {
-            if (!has(result, currExtendingType)) {
-              result[currExtendingType] = idx
-            }
-          })
-        })
-        return result
-      },
-      {} as Record<number, number>
-    )
-
-    /**
-     * @returns {number} - The chosen alternative index
-     */
-    return function (): number {
-      const nextToken = this.LA(1)
-      return choiceToAlt[nextToken.tokenTypeIdx]
-    }
-  } else {
-    // optimized lookahead without needing to check the predicates at all.
-    // this causes code duplication which is intentional to improve performance.
-    /**
-     * @returns {number} - The chosen alternative index
-     */
-    return function (): number | undefined {
-      for (let t = 0; t < numOfAlts; t++) {
-        const currAlt = alts[t]
-        const currNumOfPaths = currAlt.length
-        nextPath: for (let j = 0; j < currNumOfPaths; j++) {
-          const currPath = currAlt[j]
-          const currPathLength = currPath.length
-          for (let i = 0; i < currPathLength; i++) {
-            const nextToken = this.LA(i + 1)
-            if (tokenMatcher(nextToken, currPath[i]) === false) {
-              // mismatch in current path
-              // try the next pth
-              continue nextPath
-            }
-          }
-          // found a full path that matches.
-          // this will also work for an empty ALT as the loop will be skipped
-          return t
-        }
-        // none of the paths for the current alternative matched
-        // try the next alternative
-      }
-      // none of the alternatives could be matched
-      return undefined
-    }
-  }
-}
-
-export function buildSingleAlternativeLookaheadFunction(
-  alt: LookAheadSequence,
-  tokenMatcher: TokenMatcher,
-  dynamicTokensEnabled: boolean
-): () => boolean {
-  const areAllOneTokenLookahead = every(alt, (currPath) => {
-    return currPath.length === 1
-  })
-
-  const numOfPaths = alt.length
-
-  // optimized (common) case of all the lookaheads paths requiring only
-  // a single token lookahead.
-  if (areAllOneTokenLookahead && !dynamicTokensEnabled) {
-    const singleTokensTypes = flatten(alt)
-
-    if (
-      singleTokensTypes.length === 1 &&
-      isEmpty((<any>singleTokensTypes[0]).categoryMatches)
-    ) {
-      const expectedTokenType = singleTokensTypes[0]
-      const expectedTokenUniqueKey = (<any>expectedTokenType).tokenTypeIdx
-
-      return function (): boolean {
-        return this.LA(1).tokenTypeIdx === expectedTokenUniqueKey
-      }
-    } else {
-      const choiceToAlt = reduce(
-        singleTokensTypes,
-        (result, currTokType, idx) => {
-          result[currTokType.tokenTypeIdx!] = true
-          forEach(currTokType.categoryMatches!, (currExtendingType) => {
-            result[currExtendingType] = true
-          })
-          return result
-        },
-        [] as boolean[]
-      )
-
-      return function (): boolean {
-        const nextToken = this.LA(1)
-        return choiceToAlt[nextToken.tokenTypeIdx] === true
-      }
-    }
-  } else {
-    return function (): boolean {
-      nextPath: for (let j = 0; j < numOfPaths; j++) {
-        const currPath = alt[j]
-        const currPathLength = currPath.length
-        for (let i = 0; i < currPathLength; i++) {
-          const nextToken = this.LA(i + 1)
-          if (tokenMatcher(nextToken, currPath[i]) === false) {
-            // mismatch in current path
-            // try the next pth
-            continue nextPath
-          }
-        }
-        // found a full path that matches.
-        return true
-      }
-
-      // none of the paths matched
-      return false
-    }
-  }
 }
 
 class RestDefinitionFinderWalker extends RestWalker {
@@ -809,6 +560,8 @@ export function getLookaheadPathsForOptionalProd(
   return lookAheadSequenceFromAlternatives([insideFlat, afterFlat], k)
 }
 
+export type Alternative = TokenType[][]
+
 export function containsPath(
   alternative: Alternative,
   searchPath: TokenType[]
@@ -833,30 +586,4 @@ export function containsPath(
   }
 
   return false
-}
-
-export function isStrictPrefixOfPath(
-  prefix: TokenType[],
-  other: TokenType[]
-): boolean {
-  return (
-    prefix.length < other.length &&
-    every(prefix, (tokType, idx) => {
-      const otherTokType = other[idx]
-      return (
-        tokType === otherTokType ||
-        otherTokType.categoryMatchesMap![tokType.tokenTypeIdx!]
-      )
-    })
-  )
-}
-
-export function areTokenCategoriesNotUsed(
-  lookAheadPaths: LookAheadSequence[]
-): boolean {
-  return every(lookAheadPaths, (singleAltPaths) =>
-    every(singleAltPaths, (singlePath) =>
-      every(singlePath, (token) => isEmpty(token.categoryMatches!))
-    )
-  )
 }

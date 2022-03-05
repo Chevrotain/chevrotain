@@ -103,7 +103,7 @@ describe("The Recognizer's capabilities for detecting / handling infinite loops"
     expect(parser.errors[0].message).to.match(/[A, C]/)
   })
 
-  it("Will enter an infinite loop during parser initialization when there is an empty alternative inside nested repetitionn", () => {
+  it("Will enter an infinite loop during parser initialization when there is an empty alternative inside nested repetition", () => {
     // ----------------- lexer -----------------
     const Comma = createToken({ name: "Comma", pattern: /,/ })
     const Comma2 = createToken({ name: "Comma", pattern: /,/ })

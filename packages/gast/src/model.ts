@@ -7,6 +7,7 @@ import assign from "lodash/assign"
 import {
   IGASTVisitor,
   IProduction,
+  IProductionWithDecision,
   IProductionWithOccurrence,
   ISerializedGast,
   TokenType
@@ -37,8 +38,6 @@ export abstract class AbstractProduction<T extends IProduction = IProduction>
   public set definition(value: T[]) {
     this._definition = value
   }
-
-  atnState: any
 
   constructor(protected _definition: T[]) {}
 
@@ -125,9 +124,10 @@ export class Alternative extends AbstractProduction {
 
 export class Option
   extends AbstractProduction
-  implements IProductionWithOccurrence
+  implements IProductionWithDecision
 {
   public idx: number = 1
+  public decisionIdx: number = -1
   public maxLookahead?: number
 
   constructor(options: {
@@ -145,9 +145,10 @@ export class Option
 
 export class RepetitionMandatory
   extends AbstractProduction
-  implements IProductionWithOccurrence
+  implements IProductionWithDecision
 {
   public idx: number = 1
+  public decisionIdx: number = -1
   public maxLookahead?: number
 
   constructor(options: {
@@ -165,10 +166,11 @@ export class RepetitionMandatory
 
 export class RepetitionMandatoryWithSeparator
   extends AbstractProduction
-  implements IProductionWithOccurrence
+  implements IProductionWithDecision
 {
   public separator!: TokenType
   public idx: number = 1
+  public decisionIdx: number = -1
   public maxLookahead?: number
 
   constructor(options: {
@@ -186,10 +188,11 @@ export class RepetitionMandatoryWithSeparator
 
 export class Repetition
   extends AbstractProduction
-  implements IProductionWithOccurrence
+  implements IProductionWithDecision
 {
   public separator!: TokenType
   public idx: number = 1
+  public decisionIdx: number = -1
   public maxLookahead?: number
 
   constructor(options: {
@@ -207,10 +210,11 @@ export class Repetition
 
 export class RepetitionWithSeparator
   extends AbstractProduction
-  implements IProductionWithOccurrence
+  implements IProductionWithDecision
 {
   public separator!: TokenType
   public idx: number = 1
+  public decisionIdx: number = -1
   public maxLookahead?: number
 
   constructor(options: {
@@ -228,9 +232,10 @@ export class RepetitionWithSeparator
 
 export class Alternation
   extends AbstractProduction<Alternative>
-  implements IProductionWithOccurrence
+  implements IProductionWithDecision
 {
   public idx: number = 1
+  public decisionIdx: number = -1
   public ignoreAmbiguities: boolean = false
   public hasPredicates: boolean = false
   public maxLookahead?: number
@@ -261,8 +266,6 @@ export class Terminal implements IProductionWithOccurrence {
   public terminalType!: TokenType
   public label?: string
   public idx: number = 1
-
-  atnState: any
 
   constructor(options: {
     terminalType: TokenType

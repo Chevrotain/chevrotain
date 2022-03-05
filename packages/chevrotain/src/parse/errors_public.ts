@@ -170,44 +170,21 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
       return errMsg
     },
 
-    buildAlternationPrefixAmbiguityError(options: {
+    buildAmbiguityError(options: {
       topLevelRule: Rule
       prefixPath: TokenType[]
       ambiguityIndices: number[]
-      alternation: Alternation
-    }): string {
-      const pathMsg = map(options.prefixPath, (currTok) =>
-        tokenLabel(currTok)
-      ).join(", ")
-      const occurrence =
-        options.alternation.idx === 0 ? "" : options.alternation.idx
-      const errMsg =
-        `Ambiguous alternatives: <${options.ambiguityIndices.join(
-          " ,"
-        )}> due to common lookahead prefix\n` +
-        `in <OR${occurrence}> inside <${options.topLevelRule.name}> Rule,\n` +
-        `<${pathMsg}> may appears as a prefix path in all these alternatives.\n` +
-        `See: https://chevrotain.io/docs/guide/resolving_grammar_errors.html#COMMON_PREFIX\n` +
-        `For Further details.`
-
-      return errMsg
-    },
-
-    buildAlternationAmbiguityError(options: {
-      topLevelRule: Rule
-      prefixPath: TokenType[]
-      ambiguityIndices: number[]
-      alternation: Alternation
+      production: IProductionWithOccurrence
     }): string {
       const pathMsg = map(options.prefixPath, (currtok) =>
         tokenLabel(currtok)
       ).join(", ")
       const occurrence =
-        options.alternation.idx === 0 ? "" : options.alternation.idx
+        options.production.idx === 0 ? "" : options.production.idx
       let currMessage =
         `Ambiguous Alternatives Detected: <${options.ambiguityIndices.join(
-          " ,"
-        )}> in <OR${occurrence}>` +
+          ", "
+        )}> in <${getProductionDslName(options.production)}${occurrence}>` +
         ` inside <${options.topLevelRule.name}> Rule,\n` +
         `<${pathMsg}> may appears as a prefix path in all these alternatives.\n`
 
@@ -242,19 +219,6 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
     }): string {
       /* istanbul ignore next */
       return "deprecated"
-    },
-
-    buildEmptyAlternationError(options: {
-      topLevelRule: Rule
-      alternation: Alternation
-      emptyChoiceIdx: number
-    }): string {
-      const errMsg =
-        `Ambiguous empty alternative: <${options.emptyChoiceIdx + 1}>` +
-        ` in <OR${options.alternation.idx}> inside <${options.topLevelRule.name}> Rule.\n` +
-        `Only the last alternative may be an empty alternative.`
-
-      return errMsg
     },
 
     buildTooManyAlternativesError(options: {
