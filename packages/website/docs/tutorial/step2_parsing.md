@@ -36,17 +36,17 @@ relationalOperator
    : ">" | "<"
 ```
 
-A Chevrotain Parser analyses an [IToken](https://chevrotain.io/documentation/10_1_1/interfaces/IToken.html) vector that conforms to some grammar.
-The grammar is defined using the [parsing DSL](https://chevrotain.io/documentation/10_1_1/classes/CstParser.html#AT_LEAST_ONE), which includes the following methods.
+A Chevrotain Parser analyses an [IToken](https://chevrotain.io/documentation/10_1_2/interfaces/IToken.html) vector that conforms to some grammar.
+The grammar is defined using the [parsing DSL](https://chevrotain.io/documentation/10_1_2/classes/CstParser.html#AT_LEAST_ONE), which includes the following methods.
 
-- [CONSUME](https://chevrotain.io/documentation/10_1_1/classes/CstParser.html#CONSUME) - 'eat' a Token.
-- [SUBRULE](https://chevrotain.io/documentation/10_1_1/classes/CstParser.html#SUBRULE) - reference to another rule.
-- [OR](https://chevrotain.io/documentation/10_1_1/classes/CstParser.html#OR) - Alternation
-- [OPTION](https://chevrotain.io/documentation/10_1_1/classes/CstParser.html#OPTION) - optional production.
-- [MANY](https://chevrotain.io/documentation/10_1_1/classes/CstParser.html#MANY) - repetition zero or more.
-- [AT_LEAST_ONE](https://chevrotain.io/documentation/10_1_1/classes/CstParser.html#AT_LEAST_ONE) - repetition one or more.
-- [MANY_SEP](https://chevrotain.io/documentation/10_1_1/classes/CstParser.html#MANY_SEP) - repetition (zero or more) with a separator between any two items
-- [AT_LEAST_ONE_SEP](https://chevrotain.io/documentation/10_1_1/classes/CstParser.html#AT_LEAST_ONE_SEP) - repetition (one or more) with a separator between any two items
+- [CONSUME](https://chevrotain.io/documentation/10_1_2/classes/CstParser.html#CONSUME) - 'eat' a Token.
+- [SUBRULE](https://chevrotain.io/documentation/10_1_2/classes/CstParser.html#SUBRULE) - reference to another rule.
+- [OR](https://chevrotain.io/documentation/10_1_2/classes/CstParser.html#OR) - Alternation
+- [OPTION](https://chevrotain.io/documentation/10_1_2/classes/CstParser.html#OPTION) - optional production.
+- [MANY](https://chevrotain.io/documentation/10_1_2/classes/CstParser.html#MANY) - repetition zero or more.
+- [AT_LEAST_ONE](https://chevrotain.io/documentation/10_1_2/classes/CstParser.html#AT_LEAST_ONE) - repetition one or more.
+- [MANY_SEP](https://chevrotain.io/documentation/10_1_2/classes/CstParser.html#MANY_SEP) - repetition (zero or more) with a separator between any two items
+- [AT_LEAST_ONE_SEP](https://chevrotain.io/documentation/10_1_2/classes/CstParser.html#AT_LEAST_ONE_SEP) - repetition (one or more) with a separator between any two items
 
 ## First Rule
 

@@ -1,6 +1,6 @@
 {
   "name": "chevrotain_examples_implementation_languages",
-  "version": "10.1.1",
+  "version": "10.1.2",
   "scripts": {
     "build": "npm-run-all build:ts build:coffee",
     "build:ts": "tsc ./typescript/typescript_json.ts --types \" \" && node ./typescript/scripts/gen_dts_signatures.js",
@@ -10,7 +10,7 @@
     "test:esm": "if-node-version \">=12.17\" && mocha \"*spec.mjs\" || node -e \"process.exit(0)\""
   },
   "dependencies": {
-    "chevrotain": "^10.1.1"
+    "chevrotain": "^10.1.2"
   },
   "devDependencies": {
     "coffee-script": "^1.11.1",

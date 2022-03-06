@@ -10,7 +10,7 @@ for quick starting, see:
 ## Introduction
 
 Chevrotain provides Syntactic Content assist Capabilities.
-These can be accessed via the [**computeContentAssist**](https://chevrotain.io/documentation/10_1_1/classes/CstParser.html#computeContentAssist) method.
+These can be accessed via the [**computeContentAssist**](https://chevrotain.io/documentation/10_1_2/classes/CstParser.html#computeContentAssist) method.
 
 Note that this feature **only** provides syntactic suggestions (meaning next possible token types) **not** semantic suggestions.
 It could be used as a building block in a semantic suggestions provider, but it cannot do this on "its own".
