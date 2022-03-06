@@ -4,6 +4,11 @@
 
 - [missing \*.ts source referenced by source maps in sub-packages](https://github.com/Chevrotain/chevrotain/issues/1773)
 
+#### Documentation
+
+- [docs(api.d.ts): add generics for getBaseCstVisitorConstructor functions](https://github.com/Chevrotain/chevrotain/pull/1774)
+  - Thanks to [@jackhenry](https://github.com/jackhenry) :thumbsup:
+
 ## 10.1.1 (2-15-2022)
 
 Patch release as a workaround for release process issues...

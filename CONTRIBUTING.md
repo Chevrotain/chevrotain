@@ -18,7 +18,7 @@ There are two types of code contributions.
 #### Contributing Sample Grammars and Examples
 
 This is probably the **easiest** way to contribute as it does not require any knowledge of chevrotain's internals.
-And each contribution is self contained and limited in scope.
+And each contribution is self-contained and limited in scope.
 
 [Sample Grammars][sample_grammars] contributions are particularly encouraged.
 
@@ -75,7 +75,7 @@ To format your new code use:
 
 #### Testing
 
-Chevrotain uses several different types of tests to promote high quality.
+Chevrotain uses several types of tests to promote high quality.
 
 The most basic ones are the **mocha unit tests**, which are also often the most relevant ones.
 
@@ -87,7 +87,7 @@ You can run the whole test suite by running:
 - `cd packages/chevrotain`
 - `yarn test`
 
-Additionally **integration tests** are used to test Chevrotain as an end user via the examples packages
+Additionally, **integration tests** are used to test Chevrotain as an end user via the examples packages
 tests.
 
 - In this repo's root
@@ -99,7 +99,6 @@ This is just another yarn task which performs the whole flow
 including linting / doc generation / d.ts API creation / ...
 
 - `yarn ci`
-  - Node > 4 is required to pass the coverage checks.
 
 #### Committing Changes
 
@@ -119,12 +118,12 @@ The release process **requires push permissions to master**.
   - Only for major versions...
 - Push the changes related updates to master.
 - execute `yarn run lerna:version` and follow the instructions.
-  - This will update version related files and push a new version **tag** to github.
-  - Circle-CI will execute a deployment to npmjs.com due to this new tag.
-  - Additionally new website contents will be pushed to the gh-pages branch.
+  - This will update version related files and push a new version **tag** to Github.
+  - Github Actions will execute a deployment to npmjs.com due to this new tag.
+  - Additionally, new website contents will be pushed to the gh-pages branch.
 - Check that the release was successful.
 
-  - On [circle-ci](https://circleci.com/gh/chevrotain/chevrotain)
+  - On [Github Actions release build](https://github.com/Chevrotain/chevrotain/actions/workflows/release.yml)
   - On [npmjs.com](https://www.npmjs.com/package/chevrotain)
   - On [The website](https://chevrotain.io/docs/changes/CHANGELOG.html)
   - On [The APIs webpage](https://chevrotain.io/documentation/)
