@@ -56,7 +56,7 @@ function genNodeInterface(node: CstNodeTypeDefinition) {
 function genNodeChildrenType(node: CstNodeTypeDefinition) {
   const typeName = getNodeChildrenTypeName(node.name)
 
-  return `export type ${typeName} = {
+  return `export interface ${typeName} = {
   ${map(node.properties, (property) => genChildProperty(property)).join("\n  ")}
 };`
 }
