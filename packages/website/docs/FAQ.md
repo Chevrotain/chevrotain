@@ -109,12 +109,13 @@ Special handling is no longer needed during WebPacking scenarios.
 
 ## Why does my parser appear to be stuck during its initialization?
 
-The first time a Chevrotain parser is initialized additional validations and computations are performed.
+~~The first time a Chevrotain parser is initialized additional validations and computations are performed.
 Some of these can take a very long time under certain edge cases. Specifically the detection of ambiguous alternatives
 when the parser uses a larger than the default [maxLookahead](https://chevrotain.io/documentation/10_1_1/interfaces/iparserconfig.html#maxlookahead)
-and there are many (thousands) of ambiguous paths.
+and there are many (thousands) of ambiguous paths.~~
 
-To resolve this try reducing the maxLookahead and inspect the ambiguity errors to fix
-the grammar ambiguity which is the root cause of the problem.
+~~To resolve this try reducing the maxLookahead and inspect the ambiguity errors to fix
+the grammar ambiguity which is the root cause of the problem.~~
 
-Also have a look at the [Initialization Performance Guide](./guide/initialization_performance.md)
+The static lookahead analysis was removed in
+[version 11.0.0](http://chevrotain.io/docs/changes/BREAKING_CHANGES.html#11.0.0) of Chevrotain.
