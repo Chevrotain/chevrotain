@@ -405,7 +405,7 @@ context("lookahead specs", () => {
       expect(laFunc.call(commaParserMock)).to.equal(0)
       expect(laFunc.call(keyParserMock)).to.equal(0)
       expect(laFunc.call(entityParserMock)).to.equal(1)
-      expect(laFunc.call(colonParserMock)).to.equal(undefined)
+      expect(laFunc.call(colonParserMock)).to.be.instanceOf(Object)
     })
 
     it("can compute the lookahead function for OR using categories", () => {
@@ -835,8 +835,8 @@ context("lookahead specs", () => {
         const charlieMock = new MockParserVar([Charlie], [rule], tokenTypes)
         const laFunc = buildLookaheadFuncForOr(rule, 0, 0, false, false)
 
-        expect(laFunc.call(emptyMock)).to.be.undefined
-        expect(laFunc.call(charlieMock)).to.be.undefined
+        expect(laFunc.call(emptyMock)).to.be.instanceOf(Object)
+        expect(laFunc.call(charlieMock)).to.be.instanceOf(Object)
       })
 
       it("complex alternatives - positive", () => {
@@ -907,10 +907,10 @@ context("lookahead specs", () => {
         )
         const laFunc = buildLookaheadFuncForOr(rule, 0, 0, false, false)
 
-        expect(laFunc.call(emptyMock)).to.be.undefined
-        expect(laFunc.call(alphaMock)).to.be.undefined
-        expect(laFunc.call(charlieMock)).to.be.undefined
-        expect(laFunc.call(betaMock)).to.be.undefined
+        expect(laFunc.call(emptyMock)).to.be.instanceOf(Object)
+        expect(laFunc.call(alphaMock)).to.be.instanceOf(Object)
+        expect(laFunc.call(charlieMock)).to.be.instanceOf(Object)
+        expect(laFunc.call(betaMock)).to.be.instanceOf(Object)
       })
 
       it("complex alternatives with inheritance - positive", () => {
@@ -964,8 +964,8 @@ context("lookahead specs", () => {
         )
         const laFunc = buildLookaheadFuncForOr(rule, 0, 0, false, false)
 
-        expect(laFunc.call(extendsAlphaMock)).to.be.undefined
-        expect(laFunc.call(extendsAlphaAlphaMock)).to.be.undefined
+        expect(laFunc.call(extendsAlphaMock)).to.be.instanceOf(Object)
+        expect(laFunc.call(extendsAlphaAlphaMock)).to.be.instanceOf(Object)
       })
 
       it("Empty alternatives", () => {

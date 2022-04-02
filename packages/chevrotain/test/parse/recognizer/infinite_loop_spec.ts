@@ -95,9 +95,9 @@ describe("The Recognizer's capabilities for detecting / handling infinite loops"
 
     const parser = new InfParser()
     parser.input = [createRegularToken(A)]
-    const parseResult = parser.block()
+    parser.block()
     expect(parser.errors[0].message).to.match(
-      /Expecting: one of these possible Token sequences:/
+      /Expecting: one of these possible Tokens:/
     )
     expect(parser.errors[0].message).to.match(/[A, B]/)
     expect(parser.errors[0].message).to.match(/[A, C]/)

@@ -26,6 +26,7 @@ import {
   TokenType
 } from "@chevrotain/types"
 import { MixedInParser } from "../parser/traits/parser_traits"
+import { AdaptivePredictError } from "../parser/traits/atn_simulator"
 
 export enum PROD_TYPE {
   OPTION,
@@ -84,7 +85,7 @@ export function buildLookaheadFuncForOr(
   decisionIndex: number,
   hasPredicates: boolean,
   dynamicTokensEnabled: boolean
-): (orAlts?: IOrAlt<any>[]) => number | undefined {
+): (orAlts?: IOrAlt<any>[]) => number | AdaptivePredictError {
   const partialAlts = map(
     getLookaheadPathsForOr(occurrence, rule, 1),
     (currAlt) => map(currAlt, (path) => path[0])
@@ -112,7 +113,15 @@ export function buildLookaheadFuncForOr(
         if (orAlts !== undefined) {
           const gate = orAlts[prediction].GATE
           if (gate !== undefined && gate.call(this) === false) {
-            return undefined
+            return {
+              tokenPath: [],
+              actualToken: nextToken,
+              possibleTokenTypes: getPossiblePredicatedTokenTypes.call(
+                this,
+                partialAlts,
+                orAlts
+              )
+            }
           }
         }
         return prediction
@@ -120,7 +129,16 @@ export function buildLookaheadFuncForOr(
     } else {
       return function (): number {
         const nextToken = this.LA(1)
-        return choiceToAlt[nextToken.tokenTypeIdx]
+        return (
+          choiceToAlt[nextToken.tokenTypeIdx] ?? {
+            tokenPath: [],
+            actualToken: nextToken,
+            possibleTokenTypes: getPossiblePredicatedTokenTypes.call(
+              this,
+              partialAlts
+            )
+          }
+        )
       }
     }
   } else if (hasPredicates) {
@@ -140,13 +158,28 @@ export function buildLookaheadFuncForOr(
   }
 }
 
+function getPossiblePredicatedTokenTypes(
+  alts: TokenType[][],
+  orAlts?: IOrAlt<any>[]
+): TokenType[] {
+  const tokenTypes: TokenType[] = []
+  const length = alts.length
+  for (let i = 0; i < length; i++) {
+    const gate = orAlts?.[i].GATE
+    if (gate === undefined || gate.call(this)) {
+      tokenTypes.push(...alts[i])
+    }
+  }
+  return tokenTypes
+}
+
 export function buildLookaheadFuncForOptionalProd(
   rule: Rule,
   occurrence: number,
   prodType: PROD_TYPE,
   decisionIndex: number,
   dynamicTokensEnabled: boolean
-): () => boolean {
+): () => boolean | AdaptivePredictError {
   const alts = map(
     getLookaheadPathsForOptionalProd(occurrence, rule, prodType, 1),
     (e) => {
@@ -190,7 +223,8 @@ export function buildLookaheadFuncForOptionalProd(
     }
   }
   return function (this: MixedInParser) {
-    return this.adaptivePredict(decisionIndex, EMPTY_PREDICATES) === 0
+    const result = this.adaptivePredict(decisionIndex, EMPTY_PREDICATES)
+    return typeof result === "object" ? result : result === 0
   }
 }
 

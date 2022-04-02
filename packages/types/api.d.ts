@@ -1769,7 +1769,7 @@ export interface DSLMethodOpts<T> {
    * A Higher value may be used for a specific DSL method to resolve ambiguities
    * And a lower value may be used to resolve slow initialization times issues.
    *
-   * TODO: create full docs and link
+   * @deprecated since Chevrotain 11
    */
   MAX_LOOKAHEAD?: number
 }
@@ -1818,7 +1818,7 @@ export interface OrMethodOpts<T> {
    * A Higher value may be used for a specific DSL method to resolve ambiguities
    * And a lower value may be used to resolve slow initialization times issues.
    *
-   * TODO: create full docs and link
+   * @deprecated since Chevrotain 11
    */
   MAX_LOOKAHEAD?: number
 }
@@ -1959,6 +1959,8 @@ export interface IParserConfig {
    * Maximum number of tokens the parser will use to choose between alternatives.
    * By default this value is `4`.
    * In the future it may be reduced to `3` due to performance considerations.
+   *
+   * @deprecated since Chevrotain 11.0.0
    */
   maxLookahead?: number
   /**
@@ -2054,10 +2056,9 @@ export interface IParserErrorMessageProvider {
    * A No Viable Alternative Error happens when the parser cannot detect any valid alternative in an alternation.
    * It corresponds to a failed {@link Parser.OR} in Chevrotain DSL terms.
    *
-   * @param options.expectedPathsPerAlt - First level of the array represents each alternative
-   *                           The next two levels represent valid (expected) paths in each alternative.
+   * @param options.expectedNextTokens - Possible next tokens that would lead to successful lookahead
    *
-   * @param options.actual - The actual sequence of tokens encountered.
+   * @param options.actual - The actual token which prevented the lookahead from succeeding.
    *
    * @param options.previous - The previous Token "instance".
    *                                This is useful if options.actual[0] is of type chevrotain.EOF and you need to know the last token parsed.
@@ -2068,8 +2069,8 @@ export interface IParserErrorMessageProvider {
    * @param options.ruleName - The rule in which the error occurred.
    */
   buildNoViableAltMessage(options: {
-    expectedPathsPerAlt: TokenType[][][]
-    actual: IToken[]
+    expectedNextTokens: TokenType[]
+    actual: IToken
     previous: IToken
     customUserDescription?: string
     ruleName: string
