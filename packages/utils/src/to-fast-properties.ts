@@ -15,7 +15,10 @@ export function toFastProperties(toBecomeFast: any) {
   fakeAccess()
   fakeAccess()
 
-  return toBecomeFast
+  // Always true condition to suppress the Firefox warning of unreachable
+  // code after a return statement.
+  if (1) return toBecomeFast
+
   // Eval prevents optimization of this method (even though this is dead code)
   /* istanbul ignore next */
   // tslint:disable-next-line
