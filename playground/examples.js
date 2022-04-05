@@ -197,7 +197,7 @@ function jsonGrammarOnlyExample() {
     const Comma = createToken({name: "Comma", pattern: /,/});
     const Colon = createToken({name: "Colon", pattern: /:/});
     const StringLiteral = createToken({
-        name: "StringLiteral", pattern: /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
+        name: "StringLiteral", pattern: /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
     });
     const NumberLiteral = createToken({
         name: "NumberLiteral", pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
