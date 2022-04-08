@@ -1,3 +1,21 @@
+## 11.0.0
+
+- Adopted an unbounded lookahead algorithm for alternations (`OR`), repetitions (`MANY`, `AT_LEAST_ONE`) and optional elements (`OPTION`). This change might impact grammars which:
+  - Depend on the exact order of alternatives. Chevrotain will now always pick the **longest matching** alternative, instead of the **first matching** alternative.
+  - Depend on limited LL(k) lookahead to resolve true ambiguities in combination with alternative ordering and the `IGNORE_AMBIGUITIES` flag. The parser will now try to look ahead until the end of an ambiguity where it decides on the alternative with the lowest index. This might result in performance regressions on long lookaheads.
+  - Override internal lookahead parser methods such as `lookAheadBuilderForOptional` or `lookAheadBuilderForAlternatives`.
+  - Are using backtracking to employ pseudo-unbounded lookahead. The backtracking calls won't be necessary anymore in most cases, which also increases parsing performance. However, it might increase memory consumption slightly for large lookaheads.
+- The `IParserErrorMessageProvider.buildNoViableAltMessage` method received a breaking change related to the adaption of the new lookahead algorithm. It now accepts a single array of next possible tokens and the last valid token as its first two arguments:
+  ```TypeScript
+  buildNoViableAltMessage(options: {
+    expectedNextTokens: TokenType[]
+    actual: IToken
+    previous: IToken
+    customUserDescription?: string
+    ruleName: string
+  }): string
+  ```
+
 ## 10.0.0
 
 - Dropped support for legacy ES5.1 runtimes (e.g: IE11)

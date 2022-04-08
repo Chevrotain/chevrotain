@@ -139,7 +139,7 @@ module.exports = {
           collapsable: false,
           children: [
             ["blazing_fast", "Blazing Fast"],
-            ["llk", "LL(K) Grammars"],
+            ["ll-star", "LL(*) Grammars"],
             ["separation", "Separation of Grammar and Semantics"],
             ["easy_debugging", "Easy Debugging"],
             ["fault_tolerance", "Fault Tolerance"],

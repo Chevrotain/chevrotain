@@ -645,12 +645,12 @@ export class RecognizerEngine {
 
     const laFunc = this.getLaFuncFromCache(laKey)
     const altIdxToTake = laFunc.call(this, alts)
-    if (altIdxToTake !== undefined) {
+    if (typeof altIdxToTake === "number") {
       const chosenAlternative: any = alts[altIdxToTake]
       return chosenAlternative.ALT.call(this)
     }
     this.raiseNoAltException(
-      occurrence,
+      altIdxToTake,
       (altsOrOpts as OrMethodOpts<unknown>).ERR_MSG
     )
   }

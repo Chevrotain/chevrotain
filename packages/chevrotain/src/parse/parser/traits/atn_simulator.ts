@@ -22,6 +22,8 @@ import {
   getATNConfigKey
 } from "../../grammar/dfa"
 import min from "lodash/min"
+import flatMap from "lodash/flatMap"
+import uniqBy from "lodash/uniqBy"
 
 type DFACache = (predicateSet: PredicateSet) => DFA
 
@@ -42,6 +44,12 @@ function createDFACache(startState: DecisionState, decision: number): DFACache {
       return existing
     }
   }
+}
+
+export interface AdaptivePredictError {
+  tokenPath: IToken[]
+  possibleTokenTypes: TokenType[]
+  actualToken: IToken
 }
 
 export class ATNSimulator {
@@ -77,10 +85,11 @@ export class ATNSimulator {
     dfa: DFA,
     s0: DFAState,
     predicateSet: PredicateSet
-  ): number | undefined {
+  ): number | AdaptivePredictError {
     let previousD = s0
 
     let i = 1
+    const path: IToken[] = []
     let t = this.LA(i++)
 
     while (true) {
@@ -90,7 +99,7 @@ export class ATNSimulator {
       }
 
       if (d === DFA_ERROR) {
-        return undefined
+        return buildAdaptivePredictError(path, previousD, t)
       }
 
       if (d.isAcceptState === true) {
@@ -98,6 +107,7 @@ export class ATNSimulator {
       }
 
       previousD = d
+      path.push(t)
       t = this.LA(i++)
     }
   }
@@ -159,6 +169,28 @@ export class ATNSimulator {
 
   logLookaheadAmbiguity(message: string): void {
     console.log(message)
+  }
+}
+
+function buildAdaptivePredictError(
+  path: IToken[],
+  previous: DFAState,
+  current: IToken
+): AdaptivePredictError {
+  const nextTransitions = flatMap(
+    previous.configs.elements,
+    (e) => e.state.transitions
+  )
+  const nextTokenTypes = uniqBy(
+    nextTransitions
+      .filter((e): e is AtomTransition => e instanceof AtomTransition)
+      .map((e) => e.tokenType),
+    (e) => e.tokenTypeIdx
+  )
+  return {
+    actualToken: current,
+    possibleTokenTypes: nextTokenTypes,
+    tokenPath: path
   }
 }
 

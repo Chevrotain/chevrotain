@@ -37,67 +37,6 @@ new Lexer([], {
 })
 ```
 
-## Use a smaller Global maxLookahead
-
-Chevrotain is a K tokens lookahead Parser, this means it peeks ahead (at most) K Tokens to
-determine the alternative to pick whenever it encounters a "branching" in the grammar.
-
-During initialization Chevrotain pre-computes and caches lookahead functions that would
-later be used at runtime. The global [maxLookahead](https://chevrotain.io/documentation/10_1_2/interfaces/IParserConfig.html#maxLookAhead)
-setting can significantly affect the performance of this pre-computation due to the fact the number of possible "paths"
-in the grammar can grow **exponentially** as the max length of the possible paths increases.
-
-Example:
-
-```javascript
-class LowLookaheadParser extends CstParser {
-  constructor() {
-    super([], {
-      // By default this value is 3
-      maxLookahead: 2
-    })
-
-    this.performSelfAnalysis()
-  }
-}
-```
-
-Note that the global maxLookahead can be overridden for **individual** DSL methods(OR/OPTION/MANY/...) invocations, For example:
-
-```javascript
-class LowLookaheadParser extends CstParser {
-  constructor() {
-    super([], {
-      // Globally **only one** token lookahead.
-      maxLookahead: 1
-    })
-
-    $.RULE("value", () => {
-      $.OR({
-        // We need **two** tokens lookahead to distinguish between these two alternatives
-        MAX_LOOKAHEAD: 2,
-        DEF: [
-          {
-            ALT: () => {
-              $.CONSUME(A)
-              $.CONSUME(B)
-            }
-          },
-          {
-            ALT: () => {
-              $.CONSUME(A)
-              $.CONSUME(C)
-            }
-          }
-        ]
-      })
-    })
-
-    this.performSelfAnalysis()
-  }
-}
-```
-
 ## Disabling Grammar Validations
 
 Chevrotain performs many validations during Lexer & Parser initialization, however those are not really relevant

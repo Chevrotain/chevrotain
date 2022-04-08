@@ -7,7 +7,6 @@ const options = {
     // where this path will be imported using `WorkerGlobalScope.importScripts()`
     bundle: "../../lib/chevrotain.js",
     parserConfig: {
-      maxLookahead: 2,
       outputCst: false
     }
   },

@@ -8,105 +8,32 @@
 
 ## Common Prefix Ambiguities
 
-Imagine the following grammar:
-
-```antlr
-myRule:
-  "A" "B" |
-  "A" "B" "C"
-```
-
-The first alternative is a prefix of the second alternative.
-Now lets consider the input ["A", "B"].
-For this input the first alternative would be matched as expected.
-
-However for the input ["A", "B", "C"] the first
-alternative would still be matched but this time **incorrectly**
-as alternation matches are attempted **in order**.
-
-There are two ways to resolve this:
-
-- Reorder the alternatives so that shorter common prefix lookahead
-  paths appears after the longer ones.
-
-  ```antlr
-  myRule:
-    "A" "B" "C" |
-    "A" "B"
-  ```
-
-- Refactor the grammar to extract common prefixes.
-
-  ```antlr
-    myRule:
-      "A" "B" ("C")?
-  ```
+This problem can no longer occur in versions of Chevrotain after (and including) 11.0.0.
+See [V10 of these Docs](https://github.com/chevrotain/chevrotain/blob/v10.0.0/packages/chevrotain/docs/guide/resolving_grammar_errors.md#COMMON_PREFIX) if you have not yet upgraded.
 
 ## Ambiguous Alternatives Detected
+
+The way this grammar error is detected and handled has changed in versions of Chevrotain after (and including) 11.0.0.
+See [V10 of these Docs](https://github.com/chevrotain/chevrotain/blob/v10.0.0/packages/chevrotain/docs/guide/resolving_grammar_errors.md#AMBIGUOUS_ALTERNATIVES) if you have not yet upgraded.
 
 An Ambiguous Alternatives Error occurs when Chevrotain cannot decide between two alternatives in
 an alternation (OR DSL method).
 
-Chevrotain "looks ahead" at most [K (3 by default)][maxlookahead]
-tokens to determine which alternative to pick. An Ambiguous Alternatives Error indicates
-that more than K tokens lookahead is needed.
+Chevrotain "looks ahead" an unlimited amount of tokens to determine which alternative to pick. An Ambiguous Alternatives Error indicates that two alternatives can be parsed using the exact same path of tokens.
 
-Lets consider a more concrete example:
+Lets consider a simple example:
 
 ```antlr
-fiveTokensLookahead:
-  "A" "B" "C" "D" "1" |
-  "A" "B" "C" "D" "2"
-```
-
-In order to decide between these two alternatives, Chevrotain must "look ahead" **five** tokens as the
-disambiguating tokens are "1" and "2".
-Five is a larger than the default [maxLookahead][maxlookahead] of four, so an error will be raised.
-
-We could solve this case by increasing the global [maxLookahead][maxlookahead] to 5, however this is **not** recommended
-due to performance and grammar complexity reasons.
-From a performance perspective this is particularly problematic as some analysis
-done on the grammar (during initialization) may become **exponentially** more complex as the maxLookahead grows.
-
-We could also specify the [MAX_LOOKAHEAD](https://chevrotain.io/documentation/10_1_2/interfaces/OrMethodOpts.html#IGNORE_AMBIGUITIES)
-config on the **specific** DSL method invocation where the problem occurs, This is still not the optimal solution in this case.
-
-**_The recommended solution in this case would be to refactor the grammar to require a smaller lookahead_**.
-In our trivial example the grammar can be refactored to be LL(1), meaning only one token of lookahead is needed.
-The needed change is a simple **extraction of the common prefix before the alternation**.
-
-```antlr
-oneTokenLookahead:
+ambiguousLookahead:
+  "A" "B" "C" "D" |
   "A" "B" "C" "D"
-  (
-    "1" |
-    "2"
-  )
 ```
 
-Note that the number of lookahead tokens needed to choose between alternatives may in fact be **infinite**, for example:
+If Chevrotain encounters such an alternative during the runtime, an error message will be printed to the console. This error **cannot be caught** with the static parser validation. Chevrotain will resolve the ambiguity in favor of the matching alternative with the lowest index. You can usually avoid lookahead ambiguities by removing the ambiguous alternative. Alternatively, a [GATE](https://chevrotain.io/docs/features/gates.html) which makes the alternatives mutually exclusive can deal with this issue as well.
 
-```antlr
-infiniteTokensLookahead:
-  ("A")* "1"  |
-  ("A")* "2"
-```
+In some rare cases the grammar depends on the use of nested `GATEs` to predict the correct alternative, in those cases it is necessary to resolve the ambiguity using the [backtracking feature](../features/backtracking.md), although this is **strongly** discouraged due to performance and complexity reasons.
 
-No matter how large a maxLookahead we choose, the sequence of "A"s could always (potentially) be longer...
-The solution in this case is the same as before, **extraction of the common prefix before the alternation**, for example:
-
-```antlr
-oneTokenLookahead:
-  ("A")*
-  (
-    "1" |
-    "2"
-  )
-```
-
-In some rare cases refactoring the grammar is not possible, in those cases it is still possible to resolve the
-ambiguity using the [backtracking feature](../features/backtracking.md)
-Although this is **strongly** discouraged due to performance and complexity reasons...
+Grammars employing backtracking to artificially increase the lookahead for Versions of Chevrotain prior to 11 can usually remove it completely.
 
 ## Terminal Token Name Not Found
 

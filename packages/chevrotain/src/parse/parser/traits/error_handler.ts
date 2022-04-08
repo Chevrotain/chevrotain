@@ -17,6 +17,7 @@ import {
 } from "../../grammar/lookahead"
 import { MixedInParser } from "./parser_traits"
 import { DEFAULT_PARSER_CONFIG } from "../parser"
+import { AdaptivePredictError } from "./atn_simulator"
 
 /**
  * Trait responsible for runtime parsing errors.
@@ -90,27 +91,14 @@ export class ErrorHandler {
   // TODO: consider caching the error message computed information
   raiseNoAltException(
     this: MixedInParser,
-    occurrence: number,
+    adaptivePredictError: AdaptivePredictError,
     errMsgTypes: string | undefined
   ): never {
-    const ruleName = this.getCurrRuleFullName()
-    const ruleGrammar = this.getGAstProductions()[ruleName]
-    // TODO: getLookaheadPathsForOr can be slow for large enough maxLookahead and certain grammars, consider caching ?
-    const lookAheadPathsPerAlternative = getLookaheadPathsForOr(
-      occurrence,
-      ruleGrammar,
-      this.maxLookahead
-    )
-
-    const actualTokens = []
-    for (let i = 1; i <= this.maxLookahead; i++) {
-      actualTokens.push(this.LA(i))
-    }
-    const previousToken = this.LA(0)
+    const previousToken = this.LA(adaptivePredictError.tokenPath.length)
 
     const errMsg = this.errorMessageProvider.buildNoViableAltMessage({
-      expectedPathsPerAlt: lookAheadPathsPerAlternative,
-      actual: actualTokens,
+      expectedNextTokens: adaptivePredictError.possibleTokenTypes,
+      actual: adaptivePredictError.actualToken,
       previous: previousToken,
       customUserDescription: errMsgTypes,
       ruleName: this.getCurrRuleFullName()

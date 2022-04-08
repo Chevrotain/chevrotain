@@ -202,7 +202,6 @@ export class Parser {
         if (isEmpty(resolverErrors) && this.skipValidations === false) {
           const validationErrors = validateGrammar({
             rules: values(this.gastProductionsCache),
-            maxLookahead: this.maxLookahead,
             tokenTypes: values(this.tokensMap),
             errMsgProvider: defaultGrammarValidatorErrorProvider,
             grammarName: className

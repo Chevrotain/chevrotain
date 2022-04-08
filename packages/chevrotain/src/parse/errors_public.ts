@@ -31,7 +31,7 @@ export const defaultParserErrorProvider: IParserErrorMessageProvider = {
   },
 
   buildNoViableAltMessage({
-    expectedPathsPerAlt,
+    expectedNextTokens,
     actual,
     previous,
     customUserDescription,
@@ -39,31 +39,22 @@ export const defaultParserErrorProvider: IParserErrorMessageProvider = {
   }): string {
     const errPrefix = "Expecting: "
     // TODO: issue: No Viable Alternative Error may have incomplete details. #502
-    const actualText = first(actual)!.image
-    const errSuffix = "\nbut found: '" + actualText + "'"
+    const actualText = actual.image
+    const previousText = previous.image
+    const errSuffix =
+      "\n" +
+      (previousText ? "after '" + previous.image + "' " : "") +
+      "but found: '" +
+      actualText +
+      "'"
 
     if (customUserDescription) {
       return errPrefix + customUserDescription + errSuffix
     } else {
-      const allLookAheadPaths = reduce(
-        expectedPathsPerAlt,
-        (result, currAltPaths) => result.concat(currAltPaths),
-        [] as TokenType[][]
-      )
-      const nextValidTokenSequences = map(
-        allLookAheadPaths,
-        (currPath) =>
-          `[${map(currPath, (currTokenType) => tokenLabel(currTokenType)).join(
-            ", "
-          )}]`
-      )
-      const nextValidSequenceItems = map(
-        nextValidTokenSequences,
-        (itemMsg, idx) => `  ${idx + 1}. ${itemMsg}`
-      )
-      const calculatedDescription = `one of these possible Token sequences:\n${nextValidSequenceItems.join(
-        "\n"
-      )}`
+      const calculatedDescription = `one of these possible Tokens:\n[${map(
+        expectedNextTokens,
+        (currTokenType) => tokenLabel(currTokenType)
+      ).join(", ")}]`
 
       return errPrefix + calculatedDescription + errSuffix
     }

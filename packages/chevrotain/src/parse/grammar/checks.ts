@@ -43,7 +43,6 @@ import {
 
 export function validateGrammar(
   topLevels: Rule[],
-  globalMaxLookahead: number,
   tokenTypes: TokenType[],
   errMsgProvider: IGrammarValidatorErrorMessageProvider,
   grammarName: string
@@ -62,7 +61,6 @@ export function validateGrammar(
   if (isEmpty(leftRecursionErrors)) {
     emptyRepetitionErrors = validateSomeNonEmptyLookaheadPath(
       topLevels,
-      globalMaxLookahead,
       errMsgProvider
     )
   }
@@ -345,9 +343,7 @@ class OrCollector extends GAstVisitor {
 }
 
 export class RepetitionCollector extends GAstVisitor {
-  public allProductions: (IProductionWithOccurrence & {
-    maxLookahead?: number
-  })[] = []
+  public allProductions: IProductionWithOccurrence[] = []
 
   public visitRepetitionWithSeparator(manySep: RepetitionWithSeparator): void {
     this.allProductions.push(manySep)
@@ -399,7 +395,6 @@ export function validateTooManyAlts(
 
 export function validateSomeNonEmptyLookaheadPath(
   topLevelRules: Rule[],
-  maxLookahead: number,
   errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserDefinitionError[] {
   const errors: IParserDefinitionError[] = []
@@ -409,13 +404,12 @@ export function validateSomeNonEmptyLookaheadPath(
     const allRuleProductions = collectorVisitor.allProductions
     forEach(allRuleProductions, (currProd) => {
       const prodType = getProdType(currProd)
-      const actualMaxLookahead = currProd.maxLookahead || maxLookahead
       const currOccurrence = currProd.idx
       const paths = getLookaheadPathsForOptionalProd(
         currOccurrence,
         currTopRule,
         prodType,
-        actualMaxLookahead
+        1
       )
       const pathsInsideProduction = paths[0]
       if (isEmpty(flatten(pathsInsideProduction))) {
