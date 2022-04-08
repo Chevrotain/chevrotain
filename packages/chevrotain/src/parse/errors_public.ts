@@ -54,7 +54,7 @@ export const defaultParserErrorProvider: IParserErrorMessageProvider = {
       const calculatedDescription = `one of these possible Tokens:\n[${map(
         expectedNextTokens,
         (currTokenType) => tokenLabel(currTokenType)
-      )}]`
+      ).join(", ")}]`
 
       return errPrefix + calculatedDescription + errSuffix
     }

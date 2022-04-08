@@ -222,7 +222,7 @@ describe("Chevrotain Tutorial", () => {
       let parsingResult = parseJsonToCst(invalidInput)
       expect(parsingResult.parseErrors).to.have.lengthOf(1)
       expect(parsingResult.parseErrors[0].message).to.include(
-        "Expecting: one of these possible Token sequences:\n  1. [StringLiteral]\n  2. [NumberLiteral]\n  3. [LCurly]\n  4. [LSquare]\n  5. [True]\n  6. [False]\n  7. [Null]\nbut found: ':'"
+        "Expecting: one of these possible Tokens:\n[StringLiteral, NumberLiteral, LCurly, LSquare, True, False, Null]\nafter ':' but found: ':'"
       )
       let minimizedCst = minimizeCst(parsingResult.cst)
 

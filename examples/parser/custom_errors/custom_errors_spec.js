@@ -35,7 +35,7 @@ describe("The Chevrotain support for custom error provider", () => {
     const errors = rules.parseNoViable("C")
     expect(errors).to.have.lengthOf(1)
     expect(errors[0].message).to.equal(
-      "Expecting: one of these possible Token sequences:\n  1. [Alpha]\n  2. [Bravo]\nbut found: 'C'"
+      "Expecting: one of these possible Tokens:\n[Alpha, Bravo]\nbut found: 'C'"
     )
   })
 
