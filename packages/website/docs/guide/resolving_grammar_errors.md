@@ -26,10 +26,10 @@ Lets consider a simple example:
 ```antlr
 ambiguousLookahead:
   "A" "B" "C" "D" |
-  "A" "B" "C" "D" 
+  "A" "B" "C" "D"
 ```
 
-If Chevrotain encounters such an alternative during the runtime, an error message will be printed to the console. This error __cannot be caught__ with the static parser validation. Chevrotain will resolve the ambiguity in favor of the matching alternative with the lowest index. You can usually avoid lookahead ambiguities by removing the ambiguous alternative. Alternatively, a [GATE](https://chevrotain.io/docs/features/gates.html) which makes the alternatives mutually exclusive can deal with this issue as well.
+If Chevrotain encounters such an alternative during the runtime, an error message will be printed to the console. This error **cannot be caught** with the static parser validation. Chevrotain will resolve the ambiguity in favor of the matching alternative with the lowest index. You can usually avoid lookahead ambiguities by removing the ambiguous alternative. Alternatively, a [GATE](https://chevrotain.io/docs/features/gates.html) which makes the alternatives mutually exclusive can deal with this issue as well.
 
 In some rare cases the grammar depends on the use of nested `GATEs` to predict the correct alternative, in those cases it is necessary to resolve the ambiguity using the [backtracking feature](../features/backtracking.md), although this is **strongly** discouraged due to performance and complexity reasons.
 

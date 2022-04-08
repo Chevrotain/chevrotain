@@ -23,6 +23,7 @@ import {
 } from "../../grammar/dfa"
 import min from "lodash/min"
 import flatMap from "lodash/flatMap"
+import uniqBy from "lodash/uniqBy"
 
 type DFACache = (predicateSet: PredicateSet) => DFA
 
@@ -180,9 +181,12 @@ function buildAdaptivePredictError(
     previous.configs.elements,
     (e) => e.state.transitions
   )
-  const nextTokenTypes = nextTransitions
-    .filter((e): e is AtomTransition => e instanceof AtomTransition)
-    .map((e) => e.tokenType)
+  const nextTokenTypes = uniqBy(
+    nextTransitions
+      .filter((e): e is AtomTransition => e instanceof AtomTransition)
+      .map((e) => e.tokenType),
+    (e) => e.tokenTypeIdx
+  )
   return {
     actualToken: current,
     possibleTokenTypes: nextTokenTypes,

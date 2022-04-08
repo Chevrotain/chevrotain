@@ -1,7 +1,7 @@
-# LL(*) Grammars Support
+# LL(\*) Grammars Support
 
-Chevrotain can be used to build parsers for [LL(*)](https://en.wikipedia.org/wiki/LL_grammar) Grammars.
-This means that the number of lookahead tokens needed to disambiguate two alternatives __must not be known__ in advance.
+Chevrotain can be used to build parsers for [LL(\*)](https://en.wikipedia.org/wiki/LL_grammar) Grammars.
+This means that the number of lookahead tokens needed to disambiguate two alternatives **must not be known** in advance.
 
 For example given the grammar:
 

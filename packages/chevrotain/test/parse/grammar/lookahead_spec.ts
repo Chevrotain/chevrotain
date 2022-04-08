@@ -1,4 +1,3 @@
-import { END_OF_FILE } from "../../../src/parse/parser/parser"
 import { createToken, EOF } from "../../../src/scan/tokens_public"
 import {
   getProdType,
@@ -8,11 +7,7 @@ import {
   PredicateSet,
   buildLookaheadFuncForOr
 } from "../../../src/parse/grammar/lookahead"
-import map from "lodash/map"
-import {
-  augmentTokenTypes,
-  tokenStructuredMatcher
-} from "../../../src/scan/tokens"
+import { augmentTokenTypes } from "../../../src/scan/tokens"
 import { createRegularToken } from "../../utils/matchers"
 import {
   Alternation,
@@ -26,11 +21,12 @@ import {
   Rule,
   Terminal
 } from "@chevrotain/gast"
-import { IProduction, IToken, TokenType } from "@chevrotain/types"
+import { TokenType } from "@chevrotain/types"
 import {
   EmbeddedActionsParser,
   MixedInParser
 } from "../../../src/parse/parser/traits/parser_traits"
+import { AdaptivePredictError } from "../../../src/parse/parser/traits/atn_simulator"
 import { expect } from "chai"
 
 describe("getProdType", () => {
@@ -113,6 +109,7 @@ context("lookahead specs", () => {
   let actionDec: Rule
   let lotsOfOrs: Rule
   let emptyAltOr: Rule
+  let deepOption: Rule
 
   let IdentTok: TokenType
   let DotTok: TokenType
@@ -313,6 +310,40 @@ context("lookahead specs", () => {
         })
       ]
     })
+
+    deepOption = new Rule({
+      name: "deepOption",
+      definition: [
+        new Option({
+          definition: [
+            new Terminal({
+              terminalType: DotTok,
+              idx: 1
+            }),
+            new Terminal({
+              terminalType: DotTok,
+              idx: 2
+            }),
+            new Terminal({
+              terminalType: ColonTok,
+              idx: 1
+            })
+          ]
+        }),
+        new Terminal({
+          terminalType: DotTok,
+          idx: 3
+        }),
+        new Terminal({
+          terminalType: DotTok,
+          idx: 4
+        }),
+        new Terminal({
+          terminalType: CommaTok,
+          idx: 1
+        })
+      ]
+    })
   })
 
   describe("The Grammar Lookahead namespace", () => {
@@ -392,6 +423,56 @@ context("lookahead specs", () => {
 
       expect(laFunc.call(commaParserMock)).to.equal(true)
       expect(laFunc.call(identParserMock)).to.equal(false)
+    })
+
+    it("can compute the lookahead function for a deep OPTION", () => {
+      const colonParserMock = new MockParserVar(
+        [DotTok, DotTok, ColonTok],
+        [deepOption]
+      )
+      const commaParserMock = new MockParserVar(
+        [DotTok, DotTok, CommaTok],
+        [deepOption]
+      )
+      const invalidLongMock = new MockParserVar(
+        [DotTok, DotTok, ActionTok],
+        [deepOption]
+      )
+      const invalidShortMock = new MockParserVar(
+        [DotTok, ActionTok],
+        [deepOption]
+      )
+
+      const laFunc = buildLookaheadFuncForOptionalProd(
+        deepOption,
+        1,
+        PROD_TYPE.OPTION,
+        0,
+        false
+      )
+
+      expect(laFunc.call(colonParserMock)).to.equal(true)
+      expect(laFunc.call(commaParserMock)).to.equal(false)
+      const invalidLong = laFunc.call(invalidLongMock) as AdaptivePredictError
+      expect(
+        invalidLong.tokenPath.map((e) => e.tokenType.name)
+      ).to.be.deep.equal([DotTok.name, DotTok.name])
+      expect(
+        invalidLong.possibleTokenTypes.map((e) => e.name)
+      ).to.be.deep.equal([ColonTok.name, CommaTok.name])
+      expect(invalidLong.actualToken.tokenType.name).to.be.deep.equal(
+        ActionTok.name
+      )
+      const invalidShort = laFunc.call(invalidShortMock) as AdaptivePredictError
+      expect(
+        invalidShort.tokenPath.map((e) => e.tokenType.name)
+      ).to.be.deep.equal([DotTok.name])
+      expect(
+        invalidShort.possibleTokenTypes.map((e) => e.name)
+      ).to.be.deep.equal([DotTok.name])
+      expect(invalidShort.actualToken.tokenType.name).to.be.deep.equal(
+        ActionTok.name
+      )
     })
 
     it("can compute the lookahead function for lots of ORs sample", () => {
