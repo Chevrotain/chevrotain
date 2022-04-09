@@ -248,6 +248,13 @@ export class Parser {
   selfAnalysisDone = false
   protected skipValidations: boolean
 
+  /**
+   * Getter to return a a boolean, checking if the parser has any errors
+   */
+  get hasErrors(): boolean {
+    return this.errors.length > 0;
+  }
+  
   constructor(tokenVocabulary: TokenVocabulary, config: IParserConfig) {
     const that: MixedInParser = this as any
     that.initErrorHandler(config)
