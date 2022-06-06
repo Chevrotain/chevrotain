@@ -5701,12 +5701,12 @@ error-ex@^1.2.0, error-ex@^1.3.1:
   dependencies:
     is-arrayish "^0.2.1"
 
-error-stack-parser@2.0.7:
-  version "2.0.7"
-  resolved "https://registry.yarnpkg.com/error-stack-parser/-/error-stack-parser-2.0.7.tgz#b0c6e2ce27d0495cf78ad98715e0cad1219abb57"
-  integrity sha512-chLOW0ZGRf4s8raLrDxa5sdkvPec5YdvwbFnqJme4rk0rFajP8mPtrDL1+I+CwrQDCjswDA5sREX7jYQDQs9vA==
+error-stack-parser@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/error-stack-parser/-/error-stack-parser-3.0.0.tgz#22e1fd2051491b04ca01b22423b174d6982e6dd1"
+  integrity sha512-jz/qTUa24F2QDCVPeilr3IFgOQhbZtlUkOpQ8vpkPExAnjfyx1MRPSgTZObUnBscQwgboq0+gBeRYN4o4HriSA==
   dependencies:
-    stackframe "^1.1.1"
+    stackframe "^1.3.0"
 
 es-abstract@^1.17.0-next.1:
   version "1.17.0"
@@ -12646,10 +12646,10 @@ stack-utils@^1.0.1:
   resolved "https://registry.yarnpkg.com/stack-utils/-/stack-utils-1.0.2.tgz#33eba3897788558bebfc2db059dc158ec36cebb8"
   integrity sha512-MTX+MeG5U994cazkjd/9KNAapsHnibjMLnfXodlkXw76JEea0UiNzrqidzo1emMwk7w5Qhc9jd4Bn9TBb1MFwA==
 
-stackframe@^1.1.1:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/stackframe/-/stackframe-1.2.0.tgz#52429492d63c62eb989804c11552e3d22e779303"
-  integrity sha512-GrdeshiRmS1YLMYgzF16olf2jJ/IzxXY9lhKOskuVziubpTYcYqyOwYeJKzQkwy7uN0fYSsbsC4RQaXf9LCrYA==
+stackframe@^1.3.0:
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/stackframe/-/stackframe-1.3.2.tgz#63b41e860bd07e2606274cbd1f1fad7236f223d5"
+  integrity sha512-aPWS6K6ZVXxWB+r5TKv/iUNi7mw/f9VVEtJawrIHABGeIKQF+b2FugjRjFoGtlZVwr27Z7ZaLQGAWZ9Imjt+3A==
 
 static-extend@^0.1.1:
   version "0.1.2"

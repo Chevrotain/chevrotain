@@ -81,7 +81,7 @@
   "devDependencies": {
     "@types/lodash": "4.14.179",
     "@types/sinon-chai": "3.2.8",
-    "error-stack-parser": "2.0.7",
+    "error-stack-parser": "3.0.0",
     "esbuild": "0.14.25",
     "gen-esm-wrapper": "1.1.3",
     "gitty": "3.7.2",
