@@ -1,0 +1,1 @@
+const e=JSON.parse('{"key":"v-5c96722e","path":"/features/token_skipping.html","title":"Token Skipping","lang":"en-US","frontmatter":{},"excerpt":"","headers":[],"git":{"updatedTime":1614549192000,"contributors":[{"name":"Shahar Soel","email":"4233843+bd82@users.noreply.github.com","commits":1}]},"filePathRelative":"features/token_skipping.md"}');export{e as data};

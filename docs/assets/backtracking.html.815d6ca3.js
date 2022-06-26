@@ -1,0 +1,1 @@
+const e=JSON.parse('{"key":"v-73399762","path":"/features/backtracking.html","title":"Backtracking","lang":"en-US","frontmatter":{},"excerpt":"","headers":[],"git":{"updatedTime":1614549192000,"contributors":[{"name":"Shahar Soel","email":"4233843+bd82@users.noreply.github.com","commits":1}]},"filePathRelative":"features/backtracking.md"}');export{e as data};

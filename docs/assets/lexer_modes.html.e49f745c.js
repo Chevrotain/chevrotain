@@ -1,0 +1,1 @@
+const e=JSON.parse('{"key":"v-64a4bd75","path":"/features/lexer_modes.html","title":"Lexer Modes","lang":"en-US","frontmatter":{},"excerpt":"","headers":[],"git":{"updatedTime":1614549192000,"contributors":[{"name":"Shahar Soel","email":"4233843+bd82@users.noreply.github.com","commits":1}]},"filePathRelative":"features/lexer_modes.md"}');export{e as data};
