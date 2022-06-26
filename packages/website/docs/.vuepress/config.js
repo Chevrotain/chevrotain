@@ -64,19 +64,19 @@ module.exports = {
       return vuepressSlugify(str)
     }
   },
+  plugins: [
+    docsearchPlugin({
+      apiKey: "512c3a75c3c7e55f583e8e9c5f131066",
+      indexName: "sap_chevrotain",
+      appId: "J7Q8R9M5PG"
+    })
+  ],
   theme: defaultTheme({
     repo: "chevrotain/chevrotain",
     docsDir: "packages/website/docs",
     docsBranch: "master",
     editLinks: true,
     editLinkText: "Edit this page on GitHub",
-    plugins: [
-      docsearchPlugin({
-        apiKey: "512c3a75c3c7e55f583e8e9c5f131066",
-        indexName: "sap_chevrotain",
-        appId: "J7Q8R9M5PG"
-      })
-    ],
     navbar: [
       { text: "Home", link: "/" },
       { text: "Features", link: "/features/blazing_fast" },
