@@ -1,4 +1,4 @@
-# Internal Implementation Details
+# Internals
 
 Chevrotain provides an abstraction for building Parsers, however no abstraction is prefect
 and at some point understand the implementation details may become necessary.

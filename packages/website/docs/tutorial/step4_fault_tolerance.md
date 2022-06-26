@@ -1,4 +1,4 @@
-# Tutorial - Fault Tolerant
+# Fault Tolerance
 
 ### TLDR
 

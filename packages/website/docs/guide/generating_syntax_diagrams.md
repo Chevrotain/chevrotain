@@ -1,4 +1,4 @@
-# Generating Syntax Diagrams for a grammar.
+# Syntax Diagrams
 
 It is often useful to visually inspect a grammar's syntax diagrams during development
 or for documentation purposes.

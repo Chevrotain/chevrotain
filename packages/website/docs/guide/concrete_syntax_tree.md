@@ -1,4 +1,6 @@
-# Automatic Concrete Syntax Tree Creation
+# CST
+
+## Automatic Concrete Syntax Tree Creation
 
 Chevrotain has the capability to **automatically** create a concrete syntax tree (CST)
 during parsing. A CST is a simple structure which represents the **entire** parse tree.

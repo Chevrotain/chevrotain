@@ -1,4 +1,6 @@
-# Optimizing Runtime Performance
+# Runtime Performance
+
+This document lists tips and tricks to optimize runtime performance.
 
 ## Using a Singleton Parser
 

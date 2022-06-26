@@ -1,4 +1,4 @@
-# Tutorial - Semantics Embedded Actions
+# Semantics - Embedded
 
 ### TLDR
 

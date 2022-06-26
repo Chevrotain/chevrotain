@@ -1,4 +1,4 @@
-# Tutorial - Semantics
+# Semantics
 
 ## Introduction
 

@@ -1,4 +1,4 @@
-# LL(K) Grammars Support
+# LL(K) Grammars
 
 Chevrotain can be used to build parsers for [LL(K)](https://en.wikipedia.org/wiki/LL_grammar) Grammars.
 This means that the number of lookahead tokens needed to disambiguate two alternatives must

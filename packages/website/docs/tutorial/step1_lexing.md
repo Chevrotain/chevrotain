@@ -1,4 +1,4 @@
-# Tutorial - Lexer
+# Lexer
 
 ### TLDR
 

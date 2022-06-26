@@ -1,4 +1,4 @@
-# Cold Start Performance
+# Initialization Performance
 
 Chevrotain is (mostly) a runtime tool (No code generation).
 This means there is a fair bit of logic happening every time a Chevrotain Parser or Lexer are initialized.

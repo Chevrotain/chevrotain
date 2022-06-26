@@ -6,10 +6,10 @@ const fs = require("fs")
 const myRepo = git("")
 
 const newVersion = config.currVersion
-const dateTemplateRegExp = /^(## X\.Y\.Z )\(INSERT_DATE_HERE\)/
+const dateTemplateRegExp = /^.+\n\n(## X\.Y\.Z )\(INSERT_DATE_HERE\)/
 if (!dateTemplateRegExp.test(config.changeLogString)) {
   console.log(
-    "CHANGELOG.md must have first line in the format '## X.Y.Z (INSERT_DATE_HERE)'"
+    "CHANGELOG.md must contain '## X.Y.Z (INSERT_DATE_HERE)' as the third line"
   )
   process.exit(-1)
 }

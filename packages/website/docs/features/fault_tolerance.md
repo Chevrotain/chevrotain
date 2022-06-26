@@ -1,7 +1,7 @@
-# Fault Tolerance and Error Recovery.
+# Fault Tolerance
 
 Chevrotain provides automatic error recovery capabilities, this means
-that Chevrotain parsers are fault tolerant which is an important capability
+that Chevrotain parsers are fault-tolerant which is an important capability
 when creating editor and language services tooling.
 
 In practical terms this means that Chevrotain will be able to report multiple

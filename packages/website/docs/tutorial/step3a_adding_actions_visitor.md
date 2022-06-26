@@ -1,4 +1,4 @@
-# Tutorial - Semantics CST Visitor
+# Semantics - CST Visitor
 
 [Run and Debug the source code](https://github.com/chevrotain/chevrotain/tree/master/examples/tutorial/step3_actions/step3a_actions_visitor.js).
 

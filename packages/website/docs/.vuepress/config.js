@@ -1,5 +1,7 @@
 const _ = require("lodash")
-const vueSlugify = require("@vuepress/shared-utils/lib/slugify")
+const { vuepressSlugify } = require("@vuepress/markdown")
+const { defaultTheme } = require("@vuepress/theme-default")
+const { docsearchPlugin } = require("@vuepress/plugin-docsearch")
 const jf = require("jsonfile")
 const path = require("path")
 
@@ -59,20 +61,23 @@ module.exports = {
         return mappedSlug
       }
 
-      return vueSlugify(str)
+      return vuepressSlugify(str)
     }
   },
-  themeConfig: {
+  theme: defaultTheme({
     repo: "chevrotain/chevrotain",
     docsDir: "packages/website/docs",
     docsBranch: "master",
-    algolia: {
-      apiKey: "3f49ee33a1bc4d674ff8c03ab99c3c1e",
-      indexName: "sap_chevrotain"
-    },
     editLinks: true,
     editLinkText: "Edit this page on GitHub",
-    nav: [
+    plugins: [
+      docsearchPlugin({
+        apiKey: "512c3a75c3c7e55f583e8e9c5f131066",
+        indexName: "sap_chevrotain",
+        appId: "J7Q8R9M5PG"
+      })
+    ],
+    navbar: [
       { text: "Home", link: "/" },
       { text: "Features", link: "/features/blazing_fast" },
       { text: "Tutorial", link: "/tutorial/step0_introduction" },
@@ -101,77 +106,73 @@ module.exports = {
     sidebar: {
       "/tutorial/": [
         {
-          title: "Tutorial",
+          text: "Tutorial",
           collapsable: false,
           children: [
-            // "",
-            ["step0_introduction", "Introduction"],
-            ["step1_lexing", "Lexer"],
-            ["step2_parsing", "Parser"],
-            ["step3_adding_actions_root", "Semantics"],
-            ["step3a_adding_actions_visitor", "Semantics - CST Visitor"],
-            ["step3b_adding_actions_embedded", "Semantics - Embedded"],
-            ["step4_fault_tolerance", "Fault Tolerance"]
+            "/tutorial/step0_introduction.md",
+            "/tutorial/step1_lexing.md",
+            "/tutorial/step2_parsing.md",
+            "/tutorial/step3_adding_actions_root.md",
+            "/tutorial/step3a_adding_actions_visitor.md",
+            "/tutorial/step3b_adding_actions_embedded.md",
+            "/tutorial/step4_fault_tolerance.md"
           ]
         }
       ],
       "/guide/": [
         {
-          title: "Guide",
+          text: "Guide",
           collapsable: false,
           children: [
-            ["introduction", "Introduction"],
-            ["performance", "Runtime Performance"],
-            ["initialization_performance", "Initialization Performance"],
-            ["concrete_syntax_tree", "CST"],
-            ["generating_syntax_diagrams", "Syntax Diagrams"],
-            ["custom_token_patterns", "Custom Token Patterns"],
-            ["syntactic_content_assist", "Syntactic Content Assist"],
-            ["internals", "Internals"],
-            ["resolving_grammar_errors", "Resolving Grammar Errors"],
-            ["resolving_lexer_errors", "Resolving Lexer Errors"]
+            "/guide/introduction.md",
+            "/guide/performance.md",
+            "/guide/initialization_performance.md",
+            "/guide/concrete_syntax_tree.md",
+            "/guide/generating_syntax_diagrams.md",
+            "/guide/custom_token_patterns.md",
+            "/guide/syntactic_content_assist.md",
+            "/guide/internals.md",
+            "/guide/resolving_grammar_errors.md",
+            "/guide/resolving_lexer_errors.md"
           ]
         }
       ],
       "/features/": [
         {
-          title: "Features",
+          text: "Features",
           collapsable: false,
           children: [
-            ["blazing_fast", "Blazing Fast"],
-            ["llk", "LL(K) Grammars"],
-            ["separation", "Separation of Grammar and Semantics"],
-            ["easy_debugging", "Easy Debugging"],
-            ["fault_tolerance", "Fault Tolerance"],
-            ["multiple_start_rules", "Multiple Start Rules"],
-            ["custom_errors", "Customizable Error Messages"],
-            ["parameterized_rules", "Parameterized Rules"],
-            ["gates", "Gates"],
-            ["syntactic_content_assist", "Syntactic Content Assist"],
-            ["grammar_inheritance", "Grammar Inheritance"],
-            ["backtracking", "Backtracking"],
-            ["syntax_diagrams", "Syntax Diagrams"],
-            ["regexp", "RegExp Based Lexers"],
-            ["position_tracking", "Position Tracking"],
-            ["token_alternative_matches", "Token Alternative Matches"],
-            ["token_skipping", "Token Skipping"],
-            ["token_categories", "Token Categories"],
-            ["token_grouping", "Token Grouping"],
-            ["custom_token_patterns", "Custom Token Patterns"],
-            ["lexer_modes", "Lexer Modes"]
+            "/features/blazing_fast.md",
+            "/features/llk.md",
+            "/features/separation.md",
+            "/features/easy_debugging.md",
+            "/features/fault_tolerance.md",
+            "/features/multiple_start_rules.md",
+            "/features/custom_errors.md",
+            "/features/parameterized_rules.md",
+            "/features/gates.md",
+            "/features/syntactic_content_assist.md",
+            "/features/grammar_inheritance.md",
+            "/features/backtracking.md",
+            "/features/syntax_diagrams.md",
+            "/features/regexp.md",
+            "/features/position_tracking.md",
+            "/features/token_alternative_matches.md",
+            "/features/token_skipping.md",
+            "/features/token_categories.md",
+            "/features/token_grouping.md",
+            "/features/custom_token_patterns.md",
+            "/features/lexer_modes.md"
           ]
         }
       ],
       "/changes/": [
         {
-          title: "Changes",
+          text: "Changes",
           collapsable: false,
-          children: [
-            ["BREAKING_CHANGES", "Breaking Changes"],
-            ["CHANGELOG", "ChangeLog"]
-          ]
+          children: ["/changes/BREAKING_CHANGES.md", "/changes/CHANGELOG.md"]
         }
       ]
     }
-  }
+  })
 }

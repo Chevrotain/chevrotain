@@ -1,4 +1,4 @@
-# Customizable Error Messages.
+# Customizable Error Messages
 
 Chevrotain allows users to customize both the parser and lexer error messages.
 This can be accomplished by implementing the following interfaces:

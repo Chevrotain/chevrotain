@@ -1,3 +1,5 @@
+# Breaking Changes
+
 ## 10.0.0
 
 - Dropped support for legacy ES5.1 runtimes (e.g: IE11)

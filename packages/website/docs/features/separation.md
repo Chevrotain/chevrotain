@@ -1,4 +1,4 @@
-# Separation of Grammar and Semantics.
+# Separation of Grammar and Semantics
 
 Chevrotain is not limited like many other parsing libraries to only embedding actions inside the grammar,
 It can also **automatically** create a [**C**oncrete **S**yntax **T**ree](https://chevrotain.io/docs/guide/concrete_syntax_tree.html)
