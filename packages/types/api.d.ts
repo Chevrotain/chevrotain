@@ -1923,7 +1923,7 @@ export interface CstNode {
   /**
    * Will only be present if the {@link IParserConfig.nodeLocationTracking} is
    * **not** set to "none".
-   * See: http://chevrotain.io/docs/guide/concrete_syntax_tree.html#cstnode-location
+   * See: https://chevrotain.io/docs/guide/concrete_syntax_tree.html#cstnodes-location
    * For more details.
    */
   readonly location?: CstNodeLocation
