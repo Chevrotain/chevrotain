@@ -1,0 +1,12 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "target": "ES2015",
+    "module": "CommonJS",
+    "removeComments": false,
+    "sourceMap": false,
+    "declaration": false,
+    "lib": ["es2015"]
+  },
+  "include": ["./typescript/typescript_json.ts"]
+}
