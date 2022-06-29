@@ -6,16 +6,12 @@ compile to JS languages.
 
 The following examples all implement the same JSON parser using a variety of implementation languages:
 
-- [ECMAScript 5](https://github.com/chevrotain/chevrotain/blob/master/examples/implementation_languages/ecma5/ecma5_json.js)
-
 - [Modern ECMAScript](https://github.com/chevrotain/chevrotain/blob/master/examples/implementation_languages/modern_ecmascript/modern_ecmascript_json.mjs)
 
 - [TypeScript](https://github.com/chevrotain/chevrotain/blob/master/examples/implementation_languages/typescript/typescript_json.ts)
 
   - [Generated CST d.ts signatures](https://github.com/chevrotain/chevrotain/blob/master/examples/implementation_languages/typescript/json_cst.d.ts)
   - [Script to generate CST d.ts signatures](https://github.com/chevrotain/chevrotain/blob/master/examples/implementation_languages/typescript/scripts/gen_dts_signatures.js)
-
-- [CoffeeScript](https://github.com/chevrotain/chevrotain/blob/master/examples/implementation_languages/coffeescript/coffeescript_json.coffee)
 
 To run all the implementation languages examples tests:
 

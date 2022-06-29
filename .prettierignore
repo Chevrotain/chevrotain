@@ -2,6 +2,7 @@
 **/node_modules/
 
 # build artifacts
+/packages/website/docs/.vuepress/.temp
 /packages/website/docs/.vuepress/dist/
 /packages/types/dev
 /packages/**/lib

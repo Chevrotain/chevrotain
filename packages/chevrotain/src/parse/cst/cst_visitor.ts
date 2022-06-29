@@ -153,13 +153,16 @@ export function validateMissingCstMethods(
 }
 
 const VALID_PROP_NAMES = ["constructor", "visit", "validateVisitor"]
+
 export function validateRedundantMethods(
   visitorInstance: ICstVisitor<unknown, unknown>,
   ruleNames: string[]
 ): IVisitorDefinitionError[] {
-  const errors = []
-
-  for (const prop in visitorInstance) {
+  const errors: IVisitorDefinitionError[] = []
+  const propNames = Object.getOwnPropertyNames(
+    visitorInstance.constructor.prototype
+  )
+  forEach(propNames, (prop) => {
     if (
       isFunction((visitorInstance as any)[prop]) &&
       !includes(VALID_PROP_NAMES, prop) &&
@@ -175,6 +178,6 @@ export function validateRedundantMethods(
         methodName: prop
       })
     }
-  }
+  })
   return errors
 }
