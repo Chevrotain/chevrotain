@@ -961,7 +961,7 @@ for more details.
 #### Major Changes
 
 - [0.13.0 Performance Optimizations.](https://github.com/chevrotain/chevrotain/issues/248)
-- [Performance FAQ section docs.](https://github.com/chevrotain/chevrotain/blob/master/docs/faq.md#Q6)
+- Performance FAQ section docs.
 
 This release includes **major performance optimizations and guidelines**.
 Anywhere from 20% to 100% was measured (on V8) depending on the grammar used.
