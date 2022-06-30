@@ -5,7 +5,7 @@ export declare const VERSION: string
 export type ParserMethod<ARGS extends unknown[], R> = (...args: ARGS) => R
 
 /**
- * This class does not actually exists nor is exposed at runtime.
+ * This class does not actually exist nor is exposed at runtime.
  * This is just a helper to avoid duplications in the Type Definitions
  * Of `CstParser` and `EmbeddedActionsParser`
  */
@@ -833,7 +833,7 @@ declare abstract class BaseParser {
   protected getTokenToInsert(tokType: TokenType): IToken
 
   /**
-   * By default all tokens type may be inserted. This behavior may be overridden in inheriting Recognizers
+   * By default, all tokens type may be inserted. This behavior may be overridden in inheriting Recognizers
    * for example: One may decide that only punctuation tokens may be inserted automatically as they have no additional
    * semantic value. (A mandatory semicolon has no additional semantic meaning, but an Integer may have additional meaning
    * depending on its int value and context (Inserting an integer 0 in cardinality: "[1..]" will cause semantic issues
@@ -842,7 +842,7 @@ declare abstract class BaseParser {
   protected canTokenTypeBeInsertedInRecovery(tokType: TokenType): boolean
 
   /**
-   * By default all token types may be deleted. This behavior may be overridden in inheriting parsers.
+   * By default, all token types may be deleted. This behavior may be overridden in inheriting parsers.
    * The method receives the expected token type. The token that would be deleted can be received with {@link LA|LA(1)}.
    */
   protected canTokenTypeBeDeletedInRecovery(tokType: TokenType): boolean
@@ -856,6 +856,10 @@ declare abstract class BaseParser {
 
   input: IToken[]
 
+  /**
+   * Will consume a single token and return the **next** token, meaning
+   * the token **after** the skipped token.
+   */
   protected SKIP_TOKEN(): IToken
 
   /**
