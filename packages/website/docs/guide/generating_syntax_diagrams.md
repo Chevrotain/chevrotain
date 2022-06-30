@@ -36,7 +36,7 @@ of syntax diagrams. This html source code can then be used by an end user in eit
 
 ## Customization
 
-The [logic for generating the HTML](https://github.com/chevrotain/chevrotain/tree/master/src/diagrams/render_public.ts)
+The [logic for generating the HTML](https://github.com/Chevrotain/chevrotain/blob/master/packages/chevrotain/src/diagrams/render_public.ts)
 is quite trivial and the generated code itself is also very simple with a decent separation of concerns.
 These can be used as a basis for creating more advanced custom scenarios, for example:
 

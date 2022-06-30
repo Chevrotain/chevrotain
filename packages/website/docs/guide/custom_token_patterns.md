@@ -62,7 +62,7 @@ createToken({
   pattern: { exec: matchInteger },
 
   // Optional property that will enable optimizations in the lexer
-  // See: https://chevrotain.io/documentation/10_1_2/interfaces/itokenconfig.html#start_chars_hint
+  // See: https://chevrotain.io/documentation/10_1_2/interfaces/ITokenConfig.html#start_chars_hint
   start_chars_hint: ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 })
 ```
@@ -99,7 +99,7 @@ function matchInteger(text, offset, matchedTokens, groups) {
 
 A larger and non contrived example can seen here: [Lexing Python like indentation using Chevrotain](https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/python_indentation/python_indentation.js).
 
-It is important to note that The matchedTokens and groups arguments match the token and groups properties of the tokenize output ([ILexingResult](https://chevrotain.io/documentation/10_1_2/interfaces/ilexingresult.html)).
+It is important to note that The matchedTokens and groups arguments match the token and groups properties of the tokenize output ([ILexingResult](https://chevrotain.io/documentation/10_1_2/interfaces/ILexingResult.html)).
 These arguments are the current state of the lexing result so even if the lexer has performed error recovery any tokens found
 in those arguments are still guaranteed to be in the final result.
 

@@ -560,7 +560,7 @@ Patch release after migration to new github org with updated metadata in package
 
 #### Major Changes
 
-- [Support custom user defined declarative APIs](https://chevrotain.io/docs/guide/custom_apis.html)
+- Support custom user defined declarative APIs
 
 #### Minor Changes
 
@@ -620,9 +620,9 @@ Patch release after migration to new github org with updated metadata in package
 
 #### Breaking Changes
 
-- Removed "extendToken" and "NEXT*TOKEN" deprecated APIs.
-  Use [createToken](https://chevrotain.io/documentation/0_32_1/modules/_chevrotain_d*.html#createtoken)
-  and [LA(1)](https://chevrotain.io/documentation/0_32_1/classes/_chevrotain_d_.parser.html#la) instead.
+- Removed "extendToken" and "NEXT\*TOKEN" deprecated APIs.
+  Use createToken
+  and LA(1) instead.
 
 #### Minor Changes
 
@@ -898,11 +898,10 @@ For older versions of TypeScript use Chevrotain versions <= 0.15.0.
 - [Performance: SimpleLazyTokens.](#277)
 - ["Smart" Map based lookahead for K = 1 with Token inheritance.](#279)
 
-This release is is focused on performance improvements, with **~20%** boost on V8
+This release is focused on performance improvements, with **~20%** boost on V8
 and potentially **~100%** (double) performance on SpiderMonkey (FireFox 49).
 
 To enjoy the maximum performance boost the new **SimpleLazyTokens** should be used.
-See:**[Token Types Docs](docs/token_types.md)** for additional details.
 
 #### Breaking Changes
 
@@ -954,7 +953,7 @@ These tokens contain less actual state and defer the calculation of their proper
 until needed. Considering most of the time this information is never needed (full position information)
 the overall speed boost can be as much as **10-25%** (depending on the grammar used).
 
-[See "2. Use Lazy Tokens"](https://github.com/chevrotain/chevrotain/blob/master/docs/faq.md#Q6)
+See "2. Use Lazy Tokens"
 for more details.
 
 ## 0.13.0 (8-6-2016)

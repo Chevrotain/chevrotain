@@ -218,9 +218,9 @@ const XMLText = createToken({
 })
 ```
 
-Please Note that filling such an array [can take over 1ms][fill_16_bits] on a modern machine.
+Please Note that filling such an array can be cpu intensive.
 So if you are only parsing small inputs and/or starting a new process for each
-parser invocation the added initialization cost may be counter productive.
+parser invocation the added initialization cost may be counterproductive.
 
 Another solution to this problem is to re-define the Token pattern without using a complement.
 For example: the XMLText pattern above could be re-defined as:
@@ -360,14 +360,13 @@ const myLexer = new chevrotain.Lexer([], {
 })
 ```
 
-[position_tracking]: https://chevrotain.io/documentation/10_1_2/interfaces/ilexerconfig.html#positiontracking
-[line_terminator_docs]: https://chevrotain.io/documentation/10_1_2/interfaces/ilexerconfig.html#lineTerminatorsPattern
-[start_chars_hint]: https://chevrotain.io/documentation/10_1_2/interfaces/itokenconfig.html#start_chars_hint
+[position_tracking]: https://chevrotain.io/documentation/10_1_2/interfaces/ILexerConfig.html#positionTracking
+[line_terminator_docs]: https://chevrotain.io/documentation/10_1_2/interfaces/ILexerConfig.html#lineTerminatorsPattern
+[start_chars_hint]: https://chevrotain.io/documentation/10_1_2/interfaces/ITokenConfig.html#start_chars_hint
 [keywords_idents]: https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js
 [mdn_char_code]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/charCodeAt
-[fill_16_bits]: https://jsperf.com/fill-16-bits
 [regexp_to_ast]: https://github.com/bd82/regexp-to-ast
 [unicode_mdn]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/unicode
 [custom_token_patterns]: https://chevrotain.io/docs/guide/custom_token_patterns.html
-[line_terminator_pattern]: https://chevrotain.io/documentation/10_1_2/interfaces/ilexerconfig.html#lineterminatorspattern
-[line_terminator_characters]: https://chevrotain.io/documentation/10_1_2/interfaces/ilexerconfig.html#lineTerminatorCharacters
+[line_terminator_pattern]: https://chevrotain.io/documentation/10_1_2/interfaces/ILexerConfig.html#lineTerminatorsPattern
+[line_terminator_characters]: https://chevrotain.io/documentation/10_1_2/interfaces/ILexerConfig.html#lineTerminatorCharacters
