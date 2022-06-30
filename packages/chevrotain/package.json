@@ -59,7 +59,7 @@
     "quick-build": "tsc && yarn run bundle",
     "---------- BUILD STEPS --------": "",
     "clean": "shx rm -rf coverage dev lib lib_esm",
-    "compile": "tsc && node ./scripts/fix-coverage-report.js && npm-run-all gen-esm-wrapper",
+    "compile": "tsc && npm-run-all gen-esm-wrapper",
     "compile:watch": "tsc -w",
     "gen-esm-wrapper": "gen-esm-wrapper . ./lib_esm/api_esm.mjs",
     "coverage": "nyc mocha",
