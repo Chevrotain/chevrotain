@@ -1283,7 +1283,7 @@ function defineRecognizerSpecs(
           })
 
           public rule2 = this.RULE("rule2", () => {
-            this.OPTION(() => {
+            this.OPTION1(() => {
               this.SUBRULE5(this.rule3)
             })
           })
