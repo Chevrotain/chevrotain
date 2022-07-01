@@ -1,21 +1,9 @@
 {
-  "name": "@chevrotain/gast",
+  "name": "@chevrotain/cst-dts-gen-test",
   "version": "10.1.2",
-  "description": "Grammar AST structure for Chevrotain Parsers",
-  "keywords": [],
-  "bugs": {
-    "url": "https://github.com/Chevrotain/chevrotain/issues"
-  },
+  "private": true,
+  "description": "tests for @chevrotain/cst-dts-gen",
   "license": "Apache-2.0",
-  "typings": "lib/src/api.d.ts",
-  "main": "lib/src/api.js",
-  "files": [
-    "src/**/*.ts",
-    "lib/src/**/*.js",
-    "lib/src/**/*.d.ts",
-    "lib/src/**/*.js.map",
-    "api.d.ts"
-  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/Chevrotain/chevrotain.git"
@@ -34,13 +22,13 @@
     "coverage": "nyc mocha"
   },
   "dependencies": {
+    "@chevrotain/cst-dts-gen": "^10.1.2",
+    "@chevrotain/gast": "^10.1.2",
     "@chevrotain/types": "^10.1.2",
+    "chevrotain": "^10.1.2",
     "lodash": "4.17.21"
   },
   "devDependencies": {
-    "@types/lodash": "4.14.182"
-  },
-  "publishConfig": {
-    "access": "public"
+    "glob": "8.0.3"
   }
 }

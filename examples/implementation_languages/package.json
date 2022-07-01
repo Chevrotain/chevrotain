@@ -2,6 +2,7 @@
   "name": "chevrotain_examples_implementation_languages",
   "version": "10.1.2",
   "scripts": {
+    "ci": "pnpm run build test",
     "build": "npm-run-all build:ts",
     "build:ts": "tsc && node ./typescript/scripts/gen_dts_signatures.js",
     "test": "npm-run-all test:*",

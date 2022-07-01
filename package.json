@@ -7,14 +7,18 @@
       "examples/*"
     ]
   },
+  "engines": {
+    "pnpm": ">=7"
+  },
   "scripts": {
-    "lerna:version": "yarn && lerna version --force-publish",
-    "lerna:publish": "lerna publish from-git --yes --no-verify-access",
-    "ci": "npm-run-all format:validate lint:validate build test coverage:merge",
-    "compile": "lerna run clean && tsc --build",
-    "compile:watch": "lerna run clean && tsc --build --watch",
-    "build": "lerna run build",
-    "test": "lerna run test",
+    "version": "pnpm install && git add pnpm-lock.yaml",
+    "preinstall": "npx only-allow pnpm",
+    "release:version": "lerna version --force-publish",
+    "release:publish": "lerna publish from-git --yes --no-verify-access",
+    "ci": "npm-run-all format:validate lint:validate ci:subpackages coverage:merge",
+    "compile": "pnpm -r run clean && tsc --build",
+    "compile:watch": "pnpm -r run clean  && tsc --build --watch",
+    "ci:subpackages": "pnpm -r run ci",
     "coverage:merge": "node ./scripts/merge-coverage",
     "format:fix": "prettier --write \"**/*.@(ts|js|json|md|yml)\"",
     "format:validate": "prettier --check \"**/*.@(ts|js|json|md|yml)\"",
@@ -35,11 +39,6 @@
       "eslint --fix --max-warnings=0 --ignore-pattern=!.*"
     ]
   },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
-  },
   "commitlint": {
     "extends": [
       "@commitlint/config-conventional"
@@ -47,9 +46,14 @@
   },
   "devDependencies": {
     "@types/chai": "4.3.1",
+    "@types/sinon": "^10.0.12",
+    "@types/sinon-chai": "3.2.8",
+    "sinon": "14.0.0",
     "@types/mocha": "9.1.1",
+    "@types/node": "14.18.21",
     "nyc": "15.1.0",
     "chai": "4.3.6",
+    "sinon-chai": "3.7.0",
     "typescript": "4.7.4",
     "fs-extra": "10.1.0",
     "husky": "8.0.1",

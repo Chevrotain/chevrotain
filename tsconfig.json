@@ -14,6 +14,9 @@
     },
     {
       "path": "./packages/cst-dts-gen"
+    },
+    {
+      "path": "./packages/cst-dts-gen-test"
     }
   ],
   // needed to avoid trying to compile other .ts files in this repo

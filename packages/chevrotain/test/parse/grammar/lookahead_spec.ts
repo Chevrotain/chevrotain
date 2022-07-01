@@ -30,7 +30,6 @@ import {
 import { IToken, TokenType } from "@chevrotain/types"
 import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
 import { expect } from "chai"
-import { AST } from "eslint"
 
 describe("getProdType", () => {
   it("handles `Option`", () => {

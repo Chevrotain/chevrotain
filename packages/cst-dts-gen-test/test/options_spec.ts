@@ -1,5 +1,5 @@
 import { GenerateDtsOptions } from "@chevrotain/types"
-import { generateCstDts } from "../src/api"
+import { generateCstDts } from "@chevrotain/cst-dts-gen"
 import { CstParser, createToken } from "chevrotain"
 import { expect } from "chai"
 

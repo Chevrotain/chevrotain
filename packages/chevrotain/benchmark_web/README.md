@@ -7,7 +7,7 @@ With the **Next** version (locally built version on current branch).
 
 ## Instructions
 
-1.  `yarn ci` in the root of this repo.
+1.  `pnpm ci` in the root of this repo.
 
 - This will generate `chevrotain.js` artifact in the lib directory.
 

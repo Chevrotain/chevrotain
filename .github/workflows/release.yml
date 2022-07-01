@@ -11,18 +11,23 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: lts/*
+      - uses: pnpm/action-setup@v2.2.1
+        with:
+          version: 7.1.1
       - name: Install dependencies
-        run: yarn
-      - name: Run CI
-        run: yarn run ci
+        run: pnpm install
+      - name: Build
+        run: pnpm run ci
       - name: npm auth setup
         run: |
-          yarn logout
+          pnpm logout
           echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
-          npm whoami
+          # avoids lerna validations failing the release due to changed tracked file.
+          git update-index --assume-unchanged ".npmrc"
+          pnpm whoami
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Publish to NPM
-        run: yarn run lerna:publish
+        run: pnpm run release:publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
