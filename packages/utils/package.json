@@ -26,6 +26,7 @@
   },
   "scripts": {
     "---------- CI FLOWS --------": "",
+    "ci": "npm-run-all build test",
     "build": "npm-run-all clean compile",
     "test": "npm-run-all coverage",
     "---------- BUILD STEPS --------": "",

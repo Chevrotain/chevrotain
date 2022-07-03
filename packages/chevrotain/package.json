@@ -50,13 +50,14 @@
   "homepage": "https://chevrotain.io/docs/",
   "scripts": {
     "---------- CI FLOWS --------": "",
+    "ci": "pnpm run build test",
     "build": "npm-run-all clean compile bundle",
     "test": "npm-run-all coverage",
     "version": "tsc ./src/version.ts --outDir lib/src && node ./scripts/version-update.js",
     "---------- DEV FLOWS --------": "",
     "watch": "tsc -w",
     "unit-tests": "mocha",
-    "quick-build": "tsc && yarn run bundle",
+    "quick-build": "tsc && npm-run-all run bundle",
     "---------- BUILD STEPS --------": "",
     "clean": "shx rm -rf coverage dev lib lib_esm",
     "compile": "tsc && npm-run-all gen-esm-wrapper",
@@ -80,7 +81,6 @@
   },
   "devDependencies": {
     "@types/lodash": "4.14.182",
-    "@types/sinon-chai": "3.2.8",
     "error-stack-parser": "2.1.4",
     "esbuild": "0.14.48",
     "gen-esm-wrapper": "1.1.3",
@@ -88,10 +88,9 @@
     "jsdom": "20.0.0",
     "jsonfile": "6.1.0",
     "require-from-string": "2.0.2",
-    "sinon": "14.0.0",
-    "sinon-chai": "3.7.0",
     "webpack": "5.73.0",
     "webpack-cli": "4.10.0",
-    "xregexp": "5.1.1"
+    "xregexp": "5.1.1",
+    "sinon": "14.0.0"
   }
 }

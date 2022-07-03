@@ -6,6 +6,7 @@ node_modules
 .baseDir.ts
 /bower_components
 /npm-debug.log
+.pnpm-debug.log
 yarn-error.log
 .DS_Store
 
@@ -36,3 +37,6 @@ coverage
 
 # nyc test coverage
 .nyc_output
+package-lock.json
+yarn.lock
+.pnpm-debug.log

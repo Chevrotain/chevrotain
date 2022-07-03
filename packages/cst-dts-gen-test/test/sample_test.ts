@@ -2,7 +2,7 @@ import { BaseParser } from "chevrotain"
 import { expect } from "chai"
 import { readFileSync } from "fs"
 import { resolve, relative, basename } from "path"
-import { generateCstDts } from "../src/api"
+import { generateCstDts } from "@chevrotain/cst-dts-gen"
 
 export function executeSampleTest(dirPath: string, parser: BaseParser): void {
   it("Can generate type definition", () => {

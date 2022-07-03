@@ -5,5 +5,5 @@
     "outDir": "lib",
     "baseUrl": "."
   },
-  "include": ["./src/**/*", "api.d.ts"]
+  "include": ["./test/**/*"]
 }

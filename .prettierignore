@@ -3,6 +3,7 @@
 
 # build artifacts
 /packages/website/docs/.vuepress/.temp
+/packages/website/docs/.vuepress/.cache
 /packages/website/docs/.vuepress/dist/
 /packages/types/dev
 /packages/**/lib
@@ -18,7 +19,7 @@
 /examples/parser/minification/gen/
 
 # prettier ignores
-/packages/cst-dts-gen/test/snapshots/**/output.d.ts
+/packages/cst-dts-gen-test/test/snapshots/**/output.d.ts
 
 # used to hold "current" master version for relative performance tests.
 /packages/chevrotain/benchmark_web/chevrotain.js

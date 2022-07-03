@@ -30,7 +30,7 @@ Details:
 
 #### Contributing To Chevrotain's Runtime Source code.
 
-This can be more complex as more in-depth knowledge of chevrotain internals may be needed.
+This can be more complex as more in-depth knowledge of Chevrotain internals may be needed.
 
 Details:
 
@@ -42,63 +42,40 @@ Details:
 Chevrotain is developed as a mono-repo with a single (temporary state) productive package
 and multiple example packages.
 
-Chevrotain uses **yarn** tasks for the development flows.
-Examine the interal [packages/chevrotain/package.json][package] scripts for all the available tasks.
+Chevrotain uses **npm** tasks for the development flows.
+and pnpm + lerna for the monorepo management.
 
 #### Initial Setup
 
 In the root of this Repo:
 
-- `yarn`
-- `yarn build`
+- `pnpm`
 
 #### Some basic dev flows to get started
 
 Chevrotain is written using Typescript, so compilation to JavaScript is needed.
 
-- `cd packages/chevrotain`
-- `yarn compile`
+- `pnpm compile`
 
 Alternatively during development one would want to recompile on file changes.
 
-- `cd packages/chevrotain`
-- `yarn compile:watch`
+- `pnpm compile:watch`
 
-The compilation result will appear in the **lib** folder.
+The compilation result will appear in the **lib** folder in each sub-package.
 
 #### Code Formatting
 
 Chevrotain uses **prettier** to avoid caring about code formatting...
 To format your new code use:
 
-`yarn format:fix`
-
-#### Testing
-
-Chevrotain uses several types of tests to promote high quality.
-
-The most basic ones are the **mocha unit tests**, which are also often the most relevant ones.
-
-- `cd packages/chevrotain`
-- `yarn coverage`
-
-You can run the whole test suite by running:
-
-- `cd packages/chevrotain`
-- `yarn test`
-
-Additionally, **integration tests** are used to test Chevrotain as an end user via the examples packages
-tests.
-
-- In this repo's root
-- `yarn test`
+`pnpm format:fix`
 
 #### Running the central CI flow locally.
 
-This is just another yarn task which performs the whole flow
+This is just another npm task which performs the whole flow
 including linting / doc generation / d.ts API creation / ...
 
-- `yarn ci`
+- `pnpm ci`
 
 #### Committing Changes
 
@@ -117,7 +94,7 @@ The release process **requires push permissions to master**.
 - Update the [BREAKING_CHANGES.md](./packages/website/docs/changes/BREAKING_CHANGES.md).
   - Only for major versions...
 - Push the changes related updates to master.
-- execute `yarn run lerna:version` and follow the instructions.
+- execute `pnpm release:version` and follow the instructions.
   - This will update version related files and push a new version **tag** to Github.
   - Github Actions will execute a deployment to npmjs.com due to this new tag.
   - Additionally, new website contents will be pushed to the gh-pages branch.

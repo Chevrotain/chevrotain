@@ -9,6 +9,7 @@
   },
   "homepage": "https://chevrotain.io/docs/",
   "scripts": {
+    "ci": "pnpm run build",
     "build": "npm-run-all website:build",
     "version": "node ./scripts/version-update.js",
     "postversion": "npm-run-all website:build website:upload",
