@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: ${{ matrix.node_version }}
 
-      - uses: pnpm/action-setup@v2.2.1
+      - uses: pnpm/action-setup@v2.2.2
         with:
           version: 7.4.1
 
