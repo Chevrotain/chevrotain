@@ -476,7 +476,7 @@ declare abstract class BaseParser {
 
   /**
    * Parsing DSL method, that indicates a repetition of zero or more.
-   * This is equivalent to EBNF repetition {...}.
+   * This is equivalent to EBNF repetition \{...\}.
    *
    * Note that there are two syntax forms:
    * - Passing the grammar action directly:
@@ -843,7 +843,7 @@ declare abstract class BaseParser {
 
   /**
    * By default, all token types may be deleted. This behavior may be overridden in inheriting parsers.
-   * The method receives the expected token type. The token that would be deleted can be received with {@link LA|LA(1)}.
+   * The method receives the expected token type. The token that would be deleted can be received with {@link LA}.
    */
   protected canTokenTypeBeDeletedInRecovery(tokType: TokenType): boolean
 
@@ -1185,7 +1185,7 @@ export declare class Lexer {
   /**
    * A Constant to mark "abstract" TokenTypes that are used
    * purely as token categories.
-   * See: {@link createToken.categories}
+   * See: {@link ITokenConfig.categories}
    */
   static NA: RegExp
   lexerDefinitionErrors: ILexerDefinitionError[]
@@ -1218,7 +1218,7 @@ export declare class Lexer {
    *  The current lexing mode is selected via a "mode stack".
    *  The last (peek) value in the stack will be the current mode of the lexer.
    *  Defining entering and exiting lexer modes is done using the "push_mode" and "pop_mode" properties
-   *  of the {@link createToken.config} parameter.
+   *  of the {@link ITokenConfig} config properties.
    *
    *  - The Lexer will match the **first** pattern that matches, Therefor the order of Token Types is significant.
    *    For example when one pattern may match a prefix of another pattern.
@@ -1455,7 +1455,7 @@ export interface ITokenConfig {
    *
    * For example a TokenType may be called LCurly, which is
    * short for "left curly brace". The much easier to understand
-   * label could simply be "{".
+   * label could simply be "\{".
    */
   label?: string
 
@@ -1791,7 +1791,7 @@ export interface DSLMethodOptsWithErr<T> extends DSLMethodOpts<T> {
 export interface OrMethodOpts<T> {
   /**
    * The set of alternatives,
-   * See detailed description in {@link Parser.OR}
+   * See detailed description in {@link BaseParser.OR}
    */
   DEF: IOrAlt<T>[]
   /**
@@ -2025,7 +2025,7 @@ export interface IParserConfig {
 export interface IParserErrorMessageProvider {
   /**
    * Mismatched Token Error happens when the parser attempted to consume a terminal and failed.
-   * It corresponds to a failed {@link Parser.CONSUME} in Chevrotain DSL terms.
+   * It corresponds to a failed {@link BaseParser.CONSUME} in Chevrotain DSL terms.
    *
    * @param options.expected - The expected Token Type.
    *
@@ -2056,7 +2056,7 @@ export interface IParserErrorMessageProvider {
   }): string
   /**
    * A No Viable Alternative Error happens when the parser cannot detect any valid alternative in an alternation.
-   * It corresponds to a failed {@link Parser.OR} in Chevrotain DSL terms.
+   * It corresponds to a failed {@link BaseParser.OR} in Chevrotain DSL terms.
    *
    * @param options.expectedPathsPerAlt - First level of the array represents each alternative
    *                           The next two levels represent valid (expected) paths in each alternative.
@@ -2066,7 +2066,7 @@ export interface IParserErrorMessageProvider {
    * @param options.previous - The previous Token "instance".
    *                                This is useful if options.actual[0] is of type chevrotain.EOF and you need to know the last token parsed.
    *
-   * @param options.customUserDescription - A user may provide custom error message descriptor in the {@link Parser.AT_LEAST_ONE} DSL method
+   * @param options.customUserDescription - A user may provide custom error message descriptor in the {@link BaseParser.AT_LEAST_ONE_SEP} DSL method
    *                                        options parameter, this is that custom message.
    *
    * @param options.ruleName - The rule in which the error occurred.
@@ -2080,7 +2080,7 @@ export interface IParserErrorMessageProvider {
   }): string
   /**
    * An Early Exit Error happens when the parser cannot detect the first mandatory iteration of a repetition.
-   * It corresponds to a failed {@link Parser.AT_LEAST_ONE} or {@link Parser.AT_LEAST_ONE_SEP} in Chevrotain DSL terms.
+   * It corresponds to a failed {@link BaseParser.AT_LEAST_ONE_SEP} or {@link BaseParser.AT_LEAST_ONE_SEP} in Chevrotain DSL terms.
    *
    * @param options.expectedIterationPaths - The valid (expected) paths in the first iteration.
    *
@@ -2089,7 +2089,7 @@ export interface IParserErrorMessageProvider {
    * @param options.previous - The previous Token "instance".
    *                                This is useful if options.actual[0] is of type chevrotain.EOF and you need to know the last token parsed.
    *
-   * @param options.customUserDescription - A user may provide custom error message descriptor in the {@link Parser.AT_LEAST_ONE} DSL method
+   * @param options.customUserDescription - A user may provide custom error message descriptor in the {@link BaseParser.AT_LEAST_ONE_SEP} DSL method
    *                                        options parameter, this is that custom message.
    *
    * @param options.ruleName - The rule in which the error occurred.
@@ -2265,7 +2265,7 @@ export interface IRecognitionException {
 export declare function isRecognitionException(error: Error): boolean
 
 /**
- * An exception of this type will be saved in {@link Parser.errors} when {@link Parser.CONSUME}
+ * An exception of this type will be saved in {@link BaseParser.errors} when {@link BaseParser.CONSUME}
  * was called but failed to match the expected Token Type.
  */
 export declare class MismatchedTokenException
@@ -2281,7 +2281,7 @@ export declare class MismatchedTokenException
 }
 
 /**
- * An exception of this type will be saved in {@link Parser.errors} when {@link Parser.OR}
+ * An exception of this type will be saved in {@link BaseParser.errors} when {@link BaseParser.OR}
  * was called yet none of the possible alternatives could be matched.
  */
 export declare class NoViableAltException
@@ -2297,7 +2297,7 @@ export declare class NoViableAltException
 }
 
 /**
- * An exception of this type will be saved in {@link Parser.errors} when
+ * An exception of this type will be saved in {@link BaseParser.errors} when
  * the parser has finished yet there exists remaining input (tokens) that has not processed.
  */
 export declare class NotAllInputParsedException
@@ -2312,8 +2312,8 @@ export declare class NotAllInputParsedException
 }
 
 /**
- * An exception of this type will be saved in {@link Parser.errors} when {@link Parser.AT_LEAST_ONE}
- * or {@link Parser.AT_LEAST_ONE_SEP} was called but failed to match even a single iteration.
+ * An exception of this type will be saved in {@link BaseParser.errors} when {@link BaseParser.AT_LEAST_ONE_SEP}
+ * or {@link BaseParser.AT_LEAST_ONE_SEP} was called but failed to match even a single iteration.
  */
 export declare class EarlyExitException
   extends Error
@@ -2369,7 +2369,7 @@ export abstract class GAstVisitor {
 }
 
 /**
- * The Grammar AST class representing a top level {@link Parser.RULE} call.
+ * The Grammar AST class representing a top level {@link CstParser.RULE} or {@link EmbeddedActionsParser.RULE} call.
  */
 export declare class Rule {
   name: string
@@ -2386,7 +2386,7 @@ export declare class Rule {
 }
 
 /**
- * The Grammar AST class representing a top level {@link Parser.SUBRULE} call.
+ * The Grammar AST class representing a top level {@link CstParser.SUBRULE} or {@link EmbeddedActionsParser.SUBRULE} call.
  */
 export declare class NonTerminal implements IProductionWithOccurrence {
   nonTerminalName: string
@@ -2419,7 +2419,7 @@ export declare class Alternative {
 }
 
 /**
- * The Grammar AST class representing a {@link Parser.OPTION} call.
+ * The Grammar AST class representing a {@link BaseParser.OPTION} call.
  */
 export declare class Option implements IProductionWithOccurrence {
   idx: number
@@ -2435,7 +2435,7 @@ export declare class Option implements IProductionWithOccurrence {
 }
 
 /**
- * The Grammar AST class representing a {@link Parser.AT_LEAST_ONE} call.
+ * The Grammar AST class representing a {@link BaseParser.AT_LEAST_ONE_SEP} call.
  */
 export declare class RepetitionMandatory implements IProductionWithOccurrence {
   idx: number
@@ -2451,7 +2451,7 @@ export declare class RepetitionMandatory implements IProductionWithOccurrence {
 }
 
 /**
- * The Grammar AST class representing a {@link Parser.AT_LEAST_ONE_SEP} call.
+ * The Grammar AST class representing a {@link BaseParser.AT_LEAST_ONE_SEP} call.
  */
 export declare class RepetitionMandatoryWithSeparator
   implements IProductionWithOccurrence
@@ -2471,7 +2471,7 @@ export declare class RepetitionMandatoryWithSeparator
 }
 
 /**
- * The Grammar AST class representing a {@link Parser.MANY} call.
+ * The Grammar AST class representing a {@link BaseParser.MANY} call.
  */
 export declare class Repetition implements IProductionWithOccurrence {
   separator: TokenType
@@ -2488,7 +2488,7 @@ export declare class Repetition implements IProductionWithOccurrence {
 }
 
 /**
- * The Grammar AST class representing a {@link Parser.MANY_SEP} call.
+ * The Grammar AST class representing a {@link BaseParser.MANY_SEP} call.
  */
 export declare class RepetitionWithSeparator
   implements IProductionWithOccurrence
@@ -2508,7 +2508,7 @@ export declare class RepetitionWithSeparator
 }
 
 /**
- * The Grammar AST class representing a {@link Parser.OR} call.
+ * The Grammar AST class representing a {@link BaseParser.OR} call.
  */
 export declare class Alternation implements IProductionWithOccurrence {
   idx: number
@@ -2520,7 +2520,7 @@ export declare class Alternation implements IProductionWithOccurrence {
 }
 
 /**
- * The Grammar AST class representing a {@link Parser.CONSUME} call.
+ * The Grammar AST class representing a {@link BaseParser.CONSUME} call.
  */
 export declare class Terminal implements IProductionWithOccurrence {
   terminalType: TokenType
