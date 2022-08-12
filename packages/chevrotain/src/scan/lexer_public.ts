@@ -78,7 +78,8 @@ const DEFAULT_LEXER_CONFIG: Required<ILexerConfig> = {
   safeMode: false,
   errorMessageProvider: defaultLexerErrorProvider,
   traceInitPerf: false,
-  skipValidations: false
+  skipValidations: false,
+  recoveryEnabled: true
 }
 
 Object.freeze(DEFAULT_LEXER_CONFIG)
@@ -690,7 +691,11 @@ export class Lexer {
         const errorLine = line
         const errorColumn = column
         let foundResyncPoint = false
-        while (!foundResyncPoint && offset < orgLength) {
+        while (
+          this.config.recoveryEnabled &&
+          !foundResyncPoint &&
+          offset < orgLength
+        ) {
           // drop chars until we succeed in matching something
           droppedChar = orgText.charCodeAt(offset)
           // Identity Func (when sticky flag is enabled)
