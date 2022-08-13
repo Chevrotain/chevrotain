@@ -524,11 +524,10 @@ export class Lexer {
     push_mode.call(this, initialMode)
 
     let currConfig!: IPatternConfig
-    let failedBeforeEnd = false
 
-    const lexerConfig = this.config
+    const recoveryEnabled = this.config.recoveryEnabled
 
-    while (offset < orgLength && !failedBeforeEnd) {
+    while (offset < orgLength) {
       matchedImage = null
 
       const nextCharCode = orgText.charCodeAt(offset)
@@ -693,13 +692,9 @@ export class Lexer {
         const errorStartOffset = offset
         const errorLine = line
         const errorColumn = column
-        let foundResyncPoint = false
+        let foundResyncPoint = !recoveryEnabled
 
-        if (!lexerConfig.recoveryEnabled) {
-          failedBeforeEnd = true
-        }
-
-        while (!failedBeforeEnd && !foundResyncPoint && offset < orgLength) {
+        while (!foundResyncPoint && offset < orgLength) {
           // drop chars until we succeed in matching something
           droppedChar = orgText.charCodeAt(offset)
           // Identity Func (when sticky flag is enabled)
@@ -751,6 +746,8 @@ export class Lexer {
           length: errLength,
           message: msg
         })
+
+        if (!recoveryEnabled) break
       }
     }
 
