@@ -836,7 +836,7 @@ export function performRuntimeChecks(
   trackLines: boolean,
   lineTerminatorCharacters: (number | string)[]
 ): ILexerDefinitionError[] {
-  const errors = []
+  const errors: ILexerDefinitionError[] = []
 
   // some run time checks to help the end users.
   if (!has(lexerDefinition, DEFAULT_MODE)) {
@@ -880,6 +880,21 @@ export function performRuntimeChecks(
               `A Lexer cannot be initialized using an undefined Token Type. Mode:` +
               `<${currModeName}> at index: <${currIdx}>\n`,
             type: LexerDefinitionErrorType.LEXER_DEFINITION_CANNOT_CONTAIN_UNDEFINED
+          })
+        } else if (has(currTokType, "LONGER_ALT")) {
+          const longerAlt = isArray(currTokType.LONGER_ALT)
+            ? currTokType.LONGER_ALT
+            : [currTokType.LONGER_ALT]
+          forEach(longerAlt, (currLongerAlt) => {
+            if (
+              !isUndefined(currLongerAlt) &&
+              !includes(currModeValue, currLongerAlt)
+            ) {
+              errors.push({
+                message: `A MultiMode Lexer cannot be initialized with a longer_alt <${currLongerAlt.name}> on token <${currTokType.name}> outside of mode <${currModeName}>\n`,
+                type: LexerDefinitionErrorType.MULTI_MODE_LEXER_LONGER_ALT_NOT_IN_CURRENT_MODE
+              })
+            }
           })
         }
       })

@@ -1852,6 +1852,39 @@ function defineLexerSpecs(
           expect(badLexer.lexerDefinitionErrors[0].message).to.include("2")
         })
 
+        it("will detect LONGER_ALT outside of current mode", () => {
+          const LongerAlt = createToken({ name: "LongerAlt", pattern: /2/ })
+          const WithLongerAlt = createToken({
+            name: "WithLongerAlt",
+            pattern: /1/,
+            longer_alt: LongerAlt
+          })
+
+          const lexerDef: IMultiModeLexerDefinition = {
+            defaultMode: "a",
+            modes: {
+              a: [WithLongerAlt],
+              b: [LongerAlt]
+            }
+          }
+          const badLexer = new Lexer(lexerDef, {
+            deferDefinitionErrorsHandling: true
+          })
+          expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(1)
+          const error = badLexer.lexerDefinitionErrors[0]
+          expect(error.type).to.equal(
+            LexerDefinitionErrorType.MULTI_MODE_LEXER_LONGER_ALT_NOT_IN_CURRENT_MODE
+          )
+          expect(error.message).to.include(
+            "A MultiMode Lexer cannot be initialized with a longer_alt"
+          )
+          expect(error.message).to.include("<LongerAlt>")
+          expect(error.message).to.include("on token")
+          expect(error.message).to.include("<WithLongerAlt>")
+          expect(error.message).to.include("outside of mode")
+          expect(error.message).to.include("<a>")
+        })
+
         describe("custom lexer error provider", () => {
           const customErrorProvider: ILexerErrorMessageProvider = {
             buildUnableToPopLexerModeMessage(token: IToken): string {
