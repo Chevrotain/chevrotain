@@ -693,11 +693,9 @@ export class Lexer {
         const errorStartOffset = offset
         const errorLine = line
         const errorColumn = column
-        let foundResyncPoint = !recoveryEnabled
+        let foundResyncPoint = recoveryEnabled === false
 
-        while (!foundResyncPoint && offset < orgLength) {
-          // drop chars until we succeed in matching something
-          droppedChar = orgText.charCodeAt(offset)
+        while (foundResyncPoint === false && offset < orgLength) {
           // Identity Func (when sticky flag is enabled)
           text = this.chopInput(text, 1)
           offset++
@@ -748,7 +746,9 @@ export class Lexer {
           message: msg
         })
 
-        if (!recoveryEnabled) break
+        if (recoveryEnabled === false) {
+          break
+        }
       }
     }
 

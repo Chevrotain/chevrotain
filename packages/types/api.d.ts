@@ -1369,7 +1369,13 @@ export interface ILexerConfig {
   skipValidations?: boolean
 
   /**
-   * Is the error recovery / fault tolerance of the Chevrotain Lexer enabled.
+   * Should the lexer halt on the **first** error, or continue attempting to tokenize by dropping characters
+   * until a match is found or the end of input is reached.
+   *
+   * This is useful when you want to **halt quickly** on faulty inputs,
+   * particularly when dealing with **large** faulty inputs.
+   *
+   * By default, `recoveryEnabled` is `true`
    */
   recoveryEnabled?: boolean
 }
