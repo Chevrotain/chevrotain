@@ -1367,6 +1367,11 @@ export interface ILexerConfig {
    *   - For example: via a conditional that checks an env variable.
    */
   skipValidations?: boolean
+
+  /**
+   * Is the error recovery / fault tolerance of the Chevrotain Lexer enabled.
+   */
+  recoveryEnabled?: boolean
 }
 
 export interface ILexerErrorMessageProvider {

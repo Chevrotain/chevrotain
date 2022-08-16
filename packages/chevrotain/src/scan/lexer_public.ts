@@ -79,7 +79,8 @@ const DEFAULT_LEXER_CONFIG: Required<ILexerConfig> = {
   safeMode: false,
   errorMessageProvider: defaultLexerErrorProvider,
   traceInitPerf: false,
-  skipValidations: false
+  skipValidations: false,
+  recoveryEnabled: true
 }
 
 Object.freeze(DEFAULT_LEXER_CONFIG)
@@ -525,6 +526,8 @@ export class Lexer {
 
     let currConfig!: IPatternConfig
 
+    const recoveryEnabled = this.config.recoveryEnabled
+
     while (offset < orgLength) {
       matchedImage = null
 
@@ -690,7 +693,8 @@ export class Lexer {
         const errorStartOffset = offset
         const errorLine = line
         const errorColumn = column
-        let foundResyncPoint = false
+        let foundResyncPoint = !recoveryEnabled
+
         while (!foundResyncPoint && offset < orgLength) {
           // drop chars until we succeed in matching something
           droppedChar = orgText.charCodeAt(offset)
@@ -743,6 +747,8 @@ export class Lexer {
           length: errLength,
           message: msg
         })
+
+        if (!recoveryEnabled) break
       }
     }
 

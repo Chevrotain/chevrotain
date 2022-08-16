@@ -1336,6 +1336,91 @@ function defineLexerSpecs(
         expect(tokenMatcher(lexResult.tokens[0], If)).to.be.true
       })
 
+      it("can be configured to abort any further scanning when it encounters an invalid character input", () => {
+        const ifElseLexer = new Lexer(
+          [
+            Keyword,
+            If,
+            Else,
+            Return,
+            Integer,
+            Punctuation,
+            LParen,
+            RParen,
+            Whitespace,
+            NewLine
+          ],
+          {
+            ...lexerConfig,
+            recoveryEnabled: false
+          }
+        )
+
+        const input = "if (666) return 1@#$@#$\n" + "\telse return 2"
+
+        const lexResult = ifElseLexer.tokenize(input)
+
+        expect(lexResult.errors.length).to.equal(1)
+        expect(lexResult.errors[0].message).to.contain("@")
+        if (testStart) {
+          expect(lexResult.errors[0].line).to.equal(1)
+          expect(lexResult.errors[0].column).to.equal(18)
+        } else {
+          expect(lexResult.errors[0].line).to.be.undefined
+          expect(lexResult.errors[0].column).to.be.undefined
+        }
+
+        expect(lexResult.tokens.length).to.equal(6)
+
+        expect(lexResult.tokens[0].image).to.equal("if")
+        expect(lexResult.tokens[0].startOffset).to.equal(0)
+        if (testStart) {
+          expect(lexResult.tokens[0].startLine).to.equal(1)
+          expect(lexResult.tokens[0].startColumn).to.equal(1)
+        }
+        expect(tokenMatcher(lexResult.tokens[0], If)).to.be.true
+
+        expect(lexResult.tokens[1].image).to.equal("(")
+        expect(lexResult.tokens[1].startOffset).to.equal(3)
+        if (testStart) {
+          expect(lexResult.tokens[1].startLine).to.equal(1)
+          expect(lexResult.tokens[1].startColumn).to.equal(4)
+        }
+        expect(tokenMatcher(lexResult.tokens[1], LParen)).to.be.true
+
+        expect(lexResult.tokens[2].image).to.equal("666")
+        expect(lexResult.tokens[2].startOffset).to.equal(4)
+        if (testStart) {
+          expect(lexResult.tokens[2].startLine).to.equal(1)
+          expect(lexResult.tokens[2].startColumn).to.equal(5)
+        }
+        expect(tokenMatcher(lexResult.tokens[2], Integer)).to.be.true
+
+        expect(lexResult.tokens[3].image).to.equal(")")
+        expect(lexResult.tokens[3].startOffset).to.equal(7)
+        if (testStart) {
+          expect(lexResult.tokens[3].startLine).to.equal(1)
+          expect(lexResult.tokens[3].startColumn).to.equal(8)
+        }
+        expect(tokenMatcher(lexResult.tokens[3], RParen)).to.be.true
+
+        expect(lexResult.tokens[4].image).to.equal("return")
+        expect(lexResult.tokens[4].startOffset).to.equal(9)
+        if (testStart) {
+          expect(lexResult.tokens[4].startLine).to.equal(1)
+          expect(lexResult.tokens[4].startColumn).to.equal(10)
+        }
+        expect(tokenMatcher(lexResult.tokens[4], Return)).to.be.true
+
+        expect(lexResult.tokens[5].image).to.equal("1")
+        expect(lexResult.tokens[5].startOffset).to.equal(16)
+        if (testStart) {
+          expect(lexResult.tokens[5].startLine).to.equal(1)
+          expect(lexResult.tokens[5].startColumn).to.equal(17)
+        }
+        expect(tokenMatcher(lexResult.tokens[5], Integer)).to.be.true
+      })
+
       it("can deal with line terminators inside multi-line Tokens", () => {
         const ifElseLexer = new Lexer(
           [If, Else, WhitespaceNotSkipped],
