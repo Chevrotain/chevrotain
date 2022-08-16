@@ -1372,7 +1372,7 @@ export interface ILexerConfig {
    * Should the lexer halt on the **first** error, or continue attempting to tokenize by dropping characters
    * until a match is found or the end of input is reached.
    *
-   * Setting `recoveryEnabled` to `false` useful when you want to **halt quickly** on faulty inputs,
+   * Setting `recoveryEnabled` to `false` is useful when you want to **halt quickly** on faulty inputs,
    * particularly when dealing with **large** faulty inputs.
    *
    * By default, `recoveryEnabled` is `true`
