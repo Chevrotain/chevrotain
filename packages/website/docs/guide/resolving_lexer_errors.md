@@ -360,13 +360,13 @@ const myLexer = new chevrotain.Lexer([], {
 })
 ```
 
-[position_tracking]: https://chevrotain.io/documentation/10_1_2/interfaces/ILexerConfig.html#positionTracking
-[line_terminator_docs]: https://chevrotain.io/documentation/10_1_2/interfaces/ILexerConfig.html#lineTerminatorsPattern
-[start_chars_hint]: https://chevrotain.io/documentation/10_1_2/interfaces/ITokenConfig.html#start_chars_hint
+[position_tracking]: https://chevrotain.io/documentation/10_2_0/interfaces/ILexerConfig.html#positionTracking
+[line_terminator_docs]: https://chevrotain.io/documentation/10_2_0/interfaces/ILexerConfig.html#lineTerminatorsPattern
+[start_chars_hint]: https://chevrotain.io/documentation/10_2_0/interfaces/ITokenConfig.html#start_chars_hint
 [keywords_idents]: https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js
 [mdn_char_code]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/charCodeAt
 [regexp_to_ast]: https://github.com/bd82/regexp-to-ast
 [unicode_mdn]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/unicode
 [custom_token_patterns]: https://chevrotain.io/docs/guide/custom_token_patterns.html
-[line_terminator_pattern]: https://chevrotain.io/documentation/10_1_2/interfaces/ILexerConfig.html#lineTerminatorsPattern
-[line_terminator_characters]: https://chevrotain.io/documentation/10_1_2/interfaces/ILexerConfig.html#lineTerminatorCharacters
+[line_terminator_pattern]: https://chevrotain.io/documentation/10_2_0/interfaces/ILexerConfig.html#lineTerminatorsPattern
+[line_terminator_characters]: https://chevrotain.io/documentation/10_2_0/interfaces/ILexerConfig.html#lineTerminatorCharacters

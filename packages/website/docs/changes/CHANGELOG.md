@@ -1,6 +1,4 @@
-# ChangeLog
-
-## X.Y.Z (INSERT_DATE_HERE)
+## 10.2.0 (8-19-2022)
 
 #### Minor Changes
 

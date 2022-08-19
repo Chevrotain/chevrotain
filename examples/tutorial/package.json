@@ -1,12 +1,12 @@
 {
   "name": "chevrotain_examples_tutorial",
-  "version": "10.1.2",
+  "version": "10.2.0",
   "scripts": {
     "ci": "pnpm run test",
     "test": "mocha \"step*/*spec.js\""
   },
   "dependencies": {
-    "chevrotain": "^10.1.2"
+    "chevrotain": "^10.2.0"
   },
   "devDependencies": {
     "chai": "^4.1.2",
