@@ -1,16 +1,20 @@
 {
-  "extends": ["config:base"],
-  "dependencyDashboard": true,
-  "labels": ["dependencies"],
-  "packageRules": [
+  extends: ["config:base"],
+  dependencyDashboard: true,
+  labels: ["dependencies"],
+  packageRules: [
     {
-      "matchPackagePatterns": ["*"],
-      // typedoc upgrades require manually validating the generated website
-      "excludePackagePatterns": ["typedoc"],
-      "matchDepTypes": ["devDependencies"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "all non-major dev dependencies",
-      "groupSlug": "all-dev-minor-patch",
+      matchPackagePatterns: ["*"],
+      excludePackagePatterns: [
+        // typedoc upgrades require manually validating the generated website
+        "typedoc",
+        // build fails with vuepress-next-49
+        "vuepress"
+      ],
+      matchDepTypes: ["devDependencies"],
+      matchUpdateTypes: ["minor", "patch"],
+      groupName: "all non-major dev dependencies",
+      groupSlug: "all-dev-minor-patch"
     }
   ]
 }
