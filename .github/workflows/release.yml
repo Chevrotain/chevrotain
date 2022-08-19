@@ -20,7 +20,6 @@ jobs:
         run: pnpm run ci
       - name: npm auth setup
         run: |
-          pnpm logout
           echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
           # avoids lerna validations failing the release due to changed tracked file.
           git update-index --assume-unchanged ".npmrc"
