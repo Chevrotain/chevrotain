@@ -1,5 +1,17 @@
 # ChangeLog
 
+# X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+- [Capability to fail fast on first lexer error via ILexerConfig `recoveryEnabled` config](https://github.com/Chevrotain/chevrotain/pull/1839)
+  - Thanks to [@jonestristand](https://github.com/jonestristand) :thumbsup:
+
+#### Bug Fixes
+
+- [Lexer throws uncaught error when longer_alt token is not in mode](https://github.com/Chevrotain/chevrotain/issues/1825)
+  - Thanks to [@msujew](https://github.com/msujew) :thumbsup:
+
 ## 10.1.2 (3-6-2022)
 
 #### Bug Fixes
