@@ -1,5 +1,5 @@
 const _ = require("lodash")
-const { vuepressSlugify } = require("@vuepress/markdown")
+const { slugify } = require("@mdit-vue/shared")
 const { defaultTheme } = require("@vuepress/theme-default")
 const { docsearchPlugin } = require("@vuepress/plugin-docsearch")
 const jf = require("jsonfile")
@@ -61,7 +61,7 @@ module.exports = {
         return mappedSlug
       }
 
-      return vuepressSlugify(str)
+      return slugify(str)
     }
   },
   plugins: [

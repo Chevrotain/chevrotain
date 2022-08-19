@@ -7,9 +7,7 @@
       matchPackagePatterns: ["*"],
       excludePackagePatterns: [
         // typedoc upgrades require manually validating the generated website
-        "typedoc",
-        // build fails with vuepress-next-49
-        "vuepress"
+        "typedoc"
       ],
       matchDepTypes: ["devDependencies"],
       matchUpdateTypes: ["minor", "patch"],
