@@ -8,8 +8,5 @@
   "dependencies": {
     "chevrotain": "10.2.0"
   },
-  "devDependencies": {
-    "lodash": "4.17.21"
-  },
   "private": true
 }

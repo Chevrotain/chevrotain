@@ -72,13 +72,12 @@ importers:
 
   examples/grammars:
     specifiers:
-      acorn: ^8.0.1
+      acorn: 8.8.0
       chevrotain: 10.2.0
-      xregexp: ^5.0.1
+      xregexp: 5.1.1
     dependencies:
+      acorn: 8.8.0
       chevrotain: link:../../packages/chevrotain
-    devDependencies:
-      acorn: 8.7.1
       xregexp: 5.1.1
 
   examples/implementation_languages:
@@ -98,35 +97,21 @@ importers:
 
   examples/lexer:
     specifiers:
-      chai: ^4.1.2
       chevrotain: 10.2.0
-      extend: ^3.0.2
-      lodash: ~4.17.10
-      mocha: ^9.0.0
     dependencies:
       chevrotain: link:../../packages/chevrotain
-      lodash: 4.17.21
-    devDependencies:
-      chai: 4.3.6
-      extend: 3.0.2
-      mocha: 9.2.2
 
   examples/parser:
     specifiers:
       chevrotain: 10.2.0
-      lodash: 4.17.21
     dependencies:
       chevrotain: link:../../packages/chevrotain
-      lodash: 4.17.21
 
   examples/tutorial:
     specifiers:
       chevrotain: 10.2.0
-      lodash: 4.17.21
     dependencies:
       chevrotain: link:../../packages/chevrotain
-    devDependencies:
-      lodash: 4.17.21
 
   packages/chevrotain:
     specifiers:
@@ -517,7 +502,6 @@ packages:
     dependencies:
       core-js-pure: 3.23.3
       regenerator-runtime: 0.13.9
-    dev: true
 
   /@babel/template/7.18.6:
     resolution: {integrity: sha512-JoDWzPe+wgBsTTgdnIma3iHNFC7YVJoPssVBDjiHfNlyt4YcunDtcDOUmfVDfCK5MfdsaIoX9PkijPhjH3nYUw==}
@@ -2925,7 +2909,6 @@ packages:
     resolution: {integrity: sha512-QOxyigPVrpZ2GXT+PFyZTl6TtOFc5egxHIP9IlQ+RbupQuX4RkT/Bee4/kQuC02Xkzg84JcT7oLYtDIQxp+v7w==}
     engines: {node: '>=0.4.0'}
     hasBin: true
-    dev: true
 
   /add-stream/1.0.0:
     resolution: {integrity: sha512-qQLMr+8o0WC4FZGQTcJiKBVC59JylcPSrTtk6usvmIDFUOCKegapy1VHQwRbFMOFyb/inzUVqHs+eMYKDM1YeQ==}
@@ -3624,7 +3607,7 @@ packages:
     dev: true
 
   /concat-map/0.0.1:
-    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
+    resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
     dev: true
 
   /concat-stream/2.0.0:
@@ -3760,7 +3743,6 @@ packages:
   /core-js-pure/3.23.3:
     resolution: {integrity: sha512-XpoouuqIj4P+GWtdyV8ZO3/u4KftkeDVMfvp+308eGMhCrA3lVDSmAxO0c6GGOcmgVlaKDrgWVMo49h2ab/TDA==}
     requiresBuild: true
-    dev: true
 
   /core-util-is/1.0.3:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
@@ -4884,10 +4866,6 @@ packages:
     engines: {node: '>=0.10.0'}
     dependencies:
       is-extendable: 0.1.1
-    dev: true
-
-  /extend/3.0.2:
-    resolution: {integrity: sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==}
     dev: true
 
   /external-editor/3.1.0:
@@ -7860,7 +7838,6 @@ packages:
 
   /regenerator-runtime/0.13.9:
     resolution: {integrity: sha512-p3VT+cOEgxFsRRA9X4lkI1E+k2/CtnKtU4gcxyaCUreilL/vqI6CdZ3wxVUx3UOUg+gnUOQQcRI7BmSI656MYA==}
-    dev: true
 
   /regexp-to-ast/0.5.0:
     resolution: {integrity: sha512-tlbJqcMHnPKI9zSrystikWKwHkBqu2a/Sgw01h3zFjvYrMxEDYHzzoMZnUrbIfpTFEsoRnnviOXNCzFiSc54Qw==}
@@ -9386,7 +9363,6 @@ packages:
     resolution: {integrity: sha512-fKXeVorD+CzWvFs7VBuKTYIW63YD1e1osxwQ8caZ6o1jg6pDAbABDG54LCIq0j5cy7PjRvGIq6sef9DYPXpncg==}
     dependencies:
       '@babel/runtime-corejs3': 7.18.6
-    dev: true
 
   /xtend/4.0.2:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}

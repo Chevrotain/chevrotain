@@ -6,8 +6,7 @@
     "test": "mocha \"!(node_modules)/**/*spec.js\""
   },
   "dependencies": {
-    "chevrotain": "10.2.0",
-    "lodash": "4.17.21"
+    "chevrotain": "10.2.0"
   },
   "private": true
 }
