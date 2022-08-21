@@ -6,6 +6,10 @@
 
 - [Removed validating of redundant methods from `validateVisitor()`](https://github.com/Chevrotain/chevrotain/pull/1847)
 
+#### Bug Fixes
+
+- [runtime exception: `Class constructor GAstVisitor cannot be invoked without 'new'`](https://github.com/Chevrotain/chevrotain/issues/1845)
+
 ## 10.2.0 (8-19-2022)
 
 #### Minor Changes
