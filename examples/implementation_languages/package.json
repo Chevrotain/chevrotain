@@ -10,7 +10,7 @@
     "test:esm": "mocha \"*spec.mjs\""
   },
   "dependencies": {
-    "chevrotain": "^10.2.0"
+    "chevrotain": "10.2.0"
   },
   "devDependencies": {
     "coffee-script": "^1.11.1",

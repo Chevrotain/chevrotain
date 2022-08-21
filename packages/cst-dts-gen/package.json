@@ -30,8 +30,8 @@
     "compile": "tsc"
   },
   "dependencies": {
-    "@chevrotain/gast": "^10.2.0",
-    "@chevrotain/types": "^10.2.0",
+    "@chevrotain/gast": "10.2.0",
+    "@chevrotain/types": "10.2.0",
     "lodash": "4.17.21"
   },
   "devDependencies": {
