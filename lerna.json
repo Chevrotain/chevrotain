@@ -4,7 +4,8 @@
   "command": {
     "version": {
       "allowBranch": "master",
-      "message": "chore(release): release"
+      "message": "chore(release): release %s",
+      "exact": true
     }
   },
   "version": "10.2.0"
