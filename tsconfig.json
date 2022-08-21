@@ -10,10 +10,10 @@
       "path": "./packages/gast"
     },
     {
-      "path": "./packages/chevrotain"
+      "path": "./packages/cst-dts-gen"
     },
     {
-      "path": "./packages/cst-dts-gen"
+      "path": "./packages/chevrotain"
     },
     {
       "path": "./packages/cst-dts-gen-test"
