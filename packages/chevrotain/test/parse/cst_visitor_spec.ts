@@ -194,26 +194,4 @@ describe("The CSTVisitor", () => {
       "Errors Detected in CST Visitor"
     )
   })
-
-  it("can detect redundant visitor methods", () => {
-    class CstVisitorValidatorRedundant extends BaseVisitor {
-      constructor() {
-        super()
-        this.validateVisitor()
-      }
-
-      testRule(ctx: any, param: any) {}
-
-      bamba(ctx: any, param: any) {}
-
-      oops(ctx: any, param: any) {}
-    }
-
-    expect(() => new CstVisitorValidatorRedundant()).to.throw(
-      "Redundant visitor method: <oops>"
-    )
-    expect(() => new CstVisitorValidatorRedundant()).to.throw(
-      "Errors Detected in CST Visitor"
-    )
-  })
 })

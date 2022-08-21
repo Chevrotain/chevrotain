@@ -7,7 +7,6 @@ import filter from "lodash/filter"
 import keys from "lodash/keys"
 import isFunction from "lodash/isFunction"
 import isUndefined from "lodash/isUndefined"
-import includes from "lodash/includes"
 import { defineNameProp } from "../../lang/lang_extensions"
 import { CstNode, ICstVisitor } from "@chevrotain/types"
 
@@ -123,9 +122,8 @@ export function validateVisitor(
   ruleNames: string[]
 ): IVisitorDefinitionError[] {
   const missingErrors = validateMissingCstMethods(visitorInstance, ruleNames)
-  const redundantErrors = validateRedundantMethods(visitorInstance, ruleNames)
 
-  return missingErrors.concat(redundantErrors)
+  return missingErrors
 }
 
 export function validateMissingCstMethods(
@@ -150,34 +148,4 @@ export function validateMissingCstMethods(
   )
 
   return compact<IVisitorDefinitionError>(errors)
-}
-
-const VALID_PROP_NAMES = ["constructor", "visit", "validateVisitor"]
-
-export function validateRedundantMethods(
-  visitorInstance: ICstVisitor<unknown, unknown>,
-  ruleNames: string[]
-): IVisitorDefinitionError[] {
-  const errors: IVisitorDefinitionError[] = []
-  const propNames = Object.getOwnPropertyNames(
-    visitorInstance.constructor.prototype
-  )
-  forEach(propNames, (prop) => {
-    if (
-      isFunction((visitorInstance as any)[prop]) &&
-      !includes(VALID_PROP_NAMES, prop) &&
-      !includes(ruleNames, prop)
-    ) {
-      errors.push({
-        msg:
-          `Redundant visitor method: <${prop}> on ${<any>(
-            visitorInstance.constructor.name
-          )} CST Visitor\n` +
-          `There is no Grammar Rule corresponding to this method's name.\n`,
-        type: CstVisitorDefinitionError.REDUNDANT_METHOD,
-        methodName: prop
-      })
-    }
-  })
-  return errors
 }

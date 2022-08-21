@@ -1909,6 +1909,11 @@ export interface IOrAltWithGate<T> extends IOrAlt<T> {
 
 export interface ICstVisitor<IN, OUT> {
   visit(cstNode: CstNode | CstNode[], param?: IN): OUT
+
+  /**
+   * Will throw an error if the visitor is missing any required methods
+   * - `visitXYZ` for each `XYZ` grammar rule.
+   */
   validateVisitor(): void
 }
 
