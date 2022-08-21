@@ -8,7 +8,21 @@
 #### Bug Fixes
 
 - [Lexer throws uncaught error when longer_alt token is not in mode](https://github.com/Chevrotain/chevrotain/issues/1825)
+
   - Thanks to [@msujew](https://github.com/msujew) :thumbsup:
+
+- ["unreachable code after return statement" warning in Firefox](https://github.com/Chevrotain/chevrotain/issues/1787)
+  - Thanks to [@medihack](https://github.com/medihack) :thumbsup:
+
+#### Documentation
+
+- [TypeScript Signatures: add generics to `getBaseCstVisitorConstructor` functions](https://github.com/Chevrotain/chevrotain/pull/1774)
+
+  - Thanks to [@jackhenry](https://github.com/jackhenry) :thumbsup:
+
+- [docs: document SKIP_TOKEN()](https://github.com/Chevrotain/chevrotain/issues/1699)
+
+- Various broken links fixes in chevrotain.io/docs website.
 
 ## 10.1.2 (3-6-2022)
 
