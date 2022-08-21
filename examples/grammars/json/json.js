@@ -1,4 +1,4 @@
-const { CstParser, Lexer, createToken } = require("chevrotain")
+const { CstParser, Lexer, createToken } = require("chevrotain/lib")
 
 // ----------------- lexer -----------------
 const True = createToken({ name: "True", pattern: /true/ })
