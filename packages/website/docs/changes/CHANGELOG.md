@@ -1,3 +1,11 @@
+# ChangeLog
+
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+- [Removed validating of redundant methods from `validateVisitor()`](https://github.com/Chevrotain/chevrotain/pull/1847)
+
 ## 10.2.0 (8-19-2022)
 
 #### Minor Changes
