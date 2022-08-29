@@ -2260,7 +2260,7 @@ export declare const defaultParserErrorProvider: IParserErrorMessageProvider
 /**
  * A Chevrotain Parser runtime exception.
  */
-export interface IRecognitionException {
+export interface IRecognitionException extends Error {
   name: string
   message: string
   /**
