@@ -39,14 +39,15 @@ import {
   RepetitionMandatory,
   RepetitionMandatoryWithSeparator,
   RepetitionWithSeparator,
-  Rule,
   Terminal
 } from "@chevrotain/gast"
 import { GAstVisitor } from "@chevrotain/gast"
 import {
+  ILookaheadStrategy,
   IProduction,
   IProductionWithOccurrence,
-  TokenType
+  TokenType,
+  Rule
 } from "@chevrotain/types"
 import {
   IGrammarValidatorErrorMessageProvider,
@@ -56,6 +57,28 @@ import dropRight from "lodash/dropRight"
 import compact from "lodash/compact"
 import { tokenStructuredMatcher } from "../../scan/tokens"
 
+export function validateLookahead(options: {
+  lookaheadStrategy: ILookaheadStrategy
+  rules: Rule[]
+  maxLookahead: number
+  tokenTypes: TokenType[]
+  grammarName: string
+}): IParserDefinitionError[] {
+  if (typeof options.lookaheadStrategy.validate !== "function") {
+    return []
+  }
+  const lookaheadValidationErrorMessages = options.lookaheadStrategy.validate({
+    rules: options.rules,
+    maxLookahead: options.maxLookahead,
+    tokenTypes: options.tokenTypes,
+    grammarName: options.grammarName
+  })
+  return map(lookaheadValidationErrorMessages, (errorMessage) => ({
+    type: ParserDefinitionErrorType.CUSTOM_LOOKAHEAD_VALIDATION,
+    ...errorMessage
+  }))
+}
+
 export function validateGrammar(
   topLevels: Rule[],
   globalMaxLookahead: number,
@@ -63,37 +86,10 @@ export function validateGrammar(
   errMsgProvider: IGrammarValidatorErrorMessageProvider,
   grammarName: string
 ): IParserDefinitionError[] {
-  const duplicateErrors = flatMap(topLevels, (currTopLevel) =>
-    validateDuplicateProductions(currTopLevel, errMsgProvider)
+  const duplicateErrors: IParserDefinitionError[] = flatMap(
+    topLevels,
+    (currTopLevel) => validateDuplicateProductions(currTopLevel, errMsgProvider)
   )
-  const leftRecursionErrors = flatMap(topLevels, (currTopRule) =>
-    validateNoLeftRecursion(currTopRule, currTopRule, errMsgProvider)
-  )
-
-  let emptyAltErrors: IParserEmptyAlternativeDefinitionError[] = []
-  let ambiguousAltsErrors: IParserAmbiguousAlternativesDefinitionError[] = []
-  let emptyRepetitionErrors: IParserDefinitionError[] = []
-
-  // left recursion could cause infinite loops in the following validations.
-  // It is safest to first have the user fix the left recursion errors first and only then examine Further issues.
-  if (isEmpty(leftRecursionErrors)) {
-    emptyAltErrors = flatMap(topLevels, (currTopRule) =>
-      validateEmptyOrAlternative(currTopRule, errMsgProvider)
-    )
-    ambiguousAltsErrors = flatMap(topLevels, (currTopRule) =>
-      validateAmbiguousAlternationAlternatives(
-        currTopRule,
-        globalMaxLookahead,
-        errMsgProvider
-      )
-    )
-
-    emptyRepetitionErrors = validateSomeNonEmptyLookaheadPath(
-      topLevels,
-      globalMaxLookahead,
-      errMsgProvider
-    )
-  }
 
   const termsNamespaceConflictErrors = checkTerminalAndNoneTerminalsNameSpace(
     topLevels,
@@ -114,11 +110,7 @@ export function validateGrammar(
     )
   )
 
-  return (duplicateErrors as IParserDefinitionError[]).concat(
-    emptyRepetitionErrors,
-    leftRecursionErrors,
-    emptyAltErrors,
-    ambiguousAltsErrors,
+  return duplicateErrors.concat(
     termsNamespaceConflictErrors,
     tooManyAltsErrors,
     duplicateRulesError
@@ -292,7 +284,7 @@ export function validateNoLeftRecursion(
     return []
   } else {
     const ruleName = topRule.name
-    const foundLeftRecursion = includes(<any>nextNonTerminals, topRule)
+    const foundLeftRecursion = includes(nextNonTerminals, topRule)
     if (foundLeftRecursion) {
       errors.push({
         message: errMsgProvider.buildLeftRecursionError({
@@ -436,8 +428,7 @@ export function validateAmbiguousAlternationAlternatives(
     const alternatives = getLookaheadPathsForOr(
       currOccurrence,
       topLevelRule,
-      actualMaxLookahead,
-      currOr
+      actualMaxLookahead
     )
     const altsAmbiguityErrors = checkAlternativesAmbiguities(
       alternatives,

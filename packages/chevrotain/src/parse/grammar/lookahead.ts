@@ -7,7 +7,7 @@ import has from "lodash/has"
 import reduce from "lodash/reduce"
 import { possiblePathsFrom } from "./interpreter"
 import { RestWalker } from "./rest"
-import { Predicate, TokenMatcher, LookAheadSequence } from "../parser/parser"
+import { Predicate, TokenMatcher } from "../parser/parser"
 import {
   tokenStructuredMatcher,
   tokenStructuredMatcherNoCategories
@@ -19,16 +19,29 @@ import {
   Repetition,
   RepetitionMandatory,
   RepetitionMandatoryWithSeparator,
-  RepetitionWithSeparator,
-  Rule
+  RepetitionWithSeparator
 } from "@chevrotain/gast"
 import { GAstVisitor } from "@chevrotain/gast"
 import {
+  ILookaheadStrategy,
+  ILookaheadValidationError,
   IOrAlt,
   IProduction,
   IProductionWithOccurrence,
+  LookaheadSequence,
+  LookaheadProductionType,
+  Rule,
   TokenType
 } from "@chevrotain/types"
+import flatMap from "lodash/flatMap"
+import {
+  validateAmbiguousAlternationAlternatives,
+  validateEmptyOrAlternative,
+  validateNoLeftRecursion,
+  validateSomeNonEmptyLookaheadPath
+} from "./checks"
+import { defaultGrammarValidatorErrorProvider } from "../errors_public"
+import { IParserDefinitionError } from "./types"
 
 export enum PROD_TYPE {
   OPTION,
@@ -39,19 +52,30 @@ export enum PROD_TYPE {
   ALTERNATION
 }
 
-export function getProdType(prod: IProduction): PROD_TYPE {
+export function getProdType(
+  prod: IProduction | LookaheadProductionType
+): PROD_TYPE {
   /* istanbul ignore else */
-  if (prod instanceof Option) {
+  if (prod instanceof Option || prod === "Option") {
     return PROD_TYPE.OPTION
-  } else if (prod instanceof Repetition) {
+  } else if (prod instanceof Repetition || prod === "Repetition") {
     return PROD_TYPE.REPETITION
-  } else if (prod instanceof RepetitionMandatory) {
+  } else if (
+    prod instanceof RepetitionMandatory ||
+    prod === "RepetitionMandatory"
+  ) {
     return PROD_TYPE.REPETITION_MANDATORY
-  } else if (prod instanceof RepetitionMandatoryWithSeparator) {
+  } else if (
+    prod instanceof RepetitionMandatoryWithSeparator ||
+    prod === "RepetitionMandatoryWithSeparator"
+  ) {
     return PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR
-  } else if (prod instanceof RepetitionWithSeparator) {
+  } else if (
+    prod instanceof RepetitionWithSeparator ||
+    prod === "RepetitionWithSeparator"
+  ) {
     return PROD_TYPE.REPETITION_WITH_SEPARATOR
-  } else if (prod instanceof Alternation) {
+  } else if (prod instanceof Alternation || prod === "Alternation") {
     return PROD_TYPE.ALTERNATION
   } else {
     throw Error("non exhaustive match")
@@ -65,7 +89,7 @@ export function buildLookaheadFuncForOr(
   hasPredicates: boolean,
   dynamicTokensEnabled: boolean,
   laFuncBuilder: Function
-): (orAlts?: IOrAlt<any>[]) => number {
+): (orAlts?: IOrAlt<any>[]) => number | undefined {
   const lookAheadPaths = getLookaheadPathsForOr(
     occurrence,
     ruleGrammar,
@@ -103,7 +127,7 @@ export function buildLookaheadFuncForOptionalProd(
   dynamicTokensEnabled: boolean,
   prodType: PROD_TYPE,
   lookaheadBuilder: (
-    lookAheadSequence: LookAheadSequence,
+    lookAheadSequence: LookaheadSequence,
     tokenMatcher: TokenMatcher,
     dynamicTokensEnabled: boolean
   ) => () => boolean
@@ -125,7 +149,7 @@ export function buildLookaheadFuncForOptionalProd(
 export type Alternative = TokenType[][]
 
 export function buildAlternativesLookAheadFunc(
-  alts: LookAheadSequence[],
+  alts: LookaheadSequence[],
   hasPredicates: boolean,
   tokenMatcher: TokenMatcher,
   dynamicTokensEnabled: boolean
@@ -248,7 +272,7 @@ export function buildAlternativesLookAheadFunc(
 }
 
 export function buildSingleAlternativeLookaheadFunction(
-  alt: LookAheadSequence,
+  alt: LookaheadSequence,
   tokenMatcher: TokenMatcher,
   dynamicTokensEnabled: boolean
 ): () => boolean {
@@ -429,8 +453,7 @@ class InsideDefinitionFinderVisitor extends GAstVisitor {
 
   constructor(
     private targetOccurrence: number,
-    private targetProdType: PROD_TYPE,
-    private targetRef?: any
+    private targetProdType: PROD_TYPE
   ) {
     super()
   }
@@ -441,8 +464,7 @@ class InsideDefinitionFinderVisitor extends GAstVisitor {
   ): void {
     if (
       node.idx === this.targetOccurrence &&
-      this.targetProdType === expectedProdName &&
-      (this.targetRef === undefined || node === this.targetRef)
+      this.targetProdType === expectedProdName
     ) {
       this.result = node.definition
     }
@@ -538,7 +560,7 @@ function isUniquePrefixHash(
 export function lookAheadSequenceFromAlternatives(
   altsDefs: IProduction[],
   k: number
-): LookAheadSequence[] {
+): LookaheadSequence[] {
   const partialAlts = map(altsDefs, (currAlt) =>
     possiblePathsFrom([currAlt], 1)
   )
@@ -613,13 +635,11 @@ export function lookAheadSequenceFromAlternatives(
 export function getLookaheadPathsForOr(
   occurrence: number,
   ruleGrammar: Rule,
-  k: number,
-  orProd?: Alternation
-): LookAheadSequence[] {
+  k: number
+): LookaheadSequence[] {
   const visitor = new InsideDefinitionFinderVisitor(
     occurrence,
-    PROD_TYPE.ALTERNATION,
-    orProd
+    PROD_TYPE.ALTERNATION
   )
   ruleGrammar.accept(visitor)
   return lookAheadSequenceFromAlternatives(visitor.result, k)
@@ -630,7 +650,7 @@ export function getLookaheadPathsForOptionalProd(
   ruleGrammar: Rule,
   prodType: PROD_TYPE,
   k: number
-): LookAheadSequence[] {
+): LookaheadSequence[] {
   const insideDefVisitor = new InsideDefinitionFinderVisitor(
     occurrence,
     prodType
@@ -694,7 +714,7 @@ export function isStrictPrefixOfPath(
 }
 
 export function areTokenCategoriesNotUsed(
-  lookAheadPaths: LookAheadSequence[]
+  lookAheadPaths: LookaheadSequence[]
 ): boolean {
   return every(lookAheadPaths, (singleAltPaths) =>
     every(singleAltPaths, (singlePath) =>

@@ -40,6 +40,8 @@ import { applyMixins } from "./utils/apply_mixins"
 import { IParserDefinitionError } from "../grammar/types"
 import { Rule } from "@chevrotain/gast"
 import { IParserConfigInternal, ParserMethodInternal } from "./types"
+import { LLkLookaheadStrategy } from "../grammar/lookahead_public"
+import { validateLookahead } from "../grammar/checks"
 
 export const END_OF_FILE = createTokenInstance(
   EOF,
@@ -55,8 +57,6 @@ Object.freeze(END_OF_FILE)
 
 export type TokenMatcher = (token: IToken, tokType: TokenType) => boolean
 
-export type LookAheadSequence = TokenType[][]
-
 export const DEFAULT_PARSER_CONFIG: Required<IParserConfigInternal> =
   Object.freeze({
     recoveryEnabled: false,
@@ -66,7 +66,8 @@ export const DEFAULT_PARSER_CONFIG: Required<IParserConfigInternal> =
     errorMessageProvider: defaultParserErrorProvider,
     nodeLocationTracking: "none",
     traceInitPerf: false,
-    skipValidations: false
+    skipValidations: false,
+    lookaheadStrategy: Object.freeze(new LLkLookaheadStrategy())
   })
 
 export const DEFAULT_RULE_CONFIG: Required<IRuleConfig<any>> = Object.freeze({
@@ -87,7 +88,8 @@ export enum ParserDefinitionErrorType {
   INVALID_TOKEN_NAME = 9,
   NO_NON_EMPTY_LOOKAHEAD = 10,
   AMBIGUOUS_PREFIX_ALTS = 11,
-  TOO_MANY_ALTS = 12
+  TOO_MANY_ALTS = 12,
+  CUSTOM_LOOKAHEAD_VALIDATION = 13
 }
 
 export interface IParserDuplicatesDefinitionError
@@ -206,7 +208,17 @@ export class Parser {
             errMsgProvider: defaultGrammarValidatorErrorProvider,
             grammarName: className
           })
-          this.definitionErrors = this.definitionErrors.concat(validationErrors)
+          const lookaheadValidationErrors = validateLookahead({
+            lookaheadStrategy: this.lookaheadStrategy,
+            rules: values(this.gastProductionsCache),
+            maxLookahead: this.maxLookahead,
+            tokenTypes: values(this.tokensMap),
+            grammarName: className
+          })
+          this.definitionErrors = this.definitionErrors.concat(
+            validationErrors,
+            lookaheadValidationErrors
+          )
         }
       })
 

@@ -22,6 +22,13 @@ export {
   tokenName
 } from "./scan/tokens_public"
 
+// Lookahead
+
+export {
+  LLkLookaheadStrategy,
+  getLookaheadPaths
+} from "./parse/grammar/lookahead_public"
+
 // Other Utilities
 
 export { defaultParserErrorProvider } from "./parse/errors_public"
