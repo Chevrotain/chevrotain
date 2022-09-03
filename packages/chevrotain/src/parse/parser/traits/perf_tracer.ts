@@ -1,8 +1,8 @@
 import { IParserConfig } from "@chevrotain/types"
-import has from "lodash/has"
+import { has } from "lodash-es"
 import { timer } from "@chevrotain/utils"
-import { MixedInParser } from "./parser_traits"
-import { DEFAULT_PARSER_CONFIG } from "../parser"
+import { MixedInParser } from "./parser_traits.js"
+import { DEFAULT_PARSER_CONFIG } from "../parser.js"
 
 /**
  * Trait responsible for runtime parsing errors.

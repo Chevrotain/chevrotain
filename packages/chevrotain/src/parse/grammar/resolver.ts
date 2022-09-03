@@ -1,15 +1,13 @@
 import {
   IParserUnresolvedRefDefinitionError,
   ParserDefinitionErrorType
-} from "../parser/parser"
-import forEach from "lodash/forEach"
-import values from "lodash/values"
-import { NonTerminal, Rule } from "@chevrotain/gast"
-import { GAstVisitor } from "@chevrotain/gast"
+} from "../parser/parser.js"
+import { forEach, values } from "lodash-es"
+import { GAstVisitor, NonTerminal, Rule } from "@chevrotain/gast"
 import {
   IGrammarResolverErrorMessageProvider,
   IParserDefinitionError
-} from "./types"
+} from "./types.js"
 
 export function resolveGrammar(
   topLevels: Record<string, Rule>,

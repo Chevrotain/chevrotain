@@ -1,4 +1,4 @@
-import { RegExpParser } from "../src/regexp-parser"
+import { RegExpParser } from "../src/regexp-parser.js"
 import { expect } from "chai"
 
 describe("The RegExp to Ast parser", () => {

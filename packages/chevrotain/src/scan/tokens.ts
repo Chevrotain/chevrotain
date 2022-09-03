@@ -1,13 +1,15 @@
-import isEmpty from "lodash/isEmpty"
-import compact from "lodash/compact"
-import isArray from "lodash/isArray"
-import flatten from "lodash/flatten"
-import difference from "lodash/difference"
-import map from "lodash/map"
-import forEach from "lodash/forEach"
-import has from "lodash/has"
-import includes from "lodash/includes"
-import clone from "lodash/clone"
+import {
+  clone,
+  compact,
+  difference,
+  flatten,
+  forEach,
+  has,
+  includes,
+  isArray,
+  isEmpty,
+  map
+} from "lodash-es"
 import { IToken, TokenType } from "@chevrotain/types"
 
 export function tokenStructuredMatcher(

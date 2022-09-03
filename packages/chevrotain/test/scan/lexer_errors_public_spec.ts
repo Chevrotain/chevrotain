@@ -1,4 +1,4 @@
-import { defaultLexerErrorProvider } from "../../src/scan/lexer_errors_public"
+import { defaultLexerErrorProvider } from "../../src/scan/lexer_errors_public.js"
 import { IToken } from "@chevrotain/types"
 import { expect } from "chai"
 

@@ -1,4 +1,4 @@
-import { Character, IRegExpAST, RegExpFlags } from "../api"
+import { Character, IRegExpAST, RegExpFlags } from "../api.js"
 
 export function cc(char: string): number {
   return char.charCodeAt(0)

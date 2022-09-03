@@ -1,15 +1,13 @@
-import { Lexer } from "../../src/scan/lexer_public"
-import flatten from "lodash/flatten"
-import find from "lodash/find"
+import { Lexer } from "../../src/scan/lexer_public.js"
+import { find, flatten } from "lodash-es"
 import { expect } from "chai"
-import { SinonSpy } from "sinon/index"
+import { SinonSpy, spy } from "sinon"
 
 describe("Chevrotain's Lexer Init Performance Tracing", () => {
   let consoleLogSpy: SinonSpy
 
   beforeEach(() => {
-    // @ts-ignore
-    consoleLogSpy = sinon.spy(console, "log")
+    consoleLogSpy = spy(console, "log")
   })
 
   afterEach(() => {

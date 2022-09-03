@@ -1,6 +1,6 @@
-import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
-import { createRegularToken } from "../../utils/matchers"
-import { augmentTokenTypes } from "../../../src/scan/tokens"
+import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits.js"
+import { createRegularToken } from "../../utils/matchers.js"
+import { augmentTokenTypes } from "../../../src/scan/tokens.js"
 import { IToken } from "@chevrotain/types"
 import { expect } from "chai"
 

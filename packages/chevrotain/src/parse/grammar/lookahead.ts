@@ -1,27 +1,21 @@
-import isEmpty from "lodash/isEmpty"
-import flatten from "lodash/flatten"
-import every from "lodash/every"
-import map from "lodash/map"
-import forEach from "lodash/forEach"
-import has from "lodash/has"
-import reduce from "lodash/reduce"
-import { possiblePathsFrom } from "./interpreter"
-import { RestWalker } from "./rest"
-import { Predicate, TokenMatcher } from "../parser/parser"
+import { every, flatten, forEach, has, isEmpty, map, reduce } from "lodash-es"
+import { possiblePathsFrom } from "./interpreter.js"
+import { RestWalker } from "./rest.js"
+import { Predicate, TokenMatcher } from "../parser/parser.js"
 import {
   tokenStructuredMatcher,
   tokenStructuredMatcherNoCategories
-} from "../../scan/tokens"
+} from "../../scan/tokens.js"
 import {
   Alternation,
   Alternative as AlternativeGAST,
+  GAstVisitor,
   Option,
   Repetition,
   RepetitionMandatory,
   RepetitionMandatoryWithSeparator,
   RepetitionWithSeparator
 } from "@chevrotain/gast"
-import { GAstVisitor } from "@chevrotain/gast"
 import {
   IOrAlt,
   IProduction,

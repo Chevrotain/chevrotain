@@ -1,10 +1,10 @@
-import map from "lodash/map"
-import forEach from "lodash/forEach"
-import isString from "lodash/isString"
-import isRegExp from "lodash/isRegExp"
-import pickBy from "lodash/pickBy"
-import assign from "lodash/assign"
-import {
+import map from "lodash/map.js"
+import forEach from "lodash/forEach.js"
+import isString from "lodash/isString.js"
+import isRegExp from "lodash/isRegExp.js"
+import pickBy from "lodash/pickBy.js"
+import assign from "lodash/assign.js"
+import type {
   IGASTVisitor,
   IProduction,
   IProductionWithOccurrence,
@@ -414,6 +414,7 @@ export function serializeProduction(node: IProduction): ISerializedGast {
       orgText: node.orgText,
       definition: convertDefinition(node.definition)
     }
+    /* c8 ignore next 3 */
   } else {
     throw Error("non exhaustive match")
   }

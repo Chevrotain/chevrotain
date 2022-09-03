@@ -14,13 +14,15 @@ import {
   SubruleMethodOpts,
   TokenType
 } from "@chevrotain/types"
-import peek from "lodash/last"
-import isArray from "lodash/isArray"
-import some from "lodash/some"
-import forEach from "lodash/forEach"
-import isFunction from "lodash/isFunction"
-import has from "lodash/has"
-import { MixedInParser } from "./parser_traits"
+import {
+  forEach,
+  has,
+  isArray,
+  isFunction,
+  last as peek,
+  some
+} from "lodash-es"
+import { MixedInParser } from "./parser_traits.js"
 import {
   Alternation,
   Alternative,
@@ -33,12 +35,15 @@ import {
   Rule,
   Terminal
 } from "@chevrotain/gast"
-import { Lexer } from "../../../scan/lexer_public"
-import { augmentTokenTypes, hasShortKeyProperty } from "../../../scan/tokens"
-import { createToken, createTokenInstance } from "../../../scan/tokens_public"
-import { END_OF_FILE } from "../parser"
-import { BITS_FOR_OCCURRENCE_IDX } from "../../grammar/keys"
-import { ParserMethodInternal } from "../types"
+import { Lexer } from "../../../scan/lexer_public.js"
+import { augmentTokenTypes, hasShortKeyProperty } from "../../../scan/tokens.js"
+import {
+  createToken,
+  createTokenInstance
+} from "../../../scan/tokens_public.js"
+import { END_OF_FILE } from "../parser.js"
+import { BITS_FOR_OCCURRENCE_IDX } from "../../grammar/keys.js"
+import { ParserMethodInternal } from "../types.js"
 
 type ProdWithDef = IProduction & { definition?: IProduction[] }
 const RECORDING_NULL_OBJECT = {

@@ -1,11 +1,10 @@
-import flatten from "lodash/flatten"
-import uniq from "lodash/uniq"
-import map from "lodash/map"
-import { NonTerminal, Terminal } from "@chevrotain/gast"
+import { flatten, map, uniq } from "lodash-es"
 import {
   isBranchingProd,
   isOptionalProd,
-  isSequenceProd
+  isSequenceProd,
+  NonTerminal,
+  Terminal
 } from "@chevrotain/gast"
 import { IProduction, TokenType } from "@chevrotain/types"
 

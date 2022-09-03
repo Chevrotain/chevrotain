@@ -1,5 +1,5 @@
 import { expect } from "chai"
-import { parse } from "./ecma_quirks"
+import { parse } from "./ecma_quirks.js"
 
 describe("ECMAScript Quirks Example (ScannerLess Mode)", () => {
   it("can parse a valid text successfully", () => {

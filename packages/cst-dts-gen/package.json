@@ -6,12 +6,15 @@
   "bugs": {
     "url": "https://github.com/Chevrotain/chevrotain/issues"
   },
-  "exports": {
-    ".": "./lib/src/api.js"
-  },
   "license": "Apache-2.0",
+  "type": "module",
   "typings": "lib/src/api.d.ts",
-  "main": "lib/src/api.js",
+  "exports": {
+    ".": {
+      "types": "./lib/src/api.d.ts",
+      "import": "./lib/src/api.js"
+    }
+  },
   "files": [
     "src/**/*.ts",
     "lib/src/**/*.js",
@@ -35,10 +38,10 @@
   "dependencies": {
     "@chevrotain/gast": "10.5.0",
     "@chevrotain/types": "10.5.0",
-    "lodash": "4.17.21"
+    "lodash-es": "4.17.21"
   },
   "devDependencies": {
-    "@types/lodash": "4.14.191"
+    "@types/lodash-es": "4.17.6"
   },
   "publishConfig": {
     "access": "public"

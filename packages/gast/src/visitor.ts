@@ -9,8 +9,8 @@ import {
   RepetitionWithSeparator,
   Rule,
   Terminal
-} from "./model"
-import { IProduction } from "@chevrotain/types"
+} from "./model.js"
+import type { IProduction } from "@chevrotain/types"
 
 export abstract class GAstVisitor {
   public visit(node: IProduction): any {
@@ -36,41 +36,41 @@ export abstract class GAstVisitor {
         return this.visitTerminal(nodeAny)
       case Rule:
         return this.visitRule(nodeAny)
-      /* istanbul ignore next */
+      /* c8 ignore next 2 */
       default:
         throw Error("non exhaustive match")
     }
   }
 
-  /* istanbul ignore next - testing the fact a NOOP function exists is non-trivial  */
+  /* c8 ignore next */
   public visitNonTerminal(node: NonTerminal): any {}
 
-  /* istanbul ignore next - testing the fact a NOOP function exists is non-trivial  */
+  /* c8 ignore next */
   public visitAlternative(node: Alternative): any {}
 
-  /* istanbul ignore next - testing the fact a NOOP function exists is non-trivial  */
+  /* c8 ignore next */
   public visitOption(node: Option): any {}
 
-  /* istanbul ignore next - testing the fact a NOOP function exists is non-trivial  */
+  /* c8 ignore next */
   public visitRepetition(node: Repetition): any {}
 
-  /* istanbul ignore next - testing the fact a NOOP function exists is non-trivial  */
+  /* c8 ignore next */
   public visitRepetitionMandatory(node: RepetitionMandatory): any {}
 
-  /* istanbul ignore next - testing the fact a NOOP function exists is non-trivial  */
+  /* c8 ignore next 3 */
   public visitRepetitionMandatoryWithSeparator(
     node: RepetitionMandatoryWithSeparator
   ): any {}
 
-  /* istanbul ignore next - testing the fact a NOOP function exists is non-trivial  */
+  /* c8 ignore next */
   public visitRepetitionWithSeparator(node: RepetitionWithSeparator): any {}
 
-  /* istanbul ignore next - testing the fact a NOOP function exists is non-trivial  */
+  /* c8 ignore next */
   public visitAlternation(node: Alternation): any {}
 
-  /* istanbul ignore next - testing the fact a NOOP function exists is non-trivial  */
+  /* c8 ignore next */
   public visitTerminal(node: Terminal): any {}
 
-  /* istanbul ignore next - testing the fact a NOOP function exists is non-trivial  */
+  /* c8 ignore next */
   public visitRule(node: Rule): any {}
 }

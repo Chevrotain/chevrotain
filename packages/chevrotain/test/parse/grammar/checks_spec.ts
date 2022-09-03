@@ -1,12 +1,12 @@
 import {
   CstParser,
   EmbeddedActionsParser
-} from "../../../src/parse/parser/traits/parser_traits"
+} from "../../../src/parse/parser/traits/parser_traits.js"
 import {
   EMPTY_ALT,
   END_OF_FILE,
   ParserDefinitionErrorType
-} from "../../../src/parse/parser/parser"
+} from "../../../src/parse/parser/parser.js"
 import {
   getFirstNoneTerminal,
   identifyProductionForDuplicates,
@@ -15,10 +15,9 @@ import {
   validateRuleDoesNotAlreadyExist,
   validateRuleIsOverridden,
   validateTooManyAlts
-} from "../../../src/parse/grammar/checks"
-import { createToken } from "../../../src/scan/tokens_public"
-import first from "lodash/first"
-import map from "lodash/map"
+} from "../../../src/parse/grammar/checks.js"
+import { createToken } from "../../../src/scan/tokens_public.js"
+import { first, map, omit } from "lodash-es"
 import {
   Alternation,
   Alternative,
@@ -29,11 +28,10 @@ import {
   Rule,
   Terminal
 } from "@chevrotain/gast"
-import { defaultGrammarValidatorErrorProvider } from "../../../src/parse/errors_public"
+import { defaultGrammarValidatorErrorProvider } from "../../../src/parse/errors_public.js"
 import { IToken, TokenType } from "@chevrotain/types"
 import { expect } from "chai"
-import { createDeferredTokenBuilder } from "../../utils/builders"
-import omit from "lodash/omit"
+import { createDeferredTokenBuilder } from "../../utils/builders.js"
 
 const getIdentTok = createDeferredTokenBuilder({
   name: "IdentTok",

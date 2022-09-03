@@ -1,13 +1,15 @@
-import isEmpty from "lodash/isEmpty"
-import compact from "lodash/compact"
-import isArray from "lodash/isArray"
-import map from "lodash/map"
-import forEach from "lodash/forEach"
-import filter from "lodash/filter"
-import keys from "lodash/keys"
-import isFunction from "lodash/isFunction"
-import isUndefined from "lodash/isUndefined"
-import { defineNameProp } from "../../lang/lang_extensions"
+import {
+  compact,
+  filter,
+  forEach,
+  isArray,
+  isEmpty,
+  isFunction,
+  isUndefined,
+  keys,
+  map
+} from "lodash-es"
+import { defineNameProp } from "../../lang/lang_extensions.js"
 import { CstNode, ICstVisitor } from "@chevrotain/types"
 
 export function defaultVisit<IN>(ctx: any, param: IN): void {

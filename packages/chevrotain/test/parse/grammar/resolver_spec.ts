@@ -1,7 +1,7 @@
-import { GastRefResolverVisitor } from "../../../src/parse/grammar/resolver"
-import { ParserDefinitionErrorType } from "../../../src/parse/parser/parser"
+import { GastRefResolverVisitor } from "../../../src/parse/grammar/resolver.js"
+import { ParserDefinitionErrorType } from "../../../src/parse/parser/parser.js"
 import { NonTerminal, Rule } from "@chevrotain/gast"
-import { defaultGrammarResolverErrorProvider } from "../../../src/parse/errors_public"
+import { defaultGrammarResolverErrorProvider } from "../../../src/parse/errors_public.js"
 import { expect } from "chai"
 
 describe("The RefResolverVisitor", () => {

@@ -11,7 +11,7 @@ import {
   RegExpFlags,
   RegExpPattern,
   Set
-} from "../api"
+} from "../api.js"
 
 export class BaseRegExpVisitor {
   public visitChildren(node: IRegExpAST) {

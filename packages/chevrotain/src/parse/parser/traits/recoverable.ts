@@ -2,29 +2,31 @@ import {
   createTokenInstance,
   EOF,
   tokenMatcher
-} from "../../../scan/tokens_public"
+} from "../../../scan/tokens_public.js"
 import {
   AbstractNextTerminalAfterProductionWalker,
   IFirstAfterRepetition
-} from "../../grammar/interpreter"
-import isEmpty from "lodash/isEmpty"
-import dropRight from "lodash/dropRight"
-import flatten from "lodash/flatten"
-import map from "lodash/map"
-import find from "lodash/find"
-import has from "lodash/has"
-import includes from "lodash/includes"
-import clone from "lodash/clone"
+} from "../../grammar/interpreter.js"
+import {
+  clone,
+  dropRight,
+  find,
+  flatten,
+  has,
+  includes,
+  isEmpty,
+  map
+} from "lodash-es"
 import {
   IParserConfig,
   IToken,
   ITokenGrammarPath,
   TokenType
 } from "@chevrotain/types"
-import { MismatchedTokenException } from "../../exceptions_public"
-import { IN } from "../../constants"
-import { MixedInParser } from "./parser_traits"
-import { DEFAULT_PARSER_CONFIG } from "../parser"
+import { MismatchedTokenException } from "../../exceptions_public.js"
+import { IN } from "../../constants.js"
+import { MixedInParser } from "./parser_traits.js"
+import { DEFAULT_PARSER_CONFIG } from "../parser.js"
 
 export const EOF_FOLLOW_KEY: any = {}
 

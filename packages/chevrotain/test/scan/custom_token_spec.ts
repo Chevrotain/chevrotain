@@ -1,5 +1,5 @@
-import { createToken } from "../../src/scan/tokens_public"
-import { Lexer } from "../../src/scan/lexer_public"
+import { createToken } from "../../src/scan/tokens_public.js"
+import { Lexer } from "../../src/scan/lexer_public.js"
 import { expect } from "chai"
 
 describe("The Chevrotain Custom Tokens Support", () => {

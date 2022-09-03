@@ -1,8 +1,8 @@
-import { first } from "../../../src/parse/grammar/first"
-import { setEquality } from "../../utils/matchers"
-import { Alternative, Terminal, Option, Alternation } from "@chevrotain/gast"
+import { first } from "../../../src/parse/grammar/first.js"
+import { setEquality } from "../../utils/matchers.js"
+import { Alternation, Alternative, Option, Terminal } from "@chevrotain/gast"
 import { expect } from "chai"
-import { createToken } from "../../../src/scan/tokens_public"
+import { createToken } from "../../../src/scan/tokens_public.js"
 
 describe("The Grammar Ast first model", () => {
   it("can compute the first for a terminal", () => {

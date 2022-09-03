@@ -1,5 +1,5 @@
 import { ITokenConfig, TokenType } from "@chevrotain/types"
-import { createToken } from "../../src/scan/tokens_public"
+import { createToken } from "../../src/scan/tokens_public.js"
 
 export function createDeferredTokenBuilder(
   config: ITokenConfig

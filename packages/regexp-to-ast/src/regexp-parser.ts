@@ -13,7 +13,7 @@ import type {
   RegExpPattern,
   Set,
   Term
-} from "../api"
+} from "../api.js"
 import {
   addFlag,
   ASSERT_EXISTS,
@@ -21,12 +21,12 @@ import {
   cc,
   insertToSet,
   isCharacter
-} from "./utils"
+} from "./utils.js"
 import {
   digitsCharCodes,
   whitespaceCodes,
   wordCharCodes
-} from "./character-classes"
+} from "./character-classes.js"
 
 // consts and utilities
 const hexDigitPattern = /[0-9a-fA-F]/

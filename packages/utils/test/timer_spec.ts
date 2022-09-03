@@ -1,4 +1,4 @@
-import { timer } from "../src/api"
+import { timer } from "../src/api.js"
 import { expect } from "chai"
 
 describe("The timer helper", () => {

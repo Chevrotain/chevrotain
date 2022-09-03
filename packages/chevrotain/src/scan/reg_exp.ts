@@ -7,15 +7,15 @@ import {
   Group,
   Set
 } from "@chevrotain/regexp-to-ast"
-import isArray from "lodash/isArray"
-import every from "lodash/every"
-import forEach from "lodash/forEach"
-import find from "lodash/find"
-import values from "lodash/values"
-import includes from "lodash/includes"
+import { isArray } from "lodash-es"
+import { every } from "lodash-es"
+import { forEach } from "lodash-es"
+import { find } from "lodash-es"
+import { values } from "lodash-es"
+import { includes } from "lodash-es"
 import { PRINT_ERROR, PRINT_WARNING } from "@chevrotain/utils"
-import { ASTNode, getRegExpAst } from "./reg_exp_parser"
-import { charCodeToOptimizedIndex, minOptimizationVal } from "./lexer"
+import { ASTNode, getRegExpAst } from "./reg_exp_parser.js"
+import { charCodeToOptimizedIndex, minOptimizationVal } from "./lexer.js"
 
 const complementErrorMessage =
   "Complement Sets are not supported for first char optimization"

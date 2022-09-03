@@ -16,16 +16,18 @@ import {
   TokenTypeDictionary,
   TokenVocabulary
 } from "@chevrotain/types"
-import isEmpty from "lodash/isEmpty"
-import isArray from "lodash/isArray"
-import flatten from "lodash/flatten"
-import every from "lodash/every"
-import uniq from "lodash/uniq"
-import isObject from "lodash/isObject"
-import has from "lodash/has"
-import values from "lodash/values"
-import reduce from "lodash/reduce"
-import clone from "lodash/clone"
+import {
+  clone,
+  every,
+  flatten,
+  has,
+  isArray,
+  isEmpty,
+  isObject,
+  reduce,
+  uniq,
+  values
+} from "lodash-es"
 import {
   AT_LEAST_ONE_IDX,
   AT_LEAST_ONE_SEP_IDX,
@@ -35,32 +37,32 @@ import {
   MANY_SEP_IDX,
   OPTION_IDX,
   OR_IDX
-} from "../../grammar/keys"
+} from "../../grammar/keys.js"
 import {
   isRecognitionException,
   MismatchedTokenException,
   NotAllInputParsedException
-} from "../../exceptions_public"
-import { PROD_TYPE } from "../../grammar/lookahead"
+} from "../../exceptions_public.js"
+import { PROD_TYPE } from "../../grammar/lookahead.js"
 import {
   AbstractNextTerminalAfterProductionWalker,
   NextTerminalAfterAtLeastOneSepWalker,
   NextTerminalAfterAtLeastOneWalker,
   NextTerminalAfterManySepWalker,
   NextTerminalAfterManyWalker
-} from "../../grammar/interpreter"
-import { DEFAULT_RULE_CONFIG, IParserState, TokenMatcher } from "../parser"
-import { IN_RULE_RECOVERY_EXCEPTION } from "./recoverable"
-import { EOF } from "../../../scan/tokens_public"
-import { MixedInParser } from "./parser_traits"
+} from "../../grammar/interpreter.js"
+import { DEFAULT_RULE_CONFIG, IParserState, TokenMatcher } from "../parser.js"
+import { IN_RULE_RECOVERY_EXCEPTION } from "./recoverable.js"
+import { EOF } from "../../../scan/tokens_public.js"
+import { MixedInParser } from "./parser_traits.js"
 import {
   augmentTokenTypes,
   isTokenType,
   tokenStructuredMatcher,
   tokenStructuredMatcherNoCategories
-} from "../../../scan/tokens"
+} from "../../../scan/tokens.js"
 import { Rule } from "@chevrotain/gast"
-import { ParserMethodInternal } from "../types"
+import { ParserMethodInternal } from "../types.js"
 
 /**
  * This trait is responsible for the runtime parsing engine

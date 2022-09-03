@@ -1,5 +1,5 @@
-import { END_OF_FILE } from "../../../src/parse/parser/parser"
-import { createToken } from "../../../src/scan/tokens_public"
+import { END_OF_FILE } from "../../../src/parse/parser/parser.js"
+import { createToken } from "../../../src/scan/tokens_public.js"
 import {
   buildAlternativesLookAheadFunc,
   buildLookaheadFuncForOptionalProd,
@@ -8,13 +8,13 @@ import {
   getProdType,
   lookAheadSequenceFromAlternatives,
   PROD_TYPE
-} from "../../../src/parse/grammar/lookahead"
-import map from "lodash/map"
+} from "../../../src/parse/grammar/lookahead.js"
+import { map } from "lodash-es"
 import {
   augmentTokenTypes,
   tokenStructuredMatcher
-} from "../../../src/scan/tokens"
-import { createRegularToken } from "../../utils/matchers"
+} from "../../../src/scan/tokens.js"
+import { createRegularToken } from "../../utils/matchers.js"
 import {
   Alternation,
   Alternative,
@@ -28,7 +28,7 @@ import {
   Terminal
 } from "@chevrotain/gast"
 import { IToken, TokenType } from "@chevrotain/types"
-import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
+import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits.js"
 import { expect } from "chai"
 
 describe("getProdType", () => {

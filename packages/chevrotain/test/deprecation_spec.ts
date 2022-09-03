@@ -1,6 +1,6 @@
 import { expect } from "chai"
-import { createToken, Parser } from "../src/api"
-import { CstParser } from "../src/parse/parser/traits/parser_traits"
+import { createToken, Parser } from "../src/api.js"
+import { CstParser } from "../src/parse/parser/traits/parser_traits.js"
 
 describe("Chevrotain's runtime deprecation checks", () => {
   it("Will throw an error if someone tries to use the deprecated Parser class", () => {

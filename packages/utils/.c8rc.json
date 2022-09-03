@@ -1,0 +1,8 @@
+{
+  "reporter": ["lcov", "text"],
+  "all": true,
+  "src": ["src"],
+  "extension": [".js", ".ts"],
+  "exclude": ["src/print.ts", "src/to-fast-properties.ts", "test/*.*"],
+  "exclude-after-remap": true
+}

@@ -1,13 +1,12 @@
-import { Lexer } from "../../src/scan/lexer_public"
+import { Lexer } from "../../src/scan/lexer_public.js"
 import { expect } from "chai"
-import { SinonSpy } from "sinon"
+import { SinonSpy, spy } from "sinon"
 
 describe("Chevrotain's Lexer Init Performance Tracing", () => {
   let consoleLogSpy: SinonSpy
 
   beforeEach(() => {
-    // @ts-ignore
-    consoleLogSpy = sinon.spy(console, "log")
+    consoleLogSpy = spy(console, "log")
   })
 
   afterEach(() => {

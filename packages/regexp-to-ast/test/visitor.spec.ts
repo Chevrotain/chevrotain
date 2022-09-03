@@ -8,10 +8,10 @@ import type {
   Quantifier,
   RegExpPattern,
   Set
-} from "../api"
-import { RegExpParser } from "../src/regexp-parser"
-import { BaseRegExpVisitor } from "../src/base-regexp-visitor"
-import { Character } from "../api"
+} from "../api.js"
+import { RegExpParser } from "../src/regexp-parser.js"
+import { BaseRegExpVisitor } from "../src/base-regexp-visitor.js"
+import { Character } from "../api.js"
 
 describe("The regexp AST visitor", () => {
   let parser: RegExpParser

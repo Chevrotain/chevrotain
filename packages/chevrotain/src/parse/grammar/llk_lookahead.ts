@@ -6,24 +6,23 @@ import {
   TokenType,
   OptionalProductionType
 } from "@chevrotain/types"
-import flatMap from "lodash/flatMap"
-import isEmpty from "lodash/isEmpty"
-import { defaultGrammarValidatorErrorProvider } from "../errors_public"
-import { DEFAULT_PARSER_CONFIG } from "../parser/parser"
+import { flatMap, isEmpty } from "lodash-es"
+import { defaultGrammarValidatorErrorProvider } from "../errors_public.js"
+import { DEFAULT_PARSER_CONFIG } from "../parser/parser.js"
 import {
   validateAmbiguousAlternationAlternatives,
   validateEmptyOrAlternative,
   validateNoLeftRecursion,
   validateSomeNonEmptyLookaheadPath
-} from "./checks"
+} from "./checks.js"
 import {
   buildAlternativesLookAheadFunc,
   buildLookaheadFuncForOptionalProd,
   buildLookaheadFuncForOr,
   buildSingleAlternativeLookaheadFunction,
   getProdType
-} from "./lookahead"
-import { IParserDefinitionError } from "./types"
+} from "./lookahead.js"
+import { IParserDefinitionError } from "./types.js"
 
 export class LLkLookaheadStrategy implements ILookaheadStrategy {
   readonly maxLookahead: number

@@ -1,8 +1,8 @@
-import includes from "lodash/includes"
+import { includes } from "lodash-es"
 import {
-  IToken,
   IRecognitionException,
-  IRecognizerContext
+  IRecognizerContext,
+  IToken
 } from "@chevrotain/types"
 
 const MISMATCHED_TOKEN_EXCEPTION = "MismatchedTokenException"

@@ -3,7 +3,8 @@
   "compilerOptions": {
     "target": "ES2015",
     "composite": true,
-    "module": "CommonJS",
+    "moduleResolution": "Node16",
+    "module": "ES2020",
     "esModuleInterop": true,
     "removeComments": false,
     "sourceMap": true,

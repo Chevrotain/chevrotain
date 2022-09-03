@@ -10,7 +10,8 @@ module.exports = {
   stats: {
     colors: true,
     modules: true,
-    reasons: true
+    reasons: false,
+    modulesSpace: 200
   },
   entry: "./lib/src/api.js",
   output: {

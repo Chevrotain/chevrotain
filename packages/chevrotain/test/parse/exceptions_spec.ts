@@ -1,11 +1,11 @@
-import * as ErrorStackParser from "error-stack-parser"
-import { createTokenInstance, EOF } from "../../src/scan/tokens_public"
+import ErrorStackParser from "error-stack-parser"
+import { createTokenInstance, EOF } from "../../src/scan/tokens_public.js"
 import {
   EarlyExitException,
-  NoViableAltException,
+  MismatchedTokenException,
   NotAllInputParsedException,
-  MismatchedTokenException
-} from "../../src/parse/exceptions_public"
+  NoViableAltException
+} from "../../src/parse/exceptions_public.js"
 import { expect } from "chai"
 import { IToken } from "@chevrotain/types"
 
@@ -93,7 +93,7 @@ describe("Chevrotain's Parsing Exceptions", () => {
         () => new EarlyExitException("", dummyToken, dummyToken)
       )
       const stacktrace = ErrorStackParser.parse(exceptionInstance)
-      expect(stacktrace[0].functionName).to.be.undefined // lambda function
+      expect(stacktrace[0].functionName).to.equal("<anonymous>") // lambda function
       expect(stacktrace[1].functionName).to.equal("throwAndCatchException")
     })
 
@@ -102,7 +102,7 @@ describe("Chevrotain's Parsing Exceptions", () => {
         () => new NoViableAltException("", dummyToken, dummyToken)
       )
       const stacktrace = ErrorStackParser.parse(exceptionInstance)
-      expect(stacktrace[0].functionName).to.be.undefined // lambda function
+      expect(stacktrace[0].functionName).to.equal("<anonymous>") // lambda function
       expect(stacktrace[1].functionName).to.equal("throwAndCatchException")
     })
 
@@ -111,7 +111,7 @@ describe("Chevrotain's Parsing Exceptions", () => {
         () => new NotAllInputParsedException("", dummyToken)
       )
       const stacktrace = ErrorStackParser.parse(exceptionInstance)
-      expect(stacktrace[0].functionName).to.be.undefined // lambda function
+      expect(stacktrace[0].functionName).to.equal("<anonymous>") // lambda function
       expect(stacktrace[1].functionName).to.equal("throwAndCatchException")
     })
 
@@ -120,7 +120,7 @@ describe("Chevrotain's Parsing Exceptions", () => {
         () => new MismatchedTokenException("", dummyToken, dummyToken)
       )
       const stacktrace = ErrorStackParser.parse(exceptionInstance)
-      expect(stacktrace[0].functionName).to.be.undefined // lambda function
+      expect(stacktrace[0].functionName).to.equal("<anonymous>") // lambda function
       expect(stacktrace[1].functionName).to.equal("throwAndCatchException")
     })
   })

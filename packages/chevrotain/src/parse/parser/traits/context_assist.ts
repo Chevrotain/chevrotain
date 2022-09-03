@@ -7,10 +7,9 @@ import {
 import {
   NextAfterTokenWalker,
   nextPossibleTokensAfter
-} from "../../grammar/interpreter"
-import first from "lodash/first"
-import isUndefined from "lodash/isUndefined"
-import { MixedInParser } from "./parser_traits"
+} from "../../grammar/interpreter.js"
+import { first, isUndefined } from "lodash-es"
+import { MixedInParser } from "./parser_traits.js"
 
 export class ContentAssist {
   initContentAssist() {}

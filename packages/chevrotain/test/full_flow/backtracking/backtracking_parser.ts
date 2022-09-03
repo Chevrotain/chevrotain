@@ -5,7 +5,7 @@
 // both statements in a single rule and only distinguishing between them later, but lets see an example of using backtracking :)
 
 import { IParserConfig } from "@chevrotain/types"
-import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
+import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits.js"
 
 export enum RET_TYPE {
   WITH_DEFAULT,

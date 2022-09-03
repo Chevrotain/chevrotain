@@ -1,5 +1,5 @@
-import { executeSampleTest, testNameFromDir } from "../../sample_test"
-import { parser } from "./input"
+import { executeSampleTest, testNameFromDir } from "../../sample_test.js"
+import { parser } from "./input.js"
 describe(`${testNameFromDir(__dirname)}`, () => {
   executeSampleTest(__dirname, parser)
 })

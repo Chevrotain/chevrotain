@@ -7,16 +7,15 @@ import {
   EarlyExitException,
   isRecognitionException,
   NoViableAltException
-} from "../../exceptions_public"
-import has from "lodash/has"
-import clone from "lodash/clone"
+} from "../../exceptions_public.js"
+import { clone, has } from "lodash-es"
 import {
   getLookaheadPathsForOptionalProd,
   getLookaheadPathsForOr,
   PROD_TYPE
-} from "../../grammar/lookahead"
-import { MixedInParser } from "./parser_traits"
-import { DEFAULT_PARSER_CONFIG } from "../parser"
+} from "../../grammar/lookahead.js"
+import { MixedInParser } from "./parser_traits.js"
+import { DEFAULT_PARSER_CONFIG } from "../parser.js"
 
 /**
  * Trait responsible for runtime parsing errors.
