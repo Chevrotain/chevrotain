@@ -34,7 +34,6 @@ export function resolveGrammar(
 
 export function validateGrammar(options: {
   rules: Rule[]
-  maxLookahead: number
   tokenTypes: TokenType[]
   grammarName: string
   errMsgProvider: IGrammarValidatorErrorMessageProvider
@@ -45,7 +44,6 @@ export function validateGrammar(options: {
 
   return orgValidateGrammar(
     options.rules,
-    options.maxLookahead,
     options.tokenTypes,
     options.errMsgProvider,
     options.grammarName

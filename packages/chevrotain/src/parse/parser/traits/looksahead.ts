@@ -27,6 +27,7 @@ import {
   Rule
 } from "@chevrotain/gast"
 import { getProductionDslName } from "@chevrotain/gast"
+import { LLkLookaheadStrategy } from "../../grammar/llk_lookahead"
 
 /**
  * Trait responsible for the lookahead related utilities and optimizations.
@@ -48,7 +49,7 @@ export class LooksAhead {
 
     this.lookaheadStrategy = has(config, "lookaheadStrategy")
       ? (config.lookaheadStrategy as ILookaheadStrategy) // assumes end user provides the correct config value/type
-      : DEFAULT_PARSER_CONFIG.lookaheadStrategy
+      : new LLkLookaheadStrategy({ maxLookahead: this.maxLookahead })
 
     this.lookAheadFuncsCache = new Map()
   }

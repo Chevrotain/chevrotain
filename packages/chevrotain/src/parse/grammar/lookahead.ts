@@ -23,8 +23,6 @@ import {
 } from "@chevrotain/gast"
 import { GAstVisitor } from "@chevrotain/gast"
 import {
-  ILookaheadStrategy,
-  ILookaheadValidationError,
   IOrAlt,
   IProduction,
   IProductionWithOccurrence,
@@ -33,15 +31,6 @@ import {
   Rule,
   TokenType
 } from "@chevrotain/types"
-import flatMap from "lodash/flatMap"
-import {
-  validateAmbiguousAlternationAlternatives,
-  validateEmptyOrAlternative,
-  validateNoLeftRecursion,
-  validateSomeNonEmptyLookaheadPath
-} from "./checks"
-import { defaultGrammarValidatorErrorProvider } from "../errors_public"
-import { IParserDefinitionError } from "./types"
 
 export enum PROD_TYPE {
   OPTION,
@@ -79,6 +68,26 @@ export function getProdType(
     return PROD_TYPE.ALTERNATION
   } else {
     throw Error("non exhaustive match")
+  }
+}
+
+export function getLookaheadPaths(options: {
+  occurrence: number
+  rule: Rule
+  prodType: LookaheadProductionType
+  maxLookahead: number
+}): LookaheadSequence[] {
+  const { occurrence, rule, prodType, maxLookahead } = options
+  const type = getProdType(prodType)
+  if (type === PROD_TYPE.ALTERNATION) {
+    return getLookaheadPathsForOr(occurrence, rule, maxLookahead)
+  } else {
+    return getLookaheadPathsForOptionalProd(
+      occurrence,
+      rule,
+      type,
+      maxLookahead
+    )
   }
 }
 
@@ -453,7 +462,8 @@ class InsideDefinitionFinderVisitor extends GAstVisitor {
 
   constructor(
     private targetOccurrence: number,
-    private targetProdType: PROD_TYPE
+    private targetProdType: PROD_TYPE,
+    private targetRef?: any
   ) {
     super()
   }
@@ -464,7 +474,8 @@ class InsideDefinitionFinderVisitor extends GAstVisitor {
   ): void {
     if (
       node.idx === this.targetOccurrence &&
-      this.targetProdType === expectedProdName
+      this.targetProdType === expectedProdName &&
+      (this.targetRef === undefined || node === this.targetRef)
     ) {
       this.result = node.definition
     }
@@ -635,11 +646,13 @@ export function lookAheadSequenceFromAlternatives(
 export function getLookaheadPathsForOr(
   occurrence: number,
   ruleGrammar: Rule,
-  k: number
+  k: number,
+  orProd?: Alternation
 ): LookaheadSequence[] {
   const visitor = new InsideDefinitionFinderVisitor(
     occurrence,
-    PROD_TYPE.ALTERNATION
+    PROD_TYPE.ALTERNATION,
+    orProd
   )
   ruleGrammar.accept(visitor)
   return lookAheadSequenceFromAlternatives(visitor.result, k)

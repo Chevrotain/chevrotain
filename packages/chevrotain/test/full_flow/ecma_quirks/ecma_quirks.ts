@@ -10,6 +10,7 @@ import map from "lodash/map"
 import forEach from "lodash/forEach"
 import {
   ILookaheadStrategy,
+  ILookaheadValidationError,
   IOrAlt,
   IToken,
   OptionalProductionType,
@@ -17,7 +18,7 @@ import {
   TokenType
 } from "@chevrotain/types"
 import { MixedInParser } from "../../../src/parse/parser/traits/parser_traits"
-import { getLookaheadPaths } from "../../../src/parse/grammar/lookahead_public"
+import { getLookaheadPaths } from "../../../src/parse/grammar/lookahead"
 
 declare type QuirksTokens = {
   Return: TokenType
@@ -90,6 +91,15 @@ function deferredInitTokens() {
 const ErrorToken = createToken({ name: "ErrorToken" })
 
 class EcmaScriptQuirksLookaheadStrategy implements ILookaheadStrategy {
+  validate(options: {
+    rules: Rule[]
+    tokenTypes: TokenType[]
+    grammarName: string
+  }): ILookaheadValidationError[] {
+    // NOOP
+    return []
+  }
+
   buildLookaheadForAlternation(options: {
     prodOccurrence: number
     rule: Rule

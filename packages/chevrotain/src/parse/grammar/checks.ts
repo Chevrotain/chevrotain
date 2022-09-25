@@ -60,16 +60,11 @@ import { tokenStructuredMatcher } from "../../scan/tokens"
 export function validateLookahead(options: {
   lookaheadStrategy: ILookaheadStrategy
   rules: Rule[]
-  maxLookahead: number
   tokenTypes: TokenType[]
   grammarName: string
 }): IParserDefinitionError[] {
-  if (typeof options.lookaheadStrategy.validate !== "function") {
-    return []
-  }
   const lookaheadValidationErrorMessages = options.lookaheadStrategy.validate({
     rules: options.rules,
-    maxLookahead: options.maxLookahead,
     tokenTypes: options.tokenTypes,
     grammarName: options.grammarName
   })
@@ -81,7 +76,6 @@ export function validateLookahead(options: {
 
 export function validateGrammar(
   topLevels: Rule[],
-  globalMaxLookahead: number,
   tokenTypes: TokenType[],
   errMsgProvider: IGrammarValidatorErrorMessageProvider,
   grammarName: string
@@ -428,7 +422,8 @@ export function validateAmbiguousAlternationAlternatives(
     const alternatives = getLookaheadPathsForOr(
       currOccurrence,
       topLevelRule,
-      actualMaxLookahead
+      actualMaxLookahead,
+      currOr
     )
     const altsAmbiguityErrors = checkAlternativesAmbiguities(
       alternatives,

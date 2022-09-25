@@ -2034,7 +2034,7 @@ export interface IParserConfig {
   skipValidations?: boolean
   /**
    * A custom lookahead strategy.
-   * Can be used to override the normal LL(*k*) lookahead behavior.
+   * Can be used to override the default LL(*k*) lookahead behavior.
    *
    * Note that the default lookahead strategy is very well optimized and using a custom lookahead
    * strategy might lead to massively reduced performance.
@@ -2127,7 +2127,17 @@ export interface IParserErrorMessageProvider {
   }): string
 }
 
+/**
+ * @experimental This API is not finalized yet and may be subject to breaking changes.
+ */
 export declare class LLkLookaheadStrategy implements ILookaheadStrategy {
+  readonly maxLookahead: number
+  constructor(options: { maxLookahead?: number })
+  validate(options: {
+    rules: Rule[]
+    tokenTypes: TokenType[]
+    grammarName: string
+  }): ILookaheadValidationError[]
   validateNoLeftRecursion(rules: Rule[]): ILookaheadValidationError[]
   validateEmptyOrAlternatives(rules: Rule[]): ILookaheadValidationError[]
   validateAmbiguousAlternationAlternatives(
@@ -2154,6 +2164,9 @@ export declare class LLkLookaheadStrategy implements ILookaheadStrategy {
   }): () => boolean
 }
 
+/**
+ * @experimental This API is not finalized yet and may be subject to breaking changes.
+ */
 export interface ILookaheadStrategy {
   /**
    * Performs validations on the grammar specific to this lookahead strategy.
@@ -2161,15 +2174,12 @@ export interface ILookaheadStrategy {
    *
    * @param options.rules All parser rules of the grammar.
    *
-   * @param options.maxLookahead The maximum lookahead configured globally for the grammar.
-   *
    * @param options.tokenTypes All token types of the grammar.
    *
    * @param options.grammarName The name of the grammar.
    */
-  validate?(options: {
+  validate(options: {
     rules: Rule[]
-    maxLookahead: number
     tokenTypes: TokenType[]
     grammarName: string
   }): ILookaheadValidationError[]
@@ -2178,7 +2188,7 @@ export interface ILookaheadStrategy {
    * Initializes the lookahead for a grammar.
    *
    * Note that this method does not build the lookahead functions.
-   * It only allows to perform precomputations which require all rules.
+   * It only initializes the internal state of the strategy based on all grammar rules.
    *
    * @param options.rules All parser rules of the grammar.
    */
@@ -2186,7 +2196,6 @@ export interface ILookaheadStrategy {
 
   /**
    * Builds a lookahead function for alternations/`OR` parser methods.
-   * The resulting function is able to compute which of the alternatives to choose while parsing.
    *
    * @param options.prodOccurrence The occurrence number of this `OR` within its rule.
    *
@@ -2197,6 +2206,8 @@ export interface ILookaheadStrategy {
    * @param options.hasPredicates Whether any of the alternatives contain a predicate.
    *
    * @param options.dynamicTokensEnabled Whether dynamic tokens are enabled for this parser.
+   *
+   * @returns A function that is able to compute which of the alternatives to choose while parsing.
    */
   buildLookaheadForAlternation(options: {
     prodOccurrence: number
@@ -2208,8 +2219,6 @@ export interface ILookaheadStrategy {
 
   /**
    * Builds a lookahead function for optional productions.
-   * The resulting function is able to compute whether to parse the production
-   * or to continue with the rest of the parser rule.
    *
    * @param options.prodOccurrence The occurrence number of this production within its rule.
    *
@@ -2220,6 +2229,8 @@ export interface ILookaheadStrategy {
    * @param options.maxLookahead The maximum amount of lookahead for this production.
    *
    * @param options.dynamicTokensEnabled Whether dynamic tokens are enabled for this parser.
+   *
+   * @returns A function is able to compute whether to parse the production or to continue with the rest of the parser rule.
    */
   buildLookaheadForOptional(options: {
     prodOccurrence: number

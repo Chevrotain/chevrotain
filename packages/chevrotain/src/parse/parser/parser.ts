@@ -40,7 +40,6 @@ import { applyMixins } from "./utils/apply_mixins"
 import { IParserDefinitionError } from "../grammar/types"
 import { Rule } from "@chevrotain/gast"
 import { IParserConfigInternal, ParserMethodInternal } from "./types"
-import { LLkLookaheadStrategy } from "../grammar/lookahead_public"
 import { validateLookahead } from "../grammar/checks"
 
 export const END_OF_FILE = createTokenInstance(
@@ -57,18 +56,18 @@ Object.freeze(END_OF_FILE)
 
 export type TokenMatcher = (token: IToken, tokType: TokenType) => boolean
 
-export const DEFAULT_PARSER_CONFIG: Required<IParserConfigInternal> =
-  Object.freeze({
-    recoveryEnabled: false,
-    maxLookahead: 3,
-    dynamicTokensEnabled: false,
-    outputCst: true,
-    errorMessageProvider: defaultParserErrorProvider,
-    nodeLocationTracking: "none",
-    traceInitPerf: false,
-    skipValidations: false,
-    lookaheadStrategy: Object.freeze(new LLkLookaheadStrategy())
-  })
+export const DEFAULT_PARSER_CONFIG: Required<
+  Omit<IParserConfigInternal, "lookaheadStrategy">
+> = Object.freeze({
+  recoveryEnabled: false,
+  maxLookahead: 3,
+  dynamicTokensEnabled: false,
+  outputCst: true,
+  errorMessageProvider: defaultParserErrorProvider,
+  nodeLocationTracking: "none",
+  traceInitPerf: false,
+  skipValidations: false
+})
 
 export const DEFAULT_RULE_CONFIG: Required<IRuleConfig<any>> = Object.freeze({
   recoveryValueFunc: () => undefined,
@@ -203,7 +202,6 @@ export class Parser {
         if (isEmpty(resolverErrors) && this.skipValidations === false) {
           const validationErrors = validateGrammar({
             rules: values(this.gastProductionsCache),
-            maxLookahead: this.maxLookahead,
             tokenTypes: values(this.tokensMap),
             errMsgProvider: defaultGrammarValidatorErrorProvider,
             grammarName: className
@@ -211,7 +209,6 @@ export class Parser {
           const lookaheadValidationErrors = validateLookahead({
             lookaheadStrategy: this.lookaheadStrategy,
             rules: values(this.gastProductionsCache),
-            maxLookahead: this.maxLookahead,
             tokenTypes: values(this.tokensMap),
             grammarName: className
           })

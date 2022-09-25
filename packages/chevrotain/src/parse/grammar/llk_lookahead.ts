@@ -2,8 +2,6 @@ import {
   ILookaheadStrategy,
   ILookaheadValidationError,
   IOrAlt,
-  LookaheadSequence,
-  LookaheadProductionType,
   Rule,
   TokenType,
   OptionalProductionType
@@ -11,6 +9,7 @@ import {
 import flatMap from "lodash/flatMap"
 import isEmpty from "lodash/isEmpty"
 import { defaultGrammarValidatorErrorProvider } from "../errors_public"
+import { DEFAULT_PARSER_CONFIG } from "../parser/parser"
 import {
   validateAmbiguousAlternationAlternatives,
   validateEmptyOrAlternative,
@@ -22,63 +21,44 @@ import {
   buildLookaheadFuncForOptionalProd,
   buildLookaheadFuncForOr,
   buildSingleAlternativeLookaheadFunction,
-  getLookaheadPathsForOptionalProd,
-  getLookaheadPathsForOr,
-  getProdType,
-  PROD_TYPE
+  getProdType
 } from "./lookahead"
 import { IParserDefinitionError } from "./types"
 
-export function getLookaheadPaths(options: {
-  occurrence: number
-  rule: Rule
-  prodType: LookaheadProductionType
-  maxLookahead: number
-}): LookaheadSequence[] {
-  const { occurrence, rule, prodType, maxLookahead } = options
-  const type = getProdType(prodType)
-  if (type === PROD_TYPE.ALTERNATION) {
-    return getLookaheadPathsForOr(occurrence, rule, maxLookahead)
-  } else {
-    return getLookaheadPathsForOptionalProd(
-      occurrence,
-      rule,
-      type,
-      maxLookahead
-    )
-  }
-}
-
 export class LLkLookaheadStrategy implements ILookaheadStrategy {
+  readonly maxLookahead: number
+
+  constructor(options: { maxLookahead?: number }) {
+    this.maxLookahead =
+      options.maxLookahead ?? DEFAULT_PARSER_CONFIG.maxLookahead
+  }
+
   validate(options: {
     rules: Rule[]
-    maxLookahead: number
     tokenTypes: TokenType[]
     grammarName: string
   }): ILookaheadValidationError[] {
     const leftRecursionErrors = this.validateNoLeftRecursion(options.rules)
 
-    let emptyAltErrors: IParserDefinitionError[] = []
-    let ambiguousAltsErrors: IParserDefinitionError[] = []
-    let emptyRepetitionErrors: IParserDefinitionError[] = []
-
     if (isEmpty(leftRecursionErrors)) {
-      emptyAltErrors = this.validateEmptyOrAlternatives(options.rules)
-      ambiguousAltsErrors = this.validateAmbiguousAlternationAlternatives(
+      const emptyAltErrors = this.validateEmptyOrAlternatives(options.rules)
+      const ambiguousAltsErrors = this.validateAmbiguousAlternationAlternatives(
         options.rules,
-        options.maxLookahead
+        this.maxLookahead
       )
-      emptyRepetitionErrors = this.validateSomeNonEmptyLookaheadPath(
+      const emptyRepetitionErrors = this.validateSomeNonEmptyLookaheadPath(
         options.rules,
-        options.maxLookahead
+        this.maxLookahead
       )
+      const allErrors = [
+        ...leftRecursionErrors,
+        ...emptyAltErrors,
+        ...ambiguousAltsErrors,
+        ...emptyRepetitionErrors
+      ]
+      return allErrors
     }
-
-    return leftRecursionErrors.concat(
-      emptyAltErrors,
-      ambiguousAltsErrors,
-      emptyRepetitionErrors
-    )
+    return leftRecursionErrors
   }
 
   validateNoLeftRecursion(rules: Rule[]): IParserDefinitionError[] {

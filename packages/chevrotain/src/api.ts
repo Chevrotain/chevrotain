@@ -24,10 +24,9 @@ export {
 
 // Lookahead
 
-export {
-  LLkLookaheadStrategy,
-  getLookaheadPaths
-} from "./parse/grammar/lookahead_public"
+export { getLookaheadPaths } from "./parse/grammar/lookahead"
+
+export { LLkLookaheadStrategy } from "./parse/grammar/llk_lookahead"
 
 // Other Utilities
 
