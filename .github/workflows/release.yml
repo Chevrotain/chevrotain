@@ -11,7 +11,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: lts/*
-      - uses: pnpm/action-setup@v2.2.2
+      - uses: pnpm/action-setup@v2.2.4
         with:
           version: 7.9.3
       - name: Install dependencies
