@@ -2154,14 +2154,17 @@ export declare class LLkLookaheadStrategy implements ILookaheadStrategy {
     maxLookahead: number
     hasPredicates: boolean
     dynamicTokensEnabled: boolean
-  }): (orAlts?: IOrAlt<any>[] | undefined) => number | undefined
+  }): (
+    this: BaseParser,
+    orAlts?: IOrAlt<any>[] | undefined
+  ) => number | undefined
   buildLookaheadForOptional(options: {
     prodOccurrence: number
     prodType: OptionalProductionType
     rule: Rule
     maxLookahead: number
     dynamicTokensEnabled: boolean
-  }): () => boolean
+  }): (this: BaseParser) => boolean
 }
 
 /**

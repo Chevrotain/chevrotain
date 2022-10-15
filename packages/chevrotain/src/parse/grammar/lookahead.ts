@@ -29,7 +29,8 @@ import {
   LookaheadSequence,
   LookaheadProductionType,
   Rule,
-  TokenType
+  TokenType,
+  BaseParser
 } from "@chevrotain/types"
 
 export enum PROD_TYPE {
@@ -175,7 +176,10 @@ export function buildAlternativesLookAheadFunc(
     /**
      * @returns {number} - The chosen alternative index
      */
-    return function (orAlts: IOrAlt<any>[]): number | undefined {
+    return function (
+      this: BaseParser,
+      orAlts: IOrAlt<any>[]
+    ): number | undefined {
       // unfortunately the predicates must be extracted every single time
       // as they cannot be cached due to references to parameters(vars) which are no longer valid.
       // note that in the common case of no predicates, no cpu time will be wasted on this (see else block)
@@ -242,7 +246,7 @@ export function buildAlternativesLookAheadFunc(
     /**
      * @returns {number} - The chosen alternative index
      */
-    return function (): number {
+    return function (this: BaseParser): number {
       const nextToken = this.LA(1)
       return choiceToAlt[nextToken.tokenTypeIdx]
     }
@@ -252,7 +256,7 @@ export function buildAlternativesLookAheadFunc(
     /**
      * @returns {number} - The chosen alternative index
      */
-    return function (): number | undefined {
+    return function (this: BaseParser): number | undefined {
       for (let t = 0; t < numOfAlts; t++) {
         const currAlt = alts[t]
         const currNumOfPaths = currAlt.length
@@ -303,7 +307,7 @@ export function buildSingleAlternativeLookaheadFunction(
       const expectedTokenType = singleTokensTypes[0]
       const expectedTokenUniqueKey = (<any>expectedTokenType).tokenTypeIdx
 
-      return function (): boolean {
+      return function (this: BaseParser): boolean {
         return this.LA(1).tokenTypeIdx === expectedTokenUniqueKey
       }
     } else {
@@ -319,13 +323,13 @@ export function buildSingleAlternativeLookaheadFunction(
         [] as boolean[]
       )
 
-      return function (): boolean {
+      return function (this: BaseParser): boolean {
         const nextToken = this.LA(1)
         return choiceToAlt[nextToken.tokenTypeIdx] === true
       }
     }
   } else {
-    return function (): boolean {
+    return function (this: BaseParser): boolean {
       nextPath: for (let j = 0; j < numOfPaths; j++) {
         const currPath = alt[j]
         const currPathLength = currPath.length

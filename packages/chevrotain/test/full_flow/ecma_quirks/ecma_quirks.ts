@@ -124,7 +124,7 @@ class EcmaScriptQuirksLookaheadStrategy implements ILookaheadStrategy {
 
     const allTokenTypesPerAlt = map(alts, flatten)
 
-    return function () {
+    return function (this: EcmaScriptQuirksParser) {
       // save & restore lexer state as otherwise the text index will move ahead
       // and the parser will fail consuming the tokens we have looked ahead for.
       const lexerState = this.exportLexerState()
@@ -168,7 +168,7 @@ class EcmaScriptQuirksLookaheadStrategy implements ILookaheadStrategy {
 
     const allTokenTypes = flatten(alt)
 
-    return function () {
+    return function (this: EcmaScriptQuirksParser) {
       // save & restore lexer state as otherwise the text index will move ahead
       // and the parser will fail consuming the tokens we have looked ahead for.
       const lexerState = this.exportLexerState()
