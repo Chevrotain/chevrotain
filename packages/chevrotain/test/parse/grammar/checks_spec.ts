@@ -133,7 +133,6 @@ describe("the grammar validations", () => {
     })
     const actualErrors = validateGrammar(
       [qualifiedNameErr1, qualifiedNameErr2],
-      5,
       [],
       defaultGrammarValidatorErrorProvider,
       "bamba"

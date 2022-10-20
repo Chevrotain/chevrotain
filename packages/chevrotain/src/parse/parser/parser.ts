@@ -40,6 +40,7 @@ import { applyMixins } from "./utils/apply_mixins"
 import { IParserDefinitionError } from "../grammar/types"
 import { Rule } from "@chevrotain/gast"
 import { IParserConfigInternal, ParserMethodInternal } from "./types"
+import { validateLookahead } from "../grammar/checks"
 
 export const END_OF_FILE = createTokenInstance(
   EOF,
@@ -55,19 +56,18 @@ Object.freeze(END_OF_FILE)
 
 export type TokenMatcher = (token: IToken, tokType: TokenType) => boolean
 
-export type LookAheadSequence = TokenType[][]
-
-export const DEFAULT_PARSER_CONFIG: Required<IParserConfigInternal> =
-  Object.freeze({
-    recoveryEnabled: false,
-    maxLookahead: 3,
-    dynamicTokensEnabled: false,
-    outputCst: true,
-    errorMessageProvider: defaultParserErrorProvider,
-    nodeLocationTracking: "none",
-    traceInitPerf: false,
-    skipValidations: false
-  })
+export const DEFAULT_PARSER_CONFIG: Required<
+  Omit<IParserConfigInternal, "lookaheadStrategy">
+> = Object.freeze({
+  recoveryEnabled: false,
+  maxLookahead: 3,
+  dynamicTokensEnabled: false,
+  outputCst: true,
+  errorMessageProvider: defaultParserErrorProvider,
+  nodeLocationTracking: "none",
+  traceInitPerf: false,
+  skipValidations: false
+})
 
 export const DEFAULT_RULE_CONFIG: Required<IRuleConfig<any>> = Object.freeze({
   recoveryValueFunc: () => undefined,
@@ -87,7 +87,8 @@ export enum ParserDefinitionErrorType {
   INVALID_TOKEN_NAME = 9,
   NO_NON_EMPTY_LOOKAHEAD = 10,
   AMBIGUOUS_PREFIX_ALTS = 11,
-  TOO_MANY_ALTS = 12
+  TOO_MANY_ALTS = 12,
+  CUSTOM_LOOKAHEAD_VALIDATION = 13
 }
 
 export interface IParserDuplicatesDefinitionError
@@ -201,12 +202,20 @@ export class Parser {
         if (isEmpty(resolverErrors) && this.skipValidations === false) {
           const validationErrors = validateGrammar({
             rules: values(this.gastProductionsCache),
-            maxLookahead: this.maxLookahead,
             tokenTypes: values(this.tokensMap),
             errMsgProvider: defaultGrammarValidatorErrorProvider,
             grammarName: className
           })
-          this.definitionErrors = this.definitionErrors.concat(validationErrors)
+          const lookaheadValidationErrors = validateLookahead({
+            lookaheadStrategy: this.lookaheadStrategy,
+            rules: values(this.gastProductionsCache),
+            tokenTypes: values(this.tokensMap),
+            grammarName: className
+          })
+          this.definitionErrors = this.definitionErrors.concat(
+            validationErrors,
+            lookaheadValidationErrors
+          )
         }
       })
 

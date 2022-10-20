@@ -2032,6 +2032,14 @@ export interface IParserConfig {
    *   - For example: via a conditional that checks an env variable.
    */
   skipValidations?: boolean
+  /**
+   * A custom lookahead strategy.
+   * Can be used to override the default LL(*k*) lookahead behavior.
+   *
+   * Note that the default lookahead strategy is very well optimized and using a custom lookahead
+   * strategy might lead to massively reduced performance.
+   */
+  lookaheadStrategy?: ILookaheadStrategy
 }
 
 /**
@@ -2119,6 +2127,161 @@ export interface IParserErrorMessageProvider {
   }): string
 }
 
+/**
+ * @experimental This API is not finalized yet and may be subject to breaking changes.
+ */
+export declare class LLkLookaheadStrategy implements ILookaheadStrategy {
+  readonly maxLookahead: number
+  constructor(options: { maxLookahead?: number })
+  validate(options: {
+    rules: Rule[]
+    tokenTypes: TokenType[]
+    grammarName: string
+  }): ILookaheadValidationError[]
+  validateNoLeftRecursion(rules: Rule[]): ILookaheadValidationError[]
+  validateEmptyOrAlternatives(rules: Rule[]): ILookaheadValidationError[]
+  validateAmbiguousAlternationAlternatives(
+    rules: Rule[],
+    maxLookahead: number
+  ): ILookaheadValidationError[]
+  validateSomeNonEmptyLookaheadPath(
+    rules: Rule[],
+    maxLookahead: number
+  ): ILookaheadValidationError[]
+  buildLookaheadForAlternation(options: {
+    prodOccurrence: number
+    rule: Rule
+    maxLookahead: number
+    hasPredicates: boolean
+    dynamicTokensEnabled: boolean
+  }): (
+    this: BaseParser,
+    orAlts?: IOrAlt<any>[] | undefined
+  ) => number | undefined
+  buildLookaheadForOptional(options: {
+    prodOccurrence: number
+    prodType: OptionalProductionType
+    rule: Rule
+    maxLookahead: number
+    dynamicTokensEnabled: boolean
+  }): (this: BaseParser) => boolean
+}
+
+/**
+ * @experimental This API is not finalized yet and may be subject to breaking changes.
+ */
+export interface ILookaheadStrategy {
+  /**
+   * Performs validations on the grammar specific to this lookahead strategy.
+   * This method is not called if parser validations are disabled.
+   *
+   * @param options.rules All parser rules of the grammar.
+   *
+   * @param options.tokenTypes All token types of the grammar.
+   *
+   * @param options.grammarName The name of the grammar.
+   */
+  validate(options: {
+    rules: Rule[]
+    tokenTypes: TokenType[]
+    grammarName: string
+  }): ILookaheadValidationError[]
+
+  /**
+   * Initializes the lookahead for a grammar.
+   *
+   * Note that this method does not build the lookahead functions.
+   * It only initializes the internal state of the strategy based on all grammar rules.
+   *
+   * @param options.rules All parser rules of the grammar.
+   */
+  initialize?(options: { rules: Rule[] }): void
+
+  /**
+   * Builds a lookahead function for alternations/`OR` parser methods.
+   *
+   * @param options.prodOccurrence The occurrence number of this `OR` within its rule.
+   *
+   * @param options.rule The rule that contains this `OR`.
+   *
+   * @param options.maxLookahead The maximum amount of lookahead for this `OR`.
+   *
+   * @param options.hasPredicates Whether any of the alternatives contain a predicate.
+   *
+   * @param options.dynamicTokensEnabled Whether dynamic tokens are enabled for this parser.
+   *
+   * @returns A function that is able to compute which of the alternatives to choose while parsing.
+   */
+  buildLookaheadForAlternation(options: {
+    prodOccurrence: number
+    rule: Rule
+    maxLookahead: number
+    hasPredicates: boolean
+    dynamicTokensEnabled: boolean
+  }): (orAlts?: IOrAlt<any>[] | undefined) => number | undefined
+
+  /**
+   * Builds a lookahead function for optional productions.
+   *
+   * @param options.prodOccurrence The occurrence number of this production within its rule.
+   *
+   * @param options.prodType The type of this production.
+   *
+   * @param options.rule The rule that contains this production.
+   *
+   * @param options.maxLookahead The maximum amount of lookahead for this production.
+   *
+   * @param options.dynamicTokensEnabled Whether dynamic tokens are enabled for this parser.
+   *
+   * @returns A function is able to compute whether to parse the production or to continue with the rest of the parser rule.
+   */
+  buildLookaheadForOptional(options: {
+    prodOccurrence: number
+    prodType: OptionalProductionType
+    rule: Rule
+    maxLookahead: number
+    dynamicTokensEnabled: boolean
+  }): () => boolean
+}
+
+export interface ILookaheadValidationError {
+  message: string
+  ruleName?: string
+}
+
+export type LookaheadSequence = TokenType[][]
+
+export type OptionalProductionType =
+  | "Option"
+  | "RepetitionMandatory"
+  | "RepetitionMandatoryWithSeparator"
+  | "Repetition"
+  | "RepetitionWithSeparator"
+
+export type LookaheadProductionType = OptionalProductionType | "Alternation"
+
+/**
+ * Computes all lookahead paths for a given production.
+ *
+ * The result is a three-dimensional array of token types.
+ * Accessing this array with the index of an alternative of the given production returns a two-dimensional array.
+ * Each entry of this array represents a list of the token types which can occur in this alternative.
+ *
+ * @param options.occurrence The occurrence number of this production within its rule.
+ *
+ * @param options.rule The rule which contains this production.
+ *
+ * @param options.prodType The type of this production.
+ *
+ * @param options.maxLookahead The maximum amount of lookahead for this production.
+ */
+export declare function getLookaheadPaths(options: {
+  occurrence: number
+  rule: Rule
+  prodType: LookaheadProductionType
+  maxLookahead: number
+}): LookaheadSequence[]
+
 export interface IRecognizerContext {
   /**
    * A copy of the parser's rule stack at the "time" the RecognitionException occurred.
@@ -2138,19 +2301,16 @@ export declare type ISeparatedIterationResult<OUT> = {
 }
 
 export interface ISerializedGast {
-  type:
-    | "NonTerminal"
-    | "Alternative"
-    | "Option"
-    | "RepetitionMandatory"
-    | "RepetitionMandatoryWithSeparator"
-    | "Repetition"
-    | "RepetitionWithSeparator"
-    | "Alternation"
-    | "Terminal"
-    | "Rule"
+  type: ProductionType
   definition?: ISerializedGast[]
 }
+
+export type ProductionType =
+  | LookaheadProductionType
+  | "NonTerminal"
+  | "Alternative"
+  | "Terminal"
+  | "Rule"
 
 /**
  * Structure for the path the parser "took" to reach a certain position

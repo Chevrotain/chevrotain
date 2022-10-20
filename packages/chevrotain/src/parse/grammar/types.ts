@@ -25,7 +25,8 @@ export declare enum ParserDefinitionErrorType {
   INVALID_TOKEN_NAME = 9,
   NO_NON_EMPTY_LOOKAHEAD = 10,
   AMBIGUOUS_PREFIX_ALTS = 11,
-  TOO_MANY_ALTS = 12
+  TOO_MANY_ALTS = 12,
+  CUSTOM_LOOKAHEAD_VALIDATION = 13
 }
 
 export interface IGrammarValidatorErrorMessageProvider {

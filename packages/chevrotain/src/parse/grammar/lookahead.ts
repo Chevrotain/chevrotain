@@ -7,7 +7,7 @@ import has from "lodash/has"
 import reduce from "lodash/reduce"
 import { possiblePathsFrom } from "./interpreter"
 import { RestWalker } from "./rest"
-import { Predicate, TokenMatcher, LookAheadSequence } from "../parser/parser"
+import { Predicate, TokenMatcher } from "../parser/parser"
 import {
   tokenStructuredMatcher,
   tokenStructuredMatcherNoCategories
@@ -19,15 +19,18 @@ import {
   Repetition,
   RepetitionMandatory,
   RepetitionMandatoryWithSeparator,
-  RepetitionWithSeparator,
-  Rule
+  RepetitionWithSeparator
 } from "@chevrotain/gast"
 import { GAstVisitor } from "@chevrotain/gast"
 import {
   IOrAlt,
   IProduction,
   IProductionWithOccurrence,
-  TokenType
+  LookaheadSequence,
+  LookaheadProductionType,
+  Rule,
+  TokenType,
+  BaseParser
 } from "@chevrotain/types"
 
 export enum PROD_TYPE {
@@ -39,22 +42,53 @@ export enum PROD_TYPE {
   ALTERNATION
 }
 
-export function getProdType(prod: IProduction): PROD_TYPE {
+export function getProdType(
+  prod: IProduction | LookaheadProductionType
+): PROD_TYPE {
   /* istanbul ignore else */
-  if (prod instanceof Option) {
+  if (prod instanceof Option || prod === "Option") {
     return PROD_TYPE.OPTION
-  } else if (prod instanceof Repetition) {
+  } else if (prod instanceof Repetition || prod === "Repetition") {
     return PROD_TYPE.REPETITION
-  } else if (prod instanceof RepetitionMandatory) {
+  } else if (
+    prod instanceof RepetitionMandatory ||
+    prod === "RepetitionMandatory"
+  ) {
     return PROD_TYPE.REPETITION_MANDATORY
-  } else if (prod instanceof RepetitionMandatoryWithSeparator) {
+  } else if (
+    prod instanceof RepetitionMandatoryWithSeparator ||
+    prod === "RepetitionMandatoryWithSeparator"
+  ) {
     return PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR
-  } else if (prod instanceof RepetitionWithSeparator) {
+  } else if (
+    prod instanceof RepetitionWithSeparator ||
+    prod === "RepetitionWithSeparator"
+  ) {
     return PROD_TYPE.REPETITION_WITH_SEPARATOR
-  } else if (prod instanceof Alternation) {
+  } else if (prod instanceof Alternation || prod === "Alternation") {
     return PROD_TYPE.ALTERNATION
   } else {
     throw Error("non exhaustive match")
+  }
+}
+
+export function getLookaheadPaths(options: {
+  occurrence: number
+  rule: Rule
+  prodType: LookaheadProductionType
+  maxLookahead: number
+}): LookaheadSequence[] {
+  const { occurrence, rule, prodType, maxLookahead } = options
+  const type = getProdType(prodType)
+  if (type === PROD_TYPE.ALTERNATION) {
+    return getLookaheadPathsForOr(occurrence, rule, maxLookahead)
+  } else {
+    return getLookaheadPathsForOptionalProd(
+      occurrence,
+      rule,
+      type,
+      maxLookahead
+    )
   }
 }
 
@@ -65,7 +99,7 @@ export function buildLookaheadFuncForOr(
   hasPredicates: boolean,
   dynamicTokensEnabled: boolean,
   laFuncBuilder: Function
-): (orAlts?: IOrAlt<any>[]) => number {
+): (orAlts?: IOrAlt<any>[]) => number | undefined {
   const lookAheadPaths = getLookaheadPathsForOr(
     occurrence,
     ruleGrammar,
@@ -103,7 +137,7 @@ export function buildLookaheadFuncForOptionalProd(
   dynamicTokensEnabled: boolean,
   prodType: PROD_TYPE,
   lookaheadBuilder: (
-    lookAheadSequence: LookAheadSequence,
+    lookAheadSequence: LookaheadSequence,
     tokenMatcher: TokenMatcher,
     dynamicTokensEnabled: boolean
   ) => () => boolean
@@ -125,7 +159,7 @@ export function buildLookaheadFuncForOptionalProd(
 export type Alternative = TokenType[][]
 
 export function buildAlternativesLookAheadFunc(
-  alts: LookAheadSequence[],
+  alts: LookaheadSequence[],
   hasPredicates: boolean,
   tokenMatcher: TokenMatcher,
   dynamicTokensEnabled: boolean
@@ -142,7 +176,10 @@ export function buildAlternativesLookAheadFunc(
     /**
      * @returns {number} - The chosen alternative index
      */
-    return function (orAlts: IOrAlt<any>[]): number | undefined {
+    return function (
+      this: BaseParser,
+      orAlts: IOrAlt<any>[]
+    ): number | undefined {
       // unfortunately the predicates must be extracted every single time
       // as they cannot be cached due to references to parameters(vars) which are no longer valid.
       // note that in the common case of no predicates, no cpu time will be wasted on this (see else block)
@@ -209,7 +246,7 @@ export function buildAlternativesLookAheadFunc(
     /**
      * @returns {number} - The chosen alternative index
      */
-    return function (): number {
+    return function (this: BaseParser): number {
       const nextToken = this.LA(1)
       return choiceToAlt[nextToken.tokenTypeIdx]
     }
@@ -219,7 +256,7 @@ export function buildAlternativesLookAheadFunc(
     /**
      * @returns {number} - The chosen alternative index
      */
-    return function (): number | undefined {
+    return function (this: BaseParser): number | undefined {
       for (let t = 0; t < numOfAlts; t++) {
         const currAlt = alts[t]
         const currNumOfPaths = currAlt.length
@@ -248,7 +285,7 @@ export function buildAlternativesLookAheadFunc(
 }
 
 export function buildSingleAlternativeLookaheadFunction(
-  alt: LookAheadSequence,
+  alt: LookaheadSequence,
   tokenMatcher: TokenMatcher,
   dynamicTokensEnabled: boolean
 ): () => boolean {
@@ -270,7 +307,7 @@ export function buildSingleAlternativeLookaheadFunction(
       const expectedTokenType = singleTokensTypes[0]
       const expectedTokenUniqueKey = (<any>expectedTokenType).tokenTypeIdx
 
-      return function (): boolean {
+      return function (this: BaseParser): boolean {
         return this.LA(1).tokenTypeIdx === expectedTokenUniqueKey
       }
     } else {
@@ -286,13 +323,13 @@ export function buildSingleAlternativeLookaheadFunction(
         [] as boolean[]
       )
 
-      return function (): boolean {
+      return function (this: BaseParser): boolean {
         const nextToken = this.LA(1)
         return choiceToAlt[nextToken.tokenTypeIdx] === true
       }
     }
   } else {
-    return function (): boolean {
+    return function (this: BaseParser): boolean {
       nextPath: for (let j = 0; j < numOfPaths; j++) {
         const currPath = alt[j]
         const currPathLength = currPath.length
@@ -538,7 +575,7 @@ function isUniquePrefixHash(
 export function lookAheadSequenceFromAlternatives(
   altsDefs: IProduction[],
   k: number
-): LookAheadSequence[] {
+): LookaheadSequence[] {
   const partialAlts = map(altsDefs, (currAlt) =>
     possiblePathsFrom([currAlt], 1)
   )
@@ -615,7 +652,7 @@ export function getLookaheadPathsForOr(
   ruleGrammar: Rule,
   k: number,
   orProd?: Alternation
-): LookAheadSequence[] {
+): LookaheadSequence[] {
   const visitor = new InsideDefinitionFinderVisitor(
     occurrence,
     PROD_TYPE.ALTERNATION,
@@ -630,7 +667,7 @@ export function getLookaheadPathsForOptionalProd(
   ruleGrammar: Rule,
   prodType: PROD_TYPE,
   k: number
-): LookAheadSequence[] {
+): LookaheadSequence[] {
   const insideDefVisitor = new InsideDefinitionFinderVisitor(
     occurrence,
     prodType
@@ -694,7 +731,7 @@ export function isStrictPrefixOfPath(
 }
 
 export function areTokenCategoriesNotUsed(
-  lookAheadPaths: LookAheadSequence[]
+  lookAheadPaths: LookaheadSequence[]
 ): boolean {
   return every(lookAheadPaths, (singleAltPaths) =>
     every(singleAltPaths, (singlePath) =>
