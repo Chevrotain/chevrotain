@@ -1,3 +1,17 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+- [feat: support pluggable lookahead strategy](https://github.com/Chevrotain/chevrotain/issues/1852)
+  - **experimental** API subject to potential changes...
+  - Thanks to [@msujew](https://github.com/msujew) :thumbsup:
+
+#### Documentation
+
+- [docs: IRecognitionException should extend 'Error'](https://github.com/Chevrotain/chevrotain/pull/1850)
+
+  - Thanks to [@benhohner](https://github.com/benhohner) :thumbsup:
+
 ## 10.3.0 (8-21-2022)
 
 #### Minor Changes
