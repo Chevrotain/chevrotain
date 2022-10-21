@@ -2132,7 +2132,7 @@ export interface IParserErrorMessageProvider {
 /**
  * @experimental
  */
-export interface ILLKLookaheadValidator {
+export interface ILLkLookaheadValidator {
   validateNoLeftRecursion(rules: Rule[]): ILookaheadValidationError[]
 
   validateEmptyOrAlternatives(rules: Rule[]): ILookaheadValidationError[]
@@ -2152,7 +2152,7 @@ export interface ILLKLookaheadValidator {
  * @experimental
  */
 export interface ILLkLookaheadStrategyConstructor {
-  new (): ILookaheadStrategy & ILLKLookaheadValidator
+  new (): ILookaheadStrategy & ILLkLookaheadValidator
 }
 
 /**
