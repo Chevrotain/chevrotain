@@ -2033,6 +2033,8 @@ export interface IParserConfig {
    */
   skipValidations?: boolean
   /**
+   * @experimental
+   *
    * A custom lookahead strategy.
    * Can be used to override the default LL(*k*) lookahead behavior.
    *
@@ -2128,47 +2130,38 @@ export interface IParserErrorMessageProvider {
 }
 
 /**
- * @experimental This API is not finalized yet and may be subject to breaking changes.
+ * @experimental
  */
-export declare class LLkLookaheadStrategy implements ILookaheadStrategy {
-  readonly maxLookahead: number
-  constructor(options: { maxLookahead?: number })
-  validate(options: {
-    rules: Rule[]
-    tokenTypes: TokenType[]
-    grammarName: string
-  }): ILookaheadValidationError[]
+export interface ILLKLookaheadValidator {
   validateNoLeftRecursion(rules: Rule[]): ILookaheadValidationError[]
+
   validateEmptyOrAlternatives(rules: Rule[]): ILookaheadValidationError[]
+
   validateAmbiguousAlternationAlternatives(
     rules: Rule[],
     maxLookahead: number
   ): ILookaheadValidationError[]
+
   validateSomeNonEmptyLookaheadPath(
     rules: Rule[],
     maxLookahead: number
   ): ILookaheadValidationError[]
-  buildLookaheadForAlternation(options: {
-    prodOccurrence: number
-    rule: Rule
-    maxLookahead: number
-    hasPredicates: boolean
-    dynamicTokensEnabled: boolean
-  }): (
-    this: BaseParser,
-    orAlts?: IOrAlt<any>[] | undefined
-  ) => number | undefined
-  buildLookaheadForOptional(options: {
-    prodOccurrence: number
-    prodType: OptionalProductionType
-    rule: Rule
-    maxLookahead: number
-    dynamicTokensEnabled: boolean
-  }): (this: BaseParser) => boolean
 }
 
 /**
- * @experimental This API is not finalized yet and may be subject to breaking changes.
+ * @experimental
+ */
+export interface ILLkLookaheadStrategyConstructor {
+  new (): ILookaheadStrategy & ILLKLookaheadValidator
+}
+
+/**
+ * @experimental
+ */
+export const LLkLookaheadStrategy: ILLkLookaheadStrategyConstructor
+
+/**
+ * @experimental
  */
 export interface ILookaheadStrategy {
   /**
