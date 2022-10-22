@@ -1,13 +1,13 @@
 {
   "name": "chevrotain_examples_grammars",
-  "version": "10.3.0",
+  "version": "10.4.0",
   "scripts": {
     "ci": "pnpm run test",
     "test": "mocha \"!(node_modules)/**/*spec.js\""
   },
   "dependencies": {
     "acorn": "8.8.0",
-    "chevrotain": "10.3.0",
+    "chevrotain": "10.4.0",
     "xregexp": "5.1.1"
   },
   "private": true
