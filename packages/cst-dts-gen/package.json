@@ -31,11 +31,7 @@
   },
   "dependencies": {
     "@chevrotain/gast": "10.3.0",
-    "@chevrotain/types": "10.3.0",
-    "lodash": "4.17.21"
-  },
-  "devDependencies": {
-    "@types/lodash": "4.14.184"
+    "@chevrotain/types": "10.3.0"
   },
   "publishConfig": {
     "access": "public"

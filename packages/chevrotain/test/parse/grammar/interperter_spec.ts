@@ -1,5 +1,4 @@
 import { expect } from "chai"
-import map from "lodash/map"
 import { IToken, ITokenGrammarPath, TokenType } from "@chevrotain/types"
 import {
   NextAfterTokenWalker,
@@ -798,7 +797,7 @@ describe("The Grammar Interpeter namespace", () => {
 
   describe("The chevrotain grammar interpreter capabilities", () => {
     function extractPartialPaths(newResultFormat: PartialPathAndSuffixes[]) {
-      return map(newResultFormat, (currItem) => currItem.partialPath)
+      return newResultFormat.map((currItem) => currItem.partialPath)
     }
 
     class Alpha {
@@ -1076,11 +1075,11 @@ describe("The Grammar Interpeter namespace", () => {
 
     context("can calculate the next possible single tokens for: ", () => {
       function INPUT(tokTypes: TokenType[]): IToken[] {
-        return map(tokTypes, (currTokType) => createRegularToken(currTokType))
+        return tokTypes.map((currTokType) => createRegularToken(currTokType))
       }
 
       function pluckTokenTypes(arr: any[]): TokenType[] {
-        return map(arr, (currItem) => currItem.nextTokenType)
+        return arr.map((currItem) => currItem.nextTokenType)
       }
 
       it("Sequence positive", () => {

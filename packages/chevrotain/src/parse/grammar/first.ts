@@ -1,6 +1,3 @@
-import flatten from "lodash/flatten"
-import uniq from "lodash/uniq"
-import map from "lodash/map"
 import { NonTerminal, Terminal } from "@chevrotain/gast"
 import {
   isBranchingProd,
@@ -35,7 +32,7 @@ export function first(prod: IProduction): TokenType[] {
 export function firstForSequence(prod: {
   definition: IProduction[]
 }): TokenType[] {
-  let firstSet: TokenType[] = []
+  const firstSet = new Set<TokenType>()
   const seq = prod.definition
   let nextSubProdIdx = 0
   let hasInnerProdsRemaining = seq.length > nextSubProdIdx
@@ -46,24 +43,25 @@ export function firstForSequence(prod: {
   while (hasInnerProdsRemaining && isLastInnerProdOptional) {
     currSubProd = seq[nextSubProdIdx]
     isLastInnerProdOptional = isOptionalProd(currSubProd)
-    firstSet = firstSet.concat(first(currSubProd))
+    first(currSubProd).forEach((tokenType) => firstSet.add(tokenType))
     nextSubProdIdx = nextSubProdIdx + 1
     hasInnerProdsRemaining = seq.length > nextSubProdIdx
   }
 
-  return uniq(firstSet)
+  return Array.from(firstSet)
 }
 
 export function firstForBranching(prod: {
   definition: IProduction[]
 }): TokenType[] {
-  const allAlternativesFirsts: TokenType[][] = map(
-    prod.definition,
-    (innerProd) => {
-      return first(innerProd)
-    }
+  return Array.from(
+    new Set(
+      prod.definition.reduce(
+        (tokenTypes, innerProd) => tokenTypes.concat(first(innerProd)),
+        [] as TokenType[]
+      )
+    )
   )
-  return uniq(flatten<TokenType>(allAlternativesFirsts))
 }
 
 export function firstForTerminal(terminal: Terminal): TokenType[] {

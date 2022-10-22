@@ -6,8 +6,6 @@ import {
   TokenType,
   OptionalProductionType
 } from "@chevrotain/types"
-import flatMap from "lodash/flatMap"
-import isEmpty from "lodash/isEmpty"
 import { defaultGrammarValidatorErrorProvider } from "../errors_public"
 import { DEFAULT_PARSER_CONFIG } from "../parser/parser"
 import {
@@ -25,6 +23,11 @@ import {
 } from "./lookahead"
 import { IParserDefinitionError } from "./types"
 
+// ES2019 Array.prototype.flatMap
+function flatMap<U, R>(arr: U[], callback: (x: U, idx: number) => R[]): R[] {
+  return Array.prototype.concat.apply([], arr.map(callback))
+}
+
 export class LLkLookaheadStrategy implements ILookaheadStrategy {
   readonly maxLookahead: number
 
@@ -40,7 +43,7 @@ export class LLkLookaheadStrategy implements ILookaheadStrategy {
   }): ILookaheadValidationError[] {
     const leftRecursionErrors = this.validateNoLeftRecursion(options.rules)
 
-    if (isEmpty(leftRecursionErrors)) {
+    if (leftRecursionErrors.length === 0) {
       const emptyAltErrors = this.validateEmptyOrAlternatives(options.rules)
       const ambiguousAltsErrors = this.validateAmbiguousAlternationAlternatives(
         options.rules,

@@ -1,5 +1,3 @@
-import drop from "lodash/drop"
-import forEach from "lodash/forEach"
 import {
   Alternation,
   Alternative,
@@ -18,8 +16,8 @@ import { IProduction } from "@chevrotain/types"
  */
 export abstract class RestWalker {
   walk(prod: { definition: IProduction[] }, prevRest: any[] = []): void {
-    forEach(prod.definition, (subProd: IProduction, index) => {
-      const currRest = drop(prod.definition, index + 1)
+    prod.definition.forEach((subProd: IProduction, index) => {
+      const currRest = prod.definition.slice(index + 1)
       /* istanbul ignore else */
       if (subProd instanceof NonTerminal) {
         this.walkProdRef(subProd, currRest, prevRest)
@@ -137,7 +135,7 @@ export abstract class RestWalker {
     // ABC(D|E|F)G => when finding the (D|E|F) the rest is G
     const fullOrRest = currRest.concat(prevRest)
     // walk all different alternatives
-    forEach(orProd.definition, (alt) => {
+    orProd.definition.forEach((alt) => {
       // wrapping each alternative in a single definition wrapper
       // to avoid errors in computing the rest of that alternative in the invocation to computeInProdFollows
       // (otherwise for OR([alt1,alt2]) alt2 will be considered in 'rest' of alt1

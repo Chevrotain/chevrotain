@@ -1,19 +1,3 @@
-import first from "lodash/first"
-import isEmpty from "lodash/isEmpty"
-import drop from "lodash/drop"
-import flatten from "lodash/flatten"
-import filter from "lodash/filter"
-import reject from "lodash/reject"
-import difference from "lodash/difference"
-import map from "lodash/map"
-import forEach from "lodash/forEach"
-import groupBy from "lodash/groupBy"
-import reduce from "lodash/reduce"
-import pickBy from "lodash/pickBy"
-import values from "lodash/values"
-import includes from "lodash/includes"
-import flatMap from "lodash/flatMap"
-import clone from "lodash/clone"
 import {
   IParserAmbiguousAlternativesDefinitionError,
   IParserDuplicatesDefinitionError,
@@ -53,9 +37,12 @@ import {
   IGrammarValidatorErrorMessageProvider,
   IParserDefinitionError
 } from "./types"
-import dropRight from "lodash/dropRight"
-import compact from "lodash/compact"
 import { tokenStructuredMatcher } from "../../scan/tokens"
+
+// ES2019 Array.prototype.flatMap
+function flatMap<U, R>(arr: U[], callback: (x: U, idx: number) => R[]): R[] {
+  return Array.prototype.concat.apply([], arr.map(callback))
+}
 
 export function validateLookahead(options: {
   lookaheadStrategy: ILookaheadStrategy
@@ -68,7 +55,7 @@ export function validateLookahead(options: {
     tokenTypes: options.tokenTypes,
     grammarName: options.grammarName
   })
-  return map(lookaheadValidationErrorMessages, (errorMessage) => ({
+  return lookaheadValidationErrorMessages.map((errorMessage) => ({
     type: ParserDefinitionErrorType.CUSTOM_LOOKAHEAD_VALIDATION,
     ...errorMessage
   }))
@@ -80,9 +67,10 @@ export function validateGrammar(
   errMsgProvider: IGrammarValidatorErrorMessageProvider,
   grammarName: string
 ): IParserDefinitionError[] {
-  const duplicateErrors: IParserDefinitionError[] = flatMap(
-    topLevels,
-    (currTopLevel) => validateDuplicateProductions(currTopLevel, errMsgProvider)
+  const duplicateErrors = ([] as IParserDefinitionError[]).concat(
+    ...topLevels.map((currTopLevel) =>
+      validateDuplicateProductions(currTopLevel, errMsgProvider)
+    )
   )
 
   const termsNamespaceConflictErrors = checkTerminalAndNoneTerminalsNameSpace(
@@ -119,37 +107,41 @@ function validateDuplicateProductions(
   topLevelRule.accept(collectorVisitor)
   const allRuleProductions = collectorVisitor.allProductions
 
-  const productionGroups = groupBy(
-    allRuleProductions,
-    identifyProductionForDuplicates
+  const productionsById: Record<string, IProductionWithOccurrence[]> = {}
+  allRuleProductions.forEach((currProd) => {
+    ;(productionsById[identifyProductionForDuplicates(currProd)] ??= []).push(
+      currProd
+    )
+  })
+
+  const duplicates = Object.values(productionsById).filter(
+    (prods) => prods.length > 1
   )
 
-  const duplicates: any = pickBy(productionGroups, (currGroup) => {
-    return currGroup.length > 1
-  })
+  const errors = duplicates.map(
+    (currDuplicates: IProductionWithOccurrence[]) => {
+      const firstProd = currDuplicates[0]
+      const msg = errMsgProvider.buildDuplicateFoundError(
+        topLevelRule,
+        currDuplicates
+      )
+      const dslName = getProductionDslName(firstProd)
+      const defError: IParserDuplicatesDefinitionError = {
+        message: msg,
+        type: ParserDefinitionErrorType.DUPLICATE_PRODUCTIONS,
+        ruleName: topLevelRule.name,
+        dslName: dslName,
+        occurrence: firstProd.idx
+      }
 
-  const errors = map(values(duplicates), (currDuplicates: any) => {
-    const firstProd: any = first(currDuplicates)
-    const msg = errMsgProvider.buildDuplicateFoundError(
-      topLevelRule,
-      currDuplicates
-    )
-    const dslName = getProductionDslName(firstProd)
-    const defError: IParserDuplicatesDefinitionError = {
-      message: msg,
-      type: ParserDefinitionErrorType.DUPLICATE_PRODUCTIONS,
-      ruleName: topLevelRule.name,
-      dslName: dslName,
-      occurrence: firstProd.idx
+      const param = getExtraProductionArgument(firstProd)
+      if (param) {
+        defError.parameter = param
+      }
+
+      return defError
     }
-
-    const param = getExtraProductionArgument(firstProd)
-    if (param) {
-      defError.parameter = param
-    }
-
-    return defError
-  })
+  )
   return errors
 }
 
@@ -216,16 +208,12 @@ export function validateRuleDoesNotAlreadyExist(
   errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserDefinitionError[] {
   const errors = []
-  const occurrences = reduce(
-    allRules,
-    (result, curRule) => {
-      if (curRule.name === rule.name) {
-        return result + 1
-      }
-      return result
-    },
-    0
-  )
+  const occurrences = allRules.reduce((result, curRule) => {
+    if (curRule.name === rule.name) {
+      return result + 1
+    }
+    return result
+  }, 0)
   if (occurrences > 1) {
     const errMsg = errMsgProvider.buildDuplicateRuleNameError({
       topLevelRule: rule,
@@ -252,7 +240,7 @@ export function validateRuleIsOverridden(
   const errors = []
   let errMsg
 
-  if (!includes(definedRulesNames, ruleName)) {
+  if (definedRulesNames.indexOf(ruleName) === -1) {
     errMsg =
       `Invalid rule override, rule: ->${ruleName}<- cannot be overridden in the grammar: ->${className}<-` +
       `as it is not defined in any of the super grammars `
@@ -274,11 +262,11 @@ export function validateNoLeftRecursion(
 ): IParserDefinitionError[] {
   const errors: IParserDefinitionError[] = []
   const nextNonTerminals = getFirstNoneTerminal(currRule.definition)
-  if (isEmpty(nextNonTerminals)) {
+  if (nextNonTerminals.length === 0) {
     return []
   } else {
     const ruleName = topRule.name
-    const foundLeftRecursion = includes(nextNonTerminals, topRule)
+    const foundLeftRecursion = nextNonTerminals.indexOf(topRule) !== -1
     if (foundLeftRecursion) {
       errors.push({
         message: errMsgProvider.buildLeftRecursionError({
@@ -292,9 +280,12 @@ export function validateNoLeftRecursion(
 
     // we are only looking for cyclic paths leading back to the specific topRule
     // other cyclic paths are ignored, we still need this difference to avoid infinite loops...
-    const validNextSteps = difference(nextNonTerminals, path.concat([topRule]))
+    const pathAndTopRule = path.concat([topRule])
+    const validNextSteps = nextNonTerminals.filter(
+      (currNext) => pathAndTopRule.indexOf(currNext) === -1
+    )
     const errorsFromNextSteps = flatMap(validNextSteps, (currRefRule) => {
-      const newPath = clone(path)
+      const newPath = path.slice()
       newPath.push(currRefRule)
       return validateNoLeftRecursion(
         topRule,
@@ -310,10 +301,10 @@ export function validateNoLeftRecursion(
 
 export function getFirstNoneTerminal(definition: IProduction[]): Rule[] {
   let result: Rule[] = []
-  if (isEmpty(definition)) {
+  if (definition.length === 0) {
     return result
   }
-  const firstProd = first(definition)
+  const firstProd = definition[0]
 
   /* istanbul ignore else */
   if (firstProd instanceof NonTerminal) {
@@ -331,10 +322,8 @@ export function getFirstNoneTerminal(definition: IProduction[]): Rule[] {
     )
   } else if (firstProd instanceof Alternation) {
     // each sub definition in alternation is a FLAT
-    result = flatten(
-      map(firstProd.definition, (currSubDef) =>
-        getFirstNoneTerminal((<AlternativeGAST>currSubDef).definition)
-      )
+    result = flatMap(firstProd.definition, (currSubDef) =>
+      getFirstNoneTerminal((<AlternativeGAST>currSubDef).definition)
     )
   } else if (firstProd instanceof Terminal) {
     // nothing to see, move along
@@ -345,7 +334,7 @@ export function getFirstNoneTerminal(definition: IProduction[]): Rule[] {
   const isFirstOptional = isOptionalProd(firstProd)
   const hasMore = definition.length > 1
   if (isFirstOptional && hasMore) {
-    const rest = drop(definition)
+    const rest = definition.slice(1)
     return result.concat(getFirstNoneTerminal(rest))
   } else {
     return result
@@ -371,7 +360,7 @@ export function validateEmptyOrAlternative(
   const errors = flatMap<Alternation, IParserEmptyAlternativeDefinitionError>(
     ors,
     (currOr) => {
-      const exceptLast = dropRight(currOr.definition)
+      const exceptLast = currOr.definition.slice(0, -1)
       return flatMap(exceptLast, (currAlternative, currAltIdx) => {
         const possibleFirstInAlt = nextPossibleTokensAfter(
           [currAlternative],
@@ -379,7 +368,7 @@ export function validateEmptyOrAlternative(
           tokenStructuredMatcher,
           1
         )
-        if (isEmpty(possibleFirstInAlt)) {
+        if (possibleFirstInAlt.length === 0) {
           return [
             {
               message: errMsgProvider.buildEmptyAlternationError({
@@ -414,7 +403,7 @@ export function validateAmbiguousAlternationAlternatives(
 
   // New Handling of ignoring ambiguities
   // - https://github.com/chevrotain/chevrotain/issues/869
-  ors = reject(ors, (currOr) => currOr.ignoreAmbiguities === true)
+  ors = ors.filter((currOr) => currOr.ignoreAmbiguities !== true)
 
   const errors = flatMap(ors, (currOr: Alternation) => {
     const currOccurrence = currOr.idx
@@ -503,11 +492,11 @@ export function validateSomeNonEmptyLookaheadPath(
   errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserDefinitionError[] {
   const errors: IParserDefinitionError[] = []
-  forEach(topLevelRules, (currTopRule) => {
+  topLevelRules.forEach((currTopRule) => {
     const collectorVisitor = new RepetitionCollector()
     currTopRule.accept(collectorVisitor)
     const allRuleProductions = collectorVisitor.allProductions
-    forEach(allRuleProductions, (currProd) => {
+    allRuleProductions.forEach((currProd) => {
       const prodType = getProdType(currProd)
       const actualMaxLookahead = currProd.maxLookahead || maxLookahead
       const currOccurrence = currProd.idx
@@ -518,7 +507,7 @@ export function validateSomeNonEmptyLookaheadPath(
         actualMaxLookahead
       )
       const pathsInsideProduction = paths[0]
-      if (isEmpty(flatten(pathsInsideProduction))) {
+      if (pathsInsideProduction.every((path) => path.length === 0)) {
         const errMsg = errMsgProvider.buildEmptyRepetitionError({
           topLevelRule: currTopRule,
           repetition: currProd
@@ -547,17 +536,16 @@ function checkAlternativesAmbiguities(
   errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserAmbiguousAlternativesDefinitionError[] {
   const foundAmbiguousPaths: Alternative = []
-  const identicalAmbiguities = reduce(
-    alternatives,
+  const identicalAmbiguities = alternatives.reduce(
     (result, currAlt, currAltIdx) => {
       // ignore (skip) ambiguities with this alternative
       if (alternation.definition[currAltIdx].ignoreAmbiguities === true) {
         return result
       }
 
-      forEach(currAlt, (currPath) => {
+      currAlt.forEach((currPath) => {
         const altsCurrPathAppearsIn = [currAltIdx]
-        forEach(alternatives, (currOtherAlt, currOtherAltIdx) => {
+        alternatives.forEach((currOtherAlt, currOtherAltIdx) => {
           if (
             currAltIdx !== currOtherAltIdx &&
             containsPath(currOtherAlt, currPath) &&
@@ -584,9 +572,8 @@ function checkAlternativesAmbiguities(
     [] as { alts: number[]; path: TokenType[] }[]
   )
 
-  const currErrors = map(identicalAmbiguities, (currAmbDescriptor) => {
-    const ambgIndices = map(
-      currAmbDescriptor.alts,
+  const currErrors = identicalAmbiguities.map((currAmbDescriptor) => {
+    const ambgIndices = currAmbDescriptor.alts.map(
       (currAltIdx) => currAltIdx + 1
     )
 
@@ -616,70 +603,62 @@ export function checkPrefixAlternativesAmbiguities(
   errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserAmbiguousAlternativesDefinitionError[] {
   // flatten
-  const pathsAndIndices = reduce(
-    alternatives,
-    (result, currAlt, idx) => {
-      const currPathsAndIdx = map(currAlt, (currPath) => {
-        return { idx: idx, path: currPath }
-      })
-      return result.concat(currPathsAndIdx)
-    },
-    [] as { idx: number; path: TokenType[] }[]
-  )
-
-  const errors = compact(
-    flatMap(pathsAndIndices, (currPathAndIdx) => {
-      const alternativeGast = alternation.definition[currPathAndIdx.idx]
-      // ignore (skip) ambiguities with this alternative
-      if (alternativeGast.ignoreAmbiguities === true) {
-        return []
-      }
-      const targetIdx = currPathAndIdx.idx
-      const targetPath = currPathAndIdx.path
-
-      const prefixAmbiguitiesPathsAndIndices = filter(
-        pathsAndIndices,
-        (searchPathAndIdx) => {
-          // prefix ambiguity can only be created from lower idx (higher priority) path
-          return (
-            // ignore (skip) ambiguities with this "other" alternative
-            alternation.definition[searchPathAndIdx.idx].ignoreAmbiguities !==
-              true &&
-            searchPathAndIdx.idx < targetIdx &&
-            // checking for strict prefix because identical lookaheads
-            // will be be detected using a different validation.
-            isStrictPrefixOfPath(searchPathAndIdx.path, targetPath)
-          )
-        }
-      )
-
-      const currPathPrefixErrors = map(
-        prefixAmbiguitiesPathsAndIndices,
-        (currAmbPathAndIdx): IParserAmbiguousAlternativesDefinitionError => {
-          const ambgIndices = [currAmbPathAndIdx.idx + 1, targetIdx + 1]
-          const occurrence = alternation.idx === 0 ? "" : alternation.idx
-
-          const message = errMsgProvider.buildAlternationPrefixAmbiguityError({
-            topLevelRule: rule,
-            alternation: alternation,
-            ambiguityIndices: ambgIndices,
-            prefixPath: currAmbPathAndIdx.path
-          })
-          return {
-            message: message,
-            type: ParserDefinitionErrorType.AMBIGUOUS_PREFIX_ALTS,
-            ruleName: rule.name,
-            occurrence: occurrence,
-            alternatives: ambgIndices
-          }
-        }
-      )
-
-      return currPathPrefixErrors
+  const pathsAndIndices = alternatives.reduce((result, currAlt, idx) => {
+    const currPathsAndIdx = currAlt.map((currPath) => {
+      return { idx: idx, path: currPath }
     })
-  )
+    return result.concat(currPathsAndIdx)
+  }, [] as { idx: number; path: TokenType[] }[])
 
-  return errors
+  const errors = flatMap(pathsAndIndices, (currPathAndIdx) => {
+    const alternativeGast = alternation.definition[currPathAndIdx.idx]
+    // ignore (skip) ambiguities with this alternative
+    if (alternativeGast.ignoreAmbiguities === true) {
+      return []
+    }
+    const targetIdx = currPathAndIdx.idx
+    const targetPath = currPathAndIdx.path
+
+    const prefixAmbiguitiesPathsAndIndices = pathsAndIndices.filter(
+      (searchPathAndIdx) => {
+        // prefix ambiguity can only be created from lower idx (higher priority) path
+        return (
+          // ignore (skip) ambiguities with this "other" alternative
+          alternation.definition[searchPathAndIdx.idx].ignoreAmbiguities !==
+            true &&
+          searchPathAndIdx.idx < targetIdx &&
+          // checking for strict prefix because identical lookaheads
+          // will be be detected using a different validation.
+          isStrictPrefixOfPath(searchPathAndIdx.path, targetPath)
+        )
+      }
+    )
+
+    const currPathPrefixErrors = prefixAmbiguitiesPathsAndIndices.map(
+      (currAmbPathAndIdx): IParserAmbiguousAlternativesDefinitionError => {
+        const ambgIndices = [currAmbPathAndIdx.idx + 1, targetIdx + 1]
+        const occurrence = alternation.idx === 0 ? "" : alternation.idx
+
+        const message = errMsgProvider.buildAlternationPrefixAmbiguityError({
+          topLevelRule: rule,
+          alternation: alternation,
+          ambiguityIndices: ambgIndices,
+          prefixPath: currAmbPathAndIdx.path
+        })
+        return {
+          message: message,
+          type: ParserDefinitionErrorType.AMBIGUOUS_PREFIX_ALTS,
+          ruleName: rule.name,
+          occurrence: occurrence,
+          alternatives: ambgIndices
+        }
+      }
+    )
+
+    return currPathPrefixErrors
+  })
+
+  return errors.filter((currError) => !!currError)
 }
 
 function checkTerminalAndNoneTerminalsNameSpace(
@@ -689,11 +668,11 @@ function checkTerminalAndNoneTerminalsNameSpace(
 ): IParserDefinitionError[] {
   const errors: IParserDefinitionError[] = []
 
-  const tokenNames = map(tokenTypes, (currToken) => currToken.name)
+  const tokenNames = tokenTypes.map((currToken) => currToken.name)
 
-  forEach(topLevels, (currRule) => {
+  topLevels.forEach((currRule) => {
     const currRuleName = currRule.name
-    if (includes(tokenNames, currRuleName)) {
+    if (tokenNames.indexOf(currRuleName) !== -1) {
       const errMsg = errMsgProvider.buildNamespaceConflictError(currRule)
 
       errors.push({

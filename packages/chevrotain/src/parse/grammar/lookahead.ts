@@ -1,10 +1,3 @@
-import isEmpty from "lodash/isEmpty"
-import flatten from "lodash/flatten"
-import every from "lodash/every"
-import map from "lodash/map"
-import forEach from "lodash/forEach"
-import has from "lodash/has"
-import reduce from "lodash/reduce"
 import { possiblePathsFrom } from "./interpreter"
 import { RestWalker } from "./rest"
 import { Predicate, TokenMatcher } from "../parser/parser"
@@ -165,11 +158,9 @@ export function buildAlternativesLookAheadFunc(
   dynamicTokensEnabled: boolean
 ): (orAlts: IOrAlt<any>[]) => number | undefined {
   const numOfAlts = alts.length
-  const areAllOneTokenLookahead = every(alts, (currAlt) => {
-    return every(currAlt, (currPath) => {
-      return currPath.length === 1
-    })
-  })
+  const areAllOneTokenLookahead = alts.every((currAlt) =>
+    currAlt.every((currPath) => currPath.length === 1)
+  )
 
   // This version takes into account the predicates as well.
   if (hasPredicates) {
@@ -183,8 +174,7 @@ export function buildAlternativesLookAheadFunc(
       // unfortunately the predicates must be extracted every single time
       // as they cannot be cached due to references to parameters(vars) which are no longer valid.
       // note that in the common case of no predicates, no cpu time will be wasted on this (see else block)
-      const predicates: (Predicate | undefined)[] = map(
-        orAlts,
+      const predicates: (Predicate | undefined)[] = orAlts.map(
         (currAlt) => currAlt.GATE
       )
 
@@ -221,27 +211,23 @@ export function buildAlternativesLookAheadFunc(
   } else if (areAllOneTokenLookahead && !dynamicTokensEnabled) {
     // optimized (common) case of all the lookaheads paths requiring only
     // a single token lookahead. These Optimizations cannot work if dynamically defined Tokens are used.
-    const singleTokenAlts = map(alts, (currAlt) => {
-      return flatten(currAlt)
-    })
-
-    const choiceToAlt = reduce(
-      singleTokenAlts,
-      (result, currAlt, idx) => {
-        forEach(currAlt, (currTokType) => {
-          if (!has(result, currTokType.tokenTypeIdx!)) {
-            result[currTokType.tokenTypeIdx!] = idx
-          }
-          forEach(currTokType.categoryMatches!, (currExtendingType) => {
-            if (!has(result, currExtendingType)) {
-              result[currExtendingType] = idx
-            }
-          })
-        })
-        return result
-      },
-      {} as Record<number, number>
+    const singleTokenAlts = alts.map((currAlt) =>
+      ([] as TokenType[]).concat(...currAlt)
     )
+
+    const choiceToAlt = singleTokenAlts.reduce((result, currAlt, idx) => {
+      currAlt.forEach((currTokType) => {
+        if (result[currTokType.tokenTypeIdx!] === undefined) {
+          result[currTokType.tokenTypeIdx!] = idx
+        }
+        currTokType.categoryMatches!.forEach((currExtendingType) => {
+          if (result[currExtendingType] === undefined) {
+            result[currExtendingType] = idx
+          }
+        })
+      })
+      return result
+    }, {} as Record<number, number>)
 
     /**
      * @returns {number} - The chosen alternative index
@@ -289,7 +275,7 @@ export function buildSingleAlternativeLookaheadFunction(
   tokenMatcher: TokenMatcher,
   dynamicTokensEnabled: boolean
 ): () => boolean {
-  const areAllOneTokenLookahead = every(alt, (currPath) => {
+  const areAllOneTokenLookahead = alt.every((currPath) => {
     return currPath.length === 1
   })
 
@@ -298,11 +284,11 @@ export function buildSingleAlternativeLookaheadFunction(
   // optimized (common) case of all the lookaheads paths requiring only
   // a single token lookahead.
   if (areAllOneTokenLookahead && !dynamicTokensEnabled) {
-    const singleTokensTypes = flatten(alt)
+    const singleTokensTypes = ([] as TokenType[]).concat(...alt)
 
     if (
       singleTokensTypes.length === 1 &&
-      isEmpty((<any>singleTokensTypes[0]).categoryMatches)
+      singleTokensTypes[0].categoryMatches!.length === 0
     ) {
       const expectedTokenType = singleTokensTypes[0]
       const expectedTokenUniqueKey = (<any>expectedTokenType).tokenTypeIdx
@@ -311,11 +297,10 @@ export function buildSingleAlternativeLookaheadFunction(
         return this.LA(1).tokenTypeIdx === expectedTokenUniqueKey
       }
     } else {
-      const choiceToAlt = reduce(
-        singleTokensTypes,
+      const choiceToAlt = singleTokensTypes.reduce(
         (result, currTokType, idx) => {
           result[currTokType.tokenTypeIdx!] = true
-          forEach(currTokType.categoryMatches!, (currExtendingType) => {
+          currTokType.categoryMatches!.forEach((currExtendingType) => {
             result[currExtendingType] = true
           })
           return result
@@ -576,15 +561,13 @@ export function lookAheadSequenceFromAlternatives(
   altsDefs: IProduction[],
   k: number
 ): LookaheadSequence[] {
-  const partialAlts = map(altsDefs, (currAlt) =>
-    possiblePathsFrom([currAlt], 1)
-  )
+  const partialAlts = altsDefs.map((currAlt) => possiblePathsFrom([currAlt], 1))
   const finalResult = initializeArrayOfArrays(partialAlts.length)
-  const altsHashes = map(partialAlts, (currAltPaths) => {
+  const altsHashes = partialAlts.map((currAltPaths) => {
     const dict: { [key: string]: boolean } = {}
-    forEach(currAltPaths, (item) => {
+    currAltPaths.forEach((item) => {
       const keys = pathToHashKeys(item.partialPath)
-      forEach(keys, (currKey) => {
+      keys.forEach((currKey) => {
         dict[currKey] = true
       })
     })
@@ -611,7 +594,7 @@ export function lookAheadSequenceFromAlternatives(
         const prefixKeys = pathToHashKeys(currPathPrefix)
         const isUnique = isUniquePrefixHash(altsHashes, prefixKeys, altIdx)
         // End of the line for this path.
-        if (isUnique || isEmpty(suffixDef) || currPathPrefix.length === k) {
+        if (isUnique || suffixDef.length === 0 || currPathPrefix.length === k) {
           const currAltResult = finalResult[altIdx]
           // TODO: Can we implement a containsPath using Maps/Dictionaries?
           if (containsPath(currAltResult, currPathPrefix) === false) {
@@ -633,9 +616,9 @@ export function lookAheadSequenceFromAlternatives(
           newData[altIdx] = newData[altIdx].concat(newPartialPathsAndSuffixes)
 
           // Update keys for new known paths
-          forEach(newPartialPathsAndSuffixes, (item) => {
+          newPartialPathsAndSuffixes.forEach((item) => {
             const prefixKeys = pathToHashKeys(item.partialPath)
-            forEach(prefixKeys, (key) => {
+            prefixKeys.forEach((key) => {
               altsHashes[altIdx][key] = true
             })
           })
@@ -720,7 +703,7 @@ export function isStrictPrefixOfPath(
 ): boolean {
   return (
     prefix.length < other.length &&
-    every(prefix, (tokType, idx) => {
+    prefix.every((tokType, idx) => {
       const otherTokType = other[idx]
       return (
         tokType === otherTokType ||
@@ -733,9 +716,9 @@ export function isStrictPrefixOfPath(
 export function areTokenCategoriesNotUsed(
   lookAheadPaths: LookaheadSequence[]
 ): boolean {
-  return every(lookAheadPaths, (singleAltPaths) =>
-    every(singleAltPaths, (singlePath) =>
-      every(singlePath, (token) => isEmpty(token.categoryMatches!))
+  return lookAheadPaths.every((singleAltPaths) =>
+    singleAltPaths.every((singlePath) =>
+      singlePath.every((token) => token.categoryMatches!.length === 0)
     )
   )
 }

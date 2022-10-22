@@ -1,9 +1,3 @@
-import isEmpty from "lodash/isEmpty"
-import map from "lodash/map"
-import forEach from "lodash/forEach"
-import values from "lodash/values"
-import has from "lodash/has"
-import clone from "lodash/clone"
 import { toFastProperties } from "@chevrotain/utils"
 import { computeAllProdsFollows } from "../grammar/follow"
 import { createTokenInstance, EOF } from "../../scan/tokens_public"
@@ -169,7 +163,7 @@ export class Parser {
         try {
           this.enableRecording()
           // Building the GAST
-          forEach(this.definedRulesNames, (currRuleName) => {
+          this.definedRulesNames.forEach((currRuleName) => {
             const wrappedRule = (this as any)[
               currRuleName
             ] as ParserMethodInternal<unknown[], unknown>
@@ -191,7 +185,7 @@ export class Parser {
       let resolverErrors: IParserDefinitionError[] = []
       this.TRACE_INIT("Grammar Resolving", () => {
         resolverErrors = resolveGrammar({
-          rules: values(this.gastProductionsCache)
+          rules: Object.values(this.gastProductionsCache)
         })
         this.definitionErrors = this.definitionErrors.concat(resolverErrors)
       })
@@ -199,17 +193,17 @@ export class Parser {
       this.TRACE_INIT("Grammar Validations", () => {
         // only perform additional grammar validations IFF no resolving errors have occurred.
         // as unresolved grammar may lead to unhandled runtime exceptions in the follow up validations.
-        if (isEmpty(resolverErrors) && this.skipValidations === false) {
+        if (resolverErrors.length === 0 && this.skipValidations === false) {
           const validationErrors = validateGrammar({
-            rules: values(this.gastProductionsCache),
-            tokenTypes: values(this.tokensMap),
+            rules: Object.values(this.gastProductionsCache),
+            tokenTypes: Object.values(this.tokensMap),
             errMsgProvider: defaultGrammarValidatorErrorProvider,
             grammarName: className
           })
           const lookaheadValidationErrors = validateLookahead({
             lookaheadStrategy: this.lookaheadStrategy,
-            rules: values(this.gastProductionsCache),
-            tokenTypes: values(this.tokensMap),
+            rules: Object.values(this.gastProductionsCache),
+            tokenTypes: Object.values(this.tokensMap),
             grammarName: className
           })
           this.definitionErrors = this.definitionErrors.concat(
@@ -220,28 +214,29 @@ export class Parser {
       })
 
       // this analysis may fail if the grammar is not perfectly valid
-      if (isEmpty(this.definitionErrors)) {
+      if (this.definitionErrors.length === 0) {
         // The results of these computations are not needed unless error recovery is enabled.
         if (this.recoveryEnabled) {
           this.TRACE_INIT("computeAllProdsFollows", () => {
             const allFollows = computeAllProdsFollows(
-              values(this.gastProductionsCache)
+              Object.values(this.gastProductionsCache)
             )
             this.resyncFollows = allFollows
           })
         }
 
         this.TRACE_INIT("ComputeLookaheadFunctions", () => {
-          this.preComputeLookaheadFunctions(values(this.gastProductionsCache))
+          this.preComputeLookaheadFunctions(
+            Object.values(this.gastProductionsCache)
+          )
         })
       }
 
       if (
         !Parser.DEFER_DEFINITION_ERRORS_HANDLING &&
-        !isEmpty(this.definitionErrors)
+        this.definitionErrors.length > 0
       ) {
-        defErrorsMsgs = map(
-          this.definitionErrors,
+        defErrorsMsgs = this.definitionErrors.map(
           (defError) => defError.message
         )
         throw new Error(
@@ -269,7 +264,7 @@ export class Parser {
     that.initGastRecorder(config)
     that.initPerformanceTracer(config)
 
-    if (has(config, "ignoredIssues")) {
+    if (config.hasOwnProperty("ignoredIssues")) {
       throw new Error(
         "The <ignoredIssues> IParserConfig property has been deprecated.\n\t" +
           "Please use the <IGNORE_AMBIGUITIES> flag on the relevant DSL method instead.\n\t" +
@@ -278,9 +273,8 @@ export class Parser {
       )
     }
 
-    this.skipValidations = has(config, "skipValidations")
-      ? (config.skipValidations as boolean) // casting assumes the end user passing the correct type
-      : DEFAULT_PARSER_CONFIG.skipValidations
+    this.skipValidations =
+      config.skipValidations ?? DEFAULT_PARSER_CONFIG.skipValidations
   }
 }
 
@@ -302,7 +296,7 @@ export class CstParser extends Parser {
     tokenVocabulary: TokenVocabulary,
     config: IParserConfigInternal = DEFAULT_PARSER_CONFIG
   ) {
-    const configClone = clone(config)
+    const configClone = Object.assign({}, config)
     configClone.outputCst = true
     super(tokenVocabulary, configClone)
   }
@@ -313,7 +307,7 @@ export class EmbeddedActionsParser extends Parser {
     tokenVocabulary: TokenVocabulary,
     config: IParserConfigInternal = DEFAULT_PARSER_CONFIG
   ) {
-    const configClone = clone(config)
+    const configClone = Object.assign({}, config)
     configClone.outputCst = false
     super(tokenVocabulary, configClone)
   }
