@@ -28,9 +28,9 @@ import { IParserDefinitionError } from "./types"
 export class LLkLookaheadStrategy implements ILookaheadStrategy {
   readonly maxLookahead: number
 
-  constructor(options: { maxLookahead?: number }) {
+  constructor(options?: { maxLookahead?: number }) {
     this.maxLookahead =
-      options.maxLookahead ?? DEFAULT_PARSER_CONFIG.maxLookahead
+      options?.maxLookahead ?? DEFAULT_PARSER_CONFIG.maxLookahead
   }
 
   validate(options: {
