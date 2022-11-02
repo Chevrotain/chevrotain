@@ -2152,7 +2152,8 @@ export interface ILLkLookaheadValidator {
  * @experimental
  */
 export interface ILLkLookaheadStrategyConstructor {
-  new (): ILookaheadStrategy & ILLkLookaheadValidator
+  new (options?: { maxLookahead?: number }): ILookaheadStrategy &
+    ILLkLookaheadValidator
 }
 
 /**
