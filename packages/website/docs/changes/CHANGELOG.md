@@ -1,3 +1,15 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+- [fix: missing call to lookahead initialization for **experimental** lookahead plugins](https://github.com/Chevrotain/chevrotain/pull/1878)
+
+  - Thanks to [@msujew](https://github.com/msujew) :thumbsup:
+
+#### Documentation
+
+- [docs: fix broken links to protected props](https://github.com/Chevrotain/chevrotain/issues/1874)
+
 ## 10.4.0 (10-23-2022)
 
 #### Minor Changes
