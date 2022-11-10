@@ -40,6 +40,7 @@
   "typings": "./chevrotain.d.ts",
   "main": "./lib/src/api.js",
   "exports": {
+    "types": "./chevrotain.d.ts",
     "require": "./lib/src/api.js",
     "import": "./lib_esm/api_esm.mjs"
   },
