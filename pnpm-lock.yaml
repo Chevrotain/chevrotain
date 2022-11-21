@@ -75,7 +75,7 @@ importers:
   examples/grammars:
     specifiers:
       acorn: 8.8.0
-      chevrotain: 10.4.1
+      chevrotain: 10.4.2
       xregexp: 5.1.1
     dependencies:
       acorn: 8.8.0
@@ -84,7 +84,7 @@ importers:
 
   examples/implementation_languages:
     specifiers:
-      chevrotain: 10.4.1
+      chevrotain: 10.4.2
       coffee-script: ^1.11.1
       mocha: ^9.0.0
       npm-run-all: ^4.1.5
@@ -99,28 +99,28 @@ importers:
 
   examples/lexer:
     specifiers:
-      chevrotain: 10.4.1
+      chevrotain: 10.4.2
     dependencies:
       chevrotain: link:../../packages/chevrotain
 
   examples/parser:
     specifiers:
-      chevrotain: 10.4.1
+      chevrotain: 10.4.2
     dependencies:
       chevrotain: link:../../packages/chevrotain
 
   examples/tutorial:
     specifiers:
-      chevrotain: 10.4.1
+      chevrotain: 10.4.2
     dependencies:
       chevrotain: link:../../packages/chevrotain
 
   packages/chevrotain:
     specifiers:
-      '@chevrotain/cst-dts-gen': 10.4.1
-      '@chevrotain/gast': 10.4.1
-      '@chevrotain/types': 10.4.1
-      '@chevrotain/utils': 10.4.1
+      '@chevrotain/cst-dts-gen': 10.4.2
+      '@chevrotain/gast': 10.4.2
+      '@chevrotain/types': 10.4.2
+      '@chevrotain/utils': 10.4.2
       '@types/lodash': 4.14.184
       error-stack-parser: 2.1.4
       esbuild: 0.15.5
@@ -158,8 +158,8 @@ importers:
 
   packages/cst-dts-gen:
     specifiers:
-      '@chevrotain/gast': 10.4.1
-      '@chevrotain/types': 10.4.1
+      '@chevrotain/gast': 10.4.2
+      '@chevrotain/types': 10.4.2
       '@types/lodash': 4.14.184
       lodash: 4.17.21
     dependencies:
@@ -171,10 +171,10 @@ importers:
 
   packages/cst-dts-gen-test:
     specifiers:
-      '@chevrotain/cst-dts-gen': 10.4.1
-      '@chevrotain/gast': 10.4.1
-      '@chevrotain/types': 10.4.1
-      chevrotain: 10.4.1
+      '@chevrotain/cst-dts-gen': 10.4.2
+      '@chevrotain/gast': 10.4.2
+      '@chevrotain/types': 10.4.2
+      chevrotain: 10.4.2
       glob: 8.0.3
       lodash: 4.17.21
     dependencies:
@@ -188,7 +188,7 @@ importers:
 
   packages/gast:
     specifiers:
-      '@chevrotain/types': 10.4.1
+      '@chevrotain/types': 10.4.2
       '@types/lodash': 4.14.184
       lodash: 4.17.21
     dependencies:
