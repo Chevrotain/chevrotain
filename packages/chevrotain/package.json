@@ -89,7 +89,7 @@
     "jsdom": "20.0.0",
     "jsonfile": "6.1.0",
     "require-from-string": "2.0.2",
-    "sinon": "14.0.0",
+    "sinon": "15.0.1",
     "webpack": "5.74.0",
     "webpack-cli": "4.10.0",
     "xregexp": "5.1.1"
