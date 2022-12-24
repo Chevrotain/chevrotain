@@ -81,16 +81,16 @@
     "regexp-to-ast": "0.5.0"
   },
   "devDependencies": {
-    "@types/lodash": "4.14.184",
+    "@types/lodash": "4.14.191",
     "error-stack-parser": "2.1.4",
-    "esbuild": "0.15.5",
+    "esbuild": "0.16.10",
     "gen-esm-wrapper": "1.1.3",
     "gitty": "3.7.2",
-    "jsdom": "20.0.0",
+    "jsdom": "20.0.3",
     "jsonfile": "6.1.0",
     "require-from-string": "2.0.2",
     "sinon": "15.0.1",
-    "webpack": "5.74.0",
+    "webpack": "5.75.0",
     "webpack-cli": "4.10.0",
     "xregexp": "5.1.1"
   }
