@@ -7,7 +7,10 @@
       matchPackagePatterns: ["*"],
       excludePackagePatterns: [
         // typedoc upgrades require manually validating the generated website
-        "typedoc"
+        "typedoc",
+        // vuepress and related deps tend to break things often and require manual inspection
+        "vue",
+        "vuepress"
       ],
       matchDepTypes: ["devDependencies"],
       matchUpdateTypes: ["minor", "patch"],
