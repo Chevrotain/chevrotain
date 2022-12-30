@@ -1,17 +1,8 @@
-import isEmpty from "lodash/isEmpty"
-import compact from "lodash/compact"
-import isArray from "lodash/isArray"
-import map from "lodash/map"
-import forEach from "lodash/forEach"
-import filter from "lodash/filter"
-import keys from "lodash/keys"
-import isFunction from "lodash/isFunction"
-import isUndefined from "lodash/isUndefined"
 import { defineNameProp } from "../../lang/lang_extensions"
 import { CstNode, ICstVisitor } from "@chevrotain/types"
 
 export function defaultVisit<IN>(ctx: any, param: IN): void {
-  const childrenNames = keys(ctx)
+  const childrenNames = Object.keys(ctx)
   const childrenNamesLength = childrenNames.length
   for (let i = 0; i < childrenNamesLength; i++) {
     const currChildName = childrenNames[i]
@@ -44,14 +35,14 @@ export function createBaseSemanticVisitorConstructor(
   const semanticProto = {
     visit: function (cstNode: CstNode | CstNode[], param: any) {
       // enables writing more concise visitor methods when CstNode has only a single child
-      if (isArray(cstNode)) {
+      if (Array.isArray(cstNode)) {
         // A CST Node's children dictionary can never have empty arrays as values
         // If a key is defined there will be at least one element in the corresponding value array.
         cstNode = cstNode[0]
       }
 
       // enables passing optional CstNodes concisely.
-      if (isUndefined(cstNode)) {
+      if (cstNode === undefined) {
         return undefined
       }
 
@@ -60,9 +51,8 @@ export function createBaseSemanticVisitorConstructor(
 
     validateVisitor: function () {
       const semanticDefinitionErrors = validateVisitor(this, ruleNames)
-      if (!isEmpty(semanticDefinitionErrors)) {
-        const errorMessages = map(
-          semanticDefinitionErrors,
+      if (semanticDefinitionErrors.length > 0) {
+        const errorMessages = semanticDefinitionErrors.map(
           (currDefError) => currDefError.msg
         )
         throw Error(
@@ -96,7 +86,7 @@ export function createBaseVisitorConstructorWithDefaults(
   defineNameProp(derivedConstructor, grammarName + "BaseSemanticsWithDefaults")
 
   const withDefaultsProto = Object.create(baseConstructor.prototype)
-  forEach(ruleNames, (ruleName) => {
+  ruleNames.forEach((ruleName) => {
     withDefaultsProto[ruleName] = defaultVisit
   })
 
@@ -130,12 +120,11 @@ export function validateMissingCstMethods(
   visitorInstance: ICstVisitor<unknown, unknown>,
   ruleNames: string[]
 ): IVisitorDefinitionError[] {
-  const missingRuleNames = filter(ruleNames, (currRuleName) => {
-    return isFunction((visitorInstance as any)[currRuleName]) === false
+  const missingRuleNames = ruleNames.filter((currRuleName) => {
+    return typeof (visitorInstance as any)[currRuleName] !== "function"
   })
 
-  const errors: IVisitorDefinitionError[] = map(
-    missingRuleNames,
+  const errors: IVisitorDefinitionError[] = missingRuleNames.map(
     (currRuleName) => {
       return {
         msg: `Missing visitor method: <${currRuleName}> on ${<any>(
@@ -147,5 +136,5 @@ export function validateMissingCstMethods(
     }
   )
 
-  return compact<IVisitorDefinitionError>(errors)
+  return errors.filter((err) => !!err)
 }

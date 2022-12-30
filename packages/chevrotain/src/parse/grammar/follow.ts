@@ -1,7 +1,5 @@
 import { RestWalker } from "./rest"
 import { first } from "./first"
-import forEach from "lodash/forEach"
-import assign from "lodash/assign"
 import { IN } from "../constants"
 import { Alternative, NonTerminal, Rule, Terminal } from "@chevrotain/gast"
 import { IProduction, TokenType } from "@chevrotain/types"
@@ -48,9 +46,9 @@ export function computeAllProdsFollows(
 ): Record<string, TokenType[]> {
   const reSyncFollows = {}
 
-  forEach(topProductions, (topProd) => {
+  topProductions.forEach((topProd) => {
     const currRefsFollow = new ResyncFollowsWalker(topProd).startWalking()
-    assign(reSyncFollows, currRefsFollow)
+    Object.assign(reSyncFollows, currRefsFollow)
   })
   return reSyncFollows
 }

@@ -17,8 +17,6 @@ import {
   validateTooManyAlts
 } from "../../../src/parse/grammar/checks"
 import { createToken } from "../../../src/scan/tokens_public"
-import first from "lodash/first"
-import map from "lodash/map"
 import {
   Alternation,
   Alternative,
@@ -33,7 +31,6 @@ import { defaultGrammarValidatorErrorProvider } from "../../../src/parse/errors_
 import { IToken, TokenType } from "@chevrotain/types"
 import { expect } from "chai"
 import { createDeferredTokenBuilder } from "../../utils/builders"
-import omit from "lodash/omit"
 
 const getIdentTok = createDeferredTokenBuilder({
   name: "IdentTok",
@@ -137,7 +134,7 @@ describe("the grammar validations", () => {
       defaultGrammarValidatorErrorProvider,
       "bamba"
     )
-    expect(actualErrors.map((e) => omit(e, "message"))).to.deep.equal(
+    expect(actualErrors.map(({ message, ...e }) => e)).to.deep.equal(
       expectedErrorsNoMsg
     )
   })
@@ -363,7 +360,7 @@ describe("the getFirstNoneTerminal function", () => {
       })
     ])
     expect(result).to.have.length(1)
-    expect(first(result)!.name).to.equal("dummyRule")
+    expect(result[0].name).to.equal("dummyRule")
   })
 
   it("can find the firstNoneTerminal of a sequence with two items", () => {
@@ -379,7 +376,7 @@ describe("the getFirstNoneTerminal function", () => {
     ]
     const result = getFirstNoneTerminal(sqeuence)
     expect(result).to.have.length(1)
-    expect(first(result)!.name).to.equal("dummyRule")
+    expect(result[0].name).to.equal("dummyRule")
   })
 
   it("can find the firstNoneTerminal of a sequence with two items where the first is optional", () => {
@@ -399,7 +396,7 @@ describe("the getFirstNoneTerminal function", () => {
     ]
     const result = getFirstNoneTerminal(sqeuence)
     expect(result).to.have.length(2)
-    const resultRuleNames = map(result, (currItem) => currItem.name)
+    const resultRuleNames = result.map((currItem) => currItem.name)
     expect(resultRuleNames).to.include.members(["dummyRule", "dummyRule2"])
   })
 
@@ -436,7 +433,7 @@ describe("the getFirstNoneTerminal function", () => {
     ]
     const result = getFirstNoneTerminal(alternation)
     expect(result).to.have.length(3)
-    const resultRuleNames = map(result, (currItem) => currItem.name)
+    const resultRuleNames = result.map((currItem) => currItem.name)
     expect(resultRuleNames).to.include.members([
       "dummyRule",
       "dummyRule2",
@@ -473,7 +470,7 @@ describe("the getFirstNoneTerminal function", () => {
     ]
     const result = getFirstNoneTerminal(alternation)
     expect(result).to.have.length(2)
-    const resultRuleNames = map(result, (currItem) => currItem.name)
+    const resultRuleNames = result.map((currItem) => currItem.name)
     expect(resultRuleNames).to.include.members(["dummyRule", "dummyRule3"])
   })
 
@@ -506,7 +503,7 @@ describe("the getFirstNoneTerminal function", () => {
     ]
     const result = getFirstNoneTerminal(alternation)
     expect(result).to.have.length(1)
-    const resultRuleNames = map(result, (currItem) => currItem.name)
+    const resultRuleNames = result.map((currItem) => currItem.name)
     expect(resultRuleNames).to.include.members(["dummyRule"])
   })
 

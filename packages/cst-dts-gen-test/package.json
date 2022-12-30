@@ -25,8 +25,7 @@
     "@chevrotain/cst-dts-gen": "10.4.2",
     "@chevrotain/gast": "10.4.2",
     "@chevrotain/types": "10.4.2",
-    "chevrotain": "10.4.2",
-    "lodash": "4.17.21"
+    "chevrotain": "10.4.2"
   },
   "devDependencies": {
     "glob": "8.0.3"

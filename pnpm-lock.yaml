@@ -120,15 +120,12 @@ importers:
       '@chevrotain/cst-dts-gen': 10.4.2
       '@chevrotain/gast': 10.4.2
       '@chevrotain/types': 10.4.2
-      '@chevrotain/utils': 10.4.2
-      '@types/lodash': 4.14.191
       error-stack-parser: 2.1.4
       esbuild: 0.16.10
       gen-esm-wrapper: 1.1.3
       gitty: 3.7.2
       jsdom: 20.0.3
       jsonfile: 6.1.0
-      lodash: 4.17.21
       regexp-to-ast: 0.5.0
       require-from-string: 2.0.2
       sinon: 15.0.1
@@ -140,10 +137,8 @@ importers:
       '@chevrotain/gast': link:../gast
       '@chevrotain/types': link:../types
       '@chevrotain/utils': link:../utils
-      lodash: 4.17.21
       regexp-to-ast: 0.5.0
     devDependencies:
-      '@types/lodash': 4.14.191
       error-stack-parser: 2.1.4
       esbuild: 0.16.10
       gen-esm-wrapper: 1.1.3
@@ -160,14 +155,9 @@ importers:
     specifiers:
       '@chevrotain/gast': 10.4.2
       '@chevrotain/types': 10.4.2
-      '@types/lodash': 4.14.191
-      lodash: 4.17.21
     dependencies:
       '@chevrotain/gast': link:../gast
       '@chevrotain/types': link:../types
-      lodash: 4.17.21
-    devDependencies:
-      '@types/lodash': 4.14.191
 
   packages/cst-dts-gen-test:
     specifiers:
@@ -176,26 +166,19 @@ importers:
       '@chevrotain/types': 10.4.2
       chevrotain: 10.4.2
       glob: 8.0.3
-      lodash: 4.17.21
     dependencies:
       '@chevrotain/cst-dts-gen': link:../cst-dts-gen
       '@chevrotain/gast': link:../gast
       '@chevrotain/types': link:../types
       chevrotain: link:../chevrotain
-      lodash: 4.17.21
     devDependencies:
       glob: 8.0.3
 
   packages/gast:
     specifiers:
       '@chevrotain/types': 10.4.2
-      '@types/lodash': 4.14.191
-      lodash: 4.17.21
     dependencies:
       '@chevrotain/types': link:../types
-      lodash: 4.17.21
-    devDependencies:
-      '@types/lodash': 4.14.191
 
   packages/types:
     specifiers:
@@ -2373,10 +2356,6 @@ packages:
     resolution: {integrity: sha512-HZQYqbiFVWufzCwexrvh694SOim8z2d+xJl5UNamcvQFejLY/2YUtzXHYi3cHdI7PMlS8ejH2slRAOJQ32aNbA==}
     dev: true
 
-  /@types/lodash/4.14.191:
-    resolution: {integrity: sha512-BdZ5BCCvho3EIXw6wUCXHe7rS53AIDPLE+JzwgT+OsJk53oBfbSmZZ7CX4VaRoN78N+TJpFi9QPlfIVNmJYWxQ==}
-    dev: true
-
   /@types/markdown-it-emoji/2.0.2:
     resolution: {integrity: sha512-2ln8Wjbcj/0oRi/6VnuMeWEHHuK8uapFttvcLmDIe1GKCsFBLOLBX+D+xhDa9oWOQV0IpvxwrSfKKssAqqroog==}
     dependencies:
@@ -4017,8 +3996,8 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
     dependencies:
-      JSONStream: 1.3.5
       is-text-path: 1.0.1
+      JSONStream: 1.3.5
       lodash: 4.17.21
       meow: 8.1.2
       split2: 3.2.2
@@ -6548,6 +6527,7 @@ packages:
 
   /lodash/4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+    dev: true
 
   /log-symbols/4.1.0:
     resolution: {integrity: sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==}

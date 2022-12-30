@@ -1,5 +1,3 @@
-import forEach from "lodash/forEach"
-import has from "lodash/has"
 import { DEFAULT_PARSER_CONFIG } from "../parser"
 import {
   ILookaheadStrategy,
@@ -39,23 +37,19 @@ export class LooksAhead {
   lookaheadStrategy: ILookaheadStrategy
 
   initLooksAhead(config: IParserConfig) {
-    this.dynamicTokensEnabled = has(config, "dynamicTokensEnabled")
-      ? (config.dynamicTokensEnabled as boolean) // assumes end user provides the correct config value/type
-      : DEFAULT_PARSER_CONFIG.dynamicTokensEnabled
-
-    this.maxLookahead = has(config, "maxLookahead")
-      ? (config.maxLookahead as number) // assumes end user provides the correct config value/type
-      : DEFAULT_PARSER_CONFIG.maxLookahead
-
-    this.lookaheadStrategy = has(config, "lookaheadStrategy")
-      ? (config.lookaheadStrategy as ILookaheadStrategy) // assumes end user provides the correct config value/type
-      : new LLkLookaheadStrategy({ maxLookahead: this.maxLookahead })
+    this.dynamicTokensEnabled =
+      config.dynamicTokensEnabled ?? DEFAULT_PARSER_CONFIG.dynamicTokensEnabled
+    this.maxLookahead =
+      config.maxLookahead ?? DEFAULT_PARSER_CONFIG.maxLookahead
+    this.lookaheadStrategy =
+      config.lookaheadStrategy ??
+      new LLkLookaheadStrategy({ maxLookahead: this.maxLookahead })
 
     this.lookAheadFuncsCache = new Map()
   }
 
   preComputeLookaheadFunctions(this: MixedInParser, rules: Rule[]): void {
-    forEach(rules, (currRule) => {
+    rules.forEach((currRule) => {
       this.TRACE_INIT(`${currRule.name} Rule Lookahead`, () => {
         const {
           alternation,
@@ -66,7 +60,7 @@ export class LooksAhead {
           repetitionWithSeparator
         } = collectMethods(currRule)
 
-        forEach(alternation, (currProd) => {
+        alternation.forEach((currProd) => {
           const prodIdx = currProd.idx === 0 ? "" : currProd.idx
           this.TRACE_INIT(`${getProductionDslName(currProd)}${prodIdx}`, () => {
             const laFunc = this.lookaheadStrategy.buildLookaheadForAlternation({
@@ -86,7 +80,7 @@ export class LooksAhead {
           })
         })
 
-        forEach(repetition, (currProd) => {
+        repetition.forEach((currProd) => {
           this.computeLookaheadFunc(
             currRule,
             currProd.idx,
@@ -97,7 +91,7 @@ export class LooksAhead {
           )
         })
 
-        forEach(option, (currProd) => {
+        option.forEach((currProd) => {
           this.computeLookaheadFunc(
             currRule,
             currProd.idx,
@@ -108,7 +102,7 @@ export class LooksAhead {
           )
         })
 
-        forEach(repetitionMandatory, (currProd) => {
+        repetitionMandatory.forEach((currProd) => {
           this.computeLookaheadFunc(
             currRule,
             currProd.idx,
@@ -119,7 +113,7 @@ export class LooksAhead {
           )
         })
 
-        forEach(repetitionMandatoryWithSeparator, (currProd) => {
+        repetitionMandatoryWithSeparator.forEach((currProd) => {
           this.computeLookaheadFunc(
             currRule,
             currProd.idx,
@@ -130,7 +124,7 @@ export class LooksAhead {
           )
         })
 
-        forEach(repetitionWithSeparator, (currProd) => {
+        repetitionWithSeparator.forEach((currProd) => {
           this.computeLookaheadFunc(
             currRule,
             currProd.idx,

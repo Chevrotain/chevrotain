@@ -1,13 +1,3 @@
-import isEmpty from "lodash/isEmpty"
-import compact from "lodash/compact"
-import isArray from "lodash/isArray"
-import flatten from "lodash/flatten"
-import difference from "lodash/difference"
-import map from "lodash/map"
-import forEach from "lodash/forEach"
-import has from "lodash/has"
-import includes from "lodash/includes"
-import clone from "lodash/clone"
 import { IToken, TokenType } from "@chevrotain/types"
 
 export function tokenStructuredMatcher(
@@ -48,26 +38,26 @@ export function augmentTokenTypes(tokenTypes: TokenType[]): void {
   assignCategoriesMapProp(tokenTypesAndParents)
   assignCategoriesTokensProp(tokenTypesAndParents)
 
-  forEach(tokenTypesAndParents, (tokType) => {
+  tokenTypesAndParents.forEach((tokType) => {
     tokType.isParent = tokType.categoryMatches!.length > 0
   })
 }
 
 export function expandCategories(tokenTypes: TokenType[]): TokenType[] {
-  let result = clone(tokenTypes)
+  let result = tokenTypes.slice()
 
   let categories = tokenTypes
   let searching = true
   while (searching) {
-    categories = compact(
-      flatten(map(categories, (currTokType) => currTokType.CATEGORIES))
-    )
+    categories = ([] as (TokenType | undefined)[])
+      .concat(...categories.map((currTokType) => currTokType.CATEGORIES))
+      .filter((cat) => cat !== undefined) as TokenType[]
 
-    const newCategories = difference(categories, result)
+    const newCategories = categories.filter((cat) => result.indexOf(cat) === -1)
 
     result = result.concat(newCategories)
 
-    if (isEmpty(newCategories)) {
+    if (newCategories.length === 0) {
       searching = false
     } else {
       categories = newCategories
@@ -77,7 +67,7 @@ export function expandCategories(tokenTypes: TokenType[]): TokenType[] {
 }
 
 export function assignTokenDefaultProps(tokenTypes: TokenType[]): void {
-  forEach(tokenTypes, (currTokType) => {
+  tokenTypes.forEach((currTokType) => {
     if (!hasShortKeyProperty(currTokType)) {
       tokenIdxToClass[tokenShortNameIdx] = currTokType
       ;(<any>currTokType).tokenTypeIdx = tokenShortNameIdx++
@@ -86,7 +76,7 @@ export function assignTokenDefaultProps(tokenTypes: TokenType[]): void {
     // CATEGORIES? : TokenType | TokenType[]
     if (
       hasCategoriesProperty(currTokType) &&
-      !isArray(currTokType.CATEGORIES)
+      !Array.isArray(currTokType.CATEGORIES)
       // &&
       // !isUndefined(currTokType.CATEGORIES.PATTERN)
     ) {
@@ -108,10 +98,10 @@ export function assignTokenDefaultProps(tokenTypes: TokenType[]): void {
 }
 
 export function assignCategoriesTokensProp(tokenTypes: TokenType[]): void {
-  forEach(tokenTypes, (currTokType) => {
+  tokenTypes.forEach((currTokType) => {
     // avoid duplications
     currTokType.categoryMatches = []
-    forEach(currTokType.categoryMatchesMap!, (val, key) => {
+    Object.entries(currTokType.categoryMatchesMap!).forEach(([key, val]) => {
       currTokType.categoryMatches!.push(
         tokenIdxToClass[key as unknown as number].tokenTypeIdx!
       )
@@ -120,7 +110,7 @@ export function assignCategoriesTokensProp(tokenTypes: TokenType[]): void {
 }
 
 export function assignCategoriesMapProp(tokenTypes: TokenType[]): void {
-  forEach(tokenTypes, (currTokType) => {
+  tokenTypes.forEach((currTokType) => {
     singleAssignCategoriesToksMap([], currTokType)
   })
 }
@@ -129,37 +119,37 @@ export function singleAssignCategoriesToksMap(
   path: TokenType[],
   nextNode: TokenType
 ): void {
-  forEach(path, (pathNode) => {
+  path.forEach((pathNode) => {
     nextNode.categoryMatchesMap![pathNode.tokenTypeIdx!] = true
   })
 
-  forEach(nextNode.CATEGORIES, (nextCategory) => {
+  nextNode.CATEGORIES?.forEach((nextCategory) => {
     const newPath = path.concat(nextNode)
     // avoids infinite loops due to cyclic categories.
-    if (!includes(newPath, nextCategory)) {
+    if (newPath.indexOf(nextCategory) === -1) {
       singleAssignCategoriesToksMap(newPath, nextCategory)
     }
   })
 }
 
 export function hasShortKeyProperty(tokType: TokenType): boolean {
-  return has(tokType, "tokenTypeIdx")
+  return tokType !== null && tokType.hasOwnProperty("tokenTypeIdx")
 }
 
 export function hasCategoriesProperty(tokType: TokenType): boolean {
-  return has(tokType, "CATEGORIES")
+  return tokType !== null && tokType.hasOwnProperty("CATEGORIES")
 }
 
 export function hasExtendingTokensTypesProperty(tokType: TokenType): boolean {
-  return has(tokType, "categoryMatches")
+  return tokType !== null && tokType.hasOwnProperty("categoryMatches")
 }
 
 export function hasExtendingTokensTypesMapProperty(
   tokType: TokenType
 ): boolean {
-  return has(tokType, "categoryMatchesMap")
+  return tokType !== null && tokType.hasOwnProperty("categoryMatchesMap")
 }
 
 export function isTokenType(tokType: TokenType): boolean {
-  return has(tokType, "tokenTypeIdx")
+  return tokType !== null && tokType.hasOwnProperty("tokenTypeIdx")
 }

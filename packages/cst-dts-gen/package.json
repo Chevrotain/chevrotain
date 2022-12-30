@@ -32,10 +32,8 @@
   "dependencies": {
     "@chevrotain/gast": "10.4.2",
     "@chevrotain/types": "10.4.2",
-    "lodash": "4.17.21"
   },
   "devDependencies": {
-    "@types/lodash": "4.14.191"
   },
   "publishConfig": {
     "access": "public"

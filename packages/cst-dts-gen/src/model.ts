@@ -12,19 +12,13 @@ import type {
   TokenType
 } from "@chevrotain/types"
 import { NonTerminal, GAstVisitor } from "@chevrotain/gast"
-import map from "lodash/map"
-import flatten from "lodash/flatten"
-import values from "lodash/values"
-import some from "lodash/some"
-import groupBy from "lodash/groupBy"
-import assign from "lodash/assign"
 
 export function buildModel(
   productions: Record<string, Rule>
 ): CstNodeTypeDefinition[] {
   const generator = new CstNodeDefinitionGenerator()
-  const allRules = values(productions)
-  return map(allRules, (rule) => generator.visitRule(rule))
+  const allRules = Object.values(productions)
+  return allRules.map((rule) => generator.visitRule(rule))
 }
 
 export type CstNodeTypeDefinition = {
@@ -53,15 +47,19 @@ class CstNodeDefinitionGenerator extends GAstVisitor {
   visitRule(node: Rule): CstNodeTypeDefinition {
     const rawElements = this.visitEach(node.definition)
 
-    const grouped = groupBy(rawElements, (el) => el.propertyName)
-    const properties = map(grouped, (group, propertyName) => {
-      const allNullable = !some(group, (el) => !el.canBeNull)
+    // Group rawElements by propertyName
+    const grouped: Record<string, PropertyTupleElement[]> = {}
+    rawElements.forEach((el) => {
+      ;(grouped[el.propertyName] ??= []).push(el)
+    })
+    const properties = Object.entries(grouped).map(([propertyName, group]) => {
+      const allNullable = !group.some((el) => !el.canBeNull)
 
       // In an alternation with a label a property name can have
       // multiple types.
       let propertyType: PropertyArrayType = group[0].type
       if (group.length > 1) {
-        propertyType = map(group, (g) => g.type)
+        propertyType = group.map((g) => g.type)
       }
 
       return {
@@ -141,17 +139,17 @@ class CstNodeDefinitionGenerator extends GAstVisitor {
     definition: IProduction[],
     override: Partial<PropertyTupleElement>
   ) {
-    return map(
-      this.visitEach(definition),
-      (definition) => assign({}, definition, override) as PropertyTupleElement
+    return this.visitEach(definition).map(
+      (definition: any) =>
+        Object.assign({}, definition, override) as PropertyTupleElement
     )
   }
 
   private visitEach(definition: IProduction[]) {
-    return flatten<PropertyTupleElement>(
-      map(
-        definition,
-        (definition) => this.visit(definition) as PropertyTupleElement[]
+    return ([] as PropertyTupleElement[]).concat(
+      ...definition.map(
+        (definition) =>
+          (this as any).visit(definition) as PropertyTupleElement[]
       )
     )
   }
