@@ -1,6 +1,6 @@
 {
   "name": "@chevrotain/cst-dts-gen-test",
-  "version": "10.3.0",
+  "version": "10.4.2",
   "private": true,
   "description": "tests for @chevrotain/cst-dts-gen",
   "license": "Apache-2.0",
@@ -22,10 +22,10 @@
     "coverage": "nyc mocha"
   },
   "dependencies": {
-    "@chevrotain/cst-dts-gen": "10.3.0",
-    "@chevrotain/gast": "10.3.0",
-    "@chevrotain/types": "10.3.0",
-    "chevrotain": "10.3.0"
+    "@chevrotain/cst-dts-gen": "10.4.2",
+    "@chevrotain/gast": "10.4.2",
+    "@chevrotain/types": "10.4.2",
+    "chevrotain": "10.4.2"
   },
   "devDependencies": {
     "glob": "8.0.3"

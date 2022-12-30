@@ -1,6 +1,6 @@
 {
   "name": "@chevrotain/types",
-  "version": "10.3.0",
+  "version": "10.4.2",
   "description": "Type Signatures and API Website for Chevrotain",
   "keywords": [],
   "bugs": {
@@ -33,8 +33,8 @@
     "api-site:upload": "./scripts/api-site-upload.sh"
   },
   "devDependencies": {
-    "typedoc": "0.23.5",
-    "typescript": "4.7.4"
+    "typedoc": "0.23.23",
+    "typescript": "4.9.4"
   },
   "typings": "api.d.ts",
   "publishConfig": {

@@ -1,12 +1,12 @@
 {
   "name": "chevrotain_examples_parser",
-  "version": "10.3.0",
+  "version": "10.4.2",
   "scripts": {
     "ci": "pnpm run test",
     "test": "mocha \"!(node_modules)/**/*spec.js\""
   },
   "dependencies": {
-    "chevrotain": "10.3.0"
+    "chevrotain": "10.4.2"
   },
   "private": true
 }

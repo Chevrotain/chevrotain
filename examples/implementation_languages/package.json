@@ -1,6 +1,6 @@
 {
   "name": "chevrotain_examples_implementation_languages",
-  "version": "10.3.0",
+  "version": "10.4.2",
   "scripts": {
     "ci": "pnpm run build test",
     "build": "npm-run-all build:ts",
@@ -10,7 +10,7 @@
     "test:esm": "mocha \"*spec.mjs\""
   },
   "dependencies": {
-    "chevrotain": "10.3.0"
+    "chevrotain": "10.4.2"
   },
   "devDependencies": {
     "coffee-script": "^1.11.1",

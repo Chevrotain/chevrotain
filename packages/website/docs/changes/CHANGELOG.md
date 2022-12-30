@@ -1,4 +1,24 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 10.4.2 (11-21-2022)
+
+#### Bug Fixes
+
+- [chore: add types at package.json exports](https://github.com/Chevrotain/chevrotain/pull/1881)
+
+  - Thanks to [@msujew](https://github.com/mshima) :thumbsup:
+
+## 10.4.1 (11-4-2022)
+
+#### Bug Fixes
+
+- [fix: missing call to lookahead initialization for **experimental** lookahead plugins](https://github.com/Chevrotain/chevrotain/pull/1878)
+
+  - Thanks to [@msujew](https://github.com/msujew) :thumbsup:
+
+#### Documentation
+
+- [docs: fix broken links to protected props](https://github.com/Chevrotain/chevrotain/issues/1874)
+
+## 10.4.0 (10-23-2022)
 
 #### Minor Changes
 

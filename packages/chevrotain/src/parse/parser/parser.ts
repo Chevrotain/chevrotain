@@ -226,9 +226,10 @@ export class Parser {
         }
 
         this.TRACE_INIT("ComputeLookaheadFunctions", () => {
-          this.preComputeLookaheadFunctions(
-            Object.values(this.gastProductionsCache)
-          )
+          this.lookaheadStrategy.initialize?.({
+            rules: Object.values(this.gastProductionsCache)
+          })
+          this.preComputeLookaheadFunctions(Object.values(this.gastProductionsCache))
         })
       }
 
