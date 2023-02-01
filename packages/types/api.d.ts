@@ -1757,7 +1757,7 @@ export interface IRuleConfig<T> {
    * The function which will be invoked to produce the returned value for a production that have not been
    * successfully executed and the parser recovered from.
    */
-  recoveryValueFunc?: () => T
+  recoveryValueFunc?: (e?: Error) => T
   /**
    * Enable/Disable re-sync error recovery for this specific production.
    */
