@@ -281,7 +281,7 @@ export class RecognizerEngine {
             partialCstResult.recoveredNode = true
             return partialCstResult
           } else {
-            return recoveryValueFunc()
+            return recoveryValueFunc(e);
           }
         } else {
           if (this.outputCst) {
@@ -289,6 +289,8 @@ export class RecognizerEngine {
               this.CST_STACK[this.CST_STACK.length - 1]
             partialCstResult.recoveredNode = true
             recogError.partialCstResult = partialCstResult
+          } else {
+            return recoveryValueFunc(e);
           }
           // to be handled Further up the call stack
           throw recogError
@@ -298,7 +300,7 @@ export class RecognizerEngine {
         this.moveToTerminatedState()
         // the parser should never throw one of its own errors outside its flow.
         // even if error recovery is disabled
-        return recoveryValueFunc()
+        return recoveryValueFunc(e);
       } else {
         // to be recovered Further up the call stack
         throw recogError
