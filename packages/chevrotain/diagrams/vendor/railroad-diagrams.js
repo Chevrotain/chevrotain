@@ -956,10 +956,10 @@
   ].forEach(function (e, i) {
     root[e] = temp[i]
   })
-}.call(this, {
+}).call(this, {
   VERTICAL_SEPARATION: 8,
   ARC_RADIUS: 10,
   DIAGRAM_CLASS: "railroad-diagram",
   STROKE_ODD_PIXEL_LENGTH: true,
   INTERNAL_ALIGNMENT: "center"
-}))
+})
