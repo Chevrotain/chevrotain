@@ -75,7 +75,7 @@ importers:
   examples/grammars:
     specifiers:
       acorn: 8.8.0
-      chevrotain: 10.4.2
+      chevrotain: 10.5.0
       xregexp: 5.1.1
     dependencies:
       acorn: 8.8.0
@@ -84,7 +84,7 @@ importers:
 
   examples/implementation_languages:
     specifiers:
-      chevrotain: 10.4.2
+      chevrotain: 10.5.0
       coffee-script: ^1.11.1
       mocha: ^9.0.0
       npm-run-all: ^4.1.5
@@ -99,28 +99,28 @@ importers:
 
   examples/lexer:
     specifiers:
-      chevrotain: 10.4.2
+      chevrotain: 10.5.0
     dependencies:
       chevrotain: link:../../packages/chevrotain
 
   examples/parser:
     specifiers:
-      chevrotain: 10.4.2
+      chevrotain: 10.5.0
     dependencies:
       chevrotain: link:../../packages/chevrotain
 
   examples/tutorial:
     specifiers:
-      chevrotain: 10.4.2
+      chevrotain: 10.5.0
     dependencies:
       chevrotain: link:../../packages/chevrotain
 
   packages/chevrotain:
     specifiers:
-      '@chevrotain/cst-dts-gen': 10.4.2
-      '@chevrotain/gast': 10.4.2
-      '@chevrotain/types': 10.4.2
-      '@chevrotain/utils': 10.4.2
+      '@chevrotain/cst-dts-gen': 10.5.0
+      '@chevrotain/gast': 10.5.0
+      '@chevrotain/types': 10.5.0
+      '@chevrotain/utils': 10.5.0
       '@types/lodash': 4.14.191
       error-stack-parser: 2.1.4
       esbuild: 0.16.10
@@ -158,8 +158,8 @@ importers:
 
   packages/cst-dts-gen:
     specifiers:
-      '@chevrotain/gast': 10.4.2
-      '@chevrotain/types': 10.4.2
+      '@chevrotain/gast': 10.5.0
+      '@chevrotain/types': 10.5.0
       '@types/lodash': 4.14.191
       lodash: 4.17.21
     dependencies:
@@ -171,10 +171,10 @@ importers:
 
   packages/cst-dts-gen-test:
     specifiers:
-      '@chevrotain/cst-dts-gen': 10.4.2
-      '@chevrotain/gast': 10.4.2
-      '@chevrotain/types': 10.4.2
-      chevrotain: 10.4.2
+      '@chevrotain/cst-dts-gen': 10.5.0
+      '@chevrotain/gast': 10.5.0
+      '@chevrotain/types': 10.5.0
+      chevrotain: 10.5.0
       glob: 8.0.3
       lodash: 4.17.21
     dependencies:
@@ -188,7 +188,7 @@ importers:
 
   packages/gast:
     specifiers:
-      '@chevrotain/types': 10.4.2
+      '@chevrotain/types': 10.5.0
       '@types/lodash': 4.14.191
       lodash: 4.17.21
     dependencies:
@@ -573,15 +573,6 @@ packages:
       conventional-changelog-conventionalcommits: 5.0.0
     dev: true
 
-  /@commitlint/config-validator/17.0.3:
-    resolution: {integrity: sha512-3tLRPQJKapksGE7Kee9axv+9z5I2GDHitDH4q63q7NmNA0wkB+DAorJ0RHz2/K00Zb1/MVdHzhCga34FJvDihQ==}
-    engines: {node: '>=v14'}
-    dependencies:
-      '@commitlint/types': 17.0.0
-      ajv: 8.11.0
-    dev: true
-    optional: true
-
   /@commitlint/config-validator/17.1.0:
     resolution: {integrity: sha512-Q1rRRSU09ngrTgeTXHq6ePJs2KrI+axPTgkNYDWSJIuS1Op4w3J30vUfSXjwn5YEJHklK3fSqWNHmBhmTR7Vdg==}
     engines: {node: '>=v14'}
@@ -633,28 +624,6 @@ packages:
       '@commitlint/types': 17.0.0
     dev: true
 
-  /@commitlint/load/17.0.3:
-    resolution: {integrity: sha512-3Dhvr7GcKbKa/ey4QJ5MZH3+J7QFlARohUow6hftQyNjzoXXROm+RwpBes4dDFrXG1xDw9QPXA7uzrOShCd4bw==}
-    engines: {node: '>=v14'}
-    requiresBuild: true
-    dependencies:
-      '@commitlint/config-validator': 17.0.3
-      '@commitlint/execute-rule': 17.0.0
-      '@commitlint/resolve-extends': 17.0.3
-      '@commitlint/types': 17.0.0
-      '@types/node': 18.7.8
-      chalk: 4.1.2
-      cosmiconfig: 7.0.1
-      cosmiconfig-typescript-loader: 2.0.2_ic4ooz6cngxpec6gkztqpemn34
-      lodash: 4.17.21
-      resolve-from: 5.0.0
-      typescript: 4.9.4
-    transitivePeerDependencies:
-      - '@swc/core'
-      - '@swc/wasm'
-    dev: true
-    optional: true
-
   /@commitlint/load/17.3.0:
     resolution: {integrity: sha512-u/pV6rCAJrCUN+HylBHLzZ4qj1Ew3+eN9GBPhNi9otGxtOfA8b+8nJSxaNbcC23Ins/kcpjGf9zPSVW7628Umw==}
     engines: {node: '>=v14'}
@@ -702,19 +671,6 @@ packages:
       git-raw-commits: 2.0.11
       minimist: 1.2.6
     dev: true
-
-  /@commitlint/resolve-extends/17.0.3:
-    resolution: {integrity: sha512-H/RFMvrcBeJCMdnVC4i8I94108UDccIHrTke2tyQEg9nXQnR5/Hd6MhyNWkREvcrxh9Y+33JLb+PiPiaBxCtBA==}
-    engines: {node: '>=v14'}
-    dependencies:
-      '@commitlint/config-validator': 17.1.0
-      '@commitlint/types': 17.0.0
-      import-fresh: 3.3.0
-      lodash: 4.17.21
-      resolve-from: 5.0.0
-      resolve-global: 1.0.0
-    dev: true
-    optional: true
 
   /@commitlint/resolve-extends/17.3.0:
     resolution: {integrity: sha512-Lf3JufJlc5yVEtJWC8o4IAZaB8FQAUaVlhlAHRACd0TTFizV2Lk2VH70et23KgvbQNf7kQzHs/2B4QZalBv6Cg==}
@@ -4054,23 +4010,6 @@ packages:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
     dev: true
 
-  /cosmiconfig-typescript-loader/2.0.2_ic4ooz6cngxpec6gkztqpemn34:
-    resolution: {integrity: sha512-KmE+bMjWMXJbkWCeY4FJX/npHuZPNr9XF9q9CIQ/bpFwi1qHfCmSiKarrCcRa0LO4fWjk93pVoeRtJAkTGcYNw==}
-    engines: {node: '>=12', npm: '>=6'}
-    peerDependencies:
-      '@types/node': '*'
-      typescript: '>=3'
-    dependencies:
-      '@types/node': 18.7.8
-      cosmiconfig: 7.0.1
-      ts-node: 10.9.1_ic4ooz6cngxpec6gkztqpemn34
-      typescript: 4.9.4
-    transitivePeerDependencies:
-      - '@swc/core'
-      - '@swc/wasm'
-    dev: true
-    optional: true
-
   /cosmiconfig-typescript-loader/4.3.0_ddhj5mna3wq7ixd2imxtjvlllm:
     resolution: {integrity: sha512-NTxV1MFfZDLPiBMjxbHRwSh5LaLcPMwNdCutmnHJCKoVnlvldPWlllonKwrsRJ5pYZBIBGRWWU2tfvzxgeSW5Q==}
     engines: {node: '>=12', npm: '>=6'}
@@ -4151,7 +4090,7 @@ packages:
       longest: 2.0.1
       word-wrap: 1.2.3
     optionalDependencies:
-      '@commitlint/load': 17.0.3
+      '@commitlint/load': 17.3.0
     transitivePeerDependencies:
       - '@swc/core'
       - '@swc/wasm'
@@ -8791,38 +8730,6 @@ packages:
   /ts-debounce/4.0.0:
     resolution: {integrity: sha512-+1iDGY6NmOGidq7i7xZGA4cm8DAa6fqdYcvO5Z6yBevH++Bdo9Qt/mN0TzHUgcCcKv1gmh9+W5dHqz8pMWbCbg==}
     dev: true
-
-  /ts-node/10.9.1_ic4ooz6cngxpec6gkztqpemn34:
-    resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}
-    hasBin: true
-    peerDependencies:
-      '@swc/core': '>=1.2.50'
-      '@swc/wasm': '>=1.2.50'
-      '@types/node': '*'
-      typescript: '>=2.7'
-    peerDependenciesMeta:
-      '@swc/core':
-        optional: true
-      '@swc/wasm':
-        optional: true
-    dependencies:
-      '@cspotcode/source-map-support': 0.8.1
-      '@tsconfig/node10': 1.0.9
-      '@tsconfig/node12': 1.0.11
-      '@tsconfig/node14': 1.0.3
-      '@tsconfig/node16': 1.0.3
-      '@types/node': 18.7.8
-      acorn: 8.8.1
-      acorn-walk: 8.2.0
-      arg: 4.1.3
-      create-require: 1.1.1
-      diff: 4.0.2
-      make-error: 1.3.6
-      typescript: 4.9.4
-      v8-compile-cache-lib: 3.0.1
-      yn: 3.1.1
-    dev: true
-    optional: true
 
   /ts-node/10.9.1_xplfzyzpegygk3axf4z63vz544:
     resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}
