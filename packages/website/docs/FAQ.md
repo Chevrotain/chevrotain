@@ -111,7 +111,7 @@ Special handling is no longer needed during WebPacking scenarios.
 
 The first time a Chevrotain parser is initialized additional validations and computations are performed.
 Some of these can take a very long time under certain edge cases. Specifically the detection of ambiguous alternatives
-when the parser uses a larger than the default [maxLookahead](https://chevrotain.io/documentation/10_4_2/interfaces/IParserConfig.html)
+when the parser uses a larger than the default [maxLookahead](https://chevrotain.io/documentation/10_5_0/interfaces/IParserConfig.html)
 and there are many (thousands) of ambiguous paths.
 
 To resolve this try reducing the maxLookahead and inspect the ambiguity errors to fix

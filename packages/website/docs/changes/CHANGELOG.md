@@ -1,3 +1,10 @@
+## 10.5.0 (3-11-2023)
+
+#### Minor Changes
+
+- [feat: add context argument to recoveryValueFunc](https://github.com/Chevrotain/chevrotain/issues/1917)
+  - Thanks to [@msujew](https://github.com/nupthale) :thumbsup:
+
 ## 10.4.2 (11-21-2022)
 
 #### Bug Fixes

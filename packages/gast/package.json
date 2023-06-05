@@ -1,6 +1,6 @@
 {
   "name": "@chevrotain/gast",
-  "version": "10.4.2",
+  "version": "10.5.0",
   "description": "Grammar AST structure for Chevrotain Parsers",
   "keywords": [],
   "bugs": {
@@ -34,7 +34,7 @@
     "coverage": "nyc mocha"
   },
   "dependencies": {
-    "@chevrotain/types": "10.4.2"
+    "@chevrotain/types": "10.5.0"
   },
   "devDependencies": {
   },
