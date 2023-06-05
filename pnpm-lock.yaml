@@ -164,9 +164,6 @@ importers:
       '@chevrotain/types':
         specifier: 10.5.0
         version: link:../types
-      lodash:
-        specifier: 4.17.21
-        version: 4.17.21
       regexp-to-ast:
         specifier: 0.5.0
         version: 0.5.0
@@ -6520,6 +6517,7 @@ packages:
 
   /lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+    dev: true
 
   /log-symbols@4.1.0:
     resolution: {integrity: sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==}
