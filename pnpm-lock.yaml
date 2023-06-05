@@ -164,6 +164,9 @@ importers:
       '@chevrotain/types':
         specifier: 10.5.0
         version: link:../types
+      '@chevrotain/utils':
+        specifier: 10.5.0
+        version: link:../utils
       regexp-to-ast:
         specifier: 0.5.0
         version: 0.5.0
