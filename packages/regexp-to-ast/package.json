@@ -1,0 +1,31 @@
+{
+  "name": "@chevrotain/regexp-to-ast",
+  "version": "0.5.0",
+  "main": "lib/regexp-to-ast.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Chevrotain/chevrotain.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Shahar Soel"
+  },
+  "description": "Parses a Regular Expression and outputs an AST",
+  "keywords": [
+    "regExp",
+    "parser",
+    "regular expression"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "chai": "4.3.7",
+    "eslint": "8.30.0",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-plugin-es5": "^1.4.1",
+    "gitty": "^3.7.0",
+    "mocha": "10.2.0"
+  },
+  "scripts": {
+    "coverage": "nyc mocha"
+  }
+}
