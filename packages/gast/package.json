@@ -6,6 +6,9 @@
   "bugs": {
     "url": "https://github.com/Chevrotain/chevrotain/issues"
   },
+  "exports": {
+    ".": "./lib/src/api.js"
+  },
   "license": "Apache-2.0",
   "typings": "lib/src/api.d.ts",
   "main": "lib/src/api.js",

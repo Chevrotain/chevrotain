@@ -10,6 +10,9 @@
   "author": {
     "name": "Shahar Soel"
   },
+  "exports": {
+    ".": "./lib/src/api.js"
+  },
   "typings": "lib/src/api.d.ts",
   "main": "lib/src/api.js",
   "files": [
