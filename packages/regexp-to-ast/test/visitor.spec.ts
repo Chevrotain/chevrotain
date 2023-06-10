@@ -1,8 +1,20 @@
-const { RegExpParser, BaseRegExpVisitor } = require("../src/regexp-to-ast")
-const { expect } = require("chai")
+import { expect } from "chai"
+import type {
+  Alternative,
+  Assertion,
+  Disjunction,
+  Group,
+  GroupBackReference,
+  Quantifier,
+  RegExpPattern,
+  Set
+} from "../api"
+import { RegExpParser } from "../src/regexp-parser"
+import { BaseRegExpVisitor } from "../src/base-regexp-visitor"
+import { Character } from "../api"
 
 describe("The regexp AST visitor", () => {
-  let parser
+  let parser: RegExpParser
 
   before(() => {
     parser = new RegExpParser()
@@ -11,7 +23,7 @@ describe("The regexp AST visitor", () => {
   it("Can visit pattern", () => {
     const ast = parser.pattern("/a|b/")
     class PatternVisitor extends BaseRegExpVisitor {
-      visitPattern(node) {
+      visitPattern(node: RegExpPattern) {
         super.visitPattern(node)
         expect(node.value.value).to.have.lengthOf(2)
       }
@@ -23,7 +35,7 @@ describe("The regexp AST visitor", () => {
   it("Can visit Disjunction", () => {
     const ast = parser.pattern("/a|b|c/")
     class DisjunctionVisitor extends BaseRegExpVisitor {
-      visitDisjunction(node) {
+      visitDisjunction(node: Disjunction) {
         super.visitDisjunction(node)
         expect(node.value).to.have.lengthOf(3)
       }
@@ -36,7 +48,7 @@ describe("The regexp AST visitor", () => {
     const ast = parser.pattern("/a|b|c|d/")
     let times = 0
     class AlternativeVisitor extends BaseRegExpVisitor {
-      visitAlternative(node) {
+      visitAlternative(node: Alternative) {
         super.visitAlternative(node)
         times++
       }
@@ -50,7 +62,7 @@ describe("The regexp AST visitor", () => {
     const ast = parser.pattern("/^^abc/")
     let times = 0
     class StartAnchorVisitor extends BaseRegExpVisitor {
-      visitStartAnchor(node) {
+      visitStartAnchor(node: Assertion) {
         super.visitStartAnchor(node)
         times++
       }
@@ -64,7 +76,7 @@ describe("The regexp AST visitor", () => {
     const ast = parser.pattern("/abc$$$/")
     let times = 0
     class EndAnchorVisitor extends BaseRegExpVisitor {
-      visitEndAnchor(node) {
+      visitEndAnchor(node: Assertion) {
         super.visitEndAnchor(node)
         times++
       }
@@ -78,7 +90,7 @@ describe("The regexp AST visitor", () => {
     const ast = parser.pattern("/abc\\b\\b\\b\\b/")
     let times = 0
     class WordBoundaryVisitor extends BaseRegExpVisitor {
-      visitWordBoundary(node) {
+      visitWordBoundary(node: Assertion) {
         super.visitWordBoundary(node)
         times++
       }
@@ -92,7 +104,7 @@ describe("The regexp AST visitor", () => {
     const ast = parser.pattern("/abc\\B\\B\\B/")
     let times = 0
     class NonWordBoundaryVisitor extends BaseRegExpVisitor {
-      visitNonWordBoundary(node) {
+      visitNonWordBoundary(node: Assertion) {
         super.visitNonWordBoundary(node)
         times++
       }
@@ -105,9 +117,9 @@ describe("The regexp AST visitor", () => {
   it("Can visit Lookahead", () => {
     const ast = parser.pattern("/a(?=a|b)/")
     class LookaheadVisitor extends BaseRegExpVisitor {
-      visitLookahead(node) {
+      visitLookahead(node: Assertion) {
         super.visitLookahead(node)
-        expect(node.value.value).to.have.lengthOf(2)
+        expect(node.value?.value).to.have.lengthOf(2)
       }
     }
 
@@ -117,9 +129,9 @@ describe("The regexp AST visitor", () => {
   it("Can visit NegativeLookahead", () => {
     const ast = parser.pattern("/a(?!a|b|c)/")
     class NegativeLookaheadVisitor extends BaseRegExpVisitor {
-      visitNegativeLookahead(node) {
+      visitNegativeLookahead(node: Assertion) {
         super.visitNegativeLookahead(node)
-        expect(node.value.value).to.have.lengthOf(3)
+        expect(node.value!.value).to.have.lengthOf(3)
       }
     }
 
@@ -129,7 +141,7 @@ describe("The regexp AST visitor", () => {
   it("Can visit Character", () => {
     const ast = parser.pattern("/a/")
     class CharacterVisitor extends BaseRegExpVisitor {
-      visitCharacter(node) {
+      visitCharacter(node: Character) {
         super.visitCharacter(node)
         expect(node.value).to.equal(97)
       }
@@ -141,11 +153,11 @@ describe("The regexp AST visitor", () => {
   it("Can visit Character with quantifier", () => {
     const ast = parser.pattern("/a*/")
     class CharacterVisitor extends BaseRegExpVisitor {
-      visitCharacter(node) {
+      visitCharacter(node: Character) {
         super.visitCharacter(node)
         expect(node.value).to.equal(97)
-        expect(node.quantifier.atLeast).to.equal(0)
-        expect(node.quantifier.atMost).to.equal(Infinity)
+        expect(node.quantifier?.atLeast).to.equal(0)
+        expect(node.quantifier?.atMost).to.equal(Infinity)
       }
     }
 
@@ -155,7 +167,7 @@ describe("The regexp AST visitor", () => {
   it("Can visit Set", () => {
     const ast = parser.pattern("/[abc]/")
     class SetVisitor extends BaseRegExpVisitor {
-      visitSet(node) {
+      visitSet(node: Set) {
         super.visitSet(node)
         expect(node.value).to.deep.equal([97, 98, 99])
       }
@@ -167,7 +179,7 @@ describe("The regexp AST visitor", () => {
   it("Can visit Set with range", () => {
     const ast = parser.pattern("/[a-z]/")
     class SetVisitor extends BaseRegExpVisitor {
-      visitSet(node) {
+      visitSet(node: Set) {
         super.visitSet(node)
         expect(node.value).to.deep.equal([{ from: 97, to: 122 }])
       }
@@ -179,11 +191,11 @@ describe("The regexp AST visitor", () => {
   it("Can visit Set with quantifier", () => {
     const ast = parser.pattern("/[abc]{1,4}/")
     class SetVisitor extends BaseRegExpVisitor {
-      visitSet(node) {
+      visitSet(node: Set) {
         super.visitSet(node)
         expect(node.value).to.deep.equal([97, 98, 99])
-        expect(node.quantifier.atLeast).to.equal(1)
-        expect(node.quantifier.atMost).to.equal(4)
+        expect(node.quantifier?.atLeast).to.equal(1)
+        expect(node.quantifier?.atMost).to.equal(4)
       }
     }
 
@@ -193,7 +205,7 @@ describe("The regexp AST visitor", () => {
   it("Can visit Group", () => {
     const ast = parser.pattern("/(a|b|c)/")
     class GroupVisitor extends BaseRegExpVisitor {
-      visitGroup(node) {
+      visitGroup(node: Group) {
         super.visitGroup(node)
         expect(node.value.value).to.have.lengthOf(3)
       }
@@ -205,11 +217,11 @@ describe("The regexp AST visitor", () => {
   it("Can visit Group with quantifier", () => {
     const ast = parser.pattern("/(a|b|c)?/")
     class GroupVisitor extends BaseRegExpVisitor {
-      visitGroup(node) {
+      visitGroup(node: Group) {
         super.visitGroup(node)
         expect(node.value.value).to.have.lengthOf(3)
-        expect(node.quantifier.atLeast).to.equal(0)
-        expect(node.quantifier.atMost).to.equal(1)
+        expect(node.quantifier?.atLeast).to.equal(0)
+        expect(node.quantifier?.atMost).to.equal(1)
       }
     }
 
@@ -219,7 +231,7 @@ describe("The regexp AST visitor", () => {
   it("Can visit Group back reference", () => {
     const ast = parser.pattern("/(ab)\\1/")
     class GroupBackReferenceVisitor extends BaseRegExpVisitor {
-      visitGroupBackReference(node) {
+      visitGroupBackReference(node: GroupBackReference) {
         super.visitGroupBackReference(node)
         expect(node.value).to.equal(1)
       }
@@ -231,11 +243,11 @@ describe("The regexp AST visitor", () => {
   it("Can visit Group back reference with quantifier", () => {
     const ast = parser.pattern("/(ab)\\1{666}/")
     class GroupBackReferenceVisitor extends BaseRegExpVisitor {
-      visitGroupBackReference(node) {
+      visitGroupBackReference(node: GroupBackReference) {
         super.visitGroupBackReference(node)
         expect(node.value).to.equal(1)
-        expect(node.quantifier.atLeast).to.equal(666)
-        expect(node.quantifier.atMost).to.equal(666)
+        expect(node.quantifier?.atLeast).to.equal(666)
+        expect(node.quantifier?.atMost).to.equal(666)
       }
     }
 
@@ -245,7 +257,7 @@ describe("The regexp AST visitor", () => {
   it("Can visit Quantifier", () => {
     const ast = parser.pattern("/a{1,3}/")
     class QuantifierVisitor extends BaseRegExpVisitor {
-      visitQuantifier(node) {
+      visitQuantifier(node: Quantifier) {
         super.visitQuantifier(node)
         expect(node.atMost).to.equal(3)
       }

@@ -165,6 +165,9 @@ importers:
       '@chevrotain/gast':
         specifier: 10.5.0
         version: link:../gast
+      '@chevrotain/regexp-to-ast':
+        specifier: 10.5.0
+        version: link:../regexp-to-ast
       '@chevrotain/types':
         specifier: 10.5.0
         version: link:../types
@@ -174,9 +177,6 @@ importers:
       lodash:
         specifier: 4.17.21
         version: 4.17.21
-      regexp-to-ast:
-        specifier: 0.5.0
-        version: 0.5.0
     devDependencies:
       '@types/lodash':
         specifier: 4.14.191
@@ -266,26 +266,7 @@ importers:
         specifier: 4.14.191
         version: 4.14.191
 
-  packages/regexp-to-ast:
-    devDependencies:
-      chai:
-        specifier: 4.3.7
-        version: 4.3.7
-      eslint:
-        specifier: 8.30.0
-        version: 8.30.0
-      eslint-config-prettier:
-        specifier: 8.5.0
-        version: 8.5.0(eslint@8.30.0)
-      eslint-plugin-es5:
-        specifier: ^1.4.1
-        version: 1.5.0(eslint@8.30.0)
-      gitty:
-        specifier: ^3.7.0
-        version: 3.7.2
-      mocha:
-        specifier: 10.2.0
-        version: 10.2.0
+  packages/regexp-to-ast: {}
 
   packages/types:
     devDependencies:
@@ -4815,14 +4796,6 @@ packages:
       eslint: 8.30.0
     dev: true
 
-  /eslint-plugin-es5@1.5.0(eslint@8.30.0):
-    resolution: {integrity: sha512-Qxmfo7v2B7SGAEURJo0dpBweFf+JU15kSyALfiB2rXWcBuJ96r6X9kFHXFnhdopPHCaHjoQs1xQPUJVbGMb1AA==}
-    peerDependencies:
-      eslint: '>= 3.0.0'
-    dependencies:
-      eslint: 8.30.0
-    dev: true
-
   /eslint-plugin-eslint-comments@3.2.0(eslint@8.30.0):
     resolution: {integrity: sha512-0jkOl0hfojIHHmEHgmNdqv4fmh7300NdpA9FFpF7zaoLvB/QeXOGNLIo86oAveJFrfB1p05kC8hpEMHM8DwWVQ==}
     engines: {node: '>=6.5.0'}
@@ -8033,10 +8006,6 @@ packages:
 
   /regenerator-runtime@0.13.9:
     resolution: {integrity: sha512-p3VT+cOEgxFsRRA9X4lkI1E+k2/CtnKtU4gcxyaCUreilL/vqI6CdZ3wxVUx3UOUg+gnUOQQcRI7BmSI656MYA==}
-
-  /regexp-to-ast@0.5.0:
-    resolution: {integrity: sha512-tlbJqcMHnPKI9zSrystikWKwHkBqu2a/Sgw01h3zFjvYrMxEDYHzzoMZnUrbIfpTFEsoRnnviOXNCzFiSc54Qw==}
-    dev: false
 
   /regexp.prototype.flags@1.4.3:
     resolution: {integrity: sha512-fjggEOO3slI6Wvgjwflkc4NFRCTZAu5CnNfBd5qOMYhWdn67nJBBu34/TkD++eeFmd8C9r9jfXJ27+nSiRkSUA==}

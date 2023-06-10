@@ -5,7 +5,7 @@ import {
   Disjunction,
   RegExpParser,
   RegExpPattern
-} from "regexp-to-ast"
+} from "@chevrotain/regexp-to-ast"
 
 let regExpAstCache: { [regex: string]: RegExpPattern } = {}
 const regExpParser = new RegExpParser()

@@ -1,8 +1,8 @@
-const { RegExpParser } = require("../src/regexp-to-ast")
-const { expect } = require("chai")
+import { RegExpParser } from "../src/regexp-parser"
+import { expect } from "chai"
 
 describe("The RegExp to Ast parser", () => {
-  let parser
+  let parser: RegExpParser
 
   before(() => {
     parser = new RegExpParser()

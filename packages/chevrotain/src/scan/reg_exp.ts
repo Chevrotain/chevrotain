@@ -5,10 +5,8 @@ import {
   Character,
   Disjunction,
   Group,
-  Set,
-  Term,
-  VERSION
-} from "regexp-to-ast"
+  Set
+} from "@chevrotain/regexp-to-ast"
 import isArray from "lodash/isArray"
 import every from "lodash/every"
 import forEach from "lodash/forEach"
@@ -60,8 +58,8 @@ export function getOptimizedStartCodesIndices(
       PRINT_ERROR(
         `${failedOptimizationPrefixMsg}\n` +
           `\tFailed parsing: < ${regExp.toString()} >\n` +
-          `\tUsing the regexp-to-ast library version: ${VERSION}\n` +
-          "\tPlease open an issue at: https://github.com/bd82/regexp-to-ast/issues" +
+          `\tUsing the @chevrotain/regexp-to-ast library\n` +
+          "\tPlease open an issue at: https://github.com/chevrotain/chevrotain/issues" +
           msgSuffix
       )
     }
