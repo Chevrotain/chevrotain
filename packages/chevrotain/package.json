@@ -32,7 +32,7 @@
     "lib/chevrotain.min.js",
     "lib/chevrotain.js",
     "src/**/*.ts",
-    "READNE.md",
+    "README.md",
     "LICENSE.TXT",
     "diagrams/**/*.*",
     "CHANGELOG.md"
@@ -81,7 +81,6 @@
     "lodash": "4.17.21"
   },
   "devDependencies": {
-    "@types/lodash": "4.14.191",
     "error-stack-parser": "2.1.4",
     "esbuild": "0.16.10",
     "gen-esm-wrapper": "1.1.3",

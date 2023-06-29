@@ -4,6 +4,7 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+
 importers:
 
   .:
@@ -174,13 +175,6 @@ importers:
       '@chevrotain/utils':
         specifier: 10.5.0
         version: link:../utils
-      lodash:
-        specifier: 4.17.21
-        version: 4.17.21
-    devDependencies:
-      '@types/lodash':
-        specifier: 4.14.191
-        version: 4.14.191
       error-stack-parser:
         specifier: 2.1.4
         version: 2.1.4
@@ -223,13 +217,6 @@ importers:
       '@chevrotain/types':
         specifier: 10.5.0
         version: link:../types
-      lodash:
-        specifier: 4.17.21
-        version: 4.17.21
-    devDependencies:
-      '@types/lodash':
-        specifier: 4.14.191
-        version: 4.14.191
 
   packages/cst-dts-gen-test:
     dependencies:
@@ -245,9 +232,6 @@ importers:
       chevrotain:
         specifier: 10.5.0
         version: link:../chevrotain
-      lodash:
-        specifier: 4.17.21
-        version: 4.17.21
     devDependencies:
       glob:
         specifier: 8.0.3
@@ -258,13 +242,6 @@ importers:
       '@chevrotain/types':
         specifier: 10.5.0
         version: link:../types
-      lodash:
-        specifier: 4.17.21
-        version: 4.17.21
-    devDependencies:
-      '@types/lodash':
-        specifier: 4.14.191
-        version: 4.14.191
 
   packages/regexp-to-ast: {}
 
@@ -2408,10 +2385,6 @@ packages:
     resolution: {integrity: sha512-HZQYqbiFVWufzCwexrvh694SOim8z2d+xJl5UNamcvQFejLY/2YUtzXHYi3cHdI7PMlS8ejH2slRAOJQ32aNbA==}
     dev: true
 
-  /@types/lodash@4.14.191:
-    resolution: {integrity: sha512-BdZ5BCCvho3EIXw6wUCXHe7rS53AIDPLE+JzwgT+OsJk53oBfbSmZZ7CX4VaRoN78N+TJpFi9QPlfIVNmJYWxQ==}
-    dev: true
-
   /@types/markdown-it-emoji@2.0.2:
     resolution: {integrity: sha512-2ln8Wjbcj/0oRi/6VnuMeWEHHuK8uapFttvcLmDIe1GKCsFBLOLBX+D+xhDa9oWOQV0IpvxwrSfKKssAqqroog==}
     dependencies:
@@ -3222,6 +3195,7 @@ packages:
     dependencies:
       acorn: 8.8.1
     dev: true
+
 
   /acorn-jsx@5.3.2(acorn@8.8.0):
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -6553,6 +6527,7 @@ packages:
 
   /lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+    dev: true
 
   /log-symbols@4.1.0:
     resolution: {integrity: sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==}

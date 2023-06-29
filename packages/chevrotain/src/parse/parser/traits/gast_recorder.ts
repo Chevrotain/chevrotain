@@ -14,12 +14,6 @@ import {
   SubruleMethodOpts,
   TokenType
 } from "@chevrotain/types"
-import peek from "lodash/last"
-import isArray from "lodash/isArray"
-import some from "lodash/some"
-import forEach from "lodash/forEach"
-import isFunction from "lodash/isFunction"
-import has from "lodash/has"
 import { MixedInParser } from "./parser_traits"
 import {
   Alternation,
@@ -302,7 +296,7 @@ export class GastRecorder {
     options?: SubruleMethodOpts<ARGS>
   ): R | CstNode {
     assertMethodIdxIsValid(occurrence)
-    if (!ruleToCall || has(ruleToCall, "ruleName") === false) {
+    if (!ruleToCall || !ruleToCall.hasOwnProperty("ruleName")) {
       const error: any = new Error(
         `<SUBRULE${getIdxSuffix(occurrence)}> argument is invalid` +
           ` expecting a Parser method reference but got: <${JSON.stringify(
@@ -316,7 +310,8 @@ export class GastRecorder {
       throw error
     }
 
-    const prevProd: any = peek(this.recordingProdStack)
+    const prevProd: any =
+      this.recordingProdStack[this.recordingProdStack.length - 1]
     const ruleName = ruleToCall.ruleName
     const newNoneTerminal = new NonTerminal({
       idx: occurrence,
@@ -350,7 +345,8 @@ export class GastRecorder {
       error.KNOWN_RECORDER_ERROR = true
       throw error
     }
-    const prevProd: any = peek(this.recordingProdStack)
+    const prevProd: any =
+      this.recordingProdStack[this.recordingProdStack.length - 1]
     const newNoneTerminal = new Terminal({
       idx: occurrence,
       terminalType: tokType,
@@ -369,14 +365,16 @@ function recordProd(
   handleSep: boolean = false
 ): any {
   assertMethodIdxIsValid(occurrence)
-  const prevProd: any = peek(this.recordingProdStack)
-  const grammarAction = isFunction(mainProdArg) ? mainProdArg : mainProdArg.DEF
+  const prevProd: any =
+    this.recordingProdStack[this.recordingProdStack.length - 1]
+  const grammarAction =
+    typeof mainProdArg === "function" ? mainProdArg : mainProdArg.DEF
 
   const newProd = new prodConstructor({ definition: [], idx: occurrence })
   if (handleSep) {
     newProd.separator = mainProdArg.SEP
   }
-  if (has(mainProdArg, "MAX_LOOKAHEAD")) {
+  if (mainProdArg.hasOwnProperty("MAX_LOOKAHEAD")) {
     newProd.maxLookahead = mainProdArg.MAX_LOOKAHEAD
   }
 
@@ -390,9 +388,10 @@ function recordProd(
 
 function recordOrProd(mainProdArg: any, occurrence: number): any {
   assertMethodIdxIsValid(occurrence)
-  const prevProd: any = peek(this.recordingProdStack)
+  const prevProd: any =
+    this.recordingProdStack[this.recordingProdStack.length - 1]
   // Only an array of alternatives
-  const hasOptions = isArray(mainProdArg) === false
+  const hasOptions = !Array.isArray(mainProdArg)
   const alts: IOrAlt<unknown>[] =
     hasOptions === false ? mainProdArg : mainProdArg.DEF
 
@@ -401,23 +400,25 @@ function recordOrProd(mainProdArg: any, occurrence: number): any {
     idx: occurrence,
     ignoreAmbiguities: hasOptions && mainProdArg.IGNORE_AMBIGUITIES === true
   })
-  if (has(mainProdArg, "MAX_LOOKAHEAD")) {
+  if (mainProdArg.hasOwnProperty("MAX_LOOKAHEAD")) {
     newOrProd.maxLookahead = mainProdArg.MAX_LOOKAHEAD
   }
 
-  const hasPredicates = some(alts, (currAlt: any) => isFunction(currAlt.GATE))
+  const hasPredicates = alts.some(
+    (currAlt: any) => typeof currAlt.GATE === "function"
+  )
   newOrProd.hasPredicates = hasPredicates
 
   prevProd.definition.push(newOrProd)
 
-  forEach(alts, (currAlt) => {
+  alts.forEach((currAlt) => {
     const currAltFlat = new Alternative({ definition: [] })
     newOrProd.definition.push(currAltFlat)
-    if (has(currAlt, "IGNORE_AMBIGUITIES")) {
+    if (currAlt.hasOwnProperty("IGNORE_AMBIGUITIES")) {
       currAltFlat.ignoreAmbiguities = currAlt.IGNORE_AMBIGUITIES as boolean // assumes end user provides the correct config value/type
     }
     // **implicit** ignoreAmbiguities due to usage of gate
-    else if (has(currAlt, "GATE")) {
+    else if (currAlt.hasOwnProperty("GATE")) {
       currAltFlat.ignoreAmbiguities = true
     }
     this.recordingProdStack.push(currAltFlat)

@@ -5,14 +5,10 @@ import {
   Character,
   Disjunction,
   Group,
+  Set,
+  Term,
   Set
 } from "@chevrotain/regexp-to-ast"
-import isArray from "lodash/isArray"
-import every from "lodash/every"
-import forEach from "lodash/forEach"
-import find from "lodash/find"
-import values from "lodash/values"
-import includes from "lodash/includes"
 import { PRINT_ERROR, PRINT_WARNING } from "@chevrotain/utils"
 import { ASTNode, getRegExpAst } from "./reg_exp_parser"
 import { charCodeToOptimizedIndex, minOptimizationVal } from "./lexer"
@@ -109,7 +105,7 @@ export function firstCharOptimizedIndices(
             if (atom.complement === true) {
               throw Error(complementErrorMessage)
             }
-            forEach(atom.value, (code) => {
+            atom.value.forEach((code) => {
               if (typeof code === "number") {
                 addOptimizedIdxToResult(code, result, ignoreCase)
               } else {
@@ -186,7 +182,7 @@ export function firstCharOptimizedIndices(
   }
 
   // console.log(Object.keys(result).length)
-  return values(result)
+  return Object.values(result)
 }
 
 function addOptimizedIdxToResult(
@@ -222,17 +218,14 @@ function handleIgnoreCase(
 }
 
 function findCode(setNode: Set, targetCharCodes: number[]) {
-  return find(setNode.value, (codeOrRange) => {
+  return setNode.value.find((codeOrRange) => {
     if (typeof codeOrRange === "number") {
-      return includes(targetCharCodes, codeOrRange)
+      return targetCharCodes.indexOf(codeOrRange) !== -1
     } else {
       // range
       const range = <any>codeOrRange
-      return (
-        find(
-          targetCharCodes,
-          (targetCode) => range.from <= targetCode && targetCode <= range.to
-        ) !== undefined
+      return targetCharCodes.some(
+        (targetCode) => range.from <= targetCode && targetCode <= range.to
       )
     }
   })
@@ -248,8 +241,8 @@ function isWholeOptional(ast: any): boolean {
     return false
   }
 
-  return isArray(ast.value)
-    ? every(ast.value, isWholeOptional)
+  return Array.isArray(ast.value)
+    ? ast.value.every(isWholeOptional)
     : isWholeOptional(ast.value)
 }
 
@@ -281,7 +274,7 @@ class CharCodeFinder extends BaseRegExpVisitor {
   }
 
   visitCharacter(node: Character) {
-    if (includes(this.targetCharCodes, node.value)) {
+    if (this.targetCharCodes.indexOf(node.value) !== -1) {
       this.found = true
     }
   }
@@ -309,10 +302,8 @@ export function canMatchCharCode(
     charCodeFinder.visit(ast)
     return charCodeFinder.found
   } else {
-    return (
-      find(<any>pattern, (char) => {
-        return includes(charCodes, (<string>char).charCodeAt(0))
-      }) !== undefined
+    return Array.from(pattern).some(
+      (char) => charCodes.indexOf(char.charCodeAt(0)) !== -1
     )
   }
 }

@@ -1,9 +1,3 @@
-import flatten from "lodash/flatten"
-import isArray from "lodash/isArray"
-import map from "lodash/map"
-import reduce from "lodash/reduce"
-import uniq from "lodash/uniq"
-import upperFirst from "lodash/upperFirst"
 import { GenerateDtsOptions } from "@chevrotain/types"
 import {
   CstNodeTypeDefinition,
@@ -24,7 +18,7 @@ export function genDts(
   )
 
   contentParts = contentParts.concat(
-    flatten(map(model, (node) => genCstNodeTypes(node)))
+    ...model.map((node) => genCstNodeTypes(node))
   )
 
   if (options.includeVisitorInterface) {
@@ -57,7 +51,7 @@ function genNodeChildrenType(node: CstNodeTypeDefinition) {
   const typeName = getNodeChildrenTypeName(node.name)
 
   return `export type ${typeName} = {
-  ${map(node.properties, (property) => genChildProperty(property)).join("\n  ")}
+  ${node.properties.map((property) => genChildProperty(property)).join("\n  ")}
 };`
 }
 
@@ -68,7 +62,7 @@ function genChildProperty(prop: PropertyTypeDefinition) {
 
 function genVisitor(name: string, nodes: CstNodeTypeDefinition[]) {
   return `export interface ${name}<IN, OUT> extends ICstVisitor<IN, OUT> {
-  ${map(nodes, (node) => genVisitorFunction(node)).join("\n  ")}
+  ${nodes.map((node) => genVisitorFunction(node)).join("\n  ")}
 }`
 }
 
@@ -78,9 +72,9 @@ function genVisitorFunction(node: CstNodeTypeDefinition) {
 }
 
 function buildTypeString(type: PropertyArrayType) {
-  if (isArray(type)) {
-    const typeNames = uniq(map(type, (t) => getTypeString(t)))
-    const typeString = reduce(typeNames, (sum, t) => sum + " | " + t)
+  if (Array.isArray(type)) {
+    const typeNames = Array.from(new Set(type.map((t) => getTypeString(t))))
+    const typeString = typeNames.reduce((sum, t) => sum + " | " + t)
     return "(" + typeString + ")"
   } else {
     return getTypeString(type)
@@ -95,9 +89,9 @@ function getTypeString(type: TokenArrayType | RuleArrayType) {
 }
 
 function getNodeInterfaceName(ruleName: string) {
-  return upperFirst(ruleName) + "CstNode"
+  return `${ruleName[0].toUpperCase()}${ruleName.slice(1)}CstNode`
 }
 
 function getNodeChildrenTypeName(ruleName: string) {
-  return upperFirst(ruleName) + "CstChildren"
+  return `${ruleName[0].toUpperCase()}${ruleName.slice(1)}CstChildren`
 }

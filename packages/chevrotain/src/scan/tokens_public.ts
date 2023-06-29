@@ -1,6 +1,3 @@
-import isString from "lodash/isString"
-import has from "lodash/has"
-import isUndefined from "lodash/isUndefined"
 import { Lexer } from "./lexer_public"
 import { augmentTokenTypes, tokenStructuredMatcher } from "./tokens"
 import { IToken, ITokenConfig, TokenType } from "@chevrotain/types"
@@ -20,7 +17,7 @@ export function tokenName(tokType: TokenType): string {
 export function hasTokenLabel(
   obj: TokenType
 ): obj is TokenType & Pick<Required<TokenType>, "LABEL"> {
-  return isString(obj.LABEL) && obj.LABEL !== ""
+  return typeof obj.LABEL === "string" && obj.LABEL !== ""
 }
 
 const PARENT = "parent"
@@ -43,49 +40,49 @@ function createTokenInternal(config: ITokenConfig): TokenType {
   const tokenType: TokenType = <any>{}
   tokenType.name = config.name
 
-  if (!isUndefined(pattern)) {
+  if (pattern !== undefined) {
     tokenType.PATTERN = pattern
   }
 
-  if (has(config, PARENT)) {
+  if (config.hasOwnProperty(PARENT)) {
     throw (
       "The parent property is no longer supported.\n" +
       "See: https://github.com/chevrotain/chevrotain/issues/564#issuecomment-349062346 for details."
     )
   }
 
-  if (has(config, CATEGORIES)) {
+  if (config.hasOwnProperty(CATEGORIES)) {
     // casting to ANY as this will be fixed inside `augmentTokenTypes``
     tokenType.CATEGORIES = <any>config[CATEGORIES]
   }
 
   augmentTokenTypes([tokenType])
 
-  if (has(config, LABEL)) {
+  if (config.hasOwnProperty(LABEL)) {
     tokenType.LABEL = config[LABEL]
   }
 
-  if (has(config, GROUP)) {
+  if (config.hasOwnProperty(GROUP)) {
     tokenType.GROUP = config[GROUP]
   }
 
-  if (has(config, POP_MODE)) {
+  if (config.hasOwnProperty(POP_MODE)) {
     tokenType.POP_MODE = config[POP_MODE]
   }
 
-  if (has(config, PUSH_MODE)) {
+  if (config.hasOwnProperty(PUSH_MODE)) {
     tokenType.PUSH_MODE = config[PUSH_MODE]
   }
 
-  if (has(config, LONGER_ALT)) {
+  if (config.hasOwnProperty(LONGER_ALT)) {
     tokenType.LONGER_ALT = config[LONGER_ALT]
   }
 
-  if (has(config, LINE_BREAKS)) {
+  if (config.hasOwnProperty(LINE_BREAKS)) {
     tokenType.LINE_BREAKS = config[LINE_BREAKS]
   }
 
-  if (has(config, START_CHARS_HINT)) {
+  if (config.hasOwnProperty(START_CHARS_HINT)) {
     tokenType.START_CHARS_HINT = config[START_CHARS_HINT]
   }
 

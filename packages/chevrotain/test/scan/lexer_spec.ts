@@ -1,9 +1,3 @@
-import last from "lodash/last"
-import map from "lodash/map"
-import forEach from "lodash/forEach"
-import isString from "lodash/isString"
-import isRegExp from "lodash/isRegExp"
-import keys from "lodash/keys"
 import { createToken } from "../../src/scan/tokens_public"
 import { Lexer, LexerDefinitionErrorType } from "../../src/scan/lexer_public"
 import {
@@ -663,14 +657,15 @@ function defineLexerSpecs(
             useSticky: false
           })
 
-          const allPatterns = map(
-            analyzeResult.patternIdxToConfig,
+          const allPatterns = analyzeResult.patternIdxToConfig.map(
             (currConfig) => currConfig.pattern
           )
 
           expect(allPatterns.length).to.equal(8)
-          const allPatternsString = map(allPatterns, (pattern) => {
-            return isString(pattern) ? pattern : (pattern as RegExp).source
+          const allPatternsString = allPatterns.map((pattern) => {
+            return typeof pattern === "string"
+              ? pattern
+              : (pattern as RegExp).source
           })
           setEquality(allPatternsString, [
             "^(?:(\\t| ))",
@@ -683,11 +678,10 @@ function defineLexerSpecs(
             "^(?:return)"
           ])
 
-          const patternIdxToClass = map(
-            analyzeResult.patternIdxToConfig,
+          const patternIdxToClass = analyzeResult.patternIdxToConfig.map(
             (currConfig) => currConfig.tokenType
           )
-          expect(keys(patternIdxToClass).length).to.equal(8)
+          expect(Object.keys(patternIdxToClass).length).to.equal(8)
           expect(patternIdxToClass[0]).to.equal(If)
           expect(patternIdxToClass[1]).to.equal(Else)
           expect(patternIdxToClass[2]).to.equal(Return)
@@ -717,13 +711,14 @@ function defineLexerSpecs(
           const analyzeResult = analyzeTokenTypes(tokenClasses, {
             useSticky: true
           })
-          const allPatterns = map(
-            analyzeResult.patternIdxToConfig,
+          const allPatterns = analyzeResult.patternIdxToConfig.map(
             (currConfig) => currConfig.pattern
           )
           expect(allPatterns.length).to.equal(8)
-          const allPatternsString = map(allPatterns, (pattern) => {
-            return isString(pattern) ? pattern : (pattern as RegExp).source
+          const allPatternsString = allPatterns.map((pattern) => {
+            return typeof pattern === "string"
+              ? pattern
+              : (pattern as RegExp).source
           })
           setEquality(allPatternsString, [
             "(\\t| )",
@@ -736,16 +731,15 @@ function defineLexerSpecs(
             "return"
           ])
 
-          forEach(allPatterns, (currPattern) => {
-            if (isRegExp(currPattern)) {
+          allPatterns.forEach((currPattern) => {
+            if (currPattern instanceof RegExp) {
               expect(currPattern.sticky).to.be.true
             }
           })
-          const patternIdxToClass = map(
-            analyzeResult.patternIdxToConfig,
+          const patternIdxToClass = analyzeResult.patternIdxToConfig.map(
             (currConfig) => currConfig.tokenType
           )
-          expect(keys(patternIdxToClass).length).to.equal(8)
+          expect(Object.keys(patternIdxToClass).length).to.equal(8)
           expect(patternIdxToClass[0]).to.equal(If)
           expect(patternIdxToClass[1]).to.equal(Else)
           expect(patternIdxToClass[2]).to.equal(Return)
@@ -768,14 +762,14 @@ function defineLexerSpecs(
             pattern: /\d+/
           })
         ])
-        const lastToken = last(ltCounter.tokenize("1\r\n1\r1").tokens)!
+        const lastToken = ltCounter.tokenize("1\r\n1\r1").tokens.pop()!
         expect(lastToken.startLine).to.equal(3)
 
-        const lastToken2 = last(ltCounter.tokenize("\r\r\r1234\r\n1").tokens)!
+        const lastToken2 = ltCounter.tokenize("\r\r\r1234\r\n1").tokens.pop()!
         expect(lastToken2.startLine).to.equal(5)
         expect(lastToken2.startColumn).to.equal(1)
 
-        const lastToken3 = last(ltCounter.tokenize("2\r3\n\r4\n5").tokens)!
+        const lastToken3 = ltCounter.tokenize("2\r3\n\r4\n5").tokens.pop()!
         expect(lastToken3.startLine).to.equal(5)
       })
 
@@ -791,14 +785,14 @@ function defineLexerSpecs(
             pattern: /\d+(?=|\n)/
           })
         ])
-        const lastToken = last(ltCounter.tokenize("1\r\n1\r1").tokens)!
+        const lastToken = ltCounter.tokenize("1\r\n1\r1").tokens.pop()!
         expect(lastToken.startLine).to.equal(3)
 
-        const lastToken2 = last(ltCounter.tokenize("\r\r\r1234\r\n1").tokens)!
+        const lastToken2 = ltCounter.tokenize("\r\r\r1234\r\n1").tokens.pop()!
         expect(lastToken2.startLine).to.equal(5)
         expect(lastToken2.startColumn).to.equal(1)
 
-        const lastToken3 = last(ltCounter.tokenize("2\r3\n\r4\n5").tokens)!
+        const lastToken3 = ltCounter.tokenize("2\r3\n\r4\n5").tokens.pop()!
         expect(lastToken3.startLine).to.equal(5)
       })
 
@@ -815,14 +809,14 @@ function defineLexerSpecs(
             pattern: /\d+(?!a\n)/
           })
         ])
-        const lastToken = last(ltCounter.tokenize("1\r\n1\r1").tokens)!
+        const lastToken = ltCounter.tokenize("1\r\n1\r1").tokens.pop()!
         expect(lastToken.startLine).to.equal(3)
 
-        const lastToken2 = last(ltCounter.tokenize("\r\r\r1234\r\n1").tokens)!
+        const lastToken2 = ltCounter.tokenize("\r\r\r1234\r\n1").tokens.pop()!
         expect(lastToken2.startLine).to.equal(5)
         expect(lastToken2.startColumn).to.equal(1)
 
-        const lastToken3 = last(ltCounter.tokenize("2\r3\n\r4\n5").tokens)!
+        const lastToken3 = ltCounter.tokenize("2\r3\n\r4\n5").tokens.pop()!
         expect(lastToken3.startLine).to.equal(5)
       })
 
@@ -838,7 +832,7 @@ function defineLexerSpecs(
             pattern: /\d+/
           })
         ])
-        const lastToken = last(ltCounter.tokenize("1\n1\n1").tokens)!
+        const lastToken = ltCounter.tokenize("1\n1\n1").tokens.pop()!
         expect(lastToken.startLine).to.equal(3)
       })
 
@@ -853,7 +847,7 @@ function defineLexerSpecs(
             pattern: /\d+/
           })
         ])
-        const lastToken = last(ltCounter.tokenize("1\n1\n1").tokens)!
+        const lastToken = ltCounter.tokenize("1\n1\n1").tokens.pop()!
         expect(lastToken.startLine).to.equal(3)
       })
 
@@ -1112,7 +1106,7 @@ function defineLexerSpecs(
               pattern: /\d+/
             })
           ])
-          const lastToken = last(ltCounter.tokenize("1\n1\n1").tokens)!
+          const lastToken = ltCounter.tokenize("1\n1\n1").tokens.pop()!
           expect(lastToken.startLine).to.equal(3)
         })
 
@@ -1714,7 +1708,7 @@ function defineLexerSpecs(
           const lexResult = ModeLexer.tokenize(input)
           expect(lexResult.errors).to.be.empty
 
-          const images = map(lexResult.tokens, (currTok) => currTok.image)
+          const images = lexResult.tokens.map((currTok) => currTok.image)
           expect(images).to.deep.equal([
             "1",
             "LETTERS",
@@ -1744,7 +1738,7 @@ function defineLexerSpecs(
           const lexResult = ModeLexer.tokenize(input, "letters")
           expect(lexResult.errors).to.be.empty
 
-          const images = map(lexResult.tokens, (currTok) => currTok.image)
+          const images = lexResult.tokens.map((currTok) => currTok.image)
           expect(images).to.deep.equal(["A", "G", "SIGNS", "^"])
         })
 
@@ -1755,7 +1749,7 @@ function defineLexerSpecs(
           expect(lexResult.errors[0].message).to.include("skipped 1")
           expect(lexResult.errors[0].message).to.include(">1<")
 
-          const images = map(lexResult.tokens, (currTok) => currTok.image)
+          const images = lexResult.tokens.map((currTok) => currTok.image)
 
           expect(images).to.deep.equal([
             "1",
@@ -1780,7 +1774,7 @@ function defineLexerSpecs(
 
           expect(lexResult.errors[0].length).to.equal(12)
 
-          const images = map(lexResult.tokens, (currTok) => currTok.image)
+          const images = lexResult.tokens.map((currTok) => currTok.image)
           expect(images).to.deep.equal(["1", "EXIT_NUMBERS", "2"])
         })
 
@@ -1789,7 +1783,7 @@ function defineLexerSpecs(
           const lexResult = ModeLexer.tokenize(input)
           expect(lexResult.errors).to.be.empty
 
-          const images = map(lexResult.tokens, (currTok) => currTok.image)
+          const images = lexResult.tokens.map((currTok) => currTok.image)
           expect(images).to.deep.equal([
             "LETTERS",
             "SIGNS_AND_EXIT_LETTERS",
@@ -2218,7 +2212,7 @@ function wrapWithCustom(baseExtendToken: (c: ITokenConfig) => TokenType) {
 
     const pattern = newToken.PATTERN
     if (
-      isRegExp(pattern) &&
+      pattern instanceof RegExp &&
       !/\\n|\\r|\\s/g.test(pattern.source) &&
       pattern !== Lexer.NA
     ) {

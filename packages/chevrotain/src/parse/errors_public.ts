@@ -1,7 +1,4 @@
 import { hasTokenLabel, tokenLabel } from "../scan/tokens_public"
-import first from "lodash/first"
-import map from "lodash/map"
-import reduce from "lodash/reduce"
 import { Alternation, NonTerminal, Rule, Terminal } from "@chevrotain/gast"
 import { getProductionDslName } from "@chevrotain/gast"
 import {
@@ -39,26 +36,23 @@ export const defaultParserErrorProvider: IParserErrorMessageProvider = {
   }): string {
     const errPrefix = "Expecting: "
     // TODO: issue: No Viable Alternative Error may have incomplete details. #502
-    const actualText = first(actual)!.image
+    const actualText = actual[0]!.image
     const errSuffix = "\nbut found: '" + actualText + "'"
 
     if (customUserDescription) {
       return errPrefix + customUserDescription + errSuffix
     } else {
-      const allLookAheadPaths = reduce(
-        expectedPathsPerAlt,
+      const allLookAheadPaths = expectedPathsPerAlt.reduce(
         (result, currAltPaths) => result.concat(currAltPaths),
         [] as TokenType[][]
       )
-      const nextValidTokenSequences = map(
-        allLookAheadPaths,
+      const nextValidTokenSequences = allLookAheadPaths.map(
         (currPath) =>
-          `[${map(currPath, (currTokenType) => tokenLabel(currTokenType)).join(
-            ", "
-          )}]`
+          `[${currPath
+            .map((currTokenType) => tokenLabel(currTokenType))
+            .join(", ")}]`
       )
-      const nextValidSequenceItems = map(
-        nextValidTokenSequences,
+      const nextValidSequenceItems = nextValidTokenSequences.map(
         (itemMsg, idx) => `  ${idx + 1}. ${itemMsg}`
       )
       const calculatedDescription = `one of these possible Token sequences:\n${nextValidSequenceItems.join(
@@ -77,18 +71,17 @@ export const defaultParserErrorProvider: IParserErrorMessageProvider = {
   }): string {
     const errPrefix = "Expecting: "
     // TODO: issue: No Viable Alternative Error may have incomplete details. #502
-    const actualText = first(actual)!.image
+    const actualText = actual[0]!.image
     const errSuffix = "\nbut found: '" + actualText + "'"
 
     if (customUserDescription) {
       return errPrefix + customUserDescription + errSuffix
     } else {
-      const nextValidTokenSequences = map(
-        expectedIterationPaths,
+      const nextValidTokenSequences = expectedIterationPaths.map(
         (currPath) =>
-          `[${map(currPath, (currTokenType) => tokenLabel(currTokenType)).join(
-            ","
-          )}]`
+          `[${currPath
+            .map((currTokenType) => tokenLabel(currTokenType))
+            .join(",")}]`
       )
       const calculatedDescription =
         `expecting at least one iteration which starts with one of these possible Token sequences::\n  ` +
@@ -137,7 +130,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
       }
 
       const topLevelName = topLevelRule.name
-      const duplicateProd = first(duplicateProds)!
+      const duplicateProd = duplicateProds[0]!
       const index = duplicateProd.idx
       const dslName = getProductionDslName(duplicateProd)
       const extraArgument = getExtraProductionArgument(duplicateProd)
@@ -176,9 +169,9 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
       ambiguityIndices: number[]
       alternation: Alternation
     }): string {
-      const pathMsg = map(options.prefixPath, (currTok) =>
-        tokenLabel(currTok)
-      ).join(", ")
+      const pathMsg = options.prefixPath
+        .map((currTok) => tokenLabel(currTok))
+        .join(", ")
       const occurrence =
         options.alternation.idx === 0 ? "" : options.alternation.idx
       const errMsg =
@@ -199,9 +192,9 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
       ambiguityIndices: number[]
       alternation: Alternation
     }): string {
-      const pathMsg = map(options.prefixPath, (currtok) =>
-        tokenLabel(currtok)
-      ).join(", ")
+      const pathMsg = options.prefixPath
+        .map((currtok) => tokenLabel(currtok))
+        .join(", ")
       const occurrence =
         options.alternation.idx === 0 ? "" : options.alternation.idx
       let currMessage =
@@ -277,8 +270,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
       leftRecursionPath: Rule[]
     }): string {
       const ruleName = options.topLevelRule.name
-      const pathNames = map(
-        options.leftRecursionPath,
+      const pathNames = options.leftRecursionPath.map(
         (currRule) => currRule.name
       )
       const leftRecursivePath = `${ruleName} --> ${pathNames

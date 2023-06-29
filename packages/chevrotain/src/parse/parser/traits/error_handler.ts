@@ -8,8 +8,6 @@ import {
   isRecognitionException,
   NoViableAltException
 } from "../../exceptions_public"
-import has from "lodash/has"
-import clone from "lodash/clone"
 import {
   getLookaheadPathsForOptionalProd,
   getLookaheadPathsForOr,
@@ -27,9 +25,8 @@ export class ErrorHandler {
 
   initErrorHandler(config: IParserConfig) {
     this._errors = []
-    this.errorMessageProvider = has(config, "errorMessageProvider")
-      ? (config.errorMessageProvider as IParserErrorMessageProvider) // assumes end user provides the correct config value/type
-      : DEFAULT_PARSER_CONFIG.errorMessageProvider
+    this.errorMessageProvider =
+      config.errorMessageProvider ?? DEFAULT_PARSER_CONFIG.errorMessageProvider
   }
 
   SAVE_ERROR(
@@ -39,7 +36,7 @@ export class ErrorHandler {
     if (isRecognitionException(error)) {
       error.context = {
         ruleStack: this.getHumanReadableRuleStack(),
-        ruleOccurrenceStack: clone(this.RULE_OCCURRENCE_STACK)
+        ruleOccurrenceStack: this.RULE_OCCURRENCE_STACK.slice()
       }
       this._errors.push(error)
       return error
@@ -49,7 +46,7 @@ export class ErrorHandler {
   }
 
   get errors(): IRecognitionException[] {
-    return clone(this._errors)
+    return this._errors.slice()
   }
 
   set errors(newErrors: IRecognitionException[]) {

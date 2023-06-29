@@ -4,6 +4,7 @@ import {
   DSLMethodOpts,
   DSLMethodOptsWithErr,
   GrammarAction,
+  IMultiModeLexerDefinition,
   IOrAlt,
   IParserConfig,
   IRuleConfig,
@@ -16,16 +17,6 @@ import {
   TokenTypeDictionary,
   TokenVocabulary
 } from "@chevrotain/types"
-import isEmpty from "lodash/isEmpty"
-import isArray from "lodash/isArray"
-import flatten from "lodash/flatten"
-import every from "lodash/every"
-import uniq from "lodash/uniq"
-import isObject from "lodash/isObject"
-import has from "lodash/has"
-import values from "lodash/values"
-import reduce from "lodash/reduce"
-import clone from "lodash/clone"
 import {
   AT_LEAST_ONE_IDX,
   AT_LEAST_ONE_SEP_IDX,
@@ -100,7 +91,7 @@ export class RecognizerEngine {
     this.RULE_OCCURRENCE_STACK = []
     this.gastProductionsCache = {}
 
-    if (has(config, "serializedGrammar")) {
+    if (config.hasOwnProperty("serializedGrammar")) {
       throw Error(
         "The Parser's configuration can no longer contain a <serializedGrammar> property.\n" +
           "\tSee: https://chevrotain.io/docs/changes/BREAKING_CHANGES.html#_6-0-0\n" +
@@ -108,11 +99,11 @@ export class RecognizerEngine {
       )
     }
 
-    if (isArray(tokenVocabulary)) {
+    if (Array.isArray(tokenVocabulary)) {
       // This only checks for Token vocabularies provided as arrays.
       // That is good enough because the main objective is to detect users of pre-V4.0 APIs
       // rather than all edge cases of empty Token vocabularies.
-      if (isEmpty(tokenVocabulary as any[])) {
+      if (tokenVocabulary.length === 0) {
         throw Error(
           "A Token Vocabulary cannot be empty.\n" +
             "\tNote that the first argument for the parser constructor\n" +
@@ -129,31 +120,25 @@ export class RecognizerEngine {
       }
     }
 
-    if (isArray(tokenVocabulary)) {
-      this.tokensMap = reduce(
-        tokenVocabulary,
-        (acc, tokType: TokenType) => {
-          acc[tokType.name] = tokType
-          return acc
-        },
-        {} as { [tokenName: string]: TokenType }
-      )
+    if (Array.isArray(tokenVocabulary)) {
+      this.tokensMap = tokenVocabulary.reduce((acc, tokType: TokenType) => {
+        acc[tokType.name] = tokType
+        return acc
+      }, {} as { [tokenName: string]: TokenType })
     } else if (
-      has(tokenVocabulary, "modes") &&
-      every(flatten(values((<any>tokenVocabulary).modes)), isTokenType)
+      tokenVocabulary.modes !== undefined &&
+      [].concat(...Object.values(tokenVocabulary.modes)).every(isTokenType)
     ) {
-      const allTokenTypes = flatten(values((<any>tokenVocabulary).modes))
-      const uniqueTokens = uniq(allTokenTypes)
-      this.tokensMap = <any>reduce(
-        uniqueTokens,
-        (acc, tokType: TokenType) => {
-          acc[tokType.name] = tokType
-          return acc
-        },
-        {} as { [tokenName: string]: TokenType }
+      const allTokenTypes = ([] as TokenType[]).concat(
+        ...Object.values(tokenVocabulary.modes)
       )
-    } else if (isObject(tokenVocabulary)) {
-      this.tokensMap = clone(tokenVocabulary as TokenTypeDictionary)
+      const uniqueTokens = Array.from(new Set(allTokenTypes))
+      this.tokensMap = uniqueTokens.reduce((acc, tokType: TokenType) => {
+        acc[tokType.name] = tokType
+        return acc
+      }, {} as { [tokenName: string]: TokenType })
+    } else if (typeof tokenVocabulary === "object") {
+      this.tokensMap = Object.assign({}, tokenVocabulary as TokenTypeDictionary)
     } else {
       throw new Error(
         "<tokensDictionary> argument must be An Array of Token constructors," +
@@ -165,11 +150,13 @@ export class RecognizerEngine {
     // parsed with a clear error message ("expecting EOF but found ...")
     this.tokensMap["EOF"] = EOF
 
-    const allTokenTypes = has(tokenVocabulary, "modes")
-      ? flatten(values((<any>tokenVocabulary).modes))
-      : values(tokenVocabulary)
-    const noTokenCategoriesUsed = every(allTokenTypes, (tokenConstructor) =>
-      isEmpty(tokenConstructor.categoryMatches)
+    const allTokenTypes: TokenType[] = tokenVocabulary.hasOwnProperty("modes")
+      ? ([] as TokenType[]).concat(
+          ...Object.values((tokenVocabulary as IMultiModeLexerDefinition).modes)
+        )
+      : Object.values(tokenVocabulary)
+    const noTokenCategoriesUsed = allTokenTypes.every(
+      (tokenConstructor) => !tokenConstructor.categoryMatches?.length
     )
 
     this.tokenMatcher = noTokenCategoriesUsed
@@ -179,7 +166,7 @@ export class RecognizerEngine {
     // Because ES2015+ syntax should be supported for creating Token classes
     // We cannot assume that the Token classes were created using the "extendToken" utilities
     // Therefore we must augment the Token classes both on Lexer initialization and on Parser initialization
-    augmentTokenTypes(values(this.tokensMap))
+    augmentTokenTypes(Object.values(this.tokensMap))
   }
 
   defineRule<ARGS extends unknown[], R>(
@@ -194,12 +181,10 @@ export class RecognizerEngine {
           `Make sure that all grammar rule definitions are done before 'performSelfAnalysis' is called.`
       )
     }
-    const resyncEnabled: boolean = has(config, "resyncEnabled")
-      ? (config.resyncEnabled as boolean) // assumes end user provides the correct config value/type
-      : DEFAULT_RULE_CONFIG.resyncEnabled
-    const recoveryValueFunc = has(config, "recoveryValueFunc")
-      ? (config.recoveryValueFunc as () => R) // assumes end user provides the correct config value/type
-      : DEFAULT_RULE_CONFIG.recoveryValueFunc
+    const resyncEnabled =
+      config.resyncEnabled ?? DEFAULT_RULE_CONFIG.resyncEnabled
+    const recoveryValueFunc =
+      config.recoveryValueFunc ?? DEFAULT_RULE_CONFIG.recoveryValueFunc
 
     // performance optimization: Use small integers as keys for the longer human readable "full" rule names.
     // this greatly improves Map access time (as much as 8% for some performance benchmarks).
@@ -641,7 +626,7 @@ export class RecognizerEngine {
     occurrence: number
   ): T {
     const laKey = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
-    const alts = isArray(altsOrOpts) ? altsOrOpts : altsOrOpts.DEF
+    const alts = Array.isArray(altsOrOpts) ? altsOrOpts : altsOrOpts.DEF
 
     const laFunc = this.getLaFuncFromCache(laKey)
     const altIdxToTake = laFunc.call(this, alts)
@@ -803,7 +788,7 @@ export class RecognizerEngine {
   saveRecogState(this: MixedInParser): IParserState {
     // errors is a getter which will clone the errors array
     const savedErrors = this.errors
-    const savedRuleStack = clone(this.RULE_STACK)
+    const savedRuleStack = this.RULE_STACK.slice()
     return {
       errors: savedErrors,
       lexerState: this.exportLexerState(),
