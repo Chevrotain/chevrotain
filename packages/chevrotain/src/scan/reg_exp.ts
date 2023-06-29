@@ -5,8 +5,6 @@ import {
   Character,
   Disjunction,
   Group,
-  Set,
-  Term,
   Set
 } from "@chevrotain/regexp-to-ast"
 import { PRINT_ERROR, PRINT_WARNING } from "@chevrotain/utils"

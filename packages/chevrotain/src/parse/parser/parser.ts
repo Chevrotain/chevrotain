@@ -229,7 +229,9 @@ export class Parser {
           this.lookaheadStrategy.initialize?.({
             rules: Object.values(this.gastProductionsCache)
           })
-          this.preComputeLookaheadFunctions(Object.values(this.gastProductionsCache))
+          this.preComputeLookaheadFunctions(
+            Object.values(this.gastProductionsCache)
+          )
         })
       }
 

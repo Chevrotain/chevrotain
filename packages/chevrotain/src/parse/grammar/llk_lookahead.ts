@@ -22,11 +22,7 @@ import {
   getProdType
 } from "./lookahead"
 import { IParserDefinitionError } from "./types"
-
-// ES2019 Array.prototype.flatMap
-function flatMap<U, R>(arr: U[], callback: (x: U, idx: number) => R[]): R[] {
-  return Array.prototype.concat.apply([], arr.map(callback))
-}
+import { flatMap } from "../../utils"
 
 export class LLkLookaheadStrategy implements ILookaheadStrategy {
   readonly maxLookahead: number

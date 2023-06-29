@@ -36,8 +36,7 @@
     "@chevrotain/gast": "10.5.0",
     "@chevrotain/types": "10.5.0"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "publishConfig": {
     "access": "public"
   }

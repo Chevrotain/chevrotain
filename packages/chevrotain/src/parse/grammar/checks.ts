@@ -4,7 +4,20 @@ import {
   IParserEmptyAlternativeDefinitionError,
   ParserDefinitionErrorType
 } from "../parser/parser"
-import { getProductionDslName, isOptionalProd } from "@chevrotain/gast"
+import {
+  Alternation,
+  Alternative as AlternativeGAST,
+  GAstVisitor,
+  getProductionDslName,
+  isOptionalProd,
+  NonTerminal,
+  Option,
+  Repetition,
+  RepetitionMandatory,
+  RepetitionMandatoryWithSeparator,
+  RepetitionWithSeparator,
+  Terminal
+} from "@chevrotain/gast"
 import {
   Alternative,
   containsPath,
@@ -15,34 +28,18 @@ import {
 } from "./lookahead"
 import { nextPossibleTokensAfter } from "./interpreter"
 import {
-  Alternation,
-  Alternative as AlternativeGAST,
-  NonTerminal,
-  Option,
-  Repetition,
-  RepetitionMandatory,
-  RepetitionMandatoryWithSeparator,
-  RepetitionWithSeparator,
-  Terminal
-} from "@chevrotain/gast"
-import { GAstVisitor } from "@chevrotain/gast"
-import {
   ILookaheadStrategy,
   IProduction,
   IProductionWithOccurrence,
-  TokenType,
-  Rule
+  Rule,
+  TokenType
 } from "@chevrotain/types"
 import {
   IGrammarValidatorErrorMessageProvider,
   IParserDefinitionError
 } from "./types"
 import { tokenStructuredMatcher } from "../../scan/tokens"
-
-// ES2019 Array.prototype.flatMap
-function flatMap<U, R>(arr: U[], callback: (x: U, idx: number) => R[]): R[] {
-  return Array.prototype.concat.apply([], arr.map(callback))
-}
+import { difference, flatMap, groupBy } from "../../utils"
 
 export function validateLookahead(options: {
   lookaheadStrategy: ILookaheadStrategy
@@ -67,10 +64,9 @@ export function validateGrammar(
   errMsgProvider: IGrammarValidatorErrorMessageProvider,
   grammarName: string
 ): IParserDefinitionError[] {
-  const duplicateErrors = ([] as IParserDefinitionError[]).concat(
-    ...topLevels.map((currTopLevel) =>
-      validateDuplicateProductions(currTopLevel, errMsgProvider)
-    )
+  const duplicateErrors: IParserDefinitionError[] = flatMap(
+    topLevels,
+    (currTopLevel) => validateDuplicateProductions(currTopLevel, errMsgProvider)
   )
 
   const termsNamespaceConflictErrors = checkTerminalAndNoneTerminalsNameSpace(
@@ -107,12 +103,10 @@ function validateDuplicateProductions(
   topLevelRule.accept(collectorVisitor)
   const allRuleProductions = collectorVisitor.allProductions
 
-  const productionsById: Record<string, IProductionWithOccurrence[]> = {}
-  allRuleProductions.forEach((currProd) => {
-    ;(productionsById[identifyProductionForDuplicates(currProd)] ??= []).push(
-      currProd
-    )
-  })
+  const productionsById = groupBy(
+    allRuleProductions,
+    identifyProductionForDuplicates
+  )
 
   const duplicates = Object.values(productionsById).filter(
     (prods) => prods.length > 1
@@ -280,12 +274,9 @@ export function validateNoLeftRecursion(
 
     // we are only looking for cyclic paths leading back to the specific topRule
     // other cyclic paths are ignored, we still need this difference to avoid infinite loops...
-    const pathAndTopRule = path.concat([topRule])
-    const validNextSteps = nextNonTerminals.filter(
-      (currNext) => pathAndTopRule.indexOf(currNext) === -1
-    )
+    const validNextSteps = difference(nextNonTerminals, path.concat([topRule]))
     const errorsFromNextSteps = flatMap(validNextSteps, (currRefRule) => {
-      const newPath = path.slice()
+      const newPath = [...path]
       newPath.push(currRefRule)
       return validateNoLeftRecursion(
         topRule,
@@ -522,11 +513,6 @@ export function validateSomeNonEmptyLookaheadPath(
   })
 
   return errors
-}
-
-export interface IAmbiguityDescriptor {
-  alts: number[]
-  path: TokenType[]
 }
 
 function checkAlternativesAmbiguities(
