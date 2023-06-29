@@ -4,7 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-
 importers:
 
   .:
@@ -175,6 +174,10 @@ importers:
       '@chevrotain/utils':
         specifier: 10.5.0
         version: link:../utils
+      lodash:
+        specifier: 4.17.21
+        version: 4.17.21
+    devDependencies:
       error-stack-parser:
         specifier: 2.1.4
         version: 2.1.4
@@ -3195,7 +3198,6 @@ packages:
     dependencies:
       acorn: 8.8.1
     dev: true
-
 
   /acorn-jsx@5.3.2(acorn@8.8.0):
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -6527,7 +6529,6 @@ packages:
 
   /lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
-    dev: true
 
   /log-symbols@4.1.0:
     resolution: {integrity: sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==}
