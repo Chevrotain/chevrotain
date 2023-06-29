@@ -1,0 +1,46 @@
+{
+  "name": "@chevrotain/regexp-to-ast",
+  "version": "10.5.0",
+  "description": "Parses a Regular Expression and outputs an AST",
+  "keywords": [
+    "regExp",
+    "parser",
+    "regular expression"
+  ],
+  "bugs": {
+    "url": "https://github.com/Chevrotain/chevrotain/issues"
+  },
+  "exports": {
+    ".": "./lib/src/api.js"
+  },
+  "license": "Apache-2.0",
+  "typings": "api.d.ts",
+  "main": "lib/src/api.js",
+  "files": [
+    "src/**/*.ts",
+    "lib/src/**/*.js",
+    "lib/src/**/*.d.ts",
+    "lib/src/**/*.js.map",
+    "api.d.ts"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Chevrotain/chevrotain.git"
+  },
+  "scripts": {
+    "---------- CI FLOWS --------": "",
+    "ci": "pnpm run build test",
+    "build": "npm-run-all clean compile",
+    "test": "npm-run-all coverage",
+    "---------- BUILD STEPS --------": "",
+    "clean": "shx rm -rf lib coverage",
+    "compile:watch": "tsc -w",
+    "compile": "tsc",
+    "coverage": "nyc mocha"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "publishConfig": {
+    "access": "public"
+  }
+}
