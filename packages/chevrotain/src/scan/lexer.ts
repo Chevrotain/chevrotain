@@ -1,4 +1,4 @@
-import { BaseRegExpVisitor } from "regexp-to-ast"
+import { BaseRegExpVisitor } from "@chevrotain/regexp-to-ast"
 import { IRegExpExec, Lexer, LexerDefinitionErrorType } from "./lexer_public"
 import { PRINT_ERROR } from "@chevrotain/utils"
 import {

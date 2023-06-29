@@ -57,7 +57,7 @@ const WhiteSpace = createToken({
 
 ## All Our Tokens
 
-Lets examine all the needed Tokens definitions"
+Lets examine all the needed Tokens definitions:
 
 ```javascript
 const Identifier = createToken({ name: "Identifier", pattern: /[a-zA-Z]\w*/ })

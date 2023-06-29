@@ -7,8 +7,8 @@ import {
   Group,
   Set,
   Term,
-  VERSION
-} from "regexp-to-ast"
+  Set
+} from "@chevrotain/regexp-to-ast"
 import { PRINT_ERROR, PRINT_WARNING } from "@chevrotain/utils"
 import { ASTNode, getRegExpAst } from "./reg_exp_parser"
 import { charCodeToOptimizedIndex, minOptimizationVal } from "./lexer"
@@ -54,8 +54,8 @@ export function getOptimizedStartCodesIndices(
       PRINT_ERROR(
         `${failedOptimizationPrefixMsg}\n` +
           `\tFailed parsing: < ${regExp.toString()} >\n` +
-          `\tUsing the regexp-to-ast library version: ${VERSION}\n` +
-          "\tPlease open an issue at: https://github.com/bd82/regexp-to-ast/issues" +
+          `\tUsing the @chevrotain/regexp-to-ast library\n` +
+          "\tPlease open an issue at: https://github.com/chevrotain/chevrotain/issues" +
           msgSuffix
       )
     }
