@@ -10,6 +10,7 @@ import {
 import { PRINT_ERROR, PRINT_WARNING } from "@chevrotain/utils"
 import { ASTNode, getRegExpAst } from "./reg_exp_parser"
 import { charCodeToOptimizedIndex, minOptimizationVal } from "./lexer"
+import { includes } from "../utils"
 
 const complementErrorMessage =
   "Complement Sets are not supported for first char optimization"
@@ -78,7 +79,7 @@ export function firstCharOptimizedIndices(
       for (let i = 0; i < terms.length; i++) {
         const term = terms[i]
 
-        // skip terms that cannot effect the first char results
+        // skip terms that cannot affect the first char results
         switch (term.type) {
           case "EndAnchor":
           // A group back reference cannot affect potential starting char.
@@ -218,7 +219,7 @@ function handleIgnoreCase(
 function findCode(setNode: Set, targetCharCodes: number[]) {
   return setNode.value.find((codeOrRange) => {
     if (typeof codeOrRange === "number") {
-      return targetCharCodes.indexOf(codeOrRange) !== -1
+      return includes(targetCharCodes, codeOrRange)
     } else {
       // range
       const range = <any>codeOrRange
@@ -272,7 +273,7 @@ class CharCodeFinder extends BaseRegExpVisitor {
   }
 
   visitCharacter(node: Character) {
-    if (this.targetCharCodes.indexOf(node.value) !== -1) {
+    if (includes(this.targetCharCodes, node.value)) {
       this.found = true
     }
   }

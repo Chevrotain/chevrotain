@@ -17,6 +17,7 @@ import { MismatchedTokenException } from "../../exceptions_public"
 import { IN } from "../../constants"
 import { MixedInParser } from "./parser_traits"
 import { DEFAULT_PARSER_CONFIG } from "../parser"
+import { includes, isEmpty } from "../../../utils"
 
 export const EOF_FOLLOW_KEY: any = {}
 
@@ -231,7 +232,7 @@ export class Recoverable {
     }
 
     // must know the possible following tokens to perform single token insertion
-    if (follows.length === 0) {
+    if (isEmpty(follows)) {
       return false
     }
 
@@ -265,7 +266,7 @@ export class Recoverable {
   ): boolean {
     const followKey = this.getCurrFollowKey()
     const currentRuleReSyncSet = this.getFollowSetFromFollowKey(followKey)
-    return currentRuleReSyncSet.indexOf(tokenTypeIdx) !== -1
+    return includes(currentRuleReSyncSet, tokenTypeIdx)
   }
 
   findReSyncTokenType(this: MixedInParser): TokenType {

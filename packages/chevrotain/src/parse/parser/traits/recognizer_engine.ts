@@ -52,6 +52,7 @@ import {
 } from "../../../scan/tokens"
 import { Rule } from "@chevrotain/gast"
 import { ParserMethodInternal } from "../types"
+import { isEmpty } from "../../../utils"
 
 /**
  * This trait is responsible for the runtime parsing engine
@@ -103,7 +104,7 @@ export class RecognizerEngine {
       // This only checks for Token vocabularies provided as arrays.
       // That is good enough because the main objective is to detect users of pre-V4.0 APIs
       // rather than all edge cases of empty Token vocabularies.
-      if (tokenVocabulary.length === 0) {
+      if (isEmpty(tokenVocabulary)) {
         throw Error(
           "A Token Vocabulary cannot be empty.\n" +
             "\tNote that the first argument for the parser constructor\n" +
@@ -647,7 +648,7 @@ export class RecognizerEngine {
     // NOOP when cst is disabled
     this.cstFinallyStateUpdate()
 
-    if (this.RULE_STACK.length === 0 && this.isAtEndOfInput() === false) {
+    if (isEmpty(this.RULE_STACK) && this.isAtEndOfInput() === false) {
       const firstRedundantTok = this.LA(1)
       const errMsg = this.errorMessageProvider.buildNotAllInputParsedMessage({
         firstRedundant: firstRedundantTok,

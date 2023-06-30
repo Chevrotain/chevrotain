@@ -3,6 +3,7 @@ import {
   IRecognitionException,
   IRecognizerContext
 } from "@chevrotain/types"
+import { includes } from "../utils"
 
 const MISMATCHED_TOKEN_EXCEPTION = "MismatchedTokenException"
 const NO_VIABLE_ALT_EXCEPTION = "NoViableAltException"
@@ -21,7 +22,7 @@ Object.freeze(RECOGNITION_EXCEPTION_NAMES)
 // hacks to bypass no support for custom Errors in javascript/typescript
 export function isRecognitionException(error: Error) {
   // can't do instanceof on hacked custom js exceptions
-  return RECOGNITION_EXCEPTION_NAMES.indexOf(error.name) !== -1
+  return includes(RECOGNITION_EXCEPTION_NAMES, error.name)
 }
 
 abstract class RecognitionException

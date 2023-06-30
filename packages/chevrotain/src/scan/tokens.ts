@@ -1,4 +1,5 @@
 import { IToken, TokenType } from "@chevrotain/types"
+import { isEmpty } from "../utils"
 
 export function tokenStructuredMatcher(
   tokInstance: IToken,
@@ -57,7 +58,7 @@ export function expandCategories(tokenTypes: TokenType[]): TokenType[] {
 
     result = result.concat(newCategories)
 
-    if (newCategories.length === 0) {
+    if (isEmpty(newCategories)) {
       searching = false
     } else {
       categories = newCategories

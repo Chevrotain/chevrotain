@@ -25,6 +25,7 @@ import {
   TokenType,
   BaseParser
 } from "@chevrotain/types"
+import { isEmpty } from "../../utils"
 
 export enum PROD_TYPE {
   OPTION,
@@ -288,7 +289,7 @@ export function buildSingleAlternativeLookaheadFunction(
 
     if (
       singleTokensTypes.length === 1 &&
-      singleTokensTypes[0].categoryMatches!.length === 0
+      isEmpty(singleTokensTypes[0].categoryMatches)
     ) {
       const expectedTokenType = singleTokensTypes[0]
       const expectedTokenUniqueKey = (<any>expectedTokenType).tokenTypeIdx
@@ -594,7 +595,7 @@ export function lookAheadSequenceFromAlternatives(
         const prefixKeys = pathToHashKeys(currPathPrefix)
         const isUnique = isUniquePrefixHash(altsHashes, prefixKeys, altIdx)
         // End of the line for this path.
-        if (isUnique || suffixDef.length === 0 || currPathPrefix.length === k) {
+        if (isUnique || isEmpty(suffixDef) || currPathPrefix.length === k) {
           const currAltResult = finalResult[altIdx]
           // TODO: Can we implement a containsPath using Maps/Dictionaries?
           if (containsPath(currAltResult, currPathPrefix) === false) {
@@ -718,7 +719,7 @@ export function areTokenCategoriesNotUsed(
 ): boolean {
   return lookAheadPaths.every((singleAltPaths) =>
     singleAltPaths.every((singlePath) =>
-      singlePath.every((token) => token.categoryMatches!.length === 0)
+      singlePath.every((token) => isEmpty(token.categoryMatches))
     )
   )
 }

@@ -40,3 +40,14 @@ export function difference<T>(arrA: T[], arrB: T[]): T[] {
 
   return arrA.filter((val) => arrB.indexOf(val) === -1)
 }
+
+export function isEmpty<T>(arr: T[] | undefined): boolean {
+  return arr?.length === 0
+}
+
+export function includes<T>(arr: T[], target: T): boolean {
+  if (!Array.isArray(arr)) {
+    return false
+  }
+  return arr.indexOf(target) !== -1
+}

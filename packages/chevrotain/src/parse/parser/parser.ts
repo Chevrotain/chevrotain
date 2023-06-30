@@ -35,6 +35,7 @@ import { IParserDefinitionError } from "../grammar/types"
 import { Rule } from "@chevrotain/gast"
 import { IParserConfigInternal, ParserMethodInternal } from "./types"
 import { validateLookahead } from "../grammar/checks"
+import { isEmpty } from "../../utils"
 
 export const END_OF_FILE = createTokenInstance(
   EOF,
@@ -193,7 +194,7 @@ export class Parser {
       this.TRACE_INIT("Grammar Validations", () => {
         // only perform additional grammar validations IFF no resolving errors have occurred.
         // as unresolved grammar may lead to unhandled runtime exceptions in the follow up validations.
-        if (resolverErrors.length === 0 && this.skipValidations === false) {
+        if (isEmpty(resolverErrors) && this.skipValidations === false) {
           const validationErrors = validateGrammar({
             rules: Object.values(this.gastProductionsCache),
             tokenTypes: Object.values(this.tokensMap),
@@ -214,7 +215,7 @@ export class Parser {
       })
 
       // this analysis may fail if the grammar is not perfectly valid
-      if (this.definitionErrors.length === 0) {
+      if (isEmpty(this.definitionErrors)) {
         // The results of these computations are not needed unless error recovery is enabled.
         if (this.recoveryEnabled) {
           this.TRACE_INIT("computeAllProdsFollows", () => {

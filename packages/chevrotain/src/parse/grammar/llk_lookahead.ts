@@ -22,7 +22,7 @@ import {
   getProdType
 } from "./lookahead"
 import { IParserDefinitionError } from "./types"
-import { flatMap } from "../../utils"
+import { flatMap, isEmpty } from "../../utils"
 
 export class LLkLookaheadStrategy implements ILookaheadStrategy {
   readonly maxLookahead: number
@@ -39,7 +39,7 @@ export class LLkLookaheadStrategy implements ILookaheadStrategy {
   }): ILookaheadValidationError[] {
     const leftRecursionErrors = this.validateNoLeftRecursion(options.rules)
 
-    if (leftRecursionErrors.length === 0) {
+    if (isEmpty(leftRecursionErrors)) {
       const emptyAltErrors = this.validateEmptyOrAlternatives(options.rules)
       const ambiguousAltsErrors = this.validateAmbiguousAlternationAlternatives(
         options.rules,

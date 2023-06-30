@@ -14,6 +14,7 @@ import {
   TokenType
 } from "@chevrotain/types"
 import { getRegExpAst } from "./reg_exp_parser"
+import { isEmpty } from "../utils"
 
 const PATTERN = "PATTERN"
 export const DEFAULT_MODE = "defaultMode"
@@ -319,7 +320,7 @@ export function analyzeTokenTypes(
               /* istanbul ignore if */
               // start code will only be empty given an empty regExp or failure of regexp-to-ast library
               // the first should be a different validation and the second cannot be tested.
-              if (optimizedCodes.length === 0) {
+              if (isEmpty(optimizedCodes)) {
                 // we cannot understand what codes may start possible matches
                 // The optimization correctness requires knowing start codes for ALL patterns.
                 // Not actually sure this is an error, no debug message
@@ -1127,7 +1128,7 @@ export function charCodeToOptimizedIndex(charCode: number): number {
  * TODO: Perhaps it should be lazy initialized only if a charCode > 255 is used.
  */
 function initCharCodeToOptimizedIndexMap() {
-  if (charCodeToOptimizedIdxMap.length === 0) {
+  if (isEmpty(charCodeToOptimizedIdxMap)) {
     charCodeToOptimizedIdxMap = new Array(65536)
     for (let i = 0; i < 65536; i++) {
       charCodeToOptimizedIdxMap[i] = i > 255 ? 255 + ~~(i / 255) : i

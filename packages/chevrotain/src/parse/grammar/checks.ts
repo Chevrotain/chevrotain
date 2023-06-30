@@ -39,7 +39,7 @@ import {
   IParserDefinitionError
 } from "./types"
 import { tokenStructuredMatcher } from "../../scan/tokens"
-import { difference, flatMap, groupBy } from "../../utils"
+import { difference, flatMap, groupBy, includes, isEmpty } from "../../utils"
 
 export function validateLookahead(options: {
   lookaheadStrategy: ILookaheadStrategy
@@ -256,11 +256,11 @@ export function validateNoLeftRecursion(
 ): IParserDefinitionError[] {
   const errors: IParserDefinitionError[] = []
   const nextNonTerminals = getFirstNoneTerminal(currRule.definition)
-  if (nextNonTerminals.length === 0) {
+  if (isEmpty(nextNonTerminals)) {
     return []
   } else {
     const ruleName = topRule.name
-    const foundLeftRecursion = nextNonTerminals.indexOf(topRule) !== -1
+    const foundLeftRecursion = includes(nextNonTerminals, topRule)
     if (foundLeftRecursion) {
       errors.push({
         message: errMsgProvider.buildLeftRecursionError({
@@ -292,7 +292,7 @@ export function validateNoLeftRecursion(
 
 export function getFirstNoneTerminal(definition: IProduction[]): Rule[] {
   let result: Rule[] = []
-  if (definition.length === 0) {
+  if (isEmpty(definition)) {
     return result
   }
   const firstProd = definition[0]
@@ -359,7 +359,7 @@ export function validateEmptyOrAlternative(
           tokenStructuredMatcher,
           1
         )
-        if (possibleFirstInAlt.length === 0) {
+        if (isEmpty(possibleFirstInAlt)) {
           return [
             {
               message: errMsgProvider.buildEmptyAlternationError({
@@ -498,7 +498,7 @@ export function validateSomeNonEmptyLookaheadPath(
         actualMaxLookahead
       )
       const pathsInsideProduction = paths[0]
-      if (pathsInsideProduction.every((path) => path.length === 0)) {
+      if (pathsInsideProduction.every((path) => isEmpty(path))) {
         const errMsg = errMsgProvider.buildEmptyRepetitionError({
           topLevelRule: currTopRule,
           repetition: currProd
@@ -658,7 +658,7 @@ function checkTerminalAndNoneTerminalsNameSpace(
 
   topLevels.forEach((currRule) => {
     const currRuleName = currRule.name
-    if (tokenNames.indexOf(currRuleName) !== -1) {
+    if (includes(tokenNames, currRuleName)) {
       const errMsg = errMsgProvider.buildNamespaceConflictError(currRule)
 
       errors.push({

@@ -25,6 +25,7 @@ import {
 } from "@chevrotain/types"
 import { defaultLexerErrorProvider } from "./lexer_errors_public"
 import { clearRegExpParserCache } from "./reg_exp_parser"
+import { isEmpty } from "../utils"
 
 export interface ILexingResult {
   tokens: IToken[]
@@ -225,7 +226,7 @@ export class Lexer {
             // If definition errors were encountered, the analysis phase may fail unexpectedly/
             // Considering a lexer with definition errors may never be used, there is no point
             // to performing the analysis anyhow...
-            if (this.lexerDefinitionErrors.length === 0) {
+            if (isEmpty(this.lexerDefinitionErrors)) {
               augmentTokenTypes(currModDef)
 
               let currAnalyzeResult!: IAnalyzeResult

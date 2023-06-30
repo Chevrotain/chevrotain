@@ -21,6 +21,7 @@ import { MixedInParser } from "./parser_traits"
 import { Rule, serializeGrammar } from "@chevrotain/gast"
 import { IParserDefinitionError } from "../../grammar/types"
 import { ParserMethodInternal } from "../types"
+import { includes } from "../../../utils"
 
 /**
  * This trait is responsible for implementing the public API
@@ -641,7 +642,7 @@ export class RecognizerApi {
     implementation: (...implArgs: any[]) => T,
     config: IRuleConfig<T> = DEFAULT_RULE_CONFIG
   ): (idxInCallingRule?: number, ...args: any[]) => T | any {
-    if (this.definedRulesNames.indexOf(name) !== -1) {
+    if (includes(this.definedRulesNames, name)) {
       const errMsg =
         defaultGrammarValidatorErrorProvider.buildDuplicateRuleNameError({
           topLevelRule: name,

@@ -21,6 +21,7 @@ import {
   ITokenGrammarPath,
   TokenType
 } from "@chevrotain/types"
+import { isEmpty } from "../../utils"
 
 export abstract class AbstractNextPossibleTokensWalker extends RestWalker {
   protected possibleTokTypes: TokenType[] = []
@@ -85,7 +86,7 @@ export abstract class AbstractNextPossibleTokensWalker extends RestWalker {
 
   updateExpectedNext(): void {
     // need to consume the Terminal
-    if (this.ruleStack.length === 0) {
+    if (isEmpty(this.ruleStack)) {
       // must reset nextProductionXXX to avoid walking down another Top Level production while what we are
       // really seeking is the last Terminal...
       this.nextProductionName = ""
@@ -126,8 +127,6 @@ export class NextAfterTokenWalker extends AbstractNextPossibleTokensWalker {
     }
   }
 }
-
-export type AlternativesFirstTokens = TokenType[][]
 
 export interface IFirstAfterRepetition {
   token: TokenType | undefined
@@ -392,7 +391,7 @@ export function nextPossibleTokensAfter(
     const currOccurrenceStack = currPath.occurrenceStack
 
     // For Example: an empty path could exist in a valid grammar in the case of an EMPTY_ALT
-    if (currDef.length === 0) {
+    if (isEmpty(currDef)) {
       continue
     }
 
