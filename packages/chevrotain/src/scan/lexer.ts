@@ -14,7 +14,7 @@ import {
   TokenType
 } from "@chevrotain/types"
 import { getRegExpAst } from "./reg_exp_parser"
-import { isEmpty } from "../utils"
+import { includes, isEmpty } from "../utils"
 
 const PATTERN = "PATTERN"
 export const DEFAULT_MODE = "defaultMode"
@@ -429,7 +429,7 @@ export function findMissingPatterns(
   })
 
   const valid = tokenTypes.filter(
-    (currType) => tokenTypesWithMissingPattern.indexOf(currType) === -1
+    (currType) => !includes(tokenTypesWithMissingPattern, currType)
   )
   return { errors, valid }
 }
@@ -460,7 +460,7 @@ export function findInvalidPatterns(
   })
 
   const valid = tokenTypes.filter(
-    (currType) => tokenTypesWithInvalidPattern.indexOf(currType) === -1
+    (currType) => !includes(tokenTypesWithInvalidPattern, currType)
   )
   return { errors, valid }
 }
@@ -609,7 +609,7 @@ export function findDuplicatePatterns(
     return tokenTypes.reduce((result, innerType) => {
       if (
         outerType.PATTERN.source === (innerType.PATTERN as RegExp).source &&
-        found.indexOf(innerType) === -1 &&
+        !includes(found, innerType) &&
         innerType.PATTERN !== Lexer.NA
       ) {
         // this avoids duplicates in the result, each Token Type may only appear in one "set"
@@ -682,8 +682,7 @@ export function findModesThatDoNotExist(
 ): ILexerDefinitionError[] {
   const invalidModes = tokenTypes.filter((clazz: any) => {
     return (
-      clazz.PUSH_MODE !== undefined &&
-      validModes.indexOf(clazz.PUSH_MODE) === -1
+      clazz.PUSH_MODE !== undefined && !includes(validModes, clazz.PUSH_MODE)
     )
   })
 
@@ -855,7 +854,7 @@ export function performRuntimeChecks(
             longerAlt.forEach((currLongerAlt) => {
               if (
                 currLongerAlt !== undefined &&
-                currModeValue.indexOf(currLongerAlt) === -1
+                !includes(currModeValue, currLongerAlt)
               ) {
                 errors.push({
                   message: `A MultiMode Lexer cannot be initialized with a longer_alt <${currLongerAlt.name}> on token <${currTokType.name}> outside of mode <${currModeName}>\n`,

@@ -1,5 +1,5 @@
 import { IToken, TokenType } from "@chevrotain/types"
-import { isEmpty } from "../utils"
+import { includes, isEmpty } from "../utils"
 
 export function tokenStructuredMatcher(
   tokInstance: IToken,
@@ -54,7 +54,7 @@ export function expandCategories(tokenTypes: TokenType[]): TokenType[] {
       .concat(...categories.map((currTokType) => currTokType.CATEGORIES))
       .filter((cat) => cat !== undefined) as TokenType[]
 
-    const newCategories = categories.filter((cat) => result.indexOf(cat) === -1)
+    const newCategories = categories.filter((cat) => !includes(result, cat))
 
     result = result.concat(newCategories)
 
@@ -127,7 +127,7 @@ export function singleAssignCategoriesToksMap(
   nextNode.CATEGORIES?.forEach((nextCategory) => {
     const newPath = path.concat(nextNode)
     // avoids infinite loops due to cyclic categories.
-    if (newPath.indexOf(nextCategory) === -1) {
+    if (!includes(newPath, nextCategory)) {
       singleAssignCategoriesToksMap(newPath, nextCategory)
     }
   })

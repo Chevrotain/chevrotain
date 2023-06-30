@@ -114,6 +114,7 @@ function validateDuplicateProductions(
 
   const errors = duplicates.map(
     (currDuplicates: IProductionWithOccurrence[]) => {
+      // TODO: should `first` / `last` be implemented?
       const firstProd = currDuplicates[0]
       const msg = errMsgProvider.buildDuplicateFoundError(
         topLevelRule,
@@ -234,7 +235,7 @@ export function validateRuleIsOverridden(
   const errors = []
   let errMsg
 
-  if (definedRulesNames.indexOf(ruleName) === -1) {
+  if (!includes(definedRulesNames, ruleName)) {
     errMsg =
       `Invalid rule override, rule: ->${ruleName}<- cannot be overridden in the grammar: ->${className}<-` +
       `as it is not defined in any of the super grammars `
