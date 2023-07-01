@@ -12,7 +12,7 @@ import {
   RET_TYPE,
   SemiColonTok
 } from "./backtracking_parser"
-import flatten from "lodash/flatten"
+import { flatten } from "@chevrotain/utils"
 import { createRegularToken } from "../../utils/matchers"
 
 describe("Simple backtracking example", () => {

@@ -2,4 +2,4 @@ export { PRINT_WARNING, PRINT_ERROR } from "./print"
 export { timer } from "./timer"
 export { toFastProperties } from "./to-fast-properties"
 
-export { first } from "./library"
+export { first, flatten } from "./library"

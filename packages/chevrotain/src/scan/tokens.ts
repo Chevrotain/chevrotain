@@ -1,6 +1,6 @@
 import isEmpty from "just-is-empty"
 import compact from "just-compact"
-import flatten from "lodash/flatten"
+import { flatten } from "@chevrotain/utils"
 import difference from "lodash/difference"
 import map from "lodash/map"
 import forEach from "lodash/forEach"

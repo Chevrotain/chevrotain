@@ -1,4 +1,4 @@
-import flatten from "lodash/flatten"
+import { flatten } from "@chevrotain/utils"
 import uniq from "lodash/uniq"
 import map from "lodash/map"
 import { NonTerminal, Terminal } from "@chevrotain/gast"

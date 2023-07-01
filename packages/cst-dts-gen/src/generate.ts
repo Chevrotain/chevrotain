@@ -1,4 +1,4 @@
-import flatten from "lodash/flatten"
+import { flatten } from "@chevrotain/utils"
 import map from "lodash/map"
 import reduce from "lodash/reduce"
 import uniq from "lodash/uniq"

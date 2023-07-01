@@ -1,5 +1,5 @@
 import { Lexer } from "../../src/scan/lexer_public"
-import flatten from "lodash/flatten"
+import { flatten } from "@chevrotain/utils"
 import find from "lodash/find"
 import { expect } from "chai"
 import { SinonSpy } from "sinon/index"

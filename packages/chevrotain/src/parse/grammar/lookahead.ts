@@ -1,5 +1,5 @@
 import isEmpty from "just-is-empty"
-import flatten from "lodash/flatten"
+import { flatten } from "@chevrotain/utils"
 import every from "lodash/every"
 import map from "lodash/map"
 import forEach from "lodash/forEach"

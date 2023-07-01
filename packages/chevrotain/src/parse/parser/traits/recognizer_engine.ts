@@ -17,7 +17,7 @@ import {
   TokenVocabulary
 } from "@chevrotain/types"
 import isEmpty from "just-is-empty"
-import flatten from "lodash/flatten"
+import { flatten } from "@chevrotain/utils"
 import every from "lodash/every"
 import uniq from "lodash/uniq"
 import isObject from "lodash/isObject"

@@ -175,7 +175,7 @@ importers:
         specifier: 10.5.0
         version: link:../utils
       just-compact:
-        specifier: ^3.2.0
+        specifier: 3.2.0
         version: 3.2.0
       just-is-empty:
         specifier: 3.4.1
@@ -229,6 +229,9 @@ importers:
       '@chevrotain/types':
         specifier: 10.5.0
         version: link:../types
+      '@chevrotain/utils':
+        specifier: 10.5.0
+        version: link:../utils
       lodash:
         specifier: 4.17.21
         version: 4.17.21

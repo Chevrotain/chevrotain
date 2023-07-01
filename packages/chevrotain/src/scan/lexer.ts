@@ -4,7 +4,7 @@ import { first } from "@chevrotain/utils"
 import isEmpty from "just-is-empty"
 import compact from "just-compact"
 import values from "lodash/values"
-import flatten from "lodash/flatten"
+import { flatten } from "@chevrotain/utils"
 import reject from "lodash/reject"
 import difference from "lodash/difference"
 import indexOf from "lodash/indexOf"
@@ -910,7 +910,9 @@ export function performWarningRuntimeChecks(
 ): ILexerDefinitionError[] {
   const warnings = []
   let hasAnyLineBreak = false
-  const allTokenTypes = compact(flatten(values(lexerDefinition.modes)))
+  const modesValues = values(lexerDefinition.modes)
+  const flatValues = flatten(modesValues)
+  const allTokenTypes = compact(flatValues)
 
   const concreteTokenTypes = reject(
     allTokenTypes,

@@ -9,7 +9,7 @@ import {
 } from "../../grammar/interpreter"
 import isEmpty from "just-is-empty"
 import dropRight from "lodash/dropRight"
-import flatten from "lodash/flatten"
+import { flatten } from "@chevrotain/utils"
 import map from "lodash/map"
 import find from "lodash/find"
 import has from "lodash/has"

@@ -38,6 +38,8 @@
     "compile": "tsc",
     "coverage": "nyc mocha"
   },
+  "dependencies": {},
+  "devDependencies": {},
   "publishConfig": {
     "access": "public"
   }
