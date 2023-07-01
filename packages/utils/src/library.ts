@@ -1,3 +1,5 @@
+import justValues from "just-values"
+
 // TODO: should this be tested or is it too trivial?
 export function first<T>(arr: T[]): T {
   return arr?.[0]
@@ -30,4 +32,14 @@ export function flatten<T>(rootArr: MaybeOneLevelNestedArray<T>): T[] {
     }
   }
   return result
+}
+
+export function values<K extends string | number | symbol, V>(
+  obj: Record<K, V> | undefined
+): V[] {
+  if (!obj) {
+    return []
+  } else {
+    return justValues(obj)
+  }
 }

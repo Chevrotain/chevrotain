@@ -38,7 +38,9 @@
     "compile": "tsc",
     "coverage": "nyc mocha"
   },
-  "dependencies": {},
+  "dependencies": {
+    "just-values": "2.2.0"
+  },
   "devDependencies": {},
   "publishConfig": {
     "access": "public"

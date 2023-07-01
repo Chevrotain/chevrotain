@@ -4,6 +4,7 @@ import {
   DSLMethodOpts,
   DSLMethodOptsWithErr,
   GrammarAction,
+  IMultiModeLexerDefinition,
   IOrAlt,
   IParserConfig,
   IRuleConfig,
@@ -22,7 +23,7 @@ import every from "lodash/every"
 import uniq from "lodash/uniq"
 import isObject from "lodash/isObject"
 import has from "lodash/has"
-import values from "lodash/values"
+import { values } from "@chevrotain/utils"
 import reduce from "lodash/reduce"
 import clone from "lodash/clone"
 import {
@@ -141,7 +142,10 @@ export class RecognizerEngine {
       has(tokenVocabulary, "modes") &&
       every(flatten(values((<any>tokenVocabulary).modes)), isTokenType)
     ) {
-      const allTokenTypes = flatten(values((<any>tokenVocabulary).modes))
+      const allModes = values(
+        (tokenVocabulary as IMultiModeLexerDefinition).modes
+      )
+      const allTokenTypes = flatten(allModes) as TokenType[]
       const uniqueTokens = uniq(allTokenTypes)
       this.tokensMap = <any>reduce(
         uniqueTokens,
@@ -164,9 +168,11 @@ export class RecognizerEngine {
     // parsed with a clear error message ("expecting EOF but found ...")
     this.tokensMap["EOF"] = EOF
 
-    const allTokenTypes = has(tokenVocabulary, "modes")
-      ? flatten(values((<any>tokenVocabulary).modes))
-      : values(tokenVocabulary)
+    const allTokenTypes = (
+      has(tokenVocabulary, "modes")
+        ? flatten(values((<any>tokenVocabulary).modes))
+        : values(tokenVocabulary as IMultiModeLexerDefinition)
+    ) as TokenType[]
     const noTokenCategoriesUsed = every(allTokenTypes, (tokenConstructor) =>
       isEmpty(tokenConstructor.categoryMatches)
     )

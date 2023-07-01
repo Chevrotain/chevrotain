@@ -10,7 +10,7 @@ import {
 import every from "lodash/every"
 import forEach from "lodash/forEach"
 import find from "lodash/find"
-import values from "lodash/values"
+import { values } from "@chevrotain/utils"
 import includes from "lodash/includes"
 import { PRINT_ERROR, PRINT_WARNING } from "@chevrotain/utils"
 import { ASTNode, getRegExpAst } from "./reg_exp_parser"

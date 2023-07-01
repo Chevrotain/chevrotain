@@ -1,7 +1,7 @@
 import isEmpty from "just-is-empty"
 import map from "lodash/map"
 import forEach from "lodash/forEach"
-import values from "lodash/values"
+import { values } from "@chevrotain/utils"
 import has from "lodash/has"
 import clone from "lodash/clone"
 import { toFastProperties } from "@chevrotain/utils"

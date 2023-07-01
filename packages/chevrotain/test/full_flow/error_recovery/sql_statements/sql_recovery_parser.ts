@@ -5,7 +5,7 @@
  * INSERT (32, "SHAHAR") INTO schema2.Persons
  * DELETE (31, "SHAHAR") FROM schema2.Persons
  */
-import values from "lodash/values"
+import { values } from "@chevrotain/utils"
 import { EmbeddedActionsParser } from "../../../../src/parse/parser/traits/parser_traits"
 import * as allTokens from "./sql_recovery_tokens"
 import {

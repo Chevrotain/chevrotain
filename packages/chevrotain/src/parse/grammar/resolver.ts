@@ -3,7 +3,7 @@ import {
   ParserDefinitionErrorType
 } from "../parser/parser"
 import forEach from "lodash/forEach"
-import values from "lodash/values"
+import { values } from "@chevrotain/utils"
 import { NonTerminal, Rule } from "@chevrotain/gast"
 import { GAstVisitor } from "@chevrotain/gast"
 import {

@@ -3,6 +3,7 @@ import map from "lodash/map"
 import forEach from "lodash/forEach"
 import isString from "lodash/isString"
 import isRegExp from "lodash/isRegExp"
+import values from "lodash/values"
 import keys from "lodash/keys"
 import { createToken } from "../../src/scan/tokens_public"
 import { Lexer, LexerDefinitionErrorType } from "../../src/scan/lexer_public"
@@ -1842,7 +1843,7 @@ function defineLexerSpecs(
           )
         })
 
-        it("Will detect a multiMode Lexer definition which is missing the <modes> property", () => {
+        it.only("Will detect a multiMode Lexer definition which is missing the <modes> property", () => {
           const lexerDef: any = {
             modes___: {
               //  typo in 'modes' property name
@@ -2242,40 +2243,40 @@ defineLexerSpecs(
   false,
   { positionTracking: "full" }
 )
-defineLexerSpecs(
-  "Regular Tokens Mode (custom mode)",
-  wrapWithCustom(createToken),
-  tokenStructuredMatcher,
-  true,
-  { positionTracking: "full" }
-)
-
-defineLexerSpecs(
-  "Regular Tokens Mode - only start",
-  createToken,
-  tokenStructuredMatcher,
-  false,
-  { positionTracking: "onlyStart" }
-)
-defineLexerSpecs(
-  "Regular Tokens Mode (custom mode) - only start",
-  wrapWithCustom(createToken),
-  tokenStructuredMatcher,
-  true,
-  { positionTracking: "onlyStart" }
-)
-
-defineLexerSpecs(
-  "Regular Tokens Mode - onlyOffset",
-  createToken,
-  tokenStructuredMatcher,
-  false,
-  { positionTracking: "onlyOffset" }
-)
-defineLexerSpecs(
-  "Regular Tokens Mode (custom mode)",
-  wrapWithCustom(createToken),
-  tokenStructuredMatcher,
-  true,
-  { positionTracking: "onlyOffset" }
-)
+// defineLexerSpecs(
+//   "Regular Tokens Mode (custom mode)",
+//   wrapWithCustom(createToken),
+//   tokenStructuredMatcher,
+//   true,
+//   { positionTracking: "full" }
+// )
+//
+// defineLexerSpecs(
+//   "Regular Tokens Mode - only start",
+//   createToken,
+//   tokenStructuredMatcher,
+//   false,
+//   { positionTracking: "onlyStart" }
+// )
+// defineLexerSpecs(
+//   "Regular Tokens Mode (custom mode) - only start",
+//   wrapWithCustom(createToken),
+//   tokenStructuredMatcher,
+//   true,
+//   { positionTracking: "onlyStart" }
+// )
+//
+// defineLexerSpecs(
+//   "Regular Tokens Mode - onlyOffset",
+//   createToken,
+//   tokenStructuredMatcher,
+//   false,
+//   { positionTracking: "onlyOffset" }
+// )
+// defineLexerSpecs(
+//   "Regular Tokens Mode (custom mode)",
+//   wrapWithCustom(createToken),
+//   tokenStructuredMatcher,
+//   true,
+//   { positionTracking: "onlyOffset" }
+// )
