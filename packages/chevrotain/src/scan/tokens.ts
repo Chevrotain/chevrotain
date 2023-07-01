@@ -1,4 +1,4 @@
-import isEmpty from "lodash/isEmpty"
+import isEmpty from "just-is-empty"
 import compact from "lodash/compact"
 import isArray from "lodash/isArray"
 import flatten from "lodash/flatten"

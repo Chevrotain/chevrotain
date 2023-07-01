@@ -7,7 +7,7 @@ import {
   AbstractNextTerminalAfterProductionWalker,
   IFirstAfterRepetition
 } from "../../grammar/interpreter"
-import isEmpty from "lodash/isEmpty"
+import isEmpty from "just-is-empty"
 import dropRight from "lodash/dropRight"
 import flatten from "lodash/flatten"
 import map from "lodash/map"

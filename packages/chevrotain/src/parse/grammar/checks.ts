@@ -1,5 +1,5 @@
 import first from "lodash/first"
-import isEmpty from "lodash/isEmpty"
+import isEmpty from "just-is-empty"
 import drop from "lodash/drop"
 import flatten from "lodash/flatten"
 import filter from "lodash/filter"

@@ -1,6 +1,6 @@
 import { RestWalker } from "./rest"
 import _first from "lodash/first"
-import isEmpty from "lodash/isEmpty"
+import isEmpty from "just-is-empty"
 import dropRight from "lodash/dropRight"
 import drop from "lodash/drop"
 import last from "lodash/last"
