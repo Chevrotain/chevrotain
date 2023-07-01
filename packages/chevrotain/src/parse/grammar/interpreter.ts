@@ -1,5 +1,5 @@
 import { RestWalker } from "./rest"
-import _first from "lodash/first"
+import { first as _first } from "@chevrotain/utils"
 import isEmpty from "just-is-empty"
 import dropRight from "lodash/dropRight"
 import drop from "lodash/drop"

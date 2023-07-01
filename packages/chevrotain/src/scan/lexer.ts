@@ -1,6 +1,6 @@
 import { BaseRegExpVisitor } from "@chevrotain/regexp-to-ast"
 import { IRegExpExec, Lexer, LexerDefinitionErrorType } from "./lexer_public"
-import first from "lodash/first"
+import { first } from "@chevrotain/utils"
 import isEmpty from "just-is-empty"
 import compact from "just-compact"
 import values from "lodash/values"

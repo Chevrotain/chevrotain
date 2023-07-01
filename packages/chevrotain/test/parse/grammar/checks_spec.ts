@@ -17,7 +17,7 @@ import {
   validateTooManyAlts
 } from "../../../src/parse/grammar/checks"
 import { createToken } from "../../../src/scan/tokens_public"
-import first from "lodash/first"
+import { first } from "@chevrotain/utils"
 import map from "lodash/map"
 import {
   Alternation,

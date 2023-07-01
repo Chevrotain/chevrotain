@@ -1,4 +1,4 @@
-import first from "lodash/first"
+import { first } from "@chevrotain/utils"
 import isEmpty from "just-is-empty"
 import drop from "lodash/drop"
 import flatten from "lodash/flatten"
