@@ -174,8 +174,11 @@ importers:
       '@chevrotain/utils':
         specifier: 10.5.0
         version: link:../utils
+      just-compact:
+        specifier: ^3.2.0
+        version: 3.2.0
       just-is-empty:
-        specifier: ^3.4.1
+        specifier: 3.4.1
         version: 3.4.1
       lodash:
         specifier: 4.17.21
@@ -6296,6 +6299,10 @@ packages:
     resolution: {integrity: sha512-POQXvpdL69+CluYsillJ7SUhKvytYjW9vG/GKpnf+xP8UWgYEM/RaMzHHofbALDiKbbP1W8UEYmgGl39WkPZsg==}
     engines: {'0': node >= 0.2.0}
     dev: true
+
+  /just-compact@3.2.0:
+    resolution: {integrity: sha512-sOrec92s8U4hzuj8FhbwLYxgvqS+BqGoU+LjgqW0r1MpXLJ7xkKwiFnt5Jr9Se3A62DCJ18+14Jvc1euzmWwbA==}
+    dev: false
 
   /just-diff-apply@5.4.1:
     resolution: {integrity: sha512-AAV5Jw7tsniWwih8Ly3fXxEZ06y+6p5TwQMsw0dzZ/wPKilzyDgdAnL0Ug4NNIquPUOh1vfFWEHbmXUqM5+o8g==}

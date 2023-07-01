@@ -7,7 +7,6 @@ import {
   Group,
   Set
 } from "@chevrotain/regexp-to-ast"
-import isArray from "lodash/isArray"
 import every from "lodash/every"
 import forEach from "lodash/forEach"
 import find from "lodash/find"
@@ -248,7 +247,7 @@ function isWholeOptional(ast: any): boolean {
     return false
   }
 
-  return isArray(ast.value)
+  return Array.isArray(ast.value)
     ? every(ast.value, isWholeOptional)
     : isWholeOptional(ast.value)
 }

@@ -17,7 +17,6 @@ import {
   TokenVocabulary
 } from "@chevrotain/types"
 import isEmpty from "just-is-empty"
-import isArray from "lodash/isArray"
 import flatten from "lodash/flatten"
 import every from "lodash/every"
 import uniq from "lodash/uniq"
@@ -108,7 +107,7 @@ export class RecognizerEngine {
       )
     }
 
-    if (isArray(tokenVocabulary)) {
+    if (Array.isArray(tokenVocabulary)) {
       // This only checks for Token vocabularies provided as arrays.
       // That is good enough because the main objective is to detect users of pre-V4.0 APIs
       // rather than all edge cases of empty Token vocabularies.
@@ -129,7 +128,7 @@ export class RecognizerEngine {
       }
     }
 
-    if (isArray(tokenVocabulary)) {
+    if (Array.isArray(tokenVocabulary)) {
       this.tokensMap = reduce(
         tokenVocabulary,
         (acc, tokType: TokenType) => {
@@ -641,7 +640,7 @@ export class RecognizerEngine {
     occurrence: number
   ): T {
     const laKey = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
-    const alts = isArray(altsOrOpts) ? altsOrOpts : altsOrOpts.DEF
+    const alts = Array.isArray(altsOrOpts) ? altsOrOpts : altsOrOpts.DEF
 
     const laFunc = this.getLaFuncFromCache(laKey)
     const altIdxToTake = laFunc.call(this, alts)

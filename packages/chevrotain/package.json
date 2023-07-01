@@ -78,6 +78,7 @@
     "@chevrotain/regexp-to-ast": "10.5.0",
     "@chevrotain/types": "10.5.0",
     "@chevrotain/utils": "10.5.0",
+    "just-compact": "^3.2.0",
     "just-is-empty": "3.4.1",
     "lodash": "4.17.21"
   },

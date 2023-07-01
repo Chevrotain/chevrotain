@@ -15,7 +15,7 @@ import {
   TokenType
 } from "@chevrotain/types"
 import peek from "lodash/last"
-import isArray from "lodash/isArray"
+
 import some from "lodash/some"
 import forEach from "lodash/forEach"
 import isFunction from "lodash/isFunction"
@@ -392,7 +392,7 @@ function recordOrProd(mainProdArg: any, occurrence: number): any {
   assertMethodIdxIsValid(occurrence)
   const prevProd: any = peek(this.recordingProdStack)
   // Only an array of alternatives
-  const hasOptions = isArray(mainProdArg) === false
+  const hasOptions = Array.isArray(mainProdArg) === false
   const alts: IOrAlt<unknown>[] =
     hasOptions === false ? mainProdArg : mainProdArg.DEF
 

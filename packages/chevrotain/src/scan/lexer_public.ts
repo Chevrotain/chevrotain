@@ -13,7 +13,6 @@ import {
 } from "./lexer"
 import noop from "lodash/noop"
 import isEmpty from "just-is-empty"
-import isArray from "lodash/isArray"
 import last from "lodash/last"
 import reject from "lodash/reject"
 import map from "lodash/map"
@@ -171,7 +170,7 @@ export class Lexer {
         this.trackEndLines = /full/i.test(this.config.positionTracking)
 
         // Convert SingleModeLexerDefinition into a IMultiModeLexerDefinition.
-        if (isArray(lexerDefinition)) {
+        if (Array.isArray(lexerDefinition)) {
           actualDefinition = {
             modes: { defaultMode: clone(lexerDefinition) },
             defaultMode: DEFAULT_MODE

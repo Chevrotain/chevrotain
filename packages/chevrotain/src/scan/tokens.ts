@@ -1,6 +1,5 @@
 import isEmpty from "just-is-empty"
-import compact from "lodash/compact"
-import isArray from "lodash/isArray"
+import compact from "just-compact"
 import flatten from "lodash/flatten"
 import difference from "lodash/difference"
 import map from "lodash/map"
@@ -86,7 +85,7 @@ export function assignTokenDefaultProps(tokenTypes: TokenType[]): void {
     // CATEGORIES? : TokenType | TokenType[]
     if (
       hasCategoriesProperty(currTokType) &&
-      !isArray(currTokType.CATEGORIES)
+      !Array.isArray(currTokType.CATEGORIES)
       // &&
       // !isUndefined(currTokType.CATEGORIES.PATTERN)
     ) {

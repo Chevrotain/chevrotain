@@ -54,7 +54,7 @@ import {
   IParserDefinitionError
 } from "./types"
 import dropRight from "lodash/dropRight"
-import compact from "lodash/compact"
+import compact from "just-compact"
 import { tokenStructuredMatcher } from "../../scan/tokens"
 
 export function validateLookahead(options: {

@@ -1,6 +1,6 @@
 import isEmpty from "just-is-empty"
-import compact from "lodash/compact"
-import isArray from "lodash/isArray"
+import compact from "just-compact"
+
 import map from "lodash/map"
 import forEach from "lodash/forEach"
 import filter from "lodash/filter"
@@ -44,7 +44,7 @@ export function createBaseSemanticVisitorConstructor(
   const semanticProto = {
     visit: function (cstNode: CstNode | CstNode[], param: any) {
       // enables writing more concise visitor methods when CstNode has only a single child
-      if (isArray(cstNode)) {
+      if (Array.isArray(cstNode)) {
         // A CST Node's children dictionary can never have empty arrays as values
         // If a key is defined there will be at least one element in the corresponding value array.
         cstNode = cstNode[0]

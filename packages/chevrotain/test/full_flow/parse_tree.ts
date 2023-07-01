@@ -1,4 +1,4 @@
-import compact from "lodash/compact"
+import compact from "just-compact"
 import isFunction from "lodash/isFunction"
 import isUndefined from "lodash/isUndefined"
 import { IToken, TokenType } from "@chevrotain/types"
