@@ -7,7 +7,7 @@ import {
   Group,
   Set
 } from "@chevrotain/regexp-to-ast"
-import isArray from "lodash/isArray"
+import { isArray } from "remeda"
 import every from "lodash/every"
 import forEach from "lodash/forEach"
 import find from "lodash/find"

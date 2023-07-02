@@ -17,7 +17,7 @@ import {
   TokenVocabulary
 } from "@chevrotain/types"
 import { isEmpty } from "remeda"
-import isArray from "lodash/isArray"
+import { isArray } from "remeda"
 import flatten from "lodash/flatten"
 import every from "lodash/every"
 import uniq from "lodash/uniq"

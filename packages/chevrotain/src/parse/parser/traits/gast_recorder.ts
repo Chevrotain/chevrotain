@@ -15,7 +15,7 @@ import {
   TokenType
 } from "@chevrotain/types"
 import peek from "lodash/last"
-import isArray from "lodash/isArray"
+import { isArray } from "remeda"
 import some from "lodash/some"
 import forEach from "lodash/forEach"
 import isFunction from "lodash/isFunction"

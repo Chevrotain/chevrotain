@@ -1,6 +1,6 @@
 import { isEmpty } from "remeda"
 import { compact } from "remeda"
-import isArray from "lodash/isArray"
+import { isArray } from "remeda"
 import map from "lodash/map"
 import forEach from "lodash/forEach"
 import filter from "lodash/filter"

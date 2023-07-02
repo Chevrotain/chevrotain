@@ -1,5 +1,5 @@
 import flatten from "lodash/flatten"
-import isArray from "lodash/isArray"
+import { isArray } from "remeda"
 import map from "lodash/map"
 import reduce from "lodash/reduce"
 import uniq from "lodash/uniq"

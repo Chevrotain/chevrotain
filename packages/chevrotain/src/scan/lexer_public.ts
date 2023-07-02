@@ -13,7 +13,7 @@ import {
 } from "./lexer"
 import noop from "lodash/noop"
 import { isEmpty } from "remeda"
-import isArray from "lodash/isArray"
+import { isArray } from "remeda"
 import last from "lodash/last"
 import reject from "lodash/reject"
 import map from "lodash/map"
