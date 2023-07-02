@@ -19,7 +19,6 @@ import reject from "lodash/reject"
 import map from "lodash/map"
 import forEach from "lodash/forEach"
 import keys from "lodash/keys"
-import isUndefined from "lodash/isUndefined"
 import identity from "lodash/identity"
 import assign from "lodash/assign"
 import reduce from "lodash/reduce"
@@ -215,7 +214,7 @@ export class Lexer {
       forEach(actualDefinition.modes, (currModeValue, currModeName) => {
         actualDefinition.modes[currModeName] = reject<TokenType>(
           currModeValue,
-          (currTokType) => isUndefined(currTokType)
+          (currTokType) => currTokType === undefined
         )
       })
 

@@ -1,6 +1,5 @@
 import { compact } from "remeda"
 import isFunction from "lodash/isFunction"
-import isUndefined from "lodash/isUndefined"
 import { IToken, TokenType } from "@chevrotain/types"
 
 export class ParseTree {
@@ -37,7 +36,7 @@ export function PT(
     return new ParseTree(<IToken>tokenOrTokenClass, childrenCompact)
   } else if (isFunction(tokenOrTokenClass)) {
     return new ParseTree(new (<any>tokenOrTokenClass)(), childrenCompact)
-  } else if (isUndefined(tokenOrTokenClass) || tokenOrTokenClass === null) {
+  } else if (tokenOrTokenClass === undefined || tokenOrTokenClass === null) {
     return null
   } else {
     throw `Invalid parameter ${tokenOrTokenClass} to PT factory.`

@@ -13,7 +13,6 @@ import map from "lodash/map"
 import forEach from "lodash/forEach"
 import isString from "lodash/isString"
 import isFunction from "lodash/isFunction"
-import isUndefined from "lodash/isUndefined"
 import find from "lodash/find"
 import has from "lodash/has"
 import keys from "lodash/keys"
@@ -209,7 +208,7 @@ export function analyzeTokenTypes(
         return undefined
       } else if (isString(groupName)) {
         return groupName
-      } else if (isUndefined(groupName)) {
+      } else if (groupName === undefined) {
         return false
       } else {
         throw Error("non exhaustive match")
@@ -874,7 +873,7 @@ export function performRuntimeChecks(
   if (has(lexerDefinition, MODES)) {
     forEach(lexerDefinition.modes, (currModeValue, currModeName) => {
       forEach(currModeValue, (currTokType, currIdx) => {
-        if (isUndefined(currTokType)) {
+        if (currTokType === undefined) {
           errors.push({
             message:
               `A Lexer cannot be initialized using an undefined Token Type. Mode:` +
@@ -887,7 +886,7 @@ export function performRuntimeChecks(
             : [currTokType.LONGER_ALT]
           forEach(longerAlt, (currLongerAlt) => {
             if (
-              !isUndefined(currLongerAlt) &&
+              currLongerAlt !== undefined &&
               !includes(currModeValue, currLongerAlt)
             ) {
               errors.push({

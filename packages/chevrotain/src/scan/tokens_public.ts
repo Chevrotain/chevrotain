@@ -1,6 +1,5 @@
 import isString from "lodash/isString"
 import has from "lodash/has"
-import isUndefined from "lodash/isUndefined"
 import { Lexer } from "./lexer_public"
 import { augmentTokenTypes, tokenStructuredMatcher } from "./tokens"
 import { IToken, ITokenConfig, TokenType } from "@chevrotain/types"
@@ -43,7 +42,7 @@ function createTokenInternal(config: ITokenConfig): TokenType {
   const tokenType: TokenType = <any>{}
   tokenType.name = config.name
 
-  if (!isUndefined(pattern)) {
+  if (pattern !== undefined) {
     tokenType.PATTERN = pattern
   }
 

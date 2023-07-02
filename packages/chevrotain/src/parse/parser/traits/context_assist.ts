@@ -9,7 +9,6 @@ import {
   nextPossibleTokensAfter
 } from "../../grammar/interpreter"
 import first from "lodash/first"
-import isUndefined from "lodash/isUndefined"
 import { MixedInParser } from "./parser_traits"
 
 export class ContentAssist {
@@ -22,7 +21,7 @@ export class ContentAssist {
   ): ISyntacticContentAssistPath[] {
     const startRuleGast = this.gastProductionsCache[startRuleName]
 
-    if (isUndefined(startRuleGast)) {
+    if (startRuleGast === undefined) {
       throw Error(`Rule ->${startRuleName}<- does not exist in this grammar.`)
     }
 

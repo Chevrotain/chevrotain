@@ -6,7 +6,6 @@ import forEach from "lodash/forEach"
 import filter from "lodash/filter"
 import keys from "lodash/keys"
 import isFunction from "lodash/isFunction"
-import isUndefined from "lodash/isUndefined"
 import { defineNameProp } from "../../lang/lang_extensions"
 import { CstNode, ICstVisitor } from "@chevrotain/types"
 
@@ -51,7 +50,7 @@ export function createBaseSemanticVisitorConstructor(
       }
 
       // enables passing optional CstNodes concisely.
-      if (isUndefined(cstNode)) {
+      if (cstNode === undefined) {
         return undefined
       }
 

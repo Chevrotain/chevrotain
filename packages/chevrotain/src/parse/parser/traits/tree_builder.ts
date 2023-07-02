@@ -7,7 +7,6 @@ import {
 import noop from "lodash/noop"
 import has from "lodash/has"
 import keys from "lodash/keys"
-import isUndefined from "lodash/isUndefined"
 import {
   createBaseSemanticVisitorConstructor,
   createBaseVisitorConstructorWithDefaults
@@ -231,7 +230,7 @@ export class TreeBuilder {
   ): {
     new (...args: any[]): ICstVisitor<IN, OUT>
   } {
-    if (isUndefined(this.baseCstVisitorConstructor)) {
+    if (this.baseCstVisitorConstructor === undefined) {
       const newBaseCstVisitorConstructor = createBaseSemanticVisitorConstructor(
         this.className,
         keys(this.gastProductionsCache)
@@ -248,7 +247,7 @@ export class TreeBuilder {
   ): {
     new (...args: any[]): ICstVisitor<IN, OUT>
   } {
-    if (isUndefined(this.baseCstVisitorWithDefaultsConstructor)) {
+    if (this.baseCstVisitorWithDefaultsConstructor === undefined) {
       const newConstructor = createBaseVisitorConstructorWithDefaults(
         this.className,
         keys(this.gastProductionsCache),
