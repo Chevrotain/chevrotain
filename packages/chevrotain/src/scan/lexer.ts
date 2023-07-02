@@ -4,6 +4,7 @@ import first from "lodash/first"
 import { isEmpty } from "remeda"
 import { compact } from "remeda"
 import { isArray } from "remeda"
+import isRegexp from "is-regexp"
 import values from "lodash/values"
 import flatten from "lodash/flatten"
 import reject from "lodash/reject"
@@ -11,12 +12,11 @@ import difference from "lodash/difference"
 import indexOf from "lodash/indexOf"
 import map from "lodash/map"
 import forEach from "lodash/forEach"
-import isString from "lodash/isString"
-import isFunction from "lodash/isFunction"
+import { isString } from "remeda"
+import { isFunction } from "remeda"
 import find from "lodash/find"
 import has from "lodash/has"
 import keys from "lodash/keys"
-import isRegExp from "lodash/isRegExp"
 import filter from "lodash/filter"
 import defaults from "lodash/defaults"
 import reduce from "lodash/reduce"
@@ -116,7 +116,7 @@ export function analyzeTokenTypes(
         const currPattern = currType[PATTERN]
 
         /* istanbul ignore else */
-        if (isRegExp(currPattern)) {
+        if (isRegexp(currPattern)) {
           const regExpSource = currPattern.source
           if (
             regExpSource.length === 1 &&
@@ -332,7 +332,7 @@ export function analyzeTokenTypes(
                 )
               }
             })
-          } else if (isRegExp(currTokType.PATTERN)) {
+          } else if (isRegexp(currTokType.PATTERN)) {
             if (currTokType.PATTERN.unicode) {
               canBeOptimized = false
               if (options.ensureOptimizations) {
@@ -421,7 +421,7 @@ function validateRegExpPattern(
 ): ILexerDefinitionError[] {
   let errors: ILexerDefinitionError[] = []
   const withRegExpPatterns = filter(tokenTypes, (currTokType) =>
-    isRegExp(currTokType[PATTERN])
+    isRegexp(currTokType[PATTERN])
   )
 
   errors = errors.concat(findEndOfInputAnchor(withRegExpPatterns))
@@ -470,7 +470,7 @@ export function findInvalidPatterns(
   const tokenTypesWithInvalidPattern = filter(tokenTypes, (currType) => {
     const pattern = currType[PATTERN]
     return (
-      !isRegExp(pattern) &&
+      !isRegexp(pattern) &&
       !isFunction(pattern) &&
       !has(pattern, "exec") &&
       !isString(pattern)
@@ -748,7 +748,7 @@ export function findUnreachablePatterns(
       // deeper regExp analysis capabilities
       if (isString(pattern)) {
         result.push({ str: pattern, idx, tokenType: tokType })
-      } else if (isRegExp(pattern) && noMetaChar(pattern)) {
+      } else if (isRegexp(pattern) && noMetaChar(pattern)) {
         result.push({ str: pattern.source, idx, tokenType: tokType })
       }
       return result
@@ -778,7 +778,7 @@ export function findUnreachablePatterns(
 
 function testTokenType(str: string, pattern: any): boolean {
   /* istanbul ignore else */
-  if (isRegExp(pattern)) {
+  if (isRegexp(pattern)) {
     const regExpArray = pattern.exec(str)
     return regExpArray !== null && regExpArray.index === 0
   } else if (isFunction(pattern)) {
@@ -786,7 +786,7 @@ function testTokenType(str: string, pattern: any): boolean {
     return pattern(str, 0, [], {})
   } else if (has(pattern, "exec")) {
     // maintain the API of custom patterns
-    return pattern.exec(str, 0, [], {})
+    return (pattern as any).exec(str, 0, [], {})
   } else if (typeof pattern === "string") {
     return pattern === str
   } else {
@@ -983,7 +983,7 @@ export function cloneEmptyGroups(emptyGroups: {
 export function isCustomPattern(tokenType: TokenType): boolean {
   const pattern = tokenType.PATTERN
   /* istanbul ignore else */
-  if (isRegExp(pattern)) {
+  if (isRegexp(pattern)) {
     return false
   } else if (isFunction(pattern)) {
     // CustomPatternMatcherFunc - custom patterns do not require any transformations, only wrapping in a RegExp Like object
@@ -1050,7 +1050,7 @@ function checkLineBreaksIssues(
     return false
   } else {
     /* istanbul ignore else */
-    if (isRegExp(tokType.PATTERN)) {
+    if (isRegexp(tokType.PATTERN)) {
       try {
         // TODO: why is the casting suddenly needed?
         canMatchCharCode(lineTerminatorCharCodes, tokType.PATTERN as RegExp)

@@ -1,5 +1,5 @@
 import { compact } from "remeda"
-import isFunction from "lodash/isFunction"
+import { isFunction } from "remeda"
 import { IToken, TokenType } from "@chevrotain/types"
 
 export class ParseTree {

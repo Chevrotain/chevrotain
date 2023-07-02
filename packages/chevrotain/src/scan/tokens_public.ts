@@ -1,4 +1,4 @@
-import isString from "lodash/isString"
+import { isString } from "remeda"
 import has from "lodash/has"
 import { Lexer } from "./lexer_public"
 import { augmentTokenTypes, tokenStructuredMatcher } from "./tokens"

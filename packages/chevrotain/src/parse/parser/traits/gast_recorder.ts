@@ -18,7 +18,7 @@ import peek from "lodash/last"
 import { isArray } from "remeda"
 import some from "lodash/some"
 import forEach from "lodash/forEach"
-import isFunction from "lodash/isFunction"
+import { isFunction } from "remeda"
 import has from "lodash/has"
 import { MixedInParser } from "./parser_traits"
 import {
@@ -370,7 +370,9 @@ function recordProd(
 ): any {
   assertMethodIdxIsValid(occurrence)
   const prevProd: any = peek(this.recordingProdStack)
-  const grammarAction = isFunction(mainProdArg) ? mainProdArg : mainProdArg.DEF
+  const grammarAction = isFunction(mainProdArg)
+    ? mainProdArg
+    : (mainProdArg as DSLMethodOpts<any>).DEF
 
   const newProd = new prodConstructor({ definition: [], idx: occurrence })
   if (handleSep) {

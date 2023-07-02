@@ -5,7 +5,7 @@ import map from "lodash/map"
 import forEach from "lodash/forEach"
 import filter from "lodash/filter"
 import keys from "lodash/keys"
-import isFunction from "lodash/isFunction"
+import { isFunction } from "remeda"
 import { defineNameProp } from "../../lang/lang_extensions"
 import { CstNode, ICstVisitor } from "@chevrotain/types"
 
