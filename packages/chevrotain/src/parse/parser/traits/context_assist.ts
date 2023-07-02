@@ -8,7 +8,7 @@ import {
   NextAfterTokenWalker,
   nextPossibleTokensAfter
 } from "../../grammar/interpreter"
-import first from "lodash/first"
+import { first } from "remeda"
 import { MixedInParser } from "./parser_traits"
 
 export class ContentAssist {

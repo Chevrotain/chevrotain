@@ -12,7 +12,7 @@ import {
   Rule,
   Terminal
 } from "@chevrotain/gast"
-import keys from "lodash/keys"
+import { keys } from "remeda"
 import { expect } from "chai"
 import { createToken } from "../../../src/scan/tokens_public"
 import { TokenType } from "@chevrotain/types"

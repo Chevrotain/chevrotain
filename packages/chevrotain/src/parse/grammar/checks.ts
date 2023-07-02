@@ -1,4 +1,4 @@
-import first from "lodash/first"
+import { first } from "remeda"
 import { isEmpty } from "remeda"
 import drop from "lodash/drop"
 import flatten from "lodash/flatten"

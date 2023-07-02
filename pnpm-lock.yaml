@@ -270,6 +270,9 @@ importers:
       '@chevrotain/types':
         specifier: 10.5.0
         version: link:../types
+      is-regexp:
+        specifier: 2.1.0
+        version: 2.1.0
       lodash:
         specifier: 4.17.21
         version: 4.17.21

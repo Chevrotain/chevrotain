@@ -11,14 +11,14 @@ import {
   SUPPORT_STICKY,
   validatePatterns
 } from "./lexer"
-import noop from "lodash/noop"
+import { noop } from "remeda"
 import { isEmpty } from "remeda"
 import { isArray } from "remeda"
-import last from "lodash/last"
+import { last } from "remeda"
 import reject from "lodash/reject"
 import map from "lodash/map"
 import forEach from "lodash/forEach"
-import keys from "lodash/keys"
+import { keys } from "remeda"
 import identity from "lodash/identity"
 import assign from "lodash/assign"
 import reduce from "lodash/reduce"

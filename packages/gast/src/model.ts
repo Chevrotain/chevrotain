@@ -1,7 +1,7 @@
 import map from "lodash/map"
 import forEach from "lodash/forEach"
-import isString from "lodash/isString"
-import isRegExp from "lodash/isRegExp"
+import { isString } from "remeda"
+import isRegexp from "is-regexp"
 import pickBy from "lodash/pickBy"
 import assign from "lodash/assign"
 import {
@@ -401,7 +401,7 @@ export function serializeProduction(node: IProduction): ISerializedGast {
 
     const pattern = node.terminalType.PATTERN
     if (node.terminalType.PATTERN) {
-      serializedTerminal.pattern = isRegExp(pattern)
+      serializedTerminal.pattern = isRegexp(pattern)
         ? (<any>pattern).source
         : pattern
     }

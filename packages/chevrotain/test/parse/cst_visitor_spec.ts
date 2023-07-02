@@ -1,7 +1,7 @@
 import { createToken } from "../../src/scan/tokens_public"
 import { CstParser } from "../../src/parse/parser/traits/parser_traits"
 import { createRegularToken } from "../utils/matchers"
-import keys from "lodash/keys"
+import { keys } from "remeda"
 import { IToken, TokenType } from "@chevrotain/types"
 import { expect } from "chai"
 

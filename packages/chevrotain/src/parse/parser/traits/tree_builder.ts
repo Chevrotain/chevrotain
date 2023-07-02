@@ -4,9 +4,9 @@ import {
   setNodeLocationFull,
   setNodeLocationOnlyOffset
 } from "../../cst/cst"
-import noop from "lodash/noop"
+import { noop } from "remeda"
 import has from "lodash/has"
-import keys from "lodash/keys"
+import { keys } from "remeda"
 import {
   createBaseSemanticVisitorConstructor,
   createBaseVisitorConstructorWithDefaults

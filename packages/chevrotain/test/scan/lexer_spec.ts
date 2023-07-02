@@ -1,9 +1,9 @@
-import last from "lodash/last"
+import { last } from "remeda"
 import map from "lodash/map"
 import forEach from "lodash/forEach"
 import { isString } from "remeda"
 import isRegexp from "is-regexp"
-import keys from "lodash/keys"
+import { keys } from "remeda"
 import { createToken } from "../../src/scan/tokens_public"
 import { Lexer, LexerDefinitionErrorType } from "../../src/scan/lexer_public"
 import {
