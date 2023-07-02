@@ -1,6 +1,6 @@
 const config = require("./version-config")
 const git = require("gitty")
-const _ = require("lodash")
+const { forEach } = require("remeda")
 const fs = require("fs")
 
 const myRepo = git("")
@@ -21,8 +21,8 @@ const changeLogDate = config.changeLogString.replace(
 )
 fs.writeFileSync(config.changeLogPath, changeLogDate)
 
-_.forEach(config.docFilesPaths, function (currDocPath) {
-  if (_.includes(currDocPath, "changes")) {
+forEach(config.docFilesPaths, function (currDocPath) {
+  if (currDocPath.includes("changes")) {
     console.log("SKIPPING bumping file: <" + currDocPath + ">")
     return
   }

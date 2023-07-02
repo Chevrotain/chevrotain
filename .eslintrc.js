@@ -38,7 +38,7 @@ module.exports = {
     {
       // For sub-packages using TypeScript (libraries/VSCode Exts) && TypeScript definitions (d.ts)
       files: ["*.ts"],
-      plugins: ["@typescript-eslint", "lodash"],
+      plugins: ["@typescript-eslint"],
       parser: "@typescript-eslint/parser",
       parserOptions: {
         // project: ["./tsconfig.base.json", "./tsconfig.json"],
@@ -48,7 +48,6 @@ module.exports = {
         // "plugin:@typescript-eslint/recommended-requiring-type-checking",
       ],
       rules: {
-        "lodash/import-scope": ["error", "method"],
         "@typescript-eslint/no-use-before-define": [
           "error",
           // These can be safely used before they are defined due to function hoisting in EcmaScript

@@ -177,6 +177,9 @@ importers:
       lodash:
         specifier: 4.17.21
         version: 4.17.21
+      remeda:
+        specifier: 1.23.0
+        version: 1.23.0
     devDependencies:
       '@types/lodash':
         specifier: 4.14.191
@@ -226,6 +229,9 @@ importers:
       lodash:
         specifier: 4.17.21
         version: 4.17.21
+      remeda:
+        specifier: 1.23.0
+        version: 1.23.0
     devDependencies:
       '@types/lodash':
         specifier: 4.14.191
@@ -248,6 +254,9 @@ importers:
       lodash:
         specifier: 4.17.21
         version: 4.17.21
+      remeda:
+        specifier: 1.23.0
+        version: 1.23.0
     devDependencies:
       glob:
         specifier: 8.0.3
@@ -261,6 +270,9 @@ importers:
       lodash:
         specifier: 4.17.21
         version: 4.17.21
+      remeda:
+        specifier: 1.23.0
+        version: 1.23.0
     devDependencies:
       '@types/lodash':
         specifier: 4.14.191
@@ -296,9 +308,9 @@ importers:
       jsonfile:
         specifier: 6.1.0
         version: 6.1.0
-      lodash:
-        specifier: 4.17.21
-        version: 4.17.21
+      remeda:
+        specifier: 1.23.0
+        version: 1.23.0
       vuepress:
         specifier: 2.0.0-beta.49
         version: 2.0.0-beta.49(@vuepress/client@2.0.0-beta.49)(vue@3.2.37)
@@ -8027,6 +8039,9 @@ packages:
     dependencies:
       es6-error: 4.1.1
     dev: true
+
+  /remeda@1.23.0:
+    resolution: {integrity: sha512-1y0jygsAc3opoFQW5BtA/QYOboai0u5IwdvwtbRAd1eJ2D9NmvZpDfV819LdSmrIQ0LONbp/dE9Uo/rGxUshPw==}
 
   /require-directory@2.1.1:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==}

@@ -1,4 +1,4 @@
-const _ = require("lodash")
+const { mapValues } = require("remeda")
 const { slugify } = require("@mdit-vue/shared")
 const { defaultTheme } = require("@vuepress/theme-default")
 const { docsearchPlugin } = require("@vuepress/plugin-docsearch")
@@ -46,7 +46,7 @@ const slugMap = {
     "MISSING_LINE_TERM_CHARS"
 }
 
-const slugMapUsed = _.mapValues(slugMap, () => false)
+const slugMapUsed = mapValues(slugMap, () => false)
 
 module.exports = {
   title: "Chevrotain",
