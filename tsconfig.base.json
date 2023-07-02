@@ -1,7 +1,7 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "target": "ES5",
+    "target": "ES2015",
     "composite": true,
     "module": "CommonJS",
     "esModuleInterop": true,
