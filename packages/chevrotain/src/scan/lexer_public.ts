@@ -12,7 +12,7 @@ import {
   validatePatterns
 } from "./lexer"
 import noop from "lodash/noop"
-import isEmpty from "lodash/isEmpty"
+import { isEmpty } from "remeda"
 import isArray from "lodash/isArray"
 import last from "lodash/last"
 import reject from "lodash/reject"

@@ -1,4 +1,4 @@
-import isEmpty from "lodash/isEmpty"
+import { isEmpty } from "remeda"
 import map from "lodash/map"
 import forEach from "lodash/forEach"
 import values from "lodash/values"
