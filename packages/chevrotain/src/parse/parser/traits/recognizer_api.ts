@@ -13,7 +13,7 @@ import {
   SubruleMethodOpts,
   TokenType
 } from "@chevrotain/types"
-import values from "lodash/values"
+import { values } from "remeda"
 import includes from "lodash/includes"
 import { isRecognitionException } from "../../exceptions_public"
 import { DEFAULT_RULE_CONFIG, ParserDefinitionErrorType } from "../parser"

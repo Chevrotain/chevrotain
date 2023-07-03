@@ -12,7 +12,7 @@ import dropRight from "lodash/dropRight"
 import flatten from "lodash/flatten"
 import map from "lodash/map"
 import find from "lodash/find"
-import has from "lodash/has"
+import { has } from "@chevrotain/utils"
 import includes from "lodash/includes"
 import clone from "lodash/clone"
 import {

@@ -1,5 +1,5 @@
 import forEach from "lodash/forEach"
-import has from "lodash/has"
+import { has } from "@chevrotain/utils"
 import { DEFAULT_PARSER_CONFIG } from "../parser"
 import {
   ILookaheadStrategy,

@@ -1,5 +1,5 @@
 import { IParserConfig } from "@chevrotain/types"
-import has from "lodash/has"
+import { has } from "@chevrotain/utils"
 import { timer } from "@chevrotain/utils"
 import { MixedInParser } from "./parser_traits"
 import { DEFAULT_PARSER_CONFIG } from "../parser"

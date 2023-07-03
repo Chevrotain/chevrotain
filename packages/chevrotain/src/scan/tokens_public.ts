@@ -1,5 +1,5 @@
 import { isString } from "remeda"
-import has from "lodash/has"
+import { has } from "@chevrotain/utils"
 import { Lexer } from "./lexer_public"
 import { augmentTokenTypes, tokenStructuredMatcher } from "./tokens"
 import { IToken, ITokenConfig, TokenType } from "@chevrotain/types"

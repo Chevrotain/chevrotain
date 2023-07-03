@@ -4,11 +4,13 @@ import {
   DSLMethodOpts,
   DSLMethodOptsWithErr,
   GrammarAction,
+  IMultiModeLexerDefinition,
   IOrAlt,
   IParserConfig,
   IRuleConfig,
   IToken,
   ManySepMethodOpts,
+  MultiModesDefinition,
   OrMethodOpts,
   ParserMethod,
   SubruleMethodOpts,
@@ -22,8 +24,8 @@ import flatten from "lodash/flatten"
 import every from "lodash/every"
 import uniq from "lodash/uniq"
 import { isObject } from "remeda"
-import has from "lodash/has"
-import values from "lodash/values"
+import { has } from "@chevrotain/utils"
+import { values } from "remeda"
 import reduce from "lodash/reduce"
 import clone from "lodash/clone"
 import {
@@ -142,15 +144,17 @@ export class RecognizerEngine {
       has(tokenVocabulary, "modes") &&
       every(flatten(values((<any>tokenVocabulary).modes)), isTokenType)
     ) {
-      const allTokenTypes = flatten(values((<any>tokenVocabulary).modes))
+      const allTokenTypes: TokenType[] = flatten(
+        values((tokenVocabulary as IMultiModeLexerDefinition).modes)
+      )
       const uniqueTokens = uniq(allTokenTypes)
-      this.tokensMap = <any>reduce(
+      this.tokensMap = reduce(
         uniqueTokens,
         (acc, tokType: TokenType) => {
           acc[tokType.name] = tokType
           return acc
         },
-        {} as { [tokenName: string]: TokenType }
+        {} as Record<string, TokenType>
       )
     } else if (isObject(tokenVocabulary)) {
       this.tokensMap = clone(tokenVocabulary as TokenTypeDictionary)
@@ -166,10 +170,11 @@ export class RecognizerEngine {
     this.tokensMap["EOF"] = EOF
 
     const allTokenTypes = has(tokenVocabulary, "modes")
-      ? flatten(values((<any>tokenVocabulary).modes))
-      : values(tokenVocabulary)
-    const noTokenCategoriesUsed = every(allTokenTypes, (tokenConstructor) =>
-      isEmpty(tokenConstructor.categoryMatches)
+      ? flatten(values((tokenVocabulary as IMultiModeLexerDefinition).modes))
+      : values(tokenVocabulary as TokenTypeDictionary)
+    const noTokenCategoriesUsed = every(
+      allTokenTypes,
+      (currTokType: TokenType) => isEmpty(currTokType.categoryMatches ?? [])
     )
 
     this.tokenMatcher = noTokenCategoriesUsed

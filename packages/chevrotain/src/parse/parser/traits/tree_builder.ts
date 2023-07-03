@@ -5,7 +5,7 @@ import {
   setNodeLocationOnlyOffset
 } from "../../cst/cst"
 import { noop } from "remeda"
-import has from "lodash/has"
+import { has } from "@chevrotain/utils"
 import { keys } from "remeda"
 import {
   createBaseSemanticVisitorConstructor,

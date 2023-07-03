@@ -7,6 +7,8 @@ module.exports = {
     // possible to test using mocks but not worth it.
     "src/print.ts",
     // not possible to test without diving into V8 internals
-    "src/to-fast-properties.ts"
+    "src/to-fast-properties.ts",
+    // too trivial to test (famous last words... :-) )
+    "src/library.ts"
   ]
 }

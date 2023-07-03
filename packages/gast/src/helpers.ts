@@ -1,6 +1,5 @@
 import some from "lodash/some"
 import every from "lodash/every"
-import has from "lodash/has"
 import includes from "lodash/includes"
 import {
   AbstractProduction,

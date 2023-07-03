@@ -5,7 +5,7 @@ import { isEmpty } from "remeda"
 import { compact } from "remeda"
 import { isArray } from "remeda"
 import isRegexp from "is-regexp"
-import values from "lodash/values"
+import { values } from "remeda"
 import flatten from "lodash/flatten"
 import reject from "lodash/reject"
 import difference from "lodash/difference"
@@ -15,7 +15,7 @@ import forEach from "lodash/forEach"
 import { isString } from "remeda"
 import { isFunction } from "remeda"
 import find from "lodash/find"
-import has from "lodash/has"
+import { has } from "@chevrotain/utils"
 import { keys } from "remeda"
 import filter from "lodash/filter"
 import defaults from "lodash/defaults"
@@ -910,7 +910,8 @@ export function performWarningRuntimeChecks(
 ): ILexerDefinitionError[] {
   const warnings = []
   let hasAnyLineBreak = false
-  const allTokenTypes = compact(flatten(values(lexerDefinition.modes)))
+  const modes = lexerDefinition.modes ?? [] // edge case of invalid input (modes is `undefined`)
+  const allTokenTypes = compact(flatten(values(modes)))
 
   const concreteTokenTypes = reject(
     allTokenTypes,
