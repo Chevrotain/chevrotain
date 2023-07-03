@@ -4,7 +4,7 @@ import { every } from "@chevrotain/utils"
 import { map } from "remeda"
 import { forEach } from "remeda"
 import { has } from "@chevrotain/utils"
-import reduce from "lodash/reduce"
+import { reduce } from "remeda"
 import { possiblePathsFrom } from "./interpreter"
 import { RestWalker } from "./rest"
 import { Predicate, TokenMatcher } from "../parser/parser"
@@ -225,7 +225,7 @@ export function buildAlternativesLookAheadFunc(
       return flatten(currAlt)
     })
 
-    const choiceToAlt = reduce(
+    const choiceToAlt = reduce.indexed(
       singleTokenAlts,
       (result, currAlt, idx) => {
         forEach(currAlt, (currTokType) => {
@@ -313,7 +313,7 @@ export function buildSingleAlternativeLookaheadFunction(
     } else {
       const choiceToAlt = reduce(
         singleTokensTypes,
-        (result, currTokType, idx) => {
+        (result, currTokType) => {
           result[currTokType.tokenTypeIdx!] = true
           forEach(currTokType.categoryMatches!, (currExtendingType) => {
             result[currExtendingType] = true

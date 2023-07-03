@@ -1,7 +1,7 @@
 import { hasTokenLabel, tokenLabel } from "../scan/tokens_public"
 import { first } from "remeda"
 import { map } from "remeda"
-import reduce from "lodash/reduce"
+import { reduce } from "remeda"
 import { Alternation, NonTerminal, Rule, Terminal } from "@chevrotain/gast"
 import { getProductionDslName } from "@chevrotain/gast"
 import {

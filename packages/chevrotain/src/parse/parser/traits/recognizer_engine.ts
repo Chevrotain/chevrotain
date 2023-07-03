@@ -26,7 +26,7 @@ import uniq from "lodash/uniq"
 import { isObject } from "remeda"
 import { has, shallowClone } from "@chevrotain/utils"
 import { values } from "remeda"
-import reduce from "lodash/reduce"
+import { reduce } from "remeda"
 import { clone } from "remeda"
 import {
   AT_LEAST_ONE_IDX,

@@ -19,7 +19,7 @@ import { has } from "@chevrotain/utils"
 import { keys } from "remeda"
 import filter from "lodash/filter"
 import defaults from "lodash/defaults"
-import reduce from "lodash/reduce"
+import { reduce } from "remeda"
 import { includes } from "@chevrotain/utils"
 import { PRINT_ERROR } from "@chevrotain/utils"
 import {
@@ -304,7 +304,7 @@ export function analyzeTokenTypes(
 
   if (!options.safeMode) {
     tracer("First Char Optimization", () => {
-      charCodeToPatternIdxToConfig = reduce(
+      charCodeToPatternIdxToConfig = reduce.indexed(
         onlyRelevantTypes,
         (result, currTokType, idx) => {
           if (typeof currTokType.PATTERN === "string") {
@@ -735,7 +735,7 @@ export function findUnreachablePatterns(
 ): ILexerDefinitionError[] {
   const errors: ILexerDefinitionError[] = []
 
-  const canBeTested = reduce(
+  const canBeTested = reduce.indexed(
     tokenTypes,
     (result, tokType, idx) => {
       const pattern = tokType.PATTERN

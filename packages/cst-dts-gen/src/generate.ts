@@ -1,7 +1,7 @@
 import { flatten } from "remeda"
 import { isArray } from "remeda"
 import { map } from "remeda"
-import reduce from "lodash/reduce"
+import { reduce } from "remeda"
 import uniq from "lodash/uniq"
 import upperFirst from "lodash/upperFirst"
 import { GenerateDtsOptions } from "@chevrotain/types"
@@ -80,7 +80,7 @@ function genVisitorFunction(node: CstNodeTypeDefinition) {
 function buildTypeString(type: PropertyArrayType) {
   if (isArray(type)) {
     const typeNames = uniq(map(type, (t) => getTypeString(t)))
-    const typeString = reduce(typeNames, (sum, t) => sum + " | " + t)
+    const typeString = typeNames.join(" | ")
     return "(" + typeString + ")"
   } else {
     return getTypeString(type)

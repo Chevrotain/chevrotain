@@ -19,7 +19,7 @@
     "clean": "shx rm -rf lib coverage",
     "compile:watch": "tsc -w",
     "compile": "tsc",
-    "coverage": "nyc mocha"
+    "coverage": "mocha"
   },
   "dependencies": {
     "@chevrotain/cst-dts-gen": "10.5.0",

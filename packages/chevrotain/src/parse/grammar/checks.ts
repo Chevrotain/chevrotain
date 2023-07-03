@@ -8,7 +8,7 @@ import difference from "lodash/difference"
 import { map } from "remeda"
 import { forEach } from "remeda"
 import groupBy from "lodash/groupBy"
-import reduce from "lodash/reduce"
+import { reduce } from "remeda"
 import { pickBy } from "remeda"
 import { values } from "remeda"
 import { includes, shallowClone } from "@chevrotain/utils"
@@ -546,7 +546,7 @@ function checkAlternativesAmbiguities(
   errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserAmbiguousAlternativesDefinitionError[] {
   const foundAmbiguousPaths: Alternative = []
-  const identicalAmbiguities = reduce(
+  const identicalAmbiguities = reduce.indexed(
     alternatives,
     (result, currAlt, currAltIdx) => {
       // ignore (skip) ambiguities with this alternative
@@ -615,7 +615,7 @@ export function checkPrefixAlternativesAmbiguities(
   errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserAmbiguousAlternativesDefinitionError[] {
   // flatten
-  const pathsAndIndices = reduce(
+  const pathsAndIndices = reduce.indexed(
     alternatives,
     (result, currAlt, idx) => {
       const currPathsAndIdx = map(currAlt, (currPath) => {

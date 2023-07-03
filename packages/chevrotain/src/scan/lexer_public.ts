@@ -21,7 +21,6 @@ import { forEach } from "remeda"
 import { keys } from "remeda"
 import identity from "lodash/identity"
 import assign from "lodash/assign"
-import reduce from "lodash/reduce"
 import {
   PRINT_WARNING,
   timer,
@@ -350,15 +349,14 @@ export class Lexer {
       })
 
       this.TRACE_INIT("Failed Optimization Warnings", () => {
-        const unOptimizedModes = reduce(
+        const unOptimizedModes: string[] = []
+        forEachObj.indexed(
           this.canModeBeOptimized,
-          (cannotBeOptimized, canBeOptimized, modeName) => {
+          (canBeOptimized, modeName) => {
             if (canBeOptimized === false) {
-              cannotBeOptimized.push(modeName)
+              unOptimizedModes.push(modeName)
             }
-            return cannotBeOptimized
-          },
-          [] as string[]
+          }
         )
 
         if (config.ensureOptimizations && !isEmpty(unOptimizedModes)) {
