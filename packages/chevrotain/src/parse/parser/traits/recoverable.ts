@@ -13,7 +13,7 @@ import flatten from "lodash/flatten"
 import map from "lodash/map"
 import find from "lodash/find"
 import { has } from "@chevrotain/utils"
-import includes from "lodash/includes"
+import { includes } from "@chevrotain/utils"
 import clone from "lodash/clone"
 import {
   IParserConfig,

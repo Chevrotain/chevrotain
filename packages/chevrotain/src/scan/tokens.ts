@@ -6,7 +6,7 @@ import difference from "lodash/difference"
 import map from "lodash/map"
 import forEach from "lodash/forEach"
 import { has } from "@chevrotain/utils"
-import includes from "lodash/includes"
+import { includes } from "@chevrotain/utils"
 import clone from "lodash/clone"
 import { IToken, TokenType } from "@chevrotain/types"
 

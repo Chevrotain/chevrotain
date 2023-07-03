@@ -270,6 +270,9 @@ importers:
       '@chevrotain/types':
         specifier: 10.5.0
         version: link:../types
+      '@chevrotain/utils':
+        specifier: 10.5.0
+        version: link:../utils
       is-regexp:
         specifier: 2.1.0
         version: 2.1.0

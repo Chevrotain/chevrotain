@@ -14,7 +14,7 @@ import {
   TokenType
 } from "@chevrotain/types"
 import { values } from "remeda"
-import includes from "lodash/includes"
+import { includes } from "@chevrotain/utils"
 import { isRecognitionException } from "../../exceptions_public"
 import { DEFAULT_RULE_CONFIG, ParserDefinitionErrorType } from "../parser"
 import { defaultGrammarValidatorErrorProvider } from "../../errors_public"

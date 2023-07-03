@@ -1,6 +1,6 @@
 import some from "lodash/some"
 import every from "lodash/every"
-import includes from "lodash/includes"
+import { includes } from "@chevrotain/utils"
 import {
   AbstractProduction,
   Alternation,

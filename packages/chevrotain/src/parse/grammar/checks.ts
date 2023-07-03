@@ -11,7 +11,7 @@ import groupBy from "lodash/groupBy"
 import reduce from "lodash/reduce"
 import pickBy from "lodash/pickBy"
 import { values } from "remeda"
-import includes from "lodash/includes"
+import { includes } from "@chevrotain/utils"
 import flatMap from "lodash/flatMap"
 import clone from "lodash/clone"
 import {

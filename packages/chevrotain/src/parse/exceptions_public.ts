@@ -1,4 +1,4 @@
-import includes from "lodash/includes"
+import { includes } from "@chevrotain/utils"
 import {
   IToken,
   IRecognitionException,

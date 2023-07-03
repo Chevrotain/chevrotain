@@ -20,7 +20,7 @@ import { keys } from "remeda"
 import filter from "lodash/filter"
 import defaults from "lodash/defaults"
 import reduce from "lodash/reduce"
-import includes from "lodash/includes"
+import { includes } from "@chevrotain/utils"
 import { PRINT_ERROR } from "@chevrotain/utils"
 import {
   canMatchCharCode,
