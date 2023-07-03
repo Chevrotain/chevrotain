@@ -1,6 +1,5 @@
 import { Rule } from "@chevrotain/gast"
-import { forEach } from "remeda"
-import defaults from "lodash/defaults"
+import { forEach, merge } from "remeda"
 import { resolveGrammar as orgResolveGrammar } from "../resolver"
 import { validateGrammar as orgValidateGrammar } from "../checks"
 import {
@@ -21,9 +20,12 @@ type ResolveGrammarOpts = {
 export function resolveGrammar(
   options: ResolveGrammarOpts
 ): IParserDefinitionError[] {
-  const actualOptions: Required<ResolveGrammarOpts> = defaults(options, {
-    errMsgProvider: defaultGrammarResolverErrorProvider
-  })
+  const actualOptions: Required<ResolveGrammarOpts> = merge(
+    {
+      errMsgProvider: defaultGrammarResolverErrorProvider
+    },
+    options
+  )
 
   const topRulesTable: { [ruleName: string]: Rule } = {}
   forEach(options.rules, (rule) => {
@@ -38,14 +40,17 @@ export function validateGrammar(options: {
   grammarName: string
   errMsgProvider: IGrammarValidatorErrorMessageProvider
 }): IParserDefinitionError[] {
-  options = defaults(options, {
-    errMsgProvider: defaultGrammarValidatorErrorProvider
-  })
+  const actualOptions = merge(
+    {
+      errMsgProvider: defaultGrammarValidatorErrorProvider
+    },
+    options
+  )
 
   return orgValidateGrammar(
-    options.rules,
-    options.tokenTypes,
-    options.errMsgProvider,
-    options.grammarName
+    actualOptions.rules,
+    actualOptions.tokenTypes,
+    actualOptions.errMsgProvider,
+    actualOptions.grammarName
   )
 }

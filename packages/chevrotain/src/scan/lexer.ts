@@ -1,6 +1,6 @@
 import { BaseRegExpVisitor } from "@chevrotain/regexp-to-ast"
 import { IRegExpExec, Lexer, LexerDefinitionErrorType } from "./lexer_public"
-import { first, forEachObj } from "remeda"
+import { first, forEachObj, merge } from "remeda"
 import { isEmpty } from "remeda"
 import { compact } from "remeda"
 import { isArray } from "remeda"
@@ -18,7 +18,6 @@ import find from "lodash/find"
 import { has } from "@chevrotain/utils"
 import { keys } from "remeda"
 import { filter } from "remeda"
-import defaults from "lodash/defaults"
 import { reduce } from "remeda"
 import { includes } from "@chevrotain/utils"
 import { PRINT_ERROR } from "@chevrotain/utils"
@@ -84,16 +83,19 @@ export function analyzeTokenTypes(
     tracer?: (msg: string, action: () => void) => void
   }
 ): IAnalyzeResult {
-  options = defaults(options, {
-    useSticky: SUPPORT_STICKY,
-    debug: false as boolean,
-    safeMode: false as boolean,
-    positionTracking: "full",
-    lineTerminatorCharacters: ["\r", "\n"],
-    tracer: (msg: string, action: Function) => action()
-  })
+  const actualOptions = merge(
+    {
+      useSticky: SUPPORT_STICKY,
+      debug: false as boolean,
+      safeMode: false as boolean,
+      positionTracking: "full",
+      lineTerminatorCharacters: ["\r", "\n"],
+      tracer: (msg: string, action: Function) => action()
+    },
+    options
+  )
 
-  const tracer = options.tracer!
+  const tracer = actualOptions.tracer!
 
   tracer("initCharCodeToOptimizedIndexMap", () => {
     initCharCodeToOptimizedIndexMap()
@@ -158,7 +160,7 @@ export function analyzeTokenTypes(
             // without the escaping "\"
             return regExpSource[1]
           } else {
-            return options.useSticky
+            return actualOptions.useSticky
               ? addStickyFlag(currPattern)
               : addStartOfInput(currPattern)
           }
@@ -179,7 +181,7 @@ export function analyzeTokenTypes(
               "\\$&"
             )
             const wrappedRegExp = new RegExp(escapedRegExpString)
-            return options.useSticky
+            return actualOptions.useSticky
               ? addStickyFlag(wrappedRegExp)
               : addStartOfInput(wrappedRegExp)
           }
@@ -239,10 +241,10 @@ export function analyzeTokenTypes(
   let patternIdxToCanLineTerminator: boolean[]
   tracer("Line Terminator Handling", () => {
     const lineTerminatorCharCodes = getCharCodes(
-      options.lineTerminatorCharacters!
+      actualOptions.lineTerminatorCharacters!
     )
     patternIdxToCanLineTerminator = map(onlyRelevantTypes, (tokType) => false)
-    if (options.positionTracking !== "onlyOffset") {
+    if (actualOptions.positionTracking !== "onlyOffset") {
       patternIdxToCanLineTerminator = map(onlyRelevantTypes, (tokType) => {
         if (has(tokType, "LINE_BREAKS")) {
           return !!tokType.LINE_BREAKS
@@ -302,7 +304,7 @@ export function analyzeTokenTypes(
   let charCodeToPatternIdxToConfig: { [charCode: number]: IPatternConfig[] } =
     []
 
-  if (!options.safeMode) {
+  if (!actualOptions.safeMode) {
     tracer("First Char Optimization", () => {
       charCodeToPatternIdxToConfig = reduce.indexed(
         onlyRelevantTypes,
@@ -335,7 +337,7 @@ export function analyzeTokenTypes(
           } else if (isRegexp(currTokType.PATTERN)) {
             if (currTokType.PATTERN.unicode) {
               canBeOptimized = false
-              if (options.ensureOptimizations) {
+              if (actualOptions.ensureOptimizations) {
                 PRINT_ERROR(
                   `${failedOptimizationPrefixMsg}` +
                     `\tUnable to analyze < ${currTokType.PATTERN.toString()} > pattern.\n` +
@@ -347,7 +349,7 @@ export function analyzeTokenTypes(
             } else {
               const optimizedCodes = getOptimizedStartCodesIndices(
                 currTokType.PATTERN,
-                options.ensureOptimizations
+                actualOptions.ensureOptimizations
               )
               /* istanbul ignore if */
               // start code will only be empty given an empty regExp or failure of regexp-to-ast library
@@ -363,7 +365,7 @@ export function analyzeTokenTypes(
               })
             }
           } else {
-            if (options.ensureOptimizations) {
+            if (actualOptions.ensureOptimizations) {
               PRINT_ERROR(
                 `${failedOptimizationPrefixMsg}` +
                   `\tTokenType: <${currTokType.name}> is using a custom token pattern without providing <start_chars_hint> parameter.\n` +

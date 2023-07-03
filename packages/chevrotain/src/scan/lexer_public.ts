@@ -19,7 +19,7 @@ import { reject } from "remeda"
 import { map } from "remeda"
 import { forEach } from "remeda"
 import { keys } from "remeda"
-import identity from "lodash/identity"
+import { identity } from "remeda"
 import {
   PRINT_WARNING,
   timer,

@@ -53,9 +53,6 @@ importers:
       eslint-plugin-eslint-comments:
         specifier: 3.2.0
         version: 3.2.0(eslint@8.30.0)
-      eslint-plugin-lodash:
-        specifier: 7.4.0
-        version: 7.4.0(eslint@8.30.0)
       fs-extra:
         specifier: 11.1.0
         version: 11.1.0
@@ -71,9 +68,6 @@ importers:
       lint-staged:
         specifier: 13.1.0
         version: 13.1.0
-      lodash:
-        specifier: 4.17.21
-        version: 4.17.21
       make-dir:
         specifier: 3.1.0
         version: 3.1.0
@@ -4829,16 +4823,6 @@ packages:
       escape-string-regexp: 1.0.5
       eslint: 8.30.0
       ignore: 5.2.0
-    dev: true
-
-  /eslint-plugin-lodash@7.4.0(eslint@8.30.0):
-    resolution: {integrity: sha512-Tl83UwVXqe1OVeBRKUeWcfg6/pCW1GTRObbdnbEJgYwjxp5Q92MEWQaH9+dmzbRt6kvYU1Mp893E79nJiCSM8A==}
-    engines: {node: '>=10'}
-    peerDependencies:
-      eslint: '>=2'
-    dependencies:
-      eslint: 8.30.0
-      lodash: 4.17.21
     dev: true
 
   /eslint-scope@5.1.1:

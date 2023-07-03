@@ -1,9 +1,7 @@
 import { flatten } from "remeda"
 import { isArray } from "remeda"
 import { map } from "remeda"
-import { reduce } from "remeda"
 import uniq from "lodash/uniq"
-import upperFirst from "lodash/upperFirst"
 import { GenerateDtsOptions } from "@chevrotain/types"
 import {
   CstNodeTypeDefinition,
@@ -95,9 +93,10 @@ function getTypeString(type: TokenArrayType | RuleArrayType) {
 }
 
 function getNodeInterfaceName(ruleName: string) {
-  return upperFirst(ruleName) + "CstNode"
+  // TODO: document this is a breaking change due to unicode
+  return ruleName[0].toUpperCase() + ruleName.substring(1) + "CstNode"
 }
 
 function getNodeChildrenTypeName(ruleName: string) {
-  return upperFirst(ruleName) + "CstChildren"
+  return ruleName[0].toUpperCase() + ruleName.substring(1) + "CstChildren"
 }
