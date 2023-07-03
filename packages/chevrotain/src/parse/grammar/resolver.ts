@@ -2,7 +2,7 @@ import {
   IParserUnresolvedRefDefinitionError,
   ParserDefinitionErrorType
 } from "../parser/parser"
-import forEach from "lodash/forEach"
+import { forEach } from "remeda"
 import { values } from "remeda"
 import { NonTerminal, Rule } from "@chevrotain/gast"
 import { GAstVisitor } from "@chevrotain/gast"

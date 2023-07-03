@@ -17,7 +17,7 @@ import {
 import { last as peek } from "remeda"
 import { isArray } from "remeda"
 import { some } from "@chevrotain/utils"
-import forEach from "lodash/forEach"
+import { forEach } from "remeda"
 import { isFunction } from "remeda"
 import { has } from "@chevrotain/utils"
 import { MixedInParser } from "./parser_traits"

@@ -1,5 +1,5 @@
 import map from "lodash/map"
-import forEach from "lodash/forEach"
+import { forEach } from "remeda"
 import { isString } from "remeda"
 import isRegexp from "is-regexp"
 import { pickBy } from "remeda"

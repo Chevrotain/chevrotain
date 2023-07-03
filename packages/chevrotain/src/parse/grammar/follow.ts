@@ -1,6 +1,6 @@
 import { RestWalker } from "./rest"
 import { first } from "./first"
-import forEach from "lodash/forEach"
+import { forEach } from "remeda"
 import assign from "lodash/assign"
 import { IN } from "../constants"
 import { Alternative, NonTerminal, Rule, Terminal } from "@chevrotain/gast"

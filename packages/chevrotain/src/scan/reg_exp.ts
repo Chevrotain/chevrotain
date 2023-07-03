@@ -9,7 +9,7 @@ import {
 } from "@chevrotain/regexp-to-ast"
 import { isArray } from "remeda"
 import { every } from "@chevrotain/utils"
-import forEach from "lodash/forEach"
+import { forEach } from "remeda"
 import find from "lodash/find"
 import { values } from "remeda"
 import { includes } from "@chevrotain/utils"

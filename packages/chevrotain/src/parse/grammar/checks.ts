@@ -6,7 +6,7 @@ import filter from "lodash/filter"
 import reject from "lodash/reject"
 import difference from "lodash/difference"
 import map from "lodash/map"
-import forEach from "lodash/forEach"
+import { forEach } from "remeda"
 import groupBy from "lodash/groupBy"
 import reduce from "lodash/reduce"
 import { pickBy } from "remeda"
@@ -556,7 +556,7 @@ function checkAlternativesAmbiguities(
 
       forEach(currAlt, (currPath) => {
         const altsCurrPathAppearsIn = [currAltIdx]
-        forEach(alternatives, (currOtherAlt, currOtherAltIdx) => {
+        forEach.indexed(alternatives, (currOtherAlt, currOtherAltIdx) => {
           if (
             currAltIdx !== currOtherAltIdx &&
             containsPath(currOtherAlt, currPath) &&

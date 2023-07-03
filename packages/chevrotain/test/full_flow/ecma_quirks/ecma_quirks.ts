@@ -1,13 +1,12 @@
 import { createToken } from "../../../src/scan/tokens_public"
 import { Lexer } from "../../../src/scan/lexer_public"
 import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
-
 import { END_OF_FILE } from "../../../src/parse/parser/parser"
 import { MismatchedTokenException } from "../../../src/parse/exceptions_public"
 import flatten from "lodash/flatten"
 import { every } from "@chevrotain/utils"
 import map from "lodash/map"
-import forEach from "lodash/forEach"
+import { forEach, values } from "remeda"
 import {
   ILookaheadStrategy,
   ILookaheadValidationError,
@@ -76,7 +75,7 @@ function deferredInitTokens() {
   // Avoids errors in browser tests where the bundled specs will execute this
   // file even if the tests will avoid running it.
   if (typeof (<any>new RegExp("(?:)")).sticky === "boolean") {
-    forEach(allTokens, (currTokType) => {
+    forEach(values(allTokens), (currTokType) => {
       currTokType.PATTERN = new RegExp(
         (currTokType.PATTERN as RegExp).source,
         "y"

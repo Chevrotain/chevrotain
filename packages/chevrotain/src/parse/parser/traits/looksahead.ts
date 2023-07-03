@@ -1,4 +1,4 @@
-import forEach from "lodash/forEach"
+import { forEach } from "remeda"
 import { has } from "@chevrotain/utils"
 import { DEFAULT_PARSER_CONFIG } from "../parser"
 import {

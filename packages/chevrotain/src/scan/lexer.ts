@@ -1,6 +1,6 @@
 import { BaseRegExpVisitor } from "@chevrotain/regexp-to-ast"
 import { IRegExpExec, Lexer, LexerDefinitionErrorType } from "./lexer_public"
-import { first } from "remeda"
+import { first, forEachObj } from "remeda"
 import { isEmpty } from "remeda"
 import { compact } from "remeda"
 import { isArray } from "remeda"
@@ -11,7 +11,7 @@ import reject from "lodash/reject"
 import difference from "lodash/difference"
 import indexOf from "lodash/indexOf"
 import map from "lodash/map"
-import forEach from "lodash/forEach"
+import { forEach } from "remeda"
 import { isString } from "remeda"
 import { isFunction } from "remeda"
 import find from "lodash/find"
@@ -756,7 +756,7 @@ export function findUnreachablePatterns(
     [] as { str: string; idx: number; tokenType: TokenType }[]
   )
 
-  forEach(tokenTypes, (tokType, testIdx) => {
+  forEach.indexed(tokenTypes, (tokType, testIdx) => {
     forEach(canBeTested, ({ str, idx, tokenType }) => {
       if (testIdx < idx && testTokenType(str, tokType.PATTERN)) {
         const msg =
@@ -871,8 +871,8 @@ export function performRuntimeChecks(
   }
 
   if (has(lexerDefinition, MODES)) {
-    forEach(lexerDefinition.modes, (currModeValue, currModeName) => {
-      forEach(currModeValue, (currTokType, currIdx) => {
+    forEachObj.indexed(lexerDefinition.modes, (currModeValue, currModeName) => {
+      forEach.indexed(currModeValue, (currTokType, currIdx) => {
         if (currTokType === undefined) {
           errors.push({
             message:

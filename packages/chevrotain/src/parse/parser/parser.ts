@@ -1,6 +1,6 @@
 import { isEmpty } from "remeda"
 import map from "lodash/map"
-import forEach from "lodash/forEach"
+import { forEach } from "remeda"
 import { values } from "remeda"
 import { has, shallowClone } from "@chevrotain/utils"
 import { toFastProperties } from "@chevrotain/utils"

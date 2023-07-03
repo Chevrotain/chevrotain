@@ -1,5 +1,5 @@
 import { Rule } from "@chevrotain/gast"
-import forEach from "lodash/forEach"
+import { forEach } from "remeda"
 import defaults from "lodash/defaults"
 import { resolveGrammar as orgResolveGrammar } from "../resolver"
 import { validateGrammar as orgValidateGrammar } from "../checks"

@@ -11,13 +11,13 @@ import {
   SUPPORT_STICKY,
   validatePatterns
 } from "./lexer"
-import { noop } from "remeda"
+import { forEachObj, noop } from "remeda"
 import { isEmpty } from "remeda"
 import { isArray } from "remeda"
 import { last } from "remeda"
 import reject from "lodash/reject"
 import map from "lodash/map"
-import forEach from "lodash/forEach"
+import { forEach } from "remeda"
 import { keys } from "remeda"
 import identity from "lodash/identity"
 import assign from "lodash/assign"
@@ -217,20 +217,23 @@ export class Lexer {
 
       // an error of undefined TokenTypes will be detected in "performRuntimeChecks" above.
       // this transformation is to increase robustness in the case of partially invalid lexer definition.
-      forEach(actualDefinition.modes, (currModeValue, currModeName) => {
-        actualDefinition.modes[currModeName] = reject<TokenType>(
-          currModeValue,
-          (currTokType) => currTokType === undefined
-        )
-      })
+      forEachObj.indexed(
+        actualDefinition.modes,
+        (currModeValue, currModeName) => {
+          actualDefinition.modes[currModeName] = reject<TokenType>(
+            currModeValue,
+            (currTokType) => currTokType === undefined
+          )
+        }
+      )
 
       const allModeNames = keys(actualDefinition.modes)
 
-      forEach(
+      forEachObj.indexed(
         actualDefinition.modes,
         (currModDef: TokenType[], currModName) => {
           this.TRACE_INIT(`Mode: <${currModName}> processing`, () => {
-            this.modes.push(currModName)
+            this.modes.push(currModName as string)
 
             if (this.config.skipValidations === false) {
               this.TRACE_INIT(`validatePatterns`, () => {

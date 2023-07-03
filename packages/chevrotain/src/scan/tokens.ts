@@ -1,10 +1,10 @@
-import { isEmpty } from "remeda"
+import { forEachObj, isEmpty } from "remeda"
 import { compact } from "remeda"
 import { isArray } from "remeda"
 import flatten from "lodash/flatten"
 import difference from "lodash/difference"
 import map from "lodash/map"
-import forEach from "lodash/forEach"
+import { forEach } from "remeda"
 import { has } from "@chevrotain/utils"
 import { includes, shallowClone } from "@chevrotain/utils"
 import { IToken, TokenType } from "@chevrotain/types"
@@ -110,7 +110,7 @@ export function assignCategoriesTokensProp(tokenTypes: TokenType[]): void {
   forEach(tokenTypes, (currTokType) => {
     // avoid duplications
     currTokType.categoryMatches = []
-    forEach(currTokType.categoryMatchesMap!, (val, key) => {
+    forEachObj.indexed(currTokType.categoryMatchesMap!, (val, key) => {
       currTokType.categoryMatches!.push(
         tokenIdxToClass[key as unknown as number].tokenTypeIdx!
       )
@@ -132,7 +132,7 @@ export function singleAssignCategoriesToksMap(
     nextNode.categoryMatchesMap![pathNode.tokenTypeIdx!] = true
   })
 
-  forEach(nextNode.CATEGORIES, (nextCategory) => {
+  forEach(nextNode.CATEGORIES ?? [], (nextCategory) => {
     const newPath = path.concat(nextNode)
     // avoids infinite loops due to cyclic categories.
     if (!includes(newPath, nextCategory)) {
