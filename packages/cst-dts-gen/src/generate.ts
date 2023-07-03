@@ -1,4 +1,4 @@
-import flatten from "lodash/flatten"
+import { flatten } from "remeda"
 import { isArray } from "remeda"
 import map from "lodash/map"
 import reduce from "lodash/reduce"

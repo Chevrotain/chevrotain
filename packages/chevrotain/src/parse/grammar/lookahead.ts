@@ -1,5 +1,5 @@
 import { isEmpty } from "remeda"
-import flatten from "lodash/flatten"
+import { flatten } from "remeda"
 import { every } from "@chevrotain/utils"
 import map from "lodash/map"
 import { forEach } from "remeda"

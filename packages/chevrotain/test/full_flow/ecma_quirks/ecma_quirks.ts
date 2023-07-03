@@ -3,7 +3,7 @@ import { Lexer } from "../../../src/scan/lexer_public"
 import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
 import { END_OF_FILE } from "../../../src/parse/parser/parser"
 import { MismatchedTokenException } from "../../../src/parse/exceptions_public"
-import flatten from "lodash/flatten"
+import { flatten } from "remeda"
 import { every } from "@chevrotain/utils"
 import map from "lodash/map"
 import { forEach, values } from "remeda"
@@ -121,7 +121,7 @@ class EcmaScriptQuirksLookaheadStrategy implements ILookaheadStrategy {
       throw Error("This scannerLess parser only supports LL(1) lookahead.")
     }
 
-    const allTokenTypesPerAlt = map(alts, flatten)
+    const allTokenTypesPerAlt = map(alts, flatten())
 
     return function (this: EcmaScriptQuirksParser) {
       // save & restore lexer state as otherwise the text index will move ahead

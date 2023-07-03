@@ -1,4 +1,4 @@
-import flatten from "lodash/flatten"
+import { flatten } from "remeda"
 import uniq from "lodash/uniq"
 import map from "lodash/map"
 import { NonTerminal, Terminal } from "@chevrotain/gast"
@@ -63,7 +63,7 @@ export function firstForBranching(prod: {
       return first(innerProd)
     }
   )
-  return uniq(flatten<TokenType>(allAlternativesFirsts))
+  return uniq(flatten(allAlternativesFirsts))
 }
 
 export function firstForTerminal(terminal: Terminal): TokenType[] {

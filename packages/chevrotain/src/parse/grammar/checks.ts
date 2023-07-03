@@ -1,7 +1,7 @@
 import { first } from "remeda"
 import { isEmpty } from "remeda"
 import { drop } from "remeda"
-import flatten from "lodash/flatten"
+import { flatten } from "remeda"
 import filter from "lodash/filter"
 import reject from "lodash/reject"
 import difference from "lodash/difference"

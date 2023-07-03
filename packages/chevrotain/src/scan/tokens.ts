@@ -1,7 +1,7 @@
 import { forEachObj, isEmpty } from "remeda"
 import { compact } from "remeda"
 import { isArray } from "remeda"
-import flatten from "lodash/flatten"
+import { flatten } from "remeda"
 import difference from "lodash/difference"
 import map from "lodash/map"
 import { forEach } from "remeda"

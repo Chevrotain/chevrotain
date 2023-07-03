@@ -13,7 +13,7 @@ import type {
 } from "@chevrotain/types"
 import { NonTerminal, GAstVisitor } from "@chevrotain/gast"
 import map from "lodash/map"
-import flatten from "lodash/flatten"
+import { flatten } from "remeda"
 import { values } from "remeda"
 import { some } from "@chevrotain/utils"
 import groupBy from "lodash/groupBy"
@@ -147,8 +147,8 @@ class CstNodeDefinitionGenerator extends GAstVisitor {
     )
   }
 
-  private visitEach(definition: IProduction[]) {
-    return flatten<PropertyTupleElement>(
+  private visitEach(definition: IProduction[]): PropertyTupleElement[] {
+    return flatten(
       map(
         definition,
         (definition) => this.visit(definition) as PropertyTupleElement[]

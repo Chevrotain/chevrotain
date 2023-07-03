@@ -9,7 +9,7 @@ import {
 } from "../../grammar/interpreter"
 import { isEmpty } from "remeda"
 import { dropLast } from "remeda"
-import flatten from "lodash/flatten"
+import { flatten } from "remeda"
 import map from "lodash/map"
 import find from "lodash/find"
 import { has, shallowClone } from "@chevrotain/utils"

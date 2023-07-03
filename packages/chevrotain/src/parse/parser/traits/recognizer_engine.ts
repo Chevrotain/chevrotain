@@ -20,7 +20,7 @@ import {
 } from "@chevrotain/types"
 import { isEmpty } from "remeda"
 import { isArray } from "remeda"
-import flatten from "lodash/flatten"
+import { flatten } from "remeda"
 import { every } from "@chevrotain/utils"
 import uniq from "lodash/uniq"
 import { isObject } from "remeda"
