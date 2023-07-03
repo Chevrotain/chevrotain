@@ -11,7 +11,7 @@ import {
   SUPPORT_STICKY,
   validatePatterns
 } from "./lexer"
-import { forEachObj, noop } from "remeda"
+import { forEachObj, merge, noop } from "remeda"
 import { isEmpty } from "remeda"
 import { isArray } from "remeda"
 import { last } from "remeda"
@@ -20,7 +20,6 @@ import { map } from "remeda"
 import { forEach } from "remeda"
 import { keys } from "remeda"
 import identity from "lodash/identity"
-import assign from "lodash/assign"
 import {
   PRINT_WARNING,
   timer,
@@ -126,8 +125,7 @@ export class Lexer {
       )
     }
 
-    // todo: defaults func?
-    this.config = assign({}, DEFAULT_LEXER_CONFIG, config) as any
+    this.config = merge(DEFAULT_LEXER_CONFIG, config)
 
     const traceInitVal = this.config.traceInitPerf
     if (traceInitVal === true) {
@@ -266,11 +264,10 @@ export class Lexer {
               this.charCodeToPatternIdxToConfig[currModName] =
                 currAnalyzeResult.charCodeToPatternIdxToConfig
 
-              this.emptyGroups = assign(
-                {},
+              this.emptyGroups = merge(
                 this.emptyGroups,
                 currAnalyzeResult.emptyGroups
-              ) as any
+              )
 
               this.hasCustom = currAnalyzeResult.hasCustom || this.hasCustom
 

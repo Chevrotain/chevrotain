@@ -3,7 +3,6 @@ import { forEach } from "remeda"
 import { isString } from "remeda"
 import isRegexp from "is-regexp"
 import { pickBy } from "remeda"
-import assign from "lodash/assign"
 import {
   IGASTVisitor,
   IProduction,
@@ -64,7 +63,8 @@ export class NonTerminal
     idx?: number
   }) {
     super([])
-    assign(
+
+    Object.assign(
       this,
       pickBy(options, (v) => v !== undefined)
     )
@@ -97,7 +97,7 @@ export class Rule extends AbstractProduction {
     orgText?: string
   }) {
     super(options.definition)
-    assign(
+    Object.assign(
       this,
       pickBy(options, (v) => v !== undefined)
     )
@@ -112,7 +112,7 @@ export class Alternative extends AbstractProduction {
     ignoreAmbiguities?: boolean
   }) {
     super(options.definition)
-    assign(
+    Object.assign(
       this,
       pickBy(options, (v) => v !== undefined)
     )
@@ -132,7 +132,7 @@ export class Option
     maxLookahead?: number
   }) {
     super(options.definition)
-    assign(
+    Object.assign(
       this,
       pickBy(options, (v) => v !== undefined)
     )
@@ -152,7 +152,7 @@ export class RepetitionMandatory
     maxLookahead?: number
   }) {
     super(options.definition)
-    assign(
+    Object.assign(
       this,
       pickBy(options, (v) => v !== undefined)
     )
@@ -173,7 +173,7 @@ export class RepetitionMandatoryWithSeparator
     idx?: number
   }) {
     super(options.definition)
-    assign(
+    Object.assign(
       this,
       pickBy(options, (v) => v !== undefined)
     )
@@ -194,7 +194,7 @@ export class Repetition
     maxLookahead?: number
   }) {
     super(options.definition)
-    assign(
+    Object.assign(
       this,
       pickBy(options, (v) => v !== undefined)
     )
@@ -215,7 +215,7 @@ export class RepetitionWithSeparator
     idx?: number
   }) {
     super(options.definition)
-    assign(
+    Object.assign(
       this,
       pickBy(options, (v) => v !== undefined)
     )
@@ -246,7 +246,7 @@ export class Alternation
     maxLookahead?: number
   }) {
     super(options.definition)
-    assign(
+    Object.assign(
       this,
       pickBy(options, (v) => v !== undefined)
     )
@@ -263,7 +263,7 @@ export class Terminal implements IProductionWithOccurrence {
     label?: string
     idx?: number
   }) {
-    assign(
+    Object.assign(
       this,
       pickBy(options, (v) => v !== undefined)
     )

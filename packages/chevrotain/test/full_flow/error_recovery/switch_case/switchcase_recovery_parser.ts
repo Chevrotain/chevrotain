@@ -44,7 +44,7 @@ import {
   StringTok,
   SwitchTok
 } from "./switchcase_recovery_tokens"
-import assign from "lodash/assign"
+import { merge } from "remeda"
 import { includes } from "@chevrotain/utils"
 import { IToken, TokenType } from "@chevrotain/types"
 
@@ -103,7 +103,7 @@ export class SwitchCaseRecoveryParser extends EmbeddedActionsParser {
     // previous grammar rule invocations.
     this.invalidIdx = 1
 
-    const retObj: RetType = {}
+    let retObj: RetType = {}
 
     this.CONSUME(SwitchTok)
     this.CONSUME(LParenTok)
@@ -112,7 +112,7 @@ export class SwitchCaseRecoveryParser extends EmbeddedActionsParser {
     this.CONSUME(LCurlyTok)
 
     this.AT_LEAST_ONE(() => {
-      assign(retObj, this.SUBRULE(this.caseStmt))
+      retObj = merge(retObj, this.SUBRULE(this.caseStmt))
     })
 
     this.CONSUME(RCurlyTok)

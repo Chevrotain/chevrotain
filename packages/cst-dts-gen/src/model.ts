@@ -17,7 +17,7 @@ import { flatten } from "remeda"
 import { values } from "remeda"
 import { some } from "@chevrotain/utils"
 import groupBy from "lodash/groupBy"
-import assign from "lodash/assign"
+import { merge } from "remeda"
 
 export function buildModel(
   productions: Record<string, Rule>
@@ -142,9 +142,8 @@ class CstNodeDefinitionGenerator extends GAstVisitor {
     definition: IProduction[],
     override: Partial<PropertyTupleElement>
   ) {
-    return map(
-      this.visitEach(definition),
-      (definition) => assign({}, definition, override) as PropertyTupleElement
+    return map(this.visitEach(definition), (definition) =>
+      merge(definition, override)
     )
   }
 
