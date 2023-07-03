@@ -9,11 +9,10 @@ import map from "lodash/map"
 import forEach from "lodash/forEach"
 import groupBy from "lodash/groupBy"
 import reduce from "lodash/reduce"
-import pickBy from "lodash/pickBy"
+import { pickBy } from "remeda"
 import { values } from "remeda"
-import { includes } from "@chevrotain/utils"
+import { includes, shallowClone } from "@chevrotain/utils"
 import flatMap from "lodash/flatMap"
-import clone from "lodash/clone"
 import {
   IParserAmbiguousAlternativesDefinitionError,
   IParserDuplicatesDefinitionError,
@@ -294,7 +293,7 @@ export function validateNoLeftRecursion(
     // other cyclic paths are ignored, we still need this difference to avoid infinite loops...
     const validNextSteps = difference(nextNonTerminals, path.concat([topRule]))
     const errorsFromNextSteps = flatMap(validNextSteps, (currRefRule) => {
-      const newPath = clone(path)
+      const newPath = shallowClone(path)
       newPath.push(currRefRule)
       return validateNoLeftRecursion(
         topRule,

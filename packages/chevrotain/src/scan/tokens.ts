@@ -6,8 +6,7 @@ import difference from "lodash/difference"
 import map from "lodash/map"
 import forEach from "lodash/forEach"
 import { has } from "@chevrotain/utils"
-import { includes } from "@chevrotain/utils"
-import clone from "lodash/clone"
+import { includes, shallowClone } from "@chevrotain/utils"
 import { IToken, TokenType } from "@chevrotain/types"
 
 export function tokenStructuredMatcher(
@@ -54,7 +53,7 @@ export function augmentTokenTypes(tokenTypes: TokenType[]): void {
 }
 
 export function expandCategories(tokenTypes: TokenType[]): TokenType[] {
-  let result = clone(tokenTypes)
+  let result = shallowClone(tokenTypes)
 
   let categories = tokenTypes
   let searching = true

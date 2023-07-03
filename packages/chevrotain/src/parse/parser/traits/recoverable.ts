@@ -12,9 +12,8 @@ import dropRight from "lodash/dropRight"
 import flatten from "lodash/flatten"
 import map from "lodash/map"
 import find from "lodash/find"
-import { has } from "@chevrotain/utils"
+import { has, shallowClone } from "@chevrotain/utils"
 import { includes } from "@chevrotain/utils"
-import clone from "lodash/clone"
 import {
   IParserConfig,
   IToken,
@@ -392,7 +391,9 @@ export class Recoverable {
     tokIdxInRule: number
   ): ITokenGrammarPath {
     const pathRuleStack: string[] = this.getHumanReadableRuleStack()
-    const pathOccurrenceStack: number[] = clone(this.RULE_OCCURRENCE_STACK)
+    const pathOccurrenceStack: number[] = shallowClone(
+      this.RULE_OCCURRENCE_STACK
+    )
     const grammarPath: any = {
       ruleStack: pathRuleStack,
       occurrenceStack: pathOccurrenceStack,

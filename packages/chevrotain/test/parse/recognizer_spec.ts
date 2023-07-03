@@ -930,9 +930,9 @@ function defineRecognizerSpecs(
         const tokensMap = (<any>parser).tokensMap
         // the implementation should clone the dictionary to avoid bugs caused by mutability
         expect(tokensMap).not.to.equal(initTokenDictionary)
-        expect(tokensMap.PlusTok).to.equal(PlusTok)
-        expect(tokensMap.MinusTok).to.equal(MinusTok)
-        expect(tokensMap.IntToken).to.equal(IntTok)
+        expect(tokensMap.PlusTok).to.deep.equal(PlusTok)
+        expect(tokensMap.MinusTok).to.deep.equal(MinusTok)
+        expect(tokensMap.IntToken).to.deep.equal(IntTok)
       })
 
       it("can be initialized with a IMultiModeLexerDefinition of Tokens", () => {

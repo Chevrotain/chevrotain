@@ -2,7 +2,7 @@ import map from "lodash/map"
 import forEach from "lodash/forEach"
 import { isString } from "remeda"
 import isRegexp from "is-regexp"
-import pickBy from "lodash/pickBy"
+import { pickBy } from "remeda"
 import assign from "lodash/assign"
 import {
   IGASTVisitor,

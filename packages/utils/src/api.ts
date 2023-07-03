@@ -1,4 +1,4 @@
 export { PRINT_WARNING, PRINT_ERROR } from "./print"
 export { timer } from "./timer"
 export { toFastProperties } from "./to-fast-properties"
-export { has, includes } from "./library"
+export { has, includes, shallowClone } from "./library"

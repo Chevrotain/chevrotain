@@ -24,10 +24,10 @@ import flatten from "lodash/flatten"
 import every from "lodash/every"
 import uniq from "lodash/uniq"
 import { isObject } from "remeda"
-import { has } from "@chevrotain/utils"
+import { has, shallowClone } from "@chevrotain/utils"
 import { values } from "remeda"
 import reduce from "lodash/reduce"
-import clone from "lodash/clone"
+import { clone } from "remeda"
 import {
   AT_LEAST_ONE_IDX,
   AT_LEAST_ONE_SEP_IDX,
@@ -808,7 +808,7 @@ export class RecognizerEngine {
   saveRecogState(this: MixedInParser): IParserState {
     // errors is a getter which will clone the errors array
     const savedErrors = this.errors
-    const savedRuleStack = clone(this.RULE_STACK)
+    const savedRuleStack = shallowClone(this.RULE_STACK)
     return {
       errors: savedErrors,
       lexerState: this.exportLexerState(),

@@ -2,8 +2,7 @@ import { isEmpty } from "remeda"
 import map from "lodash/map"
 import forEach from "lodash/forEach"
 import { values } from "remeda"
-import { has } from "@chevrotain/utils"
-import clone from "lodash/clone"
+import { has, shallowClone } from "@chevrotain/utils"
 import { toFastProperties } from "@chevrotain/utils"
 import { computeAllProdsFollows } from "../grammar/follow"
 import { createTokenInstance, EOF } from "../../scan/tokens_public"
@@ -305,7 +304,7 @@ export class CstParser extends Parser {
     tokenVocabulary: TokenVocabulary,
     config: IParserConfigInternal = DEFAULT_PARSER_CONFIG
   ) {
-    const configClone = clone(config)
+    const configClone = shallowClone(config)
     configClone.outputCst = true
     super(tokenVocabulary, configClone)
   }
@@ -316,7 +315,7 @@ export class EmbeddedActionsParser extends Parser {
     tokenVocabulary: TokenVocabulary,
     config: IParserConfigInternal = DEFAULT_PARSER_CONFIG
   ) {
-    const configClone = clone(config)
+    const configClone = shallowClone(config)
     configClone.outputCst = false
     super(tokenVocabulary, configClone)
   }

@@ -5,7 +5,7 @@ import dropRight from "lodash/dropRight"
 import drop from "lodash/drop"
 import { last } from "remeda"
 import forEach from "lodash/forEach"
-import clone from "lodash/clone"
+import { shallowClone } from "@chevrotain/utils"
 import { first } from "./first"
 import { TokenMatcher } from "../parser/parser"
 import {
@@ -51,8 +51,8 @@ export abstract class AbstractNextPossibleTokensWalker extends RestWalker {
     }
 
     // immutable for the win
-    this.ruleStack = clone(this.path.ruleStack).reverse() // intelij bug requires assertion
-    this.occurrenceStack = clone(this.path.occurrenceStack).reverse() // intelij bug requires assertion
+    this.ruleStack = shallowClone(this.path.ruleStack).reverse() // intelij bug requires assertion
+    this.occurrenceStack = shallowClone(this.path.occurrenceStack).reverse() // intelij bug requires assertion
 
     // already verified that the first production is valid, we now seek the 2nd production
     this.ruleStack.pop()
@@ -253,7 +253,7 @@ export function possiblePathsFrom(
   currPath: TokenType[] = []
 ): PartialPathAndSuffixes[] {
   // avoid side effects
-  currPath = clone(currPath)
+  currPath = shallowClone(currPath)
   let result: PartialPathAndSuffixes[] = []
   let i = 0
 
@@ -443,10 +443,10 @@ export function nextPossibleTokensAfter(
         throw Error("non exhaustive match")
       }
     } else if (prod instanceof NonTerminal) {
-      const newRuleStack = clone(currRuleStack)
+      const newRuleStack = shallowClone(currRuleStack)
       newRuleStack.push(prod.nonTerminalName)
 
-      const newOccurrenceStack = clone(currOccurrenceStack)
+      const newOccurrenceStack = shallowClone(currOccurrenceStack)
       newOccurrenceStack.push(prod.idx)
 
       const nextPath = {
@@ -596,10 +596,10 @@ function expandTopLevelRule(
   currRuleStack: string[],
   currOccurrenceStack: number[]
 ): IPathToExamine {
-  const newRuleStack = clone(currRuleStack)
+  const newRuleStack = shallowClone(currRuleStack)
   newRuleStack.push(topRule.name)
 
-  const newCurrOccurrenceStack = clone(currOccurrenceStack)
+  const newCurrOccurrenceStack = shallowClone(currOccurrenceStack)
   // top rule is always assumed to have been called with occurrence index 1
   newCurrOccurrenceStack.push(1)
 

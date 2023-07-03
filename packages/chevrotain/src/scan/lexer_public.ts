@@ -22,8 +22,12 @@ import { keys } from "remeda"
 import identity from "lodash/identity"
 import assign from "lodash/assign"
 import reduce from "lodash/reduce"
-import clone from "lodash/clone"
-import { PRINT_WARNING, timer, toFastProperties } from "@chevrotain/utils"
+import {
+  PRINT_WARNING,
+  timer,
+  toFastProperties,
+  shallowClone
+} from "@chevrotain/utils"
 import { augmentTokenTypes } from "./tokens"
 import {
   CustomPatternMatcherFunc,
@@ -172,13 +176,15 @@ export class Lexer {
         // Convert SingleModeLexerDefinition into a IMultiModeLexerDefinition.
         if (isArray(lexerDefinition)) {
           actualDefinition = {
-            modes: { defaultMode: clone(lexerDefinition) },
+            modes: { defaultMode: shallowClone(lexerDefinition) },
             defaultMode: DEFAULT_MODE
           }
         } else {
           // no conversion needed, input should already be a IMultiModeLexerDefinition
           hasOnlySingleMode = false
-          actualDefinition = clone(<IMultiModeLexerDefinition>lexerDefinition)
+          actualDefinition = shallowClone(
+            <IMultiModeLexerDefinition>lexerDefinition
+          )
         }
       })
 
