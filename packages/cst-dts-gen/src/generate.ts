@@ -1,6 +1,6 @@
 import { flatten } from "remeda"
 import { isArray } from "remeda"
-import map from "lodash/map"
+import { map } from "remeda"
 import reduce from "lodash/reduce"
 import uniq from "lodash/uniq"
 import upperFirst from "lodash/upperFirst"

@@ -18,7 +18,7 @@ import {
 } from "../../../src/parse/grammar/checks"
 import { createToken } from "../../../src/scan/tokens_public"
 import { first } from "remeda"
-import map from "lodash/map"
+import { map } from "remeda"
 import {
   Alternation,
   Alternative,

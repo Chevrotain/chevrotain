@@ -1,6 +1,6 @@
 import { flatten } from "remeda"
 import uniq from "lodash/uniq"
-import map from "lodash/map"
+import { map } from "remeda"
 import { NonTerminal, Terminal } from "@chevrotain/gast"
 import {
   isBranchingProd,

@@ -9,7 +9,7 @@ import {
   lookAheadSequenceFromAlternatives,
   PROD_TYPE
 } from "../../../src/parse/grammar/lookahead"
-import map from "lodash/map"
+import { map } from "remeda"
 import {
   augmentTokenTypes,
   tokenStructuredMatcher

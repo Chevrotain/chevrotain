@@ -1,5 +1,5 @@
 import { isEmpty } from "remeda"
-import map from "lodash/map"
+import { map } from "remeda"
 import { forEach } from "remeda"
 import { values } from "remeda"
 import { has, shallowClone } from "@chevrotain/utils"

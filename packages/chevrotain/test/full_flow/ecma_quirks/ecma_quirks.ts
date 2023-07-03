@@ -5,7 +5,7 @@ import { END_OF_FILE } from "../../../src/parse/parser/parser"
 import { MismatchedTokenException } from "../../../src/parse/exceptions_public"
 import { flatten } from "remeda"
 import { every } from "@chevrotain/utils"
-import map from "lodash/map"
+import { map } from "remeda"
 import { forEach, values } from "remeda"
 import {
   ILookaheadStrategy,

@@ -10,7 +10,7 @@ import {
 import { isEmpty } from "remeda"
 import { dropLast } from "remeda"
 import { flatten } from "remeda"
-import map from "lodash/map"
+import { map } from "remeda"
 import find from "lodash/find"
 import { has, shallowClone } from "@chevrotain/utils"
 import { includes } from "@chevrotain/utils"
@@ -314,7 +314,7 @@ export class Recoverable {
     const explicitRuleStack = this.RULE_STACK
     const explicitOccurrenceStack = this.RULE_OCCURRENCE_STACK
 
-    return map(explicitRuleStack, (ruleName, idx) => {
+    return map.indexed(explicitRuleStack, (ruleName, idx) => {
       if (idx === 0) {
         return EOF_FOLLOW_KEY
       }

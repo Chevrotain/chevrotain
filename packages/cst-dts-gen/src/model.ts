@@ -12,7 +12,7 @@ import type {
   TokenType
 } from "@chevrotain/types"
 import { NonTerminal, GAstVisitor } from "@chevrotain/gast"
-import map from "lodash/map"
+import { forEachObj, map } from "remeda"
 import { flatten } from "remeda"
 import { values } from "remeda"
 import { some } from "@chevrotain/utils"
@@ -52,9 +52,10 @@ export type RuleArrayType = {
 class CstNodeDefinitionGenerator extends GAstVisitor {
   visitRule(node: Rule): CstNodeTypeDefinition {
     const rawElements = this.visitEach(node.definition)
-
     const grouped = groupBy(rawElements, (el) => el.propertyName)
-    const properties = map(grouped, (group, propertyName) => {
+
+    const properties: PropertyTypeDefinition[] = []
+    forEachObj.indexed(grouped, (group, propertyName) => {
       const allNullable = !some(group, (el) => !el.canBeNull)
 
       // In an alternation with a label a property name can have
@@ -64,11 +65,11 @@ class CstNodeDefinitionGenerator extends GAstVisitor {
         propertyType = map(group, (g) => g.type)
       }
 
-      return {
-        name: propertyName,
+      properties.push({
+        name: propertyName as string,
         type: propertyType,
         optional: allNullable
-      } as PropertyTypeDefinition
+      })
     })
 
     return {

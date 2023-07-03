@@ -10,7 +10,7 @@ import { flatten } from "remeda"
 import reject from "lodash/reject"
 import difference from "lodash/difference"
 import indexOf from "lodash/indexOf"
-import map from "lodash/map"
+import { map } from "remeda"
 import { forEach } from "remeda"
 import { isString } from "remeda"
 import { isFunction } from "remeda"
@@ -279,7 +279,7 @@ export function analyzeTokenTypes(
       {} as { [groupName: string]: IToken[] }
     )
 
-    patternIdxToConfig = map(
+    patternIdxToConfig = map.indexed(
       allTransformedPatterns,
       (x, idx): IPatternConfig => {
         return {

@@ -1,5 +1,5 @@
 import { last } from "remeda"
-import map from "lodash/map"
+import { map } from "remeda"
 import { forEach } from "remeda"
 import { isString } from "remeda"
 import isRegexp from "is-regexp"

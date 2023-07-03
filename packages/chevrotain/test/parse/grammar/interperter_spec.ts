@@ -1,5 +1,5 @@
 import { expect } from "chai"
-import map from "lodash/map"
+import { map } from "remeda"
 import { IToken, ITokenGrammarPath, TokenType } from "@chevrotain/types"
 import {
   NextAfterTokenWalker,

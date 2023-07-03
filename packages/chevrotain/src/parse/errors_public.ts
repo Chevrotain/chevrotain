@@ -1,6 +1,6 @@
 import { hasTokenLabel, tokenLabel } from "../scan/tokens_public"
 import { first } from "remeda"
-import map from "lodash/map"
+import { map } from "remeda"
 import reduce from "lodash/reduce"
 import { Alternation, NonTerminal, Rule, Terminal } from "@chevrotain/gast"
 import { getProductionDslName } from "@chevrotain/gast"
@@ -57,7 +57,7 @@ export const defaultParserErrorProvider: IParserErrorMessageProvider = {
             ", "
           )}]`
       )
-      const nextValidSequenceItems = map(
+      const nextValidSequenceItems = map.indexed(
         nextValidTokenSequences,
         (itemMsg, idx) => `  ${idx + 1}. ${itemMsg}`
       )
