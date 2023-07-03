@@ -21,7 +21,7 @@ import {
 import { isEmpty } from "remeda"
 import { isArray } from "remeda"
 import flatten from "lodash/flatten"
-import every from "lodash/every"
+import { every } from "@chevrotain/utils"
 import uniq from "lodash/uniq"
 import { isObject } from "remeda"
 import { has, shallowClone } from "@chevrotain/utils"
@@ -142,7 +142,10 @@ export class RecognizerEngine {
       )
     } else if (
       has(tokenVocabulary, "modes") &&
-      every(flatten(values((<any>tokenVocabulary).modes)), isTokenType)
+      every(
+        flatten(values((tokenVocabulary as IMultiModeLexerDefinition).modes)),
+        isTokenType
+      )
     ) {
       const allTokenTypes: TokenType[] = flatten(
         values((tokenVocabulary as IMultiModeLexerDefinition).modes)

@@ -1,5 +1,5 @@
-import some from "lodash/some"
-import every from "lodash/every"
+import { some } from "@chevrotain/utils"
+import { every } from "@chevrotain/utils"
 import { includes } from "@chevrotain/utils"
 import {
   AbstractProduction,

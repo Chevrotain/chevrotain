@@ -16,3 +16,31 @@ export function shallowClone<T>(obj: T): T {
     return { ...obj }
   }
 }
+
+/**
+ * Array.prototype.some wrapper
+ * Keep edge case handling of lodash for invalid inputs "just in case"
+ */
+export function some<T>(
+  arr: T[],
+  predicate: (elem: T, idx: number) => boolean
+) {
+  if (!Array.isArray(arr)) {
+    return false
+  }
+  return arr.some(predicate)
+}
+
+/**
+ * Array.prototype.every wrapper
+ * Keep edge case handling of lodash for invalid inputs "just in case"
+ */
+export function every<T>(
+  arr: T[],
+  predicate: (elem: T, idx: number) => boolean
+) {
+  if (!Array.isArray(arr)) {
+    return false
+  }
+  return arr.every(predicate)
+}

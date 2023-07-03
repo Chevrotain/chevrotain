@@ -15,7 +15,7 @@ import { NonTerminal, GAstVisitor } from "@chevrotain/gast"
 import map from "lodash/map"
 import flatten from "lodash/flatten"
 import { values } from "remeda"
-import some from "lodash/some"
+import { some } from "@chevrotain/utils"
 import groupBy from "lodash/groupBy"
 import assign from "lodash/assign"
 

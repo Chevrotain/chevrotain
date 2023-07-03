@@ -8,7 +8,7 @@ import {
   Set
 } from "@chevrotain/regexp-to-ast"
 import { isArray } from "remeda"
-import every from "lodash/every"
+import { every } from "@chevrotain/utils"
 import forEach from "lodash/forEach"
 import find from "lodash/find"
 import { values } from "remeda"

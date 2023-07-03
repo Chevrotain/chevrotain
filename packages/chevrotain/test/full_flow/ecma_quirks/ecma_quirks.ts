@@ -5,7 +5,7 @@ import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_t
 import { END_OF_FILE } from "../../../src/parse/parser/parser"
 import { MismatchedTokenException } from "../../../src/parse/exceptions_public"
 import flatten from "lodash/flatten"
-import every from "lodash/every"
+import { every } from "@chevrotain/utils"
 import map from "lodash/map"
 import forEach from "lodash/forEach"
 import {

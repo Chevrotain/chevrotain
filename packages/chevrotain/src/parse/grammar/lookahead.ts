@@ -1,6 +1,6 @@
 import { isEmpty } from "remeda"
 import flatten from "lodash/flatten"
-import every from "lodash/every"
+import { every } from "@chevrotain/utils"
 import map from "lodash/map"
 import forEach from "lodash/forEach"
 import { has } from "@chevrotain/utils"

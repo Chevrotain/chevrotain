@@ -16,7 +16,7 @@ import {
 } from "@chevrotain/types"
 import { last as peek } from "remeda"
 import { isArray } from "remeda"
-import some from "lodash/some"
+import { some } from "@chevrotain/utils"
 import forEach from "lodash/forEach"
 import { isFunction } from "remeda"
 import { has } from "@chevrotain/utils"
