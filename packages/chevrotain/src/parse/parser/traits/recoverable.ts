@@ -8,7 +8,7 @@ import {
   IFirstAfterRepetition
 } from "../../grammar/interpreter"
 import { isEmpty } from "remeda"
-import dropRight from "lodash/dropRight"
+import { dropLast } from "remeda"
 import flatten from "lodash/flatten"
 import map from "lodash/map"
 import find from "lodash/find"
@@ -121,7 +121,7 @@ export class Recoverable {
         this.LA(0)
       )
       // the first token here will be the original cause of the error, this is not part of the resyncedTokens property.
-      error.resyncedTokens = dropRight(resyncedTokens)
+      error.resyncedTokens = dropLast(resyncedTokens, 1)
       this.SAVE_ERROR(error)
     }
 
@@ -368,7 +368,7 @@ export class Recoverable {
       this.addToResyncTokens(nextTok, resyncedTokens)
     }
     // the last token is not part of the error.
-    return dropRight(resyncedTokens)
+    return dropLast(resyncedTokens, 1)
   }
 
   attemptInRepetitionRecovery(

@@ -1,8 +1,8 @@
 import { RestWalker } from "./rest"
 import { first as _first } from "remeda"
 import { isEmpty } from "remeda"
-import dropRight from "lodash/dropRight"
-import drop from "lodash/drop"
+import { dropLast } from "remeda"
+import { drop } from "remeda"
 import { last } from "remeda"
 import forEach from "lodash/forEach"
 import { shallowClone } from "@chevrotain/utils"
@@ -410,9 +410,9 @@ export function nextPossibleTokensAfter(
     if (prod === EXIT_NON_TERMINAL) {
       const nextPath = {
         idx: currIdx,
-        def: drop(currDef),
-        ruleStack: dropRight(currRuleStack),
-        occurrenceStack: dropRight(currOccurrenceStack)
+        def: drop(currDef, 1),
+        ruleStack: dropLast(currRuleStack, 1),
+        occurrenceStack: dropLast(currOccurrenceStack, 1)
       }
       possiblePaths.push(nextPath)
     } else if (prod instanceof Terminal) {
@@ -423,7 +423,7 @@ export function nextPossibleTokensAfter(
         if (tokMatcher!(actualToken, prod.terminalType)) {
           const nextPath = {
             idx: nextIdx,
-            def: drop(currDef),
+            def: drop(currDef, 1),
             ruleStack: currRuleStack,
             occurrenceStack: currOccurrenceStack
           }
@@ -451,7 +451,7 @@ export function nextPossibleTokensAfter(
 
       const nextPath = {
         idx: currIdx,
-        def: prod.definition.concat(EXIT_NON_TERMINAL_ARR, drop(currDef)),
+        def: prod.definition.concat(EXIT_NON_TERMINAL_ARR, drop(currDef, 1)),
         ruleStack: newRuleStack,
         occurrenceStack: newOccurrenceStack
       }
@@ -460,7 +460,7 @@ export function nextPossibleTokensAfter(
       // the order of alternatives is meaningful, FILO (Last path will be traversed first).
       const nextPathWithout = {
         idx: currIdx,
-        def: drop(currDef),
+        def: drop(currDef, 1),
         ruleStack: currRuleStack,
         occurrenceStack: currOccurrenceStack
       }
@@ -470,7 +470,7 @@ export function nextPossibleTokensAfter(
 
       const nextPathWith = {
         idx: currIdx,
-        def: prod.definition.concat(drop(currDef)),
+        def: prod.definition.concat(drop(currDef, 1)),
         ruleStack: currRuleStack,
         occurrenceStack: currOccurrenceStack
       }
@@ -481,7 +481,10 @@ export function nextPossibleTokensAfter(
         definition: prod.definition,
         idx: prod.idx
       })
-      const nextDef = prod.definition.concat([secondIteration], drop(currDef))
+      const nextDef = prod.definition.concat(
+        [secondIteration],
+        drop(currDef, 1)
+      )
       const nextPath = {
         idx: currIdx,
         def: nextDef,
@@ -498,7 +501,10 @@ export function nextPossibleTokensAfter(
         definition: [<any>separatorGast].concat(prod.definition),
         idx: prod.idx
       })
-      const nextDef = prod.definition.concat([secondIteration], drop(currDef))
+      const nextDef = prod.definition.concat(
+        [secondIteration],
+        drop(currDef, 1)
+      )
       const nextPath = {
         idx: currIdx,
         def: nextDef,
@@ -510,7 +516,7 @@ export function nextPossibleTokensAfter(
       // the order of alternatives is meaningful, FILO (Last path will be traversed first).
       const nextPathWithout = {
         idx: currIdx,
-        def: drop(currDef),
+        def: drop(currDef, 1),
         ruleStack: currRuleStack,
         occurrenceStack: currOccurrenceStack
       }
@@ -525,7 +531,7 @@ export function nextPossibleTokensAfter(
         definition: [<any>separatorGast].concat(prod.definition),
         idx: prod.idx
       })
-      const nextDef = prod.definition.concat([nthRepetition], drop(currDef))
+      const nextDef = prod.definition.concat([nthRepetition], drop(currDef, 1))
       const nextPathWith = {
         idx: currIdx,
         def: nextDef,
@@ -537,7 +543,7 @@ export function nextPossibleTokensAfter(
       // the order of alternatives is meaningful, FILO (Last path will be traversed first).
       const nextPathWithout = {
         idx: currIdx,
-        def: drop(currDef),
+        def: drop(currDef, 1),
         ruleStack: currRuleStack,
         occurrenceStack: currOccurrenceStack
       }
@@ -550,7 +556,7 @@ export function nextPossibleTokensAfter(
         definition: prod.definition,
         idx: prod.idx
       })
-      const nextDef = prod.definition.concat([nthRepetition], drop(currDef))
+      const nextDef = prod.definition.concat([nthRepetition], drop(currDef, 1))
       const nextPathWith = {
         idx: currIdx,
         def: nextDef,
@@ -564,7 +570,7 @@ export function nextPossibleTokensAfter(
         const currAlt: any = prod.definition[i]
         const currAltPath = {
           idx: currIdx,
-          def: currAlt.definition.concat(drop(currDef)),
+          def: currAlt.definition.concat(drop(currDef, 1)),
           ruleStack: currRuleStack,
           occurrenceStack: currOccurrenceStack
         }
@@ -574,7 +580,7 @@ export function nextPossibleTokensAfter(
     } else if (prod instanceof Alternative) {
       possiblePaths.push({
         idx: currIdx,
-        def: prod.definition.concat(drop(currDef)),
+        def: prod.definition.concat(drop(currDef, 1)),
         ruleStack: currRuleStack,
         occurrenceStack: currOccurrenceStack
       })

@@ -14,7 +14,7 @@ import {
   SubruleMethodOpts,
   TokenType
 } from "@chevrotain/types"
-import peek from "lodash/last"
+import { last as peek } from "remeda"
 import { isArray } from "remeda"
 import some from "lodash/some"
 import forEach from "lodash/forEach"

@@ -1,6 +1,6 @@
 import { first } from "remeda"
 import { isEmpty } from "remeda"
-import drop from "lodash/drop"
+import { drop } from "remeda"
 import flatten from "lodash/flatten"
 import filter from "lodash/filter"
 import reject from "lodash/reject"
@@ -52,7 +52,7 @@ import {
   IGrammarValidatorErrorMessageProvider,
   IParserDefinitionError
 } from "./types"
-import dropRight from "lodash/dropRight"
+import { dropLast } from "remeda"
 import { compact } from "remeda"
 import { tokenStructuredMatcher } from "../../scan/tokens"
 
@@ -344,7 +344,7 @@ export function getFirstNoneTerminal(definition: IProduction[]): Rule[] {
   const isFirstOptional = isOptionalProd(firstProd)
   const hasMore = definition.length > 1
   if (isFirstOptional && hasMore) {
-    const rest = drop(definition)
+    const rest = drop(definition, 1)
     return result.concat(getFirstNoneTerminal(rest))
   } else {
     return result
@@ -370,7 +370,7 @@ export function validateEmptyOrAlternative(
   const errors = flatMap<Alternation, IParserEmptyAlternativeDefinitionError>(
     ors,
     (currOr) => {
-      const exceptLast = dropRight(currOr.definition)
+      const exceptLast = dropLast(currOr.definition, 1)
       return flatMap(exceptLast, (currAlternative, currAltIdx) => {
         const possibleFirstInAlt = nextPossibleTokensAfter(
           [currAlternative],

@@ -1,4 +1,4 @@
-import drop from "lodash/drop"
+import { drop } from "remeda"
 import forEach from "lodash/forEach"
 import {
   Alternation,
