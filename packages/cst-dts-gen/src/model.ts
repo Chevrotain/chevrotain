@@ -12,12 +12,13 @@ import type {
   TokenType
 } from "@chevrotain/types"
 import { NonTerminal, GAstVisitor } from "@chevrotain/gast"
-import { forEachObj, map } from "remeda"
-import { flatten } from "remeda"
-import { values } from "remeda"
+import { map } from "remeda/dist/commonjs/map"
+import { forEachObj } from "remeda/dist/commonjs/forEachObj"
+import { flatten } from "remeda/dist/commonjs/flatten"
+import { values } from "remeda/dist/commonjs/values"
 import { some } from "@chevrotain/utils"
-import { groupBy } from "remeda"
-import { merge } from "remeda"
+import { groupBy } from "remeda/dist/commonjs/groupBy"
+import { merge } from "remeda/dist/commonjs/merge"
 
 export function buildModel(
   productions: Record<string, Rule>

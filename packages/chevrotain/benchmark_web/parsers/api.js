@@ -3,6 +3,26 @@ var parserInstance
 var lexerInstance
 var lexResult
 
+/**
+ * uncomment this alternative `parseBench` to measure startup time performance
+ */
+// function parseBench(
+//   text,
+//   lexerDefinition,
+//   customLexer,
+//   parser,
+//   rootRule,
+//   options,
+//   parserConfig
+// ) {
+//   if (lexerDefinition) {
+//     lexerInstance = new chevrotain.Lexer(lexerDefinition, {
+//       positionTracking: "onlyOffset"
+//     })
+//   }
+//   parserInstance = new parser(parserConfig)
+// }
+
 function parseBench(
   text,
   lexerDefinition,
@@ -25,6 +45,7 @@ function parseBench(
       console.log("Lexer init time: " + (end - start))
     }
   }
+  parserInstance = new parser(parserConfig)
 
   if (lexResult === undefined || options.lexerOnly) {
     lexResult = lexerInstance.tokenize(text)

@@ -11,15 +11,17 @@ import {
   SUPPORT_STICKY,
   validatePatterns
 } from "./lexer"
-import { forEachObj, merge, noop } from "remeda"
-import { isEmpty } from "remeda"
-import { isArray } from "remeda"
-import { last } from "remeda"
-import { reject } from "remeda"
-import { map } from "remeda"
-import { forEach } from "remeda"
-import { keys } from "remeda"
-import { identity } from "remeda"
+import { forEachObj } from "remeda/dist/commonjs/forEachObj"
+import { merge } from "remeda/dist/commonjs/merge"
+import { noop } from "remeda/dist/commonjs/noop"
+import { isEmpty } from "remeda/dist/commonjs/isEmpty"
+import { isArray } from "remeda/dist/commonjs/isArray"
+import { last } from "remeda/dist/commonjs/last"
+import { reject } from "remeda/dist/commonjs/reject"
+import { map } from "remeda/dist/commonjs/map"
+import { forEach } from "remeda/dist/commonjs/forEach"
+import { keys } from "remeda/dist/commonjs/keys"
+import { identity } from "remeda/dist/commonjs/identity"
 import {
   PRINT_WARNING,
   timer,

@@ -7,11 +7,11 @@ import {
   Group,
   Set
 } from "@chevrotain/regexp-to-ast"
-import { isArray } from "remeda"
+import { isArray } from "remeda/dist/commonjs/isArray"
 import { every } from "@chevrotain/utils"
-import { forEach } from "remeda"
-import { find } from "remeda"
-import { values } from "remeda"
+import { forEach } from "remeda/dist/commonjs/forEach"
+import { find } from "remeda/dist/commonjs/find"
+import { values } from "remeda/dist/commonjs/values"
 import { includes } from "@chevrotain/utils"
 import { PRINT_ERROR, PRINT_WARNING } from "@chevrotain/utils"
 import { ASTNode, getRegExpAst } from "./reg_exp_parser"

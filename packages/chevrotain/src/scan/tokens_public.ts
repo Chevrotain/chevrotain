@@ -1,4 +1,4 @@
-import { isString } from "remeda"
+import { isString } from "remeda/dist/commonjs/isString"
 import { has } from "@chevrotain/utils"
 import { Lexer } from "./lexer_public"
 import { augmentTokenTypes, tokenStructuredMatcher } from "./tokens"

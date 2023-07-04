@@ -1,8 +1,8 @@
-import { map } from "remeda"
-import { forEach } from "remeda"
-import { isString } from "remeda"
+import { map } from "remeda/dist/commonjs/map"
+import { forEach } from "remeda/dist/commonjs/forEach"
+import { isString } from "remeda/dist/commonjs/isString"
 import isRegexp from "is-regexp"
-import { pickBy } from "remeda"
+import { pickBy } from "remeda/dist/commonjs/pickBy"
 import {
   IGASTVisitor,
   IProduction,

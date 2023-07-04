@@ -1,5 +1,6 @@
 import { Rule } from "@chevrotain/gast"
-import { forEach, merge } from "remeda"
+import { forEach } from "remeda/dist/commonjs/forEach"
+import { merge } from "remeda/dist/commonjs/merge"
 import { resolveGrammar as orgResolveGrammar } from "../resolver"
 import { validateGrammar as orgValidateGrammar } from "../checks"
 import {

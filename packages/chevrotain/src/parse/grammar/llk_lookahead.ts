@@ -6,8 +6,8 @@ import {
   TokenType,
   OptionalProductionType
 } from "@chevrotain/types"
-import { flatMap } from "remeda"
-import { isEmpty } from "remeda"
+import { flatMap } from "remeda/dist/commonjs/flatMap"
+import { isEmpty } from "remeda/dist/commonjs/isEmpty"
 import { defaultGrammarValidatorErrorProvider } from "../errors_public"
 import { DEFAULT_PARSER_CONFIG } from "../parser/parser"
 import {

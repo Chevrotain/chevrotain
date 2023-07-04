@@ -1,16 +1,17 @@
-import { first, flatMap } from "remeda"
-import { isEmpty } from "remeda"
-import { drop } from "remeda"
-import { flatten } from "remeda"
-import { filter } from "remeda"
-import { reject } from "remeda"
-import { difference } from "remeda"
-import { map } from "remeda"
-import { forEach } from "remeda"
-import { groupBy } from "remeda"
-import { reduce } from "remeda"
-import { pickBy } from "remeda"
-import { values } from "remeda"
+import { flatMap } from "remeda/dist/commonjs/flatMap"
+import { first } from "remeda/dist/commonjs/first"
+import { isEmpty } from "remeda/dist/commonjs/isEmpty"
+import { drop } from "remeda/dist/commonjs/drop"
+import { flatten } from "remeda/dist/commonjs/flatten"
+import { filter } from "remeda/dist/commonjs/filter"
+import { reject } from "remeda/dist/commonjs/reject"
+import { difference } from "remeda/dist/commonjs/difference"
+import { map } from "remeda/dist/commonjs/map"
+import { forEach } from "remeda/dist/commonjs/forEach"
+import { groupBy } from "remeda/dist/commonjs/groupBy"
+import { reduce } from "remeda/dist/commonjs/reduce"
+import { pickBy } from "remeda/dist/commonjs/pickBy"
+import { values } from "remeda/dist/commonjs/values"
 import { includes, shallowClone } from "@chevrotain/utils"
 import {
   IParserAmbiguousAlternativesDefinitionError,
@@ -51,8 +52,8 @@ import {
   IGrammarValidatorErrorMessageProvider,
   IParserDefinitionError
 } from "./types"
-import { dropLast } from "remeda"
-import { compact } from "remeda"
+import { dropLast } from "remeda/dist/commonjs/dropLast"
+import { compact } from "remeda/dist/commonjs/compact"
 import { tokenStructuredMatcher } from "../../scan/tokens"
 
 export function validateLookahead(options: {

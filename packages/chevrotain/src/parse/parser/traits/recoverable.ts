@@ -7,11 +7,11 @@ import {
   AbstractNextTerminalAfterProductionWalker,
   IFirstAfterRepetition
 } from "../../grammar/interpreter"
-import { isEmpty } from "remeda"
-import { dropLast } from "remeda"
-import { flatten } from "remeda"
-import { map } from "remeda"
-import { find } from "remeda"
+import { isEmpty } from "remeda/dist/commonjs/isEmpty"
+import { dropLast } from "remeda/dist/commonjs/dropLast"
+import { flatten } from "remeda/dist/commonjs/flatten"
+import { map } from "remeda/dist/commonjs/map"
+import { find } from "remeda/dist/commonjs/find"
 import { has, shallowClone } from "@chevrotain/utils"
 import { includes } from "@chevrotain/utils"
 import {

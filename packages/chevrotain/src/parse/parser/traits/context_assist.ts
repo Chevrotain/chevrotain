@@ -8,7 +8,7 @@ import {
   NextAfterTokenWalker,
   nextPossibleTokensAfter
 } from "../../grammar/interpreter"
-import { first } from "remeda"
+import { first } from "remeda/dist/commonjs/first"
 import { MixedInParser } from "./parser_traits"
 
 export class ContentAssist {

@@ -17,8 +17,8 @@ import {
   validateTooManyAlts
 } from "../../../src/parse/grammar/checks"
 import { createToken } from "../../../src/scan/tokens_public"
-import { first } from "remeda"
-import { map } from "remeda"
+import { first } from "remeda/dist/commonjs/first"
+import { map } from "remeda/dist/commonjs/map"
 import {
   Alternation,
   Alternative,
@@ -33,7 +33,7 @@ import { defaultGrammarValidatorErrorProvider } from "../../../src/parse/errors_
 import { IToken, TokenType } from "@chevrotain/types"
 import { expect } from "chai"
 import { createDeferredTokenBuilder } from "../../utils/builders"
-import { omit } from "remeda"
+import { omit } from "remeda/dist/commonjs/omit"
 
 const getIdentTok = createDeferredTokenBuilder({
   name: "IdentTok",

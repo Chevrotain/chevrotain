@@ -18,16 +18,16 @@ import {
   TokenTypeDictionary,
   TokenVocabulary
 } from "@chevrotain/types"
-import { isEmpty } from "remeda"
-import { isArray } from "remeda"
-import { flatten } from "remeda"
+import { isEmpty } from "remeda/dist/commonjs/isEmpty"
+import { isArray } from "remeda/dist/commonjs/isArray"
+import { flatten } from "remeda/dist/commonjs/flatten"
 import { every } from "@chevrotain/utils"
-import { uniq } from "remeda"
-import { isObject } from "remeda"
+import { uniq } from "remeda/dist/commonjs/uniq"
+import { isObject } from "remeda/dist/commonjs/isObject"
 import { has, shallowClone } from "@chevrotain/utils"
-import { values } from "remeda"
-import { reduce } from "remeda"
-import { clone } from "remeda"
+import { values } from "remeda/dist/commonjs/values"
+import { reduce } from "remeda/dist/commonjs/reduce"
+import { clone } from "remeda/dist/commonjs/clone"
 import {
   AT_LEAST_ONE_IDX,
   AT_LEAST_ONE_SEP_IDX,

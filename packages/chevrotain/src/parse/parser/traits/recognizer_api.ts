@@ -13,7 +13,7 @@ import {
   SubruleMethodOpts,
   TokenType
 } from "@chevrotain/types"
-import { values } from "remeda"
+import { values } from "remeda/dist/commonjs/values"
 import { includes } from "@chevrotain/utils"
 import { isRecognitionException } from "../../exceptions_public"
 import { DEFAULT_RULE_CONFIG, ParserDefinitionErrorType } from "../parser"

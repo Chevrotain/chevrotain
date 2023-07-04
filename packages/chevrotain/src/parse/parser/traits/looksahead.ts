@@ -1,4 +1,4 @@
-import { forEach } from "remeda"
+import { forEach } from "remeda/dist/commonjs/forEach"
 import { has } from "@chevrotain/utils"
 import { DEFAULT_PARSER_CONFIG } from "../parser"
 import {

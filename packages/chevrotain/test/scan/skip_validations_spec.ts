@@ -1,6 +1,6 @@
 import { Lexer } from "../../src/scan/lexer_public"
-import { flatten } from "remeda"
-import { find } from "remeda"
+import { flatten } from "remeda/dist/commonjs/flatten"
+import { find } from "remeda/dist/commonjs/find"
 import { expect } from "chai"
 import { SinonSpy } from "sinon/index"
 

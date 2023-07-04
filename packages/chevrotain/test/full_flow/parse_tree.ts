@@ -1,5 +1,5 @@
-import { compact } from "remeda"
-import { isFunction } from "remeda"
+import { compact } from "remeda/dist/commonjs/compact"
+import { isFunction } from "remeda/dist/commonjs/isFunction"
 import { IToken, TokenType } from "@chevrotain/types"
 
 export class ParseTree {

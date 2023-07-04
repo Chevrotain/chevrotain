@@ -1,7 +1,7 @@
-import { flatten } from "remeda"
-import { isArray } from "remeda"
-import { map } from "remeda"
-import { uniq } from "remeda"
+import { flatten } from "remeda/dist/commonjs/flatten"
+import { isArray } from "remeda/dist/commonjs/isArray"
+import { map } from "remeda/dist/commonjs/map"
+import { uniq } from "remeda/dist/commonjs/uniq"
 import { GenerateDtsOptions } from "@chevrotain/types"
 import {
   CstNodeTypeDefinition,

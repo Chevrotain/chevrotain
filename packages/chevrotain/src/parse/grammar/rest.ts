@@ -1,5 +1,5 @@
-import { drop } from "remeda"
-import { forEach } from "remeda"
+import { drop } from "remeda/dist/commonjs/drop"
+import { forEach } from "remeda/dist/commonjs/forEach"
 import {
   Alternation,
   Alternative,

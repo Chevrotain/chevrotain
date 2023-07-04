@@ -4,9 +4,9 @@ import {
   setNodeLocationFull,
   setNodeLocationOnlyOffset
 } from "../../cst/cst"
-import { noop } from "remeda"
+import { noop } from "remeda/dist/commonjs/noop"
 import { has } from "@chevrotain/utils"
-import { keys } from "remeda"
+import { keys } from "remeda/dist/commonjs/keys"
 import {
   createBaseSemanticVisitorConstructor,
   createBaseVisitorConstructorWithDefaults

@@ -3,10 +3,11 @@ import { Lexer } from "../../../src/scan/lexer_public"
 import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
 import { END_OF_FILE } from "../../../src/parse/parser/parser"
 import { MismatchedTokenException } from "../../../src/parse/exceptions_public"
-import { flatten } from "remeda"
+import { flatten } from "remeda/dist/commonjs/flatten"
 import { every } from "@chevrotain/utils"
-import { map } from "remeda"
-import { forEach, values } from "remeda"
+import { map } from "remeda/dist/commonjs/map"
+import { forEach } from "remeda/dist/commonjs/forEach"
+import { values } from "remeda/dist/commonjs/values"
 import {
   ILookaheadStrategy,
   ILookaheadValidationError,

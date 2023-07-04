@@ -44,7 +44,7 @@ import {
   StringTok,
   SwitchTok
 } from "./switchcase_recovery_tokens"
-import { merge } from "remeda"
+import { merge } from "remeda/dist/commonjs/merge"
 import { includes } from "@chevrotain/utils"
 import { IToken, TokenType } from "@chevrotain/types"
 

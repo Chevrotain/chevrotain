@@ -12,7 +12,7 @@ import {
   RET_TYPE,
   SemiColonTok
 } from "./backtracking_parser"
-import { flatten } from "remeda"
+import { flatten } from "remeda/dist/commonjs/flatten"
 import { createRegularToken } from "../../utils/matchers"
 
 describe("Simple backtracking example", () => {
