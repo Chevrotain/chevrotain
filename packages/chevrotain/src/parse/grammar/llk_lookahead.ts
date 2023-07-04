@@ -6,7 +6,7 @@ import {
   TokenType,
   OptionalProductionType
 } from "@chevrotain/types"
-import flatMap from "lodash/flatMap"
+import { flatMap } from "remeda"
 import { isEmpty } from "remeda"
 import { defaultGrammarValidatorErrorProvider } from "../errors_public"
 import { DEFAULT_PARSER_CONFIG } from "../parser/parser"

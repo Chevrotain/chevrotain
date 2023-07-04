@@ -11,7 +11,7 @@ import { isEmpty } from "remeda"
 import { dropLast } from "remeda"
 import { flatten } from "remeda"
 import { map } from "remeda"
-import find from "lodash/find"
+import { find } from "remeda"
 import { has, shallowClone } from "@chevrotain/utils"
 import { includes } from "@chevrotain/utils"
 import {

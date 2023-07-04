@@ -33,7 +33,7 @@ import { defaultGrammarValidatorErrorProvider } from "../../../src/parse/errors_
 import { IToken, TokenType } from "@chevrotain/types"
 import { expect } from "chai"
 import { createDeferredTokenBuilder } from "../../utils/builders"
-import omit from "lodash/omit"
+import { omit } from "remeda"
 
 const getIdentTok = createDeferredTokenBuilder({
   name: "IdentTok",
@@ -137,7 +137,7 @@ describe("the grammar validations", () => {
       defaultGrammarValidatorErrorProvider,
       "bamba"
     )
-    expect(actualErrors.map((e) => omit(e, "message"))).to.deep.equal(
+    expect(actualErrors.map((e) => omit(e, ["message"]))).to.deep.equal(
       expectedErrorsNoMsg
     )
   })

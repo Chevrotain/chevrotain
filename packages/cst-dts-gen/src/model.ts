@@ -16,7 +16,7 @@ import { forEachObj, map } from "remeda"
 import { flatten } from "remeda"
 import { values } from "remeda"
 import { some } from "@chevrotain/utils"
-import groupBy from "lodash/groupBy"
+import { groupBy } from "remeda"
 import { merge } from "remeda"
 
 export function buildModel(

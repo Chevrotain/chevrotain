@@ -9,12 +9,11 @@ import { values } from "remeda"
 import { flatten } from "remeda"
 import { reject } from "remeda"
 import difference from "lodash/difference"
-import indexOf from "lodash/indexOf"
 import { map } from "remeda"
 import { forEach } from "remeda"
 import { isString } from "remeda"
 import { isFunction } from "remeda"
-import find from "lodash/find"
+import { find } from "remeda"
 import { has } from "@chevrotain/utils"
 import { keys } from "remeda"
 import { filter } from "remeda"
@@ -222,8 +221,10 @@ export function analyzeTokenTypes(
 
       if (longerAltType) {
         const longerAltIdxArr = isArray(longerAltType)
-          ? map(longerAltType, (type: any) => indexOf(onlyRelevantTypes, type))
-          : [indexOf(onlyRelevantTypes, longerAltType)]
+          ? map(longerAltType, (type: any) =>
+              safeIndexOf(onlyRelevantTypes, type)
+            )
+          : [safeIndexOf(onlyRelevantTypes, longerAltType)]
         return longerAltIdxArr
       }
     })
@@ -1167,5 +1168,17 @@ function initCharCodeToOptimizedIndexMap() {
     for (let i = 0; i < 65536; i++) {
       charCodeToOptimizedIdxMap[i] = i > 255 ? 255 + ~~(i / 255) : i
     }
+  }
+}
+
+/**
+ *  We previously used lodash's indexOf which is safe for "invalid"
+ *  inputs, so we are keeping the behavior to be on the "safe side"
+ */
+function safeIndexOf<T>(arr: T[], elem: T): number {
+  if (Array.isArray(arr)) {
+    return arr.indexOf(elem)
+  } else {
+    return -1
   }
 }

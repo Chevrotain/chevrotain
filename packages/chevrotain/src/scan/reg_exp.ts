@@ -10,7 +10,7 @@ import {
 import { isArray } from "remeda"
 import { every } from "@chevrotain/utils"
 import { forEach } from "remeda"
-import find from "lodash/find"
+import { find } from "remeda"
 import { values } from "remeda"
 import { includes } from "@chevrotain/utils"
 import { PRINT_ERROR, PRINT_WARNING } from "@chevrotain/utils"
@@ -309,10 +309,12 @@ export function canMatchCharCode(
     charCodeFinder.visit(ast)
     return charCodeFinder.found
   } else {
-    return (
-      find(<any>pattern, (char) => {
-        return includes(charCodes, (<string>char).charCodeAt(0))
-      }) !== undefined
-    )
+    for (let i = 0; i < pattern.length; i++) {
+      const cc = pattern[i].charCodeAt(0)
+      if (includes(charCodes, cc)) {
+        return true
+      }
+    }
+    return false
   }
 }

@@ -1,4 +1,4 @@
-import { first } from "remeda"
+import { first, flatMap } from "remeda"
 import { isEmpty } from "remeda"
 import { drop } from "remeda"
 import { flatten } from "remeda"
@@ -7,12 +7,11 @@ import { reject } from "remeda"
 import difference from "lodash/difference"
 import { map } from "remeda"
 import { forEach } from "remeda"
-import groupBy from "lodash/groupBy"
+import { groupBy } from "remeda"
 import { reduce } from "remeda"
 import { pickBy } from "remeda"
 import { values } from "remeda"
 import { includes, shallowClone } from "@chevrotain/utils"
-import flatMap from "lodash/flatMap"
 import {
   IParserAmbiguousAlternativesDefinitionError,
   IParserDuplicatesDefinitionError,
@@ -371,31 +370,33 @@ export function validateEmptyOrAlternative(
     ors,
     (currOr) => {
       const exceptLast = dropLast(currOr.definition, 1)
-      return flatMap(exceptLast, (currAlternative, currAltIdx) => {
-        const possibleFirstInAlt = nextPossibleTokensAfter(
-          [currAlternative],
-          [],
-          tokenStructuredMatcher,
-          1
-        )
-        if (isEmpty(possibleFirstInAlt)) {
-          return [
-            {
-              message: errMsgProvider.buildEmptyAlternationError({
-                topLevelRule: topLevelRule,
-                alternation: currOr,
-                emptyChoiceIdx: currAltIdx
-              }),
-              type: ParserDefinitionErrorType.NONE_LAST_EMPTY_ALT,
-              ruleName: topLevelRule.name,
-              occurrence: currOr.idx,
-              alternative: currAltIdx + 1
-            }
-          ]
-        } else {
-          return []
-        }
-      })
+      return flatten(
+        map.indexed(exceptLast, (currAlternative, currAltIdx) => {
+          const possibleFirstInAlt = nextPossibleTokensAfter(
+            [currAlternative],
+            [],
+            tokenStructuredMatcher,
+            1
+          )
+          if (isEmpty(possibleFirstInAlt)) {
+            return [
+              {
+                message: errMsgProvider.buildEmptyAlternationError({
+                  topLevelRule: topLevelRule,
+                  alternation: currOr,
+                  emptyChoiceIdx: currAltIdx
+                }),
+                type: ParserDefinitionErrorType.NONE_LAST_EMPTY_ALT,
+                ruleName: topLevelRule.name,
+                occurrence: currOr.idx,
+                alternative: currAltIdx + 1
+              }
+            ]
+          } else {
+            return []
+          }
+        })
+      )
     }
   )
 
