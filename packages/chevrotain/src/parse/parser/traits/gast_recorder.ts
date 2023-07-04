@@ -17,7 +17,7 @@ import {
 import { last as peek } from "remeda/dist/commonjs/last"
 import { isArray } from "remeda/dist/commonjs/isArray"
 import { some } from "@chevrotain/utils"
-import { forEach } from "remeda/dist/commonjs/forEach"
+import { forEach } from "@chevrotain/utils"
 import { isFunction } from "remeda/dist/commonjs/isFunction"
 import { has } from "@chevrotain/utils"
 import { MixedInParser } from "./parser_traits"

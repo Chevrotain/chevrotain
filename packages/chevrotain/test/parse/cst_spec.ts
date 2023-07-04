@@ -2,7 +2,7 @@ import { createToken } from "../../src/scan/tokens_public"
 import { CstParser } from "../../src/parse/parser/traits/parser_traits"
 import { tokenStructuredMatcher as tokenStructuredMatcherStrict } from "../../src/scan/tokens"
 import { createRegularToken } from "../utils/matchers"
-import { map } from "remeda/dist/commonjs/map"
+import { map } from "@chevrotain/utils"
 import { CstElement, CstNode, IToken, TokenType } from "@chevrotain/types"
 import { expect } from "chai"
 

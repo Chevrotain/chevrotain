@@ -1,25 +1,25 @@
 import { BaseRegExpVisitor } from "@chevrotain/regexp-to-ast"
 import { IRegExpExec, Lexer, LexerDefinitionErrorType } from "./lexer_public"
-import { forEachObj } from "remeda/dist/commonjs/forEachObj"
+import { forEachObj } from "@chevrotain/utils"
 import { first } from "remeda/dist/commonjs/first"
 import { merge } from "remeda/dist/commonjs/merge"
 import { isEmpty } from "remeda/dist/commonjs/isEmpty"
-import { compact } from "remeda/dist/commonjs/compact"
+import { compact } from "@chevrotain/utils"
 import { isArray } from "remeda/dist/commonjs/isArray"
 import isRegexp from "is-regexp"
 import { values } from "remeda/dist/commonjs/values"
-import { flatten } from "remeda/dist/commonjs/flatten"
-import { reject } from "remeda/dist/commonjs/reject"
-import { difference } from "remeda/dist/commonjs/difference"
-import { map } from "remeda/dist/commonjs/map"
-import { forEach } from "remeda/dist/commonjs/forEach"
+import { flatten } from "@chevrotain/utils"
+import { reject } from "@chevrotain/utils"
+import { difference } from "@chevrotain/utils"
+import { map } from "@chevrotain/utils"
+import { forEach } from "@chevrotain/utils"
 import { isString } from "remeda/dist/commonjs/isString"
 import { isFunction } from "remeda/dist/commonjs/isFunction"
-import { find } from "remeda/dist/commonjs/find"
+import { find } from "@chevrotain/utils"
 import { has } from "@chevrotain/utils"
 import { keys } from "remeda/dist/commonjs/keys"
-import { filter } from "remeda/dist/commonjs/filter"
-import { reduce } from "remeda/dist/commonjs/reduce"
+import { filter } from "@chevrotain/utils"
+import { reduce } from "@chevrotain/utils"
 import { includes } from "@chevrotain/utils"
 import { PRINT_ERROR } from "@chevrotain/utils"
 import {
@@ -284,7 +284,7 @@ export function analyzeTokenTypes(
       {} as { [groupName: string]: IToken[] }
     )
 
-    patternIdxToConfig = map.indexed(
+    patternIdxToConfig = map(
       allTransformedPatterns,
       (x, idx): IPatternConfig => {
         return {
@@ -309,7 +309,7 @@ export function analyzeTokenTypes(
 
   if (!actualOptions.safeMode) {
     tracer("First Char Optimization", () => {
-      charCodeToPatternIdxToConfig = reduce.indexed(
+      charCodeToPatternIdxToConfig = reduce(
         onlyRelevantTypes,
         (result, currTokType, idx) => {
           if (typeof currTokType.PATTERN === "string") {
@@ -740,7 +740,7 @@ export function findUnreachablePatterns(
 ): ILexerDefinitionError[] {
   const errors: ILexerDefinitionError[] = []
 
-  const canBeTested = reduce.indexed(
+  const canBeTested = reduce(
     tokenTypes,
     (result, tokType, idx) => {
       const pattern = tokType.PATTERN
@@ -761,7 +761,7 @@ export function findUnreachablePatterns(
     [] as { str: string; idx: number; tokenType: TokenType }[]
   )
 
-  forEach.indexed(tokenTypes, (tokType, testIdx) => {
+  forEach(tokenTypes, (tokType, testIdx) => {
     forEach(canBeTested, ({ str, idx, tokenType }) => {
       if (testIdx < idx && testTokenType(str, tokType.PATTERN)) {
         const msg =
@@ -876,8 +876,8 @@ export function performRuntimeChecks(
   }
 
   if (has(lexerDefinition, MODES)) {
-    forEachObj.indexed(lexerDefinition.modes, (currModeValue, currModeName) => {
-      forEach.indexed(currModeValue, (currTokType, currIdx) => {
+    forEachObj(lexerDefinition.modes, (currModeValue, currModeName) => {
+      forEach(currModeValue, (currTokType, currIdx) => {
         if (currTokType === undefined) {
           errors.push({
             message:

@@ -18,7 +18,7 @@ import {
 } from "../../../src/parse/grammar/checks"
 import { createToken } from "../../../src/scan/tokens_public"
 import { first } from "remeda/dist/commonjs/first"
-import { map } from "remeda/dist/commonjs/map"
+import { map } from "@chevrotain/utils"
 import {
   Alternation,
   Alternative,

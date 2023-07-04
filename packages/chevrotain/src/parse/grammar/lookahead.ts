@@ -1,10 +1,10 @@
 import { isEmpty } from "remeda/dist/commonjs/isEmpty"
-import { flatten } from "remeda/dist/commonjs/flatten"
+import { flatten } from "@chevrotain/utils"
 import { every } from "@chevrotain/utils"
-import { map } from "remeda/dist/commonjs/map"
-import { forEach } from "remeda/dist/commonjs/forEach"
+import { map } from "@chevrotain/utils"
+import { forEach } from "@chevrotain/utils"
 import { has } from "@chevrotain/utils"
-import { reduce } from "remeda/dist/commonjs/reduce"
+import { reduce } from "@chevrotain/utils"
 import { possiblePathsFrom } from "./interpreter"
 import { RestWalker } from "./rest"
 import { Predicate, TokenMatcher } from "../parser/parser"
@@ -225,7 +225,7 @@ export function buildAlternativesLookAheadFunc(
       return flatten(currAlt)
     })
 
-    const choiceToAlt = reduce.indexed(
+    const choiceToAlt = reduce(
       singleTokenAlts,
       (result, currAlt, idx) => {
         forEach(currAlt, (currTokType) => {

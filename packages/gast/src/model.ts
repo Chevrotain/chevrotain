@@ -1,5 +1,5 @@
-import { map } from "remeda/dist/commonjs/map"
-import { forEach } from "remeda/dist/commonjs/forEach"
+import { map } from "@chevrotain/utils"
+import { forEach } from "@chevrotain/utils"
 import { isString } from "remeda/dist/commonjs/isString"
 import isRegexp from "is-regexp"
 import { pickBy } from "remeda/dist/commonjs/pickBy"

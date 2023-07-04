@@ -1,6 +1,6 @@
-import { flatten } from "remeda/dist/commonjs/flatten"
-import { uniq } from "remeda/dist/commonjs/uniq"
-import { map } from "remeda/dist/commonjs/map"
+import { flatten } from "@chevrotain/utils"
+import { uniq } from "@chevrotain/utils"
+import { map } from "@chevrotain/utils"
 import { NonTerminal, Terminal } from "@chevrotain/gast"
 import {
   isBranchingProd,

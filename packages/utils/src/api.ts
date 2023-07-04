@@ -12,6 +12,7 @@ export {
   filter,
   flatten,
   forEach,
+  forEachObj,
   map,
   mapObj,
   reduce,

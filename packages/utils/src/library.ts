@@ -59,21 +59,27 @@ export function map<T, R>(arr: T[], cb: (elem: T, idx: number) => R): R[] {
   return arr.map(cb)
 }
 
-export function filter<T>(arr: T[], cb: (elem: T, idx: number) => T): T[] {
+export function filter<T>(
+  arr: T[],
+  cb: (elem: T, idx: number) => boolean
+): T[] {
   if (!Array.isArray(arr)) {
     return []
   }
   return arr.filter(cb)
 }
 
-export function reject<T>(arr: T[], cb: (elem: T, idx: number) => T): T[] {
+export function reject<T>(
+  arr: T[],
+  cb: (elem: T, idx?: number) => boolean
+): T[] {
   if (!Array.isArray(arr)) {
     return []
   }
   const result = [] as T[]
   for (let i = 0; i < arr.length; i++) {
     const elem = arr[i]
-    if (cb(elem, i)) {
+    if (!cb(elem, i)) {
       result.push(elem)
     }
   }
@@ -105,6 +111,22 @@ export function mapObj<T, R>(
   }
 
   return result
+}
+
+export function forEachObj<T>(
+  obj: Record<string, T>,
+  cb: (val: T, key: string | number) => void
+): void {
+  if (obj === undefined || obj === null) {
+    return
+  }
+
+  const keys = Object.keys(obj)
+
+  for (let i = 0; i < keys.length; i++) {
+    const currKey = keys[i]
+    cb(obj[currKey], currKey)
+  }
 }
 
 export function reduce<T, A>(

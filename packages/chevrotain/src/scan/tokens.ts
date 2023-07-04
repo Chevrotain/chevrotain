@@ -1,11 +1,11 @@
 import { isEmpty } from "remeda/dist/commonjs/isEmpty"
-import { forEachObj } from "remeda/dist/commonjs/forEachObj"
-import { compact } from "remeda/dist/commonjs/compact"
+import { forEachObj } from "@chevrotain/utils"
+import { compact } from "@chevrotain/utils"
 import { isArray } from "remeda/dist/commonjs/isArray"
-import { flatten } from "remeda/dist/commonjs/flatten"
-import { difference } from "remeda/dist/commonjs/difference"
-import { map } from "remeda/dist/commonjs/map"
-import { forEach } from "remeda/dist/commonjs/forEach"
+import { flatten } from "@chevrotain/utils"
+import { difference } from "@chevrotain/utils"
+import { map } from "@chevrotain/utils"
+import { forEach } from "@chevrotain/utils"
 import { has } from "@chevrotain/utils"
 import { includes, shallowClone } from "@chevrotain/utils"
 import { IToken, TokenType } from "@chevrotain/types"
@@ -111,7 +111,7 @@ export function assignCategoriesTokensProp(tokenTypes: TokenType[]): void {
   forEach(tokenTypes, (currTokType) => {
     // avoid duplications
     currTokType.categoryMatches = []
-    forEachObj.indexed(currTokType.categoryMatchesMap!, (val, key) => {
+    forEachObj(currTokType.categoryMatchesMap!, (val, key) => {
       currTokType.categoryMatches!.push(
         tokenIdxToClass[key as unknown as number].tokenTypeIdx!
       )

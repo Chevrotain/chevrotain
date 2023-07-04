@@ -1,6 +1,6 @@
 import { RestWalker } from "./rest"
 import { first } from "./first"
-import { forEach } from "remeda/dist/commonjs/forEach"
+import { forEach } from "@chevrotain/utils"
 import { IN } from "../constants"
 import { Alternative, NonTerminal, Rule, Terminal } from "@chevrotain/gast"
 import { IProduction, TokenType } from "@chevrotain/types"

@@ -2,7 +2,7 @@ import {
   IParserUnresolvedRefDefinitionError,
   ParserDefinitionErrorType
 } from "../parser/parser"
-import { forEach } from "remeda/dist/commonjs/forEach"
+import { forEach } from "@chevrotain/utils"
 import { values } from "remeda/dist/commonjs/values"
 import { NonTerminal, Rule } from "@chevrotain/gast"
 import { GAstVisitor } from "@chevrotain/gast"

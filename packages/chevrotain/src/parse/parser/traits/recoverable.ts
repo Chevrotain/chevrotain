@@ -9,9 +9,9 @@ import {
 } from "../../grammar/interpreter"
 import { isEmpty } from "remeda/dist/commonjs/isEmpty"
 import { dropLast } from "remeda/dist/commonjs/dropLast"
-import { flatten } from "remeda/dist/commonjs/flatten"
-import { map } from "remeda/dist/commonjs/map"
-import { find } from "remeda/dist/commonjs/find"
+import { flatten } from "@chevrotain/utils"
+import { map } from "@chevrotain/utils"
+import { find } from "@chevrotain/utils"
 import { has, shallowClone } from "@chevrotain/utils"
 import { includes } from "@chevrotain/utils"
 import {
@@ -314,7 +314,7 @@ export class Recoverable {
     const explicitRuleStack = this.RULE_STACK
     const explicitOccurrenceStack = this.RULE_OCCURRENCE_STACK
 
-    return map.indexed(explicitRuleStack, (ruleName, idx) => {
+    return map(explicitRuleStack, (ruleName, idx) => {
       if (idx === 0) {
         return EOF_FOLLOW_KEY
       }

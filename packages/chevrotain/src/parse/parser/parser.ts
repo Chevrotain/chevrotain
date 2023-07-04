@@ -1,6 +1,6 @@
 import { isEmpty } from "remeda/dist/commonjs/isEmpty"
-import { map } from "remeda/dist/commonjs/map"
-import { forEach } from "remeda/dist/commonjs/forEach"
+import { map } from "@chevrotain/utils"
+import { forEach } from "@chevrotain/utils"
 import { values } from "remeda/dist/commonjs/values"
 import { has, shallowClone } from "@chevrotain/utils"
 import { toFastProperties } from "@chevrotain/utils"

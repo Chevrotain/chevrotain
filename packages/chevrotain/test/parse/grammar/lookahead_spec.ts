@@ -9,7 +9,7 @@ import {
   lookAheadSequenceFromAlternatives,
   PROD_TYPE
 } from "../../../src/parse/grammar/lookahead"
-import { map } from "remeda/dist/commonjs/map"
+import { map } from "@chevrotain/utils"
 import {
   augmentTokenTypes,
   tokenStructuredMatcher

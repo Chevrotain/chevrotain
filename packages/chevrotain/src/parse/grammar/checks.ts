@@ -1,15 +1,15 @@
-import { flatMap } from "remeda/dist/commonjs/flatMap"
+import { flatMap } from "@chevrotain/utils"
 import { first } from "remeda/dist/commonjs/first"
 import { isEmpty } from "remeda/dist/commonjs/isEmpty"
 import { drop } from "remeda/dist/commonjs/drop"
-import { flatten } from "remeda/dist/commonjs/flatten"
-import { filter } from "remeda/dist/commonjs/filter"
-import { reject } from "remeda/dist/commonjs/reject"
-import { difference } from "remeda/dist/commonjs/difference"
-import { map } from "remeda/dist/commonjs/map"
-import { forEach } from "remeda/dist/commonjs/forEach"
+import { flatten } from "@chevrotain/utils"
+import { filter } from "@chevrotain/utils"
+import { reject } from "@chevrotain/utils"
+import { difference } from "@chevrotain/utils"
+import { map } from "@chevrotain/utils"
+import { forEach } from "@chevrotain/utils"
 import { groupBy } from "remeda/dist/commonjs/groupBy"
-import { reduce } from "remeda/dist/commonjs/reduce"
+import { reduce } from "@chevrotain/utils"
 import { pickBy } from "remeda/dist/commonjs/pickBy"
 import { values } from "remeda/dist/commonjs/values"
 import { includes, shallowClone } from "@chevrotain/utils"
@@ -53,7 +53,7 @@ import {
   IParserDefinitionError
 } from "./types"
 import { dropLast } from "remeda/dist/commonjs/dropLast"
-import { compact } from "remeda/dist/commonjs/compact"
+import { compact } from "@chevrotain/utils"
 import { tokenStructuredMatcher } from "../../scan/tokens"
 
 export function validateLookahead(options: {
@@ -372,7 +372,7 @@ export function validateEmptyOrAlternative(
     (currOr) => {
       const exceptLast = dropLast(currOr.definition, 1)
       return flatten(
-        map.indexed(exceptLast, (currAlternative, currAltIdx) => {
+        map(exceptLast, (currAlternative, currAltIdx) => {
           const possibleFirstInAlt = nextPossibleTokensAfter(
             [currAlternative],
             [],
@@ -548,7 +548,7 @@ function checkAlternativesAmbiguities(
   errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserAmbiguousAlternativesDefinitionError[] {
   const foundAmbiguousPaths: Alternative = []
-  const identicalAmbiguities = reduce.indexed(
+  const identicalAmbiguities = reduce(
     alternatives,
     (result, currAlt, currAltIdx) => {
       // ignore (skip) ambiguities with this alternative
@@ -558,7 +558,7 @@ function checkAlternativesAmbiguities(
 
       forEach(currAlt, (currPath) => {
         const altsCurrPathAppearsIn = [currAltIdx]
-        forEach.indexed(alternatives, (currOtherAlt, currOtherAltIdx) => {
+        forEach(alternatives, (currOtherAlt, currOtherAltIdx) => {
           if (
             currAltIdx !== currOtherAltIdx &&
             containsPath(currOtherAlt, currPath) &&
@@ -617,7 +617,7 @@ export function checkPrefixAlternativesAmbiguities(
   errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserAmbiguousAlternativesDefinitionError[] {
   // flatten
-  const pathsAndIndices = reduce.indexed(
+  const pathsAndIndices = reduce(
     alternatives,
     (result, currAlt, idx) => {
       const currPathsAndIdx = map(currAlt, (currPath) => {

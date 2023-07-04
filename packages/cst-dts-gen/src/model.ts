@@ -12,9 +12,9 @@ import type {
   TokenType
 } from "@chevrotain/types"
 import { NonTerminal, GAstVisitor } from "@chevrotain/gast"
-import { map } from "remeda/dist/commonjs/map"
-import { forEachObj } from "remeda/dist/commonjs/forEachObj"
-import { flatten } from "remeda/dist/commonjs/flatten"
+import { map } from "@chevrotain/utils"
+import { forEachObj } from "@chevrotain/utils"
+import { flatten } from "@chevrotain/utils"
 import { values } from "remeda/dist/commonjs/values"
 import { some } from "@chevrotain/utils"
 import { groupBy } from "remeda/dist/commonjs/groupBy"
@@ -56,7 +56,7 @@ class CstNodeDefinitionGenerator extends GAstVisitor {
     const grouped = groupBy(rawElements, (el) => el.propertyName)
 
     const properties: PropertyTypeDefinition[] = []
-    forEachObj.indexed(grouped, (group, propertyName) => {
+    forEachObj(grouped, (group, propertyName) => {
       const allNullable = !some(group, (el) => !el.canBeNull)
 
       // In an alternation with a label a property name can have

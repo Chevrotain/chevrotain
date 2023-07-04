@@ -11,15 +11,15 @@ import {
   SUPPORT_STICKY,
   validatePatterns
 } from "./lexer"
-import { forEachObj } from "remeda/dist/commonjs/forEachObj"
+import { forEachObj } from "@chevrotain/utils"
 import { merge } from "remeda/dist/commonjs/merge"
 import { noop } from "remeda/dist/commonjs/noop"
 import { isEmpty } from "remeda/dist/commonjs/isEmpty"
 import { isArray } from "remeda/dist/commonjs/isArray"
 import { last } from "remeda/dist/commonjs/last"
-import { reject } from "remeda/dist/commonjs/reject"
-import { map } from "remeda/dist/commonjs/map"
-import { forEach } from "remeda/dist/commonjs/forEach"
+import { reject } from "@chevrotain/utils"
+import { map } from "@chevrotain/utils"
+import { forEach } from "@chevrotain/utils"
 import { keys } from "remeda/dist/commonjs/keys"
 import { identity } from "remeda/dist/commonjs/identity"
 import {
@@ -216,19 +216,16 @@ export class Lexer {
 
       // an error of undefined TokenTypes will be detected in "performRuntimeChecks" above.
       // this transformation is to increase robustness in the case of partially invalid lexer definition.
-      forEachObj.indexed(
-        actualDefinition.modes,
-        (currModeValue, currModeName) => {
-          actualDefinition.modes[currModeName] = reject<TokenType>(
-            currModeValue,
-            (currTokType) => currTokType === undefined
-          )
-        }
-      )
+      forEachObj(actualDefinition.modes, (currModeValue, currModeName) => {
+        actualDefinition.modes[currModeName] = reject<TokenType>(
+          currModeValue,
+          (currTokType) => currTokType === undefined
+        )
+      })
 
       const allModeNames = keys(actualDefinition.modes)
 
-      forEachObj.indexed(
+      forEachObj(
         actualDefinition.modes,
         (currModDef: TokenType[], currModName) => {
           this.TRACE_INIT(`Mode: <${currModName}> processing`, () => {
@@ -349,14 +346,11 @@ export class Lexer {
 
       this.TRACE_INIT("Failed Optimization Warnings", () => {
         const unOptimizedModes: string[] = []
-        forEachObj.indexed(
-          this.canModeBeOptimized,
-          (canBeOptimized, modeName) => {
-            if (canBeOptimized === false) {
-              unOptimizedModes.push(modeName)
-            }
+        forEachObj(this.canModeBeOptimized, (canBeOptimized, modeName) => {
+          if (canBeOptimized === false) {
+            unOptimizedModes.push(modeName as string)
           }
-        )
+        })
 
         if (config.ensureOptimizations && !isEmpty(unOptimizedModes)) {
           throw Error(

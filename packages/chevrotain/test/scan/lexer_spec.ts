@@ -1,6 +1,6 @@
 import { last } from "remeda/dist/commonjs/last"
-import { map } from "remeda/dist/commonjs/map"
-import { forEach } from "remeda/dist/commonjs/forEach"
+import { map } from "@chevrotain/utils"
+import { forEach } from "@chevrotain/utils"
 import { isString } from "remeda/dist/commonjs/isString"
 import isRegexp from "is-regexp"
 import { keys } from "remeda/dist/commonjs/keys"

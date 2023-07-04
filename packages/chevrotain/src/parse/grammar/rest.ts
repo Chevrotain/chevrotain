@@ -1,5 +1,5 @@
 import { drop } from "remeda/dist/commonjs/drop"
-import { forEach } from "remeda/dist/commonjs/forEach"
+import { forEach } from "@chevrotain/utils"
 import {
   Alternation,
   Alternative,
@@ -18,7 +18,7 @@ import { IProduction } from "@chevrotain/types"
  */
 export abstract class RestWalker {
   walk(prod: { definition: IProduction[] }, prevRest: any[] = []): void {
-    forEach.indexed(prod.definition, (subProd: IProduction, index) => {
+    forEach(prod.definition, (subProd: IProduction, index) => {
       const currRest = drop(prod.definition, index + 1)
       /* istanbul ignore else */
       if (subProd instanceof NonTerminal) {

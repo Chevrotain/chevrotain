@@ -20,13 +20,13 @@ import {
 } from "@chevrotain/types"
 import { isEmpty } from "remeda/dist/commonjs/isEmpty"
 import { isArray } from "remeda/dist/commonjs/isArray"
-import { flatten } from "remeda/dist/commonjs/flatten"
+import { flatten } from "@chevrotain/utils"
 import { every } from "@chevrotain/utils"
-import { uniq } from "remeda/dist/commonjs/uniq"
+import { uniq } from "@chevrotain/utils"
 import { isObject } from "remeda/dist/commonjs/isObject"
 import { has, shallowClone } from "@chevrotain/utils"
 import { values } from "remeda/dist/commonjs/values"
-import { reduce } from "remeda/dist/commonjs/reduce"
+import { reduce } from "@chevrotain/utils"
 import { clone } from "remeda/dist/commonjs/clone"
 import {
   AT_LEAST_ONE_IDX,

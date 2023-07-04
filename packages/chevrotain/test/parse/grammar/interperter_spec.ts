@@ -1,5 +1,5 @@
 import { expect } from "chai"
-import { map } from "remeda/dist/commonjs/map"
+import { map } from "@chevrotain/utils"
 import { IToken, ITokenGrammarPath, TokenType } from "@chevrotain/types"
 import {
   NextAfterTokenWalker,
