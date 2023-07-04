@@ -78,12 +78,10 @@
     "@chevrotain/types": "10.5.0",
     "@chevrotain/utils": "10.5.0",
     "@chevrotain/regexp-to-ast": "10.5.0",
-    "lodash": "4.17.21",
     "remeda": "1.23.0",
     "is-regexp": "2.1.0"
   },
   "devDependencies": {
-    "@types/lodash": "4.14.191",
     "error-stack-parser": "2.1.4",
     "esbuild": "0.16.10",
     "gen-esm-wrapper": "1.1.3",

@@ -1,5 +1,5 @@
 import { flatten } from "remeda"
-import uniq from "lodash/uniq"
+import { uniq } from "remeda"
 import { map } from "remeda"
 import { NonTerminal, Terminal } from "@chevrotain/gast"
 import {

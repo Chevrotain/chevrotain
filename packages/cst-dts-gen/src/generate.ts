@@ -1,7 +1,7 @@
 import { flatten } from "remeda"
 import { isArray } from "remeda"
 import { map } from "remeda"
-import uniq from "lodash/uniq"
+import { uniq } from "remeda"
 import { GenerateDtsOptions } from "@chevrotain/types"
 import {
   CstNodeTypeDefinition,

@@ -171,16 +171,10 @@ importers:
       is-regexp:
         specifier: 2.1.0
         version: 2.1.0
-      lodash:
-        specifier: 4.17.21
-        version: 4.17.21
       remeda:
         specifier: 1.23.0
         version: 1.23.0
     devDependencies:
-      '@types/lodash':
-        specifier: 4.14.191
-        version: 4.14.191
       error-stack-parser:
         specifier: 2.1.4
         version: 2.1.4
@@ -226,9 +220,6 @@ importers:
       '@chevrotain/utils':
         specifier: 10.5.0
         version: link:../utils
-      lodash:
-        specifier: 4.17.21
-        version: 4.17.21
       remeda:
         specifier: 1.23.0
         version: 1.23.0
@@ -251,9 +242,6 @@ importers:
       chevrotain:
         specifier: 10.5.0
         version: link:../chevrotain
-      lodash:
-        specifier: 4.17.21
-        version: 4.17.21
       remeda:
         specifier: 1.23.0
         version: 1.23.0
@@ -273,16 +261,9 @@ importers:
       is-regexp:
         specifier: 2.1.0
         version: 2.1.0
-      lodash:
-        specifier: 4.17.21
-        version: 4.17.21
       remeda:
         specifier: 1.23.0
         version: 1.23.0
-    devDependencies:
-      '@types/lodash':
-        specifier: 4.14.191
-        version: 4.14.191
 
   packages/regexp-to-ast: {}
 
@@ -6566,6 +6547,7 @@ packages:
 
   /lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+    dev: true
 
   /log-symbols@4.1.0:
     resolution: {integrity: sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==}

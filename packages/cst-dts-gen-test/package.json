@@ -26,7 +26,6 @@
     "@chevrotain/gast": "10.5.0",
     "@chevrotain/types": "10.5.0",
     "chevrotain": "10.5.0",
-    "lodash": "4.17.21",
     "remeda": "1.23.0"
   },
   "devDependencies": {

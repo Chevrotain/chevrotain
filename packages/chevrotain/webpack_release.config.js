@@ -10,7 +10,9 @@ module.exports = {
   stats: {
     colors: true,
     modules: true,
-    reasons: true
+    reasons: true,
+    // we mainly only care about the size of external packages from `node_modules`
+    excludeModules: ["lib/src"]
   },
   entry: "./lib/src/api.js",
   output: {
