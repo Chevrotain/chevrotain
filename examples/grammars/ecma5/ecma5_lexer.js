@@ -1,5 +1,3 @@
-"use strict"
-
 /**
  * ECMAScript cannot be easily lexed using a distinct lexing phase.
  * See: https://users.soe.ucsc.edu/~cormac/papers/dls14a.pdf
@@ -11,9 +9,9 @@
  * https://github.com/chevrotain/chevrotain/blob/master/test/full_flow/ecma_quirks/ecma_quirks.ts
  *
  */
-const acorn = require("acorn")
+import * as acorn from "acorn"
 const acornTokTypes = acorn.tokTypes
-const tokens = require("./ecma5_tokens")
+import * as tokens from "./ecma5_tokens.js"
 
 function createChevToken(chevTokenClass, acornToken) {
   return {
@@ -24,7 +22,7 @@ function createChevToken(chevTokenClass, acornToken) {
   }
 }
 
-function tokenize(str) {
+export function tokenize(str) {
   const result = []
   for (let token of acorn.tokenizer(str, { ecmaVersion: 6 })) {
     let acornType = token.type
@@ -324,8 +322,4 @@ function tokenize(str) {
   }
 
   return result
-}
-
-module.exports = {
-  tokenize
 }

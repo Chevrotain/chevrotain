@@ -1,7 +1,6 @@
-"use strict"
+import { expect } from "chai"
 
-const expect = require("chai").expect
-const parse = require("./ecma5_api").parse
+import { parse } from "./ecma5_api.js"
 
 describe("The ECMAScript5 Grammar", () => {
   const sampleText = `var chevrotain = require("chevrotain")

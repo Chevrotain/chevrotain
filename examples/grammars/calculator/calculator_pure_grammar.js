@@ -1,4 +1,3 @@
-"use strict"
 /**
  * An Example of implementing a Calculator with separated grammar and semantics (actions).
  * This separation makes it easier to maintain the grammar and reuse it in different use cases.
@@ -9,7 +8,7 @@
  * See farther details here:
  * https://chevrotain.io/docs/guide/concrete_syntax_tree.html
  */
-const { createToken, tokenMatcher, Lexer, CstParser } = require("chevrotain")
+import { createToken, tokenMatcher, Lexer, CstParser } from "chevrotain"
 
 // ----------------- lexer -----------------
 // using the NA pattern marks this Token class as 'irrelevant' for the Lexer.
@@ -242,7 +241,7 @@ class CalculatorInterpreter extends BaseCstVisitor {
 // We only need a single interpreter instance because our interpreter has no state.
 const interpreter = new CalculatorInterpreter()
 
-module.exports = function (text) {
+export function parsePure(text) {
   // 1. Tokenize the input.
   const lexResult = CalculatorLexer.tokenize(text)
 

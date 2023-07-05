@@ -22,8 +22,6 @@
     "coverage:merge": "node ./scripts/merge-coverage",
     "format:fix": "prettier --write \"**/*.@(ts|js|json|md|yml)\"",
     "format:validate": "prettier --check \"**/*.@(ts|js|json|md|yml)\"",
-    "lint:fix": "eslint . --ext=js,ts --fix --max-warnings=0 --ignore-path=.gitignore",
-    "lint:validate": "eslint . --ext=js,ts --max-warnings=0 --ignore-path=.gitignore",
     "prepare": "husky install"
   },
   "prettier": {
@@ -34,9 +32,6 @@
   "lint-staged": {
     "*.{ts,js,json,md,yml}": [
       "prettier --write"
-    ],
-    "*.{ts,js}": [
-      "eslint --fix --max-warnings=0 --ignore-pattern=!.*"
     ]
   },
   "commitlint": {
@@ -67,12 +62,8 @@
     "cz-conventional-changelog": "3.3.0",
     "@commitlint/cli": "17.3.0",
     "@commitlint/config-conventional": "17.3.0",
-    "eslint": "8.30.0",
     "@typescript-eslint/parser": "5.47.0",
     "@typescript-eslint/eslint-plugin": "5.47.0",
-    "eslint-config-prettier": "8.5.0",
-    "eslint-plugin-eslint-comments": "3.2.0",
-    "eslint-plugin-lodash": "7.4.0",
     "source-map-support": "0.5.21",
     "@istanbuljs/schema": "0.1.3",
     "glob": "8.0.3",

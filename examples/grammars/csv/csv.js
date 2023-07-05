@@ -1,4 +1,3 @@
-"use strict"
 /**
  * An Example of implementing a CSV Grammar with Chevrotain.
  *
@@ -6,7 +5,7 @@
  *
  * Note that this is a pure grammar without any actions (either embedded or via a CST Visitor).
  */
-const { createToken, Lexer, CstParser, EMPTY_ALT } = require("chevrotain")
+import { createToken, Lexer, CstParser, EMPTY_ALT } from "chevrotain"
 
 // ----------------- lexer -----------------
 const Text = createToken({ name: "Text", pattern: /[^,\n\r"]+/ })
@@ -67,7 +66,7 @@ class CsvParser extends CstParser {
 // reuse the same parser instance.
 const parser = new CsvParser([])
 
-module.exports = function (text) {
+export function parseCsv(text) {
   // 1. Tokenize the input.
   const lexResult = CsvLexer.tokenize(text)
 

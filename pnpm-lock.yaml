@@ -47,18 +47,6 @@ importers:
       cz-conventional-changelog:
         specifier: 3.3.0
         version: 3.3.0
-      eslint:
-        specifier: 8.30.0
-        version: 8.30.0
-      eslint-config-prettier:
-        specifier: 8.5.0
-        version: 8.5.0(eslint@8.30.0)
-      eslint-plugin-eslint-comments:
-        specifier: 3.2.0
-        version: 3.2.0(eslint@8.30.0)
-      eslint-plugin-lodash:
-        specifier: 7.4.0
-        version: 7.4.0(eslint@8.30.0)
       fs-extra:
         specifier: 11.1.0
         version: 11.1.0
@@ -4841,36 +4829,6 @@ packages:
       optionator: 0.8.3
     optionalDependencies:
       source-map: 0.6.1
-    dev: true
-
-  /eslint-config-prettier@8.5.0(eslint@8.30.0):
-    resolution: {integrity: sha512-obmWKLUNCnhtQRKc+tmnYuQl0pFU1ibYJQ5BGhTVB08bHe9wC8qUeG7c08dj9XX+AuPj1YSGSQIHl1pnDHZR0Q==}
-    hasBin: true
-    peerDependencies:
-      eslint: '>=7.0.0'
-    dependencies:
-      eslint: 8.30.0
-    dev: true
-
-  /eslint-plugin-eslint-comments@3.2.0(eslint@8.30.0):
-    resolution: {integrity: sha512-0jkOl0hfojIHHmEHgmNdqv4fmh7300NdpA9FFpF7zaoLvB/QeXOGNLIo86oAveJFrfB1p05kC8hpEMHM8DwWVQ==}
-    engines: {node: '>=6.5.0'}
-    peerDependencies:
-      eslint: '>=4.19.1'
-    dependencies:
-      escape-string-regexp: 1.0.5
-      eslint: 8.30.0
-      ignore: 5.2.0
-    dev: true
-
-  /eslint-plugin-lodash@7.4.0(eslint@8.30.0):
-    resolution: {integrity: sha512-Tl83UwVXqe1OVeBRKUeWcfg6/pCW1GTRObbdnbEJgYwjxp5Q92MEWQaH9+dmzbRt6kvYU1Mp893E79nJiCSM8A==}
-    engines: {node: '>=10'}
-    peerDependencies:
-      eslint: '>=2'
-    dependencies:
-      eslint: 8.30.0
-      lodash: 4.17.21
     dev: true
 
   /eslint-scope@5.1.1:

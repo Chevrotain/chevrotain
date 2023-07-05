@@ -1,26 +1,22 @@
-"use strict"
-
-const {
+import {
   EmbeddedActionsParser,
   EOF,
   tokenMatcher,
   MismatchedTokenException
-} = require("chevrotain")
-const tokens = require("./ecma5_tokens")
-// for conciseness
-const t = tokens
+} from "chevrotain"
+import * as t from "./ecma5_tokens.js"
 
 const ENABLE_SEMICOLON_INSERTION = true
 const DISABLE_SEMICOLON_INSERTION = false
 
 // as defined in https://www.ecma-international.org/ecma-262/5.1/index.html
-class ECMAScript5Parser extends EmbeddedActionsParser {
+export class ECMAScript5Parser extends EmbeddedActionsParser {
   set orgText(newText) {
     this._orgText = newText
   }
 
   constructor() {
-    super(tokens, {
+    super(t, {
       // Reduces Parser Initialization time and this grammar does not need
       // a larger lookahead.
       maxLookahead: 2
@@ -904,8 +900,4 @@ const insertedSemiColon = {
   startOffset: NaN,
   endOffset: NaN,
   automaticallyInserted: true
-}
-
-module.exports = {
-  ECMAScript5Parser
 }

@@ -10,12 +10,12 @@
  * for an alternative:
  * https://github.com/chevrotain/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js
  */
-const {
+import {
   createToken,
   Lexer,
   EmbeddedActionsParser,
   tokenMatcher
-} = require("chevrotain")
+} from "chevrotain"
 
 // ----------------- lexer -----------------
 // using the NA pattern marks this Token class as 'irrelevant' for the Lexer.
@@ -194,7 +194,7 @@ class Calculator extends EmbeddedActionsParser {
 const parser = new Calculator()
 
 // wrapping it all together
-module.exports = function (text) {
+export function parseEmbedded(text) {
   const lexResult = CalculatorLexer.tokenize(text)
   // setting a new input will RESET the parser instance's state.
   parser.input = lexResult.tokens

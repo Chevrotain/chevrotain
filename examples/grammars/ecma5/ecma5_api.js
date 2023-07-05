@@ -1,11 +1,9 @@
-"use strict"
-
-const tokenize = require("./ecma5_lexer").tokenize
-const ECMAScript5Parser = require("./ecma5_parser").ECMAScript5Parser
+import { tokenize } from "./ecma5_lexer.js"
+import { ECMAScript5Parser } from "./ecma5_parser.js"
 
 const parserInstance = new ECMAScript5Parser()
 
-function parse(str) {
+export function parse(str) {
   const tokens = tokenize(str)
   parserInstance.input = tokens
   parserInstance.orgText = str
@@ -14,8 +12,4 @@ function parse(str) {
   if (parserInstance.errors.length > 0) {
     throw Error("Sad Sad Panda")
   }
-}
-
-module.exports = {
-  parse
 }

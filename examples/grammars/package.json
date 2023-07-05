@@ -1,6 +1,7 @@
 {
   "name": "chevrotain_examples_grammars",
   "version": "10.5.0",
+  "type": "module",
   "scripts": {
     "ci": "pnpm run test",
     "test": "mocha \"!(node_modules)/**/*spec.js\""
