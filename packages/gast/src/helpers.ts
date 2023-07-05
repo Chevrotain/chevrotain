@@ -1,6 +1,6 @@
-import some from "lodash/some.js"
-import every from "lodash/every.js"
-import includes from "lodash/includes.js"
+import { some } from "lodash-es"
+import { every } from "lodash-es"
+import { includes } from "lodash-es"
 import {
   AbstractProduction,
   Alternation,

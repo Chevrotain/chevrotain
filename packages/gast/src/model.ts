@@ -1,9 +1,9 @@
-import map from "lodash/map.js"
-import forEach from "lodash/forEach.js"
-import isString from "lodash/isString.js"
-import isRegExp from "lodash/isRegExp.js"
-import pickBy from "lodash/pickBy.js"
-import assign from "lodash/assign.js"
+import { map } from "lodash-es"
+import { forEach } from "lodash-es"
+import { isString } from "lodash-es"
+import { isRegExp } from "lodash-es"
+import { pickBy } from "lodash-es"
+import { assign } from "lodash-es"
 import type {
   IGASTVisitor,
   IProduction,

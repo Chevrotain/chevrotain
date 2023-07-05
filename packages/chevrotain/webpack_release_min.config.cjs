@@ -10,8 +10,7 @@ module.exports = {
   stats: {
     colors: true,
     modules: true,
-    reasons: false,
-    modulesSpace: 200
+    reasons: true
   },
   entry: "./lib/src/api.js",
   output: {
@@ -26,5 +25,7 @@ module.exports = {
   optimization: {
     minimize: true
   },
-  plugins: [new webpack.BannerPlugin({ banner: banner, raw: true })]
+  plugins: [
+    new webpack.BannerPlugin({ banner: banner, raw: true })
+  ]
 }
