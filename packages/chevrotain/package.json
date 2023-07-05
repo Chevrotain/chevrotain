@@ -23,9 +23,9 @@
     "name": "Shahar Soel"
   },
   "type": "module",
+  "types": "./chevrotain.d.ts",
   "exports": {
     ".": {
-      "types": "./chevrotain.d.ts",
       "import": "./lib/src/api.js"
     }
   },
@@ -39,7 +39,7 @@
     "lib/chevrotain.min.js",
     "lib/chevrotain.js",
     "src/**/*.ts",
-    "READNE.md",
+    "README.md",
     "LICENSE.TXT",
     "diagrams/**/*.*",
     "CHANGELOG.md"

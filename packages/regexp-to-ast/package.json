@@ -12,10 +12,9 @@
   },
   "license": "Apache-2.0",
   "type": "module",
-  "typings": "api.d.ts",
+  "types": "./types.d.ts",
   "exports": {
     ".": {
-      "types": "./api.d.ts",
       "import": "./lib/src/api.js"
     }
   },
@@ -39,7 +38,7 @@
     "clean": "shx rm -rf lib coverage",
     "compile:watch": "tsc -w",
     "compile": "tsc",
-    "coverage": "nyc mocha"
+    "coverage": "c8 mocha"
   },
   "dependencies": {},
   "devDependencies": {},

@@ -13,7 +13,7 @@ import type {
   RegExpPattern,
   Set,
   Term
-} from "../api.js"
+} from "../types"
 import {
   addFlag,
   ASSERT_EXISTS,

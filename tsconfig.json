@@ -1,6 +1,9 @@
 {
   "references": [
     {
+      "path": "./packages/regexp-to-ast"
+    },
+    {
       "path": "./packages/utils"
     },
     {

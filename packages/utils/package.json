@@ -14,7 +14,6 @@
   "typings": "lib/src/api.d.ts",
   "exports": {
     ".": {
-      "types": "./api.d.ts",
       "import": "./lib/src/api.js"
     }
   },

@@ -8,10 +8,9 @@
   },
   "license": "Apache-2.0",
   "type": "module",
-  "typings": "lib/src/api.d.ts",
+  "types": "lib/src/api.d.ts",
   "exports": {
     ".": {
-      "types": "./lib/src/api.d.ts",
       "import": "./lib/src/api.js"
     }
   },

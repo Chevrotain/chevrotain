@@ -1,17 +1,16 @@
 {
   "name": "@chevrotain/cst-dts-gen",
   "version": "10.5.0",
-  "description": "Generates type definitions for chevrotain CST nodes",
+  "description": "Generates type definitions for Chevrotain CST nodes",
   "keywords": [],
   "bugs": {
     "url": "https://github.com/Chevrotain/chevrotain/issues"
   },
   "license": "Apache-2.0",
   "type": "module",
-  "typings": "lib/src/api.d.ts",
+  "types": "./lib/src/api.d.ts",
   "exports": {
     ".": {
-      "types": "./lib/src/api.d.ts",
       "import": "./lib/src/api.js"
     }
   },

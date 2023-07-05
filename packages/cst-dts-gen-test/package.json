@@ -5,10 +5,9 @@
   "description": "tests for @chevrotain/cst-dts-gen",
   "license": "Apache-2.0",
   "type": "module",
-  "typings": "lib/src/api.d.ts",
+  "types": "./api.d.ts",
   "exports": {
     ".": {
-      "types": "./api.d.ts",
       "import": "./lib/src/api.js"
     }
   },

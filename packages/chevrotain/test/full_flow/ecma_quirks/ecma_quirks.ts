@@ -6,8 +6,7 @@ import { END_OF_FILE } from "../../../src/parse/parser/parser.js"
 import { MismatchedTokenException } from "../../../src/parse/exceptions_public.js"
 import { every, flatten, forEach, map } from "lodash-es"
 
-import {
-  getLookaheadPaths,
+import type {
   ILookaheadStrategy,
   ILookaheadValidationError,
   IOrAlt,
@@ -17,6 +16,7 @@ import {
   TokenType
 } from "@chevrotain/types"
 import { MixedInParser } from "../../../src/parse/parser/traits/parser_traits.js"
+import { getLookaheadPaths } from "../../../src/parse/grammar/lookahead.js"
 
 declare type QuirksTokens = {
   Return: TokenType

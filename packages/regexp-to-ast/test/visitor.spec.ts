@@ -7,11 +7,11 @@ import type {
   GroupBackReference,
   Quantifier,
   RegExpPattern,
-  Set
-} from "../api.js"
+  Set,
+  Character
+} from "../types"
 import { RegExpParser } from "../src/regexp-parser.js"
 import { BaseRegExpVisitor } from "../src/base-regexp-visitor.js"
-import { Character } from "../api.js"
 
 describe("The regexp AST visitor", () => {
   let parser: RegExpParser

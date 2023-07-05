@@ -16,12 +16,7 @@
     "LICENSE.TXT"
   ],
   "type": "module",
-  "typings": "./api.d.ts",
-  "exports": {
-    ".": {
-      "types": "./api.d.ts"
-    }
-  },
+  "types": "./api.d.ts",
   "repository": {
     "type": "git",
     "url": "git://github.com/Chevrotain/chevrotain.git"
