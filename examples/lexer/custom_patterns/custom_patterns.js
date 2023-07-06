@@ -6,7 +6,7 @@
  * For additional details see the docs:
  * https://chevrotain.io/docs/guide/custom_token_patterns.html
  */
-const { createToken, Lexer } = require("chevrotain")
+import { createToken, Lexer } from "chevrotain"
 
 // First lets define our custom pattern for matching an Integer Literal.
 // This function's signature matches the RegExp.prototype.exec function.
@@ -31,13 +31,13 @@ function matchInteger(text, startOffset) {
 
 // Now we can simply replace the regExp pattern with our custom pattern.
 // Consult the Docs (linked above) for additional syntax variants.
-const IntegerLiteral = createToken({
+export const IntegerLiteral = createToken({
   name: "IntegerLiteral",
   pattern: matchInteger,
   // custom patterns should explicitly specify the line_breaks option.
   line_breaks: false
 })
-const Comma = createToken({ name: "Comma", pattern: /,/ })
+export const Comma = createToken({ name: "Comma", pattern: /,/ })
 const Whitespace = createToken({
   name: "Whitespace",
   pattern: /\s+/,
@@ -46,16 +46,11 @@ const Whitespace = createToken({
 
 const customPatternLexer = new Lexer([Whitespace, Comma, IntegerLiteral])
 
-module.exports = {
-  IntegerLiteral: IntegerLiteral,
-  Comma: Comma,
+export function tokenize(text) {
+  const lexResult = customPatternLexer.tokenize(text)
 
-  tokenize: function (text) {
-    const lexResult = customPatternLexer.tokenize(text)
-
-    if (lexResult.errors.length < 0) {
-      throw new Error("sad sad panda lexing errors detected")
-    }
-    return lexResult
+  if (lexResult.errors.length < 0) {
+    throw new Error("sad sad panda lexing errors detected")
   }
+  return lexResult
 }
