@@ -2,7 +2,8 @@
   "compileOnSave": true,
   "compilerOptions": {
     "target": "ES2015",
-    "module": "CommonJS",
+    "module": "ES2020",
+    "moduleResolution": "node",
     "removeComments": false,
     "sourceMap": false,
     "declaration": false,

@@ -1,6 +1,7 @@
 {
   "name": "chevrotain_examples_implementation_languages",
   "version": "10.5.0",
+  "type": "module",
   "scripts": {
     "ci": "pnpm run build test",
     "build": "npm-run-all build:ts",
