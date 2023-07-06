@@ -1,6 +1,5 @@
-const assert = require("assert")
-
-const parseXML = require("./xml_api")
+import assert from "assert"
+import { parseXml } from "./xml_api.js"
 
 describe("The XML Grammar - Parser implemented using ES6 syntax", () => {
   it("can parse a simple XML without errors", () => {
@@ -126,7 +125,7 @@ describe("The XML Grammar - Parser implemented using ES6 syntax", () => {
       "   </book>\n" +
       "</catalog>"
 
-    const lexAndParseResult = parseXML(inputText)
+    const lexAndParseResult = parseXml(inputText)
     assert.equal(lexAndParseResult.lexErrors.length, 0)
     assert.equal(lexAndParseResult.parseErrors.length, 0)
   })

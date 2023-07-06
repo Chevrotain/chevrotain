@@ -1,5 +1,4 @@
-"use strict"
-const { createToken: createTokenOrg, Lexer } = require("chevrotain")
+import { createToken as createTokenOrg, Lexer } from "chevrotain"
 
 // A little mini DSL for easier lexer definition.
 const fragments = {}
@@ -30,7 +29,7 @@ function makePattern(strings, ...args) {
 }
 
 const tokensArray = []
-const tokensDictionary = {}
+export const tokensDictionary = {}
 
 function createToken(options) {
   const newTokenType = createTokenOrg(options)
@@ -153,7 +152,7 @@ const xmlLexerDefinition = {
   }
 }
 
-const xmlLexer = new Lexer(xmlLexerDefinition, {
+export const xmlLexer = new Lexer(xmlLexerDefinition, {
   // Reducing the amount of position tracking can provide a small performance boost (<10%)
   // Likely best to keep the full info for better error position reporting and
   // to expose "fuller" ITokens from the Lexer.
@@ -164,8 +163,3 @@ const xmlLexer = new Lexer(xmlLexerDefinition, {
   lineTerminatorCharacters: ["\n"],
   lineTerminatorsPattern: /\n|\r\n/g
 })
-
-module.exports = {
-  xmlLexer,
-  tokensDictionary
-}

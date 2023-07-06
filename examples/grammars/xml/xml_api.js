@@ -1,7 +1,7 @@
-const { xmlLexer } = require("./xml_lexer")
-const { xmlParser } = require("./xml_parser")
+import { xmlLexer } from "./xml_lexer.js"
+import { xmlParser } from "./xml_parser.js"
 
-module.exports = function (text) {
+export function parseXml(text) {
   const lexResult = xmlLexer.tokenize(text)
   // setting a new input will RESET the parser instance's state.
   xmlParser.input = lexResult.tokens

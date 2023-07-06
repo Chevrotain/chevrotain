@@ -1,4 +1,4 @@
-const { CstParser, Lexer, createToken } = require("chevrotain")
+import { CstParser, Lexer, createToken } from "chevrotain"
 
 // ----------------- lexer -----------------
 const True = createToken({ name: "True", pattern: /true/ })
@@ -24,7 +24,7 @@ const WhiteSpace = createToken({
   group: Lexer.SKIPPED
 })
 
-const allTokens = [
+export const jsonTokens = [
   WhiteSpace,
   NumberLiteral,
   StringLiteral,
@@ -39,17 +39,16 @@ const allTokens = [
   Null
 ]
 
-const JsonLexer = new Lexer(allTokens)
+const JsonLexer = new Lexer(jsonTokens)
 
 // ----------------- parser -----------------
-
-class JsonParser extends CstParser {
+export class JsonParser extends CstParser {
   // Unfortunately no support for class fields with initializer in ES2015, only in esNext...
   // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
   // invoking RULE(...)
   // see: https://github.com/jeffmo/es-class-fields-and-static-properties
   constructor() {
-    super(allTokens)
+    super(jsonTokens)
 
     // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
     const $ = this
@@ -116,22 +115,16 @@ class JsonParser extends CstParser {
 // reuse the same parser instance.
 const parser = new JsonParser()
 
-module.exports = {
-  jsonTokens: allTokens,
+export function parse(text) {
+  const lexResult = JsonLexer.tokenize(text)
+  // setting a new input will RESET the parser instance's state.
+  parser.input = lexResult.tokens
+  // any top level rule may be used as an entry point
+  const cst = parser.json()
 
-  JsonParser: JsonParser,
-
-  parse: function parse(text) {
-    const lexResult = JsonLexer.tokenize(text)
-    // setting a new input will RESET the parser instance's state.
-    parser.input = lexResult.tokens
-    // any top level rule may be used as an entry point
-    const cst = parser.json()
-
-    return {
-      cst: cst,
-      lexErrors: lexResult.errors,
-      parseErrors: parser.errors
-    }
+  return {
+    cst: cst,
+    lexErrors: lexResult.errors,
+    parseErrors: parser.errors
   }
 }

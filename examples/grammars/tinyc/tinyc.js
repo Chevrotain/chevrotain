@@ -3,15 +3,14 @@
  * https://tomassetti.me/ebnf/#examples (Scroll down a bit)
  */
 
-const chevrotain = require("chevrotain")
-const { Lexer, CstParser } = chevrotain
+import { createToken as orgCreateToken, Lexer, CstParser } from "chevrotain"
 
 // ----------------- lexer -----------------
 const allTokens = []
 
 // Utility to avoid manually building the allTokens array
 function createToken(options) {
-  const newToken = chevrotain.createToken(options)
+  const newToken = orgCreateToken(options)
   allTokens.push(newToken)
   return newToken
 }
@@ -167,7 +166,7 @@ class TinyCParser extends CstParser {
 // reuse the same parser instance.
 const parser = new TinyCParser()
 
-module.exports = function (text) {
+export function parseTinyC(text) {
   const lexResult = TinyCLexer.tokenize(text)
 
   // setting a new input will RESET the parser instance's state.

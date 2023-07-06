@@ -1,5 +1,5 @@
-const { expect } = require("chai")
-const { parse } = require("./graphql")
+import { expect } from "chai"
+import { parse } from "./graphql.js"
 
 describe("The GraphQL Grammar", () => {
   it("can parse a simple GraphQL without errors", () => {

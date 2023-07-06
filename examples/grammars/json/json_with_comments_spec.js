@@ -1,5 +1,5 @@
-const { expect } = require("chai")
-const parse = require("./json_with_comments")
+import { expect } from "chai"
+import { parse } from "./json_with_comments.js"
 
 describe("The JSON Grammar with comments", () => {
   it("can parse a simple Json without errors", () => {
