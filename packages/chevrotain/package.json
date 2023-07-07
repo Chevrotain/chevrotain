@@ -81,7 +81,10 @@
   },
   "devDependencies": {
     "@types/lodash-es": "4.17.7",
+    "@types/sinon": "10.0.13",
+    "@types/sinon-chai": "3.2.9",
     "@types/jsdom": "20.0.1",
+    "sinon-chai": "3.7.0",
     "error-stack-parser": "2.1.4",
     "esbuild": "0.16.10",
     "gen-esm-wrapper": "1.1.3",

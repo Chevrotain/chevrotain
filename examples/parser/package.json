@@ -8,7 +8,8 @@
     "bundle:diagrams": "esbuild ./diagrams/grammar.js --bundle --minify --format=esm --outfile=./diagrams/gen/grammar-bundled.min.mjs"
   },
   "dependencies": {
-    "chevrotain": "10.5.0"
+    "chevrotain": "10.5.0",
+    "lodash": "4.17.21"
   },
   "devDependencies": {
     "esbuild": "0.18.11"
