@@ -1,4 +1,4 @@
-const { createToken, Lexer } = require("chevrotain")
+import { createToken, Lexer } from "chevrotain
 
 // numbers Tokens
 const One = createToken({ name: "One", pattern: /1/ })

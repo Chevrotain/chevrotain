@@ -1,6 +1,6 @@
 "use strict"
-const expect = require("chai").expect
-const _ = require("lodash")
+import { expect } from "chai"
+import * as _ from "lodash"
 const errRecovery = require("./step4_error_recovery")
 const parseJsonToCst = errRecovery.parse
 

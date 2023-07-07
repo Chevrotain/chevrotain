@@ -7,7 +7,7 @@
  * "Public sta" --> ["static"]
  * "call f" --> ["foo"] // assuming foo is in the symbol table.
  */
-const _ = require("lodash")
+import * as _ from "lodash"
 const {
   createToken,
   Lexer,

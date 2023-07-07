@@ -1,6 +1,6 @@
 "use strict"
-const expect = require("chai").expect
-const _ = require("lodash")
+import { expect } from "chai"
+import * as _ from "lodash"
 const tokenMatcher = require("chevrotain").tokenMatcher
 const lex = require("./step1_lexing").lex
 const parse = require("./step2_parsing").parse

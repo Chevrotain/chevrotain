@@ -1,7 +1,7 @@
 "use strict"
 
-const expect = require("chai").expect
-const { tokenize } = require("./python_indentation")
+import { expect } from "chai"
+import { tokenize } from "./python_indentation.js"
 
 describe("The Chevrotain Lexer ability to lex python like indentation.", () => {
   it("Can Lex a simple python style if-else ", () => {

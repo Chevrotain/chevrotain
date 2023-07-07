@@ -1,4 +1,4 @@
-const expect = require("chai").expect
+import { expect } from "chai"
 const { NoViableAltException } = require("chevrotain")
 
 let parseHello = require("./parametrized")

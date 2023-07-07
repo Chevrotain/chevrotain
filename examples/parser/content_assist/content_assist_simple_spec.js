@@ -1,4 +1,4 @@
-const expect = require("chai").expect
+import { expect } from "chai"
 const { B, C, getContentAssistSuggestions } = require("./content_assist_simple")
 
 describe("The Official Content Assist Feature example Example", () => {

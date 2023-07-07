@@ -13,27 +13,29 @@
  * telling the lexer to prefer the longer identifier alternative if one is found.
  */
 
-const { createToken, Lexer } = require("chevrotain")
+import { createToken, Lexer } from "chevrotain"
 
-const Identifier = createToken({ name: "Identifier", pattern: /[a-zA-z]\w+/ })
+export const Identifier = createToken({
+  name: "Identifier",
+  pattern: /[a-zA-z]\w+/
+})
 
-const While = createToken({
+export const While = createToken({
   name: "While",
   pattern: /while/,
   longer_alt: Identifier
 })
-
-const For = createToken({
+export const For = createToken({
   name: "For",
   pattern: /for/,
   longer_alt: Identifier
 })
-const Do = createToken({
+export const Do = createToken({
   name: "Do",
   pattern: /do/,
   longer_alt: Identifier
 })
-const Whitespace = createToken({
+export const Whitespace = createToken({
   name: "Whitespace",
   pattern: /\s+/,
   group: Lexer.SKIPPED
@@ -50,19 +52,11 @@ const keywordsVsIdentifiersLexer = new Lexer([
   Identifier // As mentioned above, the Identifier Token must appear after ALL the Keyword Tokens.
 ])
 
-module.exports = {
-  Identifier: Identifier,
-  While: While,
-  For: For,
-  Do: Do,
-  Whitespace: Whitespace,
+export function tokenize(text) {
+  const lexResult = keywordsVsIdentifiersLexer.tokenize(text)
 
-  tokenize: function (text) {
-    const lexResult = keywordsVsIdentifiersLexer.tokenize(text)
-
-    if (lexResult.errors.length > 0) {
-      throw new Error("sad sad panda lexing errors detected")
-    }
-    return lexResult
+  if (lexResult.errors.length > 0) {
+    throw new Error("sad sad panda lexing errors detected")
   }
+  return lexResult
 }

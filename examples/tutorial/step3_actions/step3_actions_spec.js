@@ -1,5 +1,5 @@
 "use strict"
-const expect = require("chai").expect
+import { expect } from "chai"
 const toAstVisitor = require("./step3a_actions_visitor").toAst
 const toAstEmbedded = require("./step3b_actions_embedded").toAst
 

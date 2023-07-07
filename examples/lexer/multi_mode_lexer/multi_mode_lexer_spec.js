@@ -1,4 +1,4 @@
-const expect = require("chai").expect
+import { expect } from "chai"
 const multiModeLexer = require("./multi_mode_lexer")
 
 describe("The Chevrotain Lexer ability switch between Lexer modes", () => {
