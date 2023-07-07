@@ -66,8 +66,8 @@
     "coverage": "c8 mocha --enable-source-maps",
     "---------- BUNDLING --------": "",
     "bundle": "npm-run-all bundle:**",
-    "bundle:regular": "webpack --config webpack_release.config.cjs",
-    "bundle:min": "webpack --config webpack_release_min.config.cjs",
+    "bundle:regular": "webpack --config webpack_release.config.js",
+    "bundle:min": "webpack --config webpack_release_min.config.js",
     "bundle:esm:regular": "esbuild ./lib/src/api.js --bundle --sourcemap --format=esm --outfile=lib_esm/chevrotain.mjs",
     "bundle:esm:min": "esbuild ./lib/src/api.js --bundle --minify --format=esm --sourcemap --outfile=lib_esm/chevrotain.min.mjs"
   },
