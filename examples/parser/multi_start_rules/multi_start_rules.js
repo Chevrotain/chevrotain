@@ -84,8 +84,6 @@ function parseStartingWithRule(ruleName) {
   }
 }
 
-module.exports = {
-  parseFirst: parseStartingWithRule("firstRule"),
-  parseSecond: parseStartingWithRule("secondRule"),
-  parseThird: parseStartingWithRule("thirdRule")
-}
+export const parseFirst = parseStartingWithRule("firstRule")
+export const parseSecond = parseStartingWithRule("secondRule")
+export const parseThird = parseStartingWithRule("thirdRule")

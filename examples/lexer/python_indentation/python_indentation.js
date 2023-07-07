@@ -13,7 +13,6 @@
  * https://chevrotain.io/docs/guide/custom_token_patterns.html#background
  */
 
-"use strict"
 import { createToken, createTokenInstance, Lexer } from "chevrotain"
 import _ from "lodash"
 

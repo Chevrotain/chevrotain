@@ -1,4 +1,3 @@
-"use strict"
 // Written Docs for this tutorial step can be found here:
 // https://chevrotain.io/docs/tutorial/step2_parsing.html
 

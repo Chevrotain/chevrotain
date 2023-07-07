@@ -1,4 +1,3 @@
-"use strict"
 /**
  * An Example of implementing a Calculator with embedded actions (semantics).
  *

@@ -8,12 +8,9 @@
  * The Parser in this example accepts a <mood> argument with the invocation of the <topRule>
  * This parameter is passed down to the <hello> rule where it is used to determine the possible grammar path.
  */
-"use strict"
-
 import { createToken, Lexer, CstParser } from "chevrotain"
 
 // ----------------- lexer -----------------
-
 const Hello = createToken({ name: "Hello", pattern: /hello/ })
 const World = createToken({ name: "World", pattern: /world/ })
 
@@ -104,7 +101,7 @@ class HelloParser extends CstParser {
 // reuse the same parser instance.
 const parser = new HelloParser()
 
-module.exports = function (text, mood) {
+export function parseHello(text, mood) {
   const lexResult = HelloLexer.tokenize(text)
 
   // setting a new input will RESET the parser instance's state.

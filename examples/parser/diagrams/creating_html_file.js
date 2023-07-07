@@ -1,5 +1,3 @@
-"use strict"
-
 /**
  * A template for generating syntax diagrams html file.
  * See: https://github.com/chevrotain/chevrotain/tree/master/diagrams for more details

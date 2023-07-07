@@ -23,7 +23,7 @@ const PredicateLookaheadLexer = new Lexer(allTokens)
 
 /**
  * A Predicate / Gate function is invoked with context (this)
- * of the Parser. Thus it can access the Parser's internal state if needed.
+ * of the Parser. Thus, it can access the Parser's internal state if needed.
  * In this example we limit some of the available alternatives using 'global' flag
  * 'maxNumberAllowed'
  *
@@ -84,7 +84,7 @@ class PredicateLookaheadParser extends EmbeddedActionsParser {
 
     // very important to call this after all the rules have been defined.
     // otherwise the parser may not work correctly as it will lack information
-    // derived during the self analysis phase.
+    // derived during the self-analysis phase.
     this.performSelfAnalysis()
   }
 }
@@ -94,22 +94,20 @@ class PredicateLookaheadParser extends EmbeddedActionsParser {
 // reuse the same parser instance.
 const parser = new PredicateLookaheadParser()
 
-module.exports = {
-  parse: function (text) {
-    const lexResult = PredicateLookaheadLexer.tokenize(text)
-    // setting a new input will RESET the parser instance's state.
-    parser.input = lexResult.tokens
-    // any top level rule may be used as an entry point
-    const value = parser.customPredicateRule()
+export function parse(text) {
+  const lexResult = PredicateLookaheadLexer.tokenize(text)
+  // setting a new input will RESET the parser instance's state.
+  parser.input = lexResult.tokens
+  // any top level rule may be used as an entry point
+  const value = parser.customPredicateRule()
 
-    return {
-      value: value,
-      lexErrors: lexResult.errors,
-      parseErrors: parser.errors
-    }
-  },
-
-  setMaxAllowed: function (newMaxAllowed) {
-    maxNumberAllowed = newMaxAllowed
+  return {
+    value: value,
+    lexErrors: lexResult.errors,
+    parseErrors: parser.errors
   }
+}
+
+export function setMaxAllowed(newMaxAllowed) {
+  maxNumberAllowed = newMaxAllowed
 }

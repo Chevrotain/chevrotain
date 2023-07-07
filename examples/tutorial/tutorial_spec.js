@@ -1,4 +1,3 @@
-"use strict"
 import { expect } from "chai"
 import * as _ from "lodash"
 const tokenMatcher = require("chevrotain").tokenMatcher

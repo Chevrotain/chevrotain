@@ -1,7 +1,7 @@
 import { expect } from "chai"
 import { NoViableAltException } from "chevrotain"
 
-let parseHello = require("./parametrized")
+import { parseHello } from "./parametrized.js"
 
 const POSITIVE = "positive"
 const NEGATIVE = "negative"

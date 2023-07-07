@@ -1,5 +1,5 @@
 import { expect } from "chai"
-const parse = require("./dynamic_delimiters")
+import { parse } from "./dynamic_delimiters.js"
 
 describe("The Dynamic Delimiters Example", () => {
   it("Can Parse an array using built-in comma delimiter", () => {

@@ -1,4 +1,3 @@
-"use strict"
 import { expect } from "chai"
 const tokenMatcher = require("chevrotain").tokenMatcher
 const lex = require("./step1_lexing").lex

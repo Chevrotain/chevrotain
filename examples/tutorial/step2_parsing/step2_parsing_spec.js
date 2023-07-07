@@ -1,4 +1,3 @@
-"use strict"
 import { expect } from "chai"
 const parse = require("./step2_parsing").parse
 

@@ -1,5 +1,3 @@
-"use strict"
-
 const chevrotain = require("chevrotain")
 
 // ----------------- lexer -----------------

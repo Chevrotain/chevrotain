@@ -1,5 +1,5 @@
-const assert = require("assert")
-const parseSelect = require("./versioning")
+import assert from "assert"
+import { parseSelect } from "./versioning.js"
 
 const VERSION_1 = 1
 const VERSION_2 = 2

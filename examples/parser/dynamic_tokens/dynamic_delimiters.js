@@ -81,7 +81,7 @@ class DynamicDelimiterParser extends EmbeddedActionsParser {
 // reuse the same parser instance.
 const parser = new DynamicDelimiterParser()
 
-module.exports = function (text, dynamicDelimiterRegExp) {
+export function parse(text, dynamicDelimiterRegExp) {
   // make this parameter optional
   if (dynamicDelimiterRegExp === undefined) {
     dynamicDelimiterRegExp = Lexer.NA
