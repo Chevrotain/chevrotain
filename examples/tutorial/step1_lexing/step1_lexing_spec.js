@@ -1,6 +1,6 @@
 import { expect } from "chai"
 import { tokenMatcher } from "chevrotain"
-import { From, lex, Select, Identifier, From } from "./step1_lexing.js"
+import { From, lex, Select, Identifier } from "./step1_lexing.js"
 
 describe("Chevrotain Tutorial", () => {
   context("Step 1 - Lexing", () => {

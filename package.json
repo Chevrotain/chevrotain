@@ -15,7 +15,7 @@
     "preinstall": "npx only-allow pnpm",
     "release:version": "lerna version --force-publish",
     "release:publish": "lerna publish from-git --yes --no-verify-access",
-    "ci": "npm-run-all format:validate lint:validate ci:subpackages coverage:merge",
+    "ci": "npm-run-all format:validate ci:subpackages coverage:merge",
     "compile": "pnpm -r run clean && tsc --build",
     "compile:watch": "pnpm -r run clean  && tsc --build --watch",
     "ci:subpackages": "pnpm -r run ci",

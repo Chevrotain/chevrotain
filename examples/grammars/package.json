@@ -3,7 +3,7 @@
   "version": "10.5.0",
   "type": "module",
   "scripts": {
-    "ci": "pnpm run test && pnpm run bundle",
+    "ci": "pnpm run test && pnpm run bundle:graphql",
     "test": "mocha \"!(node_modules)/**/*spec.js\"",
     "bundle:graphql": "esbuild ./graphql/graphql.js --bundle --minify --format=esm --outfile=./graphql/gen/graphql-bundled.min.mjs"
   },
