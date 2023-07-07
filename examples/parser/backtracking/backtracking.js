@@ -4,7 +4,7 @@
 // generally one should avoid having to use backtracking, and this specific example can be resolved without backtracking
 // by factoring out the common prefix, but for the sake of the example let us assume backtracking is required...
 
-const { createToken, Lexer, CstParser } = require("chevrotain")
+import { createToken, Lexer, CstParser } from "chevrotain"
 
 const Number = createToken({ name: "Number", pattern: /\d+/ })
 const Element = createToken({ name: "Element", pattern: /element/ })
@@ -99,7 +99,7 @@ class BackTrackingParser extends CstParser {
 // reuse the same parser instance.
 const parser = new BackTrackingParser()
 
-module.exports = function (text) {
+export function parse(text) {
   const lexResult = backtrackingLexer.tokenize(text)
 
   // setting a new input will RESET the parser instance's state.

@@ -7,14 +7,14 @@
  * "Public sta" --> ["static"]
  * "call f" --> ["foo"] // assuming foo is in the symbol table.
  */
-import * as _ from "lodash"
-const {
+import _ from "lodash"
+import {
   createToken,
   Lexer,
   CstParser,
   tokenMatcher,
   EMPTY_ALT
-} = require("chevrotain")
+} from "chevrotain"
 
 const Keyword = createToken({ name: "Keyword", pattern: Lexer.NA })
 const Private = createToken({
@@ -126,7 +126,7 @@ const parserInstance = new StatementsParser()
  * @param text {string} - The text content assist is requested immediately afterwards.
  * @param symbolTable {string[]} - List of available symbol names.
  */
-function getContentAssistSuggestions(text, symbolTable) {
+export function getContentAssistSuggestions(text, symbolTable) {
   const lexResult = StatementsLexer.tokenize(text)
   if (lexResult.errors.length > 0) {
     throw new Error("sad sad panda, lexing errors detected")
@@ -191,8 +191,4 @@ function getContentAssistSuggestions(text, symbolTable) {
 
   // we could have duplication because each suggestion also includes a Path, and the same Token may appear in multiple suggested paths.
   return _.uniq(finalSuggestions)
-}
-
-module.exports = {
-  getContentAssistSuggestions: getContentAssistSuggestions
 }

@@ -10,7 +10,7 @@
  * Note that it is mandatory to enable the "dynamicTokensEnabled" config property for this capability to work.
  * Otherwise certain performance optimizations may break as those assume that the Token vocabulary is static.
  */
-const { createToken, Lexer, EmbeddedActionsParser } = require("chevrotain")
+import { createToken, Lexer, EmbeddedActionsParser } from "chevrotain"
 
 // ----------------- lexer -----------------
 const LSquare = createToken({ name: "LSquare", pattern: /\[/ })

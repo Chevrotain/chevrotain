@@ -1,5 +1,5 @@
 const { parse, setMaxAllowed } = require("./predicate_lookahead")
-const { expect } = require("chai")
+import { expect } from "chai"
 
 describe("The Chevrotain support for custom lookahead predicates", () => {
   it("can limit the available alternatives in an OR by an some external input number", () => {

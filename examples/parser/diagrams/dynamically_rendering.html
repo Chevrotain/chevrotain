@@ -30,18 +30,15 @@ node.js
 </iframe>
 </body>
 
-<!-- Load Chevrotain and our grammar in the browser, may require using UMD / Webpack / Browserify / rollup
-     or some other way to make the grammar browser compatible-->
-<script src="https://unpkg.com/chevrotain/lib/chevrotain.js"></script>
-<script src="grammar.js"></script>
+<script type="module">
 
-<script>
+    import { JsonParser, createSyntaxDiagramsCode } from "./gen/grammar-bundled.min.mjs"
     // extract the serialized grammar.
-    var parserInstance = grammar.parserInstance
+    var parserInstance = new JsonParser()
     var serialziedGrammar = parserInstance.getSerializedGastProductions()
 
     // create the HTML Text
-    var htmlText = chevrotain.createSyntaxDiagramsCode(serialziedGrammar)
+    var htmlText = createSyntaxDiagramsCode(serialziedGrammar)
     var innerFrame = document.getElementById("innerFrame")
 
     // Update the iframe src to visually render the diagrams.

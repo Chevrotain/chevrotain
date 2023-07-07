@@ -1,5 +1,5 @@
 import { expect } from "chai"
-const { getContentAssistSuggestions } = require("./content_assist_complex")
+import { getContentAssistSuggestions } from "./content_assist_complex.js"
 
 describe("The Official Content Assist Feature example Example", () => {
   const symbolTable = ["foo", "bar", "average"]

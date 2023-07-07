@@ -5,7 +5,7 @@
   "scripts": {
     "ci": "pnpm run test && pnpm run bundle",
     "test": "mocha \"!(node_modules)/**/*spec.js\"",
-    "bundle:graphql": "esbuild ./graphql/graphql.js --bundle --minify --format=esm --outfile=./graphql/graphql-bundled.min.mjs"
+    "bundle:graphql": "esbuild ./graphql/graphql.js --bundle --minify --format=esm --outfile=./graphql/gen/graphql-bundled.min.mjs"
   },
   "dependencies": {
     "acorn": "8.8.0",

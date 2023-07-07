@@ -7,7 +7,7 @@
  * 2. Partial parsing of only the modified parts of a document in an IDE.
  */
 
-const { createToken, Lexer, CstParser } = require("chevrotain")
+import { createToken, Lexer, CstParser } from "chevrotain"
 
 // ----------------- lexer -----------------
 const Alpha = createToken({ name: "Alpha", pattern: /A/ })

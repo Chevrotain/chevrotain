@@ -1,4 +1,4 @@
-const { expect } = require("chai")
+import { expect } from "chai"
 const parse = require("./dynamic_delimiters")
 
 describe("The Dynamic Delimiters Example", () => {

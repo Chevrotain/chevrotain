@@ -10,17 +10,20 @@
  * - open the "generated_diagrams.html" that will be created in this folder using
  *   your favorite browser.
  */
-const path = require("path")
-const fs = require("fs")
-const chevrotain = require("chevrotain")
-const grammar = require("./grammar")
+import path, { dirname } from "path"
+import fs from "fs"
+import { fileURLToPath } from "url"
+import { createSyntaxDiagramsCode } from "chevrotain"
+import { JsonParser } from "./grammar.js"
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 // extract the serialized grammar.
-const parserInstance = grammar.parserInstance
+const parserInstance = new JsonParser()
 const serializedGrammar = parserInstance.getSerializedGastProductions()
 
 // create the HTML Text
-const htmlText = chevrotain.createSyntaxDiagramsCode(serializedGrammar)
+const htmlText = createSyntaxDiagramsCode(serializedGrammar)
 
 // Write the HTML file to disk
 const outPath = path.resolve(__dirname, "./")

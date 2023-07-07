@@ -2,7 +2,7 @@
  * Example Of using Grammar inheritance to support multiple versions of the same grammar.
  */
 
-const { createToken, Lexer, CstParser } = require("chevrotain")
+import { createToken, Lexer, CstParser } from "chevrotain"
 
 // ----------------- lexer -----------------
 const Select = createToken({ name: "Select", pattern: /SELECT/i })

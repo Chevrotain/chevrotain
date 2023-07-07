@@ -1,4 +1,4 @@
-const { expect } = require("chai")
+import { expect } from "chai"
 const rules = require("./multi_start_rules")
 
 describe("The Chevrotain support using any rule as a start/top rule", () => {

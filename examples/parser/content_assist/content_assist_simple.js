@@ -7,11 +7,11 @@
  * "Public sta" --> ["static"]
  * "call f" --> ["foo"] // assuming foo is in the symbol table.
  */
-const { createToken, Lexer, CstParser } = require("chevrotain")
+import { createToken, Lexer, CstParser } from "chevrotain"
 
-const A = createToken({ name: "A", pattern: /A/ })
-const B = createToken({ name: "B", pattern: /B/ })
-const C = createToken({ name: "C", pattern: /C/ })
+export const A = createToken({ name: "A", pattern: /A/ })
+export const B = createToken({ name: "B", pattern: /B/ })
+export const C = createToken({ name: "C", pattern: /C/ })
 
 const WhiteSpace = createToken({
   name: "WhiteSpace",
@@ -46,7 +46,7 @@ class MyParser extends CstParser {
 // No need for more than one instance.
 const parserInstance = new MyParser()
 
-function getContentAssistSuggestions(text) {
+export function getContentAssistSuggestions(text) {
   const lexResult = StatementsLexer.tokenize(text)
   if (lexResult.errors.length > 0) {
     throw new Error("sad sad panda, lexing errors detected")
@@ -65,11 +65,4 @@ function getContentAssistSuggestions(text) {
   )
 
   return tokenTypesSuggestions
-}
-
-module.exports = {
-  A,
-  B,
-  C,
-  getContentAssistSuggestions: getContentAssistSuggestions
 }

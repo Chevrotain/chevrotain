@@ -10,7 +10,7 @@
  */
 "use strict"
 
-const { createToken, Lexer, CstParser } = require("chevrotain")
+import { createToken, Lexer, CstParser } from "chevrotain"
 
 // ----------------- lexer -----------------
 

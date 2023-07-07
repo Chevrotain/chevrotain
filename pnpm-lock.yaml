@@ -145,6 +145,10 @@ importers:
       chevrotain:
         specifier: 10.5.0
         version: link:../../packages/chevrotain
+    devDependencies:
+      esbuild:
+        specifier: 0.18.11
+        version: 0.18.11
 
   examples/tutorial:
     dependencies:

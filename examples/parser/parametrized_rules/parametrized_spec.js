@@ -1,5 +1,5 @@
 import { expect } from "chai"
-const { NoViableAltException } = require("chevrotain")
+import { NoViableAltException } from "chevrotain"
 
 let parseHello = require("./parametrized")
 

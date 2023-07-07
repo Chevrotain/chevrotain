@@ -1,4 +1,4 @@
-const { createToken, Lexer, EmbeddedActionsParser } = require("chevrotain")
+import { createToken, Lexer, EmbeddedActionsParser } from "chevrotain"
 
 // ----------------- lexer -----------------
 const One = createToken({ name: "One", pattern: /1/ })
