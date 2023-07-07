@@ -1,7 +1,13 @@
 import { expect } from "chai"
-import * as _ from "lodash"
-const errRecovery = require("./step4_error_recovery")
-const parseJsonToCst = errRecovery.parse
+import _ from "lodash"
+import {
+  Colon,
+  LCurly,
+  NumberLiteral,
+  parseJsonToCst,
+  RCurly,
+  StringLiteral
+} from "./step4_error_recovery.js"
 
 describe("Chevrotain Tutorial", () => {
   context("Step 4 - Fault tolerance and error recovery", () => {
@@ -44,7 +50,7 @@ describe("Chevrotain Tutorial", () => {
                   {
                     image: "{",
                     startOffset: 0,
-                    tokenType: errRecovery.LCurly
+                    tokenType: LCurly
                   }
                 ],
                 objectItem: [
@@ -55,7 +61,7 @@ describe("Chevrotain Tutorial", () => {
                         {
                           image: '"key"',
                           startOffset: 2,
-                          tokenType: errRecovery.StringLiteral
+                          tokenType: StringLiteral
                         }
                       ],
                       // This missing colon token was inserted in recovery.
@@ -69,7 +75,7 @@ describe("Chevrotain Tutorial", () => {
                           startColumn: NaN,
                           endColumn: NaN,
                           isInsertedInRecovery: true,
-                          tokenType: errRecovery.Colon
+                          tokenType: Colon
                         }
                       ],
                       // the value rule appears AFTER the error (missing colon) yet it was still parsed successfully
@@ -82,7 +88,7 @@ describe("Chevrotain Tutorial", () => {
                               {
                                 image: "666",
                                 startOffset: 10,
-                                tokenType: errRecovery.NumberLiteral
+                                tokenType: NumberLiteral
                               }
                             ]
                           }
@@ -95,7 +101,7 @@ describe("Chevrotain Tutorial", () => {
                   {
                     image: "}",
                     startOffset: 13,
-                    tokenType: errRecovery.RCurly
+                    tokenType: RCurly
                   }
                 ]
               }
@@ -126,7 +132,7 @@ describe("Chevrotain Tutorial", () => {
                   {
                     image: "{",
                     startOffset: 0,
-                    tokenType: errRecovery.LCurly
+                    tokenType: LCurly
                   }
                 ],
                 objectItem: [
@@ -137,7 +143,7 @@ describe("Chevrotain Tutorial", () => {
                         {
                           image: '"key"',
                           startOffset: 2,
-                          tokenType: errRecovery.StringLiteral
+                          tokenType: StringLiteral
                         }
                       ],
                       // The out of place '}' brackets were ignored and the colon token was parsed instead.
@@ -145,7 +151,7 @@ describe("Chevrotain Tutorial", () => {
                         {
                           image: ":",
                           startOffset: 9,
-                          tokenType: errRecovery.Colon
+                          tokenType: Colon
                         }
                       ],
                       // the value rule appears AFTER the error (out of place '}' brackets) yet it was still parsed
@@ -158,7 +164,7 @@ describe("Chevrotain Tutorial", () => {
                               {
                                 image: "666",
                                 startOffset: 11,
-                                tokenType: errRecovery.NumberLiteral
+                                tokenType: NumberLiteral
                               }
                             ]
                           }
@@ -171,7 +177,7 @@ describe("Chevrotain Tutorial", () => {
                   {
                     image: "}",
                     startOffset: 14,
-                    tokenType: errRecovery.RCurly
+                    tokenType: RCurly
                   }
                 ]
               }

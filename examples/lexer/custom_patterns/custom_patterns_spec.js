@@ -1,7 +1,6 @@
-const { expect } = require("chai")
-const { tokenize, Comma, IntegerLiteral } = require("./custom_patterns")
-
-const tokenMatcher = require("chevrotain").tokenMatcher
+import { expect } from "chai"
+import { tokenMatcher } from "chevrotain"
+import { tokenize, Comma, IntegerLiteral } from "./custom_patterns.js"
 
 describe("The Chevrotain Lexer ability to use custom pattern implementations.", () => {
   it("Can Lex a simple input using a Custom Integer Literal RegExp", () => {

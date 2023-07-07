@@ -1,4 +1,4 @@
-const lex = require("./step1_lexing").lex
+import { lex } from "./step1_lexing.js"
 
 const inputText = "SELECT column1 FROM table2"
 const lexingResult = lex(inputText)

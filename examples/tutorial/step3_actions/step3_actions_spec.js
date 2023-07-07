@@ -1,6 +1,6 @@
 import { expect } from "chai"
-const toAstVisitor = require("./step3a_actions_visitor").toAst
-const toAstEmbedded = require("./step3b_actions_embedded").toAst
+import { toAstVisitor } from "./step3a_actions_visitor.js"
+import { toAstEmbedded } from "./step3b_actions_embedded.js"
 
 describe("Chevrotain Tutorial", () => {
   context("Step 3a - Actions (semantics) using CST Visitor", () => {

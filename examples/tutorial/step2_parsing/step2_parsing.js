@@ -6,24 +6,24 @@
 // Adding a Parser (grammar only, only reads the input without any actions).
 // Using the Token Vocabulary defined in the previous step.
 
-const selectLexer = require("../step1_lexing/step1_lexing")
-const CstParser = require("chevrotain").CstParser
-const tokenVocabulary = selectLexer.tokenVocabulary
-
-// individual imports, prefer ES6 imports if supported in your runtime/transpiler...
-const Select = tokenVocabulary.Select
-const From = tokenVocabulary.From
-const Where = tokenVocabulary.Where
-const Identifier = tokenVocabulary.Identifier
-const Integer = tokenVocabulary.Integer
-const GreaterThan = tokenVocabulary.GreaterThan
-const LessThan = tokenVocabulary.LessThan
-const Comma = tokenVocabulary.Comma
+import {
+  selectLexer,
+  allTokens,
+  Select,
+  From,
+  Where,
+  LessThan,
+  GreaterThan,
+  Comma,
+  Identifier,
+  Integer
+} from "../step1_lexing/step1_lexing.js"
+import { CstParser } from "chevrotain"
 
 // ----------------- parser -----------------
-class SelectParser extends CstParser {
+export class SelectParser extends CstParser {
   constructor() {
-    super(tokenVocabulary)
+    super(allTokens)
 
     // for conciseness
     const $ = this
@@ -90,25 +90,19 @@ class SelectParser extends CstParser {
 // We only ever need one as the parser internal state is reset for each new input.
 const parserInstance = new SelectParser()
 
-module.exports = {
-  parserInstance: parserInstance,
+export function parse(inputText) {
+  const lexResult = selectLexer.tokenize(inputText)
 
-  SelectParser: SelectParser,
+  // ".input" is a setter which will reset the parser's internal state.
+  parserInstance.input = lexResult.tokens
 
-  parse: function (inputText) {
-    const lexResult = selectLexer.lex(inputText)
+  // No semantic actions so this won't return anything yet.
+  parserInstance.selectStatement()
 
-    // ".input" is a setter which will reset the parser's internal's state.
-    parserInstance.input = lexResult.tokens
-
-    // No semantic actions so this won't return anything yet.
-    parserInstance.selectStatement()
-
-    if (parserInstance.errors.length > 0) {
-      throw Error(
-        "Sad sad panda, parsing errors detected!\n" +
-          parserInstance.errors[0].message
-      )
-    }
+  if (parserInstance.errors.length > 0) {
+    throw Error(
+      "Sad sad panda, parsing errors detected!\n" +
+        parserInstance.errors[0].message
+    )
   }
 }

@@ -1,5 +1,5 @@
 import { expect } from "chai"
-const multiModeLexer = require("./multi_mode_lexer")
+import { multiModeLexer } from "./multi_mode_lexer.js"
 
 describe("The Chevrotain Lexer ability switch between Lexer modes", () => {
   it("Can Lex an input that requires multiple modes successfully", () => {
@@ -9,7 +9,7 @@ describe("The Chevrotain Lexer ability switch between Lexer modes", () => {
 
     const images = lexResult.tokens.map((currTok) => currTok.image)
     expect(images).to.deep.equal([
-      // by default starting with the "first" mode "numbers_mode".
+      // By default, starting with the "first" mode "numbers_mode."
       // The ".tokenize" method can accept an optional inital mode argument as the second parameter.
       "1",
       "LETTERS", // entering "letters_mode"

@@ -1,5 +1,5 @@
 import { expect } from "chai"
-const parse = require("./step2_parsing").parse
+import { parse } from "./step2_parsing.js"
 
 describe("Chevrotain Tutorial", () => {
   context("Step 2 - Parsing", () => {

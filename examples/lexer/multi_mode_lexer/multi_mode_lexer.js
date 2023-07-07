@@ -1,4 +1,4 @@
-import { createToken, Lexer } from "chevrotain
+import { createToken, Lexer } from "chevrotain"
 
 // numbers Tokens
 const One = createToken({ name: "One", pattern: /1/ })
@@ -95,6 +95,4 @@ const multiModeLexerDefinition = {
 // Our new lexer now support 3 different modes
 // To mode switching logic works by using a mode stack and pushing and popping modes.
 // using the PUSH_MODE and POP_MODE static properties defined on the Token classes
-const MultiModeLexer = new Lexer(multiModeLexerDefinition)
-
-module.exports = MultiModeLexer
+export const multiModeLexer = new Lexer(multiModeLexerDefinition)

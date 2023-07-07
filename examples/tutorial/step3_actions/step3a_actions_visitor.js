@@ -5,10 +5,9 @@
 
 // Adding Actions(semantics) to our grammar using a CST Visitor.
 
-const selectLexer = require("../step1_lexing/step1_lexing")
+import { lex } from "../step1_lexing/step1_lexing.js"
 // re-using the parser implemented in step two.
-const parser = require("../step2_parsing/step2_parsing")
-const SelectParser = parser.SelectParser
+import { SelectParser } from "../step2_parsing/step2_parsing.js"
 
 // A new parser instance with CST output (enabled by default).
 const parserInstance = new SelectParser()
@@ -105,25 +104,23 @@ class SQLToAstVisitor extends BaseSQLVisitor {
 // Our visitor has no state, so a single instance is sufficient.
 const toAstVisitorInstance = new SQLToAstVisitor()
 
-module.exports = {
-  toAst: function (inputText) {
-    const lexResult = selectLexer.lex(inputText)
+export function toAstVisitor(inputText) {
+  const lexResult = lex(inputText)
 
-    // ".input" is a setter which will reset the parser's internal's state.
-    parserInstance.input = lexResult.tokens
+  // ".input" is a setter which will reset the parser's internal's state.
+  parserInstance.input = lexResult.tokens
 
-    // Automatic CST created when parsing
-    const cst = parserInstance.selectStatement()
+  // Automatic CST created when parsing
+  const cst = parserInstance.selectStatement()
 
-    if (parserInstance.errors.length > 0) {
-      throw Error(
-        "Sad sad panda, parsing errors detected!\n" +
-          parserInstance.errors[0].message
-      )
-    }
-
-    const ast = toAstVisitorInstance.visit(cst)
-
-    return ast
+  if (parserInstance.errors.length > 0) {
+    throw Error(
+      "Sad sad panda, parsing errors detected!\n" +
+        parserInstance.errors[0].message
+    )
   }
+
+  const ast = toAstVisitorInstance.visit(cst)
+
+  return ast
 }
