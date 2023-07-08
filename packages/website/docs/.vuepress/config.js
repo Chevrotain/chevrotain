@@ -1,11 +1,12 @@
-// TODO: vuepress config does not seem to work when converted to ESM.
-//      - retry with newer vuepress version in the future...
-const _ = require("lodash")
-const { slugify } = require("@mdit-vue/shared")
-const { defaultTheme } = require("@vuepress/theme-default")
-const { docsearchPlugin } = require("@vuepress/plugin-docsearch")
-const jf = require("jsonfile")
-const path = require("path")
+import path, { dirname } from "path"
+import _ from "lodash"
+import jf from "jsonfile"
+import { slugify } from "@mdit-vue/shared"
+import { defaultTheme } from "@vuepress/theme-default"
+import { docsearchPlugin } from "@vuepress/plugin-docsearch"
+import { fileURLToPath } from "url"
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const packagePath = path.join(__dirname, "../../package.json")
 const version = jf.readFileSync(packagePath).version
@@ -50,7 +51,7 @@ const slugMap = {
 
 const slugMapUsed = _.mapValues(slugMap, () => false)
 
-module.exports = {
+export default {
   title: "Chevrotain",
   base: "/docs/",
   description: "Parser Building Toolkit for JavaScript",
