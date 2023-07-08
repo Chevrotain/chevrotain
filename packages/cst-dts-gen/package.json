@@ -15,10 +15,8 @@
     }
   },
   "files": [
-    "src/**/*.ts",
     "lib/src/**/*.js",
-    "lib/src/**/*.d.ts",
-    "lib/src/**/*.js.map"
+    "lib/src/**/*.d.ts"
   ],
   "repository": {
     "type": "git",

@@ -48,12 +48,12 @@ In that case the lexer will **silently** revert to using the unoptimized algorit
 
 If the TokenType's first charCodes cannot be automatically identified, you can set the [`start_chars_hint`](https://chevrotain.io/documentation/10_5_0/interfaces/ITokenConfig.html#start_chars_hint) property when calling `createToken()`. If you define a custom [pattern](https://chevrotain.io/documentation/10_5_0/interfaces/ITokenConfig.html#pattern) for your token, then you should set `start_chars_hint` manually for optimal performance.
 
-It it possible to configure the Lexer **throw** an error
+It is possible to configure the Lexer **throw** an error
 in case the optimizations cannot be enabled by turning on the
 "ensureOptimizations" flag:
 
 ```javascript
-const { Lexer } = require("chevrotain")
+import { Lexer } from "chevrotain"
 const myLexer = new Lexer(
   [
     /* tokens */

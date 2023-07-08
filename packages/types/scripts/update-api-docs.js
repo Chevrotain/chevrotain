@@ -1,14 +1,17 @@
-const fs = require("fs-extra")
-const path = require("path")
+import fs from "fs-extra"
+import { dirname, join } from "path"
+import { fileURLToPath } from "url"
 
-const pkgPath = path.join(__dirname, "../package.json")
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
+const pkgPath = join(__dirname, "../package.json")
 const pkg = fs.readJsonSync(pkgPath)
 
 console.log("updating api docs re-direct")
 
 const version = pkg.version
 const noDotsVersion = version.replace(/\./g, "_")
-const newVersionApiDocsDir = path.join(
+const newVersionApiDocsDir = join(
   __dirname,
   "../gh-pages/documentation/" + noDotsVersion
 )
@@ -25,7 +28,7 @@ try {
 }
 
 // Update redirect to latest docs
-const docsIndexHtmlPath = path.join(
+const docsIndexHtmlPath = join(
   __dirname,
   "../gh-pages/documentation/index.html"
 )
@@ -38,5 +41,5 @@ const bumpedDocsIndexHtmlString = docsIndexHtmlString.replace(
 )
 fs.writeFileSync(docsIndexHtmlPath, bumpedDocsIndexHtmlString)
 
-const orgDocsLocation = path.join(__dirname, "../dev/docs")
+const orgDocsLocation = join(__dirname, "../dev/docs")
 fs.copySync(orgDocsLocation, newVersionApiDocsDir)

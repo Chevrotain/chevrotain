@@ -18,10 +18,8 @@
     }
   },
   "files": [
-    "src/**/*.ts",
     "lib/src/**/*.js",
     "lib/src/**/*.d.ts",
-    "lib/src/**/*.js.map",
     "README.md",
     "LICENSE.TXT"
   ],

@@ -18,11 +18,9 @@
       "import": "./lib/src/api.js"
     }
   },
+  "## COMMENT": "Not exposing the generated *.d.ts as it seems to conflict with api.d.ts when `moduleResolution=nodenext`in tsconfig...",
   "files": [
-    "src/**/*.ts",
     "lib/src/**/*.js",
-    "lib/src/**/*.d.ts",
-    "lib/src/**/*.js.map",
     "api.d.ts"
   ],
   "repository": {

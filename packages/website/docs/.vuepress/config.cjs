@@ -1,3 +1,5 @@
+// TODO: vuepress config does not seem to work when converted to ESM.
+//      - retry with newer vuepress version in the future...
 const _ = require("lodash")
 const { slugify } = require("@mdit-vue/shared")
 const { defaultTheme } = require("@vuepress/theme-default")

@@ -83,7 +83,7 @@ on the previously lexed tokens.
 Lets expand the previous example to only allow lexing integers if the previous token was not an identifier (contrived example).
 
 ```javascript
-const { tokenMatcher } = require("chevrotain")
+import { tokenMatcher } from "chevrotain"
 
 function matchInteger(text, offset, matchedTokens, groups) {
   let lastMatchedToken = _.last(matchedTokens)
