@@ -160,8 +160,8 @@ importers:
         version: 4.17.21
     devDependencies:
       '@types/jsdom':
-        specifier: 20.0.1
-        version: 20.0.1
+        specifier: 21.1.1
+        version: 21.1.1
       '@types/lodash-es':
         specifier: 4.17.7
         version: 4.17.7
@@ -2598,8 +2598,8 @@ packages:
     resolution: {integrity: sha512-z/QT1XN4K4KYuslS23k62yDIDLwLFkzxOuMplDtObz0+y7VqJCaO2o+SPwHCvLFZh7xazvvoor2tA/hPz9ee7g==}
     dev: true
 
-  /@types/jsdom@20.0.1:
-    resolution: {integrity: sha512-d0r18sZPmMQr1eG35u12FZfhIXNrnsPU/g5wvRKCUf/tOGilKKwYMYGqh33BNR6ba+2gkHw1EUiHoN3mn7E5IQ==}
+  /@types/jsdom@21.1.1:
+    resolution: {integrity: sha512-cZFuoVLtzKP3gmq9eNosUL1R50U+USkbLtUQ1bYVgl/lKp0FZM7Cq4aIHAL8oIvQ17uSHi7jXPtfDOdjPwBE7A==}
     dependencies:
       '@types/node': 14.18.35
       '@types/tough-cookie': 4.0.2
