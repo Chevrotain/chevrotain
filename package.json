@@ -56,7 +56,7 @@
     "@commitlint/cli": "17.3.0",
     "@commitlint/config-conventional": "17.3.0",
     "source-map-support": "0.5.21",
-    "rimraf": "3.0.2",
+    "rimraf": "5.0.1",
     "c8": "8.0.0"
   }
 }

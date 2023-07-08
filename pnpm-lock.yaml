@@ -54,8 +54,8 @@ importers:
         specifier: 2.8.4
         version: 2.8.4
       rimraf:
-        specifier: 3.0.2
-        version: 3.0.2
+        specifier: 5.0.1
+        version: 5.0.1
       shx:
         specifier: 0.3.4
         version: 0.3.4
@@ -7393,6 +7393,14 @@ packages:
     hasBin: true
     dependencies:
       glob: 9.3.5
+    dev: true
+
+  /rimraf@5.0.1:
+    resolution: {integrity: sha512-OfFZdwtd3lZ+XZzYP/6gTACubwFcHdLRqS9UX3UwpU2dnGQYkPFISRwvM3w9IiB2w7bW5qGo/uAwE4SmXXSKvg==}
+    engines: {node: '>=14'}
+    hasBin: true
+    dependencies:
+      glob: 10.3.2
     dev: true
 
   /rollup@3.26.2:
