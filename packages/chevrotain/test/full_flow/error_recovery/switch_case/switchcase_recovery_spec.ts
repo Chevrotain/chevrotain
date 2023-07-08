@@ -1,23 +1,23 @@
 import {
-  SwitchTok,
-  LParenTok,
-  IdentTok,
-  RParenTok,
-  LCurlyTok,
   CaseTok,
-  StringTok,
   ColonTok,
-  ReturnTok,
+  IdentTok,
   IntTok,
+  LCurlyTok,
+  LParenTok,
   RCurlyTok,
-  SemiColonTok
-} from "./switchcase_recovery_tokens"
-import { SwitchCaseRecoveryParser } from "./switchcase_recovery_parser"
+  ReturnTok,
+  RParenTok,
+  SemiColonTok,
+  StringTok,
+  SwitchTok
+} from "./switchcase_recovery_tokens.js"
+import { SwitchCaseRecoveryParser } from "./switchcase_recovery_parser.js"
 import {
   EarlyExitException,
   MismatchedTokenException
-} from "../../../../src/parse/exceptions_public"
-import { createRegularToken } from "../../../utils/matchers"
+} from "../../../../src/parse/exceptions_public.js"
+import { createRegularToken } from "../../../utils/matchers.js"
 import { expect } from "chai"
 
 describe("Error Recovery switch-case Example", () => {

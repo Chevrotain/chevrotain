@@ -1,6 +1,5 @@
-"use strict"
-const expect = require("chai").expect
-const parse = require("./step2_parsing").parse
+import { expect } from "chai"
+import { parse } from "./step2_parsing.js"
 
 describe("Chevrotain Tutorial", () => {
   context("Step 2 - Parsing", () => {

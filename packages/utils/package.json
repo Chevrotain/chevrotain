@@ -10,16 +10,16 @@
   "author": {
     "name": "Shahar Soel"
   },
-  "exports": {
-    ".": "./lib/src/api.js"
-  },
+  "type": "module",
   "typings": "lib/src/api.d.ts",
-  "main": "lib/src/api.js",
+  "exports": {
+    ".": {
+      "import": "./lib/src/api.js"
+    }
+  },
   "files": [
-    "src/**/*.ts",
     "lib/src/**/*.js",
     "lib/src/**/*.d.ts",
-    "lib/src/**/*.js.map",
     "README.md",
     "LICENSE.TXT"
   ],
@@ -36,7 +36,7 @@
     "clean": "shx rm -rf lib coverage",
     "compile:watch": "tsc -w",
     "compile": "tsc",
-    "coverage": "nyc mocha"
+    "coverage": "c8 mocha --enable-source-maps"
   },
   "publishConfig": {
     "access": "public"

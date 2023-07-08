@@ -79,7 +79,8 @@ Fairly straight forward translation:
 Each grammar rule is a property of a class that extends chevrotain.CstParser.
 
 ```javascript
-const { CstParser } = require("chevrotain")
+import { CstParser } from "chevrotain"
+
 const allTokens = [
   WhiteSpace,
   Select,
@@ -221,7 +222,7 @@ can be used for error messages and fault tolerance as well as deciding which pat
 Let's finish implementing the whole SelectParser:
 
 ```javascript
-const { CstParser } = require("chevrotain")
+import { CstParser } from "chevrotain"
 const allTokens = [
   WhiteSpace,
   Select,

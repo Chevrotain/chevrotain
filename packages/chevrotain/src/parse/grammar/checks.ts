@@ -1,38 +1,35 @@
-import first from "lodash/first"
-import isEmpty from "lodash/isEmpty"
-import drop from "lodash/drop"
-import flatten from "lodash/flatten"
-import filter from "lodash/filter"
-import reject from "lodash/reject"
-import difference from "lodash/difference"
-import map from "lodash/map"
-import forEach from "lodash/forEach"
-import groupBy from "lodash/groupBy"
-import reduce from "lodash/reduce"
-import pickBy from "lodash/pickBy"
-import values from "lodash/values"
-import includes from "lodash/includes"
-import flatMap from "lodash/flatMap"
-import clone from "lodash/clone"
+import {
+  clone,
+  compact,
+  difference,
+  drop,
+  dropRight,
+  filter,
+  first,
+  flatMap,
+  flatten,
+  forEach,
+  groupBy,
+  includes,
+  isEmpty,
+  map,
+  pickBy,
+  reduce,
+  reject,
+  values
+} from "lodash-es"
 import {
   IParserAmbiguousAlternativesDefinitionError,
   IParserDuplicatesDefinitionError,
   IParserEmptyAlternativeDefinitionError,
   ParserDefinitionErrorType
-} from "../parser/parser"
-import { getProductionDslName, isOptionalProd } from "@chevrotain/gast"
-import {
-  Alternative,
-  containsPath,
-  getLookaheadPathsForOptionalProd,
-  getLookaheadPathsForOr,
-  getProdType,
-  isStrictPrefixOfPath
-} from "./lookahead"
-import { nextPossibleTokensAfter } from "./interpreter"
+} from "../parser/parser.js"
 import {
   Alternation,
   Alternative as AlternativeGAST,
+  GAstVisitor,
+  getProductionDslName,
+  isOptionalProd,
   NonTerminal,
   Option,
   Repetition,
@@ -41,7 +38,15 @@ import {
   RepetitionWithSeparator,
   Terminal
 } from "@chevrotain/gast"
-import { GAstVisitor } from "@chevrotain/gast"
+import {
+  Alternative,
+  containsPath,
+  getLookaheadPathsForOptionalProd,
+  getLookaheadPathsForOr,
+  getProdType,
+  isStrictPrefixOfPath
+} from "./lookahead.js"
+import { nextPossibleTokensAfter } from "./interpreter.js"
 import {
   ILookaheadStrategy,
   IProduction,
@@ -52,10 +57,8 @@ import {
 import {
   IGrammarValidatorErrorMessageProvider,
   IParserDefinitionError
-} from "./types"
-import dropRight from "lodash/dropRight"
-import compact from "lodash/compact"
-import { tokenStructuredMatcher } from "../../scan/tokens"
+} from "./types.js"
+import { tokenStructuredMatcher } from "../../scan/tokens.js"
 
 export function validateLookahead(options: {
   lookaheadStrategy: ILookaheadStrategy

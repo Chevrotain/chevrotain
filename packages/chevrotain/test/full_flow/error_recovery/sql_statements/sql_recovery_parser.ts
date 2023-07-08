@@ -5,42 +5,42 @@
  * INSERT (32, "SHAHAR") INTO schema2.Persons
  * DELETE (31, "SHAHAR") FROM schema2.Persons
  */
-import values from "lodash/values"
-import { EmbeddedActionsParser } from "../../../../src/parse/parser/traits/parser_traits"
-import * as allTokens from "./sql_recovery_tokens"
+import { values } from "lodash-es"
+import { EmbeddedActionsParser } from "../../../../src/parse/parser/traits/parser_traits.js"
+import * as allTokens from "./sql_recovery_tokens.js"
 import {
-  INVALID_DDL,
-  INVALID_CREATE_STMT,
-  INVALID_INSERT_STMT,
-  INVALID_DELETE_STMT,
-  INVALID_QUALIFIED_NAME,
-  STATEMENTS,
-  CreateTok,
-  TableTok,
-  SemiColonTok,
+  COMMAS,
+  CommaTok,
   CREATE_STMT,
+  CreateTok,
+  DELETE_STMT,
+  DeleteTok,
+  DOTS,
+  DotTok,
+  FromTok,
+  IdentTok,
+  INSERT_STMT,
   InsertTok,
   IntoTok,
-  INSERT_STMT,
-  DeleteTok,
-  FromTok,
-  DELETE_STMT,
-  IdentTok,
-  DotTok,
-  DOTS,
-  QUALIFIED_NAME,
-  LParenTok,
-  CommaTok,
-  RParenTok,
-  COMMAS,
-  StringTok,
   IntTok,
+  INVALID_CREATE_STMT,
+  INVALID_DDL,
+  INVALID_DELETE_STMT,
+  INVALID_INSERT_STMT,
+  INVALID_QUALIFIED_NAME,
+  LParenTok,
+  QUALIFIED_NAME,
+  RParenTok,
+  SemiColonTok,
+  STATEMENTS,
+  StringTok,
+  TableTok,
   VirtualToken
-} from "./sql_recovery_tokens"
-import { ParseTree } from "../../parse_tree"
-import { augmentTokenTypes } from "../../../../src/scan/tokens"
+} from "./sql_recovery_tokens.js"
+import { ParseTree } from "../../parse_tree.js"
+import { augmentTokenTypes } from "../../../../src/scan/tokens.js"
 
-import { createRegularToken } from "../../../utils/matchers"
+import { createRegularToken } from "../../../utils/matchers.js"
 import { IToken, TokenType } from "@chevrotain/types"
 
 // deferred execution to only run "inside" a test

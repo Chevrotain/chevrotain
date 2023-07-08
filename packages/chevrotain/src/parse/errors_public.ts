@@ -1,9 +1,12 @@
-import { hasTokenLabel, tokenLabel } from "../scan/tokens_public"
-import first from "lodash/first"
-import map from "lodash/map"
-import reduce from "lodash/reduce"
-import { Alternation, NonTerminal, Rule, Terminal } from "@chevrotain/gast"
-import { getProductionDslName } from "@chevrotain/gast"
+import { hasTokenLabel, tokenLabel } from "../scan/tokens_public.js"
+import { first, map, reduce } from "lodash-es"
+import {
+  Alternation,
+  getProductionDslName,
+  NonTerminal,
+  Rule,
+  Terminal
+} from "@chevrotain/gast"
 import {
   IParserErrorMessageProvider,
   IProductionWithOccurrence,
@@ -12,7 +15,7 @@ import {
 import {
   IGrammarResolverErrorMessageProvider,
   IGrammarValidatorErrorMessageProvider
-} from "./grammar/types"
+} from "./grammar/types.js"
 
 export const defaultParserErrorProvider: IParserErrorMessageProvider = {
   buildMismatchTokenMessage({ expected, actual, previous, ruleName }): string {

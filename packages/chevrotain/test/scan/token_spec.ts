@@ -1,12 +1,12 @@
 import {
   createToken,
+  createTokenInstance,
   tokenLabel,
   tokenMatcher,
   tokenName
-} from "../../src/scan/tokens_public"
-import { Lexer } from "../../src/scan/lexer_public"
-import { createTokenInstance } from "../../src/scan/tokens_public"
-import { singleAssignCategoriesToksMap } from "../../src/scan/tokens"
+} from "../../src/scan/tokens_public.js"
+import { Lexer } from "../../src/scan/lexer_public.js"
+import { singleAssignCategoriesToksMap } from "../../src/scan/tokens.js"
 import { expect } from "chai"
 import { TokenType } from "@chevrotain/types"
 

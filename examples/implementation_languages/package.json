@@ -1,13 +1,12 @@
 {
   "name": "chevrotain_examples_implementation_languages",
   "version": "10.5.0",
+  "type": "module",
   "scripts": {
     "ci": "pnpm run build test",
     "build": "npm-run-all build:ts",
     "build:ts": "tsc && node ./typescript/scripts/gen_dts_signatures.js",
-    "test": "npm-run-all test:*",
-    "test:cjs": "mocha \"*spec.js\"",
-    "test:esm": "mocha \"*spec.mjs\""
+    "test": "mocha \"*spec.js\""
   },
   "dependencies": {
     "chevrotain": "10.5.0"

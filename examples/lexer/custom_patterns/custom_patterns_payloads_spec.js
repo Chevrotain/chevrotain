@@ -1,11 +1,10 @@
-const expect = require("chai").expect
-const {
+import { expect } from "chai"
+import { tokenMatcher } from "chevrotain"
+import {
   tokenize,
   StringLiteral,
   DateLiteral
-} = require("./custom_patterns_payloads")
-
-const tokenMatcher = require("chevrotain").tokenMatcher
+} from "./custom_patterns_payloads.js"
 
 describe("The Chevrotain Lexer ability to use custom pattern implementations.", () => {
   context("Custom Payloads", () => {

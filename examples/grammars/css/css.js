@@ -1,6 +1,5 @@
-const XRegExp = require("xregexp")
-const chevrotain = require("chevrotain")
-const { Lexer, CstParser } = chevrotain
+import XRegExp from "xregexp"
+import { Lexer, CstParser, createToken as orgCreateToken } from "chevrotain"
 
 // ----------------- lexer -----------------
 // Based on the specs in:
@@ -23,7 +22,7 @@ function MAKE_PATTERN(def, flags) {
 // array of cssTokens
 const cssTokens = []
 const createToken = function () {
-  const newToken = chevrotain.createToken.apply(null, arguments)
+  const newToken = orgCreateToken.apply(null, arguments)
   cssTokens.push(newToken)
   return newToken
 }
@@ -607,18 +606,16 @@ class CssParser extends CstParser {
 // reuse the same parser instance.
 const parser = new CssParser()
 
-module.exports = {
-  parseCss: function (text) {
-    const lexResult = CssLexer.tokenize(text)
-    // setting a new input will RESET the parser instance's state.
-    parser.input = lexResult.tokens
-    // any top level rule may be used as an entry point
-    const cst = parser.stylesheet()
+export function parseCss(text) {
+  const lexResult = CssLexer.tokenize(text)
+  // setting a new input will RESET the parser instance's state.
+  parser.input = lexResult.tokens
+  // any top level rule may be used as an entry point
+  const cst = parser.stylesheet()
 
-    return {
-      cst: cst,
-      lexErrors: lexResult.errors,
-      parseErrors: parser.errors
-    }
+  return {
+    cst: cst,
+    lexErrors: lexResult.errors,
+    parseErrors: parser.errors
   }
 }

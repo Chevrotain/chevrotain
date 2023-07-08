@@ -1,22 +1,22 @@
 {
   "name": "@chevrotain/cst-dts-gen",
   "version": "10.5.0",
-  "description": "Generates type definitions for chevrotain CST nodes",
+  "description": "Generates type definitions for Chevrotain CST nodes",
   "keywords": [],
   "bugs": {
     "url": "https://github.com/Chevrotain/chevrotain/issues"
   },
-  "exports": {
-    ".": "./lib/src/api.js"
-  },
   "license": "Apache-2.0",
-  "typings": "lib/src/api.d.ts",
-  "main": "lib/src/api.js",
+  "type": "module",
+  "types": "./lib/src/api.d.ts",
+  "exports": {
+    ".": {
+      "import": "./lib/src/api.js"
+    }
+  },
   "files": [
-    "src/**/*.ts",
     "lib/src/**/*.js",
-    "lib/src/**/*.d.ts",
-    "lib/src/**/*.js.map"
+    "lib/src/**/*.d.ts"
   ],
   "repository": {
     "type": "git",
@@ -35,10 +35,10 @@
   "dependencies": {
     "@chevrotain/gast": "10.5.0",
     "@chevrotain/types": "10.5.0",
-    "lodash": "4.17.21"
+    "lodash-es": "4.17.21"
   },
   "devDependencies": {
-    "@types/lodash": "4.14.191"
+    "@types/lodash-es": "4.17.6"
   },
   "publishConfig": {
     "access": "public"

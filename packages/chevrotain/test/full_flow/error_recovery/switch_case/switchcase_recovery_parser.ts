@@ -28,8 +28,8 @@
  * }
  */
 
-import { EmbeddedActionsParser } from "../../../../src/parse/parser/traits/parser_traits"
-import * as allTokens from "./switchcase_recovery_tokens"
+import { EmbeddedActionsParser } from "../../../../src/parse/parser/traits/parser_traits.js"
+import * as allTokens from "./switchcase_recovery_tokens.js"
 import {
   CaseTok,
   ColonTok,
@@ -43,9 +43,8 @@ import {
   SemiColonTok,
   StringTok,
   SwitchTok
-} from "./switchcase_recovery_tokens"
-import assign from "lodash/assign"
-import includes from "lodash/includes"
+} from "./switchcase_recovery_tokens.js"
+import { assign, includes } from "lodash-es"
 import { IToken, TokenType } from "@chevrotain/types"
 
 export interface RetType {

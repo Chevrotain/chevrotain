@@ -1,18 +1,17 @@
 import { Rule } from "@chevrotain/gast"
-import forEach from "lodash/forEach"
-import defaults from "lodash/defaults"
-import { resolveGrammar as orgResolveGrammar } from "../resolver"
-import { validateGrammar as orgValidateGrammar } from "../checks"
+import { defaults, forEach } from "lodash-es"
+import { resolveGrammar as orgResolveGrammar } from "../resolver.js"
+import { validateGrammar as orgValidateGrammar } from "../checks.js"
 import {
   defaultGrammarResolverErrorProvider,
   defaultGrammarValidatorErrorProvider
-} from "../../errors_public"
+} from "../../errors_public.js"
 import { TokenType } from "@chevrotain/types"
 import {
   IGrammarResolverErrorMessageProvider,
   IGrammarValidatorErrorMessageProvider,
   IParserDefinitionError
-} from "../types"
+} from "../types.js"
 
 type ResolveGrammarOpts = {
   rules: Rule[]

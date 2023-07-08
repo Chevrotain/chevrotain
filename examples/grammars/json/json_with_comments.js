@@ -1,5 +1,5 @@
-const { tokenMatcher, Lexer, createToken } = require("chevrotain")
-const { jsonTokens, JsonParser } = require("./json")
+import { tokenMatcher, Lexer, createToken } from "chevrotain"
+import { jsonTokens, JsonParser } from "./json.js"
 
 // Upgrade the lexer to support single line comments.
 const Comment = createToken({
@@ -54,7 +54,7 @@ class JsonParserWithComments extends JsonParser {
 // reuse the same parser instance.
 const parser = new JsonParserWithComments([])
 
-module.exports = function (text) {
+export function parse(text) {
   const lexResult = JsonWithCommentsLexer.tokenize(text)
   // setting a new input will RESET the parser instance's state.
   parser.input = lexResult.tokens

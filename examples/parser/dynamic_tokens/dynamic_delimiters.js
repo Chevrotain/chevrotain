@@ -10,7 +10,7 @@
  * Note that it is mandatory to enable the "dynamicTokensEnabled" config property for this capability to work.
  * Otherwise certain performance optimizations may break as those assume that the Token vocabulary is static.
  */
-const { createToken, Lexer, EmbeddedActionsParser } = require("chevrotain")
+import { createToken, Lexer, EmbeddedActionsParser } from "chevrotain"
 
 // ----------------- lexer -----------------
 const LSquare = createToken({ name: "LSquare", pattern: /\[/ })
@@ -81,7 +81,7 @@ class DynamicDelimiterParser extends EmbeddedActionsParser {
 // reuse the same parser instance.
 const parser = new DynamicDelimiterParser()
 
-module.exports = function (text, dynamicDelimiterRegExp) {
+export function parse(text, dynamicDelimiterRegExp) {
   // make this parameter optional
   if (dynamicDelimiterRegExp === undefined) {
     dynamicDelimiterRegExp = Lexer.NA

@@ -1,11 +1,8 @@
-import last from "lodash/last"
-import map from "lodash/map"
-import forEach from "lodash/forEach"
-import isString from "lodash/isString"
-import isRegExp from "lodash/isRegExp"
-import keys from "lodash/keys"
-import { createToken } from "../../src/scan/tokens_public"
-import { Lexer, LexerDefinitionErrorType } from "../../src/scan/lexer_public"
+import { forEach, isRegExp, isString, keys, last, map } from "lodash-es"
+import { expect } from "chai"
+import { SinonSpy, spy } from "sinon"
+import { createToken } from "../../src/scan/tokens_public.js"
+import { Lexer, LexerDefinitionErrorType } from "../../src/scan/lexer_public.js"
 import {
   addStartOfInput,
   analyzeTokenTypes,
@@ -22,9 +19,9 @@ import {
   findUnreachablePatterns,
   findUnsupportedFlags,
   SUPPORT_STICKY
-} from "../../src/scan/lexer"
-import { setEquality } from "../utils/matchers"
-import { tokenStructuredMatcher } from "../../src/scan/tokens"
+} from "../../src/scan/lexer.js"
+import { setEquality } from "../utils/matchers.js"
+import { tokenStructuredMatcher } from "../../src/scan/tokens.js"
 import {
   ILexerConfig,
   ILexerErrorMessageProvider,
@@ -33,9 +30,7 @@ import {
   ITokenConfig,
   TokenType
 } from "@chevrotain/types"
-import { expect } from "chai"
-import { SinonSpy } from "sinon"
-import { TokenMatcher } from "../../src/parse/parser/parser"
+import { TokenMatcher } from "../../src/parse/parser/parser.js"
 
 const ORG_SUPPORT_STICKY = SUPPORT_STICKY
 
@@ -2100,10 +2095,8 @@ describe("debugging and messages and optimizations", () => {
   let consoleErrorSpy: SinonSpy, consoleWarnSpy: SinonSpy
 
   beforeEach(function () {
-    // @ts-ignore
-    consoleErrorSpy = sinon.spy(console, "error")
-    // @ts-ignore
-    consoleWarnSpy = sinon.spy(console, "warn")
+    consoleErrorSpy = spy(console, "error")
+    consoleWarnSpy = spy(console, "warn")
   })
 
   afterEach(function () {

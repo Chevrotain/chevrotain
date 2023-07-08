@@ -1,8 +1,7 @@
-import { RestWalker } from "./rest"
-import { first } from "./first"
-import forEach from "lodash/forEach"
-import assign from "lodash/assign"
-import { IN } from "../constants"
+import { RestWalker } from "./rest.js"
+import { first } from "./first.js"
+import { assign, forEach } from "lodash-es"
+import { IN } from "../constants.js"
 import { Alternative, NonTerminal, Rule, Terminal } from "@chevrotain/gast"
 import { IProduction, TokenType } from "@chevrotain/types"
 

@@ -12,7 +12,7 @@ import {
   RepetitionMandatory,
   Option,
   NonTerminal
-} from "../src/api"
+} from "../src/api.js"
 
 function createDummyToken(opts: ITokenConfig): TokenType {
   return {

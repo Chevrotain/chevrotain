@@ -1,4 +1,4 @@
-import {
+import type {
   Alternative,
   Assertion,
   Character,
@@ -11,7 +11,7 @@ import {
   RegExpFlags,
   RegExpPattern,
   Set
-} from "../api"
+} from "../types"
 
 export class BaseRegExpVisitor {
   public visitChildren(node: IRegExpAST) {

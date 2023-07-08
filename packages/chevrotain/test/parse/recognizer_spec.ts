@@ -1,7 +1,7 @@
-import { EOF, createToken } from "../../src/scan/tokens_public"
-import { Lexer } from "../../src/scan/lexer_public"
-import { EmbeddedActionsParser } from "../../src/parse/parser/traits/parser_traits"
-import { EMPTY_ALT, TokenMatcher } from "../../src/parse/parser/parser"
+import { createToken, EOF } from "../../src/scan/tokens_public.js"
+import { Lexer } from "../../src/scan/lexer_public.js"
+import { EmbeddedActionsParser } from "../../src/parse/parser/traits/parser_traits.js"
+import { EMPTY_ALT, TokenMatcher } from "../../src/parse/parser/parser.js"
 import { expect } from "chai"
 
 import {
@@ -9,12 +9,12 @@ import {
   MismatchedTokenException,
   NotAllInputParsedException,
   NoViableAltException
-} from "../../src/parse/exceptions_public"
+} from "../../src/parse/exceptions_public.js"
 import {
-  tokenStructuredMatcher,
-  augmentTokenTypes
-} from "../../src/scan/tokens"
-import { createRegularToken, setEquality } from "../utils/matchers"
+  augmentTokenTypes,
+  tokenStructuredMatcher
+} from "../../src/scan/tokens.js"
+import { createRegularToken, setEquality } from "../utils/matchers.js"
 import {
   IMultiModeLexerDefinition,
   IToken,

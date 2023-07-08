@@ -1,6 +1,5 @@
-import { IToken, ITokenConfig, TokenType } from "@chevrotain/types"
+import { IToken, TokenType } from "@chevrotain/types"
 import { expect } from "chai"
-import { createToken } from "../../src/scan/tokens_public"
 
 export function setEquality(actual: any[], expected: any[]): void {
   expect(actual).to.deep.include.members(expected)

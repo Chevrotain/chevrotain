@@ -1,4 +1,4 @@
-import { cc } from "./utils"
+import { cc } from "./utils.js"
 
 export const digitsCharCodes: number[] = []
 for (let i = cc("0"); i <= cc("9"); i++) {

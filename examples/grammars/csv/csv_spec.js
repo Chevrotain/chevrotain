@@ -1,9 +1,10 @@
-"use strict"
+import path from "path"
+import { fileURLToPath } from "url"
+import fs from "fs"
+import assert from "assert"
+import { parseCsv } from "./csv.js"
 
-const path = require("path")
-const fs = require("fs")
-const assert = require("assert")
-const parseCsv = require("./csv")
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 describe("The CSV Grammar", () => {
   const samplePath = path.resolve(__dirname, "./sample.csv")

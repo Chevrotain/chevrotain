@@ -1,14 +1,12 @@
-import { createToken } from "../../../src/scan/tokens_public"
-import { Lexer } from "../../../src/scan/lexer_public"
-import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
+import { createToken } from "../../../src/scan/tokens_public.js"
+import { Lexer } from "../../../src/scan/lexer_public.js"
+import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits.js"
 
-import { END_OF_FILE } from "../../../src/parse/parser/parser"
-import { MismatchedTokenException } from "../../../src/parse/exceptions_public"
-import flatten from "lodash/flatten"
-import every from "lodash/every"
-import map from "lodash/map"
-import forEach from "lodash/forEach"
-import {
+import { END_OF_FILE } from "../../../src/parse/parser/parser.js"
+import { MismatchedTokenException } from "../../../src/parse/exceptions_public.js"
+import { every, flatten, forEach, map } from "lodash-es"
+
+import type {
   ILookaheadStrategy,
   ILookaheadValidationError,
   IOrAlt,
@@ -17,8 +15,8 @@ import {
   Rule,
   TokenType
 } from "@chevrotain/types"
-import { MixedInParser } from "../../../src/parse/parser/traits/parser_traits"
-import { getLookaheadPaths } from "../../../src/parse/grammar/lookahead"
+import { MixedInParser } from "../../../src/parse/parser/traits/parser_traits.js"
+import { getLookaheadPaths } from "../../../src/parse/grammar/lookahead.js"
 
 declare type QuirksTokens = {
   Return: TokenType

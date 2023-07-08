@@ -1,5 +1,5 @@
-const assert = require("assert")
-const parseCss = require("./css").parseCss
+import assert from "assert"
+import { parseCss } from "./css.js"
 
 describe("The CSS Grammar", () => {
   it("can parse a simple CSS without errors", () => {

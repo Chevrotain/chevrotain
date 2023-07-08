@@ -1,10 +1,10 @@
-import { EmbeddedActionsParser } from "../../src/parse/parser/traits/parser_traits"
+import { EmbeddedActionsParser } from "../../src/parse/parser/traits/parser_traits.js"
 import {
   EarlyExitException,
   NoViableAltException
-} from "../../src/parse/exceptions_public"
-import { augmentTokenTypes } from "../../src/scan/tokens"
-import { createRegularToken } from "../utils/matchers"
+} from "../../src/parse/exceptions_public.js"
+import { augmentTokenTypes } from "../../src/scan/tokens.js"
+import { createRegularToken } from "../utils/matchers.js"
 import { IToken, TokenType } from "@chevrotain/types"
 import { expect } from "chai"
 

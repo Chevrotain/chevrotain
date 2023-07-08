@@ -7,7 +7,7 @@
  * 2. Partial parsing of only the modified parts of a document in an IDE.
  */
 
-const { createToken, Lexer, CstParser } = require("chevrotain")
+import { createToken, Lexer, CstParser } from "chevrotain"
 
 // ----------------- lexer -----------------
 const Alpha = createToken({ name: "Alpha", pattern: /A/ })
@@ -84,8 +84,6 @@ function parseStartingWithRule(ruleName) {
   }
 }
 
-module.exports = {
-  parseFirst: parseStartingWithRule("firstRule"),
-  parseSecond: parseStartingWithRule("secondRule"),
-  parseThird: parseStartingWithRule("thirdRule")
-}
+export const parseFirst = parseStartingWithRule("firstRule")
+export const parseSecond = parseStartingWithRule("secondRule")
+export const parseThird = parseStartingWithRule("thirdRule")

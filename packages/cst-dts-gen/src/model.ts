@@ -12,12 +12,7 @@ import type {
   TokenType
 } from "@chevrotain/types"
 import { NonTerminal, GAstVisitor } from "@chevrotain/gast"
-import map from "lodash/map"
-import flatten from "lodash/flatten"
-import values from "lodash/values"
-import some from "lodash/some"
-import groupBy from "lodash/groupBy"
-import assign from "lodash/assign"
+import { flatten, values, some, groupBy, assign, map } from "lodash-es"
 
 export function buildModel(
   productions: Record<string, Rule>

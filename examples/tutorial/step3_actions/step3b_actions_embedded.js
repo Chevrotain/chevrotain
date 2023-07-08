@@ -1,4 +1,3 @@
-"use strict"
 // Written Docs for this tutorial step can be found here:
 // https://chevrotain.io/docs/tutorial/step3b_adding_actions_embedded.html
 
@@ -8,24 +7,24 @@
 // This is the highest performance approach, but its also verbose and none modular
 // Therefore using the CST Visitor is the recommended approach:
 // https://chevrotain.io/docs/tutorial/step3a_adding_actions_visitor.html
-const selectLexer = require("../step1_lexing/step1_lexing")
-const EmbeddedActionsParser = require("chevrotain").EmbeddedActionsParser
-const tokenVocabulary = selectLexer.tokenVocabulary
-
-// individual imports, prefer ES6 imports if supported in your runtime/transpiler...
-const Select = tokenVocabulary.Select
-const From = tokenVocabulary.From
-const Where = tokenVocabulary.Where
-const Identifier = tokenVocabulary.Identifier
-const Integer = tokenVocabulary.Integer
-const GreaterThan = tokenVocabulary.GreaterThan
-const LessThan = tokenVocabulary.LessThan
-const Comma = tokenVocabulary.Comma
+import {
+  lex,
+  Select,
+  Comma,
+  From,
+  GreaterThan,
+  Identifier,
+  Integer,
+  LessThan,
+  allTokens,
+  Where
+} from "../step1_lexing/step1_lexing.js"
+import { EmbeddedActionsParser } from "chevrotain"
 
 // ----------------- parser -----------------
 class SelectParserEmbedded extends EmbeddedActionsParser {
   constructor() {
-    super(tokenVocabulary)
+    super(allTokens)
     const $ = this
 
     this.selectStatement = $.RULE("selectStatement", () => {
@@ -126,7 +125,7 @@ class SelectParserEmbedded extends EmbeddedActionsParser {
 
     // very important to call this after all the rules have been defined.
     // otherwise the parser may not work correctly as it will lack information
-    // derived during the self analysis phase.
+    // derived during the self-analysis phase.
     this.performSelfAnalysis()
   }
 }
@@ -134,23 +133,21 @@ class SelectParserEmbedded extends EmbeddedActionsParser {
 // We only ever need one as the parser internal state is reset for each new input.
 const parserInstance = new SelectParserEmbedded()
 
-module.exports = {
-  toAst: function (inputText) {
-    const lexResult = selectLexer.lex(inputText)
+export function toAstEmbedded(inputText) {
+  const lexResult = lex(inputText)
 
-    // ".input" is a setter which will reset the parser's internal's state.
-    parserInstance.input = lexResult.tokens
+  // ".input" is a setter which will reset the parser's internal's state.
+  parserInstance.input = lexResult.tokens
 
-    // No semantic actions so this won't return anything yet.
-    const ast = parserInstance.selectStatement()
+  // No semantic actions so this won't return anything yet.
+  const ast = parserInstance.selectStatement()
 
-    if (parserInstance.errors.length > 0) {
-      throw Error(
-        "Sad sad panda, parsing errors detected!\n" +
-          parserInstance.errors[0].message
-      )
-    }
-
-    return ast
+  if (parserInstance.errors.length > 0) {
+    throw Error(
+      "Sad sad panda, parsing errors detected!\n" +
+        parserInstance.errors[0].message
+    )
   }
+
+  return ast
 }

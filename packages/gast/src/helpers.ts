@@ -1,7 +1,6 @@
-import some from "lodash/some"
-import every from "lodash/every"
-import has from "lodash/has"
-import includes from "lodash/includes"
+import { some } from "lodash-es"
+import { every } from "lodash-es"
+import { includes } from "lodash-es"
 import {
   AbstractProduction,
   Alternation,
@@ -14,9 +13,8 @@ import {
   RepetitionWithSeparator,
   Rule,
   Terminal
-} from "./model"
-import { GAstVisitor } from "./visitor"
-import { IProduction, IProductionWithOccurrence } from "@chevrotain/types"
+} from "./model.js"
+import type { IProduction, IProductionWithOccurrence } from "@chevrotain/types"
 
 export function isSequenceProd(
   prod: IProduction
@@ -95,6 +93,7 @@ export function getProductionDslName(prod: IProductionWithOccurrence): string {
     return "MANY"
   } else if (prod instanceof Terminal) {
     return "CONSUME"
+    /* c8 ignore next 3 */
   } else {
     throw Error("non exhaustive match")
   }

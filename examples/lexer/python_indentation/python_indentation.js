@@ -13,9 +13,8 @@
  * https://chevrotain.io/docs/guide/custom_token_patterns.html#background
  */
 
-"use strict"
-const { createToken, createTokenInstance, Lexer } = require("chevrotain")
-const _ = require("lodash")
+import { createToken, createTokenInstance, Lexer } from "chevrotain"
+import _ from "lodash"
 
 // State required for matching the indentations
 let indentStack = [0]
@@ -110,17 +109,20 @@ function matchIndentBase(text, offset, matchedTokens, groups, type) {
 }
 
 // customize matchIndentBase to create separate functions of Indent and Outdent.
-const matchIndent = _.partialRight(matchIndentBase, "indent")
-const matchOutdent = _.partialRight(matchIndentBase, "outdent")
+export const matchIndent = _.partialRight(matchIndentBase, "indent")
+export const matchOutdent = _.partialRight(matchIndentBase, "outdent")
 
-const If = createToken({ name: "If", pattern: /if/ })
-const Else = createToken({ name: "Else", pattern: /else/ })
-const Print = createToken({ name: "Print", pattern: /print/ })
-const IntegerLiteral = createToken({ name: "IntegerLiteral", pattern: /\d+/ })
-const Colon = createToken({ name: "Colon", pattern: /:/ })
-const LParen = createToken({ name: "LParen", pattern: /\(/ })
-const RParen = createToken({ name: "RParen", pattern: /\)/ })
-const Spaces = createToken({
+export const If = createToken({ name: "If", pattern: /if/ })
+export const Else = createToken({ name: "Else", pattern: /else/ })
+export const Print = createToken({ name: "Print", pattern: /print/ })
+export const IntegerLiteral = createToken({
+  name: "IntegerLiteral",
+  pattern: /\d+/
+})
+export const Colon = createToken({ name: "Colon", pattern: /:/ })
+export const LParen = createToken({ name: "LParen", pattern: /\(/ })
+export const RParen = createToken({ name: "RParen", pattern: /\)/ })
+export const Spaces = createToken({
   name: "Spaces",
   pattern: / +/,
   group: Lexer.SKIPPED
@@ -128,27 +130,27 @@ const Spaces = createToken({
 
 // newlines are not skipped, by setting their group to "nl" they are saved in the lexer result
 // and thus we can check before creating an indentation token that the last token matched was a newline.
-const Newline = createToken({
+export const Newline = createToken({
   name: "Newline",
   pattern: /\n|\r\n?/,
   group: "nl"
 })
 
 // define the indentation tokens using custom token patterns
-const Indent = createToken({
+export const Indent = createToken({
   name: "Indent",
   pattern: matchIndent,
   // custom token patterns should explicitly specify the line_breaks option
   line_breaks: false
 })
-const Outdent = createToken({
+export const Outdent = createToken({
   name: "Outdent",
   pattern: matchOutdent,
   // custom token patterns should explicitly specify the line_breaks option
   line_breaks: false
 })
 
-const customPatternLexer = new Lexer([
+export const customPatternLexer = new Lexer([
   Newline,
   // indentation tokens must appear before Spaces, otherwise all indentation will always be consumed as spaces.
   // Outdent must appear before Indent for handling zero spaces outdents.
@@ -165,37 +167,22 @@ const customPatternLexer = new Lexer([
   RParen
 ])
 
-module.exports = {
-  // for testing purposes
-  Newline: IntegerLiteral,
-  Indent: Indent,
-  Outdent: Outdent,
-  Spaces: Spaces,
-  If: If,
-  Else: Else,
-  Print: Print,
-  IntegerLiteral: IntegerLiteral,
-  Colon: Colon,
-  LParen: LParen,
-  RParen: RParen,
+export function tokenize(text) {
+  // have to reset the indent stack between processing of different text inputs
+  indentStack = [0]
 
-  tokenize: function (text) {
-    // have to reset the indent stack between processing of different text inputs
-    indentStack = [0]
+  const lexResult = customPatternLexer.tokenize(text)
 
-    const lexResult = customPatternLexer.tokenize(text)
-
-    //add remaining Outdents
-    while (indentStack.length > 1) {
-      lexResult.tokens.push(
-        createTokenInstance(Outdent, "", NaN, NaN, NaN, NaN, NaN, NaN)
-      )
-      indentStack.pop()
-    }
-
-    if (lexResult.errors.length > 0) {
-      throw new Error("sad sad panda lexing errors detected")
-    }
-    return lexResult
+  //add remaining Outdents
+  while (indentStack.length > 1) {
+    lexResult.tokens.push(
+      createTokenInstance(Outdent, "", NaN, NaN, NaN, NaN, NaN, NaN)
+    )
+    indentStack.pop()
   }
+
+  if (lexResult.errors.length > 0) {
+    throw new Error("sad sad panda lexing errors detected")
+  }
+  return lexResult
 }

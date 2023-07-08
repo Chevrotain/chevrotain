@@ -1,8 +1,9 @@
 import { BaseParser } from "chevrotain"
 import { expect } from "chai"
 import { readFileSync } from "fs"
-import { resolve, relative, basename } from "path"
+import { resolve, relative, basename, dirname } from "path"
 import { generateCstDts } from "@chevrotain/cst-dts-gen"
+import { fileURLToPath } from "url"
 
 export function executeSampleTest(dirPath: string, parser: BaseParser): void {
   it("Can generate type definition", () => {
@@ -25,6 +26,7 @@ export function getOutputFileForSnapshot(libSnapshotDir: string): string {
 }
 
 // paths are for compiled typescript
+const __dirname = dirname(fileURLToPath(import.meta.url))
 const packageDir = resolve(__dirname, "../..")
 const libDir = resolve(packageDir, "lib")
 

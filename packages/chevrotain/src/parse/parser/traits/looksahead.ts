@@ -1,6 +1,5 @@
-import forEach from "lodash/forEach"
-import has from "lodash/has"
-import { DEFAULT_PARSER_CONFIG } from "../parser"
+import { forEach, has } from "lodash-es"
+import { DEFAULT_PARSER_CONFIG } from "../parser.js"
 import {
   ILookaheadStrategy,
   IParserConfig,
@@ -14,8 +13,8 @@ import {
   MANY_SEP_IDX,
   OPTION_IDX,
   OR_IDX
-} from "../../grammar/keys"
-import { MixedInParser } from "./parser_traits"
+} from "../../grammar/keys.js"
+import { MixedInParser } from "./parser_traits.js"
 import {
   Alternation,
   GAstVisitor,
@@ -24,10 +23,10 @@ import {
   RepetitionMandatory,
   RepetitionMandatoryWithSeparator,
   RepetitionWithSeparator,
-  Rule
+  Rule,
+  getProductionDslName
 } from "@chevrotain/gast"
-import { getProductionDslName } from "@chevrotain/gast"
-import { LLkLookaheadStrategy } from "../../grammar/llk_lookahead"
+import { LLkLookaheadStrategy } from "../../grammar/llk_lookahead.js"
 
 /**
  * Trait responsible for the lookahead related utilities and optimizations.

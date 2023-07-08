@@ -10,22 +10,24 @@ import {
   performWarningRuntimeChecks,
   SUPPORT_STICKY,
   validatePatterns
-} from "./lexer"
-import noop from "lodash/noop"
-import isEmpty from "lodash/isEmpty"
-import isArray from "lodash/isArray"
-import last from "lodash/last"
-import reject from "lodash/reject"
-import map from "lodash/map"
-import forEach from "lodash/forEach"
-import keys from "lodash/keys"
-import isUndefined from "lodash/isUndefined"
-import identity from "lodash/identity"
-import assign from "lodash/assign"
-import reduce from "lodash/reduce"
-import clone from "lodash/clone"
+} from "./lexer.js"
+import {
+  assign,
+  clone,
+  forEach,
+  identity,
+  isArray,
+  isEmpty,
+  isUndefined,
+  keys,
+  last,
+  map,
+  noop,
+  reduce,
+  reject
+} from "lodash-es"
 import { PRINT_WARNING, timer, toFastProperties } from "@chevrotain/utils"
-import { augmentTokenTypes } from "./tokens"
+import { augmentTokenTypes } from "./tokens.js"
 import {
   CustomPatternMatcherFunc,
   CustomPatternMatcherReturn,
@@ -36,8 +38,8 @@ import {
   IToken,
   TokenType
 } from "@chevrotain/types"
-import { defaultLexerErrorProvider } from "./lexer_errors_public"
-import { clearRegExpParserCache } from "./reg_exp_parser"
+import { defaultLexerErrorProvider } from "./lexer_errors_public.js"
+import { clearRegExpParserCache } from "./reg_exp_parser.js"
 
 export interface ILexingResult {
   tokens: IToken[]

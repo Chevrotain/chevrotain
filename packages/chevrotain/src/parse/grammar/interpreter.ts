@@ -1,13 +1,15 @@
-import { RestWalker } from "./rest"
-import _first from "lodash/first"
-import isEmpty from "lodash/isEmpty"
-import dropRight from "lodash/dropRight"
-import drop from "lodash/drop"
-import last from "lodash/last"
-import forEach from "lodash/forEach"
-import clone from "lodash/clone"
-import { first } from "./first"
-import { TokenMatcher } from "../parser/parser"
+import {
+  clone,
+  drop,
+  dropRight,
+  first as _first,
+  forEach,
+  isEmpty,
+  last
+} from "lodash-es"
+import { first } from "./first.js"
+import { RestWalker } from "./rest.js"
+import { TokenMatcher } from "../parser/parser.js"
 import {
   Alternation,
   Alternative,

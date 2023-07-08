@@ -1,12 +1,14 @@
 {
   "name": "chevrotain_examples_tutorial",
   "version": "10.5.0",
+  "type": "module",
   "scripts": {
     "ci": "pnpm run test",
     "test": "mocha \"step*/*spec.js\""
   },
   "dependencies": {
-    "chevrotain": "10.5.0"
+    "chevrotain": "10.5.0",
+    "lodash": "4.17.21"
   },
   "private": true
 }

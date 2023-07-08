@@ -1,33 +1,35 @@
 import { BaseRegExpVisitor } from "@chevrotain/regexp-to-ast"
-import { IRegExpExec, Lexer, LexerDefinitionErrorType } from "./lexer_public"
-import first from "lodash/first"
-import isEmpty from "lodash/isEmpty"
-import compact from "lodash/compact"
-import isArray from "lodash/isArray"
-import values from "lodash/values"
-import flatten from "lodash/flatten"
-import reject from "lodash/reject"
-import difference from "lodash/difference"
-import indexOf from "lodash/indexOf"
-import map from "lodash/map"
-import forEach from "lodash/forEach"
-import isString from "lodash/isString"
-import isFunction from "lodash/isFunction"
-import isUndefined from "lodash/isUndefined"
-import find from "lodash/find"
-import has from "lodash/has"
-import keys from "lodash/keys"
-import isRegExp from "lodash/isRegExp"
-import filter from "lodash/filter"
-import defaults from "lodash/defaults"
-import reduce from "lodash/reduce"
-import includes from "lodash/includes"
+import { IRegExpExec, Lexer, LexerDefinitionErrorType } from "./lexer_public.js"
+import {
+  compact,
+  defaults,
+  difference,
+  filter,
+  find,
+  first,
+  flatten,
+  forEach,
+  has,
+  includes,
+  indexOf,
+  isArray,
+  isEmpty,
+  isFunction,
+  isRegExp,
+  isString,
+  isUndefined,
+  keys,
+  map,
+  reduce,
+  reject,
+  values
+} from "lodash-es"
 import { PRINT_ERROR } from "@chevrotain/utils"
 import {
   canMatchCharCode,
   failedOptimizationPrefixMsg,
   getOptimizedStartCodesIndices
-} from "./reg_exp"
+} from "./reg_exp.js"
 import {
   ILexerDefinitionError,
   ILineTerminatorsTester,
@@ -35,7 +37,7 @@ import {
   IToken,
   TokenType
 } from "@chevrotain/types"
-import { getRegExpAst } from "./reg_exp_parser"
+import { getRegExpAst } from "./reg_exp_parser.js"
 
 const PATTERN = "PATTERN"
 export const DEFAULT_MODE = "defaultMode"

@@ -1,8 +1,8 @@
 import {
-  EmbeddedActionsParser,
-  CstParser
-} from "../../../src/parse/parser/traits/parser_traits"
-import { createToken } from "../../../src/scan/tokens_public"
+  CstParser,
+  EmbeddedActionsParser
+} from "../../../src/parse/parser/traits/parser_traits.js"
+import { createToken } from "../../../src/scan/tokens_public.js"
 import { expect } from "chai"
 
 describe("The Recognizer's Configuration", () => {

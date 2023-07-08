@@ -1,14 +1,19 @@
 {
   "name": "chevrotain_examples_grammars",
   "version": "10.5.0",
+  "type": "module",
   "scripts": {
-    "ci": "pnpm run test",
-    "test": "mocha \"!(node_modules)/**/*spec.js\""
+    "ci": "pnpm run test && pnpm run bundle:graphql",
+    "test": "mocha \"!(node_modules)/**/*spec.js\"",
+    "bundle:graphql": "esbuild ./graphql/graphql.js --bundle --minify --format=esm --outfile=./graphql/gen/graphql-bundled.min.mjs"
   },
   "dependencies": {
     "acorn": "8.8.0",
     "chevrotain": "10.5.0",
     "xregexp": "5.1.1"
+  },
+  "devDependencies": {
+    "esbuild": "0.18.11"
   },
   "private": true
 }

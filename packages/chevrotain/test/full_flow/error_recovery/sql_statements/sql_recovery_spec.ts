@@ -1,34 +1,34 @@
 import { expect } from "chai"
 import {
-  INVALID_DDL,
-  INVALID_CREATE_STMT,
-  INVALID_INSERT_STMT,
-  INVALID_DELETE_STMT,
-  STATEMENTS,
-  CreateTok,
-  TableTok,
-  SemiColonTok,
+  CommaTok,
   CREATE_STMT,
+  CreateTok,
+  DELETE_STMT,
+  DeleteTok,
+  DotTok,
+  FromTok,
+  IdentTok,
+  INSERT_STMT,
   InsertTok,
   IntoTok,
-  INSERT_STMT,
-  DeleteTok,
-  FromTok,
-  DELETE_STMT,
-  IdentTok,
-  DotTok,
+  IntTok,
+  INVALID_CREATE_STMT,
+  INVALID_DDL,
+  INVALID_DELETE_STMT,
+  INVALID_INSERT_STMT,
   LParenTok,
-  CommaTok,
   RParenTok,
+  SemiColonTok,
+  STATEMENTS,
   StringTok,
-  IntTok
-} from "./sql_recovery_tokens"
-import { DDLExampleRecoveryParser } from "./sql_recovery_parser"
-import { tokenMatcher } from "../../../../src/scan/tokens_public"
-import { NotAllInputParsedException } from "../../../../src/parse/exceptions_public"
-import { ParseTree } from "../../parse_tree"
-import flatten from "lodash/flatten"
-import { createRegularToken } from "../../../utils/matchers"
+  TableTok
+} from "./sql_recovery_tokens.js"
+import { DDLExampleRecoveryParser } from "./sql_recovery_parser.js"
+import { tokenMatcher } from "../../../../src/scan/tokens_public.js"
+import { NotAllInputParsedException } from "../../../../src/parse/exceptions_public.js"
+import { ParseTree } from "../../parse_tree.js"
+import { flatten } from "lodash-es"
+import { createRegularToken } from "../../../utils/matchers.js"
 import { IToken } from "@chevrotain/types"
 
 describe("Error Recovery SQL DDL Example", () => {

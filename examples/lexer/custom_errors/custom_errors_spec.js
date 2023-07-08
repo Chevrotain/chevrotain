@@ -1,5 +1,5 @@
-const expect = require("chai").expect
-const { tokenize } = require("./custom_errors")
+import { expect } from "chai"
+import { tokenize } from "./custom_errors.js"
 
 describe("A Chevrotain Lexer ability to customize error messages.", () => {
   it("Can create an 'Oy Vey' error message", () => {

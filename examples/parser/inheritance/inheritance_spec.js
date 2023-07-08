@@ -1,5 +1,5 @@
-const assert = require("assert")
-const parseCommand = require("./inheritance")
+import assert from "assert"
+import { parseCommand } from "./inheritance.js"
 
 const ENGLISH = "english"
 const GERMAN = "german"

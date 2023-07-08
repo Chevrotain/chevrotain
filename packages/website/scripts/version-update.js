@@ -1,13 +1,18 @@
-const config = require("./version-config")
-const git = require("gitty")
-const _ = require("lodash")
-const fs = require("fs")
+import fs from "fs"
+import git from "gitty"
+import _ from "lodash"
+import {
+  changeLogString,
+  currVersion,
+  changeLogPath,
+  markdownDocsFiles
+} from "./version-config.js"
 
 const myRepo = git("")
 
-const newVersion = config.currVersion
+const newVersion = currVersion
 const dateTemplateRegExp = /(## X\.Y\.Z )\(INSERT_DATE_HERE\)/
-if (!dateTemplateRegExp.test(config.changeLogString)) {
+if (!dateTemplateRegExp.test(changeLogString)) {
   console.log("CHANGELOG.md must contain '## X.Y.Z (INSERT_DATE_HERE)'")
   process.exit(-1)
 }
@@ -15,13 +20,13 @@ if (!dateTemplateRegExp.test(config.changeLogString)) {
 // updating CHANGELOG.md date
 const nowDate = new Date()
 const nowDateString = nowDate.toLocaleDateString("en-US").replace(/\//g, "-")
-const changeLogDate = config.changeLogString.replace(
+const changeLogDate = changeLogString.replace(
   dateTemplateRegExp,
   "## " + newVersion + " " + "(" + nowDateString + ")"
 )
-fs.writeFileSync(config.changeLogPath, changeLogDate)
+fs.writeFileSync(changeLogPath, changeLogDate)
 
-_.forEach(config.docFilesPaths, function (currDocPath) {
+_.forEach(markdownDocsFiles, function (currDocPath) {
   if (_.includes(currDocPath, "changes")) {
     console.log("SKIPPING bumping file: <" + currDocPath + ">")
     return
@@ -36,4 +41,4 @@ _.forEach(config.docFilesPaths, function (currDocPath) {
 })
 
 // Just adding to the current commit is sufficient as lerna does the commit + tag + push
-myRepo.addSync([config.changeLogPath].concat(config.docFilesPaths))
+myRepo.addSync([changeLogPath].concat(markdownDocsFiles))

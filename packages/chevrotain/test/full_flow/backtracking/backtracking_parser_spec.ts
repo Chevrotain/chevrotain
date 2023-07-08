@@ -11,9 +11,9 @@ import {
   NumberTok,
   RET_TYPE,
   SemiColonTok
-} from "./backtracking_parser"
-import flatten from "lodash/flatten"
-import { createRegularToken } from "../../utils/matchers"
+} from "./backtracking_parser.js"
+import { flatten } from "lodash-es"
+import { createRegularToken } from "../../utils/matchers.js"
 
 describe("Simple backtracking example", () => {
   let largeFqnTokenVector: IToken[]

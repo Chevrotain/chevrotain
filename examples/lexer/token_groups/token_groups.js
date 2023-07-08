@@ -1,4 +1,4 @@
-const { createToken, Lexer } = require("chevrotain")
+import { createToken, Lexer } from "chevrotain"
 
 const If = createToken({ name: "if", pattern: /if/ })
 const Else = createToken({ name: "else", pattern: /else/ })
@@ -7,7 +7,7 @@ const LParen = createToken({ name: "LParen", pattern: /\(/ })
 const RParen = createToken({ name: "RParen", pattern: /\)/ })
 const IntegerLiteral = createToken({ name: "IntegerLiteral", pattern: /\d+/ })
 
-const Whitespace = createToken({
+export const Whitespace = createToken({
   name: "Whitespace",
   pattern: /\s+/,
   // the Lexer.SKIPPED group is a special group that will cause the lexer to "ignore"
@@ -16,7 +16,7 @@ const Whitespace = createToken({
   group: Lexer.SKIPPED
 })
 
-const Comment = createToken({
+export const Comment = createToken({
   name: "Comment",
   pattern: /\/\/.+/,
   // a Token's group may be a 'free' String, in that case the lexer's result will contain
@@ -36,16 +36,11 @@ const TokenGroupsLexer = new Lexer([
   Comment
 ])
 
-module.exports = {
-  Comment: Comment,
-  Whitespace: Whitespace,
+export function tokenize(text) {
+  const lexResult = TokenGroupsLexer.tokenize(text)
 
-  tokenize: function (text) {
-    const lexResult = TokenGroupsLexer.tokenize(text)
-
-    if (lexResult.errors.length > 0) {
-      throw new Error("sad sad panda lexing errors detected")
-    }
-    return lexResult
+  if (lexResult.errors.length > 0) {
+    throw new Error("sad sad panda lexing errors detected")
   }
+  return lexResult
 }

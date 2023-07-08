@@ -1,4 +1,4 @@
-const { createToken, Lexer } = require("chevrotain")
+import { createToken, Lexer } from "chevrotain"
 
 const A = createToken({ name: "A", pattern: /A/ })
 const B = createToken({ name: "B", pattern: /B/ })
@@ -33,9 +33,7 @@ const CustomErrorsLexer = new Lexer([Whitespace, A, B, C], {
   errorMessageProvider: OyVeyErrorMessageProvider
 })
 
-module.exports = {
-  tokenize: function (text) {
-    const lexResult = CustomErrorsLexer.tokenize(text)
-    return lexResult
-  }
+export function tokenize(text) {
+  const lexResult = CustomErrorsLexer.tokenize(text)
+  return lexResult
 }

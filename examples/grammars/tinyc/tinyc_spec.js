@@ -1,5 +1,5 @@
-const assert = require("assert")
-const parseTinyC = require("./tinyc")
+import assert from "assert"
+import { parseTinyC } from "./tinyc.js"
 
 describe("The TinyC Grammar", () => {
   it("can parse a simple TinyC sample without errors", () => {

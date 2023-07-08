@@ -1,12 +1,12 @@
 import {
-  EmbeddedActionsParser,
-  CstParser
-} from "../../../src/parse/parser/traits/parser_traits"
-import { createRegularToken } from "../../utils/matchers"
-import { augmentTokenTypes } from "../../../src/scan/tokens"
+  CstParser,
+  EmbeddedActionsParser
+} from "../../../src/parse/parser/traits/parser_traits.js"
+import { createRegularToken } from "../../utils/matchers.js"
+import { augmentTokenTypes } from "../../../src/scan/tokens.js"
 import { IToken } from "@chevrotain/types"
-import { createToken } from "../../../src/scan/tokens_public"
-import { EMPTY_ALT } from "../../../src/parse/parser/parser"
+import { createToken } from "../../../src/scan/tokens_public.js"
+import { EMPTY_ALT } from "../../../src/parse/parser/parser.js"
 import { expect } from "chai"
 
 describe("The Recognizer's capabilities for detecting / handling infinite loops", () => {

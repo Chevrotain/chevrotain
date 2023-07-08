@@ -1,6 +1,6 @@
-import { END_OF_FILE } from "../parser"
+import { END_OF_FILE } from "../parser.js"
 import { IToken } from "@chevrotain/types"
-import { MixedInParser } from "./parser_traits"
+import { MixedInParser } from "./parser_traits.js"
 
 /**
  * Trait responsible abstracting over the interaction with Lexer output (Token vector).

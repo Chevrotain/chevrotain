@@ -1,2 +1,2 @@
-export { RegExpParser } from "./regexp-parser"
-export { BaseRegExpVisitor } from "./base-regexp-visitor"
+export { RegExpParser } from "./regexp-parser.js"
+export { BaseRegExpVisitor } from "./base-regexp-visitor.js"

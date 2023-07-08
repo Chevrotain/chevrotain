@@ -1,12 +1,18 @@
 {
   "name": "chevrotain_examples_parser",
   "version": "10.5.0",
+  "type": "module",
   "scripts": {
     "ci": "pnpm run test",
-    "test": "mocha \"!(node_modules)/**/*spec.js\""
+    "test": "mocha \"!(node_modules)/**/*spec.js\"",
+    "bundle:diagrams": "esbuild ./diagrams/grammar.js --bundle --minify --format=esm --outfile=./diagrams/gen/grammar-bundled.min.mjs"
   },
   "dependencies": {
-    "chevrotain": "10.5.0"
+    "chevrotain": "10.5.0",
+    "lodash": "4.17.21"
+  },
+  "devDependencies": {
+    "esbuild": "0.18.11"
   },
   "private": true
 }

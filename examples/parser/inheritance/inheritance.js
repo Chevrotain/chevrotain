@@ -7,7 +7,7 @@
  * 3. This also shows an example of using Token inheritance
  */
 
-const { createToken, Lexer, CstParser } = require("chevrotain")
+import { createToken, Lexer, CstParser } from "chevrotain"
 
 // ----------------- lexer -----------------
 const RelationWord = createToken({ name: "RelationWord", pattern: Lexer.NA })
@@ -197,7 +197,7 @@ class GermanCommandsParser extends AbstractCommandsParser {
 const englishParser = new EnglishCommandsParser()
 const germanParser = new GermanCommandsParser()
 
-module.exports = function (text, language) {
+export function parseCommand(text, language) {
   // lex
   let lexer
   // match language and lexer.

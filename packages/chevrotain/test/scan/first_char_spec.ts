@@ -1,5 +1,5 @@
-import { getRegExpAst } from "../../src/scan/reg_exp_parser"
-import { firstCharOptimizedIndices } from "../../src/scan/reg_exp"
+import { getRegExpAst } from "../../src/scan/reg_exp_parser.js"
+import { firstCharOptimizedIndices } from "../../src/scan/reg_exp.js"
 import { expect } from "chai"
 
 describe("The Chevrotain Lexer First Char Optimization", () => {

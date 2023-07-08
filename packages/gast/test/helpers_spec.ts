@@ -14,7 +14,7 @@ import {
   isSequenceProd,
   isOptionalProd,
   isBranchingProd
-} from "../src/api"
+} from "../src/api.js"
 
 function createDummyToken(opts: ITokenConfig): TokenType {
   return {

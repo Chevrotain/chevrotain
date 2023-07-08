@@ -1,5 +1,5 @@
-const expect = require("chai").expect
-const { B, C, getContentAssistSuggestions } = require("./content_assist_simple")
+import { expect } from "chai"
+import { B, C, getContentAssistSuggestions } from "./content_assist_simple.js"
 
 describe("The Official Content Assist Feature example Example", () => {
   context("can perform content assist for inputs:", () => {

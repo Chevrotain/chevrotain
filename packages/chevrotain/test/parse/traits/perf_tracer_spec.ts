@@ -1,15 +1,13 @@
-import { createToken } from "../../../src/scan/tokens_public"
-import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
+import { createToken } from "../../../src/scan/tokens_public.js"
+import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits.js"
 import { expect } from "chai"
-import { SinonSpy } from "sinon"
-import { BaseParser } from "@chevrotain/types"
+import { SinonSpy, spy } from "sinon"
 
 describe("Chevrotain's Init Performance Tracing", () => {
   let consoleLogSpy: SinonSpy
 
   beforeEach(() => {
-    // @ts-ignore
-    consoleLogSpy = sinon.spy(console, "log")
+    consoleLogSpy = spy(console, "log")
   })
 
   afterEach(() => {

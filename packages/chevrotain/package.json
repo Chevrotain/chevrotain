@@ -22,28 +22,24 @@
   "author": {
     "name": "Shahar Soel"
   },
+  "type": "module",
+  "types": "./chevrotain.d.ts",
+  "exports": {
+    ".": {
+      "import": "./lib/src/api.js"
+    }
+  },
   "files": [
     "chevrotain.d.ts",
     "lib_esm/**/*.mjs",
-    "lib_esm/**/*.mjs.map",
     "lib/src/**/*.js",
-    "lib/src/**/*.js.map",
-    "lib/chevrotain.d.ts",
     "lib/chevrotain.min.js",
     "lib/chevrotain.js",
-    "src/**/*.ts",
-    "READNE.md",
+    "README.md",
     "LICENSE.TXT",
     "diagrams/**/*.*",
     "CHANGELOG.md"
   ],
-  "typings": "./chevrotain.d.ts",
-  "main": "./lib/src/api.js",
-  "exports": {
-    "types": "./chevrotain.d.ts",
-    "require": "./lib/src/api.js",
-    "import": "./lib_esm/api_esm.mjs"
-  },
   "repository": {
     "type": "git",
     "url": "git://github.com/Chevrotain/chevrotain.git"
@@ -57,14 +53,13 @@
     "version": "tsc ./src/version.ts --outDir lib/src && node ./scripts/version-update.js",
     "---------- DEV FLOWS --------": "",
     "watch": "tsc -w",
-    "unit-tests": "mocha",
+    "unit-tests": "mocha --enable-source-maps",
     "quick-build": "tsc && npm-run-all run bundle",
     "---------- BUILD STEPS --------": "",
     "clean": "shx rm -rf coverage dev lib lib_esm",
-    "compile": "tsc && npm-run-all gen-esm-wrapper",
+    "compile": "tsc",
     "compile:watch": "tsc -w",
-    "gen-esm-wrapper": "gen-esm-wrapper . ./lib_esm/api_esm.mjs",
-    "coverage": "nyc mocha",
+    "coverage": "c8 mocha --enable-source-maps",
     "---------- BUNDLING --------": "",
     "bundle": "npm-run-all bundle:**",
     "bundle:regular": "webpack --config webpack_release.config.js",
@@ -78,10 +73,14 @@
     "@chevrotain/types": "10.5.0",
     "@chevrotain/utils": "10.5.0",
     "@chevrotain/regexp-to-ast": "10.5.0",
-    "lodash": "4.17.21"
+    "lodash-es": "4.17.21"
   },
   "devDependencies": {
-    "@types/lodash": "4.14.191",
+    "@types/lodash-es": "4.17.7",
+    "@types/sinon": "10.0.13",
+    "@types/sinon-chai": "3.2.9",
+    "@types/jsdom": "20.0.1",
+    "sinon-chai": "3.7.0",
     "error-stack-parser": "2.1.4",
     "esbuild": "0.16.10",
     "gen-esm-wrapper": "1.1.3",

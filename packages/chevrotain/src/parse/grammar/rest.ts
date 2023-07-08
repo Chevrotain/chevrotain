@@ -1,5 +1,4 @@
-import drop from "lodash/drop"
-import forEach from "lodash/forEach"
+import { drop, forEach } from "lodash-es"
 import {
   Alternation,
   Alternative,

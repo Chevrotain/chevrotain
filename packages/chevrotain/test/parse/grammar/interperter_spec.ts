@@ -1,5 +1,5 @@
 import { expect } from "chai"
-import map from "lodash/map"
+import { map } from "lodash-es"
 import { IToken, ITokenGrammarPath, TokenType } from "@chevrotain/types"
 import {
   NextAfterTokenWalker,
@@ -10,28 +10,28 @@ import {
   NextTerminalAfterManyWalker,
   PartialPathAndSuffixes,
   possiblePathsFrom
-} from "../../../src/parse/grammar/interpreter"
-import { createRegularToken, setEquality } from "../../utils/matchers"
-import { createToken } from "../../../src/scan/tokens_public"
-import { Lexer } from "../../../src/scan/lexer_public"
+} from "../../../src/parse/grammar/interpreter.js"
+import { createRegularToken, setEquality } from "../../utils/matchers.js"
+import { createToken } from "../../../src/scan/tokens_public.js"
+import { Lexer } from "../../../src/scan/lexer_public.js"
 import {
   augmentTokenTypes,
   tokenStructuredMatcher
-} from "../../../src/scan/tokens"
-import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits"
+} from "../../../src/scan/tokens.js"
+import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits.js"
 import {
   Alternation,
   Alternative,
+  NonTerminal,
+  Option,
   Repetition,
+  RepetitionMandatory,
+  RepetitionMandatoryWithSeparator,
   RepetitionWithSeparator,
   Rule,
-  Terminal,
-  Option,
-  RepetitionMandatory,
-  NonTerminal,
-  RepetitionMandatoryWithSeparator
+  Terminal
 } from "@chevrotain/gast"
-import { createDeferredTokenBuilder } from "../../utils/builders"
+import { createDeferredTokenBuilder } from "../../utils/builders.js"
 
 // ugly utilities to deffer execution of productive code until the relevant tests have started
 // it is done in this "ugly" manner as an "quick/easy" win as part of refactoring the whole tests to achieve this.

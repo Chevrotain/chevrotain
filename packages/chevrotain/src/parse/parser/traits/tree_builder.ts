@@ -3,15 +3,12 @@ import {
   addTerminalToCst,
   setNodeLocationFull,
   setNodeLocationOnlyOffset
-} from "../../cst/cst"
-import noop from "lodash/noop"
-import has from "lodash/has"
-import keys from "lodash/keys"
-import isUndefined from "lodash/isUndefined"
+} from "../../cst/cst.js"
+import { has, isUndefined, keys, noop } from "lodash-es"
 import {
   createBaseSemanticVisitorConstructor,
   createBaseVisitorConstructorWithDefaults
-} from "../../cst/cst_visitor"
+} from "../../cst/cst_visitor.js"
 import {
   CstNode,
   CstNodeLocation,
@@ -20,8 +17,8 @@ import {
   IToken,
   nodeLocationTrackingOptions
 } from "@chevrotain/types"
-import { MixedInParser } from "./parser_traits"
-import { DEFAULT_PARSER_CONFIG } from "../parser"
+import { MixedInParser } from "./parser_traits.js"
+import { DEFAULT_PARSER_CONFIG } from "../parser.js"
 
 /**
  * This trait is responsible for the CST building logic.

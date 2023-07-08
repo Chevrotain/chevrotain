@@ -1,5 +1,3 @@
-import {} from "../../../../src/scan/tokens_public"
-
 export class IdentTok {
   static PATTERN = /NA/
 }

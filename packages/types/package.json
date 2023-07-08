@@ -15,6 +15,8 @@
     "README.md",
     "LICENSE.TXT"
   ],
+  "type": "module",
+  "types": "./api.d.ts",
   "repository": {
     "type": "git",
     "url": "git://github.com/Chevrotain/chevrotain.git"
@@ -36,7 +38,6 @@
     "typedoc": "0.23.23",
     "typescript": "4.9.4"
   },
-  "typings": "api.d.ts",
   "publishConfig": {
     "access": "public"
   }

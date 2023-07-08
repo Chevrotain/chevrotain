@@ -1,8 +1,7 @@
 /*
- * Example Of using Grammar inheritance to support multiple versions of the same grammar.
+ * Example Of using **Grammar Inheritance** to support multiple versions of the same grammar.
  */
-
-const { createToken, Lexer, CstParser } = require("chevrotain")
+import { createToken, Lexer, CstParser } from "chevrotain"
 
 // ----------------- lexer -----------------
 const Select = createToken({ name: "Select", pattern: /SELECT/i })
@@ -33,7 +32,6 @@ const allTokens = [
 const SelectLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
-
 class SelectParserVersion1 extends CstParser {
   constructor(isInvokedByChildConstructor = false) {
     super(allTokens)
@@ -133,7 +131,7 @@ class SelectParserVersion2 extends SelectParserVersion1 {
 const version1Parser = new SelectParserVersion1()
 const version2Parser = new SelectParserVersion2()
 
-module.exports = function (text, version) {
+export function parseSelect(text, version) {
   const lexResult = SelectLexer.tokenize(text)
 
   let parser

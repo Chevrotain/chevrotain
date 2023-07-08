@@ -1,16 +1,16 @@
 /* istanbul ignore file - tricky to import some things from this module during testing */
 
 // semantic version
-export { VERSION } from "./version"
+export { VERSION } from "./version.js"
 
 export {
   CstParser,
   EmbeddedActionsParser,
   ParserDefinitionErrorType,
   EMPTY_ALT
-} from "./parse/parser/parser"
+} from "./parse/parser/parser.js"
 
-export { Lexer, LexerDefinitionErrorType } from "./scan/lexer_public"
+export { Lexer, LexerDefinitionErrorType } from "./scan/lexer_public.js"
 
 // Tokens utilities
 export {
@@ -20,17 +20,17 @@ export {
   tokenLabel,
   tokenMatcher,
   tokenName
-} from "./scan/tokens_public"
+} from "./scan/tokens_public.js"
 
 // Lookahead
 
-export { getLookaheadPaths } from "./parse/grammar/lookahead"
+export { getLookaheadPaths } from "./parse/grammar/lookahead.js"
 
-export { LLkLookaheadStrategy } from "./parse/grammar/llk_lookahead"
+export { LLkLookaheadStrategy } from "./parse/grammar/llk_lookahead.js"
 
 // Other Utilities
 
-export { defaultParserErrorProvider } from "./parse/errors_public"
+export { defaultParserErrorProvider } from "./parse/errors_public.js"
 
 export {
   EarlyExitException,
@@ -38,9 +38,9 @@ export {
   MismatchedTokenException,
   NotAllInputParsedException,
   NoViableAltException
-} from "./parse/exceptions_public"
+} from "./parse/exceptions_public.js"
 
-export { defaultLexerErrorProvider } from "./scan/lexer_errors_public"
+export { defaultLexerErrorProvider } from "./scan/lexer_errors_public.js"
 
 // grammar reflection API
 export {
@@ -75,7 +75,7 @@ export function clearCache() {
   )
 }
 
-export { createSyntaxDiagramsCode } from "./diagrams/render_public"
+export { createSyntaxDiagramsCode } from "./diagrams/render_public.js"
 
 export class Parser {
   constructor() {

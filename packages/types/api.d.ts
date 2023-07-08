@@ -1,5 +1,3 @@
-export as namespace chevrotain
-
 export declare const VERSION: string
 
 export type ParserMethod<ARGS extends unknown[], R> = (...args: ARGS) => R

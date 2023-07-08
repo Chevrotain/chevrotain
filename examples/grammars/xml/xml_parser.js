@@ -1,5 +1,5 @@
-const { CstParser } = require("chevrotain")
-const { tokensDictionary: t } = require("./xml_lexer")
+import { CstParser } from "chevrotain"
+import { tokensDictionary as t } from "./xml_lexer.js"
 
 class Xml_parser extends CstParser {
   constructor() {
@@ -109,8 +109,4 @@ class Xml_parser extends CstParser {
 }
 
 // Re-use the same parser instance
-const xmlParser = new Xml_parser()
-
-module.exports = {
-  xmlParser
-}
+export const xmlParser = new Xml_parser()

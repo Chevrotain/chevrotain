@@ -1,4 +1,4 @@
-import { Range } from "../../src/text/range"
+import { Range } from "../../src/text/range.js"
 import { expect } from "chai"
 
 describe("The Chevrotain Range namespace", () => {

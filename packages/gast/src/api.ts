@@ -11,13 +11,13 @@ export {
   Alternative,
   serializeGrammar,
   serializeProduction
-} from "./model"
+} from "./model.js"
 
-export { GAstVisitor } from "./visitor"
+export { GAstVisitor } from "./visitor.js"
 
 export {
   getProductionDslName,
   isOptionalProd,
   isBranchingProd,
   isSequenceProd
-} from "./helpers"
+} from "./helpers.js"

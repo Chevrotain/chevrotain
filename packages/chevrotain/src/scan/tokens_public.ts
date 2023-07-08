@@ -1,8 +1,6 @@
-import isString from "lodash/isString"
-import has from "lodash/has"
-import isUndefined from "lodash/isUndefined"
-import { Lexer } from "./lexer_public"
-import { augmentTokenTypes, tokenStructuredMatcher } from "./tokens"
+import { has, isString, isUndefined } from "lodash-es"
+import { Lexer } from "./lexer_public.js"
+import { augmentTokenTypes, tokenStructuredMatcher } from "./tokens.js"
 import { IToken, ITokenConfig, TokenType } from "@chevrotain/types"
 
 export function tokenLabel(tokType: TokenType): string {

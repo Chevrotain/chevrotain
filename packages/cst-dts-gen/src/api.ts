@@ -1,6 +1,6 @@
 import { Rule, GenerateDtsOptions } from "@chevrotain/types"
-import { buildModel } from "./model"
-import { genDts } from "./generate"
+import { buildModel } from "./model.js"
+import { genDts } from "./generate.js"
 
 const defaultOptions: Required<GenerateDtsOptions> = {
   includeVisitorInterface: true,

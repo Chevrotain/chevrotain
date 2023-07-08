@@ -1,4 +1,4 @@
-import { VERSION } from "../version"
+import { VERSION } from "../version.js"
 import { ISerializedGast } from "@chevrotain/types"
 
 export function createSyntaxDiagramsCode(

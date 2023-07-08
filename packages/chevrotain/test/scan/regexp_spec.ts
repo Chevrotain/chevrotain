@@ -1,9 +1,9 @@
-import { createToken } from "../../src/scan/tokens_public"
-import { Lexer } from "../../src/scan/lexer_public"
+import { createToken } from "../../src/scan/tokens_public.js"
+import { Lexer } from "../../src/scan/lexer_public.js"
 import {
   canMatchCharCode,
   getOptimizedStartCodesIndices
-} from "../../src/scan/reg_exp"
+} from "../../src/scan/reg_exp.js"
 import { expect } from "chai"
 
 describe("The Chevrotain regexp analysis", () => {

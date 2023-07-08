@@ -6,7 +6,7 @@
  * For additional details see the docs:
  * https://chevrotain.io/docs/guide/custom_token_patterns.html#custom-payloads
  */
-const { createToken, Lexer } = require("chevrotain")
+import { createToken, Lexer } from "chevrotain"
 
 // First lets define our custom patterns for matching an Integer Literal.
 // This function's signature is **similar** to the RegExp.prototype.exec function.
@@ -63,7 +63,7 @@ function matchDateLiteral(text, startOffset) {
 }
 
 // Now we can simply replace the regExp pattern with our custom pattern.
-const StringLiteral = createToken({
+export const StringLiteral = createToken({
   name: "StringLiteral",
   pattern: matchStringLiteral,
   // custom patterns should explicitly specify the line_breaks option.
@@ -71,7 +71,7 @@ const StringLiteral = createToken({
 })
 
 // Now we can simply replace the regExp pattern with our custom pattern.
-const DateLiteral = createToken({
+export const DateLiteral = createToken({
   name: "DateLiteral",
   pattern: matchDateLiteral,
   // custom patterns should explicitly specify the line_breaks option.
@@ -86,16 +86,11 @@ const Whitespace = createToken({
 
 const customPatternsLexer = new Lexer([Whitespace, StringLiteral, DateLiteral])
 
-module.exports = {
-  StringLiteral: StringLiteral,
-  DateLiteral: DateLiteral,
+export function tokenize(text) {
+  const lexResult = customPatternsLexer.tokenize(text)
 
-  tokenize: function (text) {
-    const lexResult = customPatternsLexer.tokenize(text)
-
-    if (lexResult.errors.length > 0) {
-      throw new Error("sad sad panda lexing errors detected")
-    }
-    return lexResult
+  if (lexResult.errors.length > 0) {
+    throw new Error("sad sad panda lexing errors detected")
   }
+  return lexResult
 }

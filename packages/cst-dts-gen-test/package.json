@@ -4,6 +4,7 @@
   "private": true,
   "description": "tests for @chevrotain/cst-dts-gen",
   "license": "Apache-2.0",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git://github.com/Chevrotain/chevrotain.git"
@@ -19,16 +20,17 @@
     "clean": "shx rm -rf lib coverage",
     "compile:watch": "tsc -w",
     "compile": "tsc",
-    "coverage": "nyc mocha"
+    "coverage": "c8 mocha --enable-source-maps"
   },
   "dependencies": {
     "@chevrotain/cst-dts-gen": "10.5.0",
     "@chevrotain/gast": "10.5.0",
     "@chevrotain/types": "10.5.0",
     "chevrotain": "10.5.0",
-    "lodash": "4.17.21"
+    "lodash-es": "4.17.21"
   },
   "devDependencies": {
+    "@types/lodash-es": "4.17.6",
     "glob": "8.0.3"
   }
 }

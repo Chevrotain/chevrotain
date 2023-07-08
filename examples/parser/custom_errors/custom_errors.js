@@ -4,12 +4,12 @@
  * A link to the detailed API for the IParserErrorMessageProvider can be found here:
  * https://chevrotain.io/docs/features/custom_errors.html
  */
-const {
+import {
   createToken,
   Lexer,
   CstParser,
   defaultParserErrorProvider
-} = require("chevrotain")
+} from "chevrotain"
 
 // ----------------- lexer -----------------
 const Alpha = createToken({ name: "Alpha", pattern: /A/ })
@@ -132,10 +132,8 @@ function parseStartingWithRule(ruleName) {
   }
 }
 
-module.exports = {
-  parseMismatch: parseStartingWithRule("mis_match"),
-  parseMismatchOverride: parseStartingWithRule("mis_match_override"),
-  parseRedundant: parseStartingWithRule("redundant_input"),
-  parseNoViable: parseStartingWithRule("no_viable_alternative"),
-  parseEarlyExit: parseStartingWithRule("early_exit")
-}
+export const parseMismatch = parseStartingWithRule("mis_match")
+export const parseMismatchOverride = parseStartingWithRule("mis_match_override")
+export const parseRedundant = parseStartingWithRule("redundant_input")
+export const parseNoViable = parseStartingWithRule("no_viable_alternative")
+export const parseEarlyExit = parseStartingWithRule("early_exit")

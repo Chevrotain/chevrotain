@@ -1,10 +1,10 @@
 import {
-  buildInProdFollowPrefix,
   buildBetweenProdsFollowPrefix,
-  ResyncFollowsWalker,
-  computeAllProdsFollows
-} from "../../../src/parse/grammar/follow"
-import { setEquality } from "../../utils/matchers"
+  buildInProdFollowPrefix,
+  computeAllProdsFollows,
+  ResyncFollowsWalker
+} from "../../../src/parse/grammar/follow.js"
+import { setEquality } from "../../utils/matchers.js"
 import {
   NonTerminal,
   Option,
@@ -12,11 +12,11 @@ import {
   Rule,
   Terminal
 } from "@chevrotain/gast"
-import keys from "lodash/keys"
+import { keys } from "lodash-es"
 import { expect } from "chai"
-import { createToken } from "../../../src/scan/tokens_public"
+import { createToken } from "../../../src/scan/tokens_public.js"
 import { TokenType } from "@chevrotain/types"
-import { createDeferredTokenBuilder } from "../../utils/builders"
+import { createDeferredTokenBuilder } from "../../utils/builders.js"
 
 const getIdentTok = createDeferredTokenBuilder({
   name: "IdentTok",
