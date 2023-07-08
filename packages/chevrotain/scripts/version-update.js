@@ -3,8 +3,6 @@ import fs from "fs"
 import {
   apiString,
   currVersion,
-  packagePath,
-  pkgJson,
   readmePath,
   versionPath
 } from "./version-config.js"

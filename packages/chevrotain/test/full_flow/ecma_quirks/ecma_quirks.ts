@@ -1,6 +1,9 @@
 import { createToken } from "../../../src/scan/tokens_public.js"
 import { Lexer } from "../../../src/scan/lexer_public.js"
-import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits.js"
+import {
+  EmbeddedActionsParser,
+  MixedInParser
+} from "../../../src/parse/parser/traits/parser_traits.js"
 
 import { END_OF_FILE } from "../../../src/parse/parser/parser.js"
 import { MismatchedTokenException } from "../../../src/parse/exceptions_public.js"
@@ -15,7 +18,6 @@ import type {
   Rule,
   TokenType
 } from "@chevrotain/types"
-import { MixedInParser } from "../../../src/parse/parser/traits/parser_traits.js"
 import { getLookaheadPaths } from "../../../src/parse/grammar/lookahead.js"
 
 declare type QuirksTokens = {

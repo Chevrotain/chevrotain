@@ -51,8 +51,8 @@ import {
   ILookaheadStrategy,
   IProduction,
   IProductionWithOccurrence,
-  TokenType,
-  Rule
+  Rule,
+  TokenType
 } from "@chevrotain/types"
 import {
   IGrammarValidatorErrorMessageProvider,

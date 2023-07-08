@@ -1,11 +1,11 @@
-import { upperFirst, flatten, isArray, map, reduce, uniq } from "lodash-es"
+import { flatten, isArray, map, reduce, uniq, upperFirst } from "lodash-es"
 import { GenerateDtsOptions } from "@chevrotain/types"
 import {
   CstNodeTypeDefinition,
-  PropertyTypeDefinition,
   PropertyArrayType,
-  TokenArrayType,
-  RuleArrayType
+  PropertyTypeDefinition,
+  RuleArrayType,
+  TokenArrayType
 } from "./model.js"
 
 export function genDts(

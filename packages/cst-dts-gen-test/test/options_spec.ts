@@ -1,6 +1,6 @@
 import { GenerateDtsOptions } from "@chevrotain/types"
 import { generateCstDts } from "@chevrotain/cst-dts-gen"
-import { CstParser, createToken } from "chevrotain"
+import { createToken, CstParser } from "chevrotain"
 import { expect } from "chai"
 
 describe("The DTS generator", () => {

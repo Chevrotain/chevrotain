@@ -1,7 +1,7 @@
 import { BaseParser } from "chevrotain"
 import { expect } from "chai"
 import { readFileSync } from "fs"
-import { resolve, relative, basename, dirname } from "path"
+import { basename, dirname, relative, resolve } from "path"
 import { generateCstDts } from "@chevrotain/cst-dts-gen"
 import { fileURLToPath } from "url"
 

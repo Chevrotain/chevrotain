@@ -18,13 +18,13 @@ import { MixedInParser } from "./parser_traits.js"
 import {
   Alternation,
   GAstVisitor,
+  getProductionDslName,
   Option,
   Repetition,
   RepetitionMandatory,
   RepetitionMandatoryWithSeparator,
   RepetitionWithSeparator,
-  Rule,
-  getProductionDslName
+  Rule
 } from "@chevrotain/gast"
 import { LLkLookaheadStrategy } from "../../grammar/llk_lookahead.js"
 

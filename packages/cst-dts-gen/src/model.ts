@@ -11,8 +11,8 @@ import type {
   Terminal,
   TokenType
 } from "@chevrotain/types"
-import { NonTerminal, GAstVisitor } from "@chevrotain/gast"
-import { flatten, values, some, groupBy, assign, map } from "lodash-es"
+import { GAstVisitor, NonTerminal } from "@chevrotain/gast"
+import { assign, flatten, groupBy, map, some, values } from "lodash-es"
 
 export function buildModel(
   productions: Record<string, Rule>

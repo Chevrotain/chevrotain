@@ -2,9 +2,9 @@ import fs from "fs"
 import git from "gitty"
 import _ from "lodash"
 import {
+  changeLogPath,
   changeLogString,
   currVersion,
-  changeLogPath,
   markdownDocsFiles
 } from "./version-config.js"
 

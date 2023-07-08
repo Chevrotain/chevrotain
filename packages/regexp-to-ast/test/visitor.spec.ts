@@ -2,13 +2,13 @@ import { expect } from "chai"
 import type {
   Alternative,
   Assertion,
+  Character,
   Disjunction,
   Group,
   GroupBackReference,
   Quantifier,
   RegExpPattern,
-  Set,
-  Character
+  Set
 } from "../types"
 import { RegExpParser } from "../src/regexp-parser.js"
 import { BaseRegExpVisitor } from "../src/base-regexp-visitor.js"

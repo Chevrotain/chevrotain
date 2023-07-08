@@ -2,9 +2,9 @@ import {
   ILookaheadStrategy,
   ILookaheadValidationError,
   IOrAlt,
+  OptionalProductionType,
   Rule,
-  TokenType,
-  OptionalProductionType
+  TokenType
 } from "@chevrotain/types"
 import { flatMap, isEmpty } from "lodash-es"
 import { defaultGrammarValidatorErrorProvider } from "../errors_public.js"

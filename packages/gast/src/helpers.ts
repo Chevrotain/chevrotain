@@ -1,6 +1,4 @@
-import { some } from "lodash-es"
-import { every } from "lodash-es"
-import { includes } from "lodash-es"
+import { every, includes, some } from "lodash-es"
 import {
   AbstractProduction,
   Alternation,

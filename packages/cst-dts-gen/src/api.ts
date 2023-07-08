@@ -1,4 +1,4 @@
-import { Rule, GenerateDtsOptions } from "@chevrotain/types"
+import { GenerateDtsOptions, Rule } from "@chevrotain/types"
 import { buildModel } from "./model.js"
 import { genDts } from "./generate.js"
 

@@ -17,14 +17,14 @@ import {
   RepetitionWithSeparator
 } from "@chevrotain/gast"
 import {
+  BaseParser,
   IOrAlt,
   IProduction,
   IProductionWithOccurrence,
-  LookaheadSequence,
   LookaheadProductionType,
+  LookaheadSequence,
   Rule,
-  TokenType,
-  BaseParser
+  TokenType
 } from "@chevrotain/types"
 
 export enum PROD_TYPE {

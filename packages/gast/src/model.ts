@@ -1,9 +1,4 @@
-import { map } from "lodash-es"
-import { forEach } from "lodash-es"
-import { isString } from "lodash-es"
-import { isRegExp } from "lodash-es"
-import { pickBy } from "lodash-es"
-import { assign } from "lodash-es"
+import { assign, forEach, isRegExp, isString, map, pickBy } from "lodash-es"
 import type {
   IGASTVisitor,
   IProduction,

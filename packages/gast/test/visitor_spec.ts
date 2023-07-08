@@ -1,17 +1,17 @@
 import { expect } from "chai"
 import type { ITokenConfig, TokenType } from "@chevrotain/types"
 import {
-  GAstVisitor,
-  Terminal,
-  Rule,
   Alternation,
   Alternative,
-  Repetition,
-  RepetitionWithSeparator,
-  RepetitionMandatoryWithSeparator,
-  RepetitionMandatory,
+  GAstVisitor,
+  NonTerminal,
   Option,
-  NonTerminal
+  Repetition,
+  RepetitionMandatory,
+  RepetitionMandatoryWithSeparator,
+  RepetitionWithSeparator,
+  Rule,
+  Terminal
 } from "../src/api.js"
 
 function createDummyToken(opts: ITokenConfig): TokenType {
