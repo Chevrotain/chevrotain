@@ -1,10 +1,10 @@
-import { IToken, TokenType } from "@chevrotain/types"
-import { expect } from "chai"
+import { IToken, TokenType } from "@chevrotain/types";
+import { expect } from "chai";
 
 export function setEquality(actual: any[], expected: any[]): void {
-  expect(actual).to.deep.include.members(expected)
-  expect(expected).to.deep.include.members(actual)
-  expect(expected).to.have.lengthOf(actual.length)
+  expect(actual).to.deep.include.members(expected);
+  expect(expected).to.deep.include.members(actual);
+  expect(expected).to.have.lengthOf(actual.length);
 }
 
 export function createRegularToken(
@@ -15,7 +15,7 @@ export function createRegularToken(
   startColumn?: number,
   endOffset?: number,
   endLine?: number,
-  endColumn?: number
+  endColumn?: number,
 ): IToken {
   return {
     image: image,
@@ -26,6 +26,6 @@ export function createRegularToken(
     endLine: endLine,
     endColumn: endColumn,
     tokenTypeIdx: tokType.tokenTypeIdx!,
-    tokenType: tokType
-  }
+    tokenType: tokType,
+  };
 }

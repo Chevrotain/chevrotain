@@ -1,15 +1,15 @@
 export function applyMixins(derivedCtor: any, baseCtors: any[]) {
   baseCtors.forEach((baseCtor) => {
-    const baseProto = baseCtor.prototype
+    const baseProto = baseCtor.prototype;
     Object.getOwnPropertyNames(baseProto).forEach((propName) => {
       if (propName === "constructor") {
-        return
+        return;
       }
 
       const basePropDescriptor = Object.getOwnPropertyDescriptor(
         baseProto,
-        propName
-      )
+        propName,
+      );
       // Handle Accessors
       if (
         basePropDescriptor &&
@@ -18,11 +18,11 @@ export function applyMixins(derivedCtor: any, baseCtors: any[]) {
         Object.defineProperty(
           derivedCtor.prototype,
           propName,
-          basePropDescriptor
-        )
+          basePropDescriptor,
+        );
       } else {
-        derivedCtor.prototype[propName] = baseCtor.prototype[propName]
+        derivedCtor.prototype[propName] = baseCtor.prototype[propName];
       }
-    })
-  })
+    });
+  });
 }

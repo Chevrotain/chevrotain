@@ -1,34 +1,34 @@
 // ----------------- Lexer -----------------
-var Token = chevrotain.Token
-var createToken = chevrotain.createToken
-var ChevrotainLexer = chevrotain.Lexer
+var Token = chevrotain.Token;
+var createToken = chevrotain.createToken;
+var ChevrotainLexer = chevrotain.Lexer;
 
-var True = createToken({ name: "True", pattern: "true" })
-var False = createToken({ name: "False", pattern: "false" })
-var Null = createToken({ name: "Null", pattern: "null" })
-var LCurly = createToken({ name: "LCurly", pattern: "{" })
-var RCurly = createToken({ name: "RCurly", pattern: "}" })
-var LSquare = createToken({ name: "LSquare", pattern: "[" })
-var RSquare = createToken({ name: "RSquare", pattern: "]" })
-var Comma = createToken({ name: "Comma", pattern: "," })
-var Colon = createToken({ name: "Colon", pattern: ":" })
+var True = createToken({ name: "True", pattern: "true" });
+var False = createToken({ name: "False", pattern: "false" });
+var Null = createToken({ name: "Null", pattern: "null" });
+var LCurly = createToken({ name: "LCurly", pattern: "{" });
+var RCurly = createToken({ name: "RCurly", pattern: "}" });
+var LSquare = createToken({ name: "LSquare", pattern: "[" });
+var RSquare = createToken({ name: "RSquare", pattern: "]" });
+var Comma = createToken({ name: "Comma", pattern: "," });
+var Colon = createToken({ name: "Colon", pattern: ":" });
 
-var stringLiteralPattern = /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
+var stringLiteralPattern = /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/;
 var StringLiteral = createToken({
   name: "StringLiteral",
-  pattern: stringLiteralPattern
-})
+  pattern: stringLiteralPattern,
+});
 
 var NumberLiteral = createToken({
   name: "NumberLiteral",
-  pattern: /-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/
-})
+  pattern: /-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/,
+});
 
 var WhiteSpace = createToken({
   name: "WhiteSpace",
   pattern: /[ \n\r\t]+/,
-  group: ChevrotainLexer.SKIPPED
-})
+  group: ChevrotainLexer.SKIPPED,
+});
 
 var jsonTokens = [
   WhiteSpace,
@@ -42,10 +42,10 @@ var jsonTokens = [
   RSquare,
   True,
   False,
-  Null
-]
+  Null,
+];
 
-var lexerDefinition = jsonTokens
+var lexerDefinition = jsonTokens;
 
 // ----------------- parser -----------------
 
@@ -53,14 +53,14 @@ var lexerDefinition = jsonTokens
 // (Do not create a new Parser instance for each new input.)
 var ChevrotainParser = self.parserConfig.outputCst
   ? chevrotain.CstParser
-  : chevrotain.EmbeddedActionsParser
+  : chevrotain.EmbeddedActionsParser;
 
 class parser extends ChevrotainParser {
   constructor(options) {
-    super(jsonTokens, options)
+    super(jsonTokens, options);
 
-    const $ = this
-    $.C1 = []
+    const $ = this;
+    $.C1 = [];
 
     $.RULE("json", function () {
       // prettier-ignore
@@ -76,37 +76,37 @@ class parser extends ChevrotainParser {
           }
         }
       ])
-    })
+    });
 
     $.RULE("object", function () {
-      $.CONSUME(LCurly)
+      $.CONSUME(LCurly);
       $.OPTION(function () {
-        $.SUBRULE($.objectItem)
+        $.SUBRULE($.objectItem);
         $.MANY(function () {
-          $.CONSUME(Comma)
-          $.SUBRULE2($.objectItem)
-        })
-      })
-      $.CONSUME(RCurly)
-    })
+          $.CONSUME(Comma);
+          $.SUBRULE2($.objectItem);
+        });
+      });
+      $.CONSUME(RCurly);
+    });
 
     $.RULE("objectItem", function () {
-      $.CONSUME(StringLiteral)
-      $.CONSUME(Colon)
-      $.SUBRULE($.value)
-    })
+      $.CONSUME(StringLiteral);
+      $.CONSUME(Colon);
+      $.SUBRULE($.value);
+    });
 
     $.RULE("array", function () {
-      $.CONSUME(LSquare)
+      $.CONSUME(LSquare);
       $.OPTION(function () {
-        $.SUBRULE($.value)
+        $.SUBRULE($.value);
         $.MANY(function () {
-          $.CONSUME(Comma)
-          $.SUBRULE2($.value)
-        })
-      })
-      $.CONSUME(RSquare)
-    })
+          $.CONSUME(Comma);
+          $.SUBRULE2($.value);
+        });
+      });
+      $.CONSUME(RSquare);
+    });
 
     $.RULE("value", function () {
       // https://chevrotain.io/docs/guide/performance.html#caching-arrays-of-alternatives
@@ -149,13 +149,13 @@ class parser extends ChevrotainParser {
               $.CONSUME(Null)
             }
           }
-        ])
-      )
-    })
+        ]),
+      );
+    });
 
     // very important to call this after all the rules have been setup.
     // otherwise the parser may not work correctly as it will lack information
     // derived from the self analysis.
-    this.performSelfAnalysis()
+    this.performSelfAnalysis();
   }
 }

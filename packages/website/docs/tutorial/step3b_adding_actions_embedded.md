@@ -23,11 +23,11 @@ This can be accomplished using two features of the Parsing DSL:
 For embedded actions to work as expected we need to extend the EmbeddedActionsParser class instead of the CstParser class.
 
 ```javascript
-const { EmbeddedActionsParser } = require("chevrotain")
+const { EmbeddedActionsParser } = require("chevrotain");
 
 class SelectParserEmbedded extends EmbeddedActionsParser {
   constructor() {
-    super(tokenVocabulary)
+    super(tokenVocabulary);
   }
 }
 ```
@@ -41,35 +41,35 @@ Lets inspect a simple contrived example:
 
 ```javascript
 $.RULE("topRule", () => {
-  let result = 0
+  let result = 0;
 
   $.MANY(() => {
     $.OR([
       {
         ALT: () => {
-          result += $.SUBRULE($.decimalRule)
-        }
+          result += $.SUBRULE($.decimalRule);
+        },
       },
       {
         ALT: () => {
-          result += $.SUBRULE($.IntegerRule)
-        }
-      }
-    ])
-  })
+          result += $.SUBRULE($.IntegerRule);
+        },
+      },
+    ]);
+  });
 
-  return result
-})
+  return result;
+});
 
 $.RULE("decimalRule", () => {
-  const decimalToken = $.CONSUME(Decimal)
-  return parseFloat(decimalToken.image)
-})
+  const decimalToken = $.CONSUME(Decimal);
+  return parseFloat(decimalToken.image);
+});
 
 $.RULE("IntegerRule", () => {
-  const intToken = $.CONSUME(Integer)
-  return parseInt(intToken.image)
-})
+  const intToken = $.CONSUME(Integer);
+  return parseInt(intToken.image);
+});
 ```
 
 The **decimalRule** and **IntegerRule** both return a javascript number (using parseInt/parseFloat).
@@ -84,22 +84,22 @@ Our selectStatement rule will now return an object with four properties:
 
 ```javascript
 $.RULE("selectStatement", () => {
-  let select, from, where
+  let select, from, where;
 
-  select = $.SUBRULE($.selectClause)
-  from = $.SUBRULE($.fromClause)
+  select = $.SUBRULE($.selectClause);
+  from = $.SUBRULE($.fromClause);
   $.OPTION(() => {
-    where = $.SUBRULE($.whereClause)
-  })
+    where = $.SUBRULE($.whereClause);
+  });
 
   return {
     type: "SELECT_STMT",
     selectClause: select,
     fromClause: from,
     // may be undefined if the OPTION was not entered.
-    whereClause: where
-  }
-})
+    whereClause: where,
+  };
+});
 ```
 
 Three of those properties (selectClause / fromClause / whereClause) are the results of invoking
@@ -109,22 +109,22 @@ Lets look at the "selectClause" rule implementation:
 
 ```javascript
 $.RULE("selectClause", () => {
-  let columns = []
+  let columns = [];
 
-  $.CONSUME(Select)
+  $.CONSUME(Select);
   $.AT_LEAST_ONE_SEP({
     SEP: Comma,
     DEF: () => {
       // accessing a token's original text via the `image` property
-      columns.push($.CONSUME(Identifier).image)
-    }
-  })
+      columns.push($.CONSUME(Identifier).image);
+    },
+  });
 
   return {
     type: "SELECT_CLAUSE",
-    columns: columns
-  }
-})
+    columns: columns,
+  };
+});
 ```
 
 In the selectClause rule we access the **image** property of the Identifier token returned from **CONSUME**

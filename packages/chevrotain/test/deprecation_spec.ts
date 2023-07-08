@@ -1,27 +1,27 @@
-import { expect } from "chai"
-import { createToken, Parser } from "../src/api.js"
-import { CstParser } from "../src/parse/parser/traits/parser_traits.js"
+import { expect } from "chai";
+import { createToken, Parser } from "../src/api.js";
+import { CstParser } from "../src/parse/parser/traits/parser_traits.js";
 
 describe("Chevrotain's runtime deprecation checks", () => {
   it("Will throw an error if someone tries to use the deprecated Parser class", () => {
-    expect(() => new Parser()).to.throw("The Parser class has been deprecated")
-    expect(() => new Parser()).to.throw("CstParser or EmbeddedActionsParser")
+    expect(() => new Parser()).to.throw("The Parser class has been deprecated");
+    expect(() => new Parser()).to.throw("CstParser or EmbeddedActionsParser");
     expect(() => new Parser()).to.throw(
-      "https://chevrotain.io/docs/changes/BREAKING_CHANGES.html#_7-0-0"
-    )
-  })
+      "https://chevrotain.io/docs/changes/BREAKING_CHANGES.html#_7-0-0",
+    );
+  });
 
   it("Will throw an error if someone tries to use the deprecated Parser class", () => {
-    const tokA = createToken({ name: "foo", pattern: "bar" })
+    const tokA = createToken({ name: "foo", pattern: "bar" });
     class StaticSelfAnalysisParser extends CstParser {
       constructor() {
-        super([tokA])
-        ;(CstParser as any).performSelfAnalysis()
+        super([tokA]);
+        (CstParser as any).performSelfAnalysis();
       }
     }
 
     expect(() => new StaticSelfAnalysisParser()).to.throw(
-      "The **static** `performSelfAnalysis` method has been deprecated"
-    )
-  })
-})
+      "The **static** `performSelfAnalysis` method has been deprecated",
+    );
+  });
+});

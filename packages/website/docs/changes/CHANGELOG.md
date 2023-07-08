@@ -1193,7 +1193,7 @@ so not many changes will be needed (if at all) for most users.
   // old deprecated form
   this.RULE_NO_RESYNC("createStmt", function () {
     /* ... */
-  })
+  });
 
   // new form
   this.RULE(
@@ -1201,8 +1201,8 @@ so not many changes will be needed (if at all) for most users.
     function () {
       /* ... */
     },
-    { resyncEnabled: false }
-  )
+    { resyncEnabled: false },
+  );
   ```
 
 - [Parser Configuration should be done using a "Config" Object instead of constructor parameters.](https://github.com/chevrotain/chevrotain/issues/175)
@@ -1219,7 +1219,7 @@ so not many changes will be needed (if at all) for most users.
   function JsonParser(input) {
     // The third argument was used to enable/disable error recovery
     // and was **true** by default.
-    Parser.call(this, input, true)
+    Parser.call(this, input, true);
   }
 
   // new form
@@ -1228,8 +1228,8 @@ so not many changes will be needed (if at all) for most users.
     Parser.call(this, input, allTokens, {
       // by default the error recovery flag is **false**
       // use recoveryEnabled flag in the IParserConfig object to enable enable it.
-      recoveryEnabled: true
-    })
+      recoveryEnabled: true,
+    });
   }
   ```
 

@@ -9,22 +9,22 @@ Instead re-use a single instance and reset its state between iterations. For exa
 
 ```javascript
 // reuse the same parser instance.
-const parser = new JsonParser([])
+const parser = new JsonParser([]);
 
 module.exports = function (text) {
-  const lexResult = JsonLexer.tokenize(text)
+  const lexResult = JsonLexer.tokenize(text);
 
   // setting a new input will RESET the parser instance's state.
-  parser.input = lexResult.tokens
+  parser.input = lexResult.tokens;
 
-  const value = parser.json()
+  const value = parser.json();
 
   return {
     value: value,
     lexErrors: lexResult.errors,
-    parseErrors: parser.errors
-  }
-}
+    parseErrors: parser.errors,
+  };
+};
 ```
 
 Avoiding the creation of new instances is important to avoid re-paying the Parser's initialization costs
@@ -53,13 +53,13 @@ in case the optimizations cannot be enabled by turning on the
 "ensureOptimizations" flag:
 
 ```javascript
-import { Lexer } from "chevrotain"
+import { Lexer } from "chevrotain";
 const myLexer = new Lexer(
   [
     /* tokens */
   ],
-  { ensureOptimizations: true }
-)
+  { ensureOptimizations: true },
+);
 ```
 
 With the "ensureOptimizations" flag enabled the Lexer will also print error messages
@@ -80,9 +80,9 @@ $.RULE("value", () => {
     { ALT: () => $.SUBRULE($.array) },
     { ALT: () => $.CONSUME(True) },
     { ALT: () => $.CONSUME(False) },
-    { ALT: () => $.CONSUME(Null) }
-  ])
-})
+    { ALT: () => $.CONSUME(Null) },
+  ]);
+});
 ```
 
 A simple JavaScript pattern can avoid this costly re-initialization:
@@ -99,10 +99,10 @@ $.RULE("value", function () {
         { ALT: () => $.SUBRULE($.array) },
         { ALT: () => $.CONSUME(True) },
         { ALT: () => $.CONSUME(False) },
-        { ALT: () => $.CONSUME(Null) }
-      ])
-  )
-})
+        { ALT: () => $.CONSUME(Null) },
+      ]),
+  );
+});
 ```
 
 Applying this pattern (in just a single location) on a JSON grammar provided 25-30% performance boost
@@ -120,7 +120,7 @@ It is important to note that:
   ```javascript
   // BAD
   $.RULE("value", function () {
-    let result
+    let result;
     // We reference the "result" variable via a closure.
     // So a new function is needed each time this grammar rule is invoked.
     $.OR(
@@ -128,28 +128,28 @@ It is important to note that:
         ($.c1 = [
           {
             ALT: () => {
-              result = $.CONSUME(StringLiteral)
-            }
-          }
-        ])
-    )
-  })
+              result = $.CONSUME(StringLiteral);
+            },
+          },
+        ]),
+    );
+  });
 
   // GOOD
   $.RULE("value", function () {
-    let result
+    let result;
     // no closure for the result variable, we use the returned value of the OR instead.
     result = $.OR(
       $.c1 ||
         ($.c1 = [
           {
             ALT: () => {
-              return $.CONSUME(StringLiteral)
-            }
-          }
-        ])
-    )
-  })
+              return $.CONSUME(StringLiteral);
+            },
+          },
+        ]),
+    );
+  });
   ```
 
   - Note that gates often use vars from closures.
@@ -180,8 +180,8 @@ These are only required if you are trying to squeeze every tiny bit of performan
 
     ```javascript
     this.myRedundantRule = this.RULE("myRedundantRule", function () {
-      $.CONSUME(StringLiteral)
-    })
+      $.CONSUME(StringLiteral);
+    });
     ```
 
     Instead such a rule's contents should be (manually) in-lined in its call sites.

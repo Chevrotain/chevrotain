@@ -1,16 +1,16 @@
-import path, { dirname } from "path"
-import _ from "lodash"
-import jf from "jsonfile"
-import { slugify } from "@mdit-vue/shared"
-import { defaultTheme } from "@vuepress/theme-default"
-import { docsearchPlugin } from "@vuepress/plugin-docsearch"
-import { fileURLToPath } from "url"
+import path, { dirname } from "path";
+import _ from "lodash";
+import jf from "jsonfile";
+import { slugify } from "@mdit-vue/shared";
+import { defaultTheme } from "@vuepress/theme-default";
+import { docsearchPlugin } from "@vuepress/plugin-docsearch";
+import { fileURLToPath } from "url";
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const packagePath = path.join(__dirname, "../../package.json")
-const version = jf.readFileSync(packagePath).version
-const versionWithLowDashs = version.replace(/\./g, "_")
+const packagePath = path.join(__dirname, "../../package.json");
+const version = jf.readFileSync(packagePath).version;
+const versionWithLowDashs = version.replace(/\./g, "_");
 
 const slugMap = {
   "Common Prefix Ambiguities": "COMMON_PREFIX",
@@ -46,10 +46,10 @@ const slugMap = {
   "A Custom Token Pattern should specify the <line_breaks> option":
     "CUSTOM_LINE_BREAK",
   "Missing <lineTerminatorCharacters> property on the Lexer config":
-    "MISSING_LINE_TERM_CHARS"
-}
+    "MISSING_LINE_TERM_CHARS",
+};
 
-const slugMapUsed = _.mapValues(slugMap, () => false)
+const slugMapUsed = _.mapValues(slugMap, () => false);
 
 export default {
   title: "Chevrotain",
@@ -57,22 +57,22 @@ export default {
   description: "Parser Building Toolkit for JavaScript",
   markdown: {
     slugify: function (str) {
-      const mappedSlug = slugMap[str]
+      const mappedSlug = slugMap[str];
       if (mappedSlug) {
         // TODO: can we test all mappings have been used?
-        slugMapUsed[str] = true
-        return mappedSlug
+        slugMapUsed[str] = true;
+        return mappedSlug;
       }
 
-      return slugify(str)
-    }
+      return slugify(str);
+    },
   },
   plugins: [
     docsearchPlugin({
       apiKey: "512c3a75c3c7e55f583e8e9c5f131066",
       indexName: "sap_chevrotain",
-      appId: "J7Q8R9M5PG"
-    })
+      appId: "J7Q8R9M5PG",
+    }),
   ],
   theme: defaultTheme({
     repo: "chevrotain/chevrotain",
@@ -91,20 +91,20 @@ export default {
 
       {
         text: "APIs",
-        link: `https://chevrotain.io/documentation/${versionWithLowDashs}/modules.html`
+        link: `https://chevrotain.io/documentation/${versionWithLowDashs}/modules.html`,
       },
       {
         text: "Playground",
-        link: "https://chevrotain.io/playground/"
+        link: "https://chevrotain.io/playground/",
       },
       {
         text: "Benchmark",
-        link: "https://chevrotain.io/performance/"
+        link: "https://chevrotain.io/performance/",
       },
       {
         text: "Discussions",
-        link: "https://github.com/Chevrotain/chevrotain/discussions"
-      }
+        link: "https://github.com/Chevrotain/chevrotain/discussions",
+      },
     ],
     sidebar: {
       "/tutorial/": [
@@ -118,9 +118,9 @@ export default {
             "/tutorial/step3_adding_actions_root.md",
             "/tutorial/step3a_adding_actions_visitor.md",
             "/tutorial/step3b_adding_actions_embedded.md",
-            "/tutorial/step4_fault_tolerance.md"
-          ]
-        }
+            "/tutorial/step4_fault_tolerance.md",
+          ],
+        },
       ],
       "/guide/": [
         {
@@ -136,9 +136,9 @@ export default {
             "/guide/syntactic_content_assist.md",
             "/guide/internals.md",
             "/guide/resolving_grammar_errors.md",
-            "/guide/resolving_lexer_errors.md"
-          ]
-        }
+            "/guide/resolving_lexer_errors.md",
+          ],
+        },
       ],
       "/features/": [
         {
@@ -165,17 +165,17 @@ export default {
             "/features/token_categories.md",
             "/features/token_grouping.md",
             "/features/custom_token_patterns.md",
-            "/features/lexer_modes.md"
-          ]
-        }
+            "/features/lexer_modes.md",
+          ],
+        },
       ],
       "/changes/": [
         {
           text: "Changes",
           collapsable: false,
-          children: ["/changes/BREAKING_CHANGES.md", "/changes/CHANGELOG.md"]
-        }
-      ]
-    }
-  })
-}
+          children: ["/changes/BREAKING_CHANGES.md", "/changes/CHANGELOG.md"],
+        },
+      ],
+    },
+  }),
+};

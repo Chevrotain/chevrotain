@@ -31,9 +31,9 @@ $.RULE("value", () => {
     { ALT: () => $.SUBRULE($.array) },
     { ALT: () => $.CONSUME(True) },
     { ALT: () => $.CONSUME(False) },
-    { ALT: () => $.CONSUME(Null) }
-  ])
-})
+    { ALT: () => $.CONSUME(Null) },
+  ]);
+});
 ```
 
 ### The Solution
@@ -59,14 +59,14 @@ class SafeEmbeddedActionsExample extends EmbeddedActionsParser {
     /* ... */
     $.RULE("objectItem", () => {
       // Usage of the Parsing DSL methods is always safe, otherwise the whole concept of "grammar recording" would not work...
-      const keyTok = $.CONSUME(StringLiteral)
-      $.CONSUME(Colon)
-      const valAst = $.SUBRULE($.value)
+      const keyTok = $.CONSUME(StringLiteral);
+      $.CONSUME(Colon);
+      const valAst = $.SUBRULE($.value);
 
       // strip away the quotes from the string literal
       // Note that even during the "recording phase" the CONSUME method will return an object that matches the IToken interface
       // to reduce potential runtime errors, so this is safe.
-      const keyName = keyTok.image.substring(1, keyTok.image.length - 1)
+      const keyName = keyTok.image.substring(1, keyTok.image.length - 1);
 
       // Assembling this JS object literal won't cause any issues because
       // we are not actually doing anything with the returned values.
@@ -74,9 +74,9 @@ class SafeEmbeddedActionsExample extends EmbeddedActionsParser {
       return {
         type: "keyValuePair",
         key: keyName,
-        value: valAst
-      }
-    })
+        value: valAst,
+      };
+    });
   }
 }
 ```
@@ -93,22 +93,22 @@ class ErrorEmbeddedActions1 extends EmbeddedActionsParser {
     $.RULE("topRule", () => {
       // During the recording phase `SUBRULE` will return a "dummy" value
       // Which would not match the structure `otherRule` normally returns.
-      const otherRuleVal = $.SUBRULE($.otherRule)
+      const otherRuleVal = $.SUBRULE($.otherRule);
 
       // Will cause "undefined is not an object" runtime error
       // because during the recording phase `SUBRULE` will not returned the expected value.
-      return otherRuleVal.foo.bar
-    })
+      return otherRuleVal.foo.bar;
+    });
 
     $.RULE("otherRule", () => {
-      const myTok = $.CONSUME(MyTok)
+      const myTok = $.CONSUME(MyTok);
 
       return {
         foo: {
-          bar: myTok.image
-        }
-      }
-    })
+          bar: myTok.image,
+        },
+      };
+    });
   }
 }
 ```
@@ -121,18 +121,18 @@ class ErrorSemanticChecks extends EmbeddedActionsParser {
     /* ... */
     $.RULE("semanticCheckRule", () => {
       // During the recording phase `CONSUME` will return a "dummy" IToken value.
-      const myNumTok = $.CONSUME(NumberTok)
+      const myNumTok = $.CONSUME(NumberTok);
       // The "dummy" IToken `image` is not a number so this will evaluate to NaN.
-      const numValue = parseInt(myNumTok.image)
+      const numValue = parseInt(myNumTok.image);
 
       // Our embedded semantic check will **always** throw during the recording phase because
       // the "mocked" IToken returned by `CONSUME` would never be a valid integer.
       if (isNaN(numValue)) {
-        throw Error("Unexpected Number Value!")
+        throw Error("Unexpected Number Value!");
       }
 
-      return numValue
-    })
+      return numValue;
+    });
   }
 }
 ```
@@ -152,10 +152,10 @@ class JsonParser extends CstParser {
     // This Grammar rule has no custom user semantic actions
     // So it would not throw an unexpected exception during the recording phase...
     $.RULE("objectItem", () => {
-      $.CONSUME(StringLiteral)
-      $.CONSUME(Colon)
-      $.SUBRULE($.value)
-    })
+      $.CONSUME(StringLiteral);
+      $.CONSUME(Colon);
+      $.SUBRULE($.value);
+    });
   }
 }
 ```
@@ -173,24 +173,24 @@ class SolvedEmbeddedActions1 extends EmbeddedActionsParser {
     $.RULE("topRule", () => {
       // During the recording phase `SUBRULE` will return a "dummy" value
       // Which would not match the structure `otherRule` normally returns.
-      const otherRuleVal = $.SUBRULE($.otherRule)
+      const otherRuleVal = $.SUBRULE($.otherRule);
 
       return $.ACTION(() => {
         // Code inside `ACTION` will not be executed during the grammar recording phase.
         // Therefore an error will **not** be thrown...
-        otherRuleVal.foo.bar
-      })
-    })
+        otherRuleVal.foo.bar;
+      });
+    });
 
     $.RULE("otherRule", () => {
-      const myTok = $.CONSUME(MyTok)
+      const myTok = $.CONSUME(MyTok);
 
       return {
         foo: {
-          bar: myTok.image
-        }
-      }
-    })
+          bar: myTok.image,
+        },
+      };
+    });
   }
 }
 ```
@@ -201,20 +201,20 @@ class SolvedSemanticChecks extends EmbeddedActionsParser {
     /* ... */
     $.RULE("semanticCheckRule", () => {
       // During the recording phase `CONSUME` will return a "dummy" IToken value.
-      const myNumTok = $.CONSUME(NumberTok)
+      const myNumTok = $.CONSUME(NumberTok);
       // The "dummy" IToken `image` is not a number so this will evaluate to NaN.
-      const numValue = parseInt(myNumTok.image)
+      const numValue = parseInt(myNumTok.image);
 
       $.ACTION(() => {
         // Code inside `ACTION` will not be executed during the grammar recording phase.
         // Therefore an error will **not** be thrown...
         if (isNaN(numValue)) {
-          throw Error("Unexpected Number Value!")
+          throw Error("Unexpected Number Value!");
         }
-      })
+      });
 
-      return numValue
-    })
+      return numValue;
+    });
   }
 }
 ```
@@ -236,21 +236,21 @@ during the grammar recording phase may break logic dependent on those side effec
 For example:
 
 ```javascript
-let ruleCounter = 0
+let ruleCounter = 0;
 class SideEffectsParser extends CstParser {
   constructor() {
     /* ... */
     $.RULE("myRule", () => {
       // The counter will be incremented during the recording phase.
-      counter++
-      $.CONSUME(MyToken)
-    })
+      counter++;
+      $.CONSUME(MyToken);
+    });
   }
 }
 
-const parser = new SideEffectsParser()
+const parser = new SideEffectsParser();
 // We expected this to be `0`...
-console.log(counter) // -> 1
+console.log(counter); // -> 1
 ```
 
 #### Solutions
@@ -263,10 +263,10 @@ This is normally most suitable for handling **global state** outside the Parser'
 $.RULE("myRule", () => {
   $.ACTION(() => {
     // This code will no longer execute during the recording phase.
-    counter++
-  })
-  $.CONSUME(MyToken)
-})
+    counter++;
+  });
+  $.CONSUME(MyToken);
+});
 ```
 
 Because we are dealing with state here there is another option which is to override the Parser's
@@ -277,23 +277,23 @@ This is normally suitable for state that needs to be reset every time **new inpu
 class FixedSideEffectsParser extends CstParser {
   constructor() {
     //
-    this.instanceCounter = 0
+    this.instanceCounter = 0;
     /* ... */
     $.RULE("myRule", () => {
       // The counter will be incremented during the recording phase.
-      this.instanceCounter++
-      $.CONSUME(MyToken)
-    })
+      this.instanceCounter++;
+      $.CONSUME(MyToken);
+    });
   }
 
   reset() {
-    this.instanceCounter = 0
-    super.reset()
+    this.instanceCounter = 0;
+    super.reset();
   }
 }
 
-const parser = new FixedSideEffectsParser()
-console.log(parser.instanceCounter) // -> 0
+const parser = new FixedSideEffectsParser();
+console.log(parser.instanceCounter); // -> 0
 ```
 
 ### Debugging Implications

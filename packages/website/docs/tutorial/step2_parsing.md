@@ -56,14 +56,14 @@ Let's implement our first grammar rule.
 // selectStatement
 //    : selectClause fromClause (whereClause)?;
 
-const $ = this
+const $ = this;
 $.RULE("selectStatement", () => {
-  $.SUBRULE($.selectClause)
-  $.SUBRULE($.fromClause)
+  $.SUBRULE($.selectClause);
+  $.SUBRULE($.fromClause);
   $.OPTION(() => {
-    $.SUBRULE($.whereClause)
-  })
-})
+    $.SUBRULE($.whereClause);
+  });
+});
 ```
 
 Fairly straight forward translation:
@@ -79,7 +79,7 @@ Fairly straight forward translation:
 Each grammar rule is a property of a class that extends chevrotain.CstParser.
 
 ```javascript
-import { CstParser } from "chevrotain"
+import { CstParser } from "chevrotain";
 
 const allTokens = [
   WhiteSpace,
@@ -90,24 +90,24 @@ const allTokens = [
   Identifier,
   Integer,
   GreaterThan,
-  LessThan
-]
+  LessThan,
+];
 
 class SelectParser extends CstParser {
   constructor() {
-    super(allTokens)
+    super(allTokens);
 
-    const $ = this
+    const $ = this;
 
     $.RULE("selectStatement", () => {
-      $.SUBRULE($.selectClause)
-      $.SUBRULE($.fromClause)
+      $.SUBRULE($.selectClause);
+      $.SUBRULE($.fromClause);
       $.OPTION(() => {
-        $.SUBRULE($.whereClause)
-      })
-    })
+        $.SUBRULE($.whereClause);
+      });
+    });
 
-    this.performSelfAnalysis()
+    this.performSelfAnalysis();
   }
 }
 ```
@@ -126,23 +126,23 @@ Let's look at two more grammar rule, this time with repetition and alternation.
 
 ```javascript
 $.RULE("selectClause", () => {
-  $.CONSUME(Select)
+  $.CONSUME(Select);
   $.AT_LEAST_ONE_SEP({
     SEP: Comma,
     DEF: () => {
-      $.CONSUME(Identifier)
-    }
-  })
-})
+      $.CONSUME(Identifier);
+    },
+  });
+});
 
 // atomicExpression
 //    : INTEGER | IDENTIFIER
 $.RULE("atomicExpression", () => {
   $.OR([
     { ALT: () => $.CONSUME(Integer) },
-    { ALT: () => $.CONSUME(Identifier) }
-  ])
-})
+    { ALT: () => $.CONSUME(Identifier) },
+  ]);
+});
 ```
 
 ## Debugging
@@ -157,16 +157,16 @@ point in the grammar**.
 // selectClause
 //   : "SELECT" IDENTIFIER ("," IDENTIFIER)*;
 $.RULE("selectClause", () => {
-  $.CONSUME(Select)
+  $.CONSUME(Select);
   // Can be debugged directly! no code generation.
-  debugger
+  debugger;
   $.AT_LEAST_ONE_SEP({
     SEP: Comma,
     DEF: () => {
-      $.CONSUME(Identifier)
-    }
-  })
-})
+      $.CONSUME(Identifier);
+    },
+  });
+});
 ```
 
 There **do not** exist two different representations for the grammar
@@ -195,15 +195,15 @@ So when the parser needs to choose between the two alternatives:
 $.OR([
   {
     ALT: () => {
-      $.CONSUME(Integer)
-    }
+      $.CONSUME(Integer);
+    },
   },
   {
     ALT: () => {
-      $.CONSUME(Identifier)
-    }
-  }
-])
+      $.CONSUME(Identifier);
+    },
+  },
+]);
 ```
 
 It is aware of:
@@ -222,7 +222,7 @@ can be used for error messages and fault tolerance as well as deciding which pat
 Let's finish implementing the whole SelectParser:
 
 ```javascript
-import { CstParser } from "chevrotain"
+import { CstParser } from "chevrotain";
 const allTokens = [
   WhiteSpace,
   Select,
@@ -232,68 +232,68 @@ const allTokens = [
   Identifier,
   Integer,
   GreaterThan,
-  LessThan
-]
+  LessThan,
+];
 
 class SelectParser extends CstParser {
   constructor() {
-    super(allTokens)
+    super(allTokens);
 
-    const $ = this
+    const $ = this;
 
     $.RULE("selectStatement", () => {
-      $.SUBRULE($.selectClause)
-      $.SUBRULE($.fromClause)
+      $.SUBRULE($.selectClause);
+      $.SUBRULE($.fromClause);
       $.OPTION(() => {
-        $.SUBRULE($.whereClause)
-      })
-    })
+        $.SUBRULE($.whereClause);
+      });
+    });
 
     $.RULE("selectClause", () => {
-      $.CONSUME(Select)
+      $.CONSUME(Select);
       $.AT_LEAST_ONE_SEP({
         SEP: Comma,
         DEF: () => {
-          $.CONSUME(Identifier)
-        }
-      })
-    })
+          $.CONSUME(Identifier);
+        },
+      });
+    });
 
     $.RULE("fromClause", () => {
-      $.CONSUME(From)
-      $.CONSUME(Identifier)
-    })
+      $.CONSUME(From);
+      $.CONSUME(Identifier);
+    });
 
     $.RULE("whereClause", () => {
-      $.CONSUME(Where)
-      $.SUBRULE($.expression)
-    })
+      $.CONSUME(Where);
+      $.SUBRULE($.expression);
+    });
 
     // The "rhs" and "lhs" (Right/Left Hand Side) labels will provide easy
     // to use names during CST Visitor (step 3a).
     $.RULE("expression", () => {
-      $.SUBRULE($.atomicExpression, { LABEL: "lhs" })
-      $.SUBRULE($.relationalOperator)
-      $.SUBRULE2($.atomicExpression, { LABEL: "rhs" }) // note the '2' suffix to distinguish
+      $.SUBRULE($.atomicExpression, { LABEL: "lhs" });
+      $.SUBRULE($.relationalOperator);
+      $.SUBRULE2($.atomicExpression, { LABEL: "rhs" }); // note the '2' suffix to distinguish
       // from the 'SUBRULE(atomicExpression)'
       // 2 lines above.
-    })
+    });
 
     $.RULE("atomicExpression", () => {
       $.OR([
         { ALT: () => $.CONSUME(Integer) },
-        { ALT: () => $.CONSUME(Identifier) }
-      ])
-    })
+        { ALT: () => $.CONSUME(Identifier) },
+      ]);
+    });
 
     $.RULE("relationalOperator", () => {
       $.OR([
         { ALT: () => $.CONSUME(GreaterThan) },
-        { ALT: () => $.CONSUME(LessThan) }
-      ])
-    })
+        { ALT: () => $.CONSUME(LessThan) },
+      ]);
+    });
 
-    this.performSelfAnalysis()
+    this.performSelfAnalysis();
   }
 }
 ```
@@ -308,21 +308,21 @@ class SelectParser extends CstParser {
 
 ```javascript
 // ONLY ONCE
-const parser = new SelectParser()
+const parser = new SelectParser();
 
 function parseInput(text) {
-  const lexingResult = SelectLexer.tokenize(text)
+  const lexingResult = SelectLexer.tokenize(text);
   // "input" is a setter which will reset the parser's state.
-  parser.input = lexingResult.tokens
-  parser.selectStatement()
+  parser.input = lexingResult.tokens;
+  parser.selectStatement();
 
   if (parser.errors.length > 0) {
-    throw new Error("sad sad panda, Parsing errors detected")
+    throw new Error("sad sad panda, Parsing errors detected");
   }
 }
 
-const inputText = "SELECT column1 FROM table2"
-parseInput(inputText)
+const inputText = "SELECT column1 FROM table2";
+parseInput(inputText);
 ```
 
 - Note that any of the grammar rules can be invoked as the starting rule.

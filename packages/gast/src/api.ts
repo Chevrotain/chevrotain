@@ -10,14 +10,14 @@ export {
   Alternation,
   Alternative,
   serializeGrammar,
-  serializeProduction
-} from "./model.js"
+  serializeProduction,
+} from "./model.js";
 
-export { GAstVisitor } from "./visitor.js"
+export { GAstVisitor } from "./visitor.js";
 
 export {
   getProductionDslName,
   isOptionalProd,
   isBranchingProd,
-  isSequenceProd
-} from "./helpers.js"
+  isSequenceProd,
+} from "./helpers.js";

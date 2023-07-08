@@ -1,1 +1,1 @@
-export const EOF_TOKEN_TYPE = 1
+export const EOF_TOKEN_TYPE = 1;

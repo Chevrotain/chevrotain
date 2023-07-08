@@ -7,62 +7,62 @@
  * "Public sta" --> ["static"]
  * "call f" --> ["foo"] // assuming foo is in the symbol table.
  */
-import { createToken, Lexer, CstParser } from "chevrotain"
+import { createToken, Lexer, CstParser } from "chevrotain";
 
-export const A = createToken({ name: "A", pattern: /A/ })
-export const B = createToken({ name: "B", pattern: /B/ })
-export const C = createToken({ name: "C", pattern: /C/ })
+export const A = createToken({ name: "A", pattern: /A/ });
+export const B = createToken({ name: "B", pattern: /B/ });
+export const C = createToken({ name: "C", pattern: /C/ });
 
 const WhiteSpace = createToken({
   name: "WhiteSpace",
   pattern: /\s+/,
-  group: Lexer.SKIPPED
-})
+  group: Lexer.SKIPPED,
+});
 
-const allTokens = [WhiteSpace, A, B, C]
-const StatementsLexer = new Lexer(allTokens)
+const allTokens = [WhiteSpace, A, B, C];
+const StatementsLexer = new Lexer(allTokens);
 
 // A completely normal Chevrotain Parser, no changes needed to use the content assist capabilities.
 class MyParser extends CstParser {
   constructor() {
-    super(allTokens)
+    super(allTokens);
 
-    let $ = this
+    let $ = this;
 
     $.RULE("myRule", () => {
-      $.CONSUME(A)
+      $.CONSUME(A);
 
       // prettier-ignore
       $.OR([
                     { ALT: () => $.CONSUME(B) },
                     { ALT: () => $.CONSUME(C) }
                 ])
-    })
+    });
 
-    this.performSelfAnalysis()
+    this.performSelfAnalysis();
   }
 }
 
 // No need for more than one instance.
-const parserInstance = new MyParser()
+const parserInstance = new MyParser();
 
 export function getContentAssistSuggestions(text) {
-  const lexResult = StatementsLexer.tokenize(text)
+  const lexResult = StatementsLexer.tokenize(text);
   if (lexResult.errors.length > 0) {
-    throw new Error("sad sad panda, lexing errors detected")
+    throw new Error("sad sad panda, lexing errors detected");
   }
-  const partialTokenVector = lexResult.tokens
+  const partialTokenVector = lexResult.tokens;
 
   const syntacticSuggestions = parserInstance.computeContentAssist(
     "myRule",
-    partialTokenVector
-  )
+    partialTokenVector,
+  );
 
   // The suggestions also include the context, we are only interested
   // in the TokenTypes in this example.
   const tokenTypesSuggestions = syntacticSuggestions.map(
-    (suggestion) => suggestion.nextTokenType
-  )
+    (suggestion) => suggestion.nextTokenType,
+  );
 
-  return tokenTypesSuggestions
+  return tokenTypesSuggestions;
 }

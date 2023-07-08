@@ -1,6 +1,6 @@
-import { expect } from "chai"
+import { expect } from "chai";
 
-import { parse } from "./ecma5_api.js"
+import { parse } from "./ecma5_api.js";
 
 describe("The ECMAScript5 Grammar", () => {
   const sampleText = `var chevrotain = require("chevrotain")
@@ -136,8 +136,8 @@ module.exports = function (text) {
     parseErrors: parser.errors
   }
 }
-`
+`;
   it("can parse a simple input without errors", () => {
-    expect(() => parse(sampleText)).to.not.throw()
-  })
-})
+    expect(() => parse(sampleText)).to.not.throw();
+  });
+});

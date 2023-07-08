@@ -17,24 +17,24 @@ import {
   Integer,
   LessThan,
   allTokens,
-  Where
-} from "../step1_lexing/step1_lexing.js"
-import { EmbeddedActionsParser } from "chevrotain"
+  Where,
+} from "../step1_lexing/step1_lexing.js";
+import { EmbeddedActionsParser } from "chevrotain";
 
 // ----------------- parser -----------------
 class SelectParserEmbedded extends EmbeddedActionsParser {
   constructor() {
-    super(allTokens)
-    const $ = this
+    super(allTokens);
+    const $ = this;
 
     this.selectStatement = $.RULE("selectStatement", () => {
-      let select, from, where
+      let select, from, where;
 
-      select = $.SUBRULE($.selectClause)
-      from = $.SUBRULE($.fromClause)
+      select = $.SUBRULE($.selectClause);
+      from = $.SUBRULE($.fromClause);
       $.OPTION(() => {
-        where = $.SUBRULE($.whereClause)
-      })
+        where = $.SUBRULE($.whereClause);
+      });
 
       // Each Grammar rule can return a value, these values can be combined to create a new data structure
       // in our case an AST.
@@ -43,57 +43,57 @@ class SelectParserEmbedded extends EmbeddedActionsParser {
         selectClause: select,
         fromClause: from,
         // may be undefined if the OPTION was not entered.
-        whereClause: where
-      }
-    })
+        whereClause: where,
+      };
+    });
 
     this.selectClause = $.RULE("selectClause", () => {
-      const columns = []
+      const columns = [];
 
-      $.CONSUME(Select)
+      $.CONSUME(Select);
       $.AT_LEAST_ONE_SEP({
         SEP: Comma,
         DEF: () => {
-          columns.push($.CONSUME(Identifier).image)
-        }
-      })
+          columns.push($.CONSUME(Identifier).image);
+        },
+      });
 
       return {
         type: "SELECT_CLAUSE",
-        columns: columns
-      }
-    })
+        columns: columns,
+      };
+    });
 
     this.fromClause = $.RULE("fromClause", () => {
-      let table
+      let table;
 
-      $.CONSUME(From)
-      table = $.CONSUME(Identifier).image
+      $.CONSUME(From);
+      table = $.CONSUME(Identifier).image;
 
       return {
         type: "FROM_CLAUSE",
-        table: table
-      }
-    })
+        table: table,
+      };
+    });
 
     this.whereClause = $.RULE("whereClause", () => {
-      let condition
+      let condition;
 
-      $.CONSUME(Where)
-      condition = $.SUBRULE($.expression)
+      $.CONSUME(Where);
+      condition = $.SUBRULE($.expression);
 
       return {
         type: "WHERE_CLAUSE",
-        condition: condition
-      }
-    })
+        condition: condition,
+      };
+    });
 
     this.expression = $.RULE("expression", () => {
-      let lhs, operator, rhs
+      let lhs, operator, rhs;
 
-      lhs = $.SUBRULE($.atomicExpression)
-      operator = $.SUBRULE($.relationalOperator)
-      rhs = $.SUBRULE2($.atomicExpression) // note the '2' suffix to distinguish
+      lhs = $.SUBRULE($.atomicExpression);
+      operator = $.SUBRULE($.relationalOperator);
+      rhs = $.SUBRULE2($.atomicExpression); // note the '2' suffix to distinguish
       // from the 'SUBRULE(atomicExpression)'
       // 2 lines above.
 
@@ -101,53 +101,53 @@ class SelectParserEmbedded extends EmbeddedActionsParser {
         type: "EXPRESSION",
         lhs: lhs,
         operator: operator,
-        rhs: rhs
-      }
-    })
+        rhs: rhs,
+      };
+    });
 
     this.atomicExpression = $.RULE("atomicExpression", () => {
       return $.OR([
         { ALT: () => $.CONSUME(Integer) },
-        { ALT: () => $.CONSUME(Identifier) }
-      ]).image
-    })
+        { ALT: () => $.CONSUME(Identifier) },
+      ]).image;
+    });
 
     this.relationalOperator = $.RULE("relationalOperator", () => {
       return $.OR([
         {
-          ALT: () => $.CONSUME(GreaterThan)
+          ALT: () => $.CONSUME(GreaterThan),
         },
         {
-          ALT: () => $.CONSUME(LessThan)
-        }
-      ]).image
-    })
+          ALT: () => $.CONSUME(LessThan),
+        },
+      ]).image;
+    });
 
     // very important to call this after all the rules have been defined.
     // otherwise the parser may not work correctly as it will lack information
     // derived during the self-analysis phase.
-    this.performSelfAnalysis()
+    this.performSelfAnalysis();
   }
 }
 
 // We only ever need one as the parser internal state is reset for each new input.
-const parserInstance = new SelectParserEmbedded()
+const parserInstance = new SelectParserEmbedded();
 
 export function toAstEmbedded(inputText) {
-  const lexResult = lex(inputText)
+  const lexResult = lex(inputText);
 
   // ".input" is a setter which will reset the parser's internal's state.
-  parserInstance.input = lexResult.tokens
+  parserInstance.input = lexResult.tokens;
 
   // No semantic actions so this won't return anything yet.
-  const ast = parserInstance.selectStatement()
+  const ast = parserInstance.selectStatement();
 
   if (parserInstance.errors.length > 0) {
     throw Error(
       "Sad sad panda, parsing errors detected!\n" +
-        parserInstance.errors[0].message
-    )
+        parserInstance.errors[0].message,
+    );
   }
 
-  return ast
+  return ast;
 }

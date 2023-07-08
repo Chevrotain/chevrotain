@@ -14,8 +14,8 @@ The level of position information tracking can be reduced by using the [**positi
 For example:
 
 ```javascript
-import { Lexer } from "chevrotain"
-const allTokens = []
+import { Lexer } from "chevrotain";
+const allTokens = [];
 // createTokens...
-const myLexer = new Lexer(allTokens, { positionTracking: "onlyOffset" })
+const myLexer = new Lexer(allTokens, { positionTracking: "onlyOffset" });
 ```

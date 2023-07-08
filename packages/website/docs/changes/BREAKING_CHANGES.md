@@ -42,8 +42,8 @@
   class MoreLookaheadParser extends CstParser {
     constructor() {
       super([], {
-        maxLookahead: 4
-      })
+        maxLookahead: 4,
+      });
       // ...
     }
   }
@@ -74,16 +74,16 @@
         NAME: "$letStatement",
         ALT: () => {
           // ...
-        }
+        },
       },
       {
         NAME: "$selectStatement",
         ALT: () => {
           // ...
-        }
-      }
-    ])
-  })
+        },
+      },
+    ]);
+  });
   ```
 
   This feature was not orthogonal with other features (e.g error recovery) and added quite a-lot of complexity for the
@@ -94,7 +94,7 @@
   In such a case an explicit usage of a generic `any` type will resolve the problem.
 
   ```typescript
-  this.OR<any>(/* ... */)
+  this.OR<any>(/* ... */);
   ```
 
 - All methods of the Interface `errorMessageProvider` are now **mandatory**.
@@ -105,30 +105,30 @@
     defaultParserErrorProvider,
     IParserErrorMessageProvider,
     IToken,
-    TokenType
-  } from "chevrotain"
+    TokenType,
+  } from "chevrotain";
 
   class myCustomErrorMsgProvider implements IParserErrorMessageProvider {
     buildNoViableAltMessage(options: {
-      expectedPathsPerAlt: TokenType[][][]
-      actual: IToken[]
-      previous: IToken
-      customUserDescription: string
-      ruleName: string
+      expectedPathsPerAlt: TokenType[][][];
+      actual: IToken[];
+      previous: IToken;
+      customUserDescription: string;
+      ruleName: string;
     }): string {
       // Custom user error message builder
-      return "sad sad panda:" + options.actual[0].image
+      return "sad sad panda:" + options.actual[0].image;
     }
 
     buildEarlyExitMessage(options: {
-      expectedIterationPaths: TokenType[][]
-      actual: IToken[]
-      previous: IToken
-      customUserDescription: string
-      ruleName: string
+      expectedIterationPaths: TokenType[][];
+      actual: IToken[];
+      previous: IToken;
+      customUserDescription: string;
+      ruleName: string;
     }): string {
       // invoking the default error message string builder.
-      return defaultParserErrorProvider.buildEarlyExitMessage(options)
+      return defaultParserErrorProvider.buildEarlyExitMessage(options);
     }
 
     // Implementation of other properties from `IParserErrorMessageProvider`
@@ -173,7 +173,7 @@
   // Old API
   class MyOldParser extends Parser {
     constructor(input, config) {
-      super(input, allTokens, config)
+      super(input, allTokens, config);
     }
   }
 
@@ -181,20 +181,20 @@
     [
       /* token vector */
     ],
-    {}
-  )
+    {},
+  );
 
   // New API
   class MyNewParser extends Parser {
     constructor(config) {
-      super(allTokens, config)
+      super(allTokens, config);
     }
   }
 
-  const newInstance = new MyNewParser({})
+  const newInstance = new MyNewParser({});
   newInstance.input = [
     /* token vector */
-  ]
+  ];
   ```
 
   - Note that the input **setter** has existed for a while and has been used
@@ -209,7 +209,7 @@
   class MyNewParser extends Parser {
     constructor() {
       // we have to explicitly disable the CST building for embedded actions to work.
-      super(allTokens, { outputCst: false })
+      super(allTokens, { outputCst: false });
     }
   }
   ```
@@ -224,14 +224,14 @@
     ```javascript
     // Before 4.0.0
     const stmts = $.MANY(() => {
-      return $.SUBRULE(Statement)
-    })
+      return $.SUBRULE(Statement);
+    });
 
     // After 4.0.0
-    const stmts = []
+    const stmts = [];
     $.MANY(() => {
-      stmts.push($.SUBRULE(Statement))
-    })
+      stmts.push($.SUBRULE(Statement));
+    });
     ```
 
   - Similarly **MANY_SEP** / **AT_LEAST_ONE_SEP** also no longer return any results.
@@ -251,13 +251,13 @@
     atomicExpression(ctx) {
       // BAD - will fail due to "TypeError: Cannot read property '0' of undefined"
       if (ctx.Integer[0]) {
-        return ctx.Integer[0].image
+        return ctx.Integer[0].image;
       }
 
       // GOOD - safe check
       if (ctx.Integer) {
         // if a property exists it's value is guaranteed to have at least one element.
-        return ctx.Identifier[0].image
+        return ctx.Identifier[0].image;
       }
     }
   }
@@ -272,14 +272,14 @@
   ```javascript
   // No longer officially supported
   class Identifier {
-    static pattern = /[a-zA-Z_]\w+/
+    static pattern = /[a-zA-Z_]\w+/;
   }
 
   // Use the createToken API instead
   const Identifier = createToken({
     name: "Identifier",
-    pattern: /[a-zA-Z_]\w+/
-  })
+    pattern: /[a-zA-Z_]\w+/,
+  });
   ```
 
   See the reasoning in [this issue](https://github.com/chevrotain/chevrotain/issues/653).
@@ -290,10 +290,10 @@
 
   ```javascript
   // Old API - using nested namespace.
-  chevrotain.gast.Alternation
+  chevrotain.gast.Alternation;
 
   // New API - No nested namespaces.
-  chevrotain.Alternation
+  chevrotain.Alternation;
   ```
 
 * The exceptions namespace was also flattened into the API's root.

@@ -4,21 +4,21 @@
 // generally one should avoid having to use backtracking, and this specific example can be resolved without backtracking
 // by factoring out the common prefix, but for the sake of the example let us assume backtracking is required...
 
-import { createToken, Lexer, CstParser } from "chevrotain"
+import { createToken, Lexer, CstParser } from "chevrotain";
 
-const Number = createToken({ name: "Number", pattern: /\d+/ })
-const Element = createToken({ name: "Element", pattern: /element/ })
-const Default = createToken({ name: "Default", pattern: /default/ })
-const Dot = createToken({ name: "Dot", pattern: /\./ })
-const Colon = createToken({ name: "Colon", pattern: /:/ })
-const Equals = createToken({ name: "Equals", pattern: /=/ })
-const SemiColon = createToken({ name: "SemiColon", pattern: /;/ })
-const Ident = createToken({ name: "Ident", pattern: /[a-z]+/ })
+const Number = createToken({ name: "Number", pattern: /\d+/ });
+const Element = createToken({ name: "Element", pattern: /element/ });
+const Default = createToken({ name: "Default", pattern: /default/ });
+const Dot = createToken({ name: "Dot", pattern: /\./ });
+const Colon = createToken({ name: "Colon", pattern: /:/ });
+const Equals = createToken({ name: "Equals", pattern: /=/ });
+const SemiColon = createToken({ name: "SemiColon", pattern: /;/ });
+const Ident = createToken({ name: "Ident", pattern: /[a-z]+/ });
 const WhiteSpace = createToken({
   name: "WhiteSpace",
   pattern: /\s+/,
-  group: Lexer.SKIPPED
-})
+  group: Lexer.SKIPPED,
+});
 
 const allTokens = [
   WhiteSpace,
@@ -29,16 +29,16 @@ const allTokens = [
   Colon,
   Equals,
   SemiColon,
-  Ident
-]
+  Ident,
+];
 
-const backtrackingLexer = new Lexer(allTokens)
+const backtrackingLexer = new Lexer(allTokens);
 
 class BackTrackingParser extends CstParser {
   constructor() {
-    super(allTokens)
+    super(allTokens);
 
-    const $ = this
+    const $ = this;
 
     this.RULE("statement", () => {
       $.OR([
@@ -47,70 +47,70 @@ class BackTrackingParser extends CstParser {
         {
           GATE: $.BACKTRACK($.withEqualsStatement),
           ALT: () => {
-            $.SUBRULE($.withEqualsStatement)
-          }
+            $.SUBRULE($.withEqualsStatement);
+          },
         },
         {
           GATE: $.BACKTRACK($.withDefaultStatement),
           ALT: () => {
-            $.SUBRULE($.withDefaultStatement)
-          }
-        }
-      ])
-    })
+            $.SUBRULE($.withDefaultStatement);
+          },
+        },
+      ]);
+    });
 
     this.RULE("withEqualsStatement", () => {
-      this.CONSUME(Element)
-      this.CONSUME(Ident)
-      this.CONSUME(Colon)
+      this.CONSUME(Element);
+      this.CONSUME(Ident);
+      this.CONSUME(Colon);
       // qualifiedName is of possibly infinite length so no fixed lookahead can be used to disambiguate.
-      this.SUBRULE($.qualifiedName)
+      this.SUBRULE($.qualifiedName);
       // The "Equals" Token is the first token we can be used to distinguish between the two statement rules.
-      this.CONSUME(Equals)
-      this.CONSUME(Number)
-      this.CONSUME(SemiColon)
-    })
+      this.CONSUME(Equals);
+      this.CONSUME(Number);
+      this.CONSUME(SemiColon);
+    });
 
     $.RULE("withDefaultStatement", () => {
-      $.CONSUME(Element)
-      $.CONSUME(Ident)
-      $.CONSUME(Colon)
+      $.CONSUME(Element);
+      $.CONSUME(Ident);
+      $.CONSUME(Colon);
       // qualifiedName is of possibly infinite length so no fixed lookahead can be used to disambiguate.
-      $.SUBRULE($.qualifiedName)
+      $.SUBRULE($.qualifiedName);
       // The "Default" Token is the first token we can be used to distinguish between the two statement rules.
-      $.CONSUME(Default)
-      $.CONSUME(Number)
-      $.CONSUME(SemiColon)
-    })
+      $.CONSUME(Default);
+      $.CONSUME(Number);
+      $.CONSUME(SemiColon);
+    });
 
     $.RULE("qualifiedName", () => {
-      $.CONSUME(Ident)
+      $.CONSUME(Ident);
       $.MANY(() => {
-        $.CONSUME(Dot)
-        $.CONSUME2(Ident)
-      })
-    })
+        $.CONSUME(Dot);
+        $.CONSUME2(Ident);
+      });
+    });
 
     // DOCS: The call to performSelfAnalysis must happen after all the RULEs have been defined.
-    this.performSelfAnalysis()
+    this.performSelfAnalysis();
   }
 }
 
 // reuse the same parser instance.
-const parser = new BackTrackingParser()
+const parser = new BackTrackingParser();
 
 export function parse(text) {
-  const lexResult = backtrackingLexer.tokenize(text)
+  const lexResult = backtrackingLexer.tokenize(text);
 
   // setting a new input will RESET the parser instance's state.
-  parser.input = lexResult.tokens
+  parser.input = lexResult.tokens;
 
   // any top level rule may be used as an entry point
-  const cst = parser.statement()
+  const cst = parser.statement();
 
   return {
     cst: cst,
     lexErrors: lexResult.errors,
-    parseErrors: parser.errors
-  }
+    parseErrors: parser.errors,
+  };
 }

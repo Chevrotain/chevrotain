@@ -135,10 +135,10 @@ Lets look at a few real examples that can cause this error
 
 ```javascript
 $.MANY(() => {
-  return
+  return;
   // unreachable code
-  $.CONSUME(Plus)
-})
+  $.CONSUME(Plus);
+});
 ```
 
 By returning early in the iteration grammar we prevent the parser from consuming
@@ -149,9 +149,9 @@ The condition (nextToken === Plus) would still be true.
 $.MANY(() => {
   // Never wrap Chevrotain grammar in JavaScript control flow constructs.
   if (condition) {
-    $.CONSUME(Plus)
+    $.CONSUME(Plus);
   }
-})
+});
 ```
 
 This is similar to the previous example as if the condition is false, once
@@ -164,9 +164,9 @@ For example the above example should be written as:
 ```javascript
 $.MANY(() => {
   $.OPTION(() => {
-    $.CONSUME(Plus)
-  })
-})
+    $.CONSUME(Plus);
+  });
+});
 ```
 
 ## Ignoring Ambiguities
@@ -187,9 +187,9 @@ For example:
     IGNORE_AMBIGUITIES: true,
     DEF: [
       { ALT: () => $.SUBRULE($.myRule) },
-      { ALT: () => $.SUBRULE($.myOtherRule) }
-    ]
-  })
+      { ALT: () => $.SUBRULE($.myOtherRule) },
+    ],
+  });
   ```
 
 - Ignoring ambiguities related to a **specific alternative** of an alternation:
@@ -197,8 +197,8 @@ For example:
   ```javascript
   $.OR([
     { ALT: () => $.SUBRULE($.myRule), IGNORE_AMBIGUITIES: true },
-    { ALT: () => $.SUBRULE($.myOtherRule) }
-  ])
+    { ALT: () => $.SUBRULE($.myOtherRule) },
+  ]);
   ```
 
 [maxlookahead]: https://chevrotain.io/documentation/10_5_0/interfaces/IParserConfig.html#maxLookAhead

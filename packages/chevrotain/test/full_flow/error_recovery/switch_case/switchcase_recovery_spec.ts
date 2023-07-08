@@ -10,21 +10,21 @@ import {
   RParenTok,
   SemiColonTok,
   StringTok,
-  SwitchTok
-} from "./switchcase_recovery_tokens.js"
-import { SwitchCaseRecoveryParser } from "./switchcase_recovery_parser.js"
+  SwitchTok,
+} from "./switchcase_recovery_tokens.js";
+import { SwitchCaseRecoveryParser } from "./switchcase_recovery_parser.js";
 import {
   EarlyExitException,
-  MismatchedTokenException
-} from "../../../../src/parse/exceptions_public.js"
-import { createRegularToken } from "../../../utils/matchers.js"
-import { expect } from "chai"
+  MismatchedTokenException,
+} from "../../../../src/parse/exceptions_public.js";
+import { createRegularToken } from "../../../utils/matchers.js";
+import { expect } from "chai";
 
 describe("Error Recovery switch-case Example", () => {
   before(() => {
     // called for side effect of augmenting
-    new SwitchCaseRecoveryParser([])
-  })
+    new SwitchCaseRecoveryParser([]);
+  });
 
   it("can parse a valid text successfully", () => {
     const input = [
@@ -55,21 +55,21 @@ describe("Error Recovery switch-case Example", () => {
       createRegularToken(ReturnTok),
       createRegularToken(IntTok, "6"),
       createRegularToken(SemiColonTok),
-      createRegularToken(RCurlyTok)
-    ]
+      createRegularToken(RCurlyTok),
+    ];
 
-    const parser = new SwitchCaseRecoveryParser()
-    parser.input = input
+    const parser = new SwitchCaseRecoveryParser();
+    parser.input = input;
 
-    const parseResult = parser.switchStmt()
-    expect(parser.errors.length).to.equal(0)
+    const parseResult = parser.switchStmt();
+    expect(parser.errors.length).to.equal(0);
 
     expect(parseResult).to.deep.equal({
       Terry: 2,
       Robert: 4,
-      Brandon: 6
-    })
-  })
+      Brandon: 6,
+    });
+  });
 
   it("can perform re-sync recovery to the next case stmt", () => {
     const input = [
@@ -102,27 +102,27 @@ describe("Error Recovery switch-case Example", () => {
       createRegularToken(ReturnTok),
       createRegularToken(IntTok, "6"),
       createRegularToken(SemiColonTok),
-      createRegularToken(RCurlyTok)
-    ]
+      createRegularToken(RCurlyTok),
+    ];
 
-    const parser = new SwitchCaseRecoveryParser()
-    parser.input = input
+    const parser = new SwitchCaseRecoveryParser();
+    parser.input = input;
 
-    const parseResult = parser.switchStmt()
+    const parseResult = parser.switchStmt();
 
     expect(parseResult).to.deep.equal({
       Terry: 2,
       invalid1: undefined,
-      Brandon: 6
-    })
+      Brandon: 6,
+    });
 
-    expect(parser.errors.length).to.equal(1)
-    expect(parser.errors[0].resyncedTokens).to.have.lengthOf(4)
-    expect(parser.errors[0].resyncedTokens[0].image).to.equal(":")
-    expect(parser.errors[0].resyncedTokens[1].image).to.equal("return")
-    expect(parser.errors[0].resyncedTokens[2].image).to.equal("4")
-    expect(parser.errors[0].resyncedTokens[3].image).to.equal(";")
-  })
+    expect(parser.errors.length).to.equal(1);
+    expect(parser.errors[0].resyncedTokens).to.have.lengthOf(4);
+    expect(parser.errors[0].resyncedTokens[0].image).to.equal(":");
+    expect(parser.errors[0].resyncedTokens[1].image).to.equal("return");
+    expect(parser.errors[0].resyncedTokens[2].image).to.equal("4");
+    expect(parser.errors[0].resyncedTokens[3].image).to.equal(";");
+  });
 
   it("will detect an error if missing AT_LEAST_ONCE occurrence", () => {
     const input = [
@@ -132,17 +132,17 @@ describe("Error Recovery switch-case Example", () => {
       createRegularToken(IdentTok, "name"),
       createRegularToken(RParenTok),
       createRegularToken(LCurlyTok),
-      createRegularToken(RCurlyTok)
-    ]
+      createRegularToken(RCurlyTok),
+    ];
 
-    const parser = new SwitchCaseRecoveryParser()
-    parser.input = input
+    const parser = new SwitchCaseRecoveryParser();
+    parser.input = input;
 
-    const parseResult = parser.switchStmt()
-    expect(parser.errors.length).to.equal(1)
-    expect(parser.errors[0]).to.be.an.instanceof(EarlyExitException)
-    expect(parseResult).to.deep.equal({})
-  })
+    const parseResult = parser.switchStmt();
+    expect(parser.errors.length).to.equal(1);
+    expect(parser.errors[0]).to.be.an.instanceof(EarlyExitException);
+    expect(parseResult).to.deep.equal({});
+  });
 
   it("can perform re-sync recovery to the next case stmt even if the unexpected tokens are between valid case stmts", () => {
     const input = [
@@ -179,21 +179,21 @@ describe("Error Recovery switch-case Example", () => {
       createRegularToken(IntTok, "6"),
       createRegularToken(SemiColonTok),
 
-      createRegularToken(RCurlyTok)
-    ]
+      createRegularToken(RCurlyTok),
+    ];
 
-    const parser = new SwitchCaseRecoveryParser()
-    parser.input = input
+    const parser = new SwitchCaseRecoveryParser();
+    parser.input = input;
 
-    const parseResult = parser.switchStmt()
-    expect(parser.errors.length).to.equal(1)
+    const parseResult = parser.switchStmt();
+    expect(parser.errors.length).to.equal(1);
 
     expect(parseResult).to.deep.equal({
       Terry: 2,
       Robert: 4,
-      Brandon: 6
-    })
-  })
+      Brandon: 6,
+    });
+  });
 
   it("can perform re-sync recovery to the right curly after the case statements repetition", () => {
     const input = [
@@ -227,26 +227,26 @@ describe("Error Recovery switch-case Example", () => {
       createRegularToken(StringTok, "ima"),
       createRegularToken(StringTok, "aba"),
       createRegularToken(StringTok, "bamba"),
-      createRegularToken(RCurlyTok)
-    ]
+      createRegularToken(RCurlyTok),
+    ];
 
-    const parser = new SwitchCaseRecoveryParser()
-    parser.input = input
+    const parser = new SwitchCaseRecoveryParser();
+    parser.input = input;
 
-    const parseResult = parser.switchStmt()
-    expect(parser.errors.length).to.equal(1)
+    const parseResult = parser.switchStmt();
+    expect(parser.errors.length).to.equal(1);
     expect(parseResult).to.deep.equal({
       Terry: 2,
       Robert: 4,
-      Brandon: 6
-    })
+      Brandon: 6,
+    });
 
-    expect(parser.errors.length).to.equal(1)
-    expect(parser.errors[0].resyncedTokens).to.have.lengthOf(2)
-    expect(parser.errors[0].token.image).to.equal("ima")
-    expect(parser.errors[0].resyncedTokens[0].image).to.equal("aba")
-    expect(parser.errors[0].resyncedTokens[1].image).to.equal("bamba")
-  })
+    expect(parser.errors.length).to.equal(1);
+    expect(parser.errors[0].resyncedTokens).to.have.lengthOf(2);
+    expect(parser.errors[0].token.image).to.equal("ima");
+    expect(parser.errors[0].resyncedTokens[0].image).to.equal("aba");
+    expect(parser.errors[0].resyncedTokens[1].image).to.equal("bamba");
+  });
 
   it("can perform single token deletion recovery", () => {
     const input = [
@@ -264,16 +264,16 @@ describe("Error Recovery switch-case Example", () => {
       createRegularToken(ReturnTok),
       createRegularToken(IntTok, "2"),
       createRegularToken(SemiColonTok),
-      createRegularToken(RCurlyTok)
-    ]
+      createRegularToken(RCurlyTok),
+    ];
 
-    const parser = new SwitchCaseRecoveryParser()
-    parser.input = input
+    const parser = new SwitchCaseRecoveryParser();
+    parser.input = input;
 
-    const parseResult = parser.switchStmt()
-    expect(parser.errors.length).to.equal(1)
-    expect(parseResult).to.deep.equal({ Terry: 2 })
-  })
+    const parseResult = parser.switchStmt();
+    expect(parser.errors.length).to.equal(1);
+    expect(parseResult).to.deep.equal({ Terry: 2 });
+  });
 
   it("can disable single token deletion recovery", () => {
     const input = [
@@ -291,20 +291,20 @@ describe("Error Recovery switch-case Example", () => {
       createRegularToken(ReturnTok),
       createRegularToken(IntTok, "2"),
       createRegularToken(SemiColonTok),
-      createRegularToken(RCurlyTok)
-    ]
+      createRegularToken(RCurlyTok),
+    ];
 
-    const parser = new SwitchCaseRecoveryParser()
-    parser.input = input
+    const parser = new SwitchCaseRecoveryParser();
+    parser.input = input;
 
     // disable the single token deletion recovery explicitly
-    parser.singleTokenDeletionEnabled = false
+    parser.singleTokenDeletionEnabled = false;
 
-    const parseResult = parser.switchStmt()
-    expect(parser.errors.length).to.equal(1)
-    expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException)
-    expect(parseResult).to.deep.equal({ invalid1: undefined })
-  })
+    const parseResult = parser.switchStmt();
+    expect(parser.errors.length).to.equal(1);
+    expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException);
+    expect(parseResult).to.deep.equal({ invalid1: undefined });
+  });
 
   it("will perform single token insertion for a missing colon", () => {
     const input = [
@@ -313,17 +313,17 @@ describe("Error Recovery switch-case Example", () => {
       createRegularToken(StringTok, "Terry"),
       /* createRegularToken(ColonTok) ,*/ createRegularToken(ReturnTok),
       createRegularToken(IntTok, "2"),
-      createRegularToken(SemiColonTok)
-    ]
+      createRegularToken(SemiColonTok),
+    ];
 
-    const parser = new SwitchCaseRecoveryParser()
-    parser.input = input
+    const parser = new SwitchCaseRecoveryParser();
+    parser.input = input;
 
-    const parseResult = parser.caseStmt()
-    expect(parser.errors.length).to.equal(1)
-    expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException)
-    expect(parseResult).to.deep.equal({ Terry: 2 })
-  })
+    const parseResult = parser.caseStmt();
+    expect(parser.errors.length).to.equal(1);
+    expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException);
+    expect(parseResult).to.deep.equal({ Terry: 2 });
+  });
 
   it("will NOT perform single token insertion for a missing string", () => {
     const input = [
@@ -332,15 +332,15 @@ describe("Error Recovery switch-case Example", () => {
       /* new StringTok("Terry" , 0, 1, 1),*/ createRegularToken(ColonTok),
       createRegularToken(ReturnTok),
       createRegularToken(IntTok, "2"),
-      createRegularToken(SemiColonTok)
-    ]
+      createRegularToken(SemiColonTok),
+    ];
 
-    const parser = new SwitchCaseRecoveryParser()
-    parser.input = input
+    const parser = new SwitchCaseRecoveryParser();
+    parser.input = input;
 
-    const parseResult = parser.caseStmt()
-    expect(parser.errors.length).to.equal(1)
-    expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException)
-    expect(parseResult).to.deep.equal({ invalid1: undefined })
-  })
-})
+    const parseResult = parser.caseStmt();
+    expect(parser.errors.length).to.equal(1);
+    expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException);
+    expect(parseResult).to.deep.equal({ invalid1: undefined });
+  });
+});

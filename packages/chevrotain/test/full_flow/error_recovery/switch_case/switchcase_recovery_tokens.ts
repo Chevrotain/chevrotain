@@ -1,13 +1,13 @@
 export class IdentTok {
-  static PATTERN = /NA/
+  static PATTERN = /NA/;
 }
 export class LiteralTok {
-  static PATTERN = /NA/
+  static PATTERN = /NA/;
 }
 export class IntTok extends LiteralTok {}
 export class StringTok extends LiteralTok {}
 export class Keyword {
-  static PATTERN = /NA/
+  static PATTERN = /NA/;
 }
 
 export class SwitchTok extends Keyword {}
@@ -17,27 +17,27 @@ export class CaseTok extends Keyword {}
 export class ReturnTok extends Keyword {}
 
 export class LParenTok {
-  static PATTERN = /NA/
+  static PATTERN = /NA/;
 }
 
 export class RParenTok {
-  static PATTERN = /NA/
+  static PATTERN = /NA/;
 }
 
 export class LCurlyTok {
-  static PATTERN = /NA/
+  static PATTERN = /NA/;
 }
 
 export class RCurlyTok {
-  static PATTERN = /NA/
+  static PATTERN = /NA/;
 }
 
 export class ColonTok {
-  static PATTERN = /NA/
+  static PATTERN = /NA/;
 }
 
 export class SemiColonTok {
-  static PATTERN = /NA/
+  static PATTERN = /NA/;
 }
 
 // to force some branches for coverage

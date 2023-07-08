@@ -1,28 +1,28 @@
-import { CstParser, Lexer, createToken } from "chevrotain"
+import { CstParser, Lexer, createToken } from "chevrotain";
 
 // ----------------- lexer -----------------
-const True = createToken({ name: "True", pattern: /true/ })
-const False = createToken({ name: "False", pattern: /false/ })
-const Null = createToken({ name: "Null", pattern: /null/ })
-const LCurly = createToken({ name: "LCurly", pattern: /{/ })
-const RCurly = createToken({ name: "RCurly", pattern: /}/ })
-const LSquare = createToken({ name: "LSquare", pattern: /\[/ })
-const RSquare = createToken({ name: "RSquare", pattern: /]/ })
-const Comma = createToken({ name: "Comma", pattern: /,/ })
-const Colon = createToken({ name: "Colon", pattern: /:/ })
+const True = createToken({ name: "True", pattern: /true/ });
+const False = createToken({ name: "False", pattern: /false/ });
+const Null = createToken({ name: "Null", pattern: /null/ });
+const LCurly = createToken({ name: "LCurly", pattern: /{/ });
+const RCurly = createToken({ name: "RCurly", pattern: /}/ });
+const LSquare = createToken({ name: "LSquare", pattern: /\[/ });
+const RSquare = createToken({ name: "RSquare", pattern: /]/ });
+const Comma = createToken({ name: "Comma", pattern: /,/ });
+const Colon = createToken({ name: "Colon", pattern: /:/ });
 const StringLiteral = createToken({
   name: "StringLiteral",
-  pattern: /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
-})
+  pattern: /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/,
+});
 const NumberLiteral = createToken({
   name: "NumberLiteral",
-  pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
-})
+  pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/,
+});
 const WhiteSpace = createToken({
   name: "WhiteSpace",
   pattern: /[ \t\n\r]+/,
-  group: Lexer.SKIPPED
-})
+  group: Lexer.SKIPPED,
+});
 
 export const jsonTokens = [
   WhiteSpace,
@@ -36,10 +36,10 @@ export const jsonTokens = [
   Colon,
   True,
   False,
-  Null
-]
+  Null,
+];
 
-const JsonLexer = new Lexer(jsonTokens)
+const JsonLexer = new Lexer(jsonTokens);
 
 // ----------------- parser -----------------
 export class JsonParser extends CstParser {
@@ -48,48 +48,48 @@ export class JsonParser extends CstParser {
   // invoking RULE(...)
   // see: https://github.com/jeffmo/es-class-fields-and-static-properties
   constructor() {
-    super(jsonTokens)
+    super(jsonTokens);
 
     // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
-    const $ = this
+    const $ = this;
 
     // the parsing methods
     $.RULE("json", () => {
       $.OR([
         { ALT: () => $.SUBRULE($.object) },
-        { ALT: () => $.SUBRULE($.array) }
-      ])
-    })
+        { ALT: () => $.SUBRULE($.array) },
+      ]);
+    });
 
     $.RULE("object", () => {
-      $.CONSUME(LCurly)
+      $.CONSUME(LCurly);
       $.OPTION(() => {
-        $.SUBRULE($.objectItem)
+        $.SUBRULE($.objectItem);
         $.MANY(() => {
-          $.CONSUME(Comma)
-          $.SUBRULE2($.objectItem)
-        })
-      })
-      $.CONSUME(RCurly)
-    })
+          $.CONSUME(Comma);
+          $.SUBRULE2($.objectItem);
+        });
+      });
+      $.CONSUME(RCurly);
+    });
 
     $.RULE("objectItem", () => {
-      $.CONSUME(StringLiteral)
-      $.CONSUME(Colon)
-      $.SUBRULE($.value)
-    })
+      $.CONSUME(StringLiteral);
+      $.CONSUME(Colon);
+      $.SUBRULE($.value);
+    });
 
     $.RULE("array", () => {
-      $.CONSUME(LSquare)
+      $.CONSUME(LSquare);
       $.OPTION(() => {
-        $.SUBRULE($.value)
+        $.SUBRULE($.value);
         $.MANY(() => {
-          $.CONSUME(Comma)
-          $.SUBRULE2($.value)
-        })
-      })
-      $.CONSUME(RSquare)
-    })
+          $.CONSUME(Comma);
+          $.SUBRULE2($.value);
+        });
+      });
+      $.CONSUME(RSquare);
+    });
 
     $.RULE("value", () => {
       $.OR([
@@ -99,32 +99,32 @@ export class JsonParser extends CstParser {
         { ALT: () => $.SUBRULE($.array) },
         { ALT: () => $.CONSUME(True) },
         { ALT: () => $.CONSUME(False) },
-        { ALT: () => $.CONSUME(Null) }
-      ])
-    })
+        { ALT: () => $.CONSUME(Null) },
+      ]);
+    });
 
     // very important to call this after all the rules have been defined.
     // otherwise the parser may not work correctly as it will lack information
     // derived during the self analysis phase.
-    this.performSelfAnalysis()
+    this.performSelfAnalysis();
   }
 }
 
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-const parser = new JsonParser()
+const parser = new JsonParser();
 
 export function parse(text) {
-  const lexResult = JsonLexer.tokenize(text)
+  const lexResult = JsonLexer.tokenize(text);
   // setting a new input will RESET the parser instance's state.
-  parser.input = lexResult.tokens
+  parser.input = lexResult.tokens;
   // any top level rule may be used as an entry point
-  const cst = parser.json()
+  const cst = parser.json();
 
   return {
     cst: cst,
     lexErrors: lexResult.errors,
-    parseErrors: parser.errors
-  }
+    parseErrors: parser.errors,
+  };
 }

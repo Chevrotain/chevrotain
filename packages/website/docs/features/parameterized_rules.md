@@ -9,11 +9,11 @@ For example:
 
 ```javascript
 $.RULE("ArgumentInConst", () => {
-  $.CONSUME(Name)
-  $.CONSUME(Colon)
+  $.CONSUME(Name);
+  $.CONSUME(Colon);
   // passing the argument using the "ARGS" property
-  $.SUBRULE($.Value, { ARGS: [true] })
-})
+  $.SUBRULE($.Value, { ARGS: [true] });
+});
 
 // isConst is a parameter passed from another rule.
 $.RULE("Value", (isConst) => {
@@ -22,9 +22,9 @@ $.RULE("Value", (isConst) => {
     { GATE: () => !isConst, ALT: () => $.SUBRULE($.Variable) },
     { ALT: () => $.CONSUME(IntValue) },
     { ALT: () => $.CONSUME(FloatValue) },
-    { ALT: () => $.CONSUME(StringValue) }
-  ])
-})
+    { ALT: () => $.CONSUME(StringValue) },
+  ]);
+});
 ```
 
 See [executable example](https://github.com/chevrotain/chevrotain/tree/master/examples/parser/parametrized_rules)

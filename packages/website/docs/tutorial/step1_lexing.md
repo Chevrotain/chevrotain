@@ -23,9 +23,9 @@ To use the Chevrotain lexer the Tokens must first be defined.
 Lets examine the definition for a "FROM" Token:
 
 ```javascript
-const createToken = chevrotain.createToken
+const createToken = chevrotain.createToken;
 // using createToken API
-const From = createToken({ name: "From", pattern: /FROM/ })
+const From = createToken({ name: "From", pattern: /FROM/ });
 ```
 
 There is nothing much to it. We simply use the [**createToken** API](https://chevrotain.io/documentation/10_5_0/modules.html#createToken)
@@ -37,9 +37,9 @@ into separate Tokens.
 How can we define Tokens for Identifiers or Integers?
 
 ```javascript
-const Identifier = createToken({ name: "Identifier", pattern: /[a-zA-Z]\w*/ })
+const Identifier = createToken({ name: "Identifier", pattern: /[a-zA-Z]\w*/ });
 
-const Integer = createToken({ name: "Integer", pattern: /0|[1-9]\d*/ })
+const Integer = createToken({ name: "Integer", pattern: /0|[1-9]\d*/ });
 ```
 
 ## Skipping Tokens
@@ -51,8 +51,8 @@ accomplished by marking them with the SKIP group.
 const WhiteSpace = createToken({
   name: "WhiteSpace",
   pattern: /\s+/,
-  group: chevrotain.Lexer.SKIPPED
-})
+  group: chevrotain.Lexer.SKIPPED,
+});
 ```
 
 ## All Our Tokens
@@ -60,38 +60,38 @@ const WhiteSpace = createToken({
 Lets examine all the needed Tokens definitions:
 
 ```javascript
-const Identifier = createToken({ name: "Identifier", pattern: /[a-zA-Z]\w*/ })
+const Identifier = createToken({ name: "Identifier", pattern: /[a-zA-Z]\w*/ });
 // We specify the "longer_alt" property to resolve keywords vs identifiers ambiguity.
 // See: https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js
 const Select = createToken({
   name: "Select",
   pattern: /SELECT/,
-  longer_alt: Identifier
-})
+  longer_alt: Identifier,
+});
 const From = createToken({
   name: "From",
   pattern: /FROM/,
-  longer_alt: Identifier
-})
+  longer_alt: Identifier,
+});
 const Where = createToken({
   name: "Where",
   pattern: /WHERE/,
-  longer_alt: Identifier
-})
+  longer_alt: Identifier,
+});
 
-const Comma = createToken({ name: "Comma", pattern: /,/ })
+const Comma = createToken({ name: "Comma", pattern: /,/ });
 
-const Integer = createToken({ name: "Integer", pattern: /0|[1-9]\d*/ })
+const Integer = createToken({ name: "Integer", pattern: /0|[1-9]\d*/ });
 
-const GreaterThan = createToken({ name: "GreaterThan", pattern: />/ })
+const GreaterThan = createToken({ name: "GreaterThan", pattern: />/ });
 
-const LessThan = createToken({ name: "LessThan", pattern: /</ })
+const LessThan = createToken({ name: "LessThan", pattern: /</ });
 
 const WhiteSpace = createToken({
   name: "WhiteSpace",
   pattern: /\s+/,
-  group: chevrotain.Lexer.SKIPPED
-})
+  group: chevrotain.Lexer.SKIPPED,
+});
 ```
 
 ## Creating The Lexer
@@ -111,9 +111,9 @@ let allTokens = [
   Identifier,
   Integer,
   GreaterThan,
-  LessThan
-]
-let SelectLexer = new Lexer(allTokens)
+  LessThan,
+];
+let SelectLexer = new Lexer(allTokens);
 ```
 
 Note that:
@@ -134,8 +134,8 @@ Note that:
 ## Using The Lexer
 
 ```javascript
-let inputText = "SELECT column1 FROM table2"
-let lexingResult = SelectLexer.tokenize(inputText)
+let inputText = "SELECT column1 FROM table2";
+let lexingResult = SelectLexer.tokenize(inputText);
 ```
 
 The Lexing Result will contain:

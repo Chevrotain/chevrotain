@@ -10,25 +10,25 @@
  * Note that it is mandatory to enable the "dynamicTokensEnabled" config property for this capability to work.
  * Otherwise certain performance optimizations may break as those assume that the Token vocabulary is static.
  */
-import { createToken, Lexer, EmbeddedActionsParser } from "chevrotain"
+import { createToken, Lexer, EmbeddedActionsParser } from "chevrotain";
 
 // ----------------- lexer -----------------
-const LSquare = createToken({ name: "LSquare", pattern: /\[/ })
-const RSquare = createToken({ name: "RSquare", pattern: /]/ })
+const LSquare = createToken({ name: "LSquare", pattern: /\[/ });
+const RSquare = createToken({ name: "RSquare", pattern: /]/ });
 
 // base delimiter TokenTypes
-const BaseDelimiter = createToken({ name: "BaseDelimiter", pattern: Lexer.NA })
+const BaseDelimiter = createToken({ name: "BaseDelimiter", pattern: Lexer.NA });
 const Comma = createToken({
   name: "Comma",
   pattern: /,/,
-  categories: BaseDelimiter
-})
-const NumberLiteral = createToken({ name: "NumberLiteral", pattern: /\d+/ })
+  categories: BaseDelimiter,
+});
+const NumberLiteral = createToken({ name: "NumberLiteral", pattern: /\d+/ });
 const WhiteSpace = createToken({
   name: "WhiteSpace",
   pattern: /\s+/,
-  group: Lexer.SKIPPED
-})
+  group: Lexer.SKIPPED,
+});
 
 const allTokens = [
   WhiteSpace,
@@ -36,8 +36,8 @@ const allTokens = [
   RSquare,
   BaseDelimiter,
   Comma,
-  NumberLiteral
-]
+  NumberLiteral,
+];
 
 // ----------------- parser -----------------
 class DynamicDelimiterParser extends EmbeddedActionsParser {
@@ -47,67 +47,67 @@ class DynamicDelimiterParser extends EmbeddedActionsParser {
       // use this flag to enable them
       recoveryEnabled: true,
       // IMPORTANT: must be enabled to support dynamically defined Tokens
-      dynamicTokensEnabled: true
-    })
+      dynamicTokensEnabled: true,
+    });
 
     // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
-    const $ = this
+    const $ = this;
 
     this.RULE("array", () => {
-      let result = ""
+      let result = "";
 
-      $.CONSUME(LSquare) // This will match any Token Class which extends BaseLeftDelimiter
+      $.CONSUME(LSquare); // This will match any Token Class which extends BaseLeftDelimiter
       $.OPTION(() => {
-        result += $.CONSUME(NumberLiteral).image
+        result += $.CONSUME(NumberLiteral).image;
         $.MANY(() => {
-          $.CONSUME(BaseDelimiter)
-          result += $.CONSUME2(NumberLiteral).image
-        })
-      })
-      $.CONSUME(RSquare) // This will match any Token Class which extends BaseRightDelimiter
+          $.CONSUME(BaseDelimiter);
+          result += $.CONSUME2(NumberLiteral).image;
+        });
+      });
+      $.CONSUME(RSquare); // This will match any Token Class which extends BaseRightDelimiter
 
-      return result
-    })
+      return result;
+    });
 
     // very important to call this after all the rules have been defined.
     // otherwise, the parser may not work correctly as it will lack information
     // derived during the self-analysis phase.
-    this.performSelfAnalysis()
+    this.performSelfAnalysis();
   }
 }
 
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-const parser = new DynamicDelimiterParser()
+const parser = new DynamicDelimiterParser();
 
 export function parse(text, dynamicDelimiterRegExp) {
   // make this parameter optional
   if (dynamicDelimiterRegExp === undefined) {
-    dynamicDelimiterRegExp = Lexer.NA
+    dynamicDelimiterRegExp = Lexer.NA;
   }
 
   // dynamically create Token classes which extend the BaseXXXDelimiters
   const dynamicDelimiter = createToken({
     name: "dynamicDelimiter",
     pattern: dynamicDelimiterRegExp,
-    categories: BaseDelimiter
-  })
+    categories: BaseDelimiter,
+  });
 
   // dynamically create a Lexer which can Lex all our language including the dynamic delimiters.
-  const dynamicDelimiterLexer = new Lexer(allTokens.concat([dynamicDelimiter]))
+  const dynamicDelimiterLexer = new Lexer(allTokens.concat([dynamicDelimiter]));
 
   // lex
-  const lexResult = dynamicDelimiterLexer.tokenize(text)
+  const lexResult = dynamicDelimiterLexer.tokenize(text);
 
   // setting the input will reset the parser's state
-  parser.input = lexResult.tokens
+  parser.input = lexResult.tokens;
   // parse
-  const value = parser.array()
+  const value = parser.array();
 
   return {
     value: value,
     lexErrors: lexResult.errors,
-    parseErrors: parser.errors
-  }
+    parseErrors: parser.errors,
+  };
 }

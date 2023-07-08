@@ -8,23 +8,23 @@ const options = {
     bundle: "../../lib/chevrotain.js",
     parserConfig: {
       maxLookahead: 2,
-      outputCst: false
-    }
+      outputCst: false,
+    },
   },
   current: {
     // bundle: "../chevrotain.js",
     bundle: "https://unpkg.com/chevrotain/lib/chevrotain.js",
     parserConfig: {
       maxLookahead: 2,
-      outputCst: false
-    }
-  }
-}
+      outputCst: false,
+    },
+  },
+};
 
 // pick correct options depending on mode
-const queryString = window.location.search
-const urlParams = new URLSearchParams(queryString)
-const mode = urlParams.get("mode")
-self.globalOptions = options[mode]
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+const mode = urlParams.get("mode");
+self.globalOptions = options[mode];
 
-console.log(JSON.stringify(self.globalOptions, null, "\t"))
+console.log(JSON.stringify(self.globalOptions, null, "\t"));

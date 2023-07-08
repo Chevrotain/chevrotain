@@ -32,27 +32,27 @@ To resolve this choose one of the following:
 1.  Disable the line and column position tracking using the [positionTracking][position_tracking] configuration option.
 
     ```javascript
-    const myTokens = [IntegerLiteral, StringLiteral, WhiteSpace /*, ... */]
+    const myTokens = [IntegerLiteral, StringLiteral, WhiteSpace /*, ... */];
     const myLexer = new chevrotain.Lexer([myTokens], {
-      positionTracking: "onlyOffset"
-    })
+      positionTracking: "onlyOffset",
+    });
     ```
 
 2.  Mark the Tokens which may include a line terminator with an explicit line_breaks flag.
 
     ```javascript
-    const createToken = chevrotain.createToken
+    const createToken = chevrotain.createToken;
 
     const Whitespace = createToken({
       name: "Whitespace",
       pattern: /\s+/,
       // This is normally computed automatically...
-      line_breaks: true
-    })
+      line_breaks: true,
+    });
 
-    const myTokens = [IntegerLiteral, StringLiteral, WhiteSpace /*, ... */]
+    const myTokens = [IntegerLiteral, StringLiteral, WhiteSpace /*, ... */];
 
-    const myLexer = new chevrotain.Lexer([myTokens])
+    const myLexer = new chevrotain.Lexer([myTokens]);
     ```
 
     - Note that the definition of what constitutes a line terminator is controlled by the
@@ -75,13 +75,13 @@ To resolve this warning, **explicitly** specify the line_breaks option in the of
 const MyToken = createToken({
   name: "MyToken",
   pattern: /abc/,
-  line_breaks: false
-})
+  line_breaks: false,
+});
 const MultiLineStringLiteral = createToken({
   name: "MultiLineStringLiteral",
   pattern: /`[^`]*`/,
-  line_breaks: true
-})
+  line_breaks: true,
+});
 ```
 
 Also please open an issue in the [regexp-to-ast library][regexp_to_ast]
@@ -98,13 +98,13 @@ a TokenType:
 const MyCustomToken = createToken({
   name: "MyCustomToken",
   pattern: { exec: matchFunction },
-  line_breaks: false
-})
+  line_breaks: false,
+});
 const MyCustomMultiLineToken = createToken({
   name: "MyCustomMultiLineToken",
   pattern: { exec: matchFunction2 },
-  line_breaks: true
-})
+  line_breaks: true,
+});
 ```
 
 This is only a **warning** which will cause a small performance
@@ -134,8 +134,8 @@ const Integer = createToken({
   // by explicitly providing the first possible characters of this pattern
   // the analysis by the regexp-to-ast library will be skipped
   // and the optimization can be enabled.
-  start_chars_hint: ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
-})
+  start_chars_hint: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
+});
 ```
 
 ## The regexp unicode flag is not currently supported by the regexp-to-ast library
@@ -159,8 +159,8 @@ createToken({
   pattern: /\u{1F4A9}/u,
   // The '💩' character is represented by surrogate pairs: '\uD83D\uDCA9'
   // the start_chars_hint should only be provided the first of the pair.
-  start_chars_hint: [55357]
-})
+  start_chars_hint: [55357],
+});
 ```
 
 Another way to **work around** the issue is to define the pattern as a string literal.
@@ -172,8 +172,8 @@ For example:
 createToken({
   name: "LCurley",
   // note that the pattern is a string literal, not a regExp literal.
-  pattern: "{"
-})
+  pattern: "{",
+});
 ```
 
 ## Complement Sets cannot be automatically optimized
@@ -191,8 +191,8 @@ For example an XML Text is defined by **everything** except a closing tag.
 ```javascript
 const XMLText = createToken({
   name: "XMLText",
-  pattern: /[^<&]+/
-})
+  pattern: /[^<&]+/,
+});
 ```
 
 This means that there are **65533** (65535 - 2) possible starting charCodes
@@ -203,19 +203,19 @@ It is possible to enable the optimizations by explicitly providing a "[start_cha
 e.g:
 
 ```javascript
-const hints = []
+const hints = [];
 for (let i = 0; i <= 65535; i++) {
   // 38 is '<' and 60 is '&'
   if (i !== 38 || i !== 60) {
-    hints.push(i)
+    hints.push(i);
   }
 }
 
 const XMLText = createToken({
   name: "XMLText",
   pattern: /[^<&]+/,
-  start_chars_hint: hints
-})
+  start_chars_hint: hints,
+});
 ```
 
 Please Note that filling such an array can be cpu intensive.
@@ -232,8 +232,8 @@ const XMLText = createToken({
   // Note that:
   //   - "\u0026" === "&"
   //   - "\u003C" === "<"
-  pattern: /[\u0000-\u0025\u0027-\u003B\u003D-\uFFFF]+/
-})
+  pattern: /[\u0000-\u0025\u0027-\u003B\u003D-\uFFFF]+/,
+});
 ```
 
 Note that internally Chevrotain avoids creating a 16bits large data structure
@@ -246,17 +246,17 @@ so this method would be the most optimized both in terms of runtime and initiali
 A Token RegExp pattern used in a chevrotain lexer may not use the start/end of input anchors ('\$' and '^').
 
 ```javascript
-const createToken = chevrotain.createToken
+const createToken = chevrotain.createToken;
 
 // Using createToken API
 const Whitespace = createToken({
   name: "Integer",
   // invalid pattern using both anchors
-  pattern: /^\d+$/
-})
+  pattern: /^\d+$/,
+});
 
 // will throw an error
-new chevrotain.Lexer([semVer])
+new chevrotain.Lexer([semVer]);
 ```
 
 To resolve this simply avoid using anchors in your Token Types patterns.
@@ -273,18 +273,18 @@ For example:
 ```javascript
 const ForKeyword = createToken({
   name: "ForKeyword",
-  pattern: /for/
-})
+  pattern: /for/,
+});
 
 const Identifier = createToken({
   name: "Identifier",
-  pattern: /[a-zA-z]+/
-})
+  pattern: /[a-zA-z]+/,
+});
 
 // Will throw Token <ForKeyword> can never be matched...
 // Because the input "for" is also a valid identifier
 // and matching an identifier will be attempted first.
-const myLexer = new chevrotain.Lexer([Identifier, ForKeyword])
+const myLexer = new chevrotain.Lexer([Identifier, ForKeyword]);
 ```
 
 - Note that this validation is limited to simple patterns such as keywords
@@ -296,7 +296,7 @@ definition such that the more specific Token types will be listed first.
 
 ```javascript
 // Identifier is now listed as the last Token type.
-const myLexer = new chevrotain.Lexer([ForKeyword, Identifier])
+const myLexer = new chevrotain.Lexer([ForKeyword, Identifier]);
 ```
 
 Note that the solution provided above will create a new problem.
@@ -304,13 +304,13 @@ Any identifier **starting with** "for" will be lexed as **two separate** tokens,
 a ForKeyword and an identifier. For example:
 
 ```javascript
-const myLexer = new chevrotain.Lexer([ForKeyword, Identifier])
+const myLexer = new chevrotain.Lexer([ForKeyword, Identifier]);
 
 // [
 //    {image:"for"}
 //    {image:"ward"}
 // ]
-const tokensResult = myLexer.tokenize("forward")
+const tokensResult = myLexer.tokenize("forward");
 ```
 
 To resolve this second problem see how to prefer the **longest match**
@@ -333,10 +333,10 @@ const IntegerToken = createToken({
   pattern: {
     exec: (text, offset) => {
       /* ... */
-    }
+    },
   },
-  start_chars_hint: ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
-})
+  start_chars_hint: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
+});
 ```
 
 Providing the "[start_chars_hint][start_chars_hint]" property is **not** mandatory.
@@ -356,8 +356,8 @@ const myLexer = new chevrotain.Lexer([], {
   // For our lexer only "\n" is a counted as a line terminator
   lineTerminatorsPattern: /\n/,
   // Duplicate information, "\n".charCodeAt(0) === 10
-  lineTerminatorCharacters: [10]
-})
+  lineTerminatorCharacters: [10],
+});
 ```
 
 [position_tracking]: https://chevrotain.io/documentation/10_5_0/interfaces/ILexerConfig.html#positionTracking

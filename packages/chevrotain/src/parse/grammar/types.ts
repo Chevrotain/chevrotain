@@ -3,13 +3,13 @@ import {
   IProductionWithOccurrence,
   NonTerminal,
   Rule,
-  TokenType
-} from "@chevrotain/types"
+  TokenType,
+} from "@chevrotain/types";
 
 export interface IParserDefinitionError {
-  message: string
-  type: ParserDefinitionErrorType
-  ruleName?: string
+  message: string;
+  type: ParserDefinitionErrorType;
+  ruleName?: string;
 }
 
 export declare enum ParserDefinitionErrorType {
@@ -26,69 +26,72 @@ export declare enum ParserDefinitionErrorType {
   NO_NON_EMPTY_LOOKAHEAD = 10,
   AMBIGUOUS_PREFIX_ALTS = 11,
   TOO_MANY_ALTS = 12,
-  CUSTOM_LOOKAHEAD_VALIDATION = 13
+  CUSTOM_LOOKAHEAD_VALIDATION = 13,
 }
 
 export interface IGrammarValidatorErrorMessageProvider {
   buildDuplicateFoundError(
     topLevelRule: Rule,
-    duplicateProds: IProductionWithOccurrence[]
-  ): string
-  buildNamespaceConflictError(topLevelRule: Rule): string
+    duplicateProds: IProductionWithOccurrence[],
+  ): string;
+  buildNamespaceConflictError(topLevelRule: Rule): string;
   buildAlternationPrefixAmbiguityError(options: {
-    topLevelRule: Rule
-    prefixPath: TokenType[]
-    ambiguityIndices: number[]
-    alternation: Alternation
-  }): string
+    topLevelRule: Rule;
+    prefixPath: TokenType[];
+    ambiguityIndices: number[];
+    alternation: Alternation;
+  }): string;
   buildAlternationAmbiguityError(options: {
-    topLevelRule: Rule
-    prefixPath: TokenType[]
-    ambiguityIndices: number[]
-    alternation: Alternation
-  }): string
+    topLevelRule: Rule;
+    prefixPath: TokenType[];
+    ambiguityIndices: number[];
+    alternation: Alternation;
+  }): string;
   buildEmptyRepetitionError(options: {
-    topLevelRule: Rule
-    repetition: IProductionWithOccurrence
-  }): string
+    topLevelRule: Rule;
+    repetition: IProductionWithOccurrence;
+  }): string;
   /**
    * @deprecated - There are no longer constraints on Token names
    *               This method will be removed from the interface in future versions.
    *               Providing it will currently have no impact on the runtime.
    */
   buildTokenNameError(options: {
-    tokenType: TokenType
-    expectedPattern: RegExp
-  }): any
+    tokenType: TokenType;
+    expectedPattern: RegExp;
+  }): any;
 
   buildEmptyAlternationError(options: {
-    topLevelRule: Rule
-    alternation: Alternation
-    emptyChoiceIdx: number
-  }): any
+    topLevelRule: Rule;
+    alternation: Alternation;
+    emptyChoiceIdx: number;
+  }): any;
   buildTooManyAlternativesError(options: {
-    topLevelRule: Rule
-    alternation: Alternation
-  }): string
+    topLevelRule: Rule;
+    alternation: Alternation;
+  }): string;
   buildLeftRecursionError(options: {
-    topLevelRule: Rule
-    leftRecursionPath: Rule[]
-  }): string
+    topLevelRule: Rule;
+    leftRecursionPath: Rule[];
+  }): string;
   /**
    * @deprecated - There are no longer constraints on Rule names
    *               This method will be removed from the interface in future versions.
    *               Providing it will currently have no impact on the runtime.
    */
   buildInvalidRuleNameError(options: {
-    topLevelRule: Rule
-    expectedPattern: RegExp
-  }): string
+    topLevelRule: Rule;
+    expectedPattern: RegExp;
+  }): string;
   buildDuplicateRuleNameError(options: {
-    topLevelRule: Rule | string
-    grammarName: string
-  }): string
+    topLevelRule: Rule | string;
+    grammarName: string;
+  }): string;
 }
 
 export interface IGrammarResolverErrorMessageProvider {
-  buildRuleNotFoundError(topLevelRule: Rule, undefinedRule: NonTerminal): string
+  buildRuleNotFoundError(
+    topLevelRule: Rule,
+    undefinedRule: NonTerminal,
+  ): string;
 }

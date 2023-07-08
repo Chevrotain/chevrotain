@@ -1,28 +1,28 @@
-import { createToken, CstParser } from "chevrotain"
+import { createToken, CstParser } from "chevrotain";
 
 const Token1 = createToken({
   name: "Token1",
-  pattern: /TOKEN1/
-})
+  pattern: /TOKEN1/,
+});
 
 const Token2 = createToken({
   name: "Token2",
-  pattern: /TOKEN2/
-})
+  pattern: /TOKEN2/,
+});
 
 class TestParser extends CstParser {
   constructor() {
-    super([Token1, Token2])
+    super([Token1, Token2]);
 
-    this.performSelfAnalysis()
+    this.performSelfAnalysis();
   }
 
   testRule = this.RULE("testRule", () => {
     this.AT_LEAST_ONE(() => {
-      this.CONSUME(Token1)
-      this.CONSUME(Token2)
-    })
-  })
+      this.CONSUME(Token1);
+      this.CONSUME(Token2);
+    });
+  });
 }
 
-export const parser = new TestParser()
+export const parser = new TestParser();

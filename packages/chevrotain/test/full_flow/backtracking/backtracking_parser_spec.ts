@@ -1,5 +1,5 @@
-import { expect } from "chai"
-import { IToken } from "@chevrotain/types"
+import { expect } from "chai";
+import { IToken } from "@chevrotain/types";
 import {
   BackTrackingParser,
   ColonTok,
@@ -10,16 +10,16 @@ import {
   IdentTok,
   NumberTok,
   RET_TYPE,
-  SemiColonTok
-} from "./backtracking_parser.js"
-import { flatten } from "lodash-es"
-import { createRegularToken } from "../../utils/matchers.js"
+  SemiColonTok,
+} from "./backtracking_parser.js";
+import { flatten } from "lodash-es";
+import { createRegularToken } from "../../utils/matchers.js";
 
 describe("Simple backtracking example", () => {
-  let largeFqnTokenVector: IToken[]
+  let largeFqnTokenVector: IToken[];
   before(() => {
     // for side effect of augmenting the tokens metadata
-    new BackTrackingParser()
+    new BackTrackingParser();
 
     // TODO: modify example to use the Chevrotain Lexer to increase readability
     largeFqnTokenVector = [
@@ -45,9 +45,9 @@ describe("Simple backtracking example", () => {
       createRegularToken(DotTok, "."),
       createRegularToken(IdentTok, "ns11"),
       createRegularToken(DotTok, "."),
-      createRegularToken(IdentTok, "ns12")
-    ]
-  })
+      createRegularToken(IdentTok, "ns12"),
+    ];
+  });
 
   it("can parse an element with Equals and a very long qualified name", () => {
     const input: any = flatten([
@@ -58,16 +58,16 @@ describe("Simple backtracking example", () => {
       largeFqnTokenVector,
       createRegularToken(EqualsTok, "="),
       createRegularToken(NumberTok, "666"),
-      createRegularToken(SemiColonTok, ";")
-    ])
+      createRegularToken(SemiColonTok, ";"),
+    ]);
 
-    const parser = new BackTrackingParser()
-    parser.input = input
-    const result = parser.statement()
+    const parser = new BackTrackingParser();
+    parser.input = input;
+    const result = parser.statement();
 
-    expect(parser.errors.length).to.equal(0)
-    expect(result).to.equal(RET_TYPE.WITH_EQUALS)
-  })
+    expect(parser.errors.length).to.equal(0);
+    expect(result).to.equal(RET_TYPE.WITH_EQUALS);
+  });
 
   it("can parse an element with Default and a very long qualified name", () => {
     const input: any = flatten([
@@ -78,14 +78,14 @@ describe("Simple backtracking example", () => {
       largeFqnTokenVector,
       createRegularToken(DefaultTok, "deafult"),
       createRegularToken(NumberTok, "666"),
-      createRegularToken(SemiColonTok, ";")
-    ])
+      createRegularToken(SemiColonTok, ";"),
+    ]);
 
-    const parser = new BackTrackingParser()
-    parser.input = input
-    const result = parser.statement()
+    const parser = new BackTrackingParser();
+    parser.input = input;
+    const result = parser.statement();
 
-    expect(parser.errors.length).to.equal(0)
-    expect(result).to.equal(RET_TYPE.WITH_DEFAULT)
-  })
-})
+    expect(parser.errors.length).to.equal(0);
+    expect(result).to.equal(RET_TYPE.WITH_DEFAULT);
+  });
+});

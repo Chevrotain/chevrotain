@@ -4,60 +4,60 @@ import {
   IOrAlt,
   OptionalProductionType,
   Rule,
-  TokenType
-} from "@chevrotain/types"
-import { flatMap, isEmpty } from "lodash-es"
-import { defaultGrammarValidatorErrorProvider } from "../errors_public.js"
-import { DEFAULT_PARSER_CONFIG } from "../parser/parser.js"
+  TokenType,
+} from "@chevrotain/types";
+import { flatMap, isEmpty } from "lodash-es";
+import { defaultGrammarValidatorErrorProvider } from "../errors_public.js";
+import { DEFAULT_PARSER_CONFIG } from "../parser/parser.js";
 import {
   validateAmbiguousAlternationAlternatives,
   validateEmptyOrAlternative,
   validateNoLeftRecursion,
-  validateSomeNonEmptyLookaheadPath
-} from "./checks.js"
+  validateSomeNonEmptyLookaheadPath,
+} from "./checks.js";
 import {
   buildAlternativesLookAheadFunc,
   buildLookaheadFuncForOptionalProd,
   buildLookaheadFuncForOr,
   buildSingleAlternativeLookaheadFunction,
-  getProdType
-} from "./lookahead.js"
-import { IParserDefinitionError } from "./types.js"
+  getProdType,
+} from "./lookahead.js";
+import { IParserDefinitionError } from "./types.js";
 
 export class LLkLookaheadStrategy implements ILookaheadStrategy {
-  readonly maxLookahead: number
+  readonly maxLookahead: number;
 
   constructor(options?: { maxLookahead?: number }) {
     this.maxLookahead =
-      options?.maxLookahead ?? DEFAULT_PARSER_CONFIG.maxLookahead
+      options?.maxLookahead ?? DEFAULT_PARSER_CONFIG.maxLookahead;
   }
 
   validate(options: {
-    rules: Rule[]
-    tokenTypes: TokenType[]
-    grammarName: string
+    rules: Rule[];
+    tokenTypes: TokenType[];
+    grammarName: string;
   }): ILookaheadValidationError[] {
-    const leftRecursionErrors = this.validateNoLeftRecursion(options.rules)
+    const leftRecursionErrors = this.validateNoLeftRecursion(options.rules);
 
     if (isEmpty(leftRecursionErrors)) {
-      const emptyAltErrors = this.validateEmptyOrAlternatives(options.rules)
+      const emptyAltErrors = this.validateEmptyOrAlternatives(options.rules);
       const ambiguousAltsErrors = this.validateAmbiguousAlternationAlternatives(
         options.rules,
-        this.maxLookahead
-      )
+        this.maxLookahead,
+      );
       const emptyRepetitionErrors = this.validateSomeNonEmptyLookaheadPath(
         options.rules,
-        this.maxLookahead
-      )
+        this.maxLookahead,
+      );
       const allErrors = [
         ...leftRecursionErrors,
         ...emptyAltErrors,
         ...ambiguousAltsErrors,
-        ...emptyRepetitionErrors
-      ]
-      return allErrors
+        ...emptyRepetitionErrors,
+      ];
+      return allErrors;
     }
-    return leftRecursionErrors
+    return leftRecursionErrors;
   }
 
   validateNoLeftRecursion(rules: Rule[]): IParserDefinitionError[] {
@@ -65,50 +65,50 @@ export class LLkLookaheadStrategy implements ILookaheadStrategy {
       validateNoLeftRecursion(
         currTopRule,
         currTopRule,
-        defaultGrammarValidatorErrorProvider
-      )
-    )
+        defaultGrammarValidatorErrorProvider,
+      ),
+    );
   }
 
   validateEmptyOrAlternatives(rules: Rule[]): IParserDefinitionError[] {
     return flatMap(rules, (currTopRule) =>
       validateEmptyOrAlternative(
         currTopRule,
-        defaultGrammarValidatorErrorProvider
-      )
-    )
+        defaultGrammarValidatorErrorProvider,
+      ),
+    );
   }
 
   validateAmbiguousAlternationAlternatives(
     rules: Rule[],
-    maxLookahead: number
+    maxLookahead: number,
   ): IParserDefinitionError[] {
     return flatMap(rules, (currTopRule) =>
       validateAmbiguousAlternationAlternatives(
         currTopRule,
         maxLookahead,
-        defaultGrammarValidatorErrorProvider
-      )
-    )
+        defaultGrammarValidatorErrorProvider,
+      ),
+    );
   }
 
   validateSomeNonEmptyLookaheadPath(
     rules: Rule[],
-    maxLookahead: number
+    maxLookahead: number,
   ): IParserDefinitionError[] {
     return validateSomeNonEmptyLookaheadPath(
       rules,
       maxLookahead,
-      defaultGrammarValidatorErrorProvider
-    )
+      defaultGrammarValidatorErrorProvider,
+    );
   }
 
   buildLookaheadForAlternation(options: {
-    prodOccurrence: number
-    rule: Rule
-    maxLookahead: number
-    hasPredicates: boolean
-    dynamicTokensEnabled: boolean
+    prodOccurrence: number;
+    rule: Rule;
+    maxLookahead: number;
+    hasPredicates: boolean;
+    dynamicTokensEnabled: boolean;
   }): (orAlts?: IOrAlt<any>[] | undefined) => number | undefined {
     return buildLookaheadFuncForOr(
       options.prodOccurrence,
@@ -116,16 +116,16 @@ export class LLkLookaheadStrategy implements ILookaheadStrategy {
       options.maxLookahead,
       options.hasPredicates,
       options.dynamicTokensEnabled,
-      buildAlternativesLookAheadFunc
-    )
+      buildAlternativesLookAheadFunc,
+    );
   }
 
   buildLookaheadForOptional(options: {
-    prodOccurrence: number
-    prodType: OptionalProductionType
-    rule: Rule
-    maxLookahead: number
-    dynamicTokensEnabled: boolean
+    prodOccurrence: number;
+    prodType: OptionalProductionType;
+    rule: Rule;
+    maxLookahead: number;
+    dynamicTokensEnabled: boolean;
   }): () => boolean {
     return buildLookaheadFuncForOptionalProd(
       options.prodOccurrence,
@@ -133,7 +133,7 @@ export class LLkLookaheadStrategy implements ILookaheadStrategy {
       options.maxLookahead,
       options.dynamicTokensEnabled,
       getProdType(options.prodType),
-      buildSingleAlternativeLookaheadFunction
-    )
+      buildSingleAlternativeLookaheadFunction,
+    );
   }
 }

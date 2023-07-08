@@ -1,5 +1,5 @@
-import { expect } from "chai"
-import { parse } from "./graphql.js"
+import { expect } from "chai";
+import { parse } from "./graphql.js";
 
 describe("The GraphQL Grammar", () => {
   it("can parse a simple GraphQL without errors", () => {
@@ -13,11 +13,11 @@ describe("The GraphQL Grammar", () => {
     }
   }
 }
-`
-    const parseResult = parse(input)
-    expect(parseResult.lexErrors).to.be.empty
-    expect(parseResult.parseErrors).to.be.empty
-  })
+`;
+    const parseResult = parse(input);
+    expect(parseResult.lexErrors).to.be.empty;
+    expect(parseResult.parseErrors).to.be.empty;
+  });
 
   it("can parse a simple GraphQL without errors #2", () => {
     const input = `
@@ -27,11 +27,11 @@ describe("The GraphQL Grammar", () => {
     height(unit: FOOT)
 }
 }
-`
-    const parseResult = parse(input)
-    expect(parseResult.lexErrors).to.be.empty
-    expect(parseResult.parseErrors).to.be.empty
-  })
+`;
+    const parseResult = parse(input);
+    expect(parseResult.lexErrors).to.be.empty;
+    expect(parseResult.parseErrors).to.be.empty;
+  });
 
   it("can parse a simple GraphQL without errors #3", () => {
     const input = `
@@ -51,9 +51,9 @@ type Droid implements Character {
   appearsIn: [Episode]!
   primaryFunction: String
 }
-`
-    const parseResult = parse(input)
-    expect(parseResult.lexErrors).to.be.empty
-    expect(parseResult.parseErrors).to.be.empty
-  })
-})
+`;
+    const parseResult = parse(input);
+    expect(parseResult.lexErrors).to.be.empty;
+    expect(parseResult.parseErrors).to.be.empty;
+  });
+});

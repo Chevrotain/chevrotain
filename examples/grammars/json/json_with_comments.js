@@ -1,15 +1,15 @@
-import { tokenMatcher, Lexer, createToken } from "chevrotain"
-import { jsonTokens, JsonParser } from "./json.js"
+import { tokenMatcher, Lexer, createToken } from "chevrotain";
+import { jsonTokens, JsonParser } from "./json.js";
 
 // Upgrade the lexer to support single line comments.
 const Comment = createToken({
   name: "Comment",
-  pattern: /\/\/.*/
-})
+  pattern: /\/\/.*/,
+});
 
-const allTokens = jsonTokens.concat([Comment])
+const allTokens = jsonTokens.concat([Comment]);
 
-const JsonWithCommentsLexer = new Lexer(allTokens)
+const JsonWithCommentsLexer = new Lexer(allTokens);
 
 // ----------------- parser -----------------
 
@@ -19,7 +19,7 @@ const JsonWithCommentsLexer = new Lexer(allTokens)
  */
 class JsonParserWithComments extends JsonParser {
   constructor() {
-    super()
+    super();
     // We did not define any new rules so no need to call performSelfAnalysis
   }
 
@@ -27,24 +27,24 @@ class JsonParserWithComments extends JsonParser {
     // Skip Comments during regular parsing as we wish to auto-magically insert them
     // into our CST
     while (tokenMatcher(super.LA(howMuch), Comment)) {
-      super.consumeToken()
+      super.consumeToken();
     }
 
-    return super.LA(howMuch)
+    return super.LA(howMuch);
   }
 
   cstPostTerminal(key, consumedToken) {
-    super.cstPostTerminal(key, consumedToken)
+    super.cstPostTerminal(key, consumedToken);
 
-    let lookBehindIdx = -1
-    let prevToken = super.LA(lookBehindIdx)
+    let lookBehindIdx = -1;
+    let prevToken = super.LA(lookBehindIdx);
 
     // After every Token (terminal) is successfully consumed
     // We will add all the comment that appeared before it to the CST (Parse Tree)
     while (tokenMatcher(prevToken, Comment)) {
-      super.cstPostTerminal(Comment.name, prevToken)
-      lookBehindIdx--
-      prevToken = super.LA(lookBehindIdx)
+      super.cstPostTerminal(Comment.name, prevToken);
+      lookBehindIdx--;
+      prevToken = super.LA(lookBehindIdx);
     }
   }
 }
@@ -52,18 +52,18 @@ class JsonParserWithComments extends JsonParser {
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-const parser = new JsonParserWithComments([])
+const parser = new JsonParserWithComments([]);
 
 export function parse(text) {
-  const lexResult = JsonWithCommentsLexer.tokenize(text)
+  const lexResult = JsonWithCommentsLexer.tokenize(text);
   // setting a new input will RESET the parser instance's state.
-  parser.input = lexResult.tokens
+  parser.input = lexResult.tokens;
   // any top level rule may be used as an entry point
-  const cst = parser.json()
+  const cst = parser.json();
 
   return {
     cst: cst,
     lexErrors: lexResult.errors,
-    parseErrors: parser.errors
-  }
+    parseErrors: parser.errors,
+  };
 }

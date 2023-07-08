@@ -5,30 +5,30 @@ import {
   Character,
   Disjunction,
   Group,
-  Set
-} from "@chevrotain/regexp-to-ast"
-import { every, find, forEach, includes, isArray, values } from "lodash-es"
-import { PRINT_ERROR, PRINT_WARNING } from "@chevrotain/utils"
-import { ASTNode, getRegExpAst } from "./reg_exp_parser.js"
-import { charCodeToOptimizedIndex, minOptimizationVal } from "./lexer.js"
+  Set,
+} from "@chevrotain/regexp-to-ast";
+import { every, find, forEach, includes, isArray, values } from "lodash-es";
+import { PRINT_ERROR, PRINT_WARNING } from "@chevrotain/utils";
+import { ASTNode, getRegExpAst } from "./reg_exp_parser.js";
+import { charCodeToOptimizedIndex, minOptimizationVal } from "./lexer.js";
 
 const complementErrorMessage =
-  "Complement Sets are not supported for first char optimization"
+  "Complement Sets are not supported for first char optimization";
 export const failedOptimizationPrefixMsg =
-  'Unable to use "first char" lexer optimizations:\n'
+  'Unable to use "first char" lexer optimizations:\n';
 
 export function getOptimizedStartCodesIndices(
   regExp: RegExp,
-  ensureOptimizations = false
+  ensureOptimizations = false,
 ): number[] {
   try {
-    const ast = getRegExpAst(regExp)
+    const ast = getRegExpAst(regExp);
     const firstChars = firstCharOptimizedIndices(
       ast.value,
       {},
-      ast.flags.ignoreCase
-    )
-    return firstChars
+      ast.flags.ignoreCase,
+    );
+    return firstChars;
   } catch (e) {
     /* istanbul ignore next */
     // Testing this relies on the regexp-to-ast library having a bug... */
@@ -40,44 +40,44 @@ export function getOptimizedStartCodesIndices(
             `\tUnable to optimize: < ${regExp.toString()} >\n` +
             "\tComplement Sets cannot be automatically optimized.\n" +
             "\tThis will disable the lexer's first char optimizations.\n" +
-            "\tSee: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#COMPLEMENT for details."
-        )
+            "\tSee: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#COMPLEMENT for details.",
+        );
       }
     } else {
-      let msgSuffix = ""
+      let msgSuffix = "";
       if (ensureOptimizations) {
         msgSuffix =
           "\n\tThis will disable the lexer's first char optimizations.\n" +
-          "\tSee: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#REGEXP_PARSING for details."
+          "\tSee: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#REGEXP_PARSING for details.";
       }
       PRINT_ERROR(
         `${failedOptimizationPrefixMsg}\n` +
           `\tFailed parsing: < ${regExp.toString()} >\n` +
           `\tUsing the @chevrotain/regexp-to-ast library\n` +
           "\tPlease open an issue at: https://github.com/chevrotain/chevrotain/issues" +
-          msgSuffix
-      )
+          msgSuffix,
+      );
     }
   }
 
-  return []
+  return [];
 }
 
 export function firstCharOptimizedIndices(
   ast: ASTNode,
   result: { [charCode: number]: number },
-  ignoreCase: boolean
+  ignoreCase: boolean,
 ): number[] {
   switch (ast.type) {
     case "Disjunction":
       for (let i = 0; i < ast.value.length; i++) {
-        firstCharOptimizedIndices(ast.value[i], result, ignoreCase)
+        firstCharOptimizedIndices(ast.value[i], result, ignoreCase);
       }
-      break
+      break;
     case "Alternative":
-      const terms = ast.value
+      const terms = ast.value;
       for (let i = 0; i < terms.length; i++) {
-        const term = terms[i]
+        const term = terms[i];
 
         // skip terms that cannot effect the first char results
         switch (term.type) {
@@ -92,24 +92,24 @@ export function firstCharOptimizedIndices(
           case "StartAnchor":
           case "WordBoundary":
           case "NonWordBoundary":
-            continue
+            continue;
         }
 
-        const atom = term
+        const atom = term;
         switch (atom.type) {
           case "Character":
-            addOptimizedIdxToResult(atom.value, result, ignoreCase)
-            break
+            addOptimizedIdxToResult(atom.value, result, ignoreCase);
+            break;
           case "Set":
             if (atom.complement === true) {
-              throw Error(complementErrorMessage)
+              throw Error(complementErrorMessage);
             }
             forEach(atom.value, (code) => {
               if (typeof code === "number") {
-                addOptimizedIdxToResult(code, result, ignoreCase)
+                addOptimizedIdxToResult(code, result, ignoreCase);
               } else {
                 // range
-                const range = code as any
+                const range = code as any;
                 // cannot optimize when ignoreCase is
                 if (ignoreCase === true) {
                   for (
@@ -117,7 +117,7 @@ export function firstCharOptimizedIndices(
                     rangeCode <= range.to;
                     rangeCode++
                   ) {
-                    addOptimizedIdxToResult(rangeCode, result, ignoreCase)
+                    addOptimizedIdxToResult(rangeCode, result, ignoreCase);
                   }
                 }
                 // Optimization (2 orders of magnitude less work for very large ranges)
@@ -128,7 +128,7 @@ export function firstCharOptimizedIndices(
                     rangeCode <= range.to && rangeCode < minOptimizationVal;
                     rangeCode++
                   ) {
-                    addOptimizedIdxToResult(rangeCode, result, ignoreCase)
+                    addOptimizedIdxToResult(rangeCode, result, ignoreCase);
                   }
 
                   // Less common charCode where we optimize for faster init time, by using larger "buckets"
@@ -136,34 +136,34 @@ export function firstCharOptimizedIndices(
                     const minUnOptVal =
                       range.from >= minOptimizationVal
                         ? range.from
-                        : minOptimizationVal
-                    const maxUnOptVal = range.to
-                    const minOptIdx = charCodeToOptimizedIndex(minUnOptVal)
-                    const maxOptIdx = charCodeToOptimizedIndex(maxUnOptVal)
+                        : minOptimizationVal;
+                    const maxUnOptVal = range.to;
+                    const minOptIdx = charCodeToOptimizedIndex(minUnOptVal);
+                    const maxOptIdx = charCodeToOptimizedIndex(maxUnOptVal);
 
                     for (
                       let currOptIdx = minOptIdx;
                       currOptIdx <= maxOptIdx;
                       currOptIdx++
                     ) {
-                      result[currOptIdx] = currOptIdx
+                      result[currOptIdx] = currOptIdx;
                     }
                   }
                 }
               }
-            })
-            break
+            });
+            break;
           case "Group":
-            firstCharOptimizedIndices(atom.value, result, ignoreCase)
-            break
+            firstCharOptimizedIndices(atom.value, result, ignoreCase);
+            break;
           /* istanbul ignore next */
           default:
-            throw Error("Non Exhaustive Match")
+            throw Error("Non Exhaustive Match");
         }
 
         // reached a mandatory production, no more **start** codes can be found on this alternative
         const isOptionalQuantifier =
-          atom.quantifier !== undefined && atom.quantifier.atLeast === 0
+          atom.quantifier !== undefined && atom.quantifier.atLeast === 0;
         if (
           // A group may be optional due to empty contents /(?:)/
           // or if everything inside it is optional /((a)?)/
@@ -171,47 +171,49 @@ export function firstCharOptimizedIndices(
           // If this term is not a group it may only be optional if it has an optional quantifier
           (atom.type !== "Group" && isOptionalQuantifier === false)
         ) {
-          break
+          break;
         }
       }
-      break
+      break;
     /* istanbul ignore next */
     default:
-      throw Error("non exhaustive match!")
+      throw Error("non exhaustive match!");
   }
 
   // console.log(Object.keys(result).length)
-  return values(result)
+  return values(result);
 }
 
 function addOptimizedIdxToResult(
   code: number,
   result: { [charCode: number]: number },
-  ignoreCase: boolean
+  ignoreCase: boolean,
 ) {
-  const optimizedCharIdx = charCodeToOptimizedIndex(code)
-  result[optimizedCharIdx] = optimizedCharIdx
+  const optimizedCharIdx = charCodeToOptimizedIndex(code);
+  result[optimizedCharIdx] = optimizedCharIdx;
 
   if (ignoreCase === true) {
-    handleIgnoreCase(code, result)
+    handleIgnoreCase(code, result);
   }
 }
 
 function handleIgnoreCase(
   code: number,
-  result: { [charCode: number]: number }
+  result: { [charCode: number]: number },
 ) {
-  const char = String.fromCharCode(code)
-  const upperChar = char.toUpperCase()
+  const char = String.fromCharCode(code);
+  const upperChar = char.toUpperCase();
   /* istanbul ignore else */
   if (upperChar !== char) {
-    const optimizedCharIdx = charCodeToOptimizedIndex(upperChar.charCodeAt(0))
-    result[optimizedCharIdx] = optimizedCharIdx
+    const optimizedCharIdx = charCodeToOptimizedIndex(upperChar.charCodeAt(0));
+    result[optimizedCharIdx] = optimizedCharIdx;
   } else {
-    const lowerChar = char.toLowerCase()
+    const lowerChar = char.toLowerCase();
     if (lowerChar !== char) {
-      const optimizedCharIdx = charCodeToOptimizedIndex(lowerChar.charCodeAt(0))
-      result[optimizedCharIdx] = optimizedCharIdx
+      const optimizedCharIdx = charCodeToOptimizedIndex(
+        lowerChar.charCodeAt(0),
+      );
+      result[optimizedCharIdx] = optimizedCharIdx;
     }
   }
 }
@@ -219,76 +221,76 @@ function handleIgnoreCase(
 function findCode(setNode: Set, targetCharCodes: number[]) {
   return find(setNode.value, (codeOrRange) => {
     if (typeof codeOrRange === "number") {
-      return includes(targetCharCodes, codeOrRange)
+      return includes(targetCharCodes, codeOrRange);
     } else {
       // range
-      const range = <any>codeOrRange
+      const range = <any>codeOrRange;
       return (
         find(
           targetCharCodes,
-          (targetCode) => range.from <= targetCode && targetCode <= range.to
+          (targetCode) => range.from <= targetCode && targetCode <= range.to,
         ) !== undefined
-      )
+      );
     }
-  })
+  });
 }
 
 function isWholeOptional(ast: any): boolean {
-  const quantifier = (ast as Atom).quantifier
+  const quantifier = (ast as Atom).quantifier;
   if (quantifier && quantifier.atLeast === 0) {
-    return true
+    return true;
   }
 
   if (!ast.value) {
-    return false
+    return false;
   }
 
   return isArray(ast.value)
     ? every(ast.value, isWholeOptional)
-    : isWholeOptional(ast.value)
+    : isWholeOptional(ast.value);
 }
 
 class CharCodeFinder extends BaseRegExpVisitor {
-  found: boolean = false
+  found: boolean = false;
 
   constructor(private targetCharCodes: number[]) {
-    super()
+    super();
   }
 
   visitChildren(node: ASTNode) {
     // No need to keep looking...
     if (this.found === true) {
-      return
+      return;
     }
 
     // switch lookaheads as they do not actually consume any characters thus
     // finding a charCode at lookahead context does not mean that regexp can actually contain it in a match.
     switch (node.type) {
       case "Lookahead":
-        this.visitLookahead(node)
-        return
+        this.visitLookahead(node);
+        return;
       case "NegativeLookahead":
-        this.visitNegativeLookahead(node)
-        return
+        this.visitNegativeLookahead(node);
+        return;
     }
 
-    super.visitChildren(node)
+    super.visitChildren(node);
   }
 
   visitCharacter(node: Character) {
     if (includes(this.targetCharCodes, node.value)) {
-      this.found = true
+      this.found = true;
     }
   }
 
   visitSet(node: Set) {
     if (node.complement) {
       if (findCode(node, this.targetCharCodes) === undefined) {
-        this.found = true
+        this.found = true;
       }
     } else {
       if (findCode(node, this.targetCharCodes) !== undefined) {
-        this.found = true
+        this.found = true;
       }
     }
   }
@@ -296,18 +298,18 @@ class CharCodeFinder extends BaseRegExpVisitor {
 
 export function canMatchCharCode(
   charCodes: number[],
-  pattern: RegExp | string
+  pattern: RegExp | string,
 ) {
   if (pattern instanceof RegExp) {
-    const ast = getRegExpAst(pattern)
-    const charCodeFinder = new CharCodeFinder(charCodes)
-    charCodeFinder.visit(ast)
-    return charCodeFinder.found
+    const ast = getRegExpAst(pattern);
+    const charCodeFinder = new CharCodeFinder(charCodes);
+    charCodeFinder.visit(ast);
+    return charCodeFinder.found;
   } else {
     return (
       find(<any>pattern, (char) => {
-        return includes(charCodes, (<string>char).charCodeAt(0))
+        return includes(charCodes, (<string>char).charCodeAt(0));
       }) !== undefined
-    )
+    );
   }
 }

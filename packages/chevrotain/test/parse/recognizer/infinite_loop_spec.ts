@@ -1,30 +1,30 @@
 import {
   CstParser,
-  EmbeddedActionsParser
-} from "../../../src/parse/parser/traits/parser_traits.js"
-import { createRegularToken } from "../../utils/matchers.js"
-import { augmentTokenTypes } from "../../../src/scan/tokens.js"
-import { IToken } from "@chevrotain/types"
-import { createToken } from "../../../src/scan/tokens_public.js"
-import { EMPTY_ALT } from "../../../src/parse/parser/parser.js"
-import { expect } from "chai"
+  EmbeddedActionsParser,
+} from "../../../src/parse/parser/traits/parser_traits.js";
+import { createRegularToken } from "../../utils/matchers.js";
+import { augmentTokenTypes } from "../../../src/scan/tokens.js";
+import { IToken } from "@chevrotain/types";
+import { createToken } from "../../../src/scan/tokens_public.js";
+import { EMPTY_ALT } from "../../../src/parse/parser/parser.js";
+import { expect } from "chai";
 
 describe("The Recognizer's capabilities for detecting / handling infinite loops", () => {
   it("Will gracefully 'escape' from an infinite loop in a repetition", () => {
     class PlusTok {
-      static PATTERN = /\+/
+      static PATTERN = /\+/;
     }
-    augmentTokenTypes(<any>[PlusTok])
+    augmentTokenTypes(<any>[PlusTok]);
 
     class InfiniteLoopParser extends EmbeddedActionsParser {
       constructor(input: IToken[] = []) {
-        super([PlusTok])
+        super([PlusTok]);
 
-        this.performSelfAnalysis()
-        this.input = input
+        this.performSelfAnalysis();
+        this.input = input;
       }
 
-      counter = 0
+      counter = 0;
       public loop = this.RULE("loop", () => {
         this.MANY(() => {
           // By returning without consuming any tokens we could
@@ -35,109 +35,109 @@ describe("The Recognizer's capabilities for detecting / handling infinite loops"
             // So the Grammar Recording will process the grammar correctly
             // Otherwise a different error would occur
             // (detection of empty repetition at GAST level).
-            return
+            return;
           }
-          this.counter++
-          this.CONSUME(PlusTok)
-        })
-      })
+          this.counter++;
+          this.CONSUME(PlusTok);
+        });
+      });
     }
 
-    const parser = new InfiniteLoopParser()
-    parser.input = [createRegularToken(PlusTok)]
-    const parseResult = parser.loop()
+    const parser = new InfiniteLoopParser();
+    parser.input = [createRegularToken(PlusTok)];
+    const parseResult = parser.loop();
     expect(parser.errors[0].message).to.match(
-      /Redundant input, expecting EOF but found/
-    )
-  })
+      /Redundant input, expecting EOF but found/,
+    );
+  });
 
   it("Will gracefully 'escape' from an infinite loop in a repetition issue #956", () => {
-    const Semi = createToken({ name: "Semi", pattern: /;/, label: ";" })
-    const A = createToken({ name: "A", pattern: /A/i })
-    const B = createToken({ name: "B", pattern: /B/i })
-    const C = createToken({ name: "C", pattern: /C/i })
+    const Semi = createToken({ name: "Semi", pattern: /;/, label: ";" });
+    const A = createToken({ name: "A", pattern: /A/i });
+    const B = createToken({ name: "B", pattern: /B/i });
+    const C = createToken({ name: "C", pattern: /C/i });
 
-    const allTokens = [Semi, A, B, C]
+    const allTokens = [Semi, A, B, C];
 
     class InfParser extends EmbeddedActionsParser {
       constructor() {
         super(allTokens, {
-          recoveryEnabled: true
-        })
+          recoveryEnabled: true,
+        });
 
-        this.performSelfAnalysis()
+        this.performSelfAnalysis();
       }
 
       public block = this.RULE("block", () => {
         this.MANY(() => {
-          this.SUBRULE(this.command)
-        })
-      })
+          this.SUBRULE(this.command);
+        });
+      });
 
       public command = this.RULE("command", () => {
         this.OR([
           { ALT: () => this.SUBRULE(this.ab) },
-          { ALT: () => this.SUBRULE(this.ac) }
-        ])
-        this.CONSUME(Semi)
-      })
+          { ALT: () => this.SUBRULE(this.ac) },
+        ]);
+        this.CONSUME(Semi);
+      });
 
       public ab = this.RULE("ab", () => {
-        this.CONSUME(A)
-        this.CONSUME(B)
-      })
+        this.CONSUME(A);
+        this.CONSUME(B);
+      });
 
       public ac = this.RULE("ac", () => {
-        this.CONSUME(A)
-        this.CONSUME(C)
-      })
+        this.CONSUME(A);
+        this.CONSUME(C);
+      });
     }
 
-    const parser = new InfParser()
-    parser.input = [createRegularToken(A)]
-    const parseResult = parser.block()
+    const parser = new InfParser();
+    parser.input = [createRegularToken(A)];
+    const parseResult = parser.block();
     expect(parser.errors[0].message).to.match(
-      /Expecting: one of these possible Token sequences:/
-    )
-    expect(parser.errors[0].message).to.match(/[A, B]/)
-    expect(parser.errors[0].message).to.match(/[A, C]/)
-  })
+      /Expecting: one of these possible Token sequences:/,
+    );
+    expect(parser.errors[0].message).to.match(/[A, B]/);
+    expect(parser.errors[0].message).to.match(/[A, C]/);
+  });
 
   it("Will enter an infinite loop during parser initialization when there is an empty alternative inside nested repetitionn", () => {
     // ----------------- lexer -----------------
-    const Comma = createToken({ name: "Comma", pattern: /,/ })
-    const Comma2 = createToken({ name: "Comma", pattern: /,/ })
+    const Comma = createToken({ name: "Comma", pattern: /,/ });
+    const Comma2 = createToken({ name: "Comma", pattern: /,/ });
 
-    const allTokens = [Comma]
+    const allTokens = [Comma];
 
     class NestedManyEmptyAltBugParser extends CstParser {
       constructor() {
-        super(allTokens)
-        this.performSelfAnalysis()
+        super(allTokens);
+        this.performSelfAnalysis();
       }
 
       public A = this.RULE("A", () => {
         this.MANY(() => {
-          this.SUBRULE(this.B)
-        })
-      })
+          this.SUBRULE(this.B);
+        });
+      });
 
       public B = this.RULE("B", () => {
         this.MANY(() => {
-          this.SUBRULE(this.C)
-        })
-      })
+          this.SUBRULE(this.C);
+        });
+      });
 
       public C = this.RULE("C", () => {
         this.OR([
           { ALT: () => this.CONSUME(Comma) },
           {
-            ALT: EMPTY_ALT()
-          }
-        ])
-      })
+            ALT: EMPTY_ALT(),
+          },
+        ]);
+      });
     }
 
-    expect(() => new NestedManyEmptyAltBugParser()).to.not.throw()
-  })
-})
+    expect(() => new NestedManyEmptyAltBugParser()).to.not.throw();
+  });
+});

@@ -4,11 +4,11 @@ import {
   Atom,
   Disjunction,
   RegExpParser,
-  RegExpPattern
-} from "@chevrotain/regexp-to-ast"
+  RegExpPattern,
+} from "@chevrotain/regexp-to-ast";
 
-let regExpAstCache: { [regex: string]: RegExpPattern } = {}
-const regExpParser = new RegExpParser()
+let regExpAstCache: { [regex: string]: RegExpPattern } = {};
+const regExpParser = new RegExpParser();
 
 // this should be moved to regexp-to-ast
 export type ASTNode =
@@ -16,19 +16,19 @@ export type ASTNode =
   | Disjunction
   | Alternative
   | Assertion
-  | Atom
+  | Atom;
 
 export function getRegExpAst(regExp: RegExp): RegExpPattern {
-  const regExpStr = regExp.toString()
+  const regExpStr = regExp.toString();
   if (regExpAstCache.hasOwnProperty(regExpStr)) {
-    return regExpAstCache[regExpStr]
+    return regExpAstCache[regExpStr];
   } else {
-    const regExpAst = regExpParser.pattern(regExpStr)
-    regExpAstCache[regExpStr] = regExpAst
-    return regExpAst
+    const regExpAst = regExpParser.pattern(regExpStr);
+    regExpAstCache[regExpStr] = regExpAst;
+    return regExpAst;
   }
 }
 
 export function clearRegExpParserCache() {
-  regExpAstCache = {}
+  regExpAstCache = {};
 }

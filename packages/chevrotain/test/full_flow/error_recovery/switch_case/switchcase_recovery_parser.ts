@@ -28,8 +28,8 @@
  * }
  */
 
-import { EmbeddedActionsParser } from "../../../../src/parse/parser/traits/parser_traits.js"
-import * as allTokens from "./switchcase_recovery_tokens.js"
+import { EmbeddedActionsParser } from "../../../../src/parse/parser/traits/parser_traits.js";
+import * as allTokens from "./switchcase_recovery_tokens.js";
 import {
   CaseTok,
   ColonTok,
@@ -42,13 +42,13 @@ import {
   RParenTok,
   SemiColonTok,
   StringTok,
-  SwitchTok
-} from "./switchcase_recovery_tokens.js"
-import { assign, includes } from "lodash-es"
-import { IToken, TokenType } from "@chevrotain/types"
+  SwitchTok,
+} from "./switchcase_recovery_tokens.js";
+import { assign, includes } from "lodash-es";
+import { IToken, TokenType } from "@chevrotain/types";
 
 export interface RetType {
-  [caseValue: string]: number | undefined
+  [caseValue: string]: number | undefined;
 }
 
 export class SwitchCaseRecoveryParser extends EmbeddedActionsParser {
@@ -56,20 +56,20 @@ export class SwitchCaseRecoveryParser extends EmbeddedActionsParser {
     super(
       { ...allTokens },
       {
-        recoveryEnabled: true
-      }
-    )
-    this.performSelfAnalysis()
+        recoveryEnabled: true,
+      },
+    );
+    this.performSelfAnalysis();
   }
 
   public switchStmt = this.RULE("switchStmt", this.parseSwitchStmt, {
     recoveryValueFunc: () => {
-      return {}
-    }
-  })
+      return {};
+    },
+  });
   public caseStmt = this.RULE("caseStmt", this.parseCaseStmt, {
-    recoveryValueFunc: this.INVALID()
-  })
+    recoveryValueFunc: this.INVALID(),
+  });
 
   // DOCS: in this example we avoid automatic missing token insertion for tokens that have additional semantic meaning.
   //       to understand this first consider the positive case, which tokens can we safely insert?
@@ -77,74 +77,78 @@ export class SwitchCaseRecoveryParser extends EmbeddedActionsParser {
   //       but what about a missing StringToken? if we insert one, what will be its string value?
   //       an empty string? in the grammar this could lead to an empty key in the created object...
   //       what about a string with some random value? this could still lead to duplicate keys in the returned parse result
-  private tokTypesThatCannotBeInsertedInRecovery = [IdentTok, StringTok, IntTok]
+  private tokTypesThatCannotBeInsertedInRecovery = [
+    IdentTok,
+    StringTok,
+    IntTok,
+  ];
 
   // DOCS: overriding this method allows us to customize the logic for which tokens may not be automatically inserted
   // during error recovery.
   public canTokenTypeBeInsertedInRecovery(tokType: TokenType) {
     return !includes(
       this.tokTypesThatCannotBeInsertedInRecovery,
-      tokType as unknown
-    )
+      tokType as unknown,
+    );
   }
 
   // a property with which the single token deletion recovery can be explicitly disabled for testing purposes
-  public singleTokenDeletionEnabled = true
+  public singleTokenDeletionEnabled = true;
 
   // DOCS: overriding this method allows us to customize the logic for which tokens may not be automatically deleted
   // during error recovery.
   public canTokenTypeBeDeletedInRecovery(tokType: TokenType) {
-    return this.singleTokenDeletionEnabled
+    return this.singleTokenDeletionEnabled;
   }
 
   public parseSwitchStmt(): RetType {
     // house keeping so the invalid property names will not be dependent on
     // previous grammar rule invocations.
-    this.invalidIdx = 1
+    this.invalidIdx = 1;
 
-    const retObj: RetType = {}
+    const retObj: RetType = {};
 
-    this.CONSUME(SwitchTok)
-    this.CONSUME(LParenTok)
-    this.CONSUME(IdentTok)
-    this.CONSUME(RParenTok)
-    this.CONSUME(LCurlyTok)
+    this.CONSUME(SwitchTok);
+    this.CONSUME(LParenTok);
+    this.CONSUME(IdentTok);
+    this.CONSUME(RParenTok);
+    this.CONSUME(LCurlyTok);
 
     this.AT_LEAST_ONE(() => {
-      assign(retObj, this.SUBRULE(this.caseStmt))
-    })
+      assign(retObj, this.SUBRULE(this.caseStmt));
+    });
 
-    this.CONSUME(RCurlyTok)
+    this.CONSUME(RCurlyTok);
 
-    return retObj
+    return retObj;
   }
 
   private parseCaseStmt(): RetType {
-    this.CONSUME(CaseTok)
-    const keyTok = this.CONSUME(StringTok)
-    this.CONSUME(ColonTok)
-    this.CONSUME(ReturnTok)
-    const valueTok = this.CONSUME(IntTok)
+    this.CONSUME(CaseTok);
+    const keyTok = this.CONSUME(StringTok);
+    this.CONSUME(ColonTok);
+    this.CONSUME(ReturnTok);
+    const valueTok = this.CONSUME(IntTok);
     this.OPTION6(() => {
-      this.CONSUME(SemiColonTok)
-    })
+      this.CONSUME(SemiColonTok);
+    });
 
-    const key = keyTok.image
-    const value = parseInt(valueTok.image, 10)
-    const caseKeyValue: RetType = {}
-    caseKeyValue[key] = value
-    return caseKeyValue
+    const key = keyTok.image;
+    const value = parseInt(valueTok.image, 10);
+    const caseKeyValue: RetType = {};
+    caseKeyValue[key] = value;
+    return caseKeyValue;
   }
 
   // because we are building a javascript object we must not have any duplications
   // in the name of the keys, the index below is used to solve this.
-  private invalidIdx = 1
+  private invalidIdx = 1;
 
   private INVALID(): () => RetType {
     return () => {
-      const retObj: RetType = {}
-      retObj["invalid" + this.invalidIdx++] = undefined
-      return retObj
-    }
+      const retObj: RetType = {};
+      retObj["invalid" + this.invalidIdx++] = undefined;
+      return retObj;
+    };
   }
 }

@@ -62,20 +62,20 @@ Lets look at an example first:
 ```javascript
 this.RULE("someRule", () => {
   $.OPTION(() => {
-    $.CONSUME(MyToken)
-  })
+    $.CONSUME(MyToken);
+  });
 
   $.OPTION1(() => {
     // A different suffix is not needed because the argument is different!
-    $.CONSUME(MyOtherToken)
-  })
+    $.CONSUME(MyOtherToken);
+  });
 
   // OPTION has no "named" argument so a different suffix is **always** needed
   // within the same top level rule.
   $.OPTION2(() => {
-    $.CONSUME2(MyToken)
-  })
-})
+    $.CONSUME2(MyToken);
+  });
+});
 ```
 
 This snippet uses three different variations of OPTION(""|1|2) and two variations of CONSUME(""|2).

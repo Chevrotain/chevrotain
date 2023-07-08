@@ -1,8 +1,8 @@
-import { ILexerErrorMessageProvider, IToken } from "@chevrotain/types"
+import { ILexerErrorMessageProvider, IToken } from "@chevrotain/types";
 
 export const defaultLexerErrorProvider: ILexerErrorMessageProvider = {
   buildUnableToPopLexerModeMessage(token: IToken): string {
-    return `Unable to pop Lexer Mode after encountering Token ->${token.image}<- The Mode Stack is empty`
+    return `Unable to pop Lexer Mode after encountering Token ->${token.image}<- The Mode Stack is empty`;
   },
 
   buildUnexpectedCharactersMessage(
@@ -10,12 +10,12 @@ export const defaultLexerErrorProvider: ILexerErrorMessageProvider = {
     startOffset: number,
     length: number,
     line?: number,
-    column?: number
+    column?: number,
   ): string {
     return (
       `unexpected character: ->${fullText.charAt(
-        startOffset
+        startOffset,
       )}<- at offset: ${startOffset},` + ` skipped ${length} characters.`
-    )
-  }
-}
+    );
+  },
+};

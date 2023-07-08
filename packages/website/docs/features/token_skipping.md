@@ -8,10 +8,10 @@ To skip a Token define its group as the special **Lexer.SKIPPED**
 For example:
 
 ```javascript
-import { createToken, Lexer } from "chevrotain"
+import { createToken, Lexer } from "chevrotain";
 const WhiteSpace = createToken({
   name: "WhiteSpace",
   pattern: /\s+/,
-  group: Lexer.SKIPPED
-})
+  group: Lexer.SKIPPED,
+});
 ```

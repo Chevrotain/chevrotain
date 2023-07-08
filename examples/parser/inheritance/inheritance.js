@@ -7,66 +7,66 @@
  * 3. This also shows an example of using Token inheritance
  */
 
-import { createToken, Lexer, CstParser } from "chevrotain"
+import { createToken, Lexer, CstParser } from "chevrotain";
 
 // ----------------- lexer -----------------
-const RelationWord = createToken({ name: "RelationWord", pattern: Lexer.NA })
+const RelationWord = createToken({ name: "RelationWord", pattern: Lexer.NA });
 
 // Token inheritance CONSUME(RelationWord) will work on any Token extending RelationWord
 const And = createToken({
   name: "And",
   pattern: /and/,
-  categories: RelationWord
-})
+  categories: RelationWord,
+});
 const Before = createToken({
   name: "Before",
   pattern: /before/,
-  categories: RelationWord
-})
+  categories: RelationWord,
+});
 const After = createToken({
   name: "After",
   pattern: /after/,
-  categories: RelationWord
-})
+  categories: RelationWord,
+});
 const Und = createToken({
   name: "Und",
   pattern: /und/,
-  categories: RelationWord
-})
+  categories: RelationWord,
+});
 const Vor = createToken({
   name: "Vor",
   pattern: /vor/,
-  categories: RelationWord
-})
+  categories: RelationWord,
+});
 const Nach = createToken({
   name: "Nach",
   pattern: /nach/,
-  categories: RelationWord
-})
+  categories: RelationWord,
+});
 
 /// English Tokens
-const Cook = createToken({ name: "Cook", pattern: /cooking|cook/ })
-const Some = createToken({ name: "Some", pattern: /some/ })
-const Sausages = createToken({ name: "Sausages", pattern: /sausages/ })
-const Clean = createToken({ name: "Clean", pattern: /clean/ })
-const The = createToken({ name: "The", pattern: /the/ })
-const Room = createToken({ name: "Room", pattern: /room/ })
+const Cook = createToken({ name: "Cook", pattern: /cooking|cook/ });
+const Some = createToken({ name: "Some", pattern: /some/ });
+const Sausages = createToken({ name: "Sausages", pattern: /sausages/ });
+const Clean = createToken({ name: "Clean", pattern: /clean/ });
+const The = createToken({ name: "The", pattern: /the/ });
+const Room = createToken({ name: "Room", pattern: /room/ });
 
 // German Tokens
-const Kochen = createToken({ name: "Kochen", pattern: /kochen/ })
-const Wurstchen = createToken({ name: "Wurstchen", pattern: /wurstchen/ })
-const Wurst = createToken({ name: "Wurst", pattern: /wurst/ })
-const Raum = createToken({ name: "Raum", pattern: /raum/ })
-const Auf = createToken({ name: "Auf", pattern: /auf/ })
-const Den = createToken({ name: "Den", pattern: /den/ })
+const Kochen = createToken({ name: "Kochen", pattern: /kochen/ });
+const Wurstchen = createToken({ name: "Wurstchen", pattern: /wurstchen/ });
+const Wurst = createToken({ name: "Wurst", pattern: /wurst/ });
+const Raum = createToken({ name: "Raum", pattern: /raum/ });
+const Auf = createToken({ name: "Auf", pattern: /auf/ });
+const Den = createToken({ name: "Den", pattern: /den/ });
 
 const WhiteSpace = createToken({
   name: "WhiteSpace",
   pattern: /\s+/,
-  group: Lexer.SKIPPED
-})
+  group: Lexer.SKIPPED,
+});
 
-const abstractTokens = [RelationWord]
+const abstractTokens = [RelationWord];
 
 const englishTokens = [
   WhiteSpace,
@@ -79,8 +79,8 @@ const englishTokens = [
   Sausages,
   Clean,
   The,
-  Room
-]
+  Room,
+];
 
 const germanTokens = [
   WhiteSpace,
@@ -93,12 +93,12 @@ const germanTokens = [
   Wurst,
   Raum,
   Auf,
-  Den
-]
+  Den,
+];
 
 // We can define a different Lexer for each of the sub grammars.
-const EnglishLexer = new Lexer(englishTokens)
-const GermanLexer = new Lexer(germanTokens)
+const EnglishLexer = new Lexer(englishTokens);
+const GermanLexer = new Lexer(germanTokens);
 
 // ----------------- parser -----------------
 
@@ -106,26 +106,26 @@ const GermanLexer = new Lexer(germanTokens)
 class AbstractCommandsParser extends CstParser {
   constructor(tokenVocabulary) {
     // combining the token vocabularies of parent and child.
-    super(abstractTokens.concat(tokenVocabulary))
+    super(abstractTokens.concat(tokenVocabulary));
 
-    const $ = this
+    const $ = this;
 
     $.RULE("commands", () => {
-      $.SUBRULE($.command)
+      $.SUBRULE($.command);
 
       $.MANY(() => {
-        $.CONSUME(RelationWord)
-        $.SUBRULE2($.command)
-      })
-    })
+        $.CONSUME(RelationWord);
+        $.SUBRULE2($.command);
+      });
+    });
 
     $.RULE("command", () => {
       // The cook and clean commands must be implemented in each sub grammar
       $.OR([
         { ALT: () => $.SUBRULE($.cookCommand) },
-        { ALT: () => $.SUBRULE($.cleanCommand) }
-      ])
-    })
+        { ALT: () => $.SUBRULE($.cleanCommand) },
+      ]);
+    });
 
     // this is an "abstract" base grammar it should not be instantiated directly
     // therefor it does not invoke "performSelfAnalysis"
@@ -134,108 +134,108 @@ class AbstractCommandsParser extends CstParser {
 
 class EnglishCommandsParser extends AbstractCommandsParser {
   constructor() {
-    super(englishTokens)
+    super(englishTokens);
 
-    const $ = this
+    const $ = this;
 
     // implementing the 'cookCommand' referenced in the AbstractCommandsParser
     $.RULE("cookCommand", () => {
-      $.CONSUME(Cook)
+      $.CONSUME(Cook);
       $.OPTION(() => {
-        $.CONSUME(Some)
-      })
-      $.CONSUME(Sausages)
-    })
+        $.CONSUME(Some);
+      });
+      $.CONSUME(Sausages);
+    });
 
     // implementing the 'cleanCommand' referenced in the AbstractCommandsParser
     $.RULE("cleanCommand", () => {
-      $.CONSUME(Clean)
-      $.CONSUME(The)
-      $.CONSUME(Room)
-    })
+      $.CONSUME(Clean);
+      $.CONSUME(The);
+      $.CONSUME(Room);
+    });
 
     // very important to call this after all the rules have been defined.
     // otherwise the parser may not work correctly as it will lack information
     // derived during the self analysis phase.
-    this.performSelfAnalysis()
+    this.performSelfAnalysis();
   }
 }
 
 class GermanCommandsParser extends AbstractCommandsParser {
   constructor() {
-    super(germanTokens)
+    super(germanTokens);
 
-    const $ = this
+    const $ = this;
 
     // implementing the 'cookCommand' referenced in the AbstractCommandsParser
     $.RULE("cookCommand", () => {
-      $.CONSUME(Kochen)
+      $.CONSUME(Kochen);
       $.OR([
         { ALT: () => $.CONSUME(Wurstchen) },
-        { ALT: () => $.CONSUME(Wurst) }
-      ])
-    })
+        { ALT: () => $.CONSUME(Wurst) },
+      ]);
+    });
 
     // implementing the 'cleanCommand' referenced in the AbstractCommandsParser
     $.RULE("cleanCommand", () => {
-      $.CONSUME(Raum)
-      $.CONSUME(Den)
-      $.CONSUME2(Raum)
-      $.CONSUME(Auf)
-    })
+      $.CONSUME(Raum);
+      $.CONSUME(Den);
+      $.CONSUME2(Raum);
+      $.CONSUME(Auf);
+    });
 
     // very important to call this after all the rules have been defined.
     // otherwise the parser may not work correctly as it will lack information
     // derived during the self analysis phase.
-    this.performSelfAnalysis()
+    this.performSelfAnalysis();
   }
 }
 
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instances.
-const englishParser = new EnglishCommandsParser()
-const germanParser = new GermanCommandsParser()
+const englishParser = new EnglishCommandsParser();
+const germanParser = new GermanCommandsParser();
 
 export function parseCommand(text, language) {
   // lex
-  let lexer
+  let lexer;
   // match language and lexer.
   switch (language) {
     case "english":
-      lexer = EnglishLexer
-      break
+      lexer = EnglishLexer;
+      break;
     case "german":
-      lexer = GermanLexer
-      break
+      lexer = GermanLexer;
+      break;
     default:
-      throw Error("no valid language chosen")
+      throw Error("no valid language chosen");
   }
 
-  const lexResult = lexer.tokenize(text)
+  const lexResult = lexer.tokenize(text);
 
   // parse
-  let parser
+  let parser;
   // match language and parser.
   switch (language) {
     case "english":
-      parser = englishParser
-      break
+      parser = englishParser;
+      break;
     case "german":
-      parser = germanParser
-      break
+      parser = germanParser;
+      break;
     default:
-      throw Error("no valid language chosen")
+      throw Error("no valid language chosen");
   }
 
   // setting a new input will RESET the parser instance's state.
-  parser.input = lexResult.tokens
+  parser.input = lexResult.tokens;
   // any top level rule may be used as an entry point
-  const cst = parser.commands()
+  const cst = parser.commands();
 
   return {
     cst: cst,
     lexErrors: lexResult.errors,
-    parseErrors: parser.errors
-  }
+    parseErrors: parser.errors,
+  };
 }

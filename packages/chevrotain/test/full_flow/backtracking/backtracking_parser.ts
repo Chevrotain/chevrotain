@@ -4,8 +4,8 @@
 // generally one should avoid having to use backtracking, and this specific example can be resolved by parsing
 // both statements in a single rule and only distinguishing between them later, but lets see an example of using backtracking :)
 
-import { IParserConfig } from "@chevrotain/types"
-import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits.js"
+import { IParserConfig } from "@chevrotain/types";
+import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits.js";
 
 export enum RET_TYPE {
   WITH_DEFAULT,
@@ -14,35 +14,35 @@ export enum RET_TYPE {
   INVALID_WITH_DEFAULT,
   INVALID_WITH_EQUALS,
   INVALID_STATEMENT,
-  INVALID_FQN
+  INVALID_FQN,
 }
 
 export class NumberTok {
-  static PATTERN = /NA/
+  static PATTERN = /NA/;
 }
 export class ElementTok {
-  static PATTERN = /NA/
+  static PATTERN = /NA/;
 }
 export class DefaultTok {
-  static PATTERN = /NA/
+  static PATTERN = /NA/;
 }
 export class DotTok {
-  static PATTERN = /NA/
+  static PATTERN = /NA/;
 }
 export class ColonTok {
-  static PATTERN = /NA/
+  static PATTERN = /NA/;
 }
 export class EqualsTok {
-  static PATTERN = /NA/
+  static PATTERN = /NA/;
 }
 export class SemiColonTok {
-  static PATTERN = /NA/
+  static PATTERN = /NA/;
 }
 export class IdentTok {
-  static PATTERN = /NA/
+  static PATTERN = /NA/;
 }
 
-const configuration: IParserConfig = {}
+const configuration: IParserConfig = {};
 
 // extending the BaseErrorRecoveryRecognizer in this example because it too has logic related to backtracking
 // that needs to be tested too.
@@ -60,38 +60,38 @@ export class BackTrackingParser extends EmbeddedActionsParser {
         ColonTok,
         EqualsTok,
         SemiColonTok,
-        IdentTok
+        IdentTok,
       ],
-      configuration
-    )
+      configuration,
+    );
     // DOCS: The call to performSelfAnalysis needs to happen after all the RULEs have been defined
     //       The typescript compiler places the constructor body last after initializations in the class's body
     //       which is why place the call here meets the criteria.
-    this.performSelfAnalysis()
+    this.performSelfAnalysis();
   }
 
   public statement = this.RULE("statement", this.parseStatement, {
-    recoveryValueFunc: INVALID(RET_TYPE.INVALID_STATEMENT)
-  })
+    recoveryValueFunc: INVALID(RET_TYPE.INVALID_STATEMENT),
+  });
   public withEqualsStatement = this.RULE(
     "withEqualsStatement",
     this.parseWithEqualsStatement,
-    { recoveryValueFunc: INVALID(RET_TYPE.INVALID_WITH_EQUALS) }
-  )
+    { recoveryValueFunc: INVALID(RET_TYPE.INVALID_WITH_EQUALS) },
+  );
   public withDefaultStatement = this.RULE(
     "withDefaultStatement",
     this.parseWithDefaultStatement,
     {
-      recoveryValueFunc: INVALID(RET_TYPE.INVALID_WITH_DEFAULT)
-    }
-  )
+      recoveryValueFunc: INVALID(RET_TYPE.INVALID_WITH_DEFAULT),
+    },
+  );
   public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, {
     recoveryValueFunc: INVALID(RET_TYPE.INVALID_FQN),
-    resyncEnabled: false
-  })
+    resyncEnabled: false,
+  });
 
   private parseStatement(): RET_TYPE {
-    let statementTypeFound!: RET_TYPE
+    let statementTypeFound!: RET_TYPE;
     this.OR([
       // both statements have the same prefix which may be of "infinite" length, this means there is no K for which
       // we can build an LL(K) parser that can distinguish the two alternatives as a negative example
@@ -99,56 +99,56 @@ export class BackTrackingParser extends EmbeddedActionsParser {
       {
         GATE: this.BACKTRACK(this.withEqualsStatement),
         ALT: () => {
-          statementTypeFound = this.SUBRULE8(this.withEqualsStatement)
-        }
+          statementTypeFound = this.SUBRULE8(this.withEqualsStatement);
+        },
       },
       {
         GATE: this.BACKTRACK(this.withDefaultStatement),
         ALT: () => {
-          statementTypeFound = this.SUBRULE9(this.withDefaultStatement)
-        }
-      }
-    ])
+          statementTypeFound = this.SUBRULE9(this.withDefaultStatement);
+        },
+      },
+    ]);
 
-    return statementTypeFound
+    return statementTypeFound;
   }
 
   private parseWithEqualsStatement(): RET_TYPE {
-    this.CONSUME(ElementTok)
-    this.CONSUME6(IdentTok)
-    this.CONSUME7(ColonTok)
-    this.SUBRULE7(this.qualifiedName) // this rule creates the no fixed look ahead issue
-    this.CONSUME8(EqualsTok)
-    this.CONSUME9(NumberTok)
-    this.CONSUME(SemiColonTok)
+    this.CONSUME(ElementTok);
+    this.CONSUME6(IdentTok);
+    this.CONSUME7(ColonTok);
+    this.SUBRULE7(this.qualifiedName); // this rule creates the no fixed look ahead issue
+    this.CONSUME8(EqualsTok);
+    this.CONSUME9(NumberTok);
+    this.CONSUME(SemiColonTok);
 
-    return RET_TYPE.WITH_EQUALS
+    return RET_TYPE.WITH_EQUALS;
   }
 
   private parseWithDefaultStatement(): RET_TYPE {
-    this.CONSUME(ElementTok)
-    this.CONSUME(IdentTok)
-    this.CONSUME(ColonTok)
-    this.SUBRULE6(this.qualifiedName) // this rule creates the no fixed look ahead issue
-    this.CONSUME(DefaultTok)
-    this.CONSUME(NumberTok)
-    this.CONSUME(SemiColonTok)
+    this.CONSUME(ElementTok);
+    this.CONSUME(IdentTok);
+    this.CONSUME(ColonTok);
+    this.SUBRULE6(this.qualifiedName); // this rule creates the no fixed look ahead issue
+    this.CONSUME(DefaultTok);
+    this.CONSUME(NumberTok);
+    this.CONSUME(SemiColonTok);
 
-    return RET_TYPE.WITH_DEFAULT
+    return RET_TYPE.WITH_DEFAULT;
   }
 
   private parseQualifiedName(): RET_TYPE {
-    this.CONSUME(IdentTok)
+    this.CONSUME(IdentTok);
     this.MANY(() => {
-      this.CONSUME(DotTok)
-      this.CONSUME2(IdentTok)
-    })
-    return RET_TYPE.QUALIFED_NAME
+      this.CONSUME(DotTok);
+      this.CONSUME2(IdentTok);
+    });
+    return RET_TYPE.QUALIFED_NAME;
   }
 }
 
 export function INVALID(stmtType: RET_TYPE): () => RET_TYPE {
   return () => {
-    return stmtType
-  }
+    return stmtType;
+  };
 }

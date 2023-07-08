@@ -1,17 +1,17 @@
-import { cc } from "./utils.js"
+import { cc } from "./utils.js";
 
-export const digitsCharCodes: number[] = []
+export const digitsCharCodes: number[] = [];
 for (let i = cc("0"); i <= cc("9"); i++) {
-  digitsCharCodes.push(i)
+  digitsCharCodes.push(i);
 }
 
-export const wordCharCodes: number[] = [cc("_")].concat(digitsCharCodes)
+export const wordCharCodes: number[] = [cc("_")].concat(digitsCharCodes);
 for (let i = cc("a"); i <= cc("z"); i++) {
-  wordCharCodes.push(i)
+  wordCharCodes.push(i);
 }
 
 for (let i = cc("A"); i <= cc("Z"); i++) {
-  wordCharCodes.push(i)
+  wordCharCodes.push(i);
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp#character-classes
@@ -41,5 +41,5 @@ export const whitespaceCodes: number[] = [
   cc("\u202f"),
   cc("\u205f"),
   cc("\u3000"),
-  cc("\ufeff")
-]
+  cc("\ufeff"),
+];

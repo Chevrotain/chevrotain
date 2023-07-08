@@ -6,18 +6,18 @@ This capability is most often used to disambiguate the keywords vs identifiers a
 For example:
 
 ```javascript
-import { createToken } from "chevrotain"
+import { createToken } from "chevrotain";
 
 const Identifier = createToken({
   name: "Identifier",
-  pattern: /[a-zA-Z][\w+]/
-})
+  pattern: /[a-zA-Z][\w+]/,
+});
 
 const ClassKeyword = createToken({
   name: "ClassKeyword",
   pattern: /class/,
-  longer_alt: Identifier
-})
+  longer_alt: Identifier,
+});
 ```
 
 Note that the `longer_alt` capability **cannot be chained**, only a single longer_alt will be checked for a specific Token. A token may define multiple longer alternatives using an array. As per usual with the lexer, the first matching token in the array will be chosen for lexing.

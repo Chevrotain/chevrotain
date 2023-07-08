@@ -13,33 +13,33 @@
  * telling the lexer to prefer the longer identifier alternative if one is found.
  */
 
-import { createToken, Lexer } from "chevrotain"
+import { createToken, Lexer } from "chevrotain";
 
 export const Identifier = createToken({
   name: "Identifier",
-  pattern: /[a-zA-z]\w+/
-})
+  pattern: /[a-zA-z]\w+/,
+});
 
 export const While = createToken({
   name: "While",
   pattern: /while/,
-  longer_alt: Identifier
-})
+  longer_alt: Identifier,
+});
 export const For = createToken({
   name: "For",
   pattern: /for/,
-  longer_alt: Identifier
-})
+  longer_alt: Identifier,
+});
 export const Do = createToken({
   name: "Do",
   pattern: /do/,
-  longer_alt: Identifier
-})
+  longer_alt: Identifier,
+});
 export const Whitespace = createToken({
   name: "Whitespace",
   pattern: /\s+/,
-  group: Lexer.SKIPPED
-})
+  group: Lexer.SKIPPED,
+});
 
 const keywordsVsIdentifiersLexer = new Lexer([
   Whitespace, // Whitespace is very common in most languages so placing it first generally speeds up the lexing process.
@@ -49,14 +49,14 @@ const keywordsVsIdentifiersLexer = new Lexer([
   Do, // 'do' vs 'done' or 'for' vs 'forEach'. This is solved by defining 'Keyword.LONGER_ALT = Identifier',
   // thus each time a Keyword is detected, the Lexer will also try to match a LONGER Identifier.
 
-  Identifier // As mentioned above, the Identifier Token must appear after ALL the Keyword Tokens.
-])
+  Identifier, // As mentioned above, the Identifier Token must appear after ALL the Keyword Tokens.
+]);
 
 export function tokenize(text) {
-  const lexResult = keywordsVsIdentifiersLexer.tokenize(text)
+  const lexResult = keywordsVsIdentifiersLexer.tokenize(text);
 
   if (lexResult.errors.length > 0) {
-    throw new Error("sad sad panda lexing errors detected")
+    throw new Error("sad sad panda lexing errors detected");
   }
-  return lexResult
+  return lexResult;
 }

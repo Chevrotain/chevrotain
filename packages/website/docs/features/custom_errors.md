@@ -18,9 +18,9 @@ for specific parsing DSL methods, for example:
 $.RULE("myStatement", () => {
   // ...
   $.CONSUME(SemiColon, {
-    ERR_MSG: "expecting semiColon at end of myStatement"
-  })
-})
+    ERR_MSG: "expecting semiColon at end of myStatement",
+  });
+});
 ```
 
 The **ERR_MSG** config property is available for the following DSL methods:

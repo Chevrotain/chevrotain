@@ -990,4 +990,4 @@ var sample =
   '    "greeting": "Hello, Soto Chase! You have 5 unread messages.",\r\n' +
   '    "favoriteFruit": "banana"\r\n' +
   "  }\r\n" +
-  "]"
+  "]";

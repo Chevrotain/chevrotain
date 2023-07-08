@@ -10,8 +10,8 @@ For example:
 const Comment = createToken({
   name: "Comment",
   pattern: /\/\/.+/,
-  group: "comments"
-})
+  group: "comments",
+});
 ```
 
 See [executable example](https://github.com/chevrotain/chevrotain/tree/master/examples/lexer/token_groups)

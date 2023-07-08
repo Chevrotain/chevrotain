@@ -7,49 +7,57 @@
  * "Public sta" --> ["static"]
  * "call f" --> ["foo"] // assuming foo is in the symbol table.
  */
-import _ from "lodash"
+import _ from "lodash";
 import {
   createToken,
   Lexer,
   CstParser,
   tokenMatcher,
-  EMPTY_ALT
-} from "chevrotain"
+  EMPTY_ALT,
+} from "chevrotain";
 
-const Keyword = createToken({ name: "Keyword", pattern: Lexer.NA })
+const Keyword = createToken({ name: "Keyword", pattern: Lexer.NA });
 const Private = createToken({
   name: "Private",
   pattern: /private/,
-  categories: Keyword
-})
+  categories: Keyword,
+});
 const Public = createToken({
   name: "Public",
   pattern: /public/,
-  categories: Keyword
-})
+  categories: Keyword,
+});
 const Static = createToken({
   name: "Static",
   pattern: /static/,
-  categories: Keyword
-})
+  categories: Keyword,
+});
 const Declare = createToken({
   name: "Declare",
   pattern: /declare/,
-  categories: Keyword
-})
-const Call = createToken({ name: "Call", pattern: /call/, categories: Keyword })
-const Enum = createToken({ name: "Enum", pattern: /enum/, categories: Keyword })
+  categories: Keyword,
+});
+const Call = createToken({
+  name: "Call",
+  pattern: /call/,
+  categories: Keyword,
+});
+const Enum = createToken({
+  name: "Enum",
+  pattern: /enum/,
+  categories: Keyword,
+});
 const Function = createToken({
   name: "Function",
   pattern: /function/,
-  categories: Keyword
-})
-const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
+  categories: Keyword,
+});
+const Identifier = createToken({ name: "Identifier", pattern: /\w+/ });
 const WhiteSpace = createToken({
   name: "WhiteSpace",
   pattern: /\s+/,
-  group: Lexer.SKIPPED
-})
+  group: Lexer.SKIPPED,
+});
 
 const allTokens = [
   WhiteSpace,
@@ -60,81 +68,81 @@ const allTokens = [
   Enum,
   Declare,
   Function,
-  Identifier
-]
-const StatementsLexer = new Lexer(allTokens)
+  Identifier,
+];
+const StatementsLexer = new Lexer(allTokens);
 
 // A completely normal Chevrotain Parser, no changes needed to use the content assist capabilities.
 class StatementsParser extends CstParser {
   constructor() {
-    super(allTokens)
+    super(allTokens);
 
-    let $ = this
+    let $ = this;
 
     $.RULE("startRule", () => {
       $.MANY(() => {
-        $.SUBRULE($.stmt)
-      })
-    })
+        $.SUBRULE($.stmt);
+      });
+    });
 
     $.RULE("stmt", () => {
       $.OR([
         { ALT: () => $.SUBRULE($.functionInvocation) },
         { ALT: () => $.SUBRULE($.functionStmt) },
-        { ALT: () => $.SUBRULE($.enumStmt) }
-      ])
-    })
+        { ALT: () => $.SUBRULE($.enumStmt) },
+      ]);
+    });
 
     $.RULE("functionInvocation", () => {
-      $.CONSUME(Call)
-      $.CONSUME(Identifier)
-    })
+      $.CONSUME(Call);
+      $.CONSUME(Identifier);
+    });
 
     // e.g: "private static function foo"
     $.RULE("functionStmt", () => {
-      $.SUBRULE($.visibility)
+      $.SUBRULE($.visibility);
       $.OPTION(() => {
-        $.CONSUME(Static)
-      })
-      $.CONSUME(Function)
-      $.CONSUME(Identifier)
-    })
+        $.CONSUME(Static);
+      });
+      $.CONSUME(Function);
+      $.CONSUME(Identifier);
+    });
 
     // e.g "public enum MONTHS"
     $.RULE("enumStmt", () => {
-      $.SUBRULE($.visibility)
-      $.CONSUME(Enum)
-      $.CONSUME(Identifier)
-    })
+      $.SUBRULE($.visibility);
+      $.CONSUME(Enum);
+      $.CONSUME(Identifier);
+    });
 
     $.RULE("visibility", () => {
       $.OR([
         { ALT: () => $.CONSUME(Private) },
         { ALT: () => $.CONSUME(Public) },
-        { ALT: EMPTY_ALT("EMPTY_ALT") }
-      ])
-    })
+        { ALT: EMPTY_ALT("EMPTY_ALT") },
+      ]);
+    });
 
-    this.performSelfAnalysis()
+    this.performSelfAnalysis();
   }
 }
 
 // No need for more than one instance.
-const parserInstance = new StatementsParser()
+const parserInstance = new StatementsParser();
 
 /**
  * @param text {string} - The text content assist is requested immediately afterwards.
  * @param symbolTable {string[]} - List of available symbol names.
  */
 export function getContentAssistSuggestions(text, symbolTable) {
-  const lexResult = StatementsLexer.tokenize(text)
+  const lexResult = StatementsLexer.tokenize(text);
   if (lexResult.errors.length > 0) {
-    throw new Error("sad sad panda, lexing errors detected")
+    throw new Error("sad sad panda, lexing errors detected");
   }
 
-  const lastInputToken = _.last(lexResult.tokens)
-  let partialSuggestionMode = false
-  let assistanceTokenVector = lexResult.tokens
+  const lastInputToken = _.last(lexResult.tokens);
+  let partialSuggestionMode = false;
+  let assistanceTokenVector = lexResult.tokens;
 
   // we have requested assistance while inside a Keyword or Identifier
   if (
@@ -143,26 +151,26 @@ export function getContentAssistSuggestions(text, symbolTable) {
       tokenMatcher(lastInputToken, Keyword)) &&
     /\w/.test(text[text.length - 1])
   ) {
-    assistanceTokenVector = _.dropRight(assistanceTokenVector)
-    partialSuggestionMode = true
+    assistanceTokenVector = _.dropRight(assistanceTokenVector);
+    partialSuggestionMode = true;
   }
 
   const syntacticSuggestions = parserInstance.computeContentAssist(
     "startRule",
-    assistanceTokenVector
-  )
+    assistanceTokenVector,
+  );
 
-  let finalSuggestions = []
+  let finalSuggestions = [];
 
   for (let i = 0; i < syntacticSuggestions.length; i++) {
-    const currSyntaxSuggestion = syntacticSuggestions[i]
-    const currTokenType = currSyntaxSuggestion.nextTokenType
-    const currRuleStack = currSyntaxSuggestion.ruleStack
-    const lastRuleName = _.last(currRuleStack)
+    const currSyntaxSuggestion = syntacticSuggestions[i];
+    const currTokenType = currSyntaxSuggestion.nextTokenType;
+    const currRuleStack = currSyntaxSuggestion.ruleStack;
+    const lastRuleName = _.last(currRuleStack);
 
     // easy case where a keyword is suggested.
     if (Keyword.categoryMatchesMap[currTokenType.tokenTypeIdx]) {
-      finalSuggestions.push(currTokenType.PATTERN.source)
+      finalSuggestions.push(currTokenType.PATTERN.source);
     } else if (currTokenType === Identifier) {
       // in declarations, should not provide content assist for new symbols (Identifiers)
       if (_.includes(["enumStmt", "functionStmt"], lastRuleName)) {
@@ -173,22 +181,22 @@ export function getContentAssistSuggestions(text, symbolTable) {
         // in a real world example symbol scoping and probably more in depth logic will be required.
         // This scenario appears in this example to emphasize that Chevrotain only supplies Syntactic content assist
         // The Semantic content assist must be implemented by the Grammar's author.
-        finalSuggestions = finalSuggestions.concat(symbolTable)
+        finalSuggestions = finalSuggestions.concat(symbolTable);
       } else {
-        throw Error("non exhaustive match")
+        throw Error("non exhaustive match");
       }
     } else {
-      throw Error("non exhaustive match")
+      throw Error("non exhaustive match");
     }
   }
 
   // throw away any suggestion that is not a suffix of the last partialToken.
   if (partialSuggestionMode) {
     finalSuggestions = _.filter(finalSuggestions, (currSuggestion) => {
-      return _.startsWith(currSuggestion, lastInputToken.image)
-    })
+      return _.startsWith(currSuggestion, lastInputToken.image);
+    });
   }
 
   // we could have duplication because each suggestion also includes a Path, and the same Token may appear in multiple suggested paths.
-  return _.uniq(finalSuggestions)
+  return _.uniq(finalSuggestions);
 }

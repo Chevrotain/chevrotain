@@ -1,25 +1,25 @@
-import { createToken, Lexer, EmbeddedActionsParser } from "chevrotain"
+import { createToken, Lexer, EmbeddedActionsParser } from "chevrotain";
 
 // ----------------- lexer -----------------
-const One = createToken({ name: "One", pattern: /1/ })
-const Two = createToken({ name: "Two", pattern: /2/ })
-const Three = createToken({ name: "Three", pattern: /3/ })
+const One = createToken({ name: "One", pattern: /1/ });
+const Two = createToken({ name: "Two", pattern: /2/ });
+const Three = createToken({ name: "Three", pattern: /3/ });
 
 const WhiteSpace = createToken({
   name: "WhiteSpace",
   pattern: /\s+/,
-  group: Lexer.SKIPPED
-})
+  group: Lexer.SKIPPED,
+});
 
 const allTokens = [
   // whitespace is normally very common so it should be placed first to speed up the lexer's performance
   WhiteSpace,
   One,
   Two,
-  Three
-]
+  Three,
+];
 
-const PredicateLookaheadLexer = new Lexer(allTokens)
+const PredicateLookaheadLexer = new Lexer(allTokens);
 
 /**
  * A Predicate / Gate function is invoked with context (this)
@@ -31,26 +31,26 @@ const PredicateLookaheadLexer = new Lexer(allTokens)
  * Note that this logic is in addition to the built in grammar lookahead function (choosing the alternative according to the next tokens)
  * Not instead of it.
  */
-let maxNumberAllowed = 3
+let maxNumberAllowed = 3;
 
 function isOne() {
-  return maxNumberAllowed >= 1
+  return maxNumberAllowed >= 1;
 }
 
 function isTwo() {
-  return maxNumberAllowed >= 2
+  return maxNumberAllowed >= 2;
 }
 
 function isThree() {
-  return maxNumberAllowed >= 3
+  return maxNumberAllowed >= 3;
 }
 
 // ----------------- parser -----------------
 class PredicateLookaheadParser extends EmbeddedActionsParser {
   constructor() {
-    super(allTokens)
+    super(allTokens);
 
-    const $ = this
+    const $ = this;
 
     $.RULE("customPredicateRule", () => {
       return $.OR([
@@ -61,53 +61,53 @@ class PredicateLookaheadParser extends EmbeddedActionsParser {
         {
           GATE: isOne,
           ALT: () => {
-            $.CONSUME(One)
-            return 1
-          }
+            $.CONSUME(One);
+            return 1;
+          },
         },
         {
           GATE: isTwo,
           ALT: () => {
-            $.CONSUME(Two)
-            return 2
-          }
+            $.CONSUME(Two);
+            return 2;
+          },
         },
         {
           GATE: isThree,
           ALT: () => {
-            $.CONSUME(Three)
-            return 3
-          }
-        }
-      ])
-    })
+            $.CONSUME(Three);
+            return 3;
+          },
+        },
+      ]);
+    });
 
     // very important to call this after all the rules have been defined.
     // otherwise the parser may not work correctly as it will lack information
     // derived during the self-analysis phase.
-    this.performSelfAnalysis()
+    this.performSelfAnalysis();
   }
 }
 
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-const parser = new PredicateLookaheadParser()
+const parser = new PredicateLookaheadParser();
 
 export function parse(text) {
-  const lexResult = PredicateLookaheadLexer.tokenize(text)
+  const lexResult = PredicateLookaheadLexer.tokenize(text);
   // setting a new input will RESET the parser instance's state.
-  parser.input = lexResult.tokens
+  parser.input = lexResult.tokens;
   // any top level rule may be used as an entry point
-  const value = parser.customPredicateRule()
+  const value = parser.customPredicateRule();
 
   return {
     value: value,
     lexErrors: lexResult.errors,
-    parseErrors: parser.errors
-  }
+    parseErrors: parser.errors,
+  };
 }
 
 export function setMaxAllowed(newMaxAllowed) {
-  maxNumberAllowed = newMaxAllowed
+  maxNumberAllowed = newMaxAllowed;
 }

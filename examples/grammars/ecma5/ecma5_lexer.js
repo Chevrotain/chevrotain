@@ -9,317 +9,317 @@
  * https://github.com/chevrotain/chevrotain/blob/master/test/full_flow/ecma_quirks/ecma_quirks.ts
  *
  */
-import * as acorn from "acorn"
-const acornTokTypes = acorn.tokTypes
-import * as tokens from "./ecma5_tokens.js"
+import * as acorn from "acorn";
+const acornTokTypes = acorn.tokTypes;
+import * as tokens from "./ecma5_tokens.js";
 
 function createChevToken(chevTokenClass, acornToken) {
   return {
     tokenTypeIdx: chevTokenClass.tokenTypeIdx,
     image: acornToken.value,
     startOffset: acornToken.start,
-    endOffset: acornToken.end
-  }
+    endOffset: acornToken.end,
+  };
 }
 
 export function tokenize(str) {
-  const result = []
+  const result = [];
   for (let token of acorn.tokenizer(str, { ecmaVersion: 6 })) {
-    let acornType = token.type
-    let ctt
+    let acornType = token.type;
+    let ctt;
     // https://github.com/ternjs/acorn/blob/master/src/tokentype.js#L54
     switch (acornType) {
       case acornTokTypes._var:
-        ctt = tokens.VarTok
-        break
+        ctt = tokens.VarTok;
+        break;
       case acornTokTypes.name:
         switch (token.value) {
           case "set":
-            ctt = tokens.SetTok
-            break
+            ctt = tokens.SetTok;
+            break;
           case "get":
-            ctt = tokens.GetTok
-            break
+            ctt = tokens.GetTok;
+            break;
           default:
-            ctt = tokens.Identifier
-            break
+            ctt = tokens.Identifier;
+            break;
         }
-        break
+        break;
       case acornTokTypes._break:
-        ctt = tokens.BreakTok
-        break
+        ctt = tokens.BreakTok;
+        break;
       case acornTokTypes._do:
-        ctt = tokens.DoTok
-        break
+        ctt = tokens.DoTok;
+        break;
       case acornTokTypes._instanceof:
-        ctt = tokens.InstanceOfTok
-        break
+        ctt = tokens.InstanceOfTok;
+        break;
       case acornTokTypes._typeof:
-        ctt = tokens.TypeOfTok
-        break
+        ctt = tokens.TypeOfTok;
+        break;
       case acornTokTypes._case:
-        ctt = tokens.CaseTok
-        break
+        ctt = tokens.CaseTok;
+        break;
       case acornTokTypes._else:
-        ctt = tokens.ElseTok
-        break
+        ctt = tokens.ElseTok;
+        break;
       case acornTokTypes._new:
-        ctt = tokens.NewTok
-        break
+        ctt = tokens.NewTok;
+        break;
       case acornTokTypes._catch:
-        ctt = tokens.CatchTok
-        break
+        ctt = tokens.CatchTok;
+        break;
       case acornTokTypes._finally:
-        ctt = tokens.FinallyTok
-        break
+        ctt = tokens.FinallyTok;
+        break;
       case acornTokTypes._return:
-        ctt = tokens.ReturnTok
-        break
+        ctt = tokens.ReturnTok;
+        break;
       case acornTokTypes._void:
-        ctt = tokens.VoidTok
-        break
+        ctt = tokens.VoidTok;
+        break;
       case acornTokTypes._continue:
-        ctt = tokens.ContinueTok
-        break
+        ctt = tokens.ContinueTok;
+        break;
       case acornTokTypes._for:
-        ctt = tokens.ForTok
-        break
+        ctt = tokens.ForTok;
+        break;
       case acornTokTypes._switch:
-        ctt = tokens.SwitchTok
-        break
+        ctt = tokens.SwitchTok;
+        break;
       case acornTokTypes._while:
-        ctt = tokens.WhileTok
-        break
+        ctt = tokens.WhileTok;
+        break;
       case acornTokTypes._debugger:
-        ctt = tokens.DebuggerTok
-        break
+        ctt = tokens.DebuggerTok;
+        break;
       case acornTokTypes._function:
-        ctt = tokens.FunctionTok
-        break
+        ctt = tokens.FunctionTok;
+        break;
       case acornTokTypes._this:
-        ctt = tokens.ThisTok
-        break
+        ctt = tokens.ThisTok;
+        break;
       case acornTokTypes._with:
-        ctt = tokens.WithTok
-        break
+        ctt = tokens.WithTok;
+        break;
       case acornTokTypes._default:
-        ctt = tokens.DefaultTok
-        break
+        ctt = tokens.DefaultTok;
+        break;
       case acornTokTypes._if:
-        ctt = tokens.IfTok
-        break
+        ctt = tokens.IfTok;
+        break;
       case acornTokTypes._throw:
-        ctt = tokens.ThrowTok
-        break
+        ctt = tokens.ThrowTok;
+        break;
       case acornTokTypes._delete:
-        ctt = tokens.DeleteTok
-        break
+        ctt = tokens.DeleteTok;
+        break;
       case acornTokTypes._in:
-        ctt = tokens.InTok
-        break
+        ctt = tokens.InTok;
+        break;
       case acornTokTypes._try:
-        ctt = tokens.TryTok
-        break
+        ctt = tokens.TryTok;
+        break;
       case acornTokTypes._super:
-        ctt = tokens.SuperTok
-        break
+        ctt = tokens.SuperTok;
+        break;
       case acornTokTypes.braceL:
-        ctt = tokens.LCurly
-        break
+        ctt = tokens.LCurly;
+        break;
       case acornTokTypes.braceR:
-        ctt = tokens.RCurly
-        break
+        ctt = tokens.RCurly;
+        break;
       case acornTokTypes.parenL:
-        ctt = tokens.LParen
-        break
+        ctt = tokens.LParen;
+        break;
       case acornTokTypes.parenR:
-        ctt = tokens.RParen
-        break
+        ctt = tokens.RParen;
+        break;
       case acornTokTypes.bracketL:
-        ctt = tokens.LBracket
-        break
+        ctt = tokens.LBracket;
+        break;
       case acornTokTypes.bracketR:
-        ctt = tokens.RBracket
-        break
+        ctt = tokens.RBracket;
+        break;
       case acornTokTypes.dot:
-        ctt = tokens.Dot
-        break
+        ctt = tokens.Dot;
+        break;
       case acornTokTypes.semi:
-        ctt = tokens.Semicolon
-        break
+        ctt = tokens.Semicolon;
+        break;
       case acornTokTypes.comma:
-        ctt = tokens.Comma
-        break
+        ctt = tokens.Comma;
+        break;
       case acornTokTypes.incDec:
         switch (token.value) {
           case "++":
-            ctt = tokens.PlusPlus
-            break
+            ctt = tokens.PlusPlus;
+            break;
           case "--":
-            ctt = tokens.MinusMinus
-            break
+            ctt = tokens.MinusMinus;
+            break;
         }
-        break
+        break;
       case acornTokTypes.bitwiseAND:
-        ctt = tokens.Ampersand
-        break
+        ctt = tokens.Ampersand;
+        break;
       case acornTokTypes.bitwiseOR:
-        ctt = tokens.VerticalBar
-        break
+        ctt = tokens.VerticalBar;
+        break;
       case acornTokTypes.bitwiseXOR:
-        ctt = tokens.Circumflex
-        break
+        ctt = tokens.Circumflex;
+        break;
       case acornTokTypes.prefix:
         switch (token.value) {
           case "!":
-            ctt = tokens.Exclamation
-            break
+            ctt = tokens.Exclamation;
+            break;
           case "~":
-            ctt = tokens.Tilde
-            break
+            ctt = tokens.Tilde;
+            break;
         }
-        break
+        break;
       case acornTokTypes.logicalAND:
-        ctt = tokens.AmpersandAmpersand
-        break
+        ctt = tokens.AmpersandAmpersand;
+        break;
       case acornTokTypes.logicalOR:
-        ctt = tokens.VerticalBarVerticalBar
-        break
+        ctt = tokens.VerticalBarVerticalBar;
+        break;
       case acornTokTypes.question:
-        ctt = tokens.Question
-        break
+        ctt = tokens.Question;
+        break;
       case acornTokTypes.colon:
-        ctt = tokens.Colon
-        break
+        ctt = tokens.Colon;
+        break;
       case acornTokTypes.star:
-        ctt = tokens.Asterisk
-        break
+        ctt = tokens.Asterisk;
+        break;
       case acornTokTypes.slash:
-        ctt = tokens.Slash
-        break
+        ctt = tokens.Slash;
+        break;
       case acornTokTypes.modulo:
-        ctt = tokens.Percent
-        break
+        ctt = tokens.Percent;
+        break;
       case acornTokTypes.plusMin:
         switch (token.value) {
           case "+":
-            ctt = tokens.Plus
+            ctt = tokens.Plus;
 
-            break
+            break;
           case "-":
-            ctt = tokens.Minus
-            break
+            ctt = tokens.Minus;
+            break;
         }
-        break
+        break;
       case acornTokTypes.bitShift:
         switch (token.value) {
           case "<<":
-            ctt = tokens.LessLess
-            break
+            ctt = tokens.LessLess;
+            break;
           case ">>":
-            ctt = tokens.MoreMore
-            break
+            ctt = tokens.MoreMore;
+            break;
           case ">>>":
-            ctt = tokens.MoreMoreMore
-            break
+            ctt = tokens.MoreMoreMore;
+            break;
         }
-        break
+        break;
       case acornTokTypes.relational:
         switch (token.value) {
           case "<":
-            ctt = tokens.Less
-            break
+            ctt = tokens.Less;
+            break;
           case ">":
-            ctt = tokens.Greater
-            break
+            ctt = tokens.Greater;
+            break;
           case "<=":
-            ctt = tokens.LessEq
-            break
+            ctt = tokens.LessEq;
+            break;
           case ">=":
-            ctt = tokens.GreaterEq
-            break
+            ctt = tokens.GreaterEq;
+            break;
         }
-        break
+        break;
       case acornTokTypes.equality:
         switch (token.value) {
           case "==":
-            ctt = tokens.EqEq
-            break
+            ctt = tokens.EqEq;
+            break;
           case "!=":
-            ctt = tokens.NotEq
-            break
+            ctt = tokens.NotEq;
+            break;
           case "===":
-            ctt = tokens.EqEqEq
-            break
+            ctt = tokens.EqEqEq;
+            break;
           case "!==":
-            ctt = tokens.NotEqEq
-            break
+            ctt = tokens.NotEqEq;
+            break;
         }
-        break
+        break;
       case acornTokTypes.eq:
-        ctt = tokens.Eq
-        break
+        ctt = tokens.Eq;
+        break;
       case acornTokTypes.assign:
         switch (token.value) {
           case "+=":
-            ctt = tokens.PlusEq
-            break
+            ctt = tokens.PlusEq;
+            break;
           case "-=":
-            ctt = tokens.MinusEq
-            break
+            ctt = tokens.MinusEq;
+            break;
           case "*=":
-            ctt = tokens.AsteriskEq
-            break
+            ctt = tokens.AsteriskEq;
+            break;
           case "%=":
-            ctt = tokens.PercentEq
-            break
+            ctt = tokens.PercentEq;
+            break;
           case "<<=":
-            ctt = tokens.LessLessEq
-            break
+            ctt = tokens.LessLessEq;
+            break;
           case ">>=":
-            ctt = tokens.MoreMoreEq
-            break
+            ctt = tokens.MoreMoreEq;
+            break;
           case ">>>=":
-            ctt = tokens.MoreMoreMoreEq
-            break
+            ctt = tokens.MoreMoreMoreEq;
+            break;
           case "&=":
-            ctt = tokens.AmpersandEq
-            break
+            ctt = tokens.AmpersandEq;
+            break;
           case "|=":
-            ctt = tokens.VerticalBarEq
-            break
+            ctt = tokens.VerticalBarEq;
+            break;
           case "^=":
-            ctt = tokens.CircumflexEq
-            break
+            ctt = tokens.CircumflexEq;
+            break;
           case "/=":
-            ctt = tokens.SlashEq
-            break
+            ctt = tokens.SlashEq;
+            break;
         }
-        break
+        break;
       case acornTokTypes._null:
-        ctt = tokens.NullTok
-        break
+        ctt = tokens.NullTok;
+        break;
       case acornTokTypes._true:
-        ctt = tokens.TrueTok
-        break
+        ctt = tokens.TrueTok;
+        break;
       case acornTokTypes._false:
-        ctt = tokens.FalseTok
-        break
+        ctt = tokens.FalseTok;
+        break;
       case acornTokTypes.num:
-        ctt = tokens.NumericLiteral
-        break
+        ctt = tokens.NumericLiteral;
+        break;
       case acornTokTypes.string:
-        ctt = tokens.StringLiteral
-        break
+        ctt = tokens.StringLiteral;
+        break;
       case acornTokTypes.regexp:
-        ctt = tokens.RegularExpressionLiteral
-        break
+        ctt = tokens.RegularExpressionLiteral;
+        break;
       default:
-        throw Error("sad sad panda")
+        throw Error("sad sad panda");
     }
-    const chevToken = createChevToken(ctt, token)
-    result.push(chevToken)
+    const chevToken = createChevToken(ctt, token);
+    result.push(chevToken);
   }
 
-  return result
+  return result;
 }

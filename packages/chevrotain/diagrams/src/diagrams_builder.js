@@ -1,27 +1,27 @@
-;(function (root, factory) {
+(function (root, factory) {
   if (typeof define === "function" && define.amd) {
     // AMD. Register as an anonymous module.
     // TODO: remove dependency to Chevrotain
-    define(["../vendor/railroad-diagrams"], factory)
+    define(["../vendor/railroad-diagrams"], factory);
   } else if (typeof module === "object" && module.exports) {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
     // like Node.
     // TODO: remove dependency to Chevrotain
-    module.exports = factory(require("../vendor/railroad-diagrams"))
+    module.exports = factory(require("../vendor/railroad-diagrams"));
   } else {
     // Browser globals (root is window)
-    root.diagrams_builder = factory(root.railroad)
+    root.diagrams_builder = factory(root.railroad);
   }
 })(this, function (railroad) {
-  var Diagram = railroad.Diagram
-  var Sequence = railroad.Sequence
-  var Choice = railroad.Choice
-  var Optional = railroad.Optional
-  var OneOrMore = railroad.OneOrMore
-  var ZeroOrMore = railroad.ZeroOrMore
+  var Diagram = railroad.Diagram;
+  var Sequence = railroad.Sequence;
+  var Choice = railroad.Choice;
+  var Optional = railroad.Optional;
+  var OneOrMore = railroad.OneOrMore;
+  var ZeroOrMore = railroad.ZeroOrMore;
   // var Terminal = railroad.Terminal
-  var NonTerminal = railroad.NonTerminal
+  var NonTerminal = railroad.NonTerminal;
 
   /**
    * @param {chevrotain.gast.ISerializedGast} topRules
@@ -29,28 +29,28 @@
    * @returns {string} - The htmlText that will render the diagrams
    */
   function buildSyntaxDiagramsText(topRules) {
-    var diagramsHtml = ""
+    var diagramsHtml = "";
 
     topRules.forEach(function (production) {
       var currDiagramHtml = convertProductionToDiagram(
         production,
-        production.name
-      )
+        production.name,
+      );
       diagramsHtml +=
         '<h2 class="diagramHeader">' +
         production.name +
         "</h2>" +
-        currDiagramHtml
-    })
+        currDiagramHtml;
+    });
 
-    return diagramsHtml
+    return diagramsHtml;
   }
 
   function definitionsToSubDiagrams(definitions, topRuleName) {
     var subDiagrams = definitions.map(function (subProd) {
-      return convertProductionToDiagram(subProd, topRuleName)
-    })
-    return subDiagrams
+      return convertProductionToDiagram(subProd, topRuleName);
+    });
+    return subDiagrams;
   }
 
   /**
@@ -62,13 +62,13 @@
    */
   function createTerminalFromSerializedGast(prod, topRuleName, dslRuleName) {
     // PATTERN static property will not exist when using custom lexers (hand built or other lexer generators)
-    var toolTipTitle = undefined
+    var toolTipTitle = undefined;
     // avoid trying to use a custom token pattern as the title.
     if (
       typeof prod.pattern === "string" ||
       Object.prototype.toString.call(prod.pattern) === "[object RegExp]"
     ) {
-      toolTipTitle = prod.pattern
+      toolTipTitle = prod.pattern;
     }
 
     return railroad.Terminal(
@@ -78,8 +78,8 @@
       prod.occurrenceInParent,
       topRuleName,
       dslRuleName,
-      prod.name
-    )
+      prod.name,
+    );
   }
 
   /**
@@ -98,40 +98,40 @@
         getNonTerminalName(prod),
         undefined,
         prod.occurrenceInParent,
-        topRuleName
-      )
+        topRuleName,
+      );
     } else if (prod.type !== "Terminal") {
-      var subDiagrams = definitionsToSubDiagrams(prod.definition, topRuleName)
+      var subDiagrams = definitionsToSubDiagrams(prod.definition, topRuleName);
       if (prod.type === "Rule") {
-        return Diagram.apply(this, subDiagrams)
+        return Diagram.apply(this, subDiagrams);
       } else if (prod.type === "Alternative") {
-        return Sequence.apply(this, subDiagrams)
+        return Sequence.apply(this, subDiagrams);
       } else if (prod.type === "Option") {
         if (subDiagrams.length > 1) {
-          return Optional(Sequence.apply(this, subDiagrams))
+          return Optional(Sequence.apply(this, subDiagrams));
         } else if (subDiagrams.length === 1) {
-          return Optional(subDiagrams[0])
+          return Optional(subDiagrams[0]);
         } else {
-          throw Error("Empty Optional production, OOPS!")
+          throw Error("Empty Optional production, OOPS!");
         }
       } else if (prod.type === "Repetition") {
         if (subDiagrams.length > 1) {
-          return ZeroOrMore(Sequence.apply(this, subDiagrams))
+          return ZeroOrMore(Sequence.apply(this, subDiagrams));
         } else if (subDiagrams.length === 1) {
-          return ZeroOrMore(subDiagrams[0])
+          return ZeroOrMore(subDiagrams[0]);
         } else {
-          throw Error("Empty Optional production, OOPS!")
+          throw Error("Empty Optional production, OOPS!");
         }
       } else if (prod.type === "Alternation") {
         // todo: what does the first argument of choice (the index 0 means?)
-        return Choice.apply(this, [0].concat(subDiagrams))
+        return Choice.apply(this, [0].concat(subDiagrams));
       } else if (prod.type === "RepetitionMandatory") {
         if (subDiagrams.length > 1) {
-          return OneOrMore(Sequence.apply(this, subDiagrams))
+          return OneOrMore(Sequence.apply(this, subDiagrams));
         } else if (subDiagrams.length === 1) {
-          return OneOrMore(subDiagrams[0])
+          return OneOrMore(subDiagrams[0]);
         } else {
-          throw Error("Empty Optional production, OOPS!")
+          throw Error("Empty Optional production, OOPS!");
         }
       } else if (prod.type === "RepetitionWithSeparator") {
         if (subDiagrams.length > 0) {
@@ -147,16 +147,16 @@
                       createTerminalFromSerializedGast(
                         prod.separator,
                         topRuleName,
-                        "many_sep"
-                      )
-                    ].concat(subDiagrams)
-                  )
-                )
-              ])
-            )
-          )
+                        "many_sep",
+                      ),
+                    ].concat(subDiagrams),
+                  ),
+                ),
+              ]),
+            ),
+          );
         } else {
-          throw Error("Empty Optional production, OOPS!")
+          throw Error("Empty Optional production, OOPS!");
         }
       } else if (prod.type === "RepetitionMandatoryWithSeparator") {
         if (subDiagrams.length > 0) {
@@ -171,34 +171,34 @@
                     createTerminalFromSerializedGast(
                       prod.separator,
                       topRuleName,
-                      "at_least_one_sep"
-                    )
-                  ].concat(subDiagrams)
-                )
-              )
-            ])
-          )
+                      "at_least_one_sep",
+                    ),
+                  ].concat(subDiagrams),
+                ),
+              ),
+            ]),
+          );
         } else {
-          throw Error("Empty Optional production, OOPS!")
+          throw Error("Empty Optional production, OOPS!");
         }
       }
     } else if (prod.type === "Terminal") {
-      return createTerminalFromSerializedGast(prod, topRuleName, "consume")
+      return createTerminalFromSerializedGast(prod, topRuleName, "consume");
     } else {
-      throw Error("non exhaustive match")
+      throw Error("non exhaustive match");
     }
   }
 
   function getNonTerminalName(prod) {
     if (prod.nonTerminalName !== undefined) {
-      return prod.nonTerminalName
+      return prod.nonTerminalName;
     } else {
-      return prod.name
+      return prod.name;
     }
   }
 
   return {
     buildSyntaxDiagramsText: buildSyntaxDiagramsText,
-    convertProductionToDiagram: convertProductionToDiagram
-  }
-})
+    convertProductionToDiagram: convertProductionToDiagram,
+  };
+});

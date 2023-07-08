@@ -32,11 +32,11 @@ How to enable CST output?
 This feature is enabled when a parser extends the [CstParser class](https://chevrotain.io/documentation/10_5_0/classes/CstParser.html).
 
 ```typescript
-import { CstParser } from "chevrotain"
+import { CstParser } from "chevrotain";
 
 class SelectParser extends CstParser {
   constructor() {
-    super([])
+    super([]);
   }
 }
 ```
@@ -68,14 +68,14 @@ export interface CstNode {
 A single CstNode corresponds to a single grammar rule's invocation result.
 
 ```javascript
-$.RULE("qualifiedName", () => {})
+$.RULE("qualifiedName", () => {});
 
-input = ""
+input = "";
 
 output = {
   name: "qualifiedName",
-  children: {}
-}
+  children: {},
+};
 ```
 
 Each Terminal will appear in the children dictionary using the terminal's name
@@ -83,20 +83,20 @@ as the key and an **array** of IToken as the value.
 
 ```javascript
 $.RULE("qualifiedName", () => {
-  $.CONSUME(Identifier)
-  $.CONSUME(Dot)
-  $.CONSUME2(Identifier)
-})
+  $.CONSUME(Identifier);
+  $.CONSUME(Dot);
+  $.CONSUME2(Identifier);
+});
 
-input = "foo.bar"
+input = "foo.bar";
 
 output = {
   name: "qualifiedName",
   children: {
     Dot: ["."],
-    Identifier: ["foo", "bar"]
-  }
-}
+    Identifier: ["foo", "bar"],
+  },
+};
 ```
 
 Non-Terminals are handled similarly to Terminals except each item in the value's array
@@ -104,14 +104,14 @@ Is the CstNode of the corresponding Grammar Rule (Non-Terminal).
 
 ```javascript
 $.RULE("qualifiedName", () => {
-  $.SUBRULE($.singleIdent)
-})
+  $.SUBRULE($.singleIdent);
+});
 
 $.RULE("singleIdent", () => {
-  $.CONSUME(Identifier)
-})
+  $.CONSUME(Identifier);
+});
 
-input = "foo"
+input = "foo";
 
 output = {
   name: "qualifiedName",
@@ -120,12 +120,12 @@ output = {
       {
         name: "singleIdent",
         children: {
-          Identifier: ["foo"]
-        }
-      }
-    ]
-  }
-}
+          Identifier: ["foo"],
+        },
+      },
+    ],
+  },
+};
 ```
 
 Note that Terminals and Non-Terminals will only appear in the children object
@@ -135,26 +135,26 @@ depending on the actual input, e.g:
 
 ```javascript
 $.RULE("variableStatement", () => {
-  $.CONSUME(Var)
-  $.CONSUME(Identifier)
+  $.CONSUME(Var);
+  $.CONSUME(Identifier);
   $.OPTION(() => {
-    $.CONSUME(Equals)
-    $.CONSUME(Integer)
-  })
-})
+    $.CONSUME(Equals);
+    $.CONSUME(Integer);
+  });
+});
 
-input1 = "var x"
+input1 = "var x";
 
 output1 = {
   name: "variableStatement",
   children: {
     Var: ["var"],
-    Identifier: ["x"]
+    Identifier: ["x"],
     // no "Equals" or "Integer" keys
-  }
-}
+  },
+};
 
-input2 = "var x = 5"
+input2 = "var x = 5";
 
 output2 = {
   name: "variableStatement",
@@ -162,9 +162,9 @@ output2 = {
     Var: ["var"],
     Identifier: ["x"],
     Equals: ["="],
-    Integer: ["5"]
-  }
-}
+    Integer: ["5"],
+  },
+};
 ```
 
 ## Extracting Alternatives to "sub" rules
@@ -177,25 +177,25 @@ $.RULE("statements", () => {
     // let x = 5
     {
       ALT: () => {
-        $.CONSUME(Let)
-        $.CONSUME(Identifer)
-        $.CONSUME(Equals)
-        $.SUBRULE($.expression)
-      }
+        $.CONSUME(Let);
+        $.CONSUME(Identifer);
+        $.CONSUME(Equals);
+        $.SUBRULE($.expression);
+      },
     },
     // select age from employee where age = 120
     {
       ALT: () => {
-        $.CONSUME(Select)
-        $.CONSUME2(Identifer)
-        $.CONSUME(From)
-        $.CONSUME3(Identifer)
-        $.CONSUME(Where)
-        $.SUBRULE($.expression)
-      }
-    }
-  ])
-})
+        $.CONSUME(Select);
+        $.CONSUME2(Identifer);
+        $.CONSUME(From);
+        $.CONSUME3(Identifer);
+        $.CONSUME(Where);
+        $.SUBRULE($.expression);
+      },
+    },
+  ]);
+});
 ```
 
 Some Terminals and Non-Terminals are used in **both** alternatives.
@@ -203,7 +203,7 @@ It is possible to check for the existence of "distinguishing" terminals such as 
 But this is not a robust approach.
 
 ```javascript
-let cstResult = parser.qualifiedName()
+let cstResult = parser.qualifiedName();
 
 if (cstResult.children.Let !== undefined) {
   // Let statement
@@ -221,9 +221,9 @@ Would be completely wrapped in their own Non-Terminal "sub" rules.
 $.RULE("statements", () => {
   $.OR([
     { ALT: () => $.SUBRULE($.letStatement) },
-    { ALT: () => $.SUBRULE($.selectStatement) }
-  ])
-})
+    { ALT: () => $.SUBRULE($.selectStatement) },
+  ]);
+});
 ```
 
 This is the recommended approach in this case as more and more alternations are added the grammar rule
@@ -247,13 +247,13 @@ to:
 for example:
 
 ```typescript
-import { CstParser } from "chevrotain"
+import { CstParser } from "chevrotain";
 
 class SelectParser extends CstParser {
   constructor() {
     super([], {
-      nodeLocationTracking: "full"
-    })
+      nodeLocationTracking: "full",
+    });
   }
 }
 ```
@@ -291,30 +291,30 @@ the "Where" token:
 
 ```javascript
 $.RULE("SelectClause", () => {
-  $.CONSUME(Select)
-  $.CONSUME2(Identifer)
-  $.CONSUME(From)
-  $.CONSUME3(Identifer)
-  $.CONSUME(Where)
-  $.SUBRULE($.expression)
-})
+  $.CONSUME(Select);
+  $.CONSUME2(Identifer);
+  $.CONSUME(From);
+  $.CONSUME3(Identifer);
+  $.CONSUME(Where);
+  $.SUBRULE($.expression);
+});
 
 // mismatch token due to typo at "wherrrre", parsing halts and re-syncs to upper rule so
 // the suffix "wherrrre age > 25" is not parsed.
-input = "select age from persons wherrrre age > 25"
+input = "select age from persons wherrrre age > 25";
 
 output = {
   name: "SelectClause",
   children: {
     Select: ["select"],
     Identifier: ["age, persons"],
-    From: ["from"]
+    From: ["from"],
     // No "Where" key d,ue to the parse error
     // No "expression" key due to the parse error
   },
   // This marks a recovered node.
-  recoveredNode: true
-}
+  recoveredNode: true,
+};
 ```
 
 This accessibility of **partial parsing results** means some post-parsing logic
@@ -337,23 +337,23 @@ One option would be to "manually" recursively "walk" the output CST structure.
 ```javascript
 // Tree Walker
 export function toAst(cst) {
-  const children = cst.children
+  const children = cst.children;
   switch (cst.name) {
     case "selectStatement": {
-      let columnsListCst = children.columnsList[0]
-      let fromClauseCst = children.fromClause[0]
+      let columnsListCst = children.columnsList[0];
+      let fromClauseCst = children.fromClause[0];
 
-      let columnsListAst = toAst(columnsListCst)
-      let fromClauseAst = toAst(fromClauseCst)
+      let columnsListAst = toAst(columnsListCst);
+      let fromClauseAst = toAst(fromClauseCst);
 
       return {
         type: "SelectStatementAst",
         columns: columnsListAst,
-        from: fromClauseAst
-      }
+        from: fromClauseAst,
+      };
     }
     case "columnsList": {
-      let columnName = children.identifier[0].image
+      let columnName = children.identifier[0].image;
       /*...*/
     }
     case "fromClause": {
@@ -361,8 +361,8 @@ export function toAst(cst) {
     }
     default: {
       throw new Error(
-        `CST case handler not implemented for CST node <${cst.name}>`
-      )
+        `CST case handler not implemented for CST node <${cst.name}>`,
+      );
     }
   }
 }
@@ -382,31 +382,31 @@ Chevrotain provides a CSTVisitor class which can make traversing the CST less er
 
 ```javascript
 // The base Visitor Class can be accessed via a Parser **instance**.
-const BaseCstVisitor = myParserInstance.getBaseCstVisitorConstructor()
+const BaseCstVisitor = myParserInstance.getBaseCstVisitorConstructor();
 
 class SqlToAstVisitor extends BaseCstVisitor {
   constructor() {
-    super()
+    super();
     // This helper will detect any missing or redundant methods on this visitor
-    this.validateVisitor()
+    this.validateVisitor();
   }
 
   selectStatement(ctx) {
     // ctx.columnsList is an array, while this.visit accepts a CSTNode
     // but if an array is passed to this.visit it will act as though the first element of the array has been passed.
     // this means "this.visit(ctx.columnsList)" is equivalent to "this.visit(ctx.columnsList[0])"
-    let columnsListAst = this.visit(ctx.columnsList)
-    let fromClauseAst = this.visit(ctx.fromClause)
+    let columnsListAst = this.visit(ctx.columnsList);
+    let fromClauseAst = this.visit(ctx.fromClause);
 
     return {
       type: "SelectStatementAst",
       columns: columnsListAst,
-      from: fromClauseAst
-    }
+      from: fromClauseAst,
+    };
   }
 
   columnsList(ctx) {
-    let columnName = ctx.identifier[0].image
+    let columnName = ctx.identifier[0].image;
     /*...*/
   }
 
@@ -444,18 +444,18 @@ which simply invokes **this.visit** on all none terminals in the CSTNode's child
 ```javascript
 // The base Visitor Class can be accessed via a Parser **instance**.
 const BaseCstVisitorWithDefaults =
-  myParserInstance.getBaseCstVisitorConstructorWithDefaults()
+  myParserInstance.getBaseCstVisitorConstructorWithDefaults();
 
 class SqlColumnNamesVisitor extends BaseCstVisitorWithDefaults {
   constructor() {
-    super()
-    this.result = []
-    this.validateVisitor()
+    super();
+    this.result = [];
+    this.validateVisitor();
   }
 
   fromClause(ctx) {
     // collect only the names of the columns
-    this.result.push(ctx.Identifier[0].image)
+    this.result.push(ctx.Identifier[0].image);
   }
 
   // All other visit methods will be "filled" automatically with the default implementation.
@@ -487,15 +487,15 @@ For example, given the Parser rules for **arrays** in JSON.
 ```typescript
 class JSONParser extends CstParser {
   private array = this.RULE("array", () => {
-    this.CONSUME(LSquare)
+    this.CONSUME(LSquare);
     this.MANY_SEP({
       SEP: Comma,
       DEF: () => {
-        this.SUBRULE(this.value)
-      }
-    })
-    this.CONSUME(RSquare)
-  })
+        this.SUBRULE(this.value);
+      },
+    });
+    this.CONSUME(RSquare);
+  });
 }
 ```
 
@@ -503,16 +503,16 @@ It would produce the following signatures:
 
 ```typescript
 export interface ArrayCstNode extends CstNode {
-  name: "array"
-  children: ArrayCstChildren
+  name: "array";
+  children: ArrayCstChildren;
 }
 
 export type ArrayCstChildren = {
-  LSquare: IToken[]
-  value?: ValueCstNode[]
-  Comma?: IToken[]
-  RSquare: IToken[]
-}
+  LSquare: IToken[];
+  value?: ValueCstNode[];
+  Comma?: IToken[];
+  RSquare: IToken[];
+};
 ```
 
 Note that the [generateCstDts](https://chevrotain.io/documentation/10_5_0/modules.html#generateCstDts) function

@@ -9,31 +9,31 @@ For example:
 // "KeywordOrIdentifier" is our Token category used to match any keyword or Identifier
 const KeywordOrIdentifier = createToken({
   name: "AnyWord",
-  pattern: Lexer.NA
-})
+  pattern: Lexer.NA,
+});
 
 // General Identifier
 export const Identifier = createToken({
   name: "Identifier",
   pattern: /[a-zA-Z]\w*/,
-  categories: [KeywordOrIdentifier]
-})
+  categories: [KeywordOrIdentifier],
+});
 
 // a Keyword
 export const Class = createToken({
   name: "Class",
   pattern: /Class/,
   longer_alt: Identifier,
-  categories: [KeywordOrIdentifier]
-})
+  categories: [KeywordOrIdentifier],
+});
 ```
 
 ```javascript
 $.RULE("SomeRule", () => {
   // This would match either an Identifier or a keyword thus allowing for
   // "None Reserved keywords"
-  $.CONSUME(KeywordOrIdentifier)
-})
+  $.CONSUME(KeywordOrIdentifier);
+});
 ```
 
 Note that:

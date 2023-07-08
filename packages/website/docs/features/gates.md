@@ -15,9 +15,9 @@ $.RULE("Value", (isConst) => {
     { GATE: () => !isConst, ALT: () => $.SUBRULE($.Variable) },
     { ALT: () => $.CONSUME(IntValue) },
     { ALT: () => $.CONSUME(FloatValue) },
-    { ALT: () => $.CONSUME(StringValue) }
-  ])
-})
+    { ALT: () => $.CONSUME(StringValue) },
+  ]);
+});
 ```
 
 Using the [Look Ahead](https://chevrotain.io/documentation/10_5_0/classes/CstParser.html#LA) method is often helpful with the use of Gates to determine if a path should be followed or not, for example:
@@ -26,14 +26,14 @@ Using the [Look Ahead](https://chevrotain.io/documentation/10_5_0/classes/CstPar
 // SELECT LIMIT.ID FROM USER_LIMIT LIMIT
 // SELECT ID, NAME FROM USER_LIMIT LIMIT 1
 $.RULE("FromClause", () => {
-  $.CONSUME(From)
-  $.CONSUME(Identifier)
+  $.CONSUME(From);
+  $.CONSUME(Identifier);
 
   $.OPTION({
     GATE: () => $.LA(2).tokenType !== UnsignedInteger,
-    DEF: () => $.CONSUME1(Identifier, { LABEL: "alias" })
-  })
-})
+    DEF: () => $.CONSUME1(Identifier, { LABEL: "alias" }),
+  });
+});
 ```
 
 If **LIMIT** is an identifier or a keyword based on the surrounding tokens, looking ahead at subsequent tokens is required to know if the token should be consumed as an identifer or should be skipped to be parsed up by a subsequent rule.

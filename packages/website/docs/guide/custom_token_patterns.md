@@ -9,7 +9,7 @@ See: [**Runnable example**](https://github.com/chevrotain/chevrotain/blob/master
 Normally a Token's pattern is defined using a JavaScript regular expression:
 
 ```javascript
-const IntegerToken = createToken({ name: "IntegerToken", pattern: /\d+/ })
+const IntegerToken = createToken({ name: "IntegerToken", pattern: /\d+/ });
 ```
 
 However in some circumstances the capability to provide a custom pattern matching implementation may be required.
@@ -39,21 +39,21 @@ Example:
 
 ```javascript
 function matchInteger(text, startOffset) {
-  let endOffset = startOffset
-  let charCode = text.charCodeAt(endOffset)
+  let endOffset = startOffset;
+  let charCode = text.charCodeAt(endOffset);
   // 0-9 digits
   while (charCode >= 48 && charCode <= 57) {
-    endOffset++
-    charCode = text.charCodeAt(endOffset)
+    endOffset++;
+    charCode = text.charCodeAt(endOffset);
   }
 
   // No match, must return null to conform with the RegExp.prototype.exec signature
   if (endOffset === startOffset) {
-    return null
+    return null;
   } else {
-    let matchedString = text.substring(startOffset, endOffset)
+    let matchedString = text.substring(startOffset, endOffset);
     // according to the RegExp.prototype.exec API the first item in the returned array must be the whole matched string.
-    return [matchedString]
+    return [matchedString];
   }
 }
 
@@ -63,15 +63,15 @@ createToken({
 
   // Optional property that will enable optimizations in the lexer
   // See: https://chevrotain.io/documentation/10_5_0/interfaces/ITokenConfig.html#start_chars_hint
-  start_chars_hint: ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
-})
+  start_chars_hint: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
+});
 ```
 
 Using an Object literal with only a single property is still a little verbose so an even more concise syntax is also supported:
 
 ```javascript
 // pattern is passed the matcher function directly.
-createToken({ name: "IntegerToken", pattern: matchInteger })
+createToken({ name: "IntegerToken", pattern: matchInteger });
 ```
 
 ## Lexing Context
@@ -83,15 +83,15 @@ on the previously lexed tokens.
 Lets expand the previous example to only allow lexing integers if the previous token was not an identifier (contrived example).
 
 ```javascript
-import { tokenMatcher } from "chevrotain"
+import { tokenMatcher } from "chevrotain";
 
 function matchInteger(text, offset, matchedTokens, groups) {
-  let lastMatchedToken = _.last(matchedTokens)
+  let lastMatchedToken = _.last(matchedTokens);
 
   // An Integer may not follow an Identifier
   if (tokenMatcher(lastMatchedToken, Identifier)) {
     // No match, must return null to conform with the RegExp.prototype.exec signature
-    return null
+    return null;
   }
   // rest of the code from the example above...
 }
@@ -116,32 +116,33 @@ for example:
 
 ```javascript
 // We define the regExp only **once** (outside) to avoid performance issues.
-const stringLiteralPattern = /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/y
+const stringLiteralPattern =
+  /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/y;
 function matchStringLiteral(text, startOffset) {
   // using 'y' sticky flag (Note it is not supported on IE11...)
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/sticky
-  stringLiteralPattern.lastIndex = startOffset
+  stringLiteralPattern.lastIndex = startOffset;
 
   // Note that just because we are using a custom token pattern
   // Does not mean we cannot implement it using JavaScript Regular Expressions...
-  const execResult = stringLiteralPattern.exec(text)
+  const execResult = stringLiteralPattern.exec(text);
   if (execResult !== null) {
-    const fullMatch = execResult[0]
+    const fullMatch = execResult[0];
     // compute the payload
-    const matchWithOutQuotes = fullMatch.substr(1, fullMatch.length - 2)
+    const matchWithOutQuotes = fullMatch.substr(1, fullMatch.length - 2);
     // attach the payload
-    execResult.payload = matchWithOutQuotes
+    execResult.payload = matchWithOutQuotes;
   }
 
-  return execResult
+  return execResult;
 }
 
 const StringLiteral = createToken({
   name: "StringLiteral",
   pattern: matchStringLiteral,
   // custom patterns should explicitly specify the line_breaks option.
-  line_breaks: false
-})
+  line_breaks: false,
+});
 
 // When we lex a StringLiteral text a "payload" property will now exist on the resulting token object.
 ```

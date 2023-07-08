@@ -33,14 +33,14 @@ $.RULE("statement", () => {
   $.OR([
     {
       GATE: $.BACKTRACK($.longRule1),
-      ALT: () => $.SUBRULE($.longRule1)
+      ALT: () => $.SUBRULE($.longRule1),
     },
     {
       GATE: $.BACKTRACK($.longRule2),
-      ALT: () => $.SUBRULE($.longRule2)
-    }
-  ])
-})
+      ALT: () => $.SUBRULE($.longRule2),
+    },
+  ]);
+});
 ```
 
 See [executable example](https://github.com/chevrotain/chevrotain/tree/master/examples/parser/backtracking)

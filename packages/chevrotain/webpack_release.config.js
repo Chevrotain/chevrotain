@@ -1,6 +1,6 @@
-import { createWebpackConfig } from "./webpack_base.config.js"
+import { createWebpackConfig } from "./webpack_base.config.js";
 
 export default createWebpackConfig({
   minimize: false,
-  filename: "chevrotain.js"
-})
+  filename: "chevrotain.js",
+});

@@ -1,5 +1,5 @@
-import assert from "assert"
-import { parseCss } from "./css.js"
+import assert from "assert";
+import { parseCss } from "./css.js";
 
 describe("The CSS Grammar", () => {
   it("can parse a simple CSS without errors", () => {
@@ -86,10 +86,10 @@ describe("The CSS Grammar", () => {
       "\r\n" +
       "\r\nsvg.railroad-diagram g.non-terminal text {" +
       "\r\n    cursor: pointer;" +
-      "\r\n}"
-    const result = parseCss(inputText)
+      "\r\n}";
+    const result = parseCss(inputText);
 
-    assert.equal(result.lexErrors, 0)
-    assert.equal(result.parseErrors.length, 0)
-  })
-})
+    assert.equal(result.lexErrors, 0);
+    assert.equal(result.parseErrors.length, 0);
+  });
+});

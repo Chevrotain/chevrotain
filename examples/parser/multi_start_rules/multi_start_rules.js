@@ -7,83 +7,83 @@
  * 2. Partial parsing of only the modified parts of a document in an IDE.
  */
 
-import { createToken, Lexer, CstParser } from "chevrotain"
+import { createToken, Lexer, CstParser } from "chevrotain";
 
 // ----------------- lexer -----------------
-const Alpha = createToken({ name: "Alpha", pattern: /A/ })
-const Bravo = createToken({ name: "Bravo", pattern: /B/ })
-const Charlie = createToken({ name: "Charlie", pattern: /C/ })
+const Alpha = createToken({ name: "Alpha", pattern: /A/ });
+const Bravo = createToken({ name: "Bravo", pattern: /B/ });
+const Charlie = createToken({ name: "Charlie", pattern: /C/ });
 
 const WhiteSpace = createToken({
   name: "WhiteSpace",
   pattern: /\s+/,
-  group: Lexer.SKIPPED
-})
+  group: Lexer.SKIPPED,
+});
 
 const allTokens = [
   WhiteSpace, // whitespace is normally very common so it should be placed first to speed up the lexer's performance
   Alpha,
   Bravo,
-  Charlie
-]
+  Charlie,
+];
 
-const PhoneticLexer = new Lexer(allTokens)
+const PhoneticLexer = new Lexer(allTokens);
 
 // ----------------- parser -----------------
 class MultiStartParser extends CstParser {
   constructor() {
-    super(allTokens)
+    super(allTokens);
 
-    const $ = this
+    const $ = this;
 
     $.RULE("firstRule", () => {
-      $.CONSUME(Alpha)
+      $.CONSUME(Alpha);
 
       $.OPTION(() => {
-        $.SUBRULE($.secondRule)
-      })
-    })
+        $.SUBRULE($.secondRule);
+      });
+    });
 
     $.RULE("secondRule", () => {
-      $.CONSUME(Bravo)
+      $.CONSUME(Bravo);
 
       $.OPTION(() => {
-        $.SUBRULE($.thirdRule)
-      })
-    })
+        $.SUBRULE($.thirdRule);
+      });
+    });
 
     $.RULE("thirdRule", () => {
-      $.CONSUME(Charlie)
-    })
+      $.CONSUME(Charlie);
+    });
 
     // very important to call this after all the rules have been defined.
     // otherwise the parser may not work correctly as it will lack information
     // derived during the self analysis phase.
-    this.performSelfAnalysis()
+    this.performSelfAnalysis();
   }
 }
 
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-const parser = new MultiStartParser()
+const parser = new MultiStartParser();
 
 function parseStartingWithRule(ruleName) {
   return function (text) {
-    const lexResult = PhoneticLexer.tokenize(text)
+    const lexResult = PhoneticLexer.tokenize(text);
     // setting a new input will RESET the parser instance's state.
-    parser.input = lexResult.tokens
+    parser.input = lexResult.tokens;
     // just invoke which ever rule you want as the start rule. its all just plain javascript...
-    const cst = parser[ruleName]()
+    const cst = parser[ruleName]();
 
     return {
       cst: cst,
       lexErrors: lexResult.errors,
-      parseErrors: parser.errors
-    }
-  }
+      parseErrors: parser.errors,
+    };
+  };
 }
 
-export const parseFirst = parseStartingWithRule("firstRule")
-export const parseSecond = parseStartingWithRule("secondRule")
-export const parseThird = parseStartingWithRule("thirdRule")
+export const parseFirst = parseStartingWithRule("firstRule");
+export const parseSecond = parseStartingWithRule("secondRule");
+export const parseThird = parseStartingWithRule("thirdRule");

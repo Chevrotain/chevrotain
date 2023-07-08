@@ -1,5 +1,5 @@
-import assert from "assert"
-import { parseTinyC } from "./tinyc.js"
+import assert from "assert";
+import { parseTinyC } from "./tinyc.js";
 
 describe("The TinyC Grammar", () => {
   it("can parse a simple TinyC sample without errors", () => {
@@ -11,10 +11,10 @@ describe("The TinyC Grammar", () => {
       "   if (i<j) " +
       "       j=j-i; " +
       "   else i=i-j;" +
-      "}"
-    const lexAndParseResult = parseTinyC(inputText)
+      "}";
+    const lexAndParseResult = parseTinyC(inputText);
 
-    assert.equal(lexAndParseResult.lexErrors.length, 0)
-    assert.equal(lexAndParseResult.parseErrors.length, 0)
-  })
-})
+    assert.equal(lexAndParseResult.lexErrors.length, 0);
+    assert.equal(lexAndParseResult.parseErrors.length, 0);
+  });
+});

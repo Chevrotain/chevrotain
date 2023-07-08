@@ -8,37 +8,37 @@ import {
   RepetitionMandatoryWithSeparator,
   RepetitionWithSeparator,
   Rule,
-  Terminal
-} from "./model.js"
-import type { IProduction } from "@chevrotain/types"
+  Terminal,
+} from "./model.js";
+import type { IProduction } from "@chevrotain/types";
 
 export abstract class GAstVisitor {
   public visit(node: IProduction): any {
-    const nodeAny: any = node
+    const nodeAny: any = node;
     switch (nodeAny.constructor) {
       case NonTerminal:
-        return this.visitNonTerminal(nodeAny)
+        return this.visitNonTerminal(nodeAny);
       case Alternative:
-        return this.visitAlternative(nodeAny)
+        return this.visitAlternative(nodeAny);
       case Option:
-        return this.visitOption(nodeAny)
+        return this.visitOption(nodeAny);
       case RepetitionMandatory:
-        return this.visitRepetitionMandatory(nodeAny)
+        return this.visitRepetitionMandatory(nodeAny);
       case RepetitionMandatoryWithSeparator:
-        return this.visitRepetitionMandatoryWithSeparator(nodeAny)
+        return this.visitRepetitionMandatoryWithSeparator(nodeAny);
       case RepetitionWithSeparator:
-        return this.visitRepetitionWithSeparator(nodeAny)
+        return this.visitRepetitionWithSeparator(nodeAny);
       case Repetition:
-        return this.visitRepetition(nodeAny)
+        return this.visitRepetition(nodeAny);
       case Alternation:
-        return this.visitAlternation(nodeAny)
+        return this.visitAlternation(nodeAny);
       case Terminal:
-        return this.visitTerminal(nodeAny)
+        return this.visitTerminal(nodeAny);
       case Rule:
-        return this.visitRule(nodeAny)
+        return this.visitRule(nodeAny);
       /* c8 ignore next 2 */
       default:
-        throw Error("non exhaustive match")
+        throw Error("non exhaustive match");
     }
   }
 
@@ -59,7 +59,7 @@ export abstract class GAstVisitor {
 
   /* c8 ignore next 3 */
   public visitRepetitionMandatoryWithSeparator(
-    node: RepetitionMandatoryWithSeparator
+    node: RepetitionMandatoryWithSeparator,
   ): any {}
 
   /* c8 ignore next */

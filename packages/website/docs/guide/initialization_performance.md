@@ -15,14 +15,14 @@ class InitTracingParser extends CstParser {
   constructor() {
     super([], {
       // Note `traceInitPerf` may also accept numerical values
-      traceInitPerf: true
-    })
+      traceInitPerf: true,
+    });
 
-    this.performSelfAnalysis()
+    this.performSelfAnalysis();
   }
 }
 
-new InitTracingParser() // Will print tracing info to the console.
+new InitTracingParser(); // Will print tracing info to the console.
 ```
 
 A Lexer's initialization performance can similarly be measured by enabling the
@@ -33,8 +33,8 @@ flag:
 // Will print tracing info to the console.
 new Lexer([], {
   // Note `traceInitPerf` may also accept numerical values
-  traceInitPerf: true
-})
+  traceInitPerf: true,
+});
 ```
 
 ## Use a smaller Global maxLookahead
@@ -54,10 +54,10 @@ class LowLookaheadParser extends CstParser {
   constructor() {
     super([], {
       // By default this value is 3
-      maxLookahead: 2
-    })
+      maxLookahead: 2,
+    });
 
-    this.performSelfAnalysis()
+    this.performSelfAnalysis();
   }
 }
 ```
@@ -69,8 +69,8 @@ class LowLookaheadParser extends CstParser {
   constructor() {
     super([], {
       // Globally **only one** token lookahead.
-      maxLookahead: 1
-    })
+      maxLookahead: 1,
+    });
 
     $.RULE("value", () => {
       $.OR({
@@ -79,21 +79,21 @@ class LowLookaheadParser extends CstParser {
         DEF: [
           {
             ALT: () => {
-              $.CONSUME(A)
-              $.CONSUME(B)
-            }
+              $.CONSUME(A);
+              $.CONSUME(B);
+            },
           },
           {
             ALT: () => {
-              $.CONSUME(A)
-              $.CONSUME(C)
-            }
-          }
-        ]
-      })
-    })
+              $.CONSUME(A);
+              $.CONSUME(C);
+            },
+          },
+        ],
+      });
+    });
 
-    this.performSelfAnalysis()
+    this.performSelfAnalysis();
   }
 }
 ```
@@ -111,10 +111,10 @@ class NaiveSkippedValidationsParser extends CstParser {
   constructor() {
     super([], {
       // This could reduce 30-50% of the initialization time
-      skipValidations: true
-    })
+      skipValidations: true,
+    });
 
-    this.performSelfAnalysis()
+    this.performSelfAnalysis();
   }
 }
 ```
@@ -124,8 +124,8 @@ config property can be used to skip the optional validations during **Lexer** in
 
 ```javascript
 new Lexer([], {
-  skipValidations: true
-})
+  skipValidations: true,
+});
 ```
 
 The examples above are a little naive, as the validations are **always** skipped, while we only need to skip
@@ -138,10 +138,10 @@ class MoreRealisticSkippedValidationsParser extends CstParser {
       // only run the validations when a certain env variable is set.
       skipValidations: process.env["IN_MY_PACKAGE_LOCAL_TESTING"] !== true,
       // Always Trace init logs when in local testing to hopefully spot regressions.
-      traceInitPerf: process.env["IN_MY_PACKAGE_LOCAL_TESTING"] === true
-    })
+      traceInitPerf: process.env["IN_MY_PACKAGE_LOCAL_TESTING"] === true,
+    });
 
-    this.performSelfAnalysis()
+    this.performSelfAnalysis();
   }
 }
 ```

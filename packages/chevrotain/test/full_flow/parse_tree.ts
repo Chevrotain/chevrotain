@@ -1,20 +1,23 @@
-import { compact, isFunction, isUndefined } from "lodash-es"
-import { IToken, TokenType } from "@chevrotain/types"
+import { compact, isFunction, isUndefined } from "lodash-es";
+import { IToken, TokenType } from "@chevrotain/types";
 
 export class ParseTree {
   getImage(): string {
-    return this.payload.image
+    return this.payload.image;
   }
 
   getLine(): number | undefined {
-    return this.payload.startLine
+    return this.payload.startLine;
   }
 
   getColumn(): number | undefined {
-    return this.payload.startColumn
+    return this.payload.startColumn;
   }
 
-  constructor(public payload: IToken, public children: ParseTree[] = []) {}
+  constructor(
+    public payload: IToken,
+    public children: ParseTree[] = [],
+  ) {}
 }
 
 /**
@@ -27,17 +30,17 @@ export class ParseTree {
  */
 export function PT(
   tokenOrTokenClass: TokenType | IToken,
-  children: ParseTree[] = []
+  children: ParseTree[] = [],
 ): ParseTree | null {
-  const childrenCompact = compact(children)
+  const childrenCompact = compact(children);
 
   if ((<IToken>tokenOrTokenClass).image !== undefined) {
-    return new ParseTree(<IToken>tokenOrTokenClass, childrenCompact)
+    return new ParseTree(<IToken>tokenOrTokenClass, childrenCompact);
   } else if (isFunction(tokenOrTokenClass)) {
-    return new ParseTree(new (<any>tokenOrTokenClass)(), childrenCompact)
+    return new ParseTree(new (<any>tokenOrTokenClass)(), childrenCompact);
   } else if (isUndefined(tokenOrTokenClass) || tokenOrTokenClass === null) {
-    return null
+    return null;
   } else {
-    throw `Invalid parameter ${tokenOrTokenClass} to PT factory.`
+    throw `Invalid parameter ${tokenOrTokenClass} to PT factory.`;
   }
 }

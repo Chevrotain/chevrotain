@@ -1,26 +1,26 @@
-var initialized = false
-var startRule
-var parserConfig = {}
+var initialized = false;
+var startRule;
+var parserConfig = {};
 onmessage = function (event) {
   if (!initialized) {
-    initialized = true
+    initialized = true;
     event.data.importScripts.forEach(function (elem) {
-      importScripts(elem)
-    })
+      importScripts(elem);
+    });
 
     if (event.data.sampleUrl) {
-      var xhrObj = new XMLHttpRequest()
-      xhrObj.open("GET", event.data.sampleUrl, false)
-      xhrObj.send("")
+      var xhrObj = new XMLHttpRequest();
+      xhrObj.open("GET", event.data.sampleUrl, false);
+      xhrObj.send("");
 
-      self.sample = xhrObj.responseText
+      self.sample = xhrObj.responseText;
     }
-    startRule = event.data.startRule
+    startRule = event.data.startRule;
     if (event.data.parserConfig) {
-      parserConfig = event.data.parserConfig
+      parserConfig = event.data.parserConfig;
     }
   } else {
-    var options = event.data[0]
+    var options = event.data[0];
 
     try {
       parseBench(
@@ -30,13 +30,13 @@ onmessage = function (event) {
         parser,
         startRule,
         options,
-        parserConfig
-      )
-      postMessage(0)
+        parserConfig,
+      );
+      postMessage(0);
     } catch (e) {
-      console.error(e.message)
-      console.error(e.stack)
-      postMessage(1)
+      console.error(e.message);
+      console.error(e.stack);
+      postMessage(1);
     }
   }
-}
+};

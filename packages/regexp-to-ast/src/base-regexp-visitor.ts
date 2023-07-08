@@ -10,21 +10,21 @@ import type {
   RegExpAstPart,
   RegExpFlags,
   RegExpPattern,
-  Set
-} from "../types"
+  Set,
+} from "../types";
 
 export class BaseRegExpVisitor {
   public visitChildren(node: IRegExpAST) {
     for (const key in node) {
-      const child = (node as any)[key]
+      const child = (node as any)[key];
       /* istanbul ignore else */
       if (node.hasOwnProperty(key)) {
         if (child.type !== undefined) {
-          this.visit(child)
+          this.visit(child);
         } else if (Array.isArray(child)) {
           child.forEach((subChild) => {
-            this.visit(subChild)
-          }, this)
+            this.visit(subChild);
+          }, this);
         }
       }
     }
@@ -33,53 +33,53 @@ export class BaseRegExpVisitor {
   public visit(node: RegExpAstPart): void {
     switch (node.type) {
       case "Pattern":
-        this.visitPattern(node)
-        break
+        this.visitPattern(node);
+        break;
       case "Flags":
-        this.visitFlags(node)
-        break
+        this.visitFlags(node);
+        break;
       case "Disjunction":
-        this.visitDisjunction(node)
-        break
+        this.visitDisjunction(node);
+        break;
       case "Alternative":
-        this.visitAlternative(node)
-        break
+        this.visitAlternative(node);
+        break;
       case "StartAnchor":
-        this.visitStartAnchor(node)
-        break
+        this.visitStartAnchor(node);
+        break;
       case "EndAnchor":
-        this.visitEndAnchor(node)
-        break
+        this.visitEndAnchor(node);
+        break;
       case "WordBoundary":
-        this.visitWordBoundary(node)
-        break
+        this.visitWordBoundary(node);
+        break;
       case "NonWordBoundary":
-        this.visitNonWordBoundary(node)
-        break
+        this.visitNonWordBoundary(node);
+        break;
       case "Lookahead":
-        this.visitLookahead(node)
-        break
+        this.visitLookahead(node);
+        break;
       case "NegativeLookahead":
-        this.visitNegativeLookahead(node)
-        break
+        this.visitNegativeLookahead(node);
+        break;
       case "Character":
-        this.visitCharacter(node)
-        break
+        this.visitCharacter(node);
+        break;
       case "Set":
-        this.visitSet(node)
-        break
+        this.visitSet(node);
+        break;
       case "Group":
-        this.visitGroup(node)
-        break
+        this.visitGroup(node);
+        break;
       case "GroupBackReference":
-        this.visitGroupBackReference(node)
-        break
+        this.visitGroupBackReference(node);
+        break;
       case "Quantifier":
-        this.visitQuantifier(node)
-        break
+        this.visitQuantifier(node);
+        break;
     }
 
-    this.visitChildren(node)
+    this.visitChildren(node);
   }
 
   public visitPattern(node: RegExpPattern): void {}

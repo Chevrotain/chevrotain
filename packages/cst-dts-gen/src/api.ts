@@ -1,22 +1,22 @@
-import { GenerateDtsOptions, Rule } from "@chevrotain/types"
-import { buildModel } from "./model.js"
-import { genDts } from "./generate.js"
+import { GenerateDtsOptions, Rule } from "@chevrotain/types";
+import { buildModel } from "./model.js";
+import { genDts } from "./generate.js";
 
 const defaultOptions: Required<GenerateDtsOptions> = {
   includeVisitorInterface: true,
-  visitorInterfaceName: "ICstNodeVisitor"
-}
+  visitorInterfaceName: "ICstNodeVisitor",
+};
 
 export function generateCstDts(
   productions: Record<string, Rule>,
-  options?: GenerateDtsOptions
+  options?: GenerateDtsOptions,
 ): string {
   const effectiveOptions = {
     ...defaultOptions,
-    ...options
-  }
+    ...options,
+  };
 
-  const model = buildModel(productions)
+  const model = buildModel(productions);
 
-  return genDts(model, effectiveOptions)
+  return genDts(model, effectiveOptions);
 }
