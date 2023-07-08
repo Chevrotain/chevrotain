@@ -53,9 +53,6 @@ importers:
       prettier:
         specifier: 2.8.4
         version: 2.8.4
-      rimraf:
-        specifier: 3.0.2
-        version: 3.0.2
       shx:
         specifier: 0.3.4
         version: 0.3.4
