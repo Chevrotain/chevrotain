@@ -1,28 +1,35 @@
-const config = require("./version-config")
-const git = require("gitty")
-const fs = require("fs")
+import git from "gitty"
+import fs from "fs"
+import {
+  apiString,
+  currVersion,
+  packagePath,
+  pkgJson,
+  readmePath,
+  versionPath
+} from "./version-config.js"
+import { VERSION as oldVersion } from "../lib/src/version.js"
 
 const myRepo = git("../../")
 
-const newVersion = config.currVersion
-const oldVersion = require("../lib/src/version").VERSION
+const newVersion = currVersion
 const oldVersionRegExpGlobal = new RegExp(oldVersion.replace(/\./g, "\\."), "g")
 
-console.log("bumping version on <" + config.versionPath + ">")
+console.log("bumping version on <" + versionPath + ">")
 
-const bumpedVersionTsFileContents = config.apiString.replace(
+const bumpedVersionTsFileContents = apiString.replace(
   oldVersionRegExpGlobal,
   newVersion
 )
-fs.writeFileSync(config.versionPath, bumpedVersionTsFileContents)
+fs.writeFileSync(versionPath, bumpedVersionTsFileContents)
 
-console.log("bumping unpkg link in: <" + config.readmePath + ">")
-const readmeContents = fs.readFileSync(config.readmePath, "utf8").toString()
+console.log("bumping unpkg link in: <" + readmePath + ">")
+const readmeContents = fs.readFileSync(readmePath, "utf8").toString()
 const bumpedReadmeContents = readmeContents.replace(
   oldVersionRegExpGlobal,
   newVersion
 )
-fs.writeFileSync(config.readmePath, bumpedReadmeContents)
+fs.writeFileSync(readmePath, bumpedReadmeContents)
 
 // Just adding to the current commit is sufficient as lerna does the commit + tag + push
-myRepo.addSync([config.versionPath, config.readmePath])
+myRepo.addSync([versionPath, readmePath])
