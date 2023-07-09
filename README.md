@@ -7,29 +7,31 @@
 
 # Chevrotain
 
-## Introduction
-
-Chevrotain is a [**blazing fast**](https://chevrotain.io/performance/) and [**feature rich**](http://chevrotain.io/docs/features/blazing_fast.html) **Parser Building Toolkit** for **JavaScript**.
-It can be used to build parsers/compilers/interpreters for various use cases ranging from simple configuration files,
-to full-fledged programing languages.
-
-A more in depth description of Chevrotain can be found in this great article on: [Parsing in JavaScript: Tools and Libraries](https://tomassetti.me/parsing-in-javascript/#chevrotain).
-
-It is important to note that Chevrotain is **NOT** a parser generator. It solves the same kind of problems as a parser generator, just **without any code generation**. Chevrotain Grammars are pure code which can be created/debugged/edited
-as any other pure code without requiring any new tools or processes.
-
 ## TLDR
 
 - [**Online Playground**](https://chevrotain.io/playground/)
-- **[Getting Started Tutorial](https://chevrotain.io/docs/tutorial/step0_introduction.html)**
+- [**Getting Started Tutorial**](https://chevrotain.io/docs/tutorial/step0_introduction.html)
+- [**YouTube Video**: Introduction to Lexers, Parsers and Interpreters with Chevrotain](https://www.youtube.com/watch?v=l-jMsoAY64k)
 - [**Performance benchmark**](https://chevrotain.io/performance/)
+
+## Introduction
+
+Chevrotain is a [**blazing fast**](https://chevrotain.io/performance/)
+and [**feature rich**](http://chevrotain.io/docs/features/blazing_fast.html)
+**Parser Building Toolkit** for **JavaScript** with built-in support for **LL(K)**.
+Grammars and [3rd party plugin for **LL(\*)**](https://github.com/langium/chevrotain-allstar) grammars.
+It can be used to build parsers/compilers/interpreters for various use cases ranging from simple configuration files,
+to full-fledged programing languages.
+
+Grammars are written as [**pure JavaScript sources**](https://chevrotain.io/docs/FAQ.html#VS_GENERATORS) without a code generation phase,
+
+A more in depth review of Chevrotain can be found in this great article on: [Parsing in JavaScript: Tools and Libraries](https://tomassetti.me/parsing-in-javascript/#chevrotain).
 
 ## Installation
 
 - **npm**: `npm install chevrotain`
-- **Browser**:
-  The npm package contains Chevrotain as concatenated and minified files ready for use in a browser.
-  These can also be accessed directly via [UNPKG](https://unpkg.com/) in a script tag.
+- **Browser** bundled versions:
+  These can be downloaded directly via [UNPKG](https://unpkg.com/) or other NPM cdn services, e.g:
   - Latest:
     - `https://unpkg.com/chevrotain/lib/chevrotain.js`
     - `https://unpkg.com/chevrotain/lib/chevrotain.min.js`
@@ -43,8 +45,6 @@ as any other pure code without requiring any new tools or processes.
 
 ## Documentation & Resources
 
-- **[Getting Started Tutorial](https://chevrotain.io/docs/tutorial/step1_lexing.html)**.
-
 - **[Sample Grammars](https://github.com/chevrotain/chevrotain/blob/master/examples/grammars)**.
 
 - **[FAQ](https://chevrotain.io/docs/FAQ.html).**
@@ -55,13 +55,13 @@ as any other pure code without requiring any new tools or processes.
 
   - [The Parsing DSL Docs](https://chevrotain.io/documentation/10_0_0/classes/BaseParser.html#AT_LEAST_ONE).
 
+- [ALL(\*) Lookahead in Langium](https://www.typefox.io/blog/allstar-lookahead)
+
 ## Compatibility
 
 Chevrotain will run on any **modern** JavaScript ES2015 runtime.
 That includes nodejs maintenance/active/current version, modern major browsers,
 but **not** legacy ES5.1 runtimes such as IE11.
-
-- Uses [UMD](https://github.com/umdjs/umd) to work with common module loaders (browser global / amd / commonjs).
 
 ## Contributions
 
@@ -70,7 +70,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
 ## Where used
 
-A small curated list:
+A small-curated list:
 
 1. [HyperFormula](https://github.com/handsontable/hyperformula)
 
