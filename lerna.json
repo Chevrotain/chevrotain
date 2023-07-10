@@ -1,5 +1,4 @@
 {
-  "packages": ["packages/*", "examples/*"],
   "useWorkspaces": true,
   "command": {
     "version": {
