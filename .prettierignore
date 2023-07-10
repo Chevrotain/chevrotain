@@ -10,7 +10,7 @@
 /packages/**/coverage
 /packages/**/.nyc_output
 /packages/**/gh-pages
-/packages/chevrotain/lib_esm
+/packages/chevrotain/temp
 
 /examples/webpack/lib
 /examples/implementation_languages/typescript/*.js

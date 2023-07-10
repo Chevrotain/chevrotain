@@ -30,18 +30,14 @@ A more in depth review of Chevrotain can be found in this great article on: [Par
 ## Installation
 
 - **npm**: `npm install chevrotain`
-- **Browser** bundled versions:
-  These can be downloaded directly via [UNPKG](https://unpkg.com/) or other NPM cdn services, e.g:
+- **Browser** **ESM** bundled versions:
+  These can be downloaded directly via [UNPKG](https://unpkg.com/) or other NPM cdn services, e.g.:
   - Latest:
-    - `https://unpkg.com/chevrotain/lib/chevrotain.js`
-    - `https://unpkg.com/chevrotain/lib/chevrotain.min.js`
-    - `https://unpkg.com/chevrotain/lib_esm/chevrotain.mjs`
-    - `https://unpkg.com/chevrotain/lib_esm/chevrotain.min.mjs`
+    - `https://unpkg.com/chevrotain/lib/chevrotain.mjs`
+    - `https://unpkg.com/chevrotain/lib/chevrotain.min.mjs`
   - Explicit version number:
-    - `https://unpkg.com/chevrotain@10.5.0/lib/chevrotain.js`
-    - `https://unpkg.com/chevrotain@10.5.0/lib/chevrotain.min.js`
-    - `https://unpkg.com/chevrotain@10.5.0/lib_esm/chevrotain.mjs`
-    - `https://unpkg.com/chevrotain@10.5.0/lib_esm/chevrotain.min.mjs`
+    - `https://unpkg.com/chevrotain@10.5.0/lib/chevrotain.mjs`
+    - `https://unpkg.com/chevrotain@10.5.0/lib/chevrotain.min.mjs`
 
 ## Documentation & Resources
 

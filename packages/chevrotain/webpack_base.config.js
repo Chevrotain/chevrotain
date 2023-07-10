@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkg = jf.readFileSync("./package.json");
 
-const banner = `/*! ${pkg.name} - v${pkg.version} */`;
+const banner = `/*! ${pkg.name} - v${pkg.version} -- NOT FOR PRODUCTIVE USAGE*/`;
 
 export function createWebpackConfig({ mode, filename, minimize }) {
   return {
@@ -18,7 +18,7 @@ export function createWebpackConfig({ mode, filename, minimize }) {
     },
     entry: "./lib/src/api.js",
     output: {
-      path: resolve(__dirname, "./lib/"),
+      path: resolve(__dirname, "./temp/"),
       filename,
       library: "chevrotain",
       libraryTarget: "umd",

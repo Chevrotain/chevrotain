@@ -31,14 +31,14 @@
   },
   "files": [
     "chevrotain.d.ts",
-    "lib_esm/**/*.mjs",
+    "lib/chevrotain.min.mjs",
+    "lib/chevrotain.mjs",
     "lib/src/**/*.js",
-    "lib/chevrotain.min.js",
-    "lib/chevrotain.js",
     "README.md",
     "LICENSE.TXT",
     "diagrams/**/*.*",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "temp/*.js"
   ],
   "repository": {
     "type": "git",
@@ -56,7 +56,7 @@
     "unit-tests": "mocha --enable-source-maps",
     "quick-build": "tsc && npm-run-all run bundle",
     "---------- BUILD STEPS --------": "",
-    "clean": "shx rm -rf coverage dev lib lib_esm",
+    "clean": "shx rm -rf coverage dev lib temp",
     "compile": "tsc",
     "compile:watch": "tsc -w",
     "coverage": "c8 mocha --enable-source-maps",
@@ -64,8 +64,8 @@
     "bundle": "npm-run-all bundle:**",
     "bundle:regular": "webpack --config webpack_release.config.js",
     "bundle:min": "webpack --config webpack_release_min.config.js",
-    "bundle:esm:regular": "esbuild ./lib/src/api.js --bundle --sourcemap --format=esm --outfile=lib_esm/chevrotain.mjs",
-    "bundle:esm:min": "esbuild ./lib/src/api.js --bundle --minify --format=esm --sourcemap --outfile=lib_esm/chevrotain.min.mjs"
+    "bundle:esm:regular": "esbuild ./lib/src/api.js --bundle --sourcemap --format=esm --outfile=lib/chevrotain.mjs",
+    "bundle:esm:min": "esbuild ./lib/src/api.js --bundle --minify --format=esm --sourcemap --outfile=lib/chevrotain.min.mjs"
   },
   "dependencies": {
     "@chevrotain/cst-dts-gen": "10.5.0",
