@@ -13,7 +13,7 @@
   "scripts": {
     "version": "pnpm install && git add pnpm-lock.yaml",
     "preinstall": "npx only-allow pnpm",
-    "release:version": "lerna version --force-publish",
+    "release:version": "pnpm run compile && lerna version --force-publish",
     "release:publish": "lerna publish from-git --yes --no-verify-access",
     "ci": "npm-run-all format:validate ci:subpackages",
     "compile": "pnpm -r run clean && tsc --build",
