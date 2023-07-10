@@ -1,4 +1,5 @@
 {
+  "extends": "./tsconfig.base.json",
   "references": [
     {
       "path": "./packages/regexp-to-ast"
