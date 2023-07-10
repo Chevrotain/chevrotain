@@ -1,3 +1,19 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Breaking Changes
+
+- [BREAKING_CHANGES For V11](https://chevrotain.io/docs/changes/BREAKING_CHANGES.html#_11-0-0)
+
+#### Minor Changes
+
+- [Reduced bundled size of `chevrotain.min.mjs` 212Kb --> 137kb ](https://github.com/Chevrotain/chevrotain/issues/1697)
+- [build: move regexp-to-ast package into this mono-repo](https://github.com/Chevrotain/chevrotain/pull/1947)
+  - Thanks to [@luiz290788](https://github.com/luiz290788) :thumbsup:
+
+#### Bug Fixes
+
+- [fix: direct eval() causing warning with esbuild/rollup](https://github.com/Chevrotain/chevrotain/issues/1760)
+
 ## 10.5.0 (3-11-2023)
 
 #### Minor Changes

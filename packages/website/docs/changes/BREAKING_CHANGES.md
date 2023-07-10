@@ -1,5 +1,16 @@
 # Breaking Changes
 
+## 11.0.0
+
+- Chevrotain is now **ESM only**.
+  If you need to use Chevrotain 11.0.0+ in a CommonJS project, either:
+  - Use [dynamic import](https://medium.com/@mariokandut/how-to-dynamically-load-esm-in-cjs-b39668a6038)
+  - Bundle Chevrotain yourself to Commonjs (e.g using Webpack / esbuild).
+- UMD bundles (e.g: `chevrotain.js/chevrotain.min.js`) were removed.
+- ESM bundles have been moved from `lib_esm` to `lib` folder, so CDN urls will break, e.g:
+  - New: `https://unpkg.com/chevrotain/lib/chevrotain.min.mjs`.
+  - Old: `https://unpkg.com/chevrotain/lib_esm/chevrotain.min.mjs` (now broken).
+
 ## 10.0.0
 
 - Dropped support for legacy ES5.1 runtimes (e.g: IE11)

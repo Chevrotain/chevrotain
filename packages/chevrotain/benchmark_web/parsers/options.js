@@ -5,7 +5,7 @@ const options = {
   next: {
     // this path seems to be relative to the `worker_impel.js` file
     // where this path will be imported using `WorkerGlobalScope.importScripts()`
-    bundle: "../../lib/chevrotain.js",
+    bundle: "../../temp/chevrotain.internal.temp.js",
     parserConfig: {
       maxLookahead: 2,
       outputCst: false,
@@ -13,7 +13,7 @@ const options = {
   },
   current: {
     // bundle: "../chevrotain.js",
-    bundle: "https://unpkg.com/chevrotain/lib/chevrotain.js",
+    bundle: "https://unpkg.com/chevrotain/temp/chevrotain.internal.temp.js",
     parserConfig: {
       maxLookahead: 2,
       outputCst: false,
@@ -21,7 +21,7 @@ const options = {
   },
 };
 
-// pick correct options depending on mode
+// pick the correct options depending on mode
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const mode = urlParams.get("mode");

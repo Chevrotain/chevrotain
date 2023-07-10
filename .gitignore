@@ -17,7 +17,6 @@ yarn-error.log
 /packages/**/lib
 /packages/**/coverage
 /packages/**/.nyc_output
-/packages/chevrotain/lib_esm
 /packages/chevrotain/.nyc_output
 /packages/chevrotain/coverage
 /packages/chevrotain/scripts/gh-pages
