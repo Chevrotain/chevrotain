@@ -1,0 +1,1 @@
+const a=JSON.parse('{"key":"v-049a2db6","path":"/features/syntax_diagrams.html","title":"Syntax Diagrams","lang":"en-US","frontmatter":{},"headers":[],"git":{"updatedTime":1614549192000,"contributors":[{"name":"Shahar Soel","email":"4233843+bd82@users.noreply.github.com","commits":1}]},"filePathRelative":"features/syntax_diagrams.md"}');export{a as data};

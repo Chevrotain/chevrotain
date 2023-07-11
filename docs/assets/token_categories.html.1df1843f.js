@@ -1,1 +1,0 @@
-const e=JSON.parse('{"key":"v-85c16244","path":"/features/token_categories.html","title":"Token Categories","lang":"en-US","frontmatter":{},"excerpt":"","headers":[],"git":{"updatedTime":1614549192000,"contributors":[{"name":"Shahar Soel","email":"4233843+bd82@users.noreply.github.com","commits":1}]},"filePathRelative":"features/token_categories.md"}');export{e as data};
