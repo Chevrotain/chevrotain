@@ -14,6 +14,7 @@ yarn-error.log
 # as prettier --ignore-path does not support nested folders ignores
 /packages/website/docs/.vuepress/dist/
 /packages/types/dev
+/packages/types/gh-pages
 /packages/**/lib
 /packages/**/coverage
 /packages/**/.nyc_output
