@@ -18,7 +18,7 @@ type ResolveGrammarOpts = {
   errMsgProvider?: IGrammarResolverErrorMessageProvider;
 };
 export function resolveGrammar(
-  options: ResolveGrammarOpts,
+  options: ResolveGrammarOpts
 ): IParserDefinitionError[] {
   const actualOptions: Required<ResolveGrammarOpts> = defaults(options, {
     errMsgProvider: defaultGrammarResolverErrorProvider,
@@ -45,6 +45,6 @@ export function validateGrammar(options: {
     options.rules,
     options.tokenTypes,
     options.errMsgProvider,
-    options.grammarName,
+    options.grammarName
   );
 }

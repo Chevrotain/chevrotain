@@ -89,7 +89,7 @@ describe("The Chevrotain Tokens namespace", () => {
         -1,
         -1,
         -1,
-        -1,
+        -1
       );
       const BInstanceRegular = createTokenInstance(
         BTokRegular,
@@ -99,7 +99,7 @@ describe("The Chevrotain Tokens namespace", () => {
         -1,
         -1,
         -1,
-        -1,
+        -1
       );
 
       expect(tokenMatcher(AInstanceRegular, ATokRegular)).to.be.true;
@@ -176,7 +176,7 @@ describe("The Chevrotain Tokens namespace", () => {
         createToken(<any>{
           name: "A",
           parent: "oops",
-        }),
+        })
       ).to.throw("The parent property is no longer supported");
     });
 

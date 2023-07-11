@@ -38,7 +38,7 @@ export type MixedInParser = ParserConstructorImpel &
 interface MixedInCstParserConstructor {
   new (
     tokenVocabulary: defs.TokenVocabulary,
-    config?: defs.IParserConfig,
+    config?: defs.IParserConfig
   ): defs.CstParser;
 }
 
@@ -49,7 +49,7 @@ export const CstParser: MixedInCstParserConstructor = <any>(
 interface MixedInEmbeddedActionsParserConstructor {
   new (
     tokenVocabulary: defs.TokenVocabulary,
-    config?: defs.IParserConfig,
+    config?: defs.IParserConfig
   ): defs.EmbeddedActionsParser;
 }
 

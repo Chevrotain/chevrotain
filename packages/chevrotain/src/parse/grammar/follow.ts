@@ -22,7 +22,7 @@ export class ResyncFollowsWalker extends RestWalker {
   walkTerminal(
     terminal: Terminal,
     currRest: IProduction[],
-    prevRest: IProduction[],
+    prevRest: IProduction[]
   ): void {
     // do nothing! just like in the public sector after 13:00
   }
@@ -30,7 +30,7 @@ export class ResyncFollowsWalker extends RestWalker {
   walkProdRef(
     refProd: NonTerminal,
     currRest: IProduction[],
-    prevRest: IProduction[],
+    prevRest: IProduction[]
   ): void {
     const followName =
       buildBetweenProdsFollowPrefix(refProd.referencedRule, refProd.idx) +
@@ -43,7 +43,7 @@ export class ResyncFollowsWalker extends RestWalker {
 }
 
 export function computeAllProdsFollows(
-  topProductions: Rule[],
+  topProductions: Rule[]
 ): Record<string, TokenType[]> {
   const reSyncFollows = {};
 
@@ -56,7 +56,7 @@ export function computeAllProdsFollows(
 
 export function buildBetweenProdsFollowPrefix(
   inner: Rule,
-  occurenceInParent: number,
+  occurenceInParent: number
 ): string {
   return inner.name + occurenceInParent + IN;
 }

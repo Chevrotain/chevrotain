@@ -33,7 +33,7 @@ export class ErrorHandler {
 
   SAVE_ERROR(
     this: MixedInParser,
-    error: IRecognitionException,
+    error: IRecognitionException
   ): IRecognitionException {
     if (isRecognitionException(error)) {
       error.context = {
@@ -44,7 +44,7 @@ export class ErrorHandler {
       return error;
     } else {
       throw Error(
-        "Trying to save an Error which is not a RecognitionException",
+        "Trying to save an Error which is not a RecognitionException"
       );
     }
   }
@@ -62,7 +62,7 @@ export class ErrorHandler {
     this: MixedInParser,
     occurrence: number,
     prodType: PROD_TYPE,
-    userDefinedErrMsg: string | undefined,
+    userDefinedErrMsg: string | undefined
   ): never {
     const ruleName = this.getCurrRuleFullName();
     const ruleGrammar = this.getGAstProductions()[ruleName];
@@ -70,7 +70,7 @@ export class ErrorHandler {
       occurrence,
       ruleGrammar,
       prodType,
-      this.maxLookahead,
+      this.maxLookahead
     );
     const insideProdPaths = lookAheadPathsPerAlternative[0];
     const actualTokens = [];
@@ -92,7 +92,7 @@ export class ErrorHandler {
   raiseNoAltException(
     this: MixedInParser,
     occurrence: number,
-    errMsgTypes: string | undefined,
+    errMsgTypes: string | undefined
   ): never {
     const ruleName = this.getCurrRuleFullName();
     const ruleGrammar = this.getGAstProductions()[ruleName];
@@ -100,7 +100,7 @@ export class ErrorHandler {
     const lookAheadPathsPerAlternative = getLookaheadPathsForOr(
       occurrence,
       ruleGrammar,
-      this.maxLookahead,
+      this.maxLookahead
     );
 
     const actualTokens = [];
@@ -118,7 +118,7 @@ export class ErrorHandler {
     });
 
     throw this.SAVE_ERROR(
-      new NoViableAltException(errMsg, this.LA(1), previousToken),
+      new NoViableAltException(errMsg, this.LA(1), previousToken)
     );
   }
 }

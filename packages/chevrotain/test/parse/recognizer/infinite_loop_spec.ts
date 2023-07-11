@@ -47,7 +47,7 @@ describe("The Recognizer's capabilities for detecting / handling infinite loops"
     parser.input = [createRegularToken(PlusTok)];
     const parseResult = parser.loop();
     expect(parser.errors[0].message).to.match(
-      /Redundant input, expecting EOF but found/,
+      /Redundant input, expecting EOF but found/
     );
   });
 
@@ -97,7 +97,7 @@ describe("The Recognizer's capabilities for detecting / handling infinite loops"
     parser.input = [createRegularToken(A)];
     const parseResult = parser.block();
     expect(parser.errors[0].message).to.match(
-      /Expecting: one of these possible Token sequences:/,
+      /Expecting: one of these possible Token sequences:/
     );
     expect(parser.errors[0].message).to.match(/[A, B]/);
     expect(parser.errors[0].message).to.match(/[A, C]/);

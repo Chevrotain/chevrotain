@@ -88,15 +88,15 @@ describe("The Recognizer's capabilities for overriding grammar productions", () 
           this.CONSUME(PlusTok);
           return "poof";
         },
-        { recoveryValueFunc: () => "boom" },
+        { recoveryValueFunc: () => "boom" }
       );
     }
 
     expect(() => new InvalidOverrideParser([])).to.throw(
-      "Parser Definition Errors detected",
+      "Parser Definition Errors detected"
     );
     expect(() => new InvalidOverrideParser([])).to.throw(
-      "Invalid rule override",
+      "Invalid rule override"
     );
     expect(() => new InvalidOverrideParser([])).to.throw("->oops<-");
   });

@@ -14,10 +14,7 @@ export class ParseTree {
     return this.payload.startColumn;
   }
 
-  constructor(
-    public payload: IToken,
-    public children: ParseTree[] = [],
-  ) {}
+  constructor(public payload: IToken, public children: ParseTree[] = []) {}
 }
 
 /**
@@ -30,7 +27,7 @@ export class ParseTree {
  */
 export function PT(
   tokenOrTokenClass: TokenType | IToken,
-  children: ParseTree[] = [],
+  children: ParseTree[] = []
 ): ParseTree | null {
   const childrenCompact = compact(children);
 

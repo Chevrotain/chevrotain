@@ -17,7 +17,7 @@ export class ContentAssist {
   public computeContentAssist(
     this: MixedInParser,
     startRuleName: string,
-    precedingInput: IToken[],
+    precedingInput: IToken[]
   ): ISyntacticContentAssistPath[] {
     const startRuleGast = this.gastProductionsCache[startRuleName];
 
@@ -29,7 +29,7 @@ export class ContentAssist {
       [startRuleGast],
       precedingInput,
       this.tokenMatcher,
-      this.maxLookahead,
+      this.maxLookahead
     );
   }
 
@@ -37,14 +37,14 @@ export class ContentAssist {
   // TODO: should this be more explicitly part of the public API?
   public getNextPossibleTokenTypes(
     this: MixedInParser,
-    grammarPath: ITokenGrammarPath,
+    grammarPath: ITokenGrammarPath
   ): TokenType[] {
     const topRuleName = first(grammarPath.ruleStack)!;
     const gastProductions = this.getGAstProductions();
     const topProduction = gastProductions[topRuleName];
     const nextPossibleTokenTypes = new NextAfterTokenWalker(
       topProduction,
-      grammarPath,
+      grammarPath
     ).startWalking();
     return nextPossibleTokenTypes;
   }

@@ -59,7 +59,7 @@ export abstract class GAstVisitor {
 
   /* c8 ignore next 3 */
   public visitRepetitionMandatoryWithSeparator(
-    node: RepetitionMandatoryWithSeparator,
+    node: RepetitionMandatoryWithSeparator
   ): any {}
 
   /* c8 ignore next */

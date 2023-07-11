@@ -9,7 +9,7 @@ export function createSyntaxDiagramsCode(
   }: {
     resourceBase?: string;
     css?: string;
-  } = {},
+  } = {}
 ) {
   const header = `
 <!-- This is a generated file -->

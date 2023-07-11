@@ -16,7 +16,7 @@ describe("The Recognizer's Configuration", () => {
     }
 
     expect(() => new InvalidNodeLocationTrackingOption()).to.throw(
-      'Invalid <nodeLocationTracking> config option: "oops"',
+      'Invalid <nodeLocationTracking> config option: "oops"'
     );
   });
 
@@ -60,7 +60,7 @@ describe("The Recognizer's Configuration", () => {
       }
     }
     expect(() => new IgnoredIssuesParser()).to.throw(
-      "The <ignoredIssues> IParserConfig property has been deprecated",
+      "The <ignoredIssues> IParserConfig property has been deprecated"
     );
   });
 });

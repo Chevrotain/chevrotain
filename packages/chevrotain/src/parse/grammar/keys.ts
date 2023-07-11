@@ -25,7 +25,7 @@ export const AT_LEAST_ONE_SEP_IDX = 6 << BITS_FOR_OCCURRENCE_IDX;
 export function getKeyForAutomaticLookahead(
   ruleIdx: number,
   dslMethodIdx: number,
-  occurrence: number,
+  occurrence: number
 ): number {
   return occurrence | dslMethodIdx | ruleIdx;
 }

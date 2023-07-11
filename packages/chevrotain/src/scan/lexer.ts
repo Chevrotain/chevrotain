@@ -89,7 +89,7 @@ export function analyzeTokenTypes(
     useSticky?: boolean;
     safeMode?: boolean;
     tracer?: (msg: string, action: () => void) => void;
-  },
+  }
 ): IAnalyzeResult {
   options = defaults(options, {
     useSticky: SUPPORT_STICKY,
@@ -157,7 +157,7 @@ export function analyzeTokenTypes(
                 "w",
                 "W",
               ],
-              regExpSource[1],
+              regExpSource[1]
             )
           ) {
             // escaped meta Characters: /\+/ /\[/
@@ -183,7 +183,7 @@ export function analyzeTokenTypes(
           } else {
             const escapedRegExpString = currPattern.replace(
               /[\\^$.*+?()[\]{}|]/g,
-              "\\$&",
+              "\\$&"
             );
             const wrappedRegExp = new RegExp(escapedRegExpString);
             return options.useSticky
@@ -193,7 +193,7 @@ export function analyzeTokenTypes(
         } else {
           throw Error("non exhaustive match");
         }
-      },
+      }
     );
   });
 
@@ -205,7 +205,7 @@ export function analyzeTokenTypes(
   tracer("misc mapping", () => {
     patternIdxToType = map(
       onlyRelevantTypes,
-      (currType) => currType.tokenTypeIdx!,
+      (currType) => currType.tokenTypeIdx!
     );
 
     patternIdxToGroup = map(onlyRelevantTypes, (clazz: any) => {
@@ -235,18 +235,18 @@ export function analyzeTokenTypes(
 
     patternIdxToPushMode = map(
       onlyRelevantTypes,
-      (clazz: any) => clazz.PUSH_MODE,
+      (clazz: any) => clazz.PUSH_MODE
     );
 
     patternIdxToPopMode = map(onlyRelevantTypes, (clazz: any) =>
-      has(clazz, "POP_MODE"),
+      has(clazz, "POP_MODE")
     );
   });
 
   let patternIdxToCanLineTerminator: boolean[];
   tracer("Line Terminator Handling", () => {
     const lineTerminatorCharCodes = getCharCodes(
-      options.lineTerminatorCharacters!,
+      options.lineTerminatorCharacters!
     );
     patternIdxToCanLineTerminator = map(onlyRelevantTypes, (tokType) => false);
     if (options.positionTracking !== "onlyOffset") {
@@ -258,7 +258,7 @@ export function analyzeTokenTypes(
             checkLineBreaksIssues(tokType, lineTerminatorCharCodes) === false &&
             canMatchCharCode(
               lineTerminatorCharCodes,
-              tokType.PATTERN as RegExp | string,
+              tokType.PATTERN as RegExp | string
             )
           );
         }
@@ -283,7 +283,7 @@ export function analyzeTokenTypes(
         }
         return acc;
       },
-      {} as { [groupName: string]: IToken[] },
+      {} as { [groupName: string]: IToken[] }
     );
 
     patternIdxToConfig = map(
@@ -301,7 +301,7 @@ export function analyzeTokenTypes(
           tokenTypeIdx: patternIdxToType[idx],
           tokenType: onlyRelevantTypes[idx],
         };
-      },
+      }
     );
   });
 
@@ -335,7 +335,7 @@ export function analyzeTokenTypes(
                 addToMapOfArrays(
                   result,
                   currOptimizedIdx,
-                  patternIdxToConfig[idx],
+                  patternIdxToConfig[idx]
                 );
               }
             });
@@ -348,13 +348,13 @@ export function analyzeTokenTypes(
                     `\tUnable to analyze < ${currTokType.PATTERN.toString()} > pattern.\n` +
                     "\tThe regexp unicode flag is not currently supported by the regexp-to-ast library.\n" +
                     "\tThis will disable the lexer's first char optimizations.\n" +
-                    "\tFor details See: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#UNICODE_OPTIMIZE",
+                    "\tFor details See: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#UNICODE_OPTIMIZE"
                 );
               }
             } else {
               const optimizedCodes = getOptimizedStartCodesIndices(
                 currTokType.PATTERN,
-                options.ensureOptimizations,
+                options.ensureOptimizations
               );
               /* istanbul ignore if */
               // start code will only be empty given an empty regExp or failure of regexp-to-ast library
@@ -375,7 +375,7 @@ export function analyzeTokenTypes(
                 `${failedOptimizationPrefixMsg}` +
                   `\tTokenType: <${currTokType.name}> is using a custom token pattern without providing <start_chars_hint> parameter.\n` +
                   "\tThis will disable the lexer's first char optimizations.\n" +
-                  "\tFor details See: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#CUSTOM_OPTIMIZE",
+                  "\tFor details See: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#CUSTOM_OPTIMIZE"
               );
             }
             canBeOptimized = false;
@@ -383,7 +383,7 @@ export function analyzeTokenTypes(
 
           return result;
         },
-        [] as { [charCode: number]: IPatternConfig[] },
+        [] as { [charCode: number]: IPatternConfig[] }
       );
     });
   }
@@ -399,7 +399,7 @@ export function analyzeTokenTypes(
 
 export function validatePatterns(
   tokenTypes: TokenType[],
-  validModesNames: string[],
+  validModesNames: string[]
 ): ILexerDefinitionError[] {
   let errors: ILexerDefinitionError[] = [];
 
@@ -415,7 +415,7 @@ export function validatePatterns(
   errors = errors.concat(findInvalidGroupType(validTokenTypes));
 
   errors = errors.concat(
-    findModesThatDoNotExist(validTokenTypes, validModesNames),
+    findModesThatDoNotExist(validTokenTypes, validModesNames)
   );
 
   errors = errors.concat(findUnreachablePatterns(validTokenTypes));
@@ -424,11 +424,11 @@ export function validatePatterns(
 }
 
 function validateRegExpPattern(
-  tokenTypes: TokenType[],
+  tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
   let errors: ILexerDefinitionError[] = [];
   const withRegExpPatterns = filter(tokenTypes, (currTokType) =>
-    isRegExp(currTokType[PATTERN]),
+    isRegExp(currTokType[PATTERN])
   );
 
   errors = errors.concat(findEndOfInputAnchor(withRegExpPatterns));
@@ -450,7 +450,7 @@ export interface ILexerFilterResult {
 }
 
 export function findMissingPatterns(
-  tokenTypes: TokenType[],
+  tokenTypes: TokenType[]
 ): ILexerFilterResult {
   const tokenTypesWithMissingPattern = filter(tokenTypes, (currType) => {
     return !has(currType, PATTERN);
@@ -472,7 +472,7 @@ export function findMissingPatterns(
 }
 
 export function findInvalidPatterns(
-  tokenTypes: TokenType[],
+  tokenTypes: TokenType[]
 ): ILexerFilterResult {
   const tokenTypesWithInvalidPattern = filter(tokenTypes, (currType) => {
     const pattern = currType[PATTERN];
@@ -503,7 +503,7 @@ export function findInvalidPatterns(
 const end_of_input = /[^\\][$]/;
 
 export function findEndOfInputAnchor(
-  tokenTypes: TokenType[],
+  tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
   class EndAnchorFinder extends BaseRegExpVisitor {
     found = false;
@@ -547,7 +547,7 @@ export function findEndOfInputAnchor(
 }
 
 export function findEmptyMatchRegExps(
-  tokenTypes: TokenType[],
+  tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
   const matchesEmptyString = filter(tokenTypes, (currType) => {
     const pattern = currType.PATTERN as RegExp;
@@ -571,7 +571,7 @@ export function findEmptyMatchRegExps(
 const start_of_input = /[^\\[][\^]|^\^/;
 
 export function findStartOfInputAnchor(
-  tokenTypes: TokenType[],
+  tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
   class StartAnchorFinder extends BaseRegExpVisitor {
     found = false;
@@ -614,7 +614,7 @@ export function findStartOfInputAnchor(
 }
 
 export function findUnsupportedFlags(
-  tokenTypes: TokenType[],
+  tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
   const invalidFlags = filter(tokenTypes, (currType) => {
     const pattern = currType[PATTERN];
@@ -637,7 +637,7 @@ export function findUnsupportedFlags(
 
 // This can only test for identical duplicate RegExps, not semantically equivalent ones.
 export function findDuplicatePatterns(
-  tokenTypes: TokenType[],
+  tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
   const found: TokenType[] = [];
   let identicalPatterns = map(tokenTypes, (outerType: any) => {
@@ -657,7 +657,7 @@ export function findDuplicatePatterns(
         }
         return result;
       },
-      [] as TokenType[],
+      [] as TokenType[]
     );
   });
 
@@ -677,7 +677,7 @@ export function findDuplicatePatterns(
       message:
         `The same RegExp pattern ->${dupPatternSrc}<-` +
         `has been used in all of the following Token Types: ${tokenTypeNames.join(
-          ", ",
+          ", "
         )} <-`,
       type: LexerDefinitionErrorType.DUPLICATE_PATTERNS_FOUND,
       tokenTypes: setOfIdentical,
@@ -688,7 +688,7 @@ export function findDuplicatePatterns(
 }
 
 export function findInvalidGroupType(
-  tokenTypes: TokenType[],
+  tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
   const invalidTypes = filter(tokenTypes, (clazz: any) => {
     if (!has(clazz, "GROUP")) {
@@ -715,7 +715,7 @@ export function findInvalidGroupType(
 
 export function findModesThatDoNotExist(
   tokenTypes: TokenType[],
-  validModes: string[],
+  validModes: string[]
 ): ILexerDefinitionError[] {
   const invalidModes = filter(tokenTypes, (clazz: any) => {
     return (
@@ -738,7 +738,7 @@ export function findModesThatDoNotExist(
 }
 
 export function findUnreachablePatterns(
-  tokenTypes: TokenType[],
+  tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
   const errors: ILexerDefinitionError[] = [];
 
@@ -760,7 +760,7 @@ export function findUnreachablePatterns(
       }
       return result;
     },
-    [] as { str: string; idx: number; tokenType: TokenType }[],
+    [] as { str: string; idx: number; tokenType: TokenType }[]
   );
 
   forEach(tokenTypes, (tokType, testIdx) => {
@@ -840,7 +840,7 @@ export function addStickyFlag(pattern: RegExp): RegExp {
 export function performRuntimeChecks(
   lexerDefinition: IMultiModeLexerDefinition,
   trackLines: boolean,
-  lineTerminatorCharacters: (number | string)[],
+  lineTerminatorCharacters: (number | string)[]
 ): ILexerDefinitionError[] {
   const errors: ILexerDefinitionError[] = [];
 
@@ -913,7 +913,7 @@ export function performRuntimeChecks(
 export function performWarningRuntimeChecks(
   lexerDefinition: IMultiModeLexerDefinition,
   trackLines: boolean,
-  lineTerminatorCharacters: (number | string)[],
+  lineTerminatorCharacters: (number | string)[]
 ): ILexerDefinitionError[] {
   const warnings = [];
   let hasAnyLineBreak = false;
@@ -921,7 +921,7 @@ export function performWarningRuntimeChecks(
 
   const concreteTokenTypes = reject(
     allTokenTypes,
-    (currType) => currType[PATTERN] === Lexer.NA,
+    (currType) => currType[PATTERN] === Lexer.NA
   );
   const terminatorCharCodes = getCharCodes(lineTerminatorCharacters);
   if (trackLines) {
@@ -1042,7 +1042,7 @@ export const LineTerminatorOptimizedTester: ILineTerminatorsTester = {
 
 function checkLineBreaksIssues(
   tokType: TokenType,
-  lineTerminatorCharCodes: number[],
+  lineTerminatorCharCodes: number[]
 ):
   | {
       issue:
@@ -1088,7 +1088,7 @@ export function buildLineBreakIssueMessage(
       | LexerDefinitionErrorType.IDENTIFY_TERMINATOR
       | LexerDefinitionErrorType.CUSTOM_LINE_BREAK;
     errMsg?: string;
-  },
+  }
 ): string {
   /* istanbul ignore else */
   if (details.issue === LexerDefinitionErrorType.IDENTIFY_TERMINATOR) {
@@ -1124,7 +1124,7 @@ function getCharCodes(charsOrCodes: (number | string)[]): number[] {
 function addToMapOfArrays<T>(
   map: Record<number, T[]>,
   key: number,
-  value: T,
+  value: T
 ): void {
   if (map[key] === undefined) {
     map[key] = [value];

@@ -70,7 +70,7 @@ function matchIndentBase(text, offset, matchedTokens, groups, type) {
     else if (currIndentLevel < prevIndentLevel && type === "outdent") {
       const matchIndentIndex = _.findLastIndex(
         indentStack,
-        (stackIndentDepth) => stackIndentDepth === currIndentLevel,
+        (stackIndentDepth) => stackIndentDepth === currIndentLevel
       );
 
       // any outdent must match some previous indentation level.
@@ -89,7 +89,7 @@ function matchIndentBase(text, offset, matchedTokens, groups, type) {
       for (let i = iStart; i < numberOfDedents; i++) {
         indentStack.pop();
         matchedTokens.push(
-          createTokenInstance(Outdent, "", NaN, NaN, NaN, NaN, NaN, NaN),
+          createTokenInstance(Outdent, "", NaN, NaN, NaN, NaN, NaN, NaN)
         );
       }
 
@@ -176,7 +176,7 @@ export function tokenize(text) {
   //add remaining Outdents
   while (indentStack.length > 1) {
     lexResult.tokens.push(
-      createTokenInstance(Outdent, "", NaN, NaN, NaN, NaN, NaN, NaN),
+      createTokenInstance(Outdent, "", NaN, NaN, NaN, NaN, NaN, NaN)
     );
     indentStack.pop();
   }

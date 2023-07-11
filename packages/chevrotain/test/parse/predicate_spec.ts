@@ -33,10 +33,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
     }
 
     class PredicateOptionParser extends EmbeddedActionsParser {
-      constructor(
-        input: IToken[] = [],
-        private gate: boolean,
-      ) {
+      constructor(input: IToken[] = [], private gate: boolean) {
         super(ALL_TOKENS, {});
         this.performSelfAnalysis();
         this.input = input;
@@ -57,25 +54,25 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
 
     const gateOpenInputGood = new PredicateOptionParser(
       [createRegularToken(A)],
-      true,
+      true
     ).optionRule();
     expect(gateOpenInputGood).to.equal("entered!");
 
     const gateOpenInputBad = new PredicateOptionParser(
       [createRegularToken(B)],
-      true,
+      true
     ).optionRule();
     expect(gateOpenInputBad).to.equal("not entered!");
 
     const gateClosedInputGood = new PredicateOptionParser(
       [createRegularToken(A)],
-      false,
+      false
     ).optionRule();
     expect(gateClosedInputGood).to.equal("not entered!");
 
     const gateClosedInputBad = new PredicateOptionParser(
       [createRegularToken(B)],
-      false,
+      false
     ).optionRule();
     expect(gateClosedInputBad).to.equal("not entered!");
   });
@@ -86,10 +83,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
     }
 
     class PredicateManyParser extends EmbeddedActionsParser {
-      constructor(
-        input: IToken[] = [],
-        private gate: boolean,
-      ) {
+      constructor(input: IToken[] = [], private gate: boolean) {
         super(ALL_TOKENS, {});
         this.performSelfAnalysis();
         this.input = input;
@@ -111,25 +105,25 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
 
     const gateOpenInputGood = new PredicateManyParser(
       [createRegularToken(A), createRegularToken(A)],
-      true,
+      true
     ).manyRule();
     expect(gateOpenInputGood).to.equal("entered!");
 
     const gateOpenInputBad = new PredicateManyParser(
       [createRegularToken(B)],
-      true,
+      true
     ).manyRule();
     expect(gateOpenInputBad).to.equal("not entered!");
 
     const gateClosedInputGood = new PredicateManyParser(
       [createRegularToken(A), createRegularToken(A)],
-      false,
+      false
     ).manyRule();
     expect(gateClosedInputGood).to.equal("not entered!");
 
     const gateClosedInputBad = new PredicateManyParser(
       [createRegularToken(B)],
-      false,
+      false
     ).manyRule();
     expect(gateClosedInputBad).to.equal("not entered!");
   });
@@ -140,10 +134,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
     }
 
     class PredicateAtLeastOneParser extends EmbeddedActionsParser {
-      constructor(
-        input: IToken[] = [],
-        private gate: boolean,
-      ) {
+      constructor(input: IToken[] = [], private gate: boolean) {
         super(ALL_TOKENS, {});
         this.performSelfAnalysis();
         this.input = input;
@@ -165,38 +156,38 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
 
     const gateOpenInputGood = new PredicateAtLeastOneParser(
       [createRegularToken(A), createRegularToken(A)],
-      true,
+      true
     ).atLeastOneRule();
     expect(gateOpenInputGood).to.equal("entered!");
 
     const gateOpenInputBadParser = new PredicateAtLeastOneParser(
       [createRegularToken(B)],
-      true,
+      true
     );
     gateOpenInputBadParser.atLeastOneRule();
     expect(gateOpenInputBadParser.errors).to.have.lengthOf(1);
     expect(gateOpenInputBadParser.errors[0]).to.be.an.instanceOf(
-      EarlyExitException,
+      EarlyExitException
     );
 
     const gateClosedInputGood = new PredicateAtLeastOneParser(
       [createRegularToken(A), createRegularToken(A)],
-      false,
+      false
     );
     gateClosedInputGood.atLeastOneRule();
     expect(gateClosedInputGood.errors).to.have.lengthOf(1);
     expect(gateClosedInputGood.errors[0]).to.be.an.instanceOf(
-      EarlyExitException,
+      EarlyExitException
     );
 
     const gateClosedInputBad = new PredicateAtLeastOneParser(
       [createRegularToken(B)],
-      false,
+      false
     );
     gateClosedInputBad.atLeastOneRule();
     expect(gateClosedInputBad.errors).to.have.lengthOf(1);
     expect(gateClosedInputBad.errors[0]).to.be.an.instanceOf(
-      EarlyExitException,
+      EarlyExitException
     );
   });
 
@@ -206,10 +197,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
     }
 
     class PredicateOrParser extends EmbeddedActionsParser {
-      constructor(
-        input: IToken[] = [],
-        private gate: boolean,
-      ) {
+      constructor(input: IToken[] = [], private gate: boolean) {
         super(ALL_TOKENS, {});
         this.performSelfAnalysis();
         this.input = input;
@@ -244,41 +232,41 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
 
     const gateOpenInputA = new PredicateOrParser(
       [createRegularToken(A)],
-      true,
+      true
     ).orRule();
     expect(gateOpenInputA).to.equal("A");
 
     const gateOpenInputB = new PredicateOrParser(
       [createRegularToken(B)],
-      true,
+      true
     ).orRule();
     expect(gateOpenInputB).to.equal("B");
 
     const gateOpenInputC = new PredicateOrParser(
       [createRegularToken(C)],
-      true,
+      true
     ).orRule();
     expect(gateOpenInputC).to.equal("C");
 
     const gateClosedInputA = new PredicateOrParser(
       [createRegularToken(A)],
-      false,
+      false
     ).orRule();
     expect(gateClosedInputA).to.equal("A");
 
     const gateClosedInputBad = new PredicateOrParser(
       [createRegularToken(B)],
-      false,
+      false
     );
     gateClosedInputBad.orRule();
     expect(gateClosedInputBad.errors).to.have.lengthOf(1);
     expect(gateClosedInputBad.errors[0]).to.be.an.instanceOf(
-      NoViableAltException,
+      NoViableAltException
     );
 
     const gateClosedInputC = new PredicateOrParser(
       [createRegularToken(C)],
-      false,
+      false
     ).orRule();
     expect(gateClosedInputC).to.equal("C");
   });

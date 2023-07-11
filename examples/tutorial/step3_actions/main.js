@@ -12,5 +12,5 @@ console.log(JSON.stringify(astFromVisitor, null, "\t"));
 assert.deepEqual(
   astFromVisitor,
   astFromEmbedded,
-  "Both ASTs should be identical",
+  "Both ASTs should be identical"
 );

@@ -13,14 +13,14 @@ const myRepo = git("../../");
 const newVersion = currVersion;
 const oldVersionRegExpGlobal = new RegExp(
   oldVersion.replace(/\./g, "\\."),
-  "g",
+  "g"
 );
 
 console.log("bumping version on <" + versionPath + ">");
 
 const bumpedVersionTsFileContents = apiString.replace(
   oldVersionRegExpGlobal,
-  newVersion,
+  newVersion
 );
 fs.writeFileSync(versionPath, bumpedVersionTsFileContents);
 
@@ -28,7 +28,7 @@ console.log("bumping unpkg link in: <" + readmePath + ">");
 const readmeContents = fs.readFileSync(readmePath, "utf8").toString();
 const bumpedReadmeContents = readmeContents.replace(
   oldVersionRegExpGlobal,
-  newVersion,
+  newVersion
 );
 fs.writeFileSync(readmePath, bumpedReadmeContents);
 

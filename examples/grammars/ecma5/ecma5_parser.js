@@ -60,7 +60,7 @@ export class ECMAScript5Parser extends EmbeddedActionsParser {
             { ALT: () => $.SUBRULE($.ArrayLiteral) },
             { ALT: () => $.SUBRULE($.ObjectLiteral) },
             { ALT: () => $.SUBRULE($.ParenthesisExpression) },
-          ]),
+          ])
       );
     });
 
@@ -246,7 +246,7 @@ export class ECMAScript5Parser extends EmbeddedActionsParser {
                   { ALT: () => $.CONSUME(t.Minus) },
                   { ALT: () => $.CONSUME(t.Tilde) },
                   { ALT: () => $.CONSUME(t.Exclamation) },
-                ]),
+                ])
             );
             $.SUBRULE($.UnaryExpression);
           },
@@ -276,7 +276,7 @@ export class ECMAScript5Parser extends EmbeddedActionsParser {
                 ALT: () => $.CONSUME(t.AbsMultiplicativeOperator),
               },
               { ALT: () => $.CONSUME(t.AbsAdditiveOperator) },
-            ]),
+            ])
         );
         $.SUBRULE2($.UnaryExpression);
       });
@@ -303,7 +303,7 @@ export class ECMAScript5Parser extends EmbeddedActionsParser {
                 ALT: () => $.CONSUME(t.AbsMultiplicativeOperator),
               },
               { ALT: () => $.CONSUME(t.AbsAdditiveOperator) },
-            ]),
+            ])
         );
         $.SUBRULE2($.UnaryExpression);
       });
@@ -378,7 +378,7 @@ export class ECMAScript5Parser extends EmbeddedActionsParser {
             { ALT: () => $.SUBRULE($.ThrowStatement) },
             { ALT: () => $.SUBRULE($.TryStatement) },
             { ALT: () => $.SUBRULE($.DebuggerStatement) },
-          ]),
+          ])
       );
     });
 
@@ -575,7 +575,7 @@ export class ECMAScript5Parser extends EmbeddedActionsParser {
             },
           },
         ]);
-      },
+      }
     );
 
     // See 12.7
@@ -691,9 +691,9 @@ export class ECMAScript5Parser extends EmbeddedActionsParser {
         // happening in this case because that type of recovery can only happen if CONSUME(...) was invoked.
         this.SAVE_ERROR(
           new MismatchedTokenException(
-            "Line Terminator not allowed before Expression in Throw Statement",
+            "Line Terminator not allowed before Expression in Throw Statement"
             // TODO: create line terminator token on the fly?
-          ),
+          )
         );
       }
       $.SUBRULE($.Expression);

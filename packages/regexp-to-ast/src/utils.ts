@@ -16,7 +16,7 @@ export function insertToSet<T>(item: T | T[], set: T[]) {
 
 export function addFlag(
   flagObj: RegExpFlags,
-  flagKey: keyof Omit<RegExpFlags, keyof IRegExpAST>,
+  flagKey: keyof Omit<RegExpFlags, keyof IRegExpAST>
 ) {
   if (flagObj[flagKey] === true) {
     throw "duplicate flag " + flagKey;

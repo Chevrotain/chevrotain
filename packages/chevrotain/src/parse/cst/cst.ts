@@ -9,7 +9,7 @@ import { CstNode, CstNodeLocation, IToken } from "@chevrotain/types";
  */
 export function setNodeLocationOnlyOffset(
   currNodeLocation: CstNodeLocation,
-  newLocationInfo: Required<Pick<IToken, "startOffset" | "endOffset">>,
+  newLocationInfo: Required<Pick<IToken, "startOffset" | "endOffset">>
 ): void {
   // First (valid) update for this cst node
   if (isNaN(currNodeLocation.startOffset) === true) {
@@ -37,7 +37,7 @@ export function setNodeLocationOnlyOffset(
  */
 export function setNodeLocationFull(
   currNodeLocation: CstNodeLocation,
-  newLocationInfo: CstNodeLocation,
+  newLocationInfo: CstNodeLocation
 ): void {
   // First (valid) update for this cst node
   if (isNaN(currNodeLocation.startOffset) === true) {
@@ -65,7 +65,7 @@ export function setNodeLocationFull(
 export function addTerminalToCst(
   node: CstNode,
   token: IToken,
-  tokenTypeName: string,
+  tokenTypeName: string
 ): void {
   if (node.children[tokenTypeName] === undefined) {
     node.children[tokenTypeName] = [token];
@@ -77,7 +77,7 @@ export function addTerminalToCst(
 export function addNoneTerminalToCst(
   node: CstNode,
   ruleName: string,
-  ruleResult: any,
+  ruleResult: any
 ): void {
   if (node.children[ruleName] === undefined) {
     node.children[ruleName] = [ruleResult];

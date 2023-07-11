@@ -188,10 +188,10 @@ describe("The CSTVisitor", () => {
     }
 
     expect(() => new CstVisitorValidator()).to.throw(
-      "Missing visitor method: <bamba>",
+      "Missing visitor method: <bamba>"
     );
     expect(() => new CstVisitorValidator()).to.throw(
-      "Errors Detected in CST Visitor",
+      "Errors Detected in CST Visitor"
     );
   });
 });

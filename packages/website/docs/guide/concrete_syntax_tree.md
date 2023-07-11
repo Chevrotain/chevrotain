@@ -361,7 +361,7 @@ export function toAst(cst) {
     }
     default: {
       throw new Error(
-        `CST case handler not implemented for CST node <${cst.name}>`,
+        `CST case handler not implemented for CST node <${cst.name}>`
       );
     }
   }

@@ -254,16 +254,16 @@ describe("Error Recovery SQL DDL Example", () => {
       expect(ptResult.children.length).to.equal(3);
       expect(ptResult.children[0].payload.tokenType).to.equal(CREATE_STMT);
       expect(ptResult.children[0].payload.tokenType).to.not.equal(
-        INVALID_CREATE_STMT,
+        INVALID_CREATE_STMT
       );
       // but the second one is marked as invalid
       expect(ptResult.children[1].payload.tokenType).to.equal(
-        INVALID_INSERT_STMT,
+        INVALID_INSERT_STMT
       );
       // yet the third one is still valid!, we recovered and continued parsing.
       expect(ptResult.children[2].payload.tokenType).to.equal(DELETE_STMT);
       expect(ptResult.children[2].payload.tokenType).to.not.equal(
-        INVALID_DELETE_STMT,
+        INVALID_DELETE_STMT
       );
     });
 
@@ -279,16 +279,16 @@ describe("Error Recovery SQL DDL Example", () => {
       expect(ptResult.children.length).to.equal(3);
       expect(ptResult.children[0].payload.tokenType).to.equal(CREATE_STMT);
       expect(ptResult.children[0].payload.tokenType).to.not.equal(
-        INVALID_CREATE_STMT,
+        INVALID_CREATE_STMT
       );
       // but the second one is marked as invalid, this means we kept trying to re-sync to an "higher" rule
       expect(ptResult.children[1].payload.tokenType).to.equal(
-        INVALID_INSERT_STMT,
+        INVALID_INSERT_STMT
       );
       // yet the third one is still valid!, we recovered and continued parsing.
       expect(ptResult.children[2].payload.tokenType).to.equal(DELETE_STMT);
       expect(ptResult.children[2].payload.tokenType).to.not.equal(
-        INVALID_DELETE_STMT,
+        INVALID_DELETE_STMT
       );
     });
 
@@ -310,15 +310,15 @@ describe("Error Recovery SQL DDL Example", () => {
     expect(ptResult.children.length).to.equal(3);
     expect(ptResult.children[0].payload.tokenType).to.equal(CREATE_STMT);
     expect(ptResult.children[0].payload.tokenType).to.not.equal(
-      INVALID_CREATE_STMT,
+      INVALID_CREATE_STMT
     );
     expect(ptResult.children[1].payload.tokenType).to.equal(INSERT_STMT);
     expect(ptResult.children[1].payload.tokenType).to.not.equal(
-      INVALID_INSERT_STMT,
+      INVALID_INSERT_STMT
     );
     expect(ptResult.children[2].payload.tokenType).to.equal(DELETE_STMT);
     expect(ptResult.children[2].payload.tokenType).to.not.equal(
-      INVALID_DELETE_STMT,
+      INVALID_DELETE_STMT
     );
   }
 
@@ -369,7 +369,7 @@ describe("Error Recovery SQL DDL Example", () => {
     expect(ptResult.children.length).to.equal(1);
     expect(ptResult.children[0].payload.tokenType).to.equal(DELETE_STMT);
     expect(ptResult.children[0].payload.tokenType).to.not.equal(
-      INVALID_DELETE_STMT,
+      INVALID_DELETE_STMT
     );
   });
 

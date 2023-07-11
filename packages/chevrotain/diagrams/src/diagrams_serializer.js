@@ -11,7 +11,7 @@ function serializeGrammarToFile(targetFilePath, varName, parserInstance) {
   // generated a JavaScript file which exports the serialized grammar on the global scope (Window)
   fs.writeFileSync(
     targetFilePath,
-    "var " + varName + " = " + serializedGrammarText,
+    "var " + varName + " = " + serializedGrammarText
   );
 }
 

@@ -58,7 +58,7 @@ const myLexer = new Lexer(
   [
     /* tokens */
   ],
-  { ensureOptimizations: true },
+  { ensureOptimizations: true }
 );
 ```
 
@@ -100,7 +100,7 @@ $.RULE("value", function () {
         { ALT: () => $.CONSUME(True) },
         { ALT: () => $.CONSUME(False) },
         { ALT: () => $.CONSUME(Null) },
-      ]),
+      ])
   );
 });
 ```
@@ -131,7 +131,7 @@ It is important to note that:
               result = $.CONSUME(StringLiteral);
             },
           },
-        ]),
+        ])
     );
   });
 
@@ -147,7 +147,7 @@ It is important to note that:
               return $.CONSUME(StringLiteral);
             },
           },
-        ]),
+        ])
     );
   });
   ```

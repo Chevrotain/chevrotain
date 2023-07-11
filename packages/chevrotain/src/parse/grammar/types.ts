@@ -32,7 +32,7 @@ export declare enum ParserDefinitionErrorType {
 export interface IGrammarValidatorErrorMessageProvider {
   buildDuplicateFoundError(
     topLevelRule: Rule,
-    duplicateProds: IProductionWithOccurrence[],
+    duplicateProds: IProductionWithOccurrence[]
   ): string;
   buildNamespaceConflictError(topLevelRule: Rule): string;
   buildAlternationPrefixAmbiguityError(options: {
@@ -92,6 +92,6 @@ export interface IGrammarValidatorErrorMessageProvider {
 export interface IGrammarResolverErrorMessageProvider {
   buildRuleNotFoundError(
     topLevelRule: Rule,
-    undefinedRule: NonTerminal,
+    undefinedRule: NonTerminal
   ): string;
 }

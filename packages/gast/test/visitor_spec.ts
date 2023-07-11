@@ -186,7 +186,7 @@ describe("the gast visitor", () => {
 
       class TestVisitor extends GAstVisitor {
         visitRepetitionMandatoryWithSeparator(
-          node: RepetitionMandatoryWithSeparator,
+          node: RepetitionMandatoryWithSeparator
         ): void {
           expect(node).to.equal(rootNode);
           expect(node.separator).to.equal;

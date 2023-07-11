@@ -149,7 +149,7 @@ class parser extends ChevrotainParser {
               $.CONSUME(Null)
             }
           }
-        ]),
+        ])
       );
     });
 

@@ -63,7 +63,7 @@ var Uri = createToken({ name: "Uri", pattern: Lexer.NA });
 var UriString = createToken({
   name: "UriString",
   pattern: MAKE_PATTERN(
-    "url\\((:?{{spaces}})?({{string1}}|{{string2}})(:?{{spaces}})?\\)",
+    "url\\((:?{{spaces}})?({{string1}}|{{string2}})(:?{{spaces}})?\\)"
   ),
   categories: Uri,
 });

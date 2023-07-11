@@ -62,7 +62,7 @@ export class BackTrackingParser extends EmbeddedActionsParser {
         SemiColonTok,
         IdentTok,
       ],
-      configuration,
+      configuration
     );
     // DOCS: The call to performSelfAnalysis needs to happen after all the RULEs have been defined
     //       The typescript compiler places the constructor body last after initializations in the class's body
@@ -76,14 +76,14 @@ export class BackTrackingParser extends EmbeddedActionsParser {
   public withEqualsStatement = this.RULE(
     "withEqualsStatement",
     this.parseWithEqualsStatement,
-    { recoveryValueFunc: INVALID(RET_TYPE.INVALID_WITH_EQUALS) },
+    { recoveryValueFunc: INVALID(RET_TYPE.INVALID_WITH_EQUALS) }
   );
   public withDefaultStatement = this.RULE(
     "withDefaultStatement",
     this.parseWithDefaultStatement,
     {
       recoveryValueFunc: INVALID(RET_TYPE.INVALID_WITH_DEFAULT),
-    },
+    }
   );
   public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, {
     recoveryValueFunc: INVALID(RET_TYPE.INVALID_FQN),

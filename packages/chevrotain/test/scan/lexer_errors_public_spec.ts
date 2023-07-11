@@ -10,11 +10,11 @@ describe("The Chevrotain default lexer error message provider", () => {
       23,
       1,
       0,
-      23,
+      23
     );
 
     expect(msg).to.equal(
-      "unexpected character: ->+<- at offset: 23, skipped 1 characters.",
+      "unexpected character: ->+<- at offset: 23, skipped 1 characters."
     );
   });
 
@@ -28,7 +28,7 @@ describe("The Chevrotain default lexer error message provider", () => {
       defaultLexerErrorProvider.buildUnableToPopLexerModeMessage(popToken);
 
     expect(msg).to.equal(
-      "Unable to pop Lexer Mode after encountering Token ->EXIT_NUMBERS<- The Mode Stack is empty",
+      "Unable to pop Lexer Mode after encountering Token ->EXIT_NUMBERS<- The Mode Stack is empty"
     );
   });
 });

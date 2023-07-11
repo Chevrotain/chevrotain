@@ -60,7 +60,7 @@ export function firstForBranching(prod: {
     prod.definition,
     (innerProd) => {
       return first(innerProd);
-    },
+    }
   );
   return uniq(flatten<TokenType>(allAlternativesFirsts));
 }

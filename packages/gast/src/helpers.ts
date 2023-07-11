@@ -15,7 +15,7 @@ import {
 import type { IProduction, IProductionWithOccurrence } from "@chevrotain/types";
 
 export function isSequenceProd(
-  prod: IProduction,
+  prod: IProduction
 ): prod is { definition: IProduction[] } & IProduction {
   return (
     prod instanceof Alternative ||
@@ -31,7 +31,7 @@ export function isSequenceProd(
 
 export function isOptionalProd(
   prod: IProduction,
-  alreadyVisited: NonTerminal[] = [],
+  alreadyVisited: NonTerminal[] = []
 ): boolean {
   const isDirectlyOptional =
     prod instanceof Option ||
@@ -60,7 +60,7 @@ export function isOptionalProd(
       (<AbstractProduction>prod).definition,
       (subProd: IProduction) => {
         return isOptionalProd(subProd, alreadyVisited);
-      },
+      }
     );
   } else {
     return false;
@@ -68,7 +68,7 @@ export function isOptionalProd(
 }
 
 export function isBranchingProd(
-  prod: IProduction,
+  prod: IProduction
 ): prod is { definition: IProduction[] } & IProduction {
   return prod instanceof Alternation;
 }

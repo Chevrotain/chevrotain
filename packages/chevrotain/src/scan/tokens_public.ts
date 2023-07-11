@@ -16,7 +16,7 @@ export function tokenName(tokType: TokenType): string {
 }
 
 export function hasTokenLabel(
-  obj: TokenType,
+  obj: TokenType
 ): obj is TokenType & Pick<Required<TokenType>, "LABEL"> {
   return isString(obj.LABEL) && obj.LABEL !== "";
 }
@@ -101,7 +101,7 @@ export function createTokenInstance(
   startLine: number,
   endLine: number,
   startColumn: number,
-  endColumn: number,
+  endColumn: number
 ): IToken {
   return {
     image,

@@ -57,7 +57,7 @@ describe("lookahead Regular Tokens Mode", () => {
 
       public manyOptionsRule = this.RULE(
         "manyOptionsRule",
-        this.parseManyOptionsRule,
+        this.parseManyOptionsRule
       );
 
       private parseManyOptionsRule(): string {
@@ -458,7 +458,7 @@ describe("lookahead Regular Tokens Mode", () => {
           recoveryValueFunc: () => {
             return "-666";
           },
-        },
+        }
       );
 
       private parseAtLeastOneRule(): string {
@@ -570,7 +570,7 @@ describe("lookahead Regular Tokens Mode", () => {
               separators: [],
             };
           },
-        },
+        }
       );
 
       private parseAtLeastOneRule(): any {
@@ -943,7 +943,7 @@ describe("lookahead Regular Tokens Mode", () => {
 
         public ambiguityRule = this.RULE(
           "ambiguityRule",
-          this.parseAmbiguityRule,
+          this.parseAmbiguityRule
         );
 
         private parseAmbiguityRule(): void {
@@ -974,7 +974,7 @@ describe("lookahead Regular Tokens Mode", () => {
       }
 
       expect(() => new OrAmbiguityLookAheadParser()).to.throw(
-        "Ambiguous Alternatives Detected:",
+        "Ambiguous Alternatives Detected:"
       );
       expect(() => new OrAmbiguityLookAheadParser()).to.throw("OneTok");
     });
@@ -990,7 +990,7 @@ describe("lookahead Regular Tokens Mode", () => {
 
         public ambiguityRule = this.RULE(
           "ambiguityRule",
-          this.parseAmbiguityRule,
+          this.parseAmbiguityRule
         );
 
         private parseAmbiguityRule(): void {
@@ -1018,10 +1018,10 @@ describe("lookahead Regular Tokens Mode", () => {
         }
       }
       expect(() => new OrAmbiguityMultiTokenLookAheadParser()).to.throw(
-        "Ambiguous Alternatives Detected:",
+        "Ambiguous Alternatives Detected:"
       );
       expect(() => new OrAmbiguityMultiTokenLookAheadParser()).to.throw(
-        "TwoTok, ThreeTok, FourTok",
+        "TwoTok, ThreeTok, FourTok"
       );
     });
   });
@@ -1562,7 +1562,7 @@ describe("lookahead Regular Tokens Mode", () => {
           createRegularToken(ThreeTok),
           createRegularToken(OneTok),
           createRegularToken(TwoTok),
-        ],
+        ]
       );
       expect(twoIterationsParser.rule()).to.equal(2);
 
@@ -1622,7 +1622,7 @@ describe("lookahead Regular Tokens Mode", () => {
       expect(parser.errors.length).to.eql(1);
       // wrong path chosen due to low explicit lookahead
       expect(parser.errors[0].message).to.include(
-        "Expecting token of type --> ThreeTok <--",
+        "Expecting token of type --> ThreeTok <--"
       );
     });
 
@@ -1928,7 +1928,7 @@ describe("lookahead Regular Tokens Mode", () => {
           createRegularToken(ThreeTok),
           createRegularToken(OneTok),
           createRegularToken(TwoTok),
-        ],
+        ]
       );
       expect(twoIterationsParser.rule()).to.equal(2);
 

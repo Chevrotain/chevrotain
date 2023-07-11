@@ -23,16 +23,16 @@
     }
 
     var diagramHeaders = toArr(
-      document.getElementsByClassName("diagramHeader"),
+      document.getElementsByClassName("diagramHeader")
     );
     diagramHeaders.forEach(function (header) {
       header.addEventListener(
         "mouseover",
-        toggleNonTerminalUsageAndDef_fromHeader,
+        toggleNonTerminalUsageAndDef_fromHeader
       );
       header.addEventListener(
         "mouseout",
-        toggleNonTerminalUsageAndDef_fromHeader,
+        toggleNonTerminalUsageAndDef_fromHeader
       );
     });
 
@@ -41,11 +41,11 @@
     noneTerminalsText.forEach(function (nonTerminal) {
       nonTerminal.addEventListener(
         "mouseover",
-        toggleNonTerminalUsageAndDef_fromNoneTerminal,
+        toggleNonTerminalUsageAndDef_fromNoneTerminal
       );
       nonTerminal.addEventListener(
         "mouseout",
-        toggleNonTerminalUsageAndDef_fromNoneTerminal,
+        toggleNonTerminalUsageAndDef_fromNoneTerminal
       );
 
       if (scrollingEnabled) {
@@ -166,7 +166,7 @@
     // min time .1, max time .8 seconds
     var time = Math.max(
       0.1,
-      Math.min(Math.abs(scrollY - scrollTargetY) / speed, 0.8),
+      Math.min(Math.abs(scrollY - scrollTargetY) / speed, 0.8)
     );
 
     // easing equations from https://github.com/danro/easing-js/blob/master/easing.js

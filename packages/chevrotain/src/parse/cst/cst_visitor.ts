@@ -32,7 +32,7 @@ export function defaultVisit<IN>(ctx: any, param: IN): void {
 
 export function createBaseSemanticVisitorConstructor(
   grammarName: string,
-  ruleNames: string[],
+  ruleNames: string[]
 ): {
   new (...args: any[]): ICstVisitor<any, any>;
 } {
@@ -65,11 +65,11 @@ export function createBaseSemanticVisitorConstructor(
       if (!isEmpty(semanticDefinitionErrors)) {
         const errorMessages = map(
           semanticDefinitionErrors,
-          (currDefError) => currDefError.msg,
+          (currDefError) => currDefError.msg
         );
         throw Error(
           `Errors Detected in CST Visitor <${this.constructor.name}>:\n\t` +
-            `${errorMessages.join("\n\n").replace(/\n/g, "\n\t")}`,
+            `${errorMessages.join("\n\n").replace(/\n/g, "\n\t")}`
         );
       }
     },
@@ -86,7 +86,7 @@ export function createBaseSemanticVisitorConstructor(
 export function createBaseVisitorConstructorWithDefaults(
   grammarName: string,
   ruleNames: string[],
-  baseConstructor: Function,
+  baseConstructor: Function
 ): {
   new (...args: any[]): ICstVisitor<any, any>;
 } {
@@ -121,7 +121,7 @@ export interface IVisitorDefinitionError {
 
 export function validateVisitor(
   visitorInstance: ICstVisitor<unknown, unknown>,
-  ruleNames: string[],
+  ruleNames: string[]
 ): IVisitorDefinitionError[] {
   const missingErrors = validateMissingCstMethods(visitorInstance, ruleNames);
 
@@ -130,7 +130,7 @@ export function validateVisitor(
 
 export function validateMissingCstMethods(
   visitorInstance: ICstVisitor<unknown, unknown>,
-  ruleNames: string[],
+  ruleNames: string[]
 ): IVisitorDefinitionError[] {
   const missingRuleNames = filter(ruleNames, (currRuleName) => {
     return isFunction((visitorInstance as any)[currRuleName]) === false;
@@ -146,7 +146,7 @@ export function validateMissingCstMethods(
         type: CstVisitorDefinitionError.MISSING_METHOD,
         methodName: currRuleName,
       };
-    },
+    }
   );
 
   return compact<IVisitorDefinitionError>(errors);

@@ -61,7 +61,7 @@ declare abstract class BaseParser {
    */
   computeContentAssist(
     startRuleName: string,
-    precedingInput: IToken[],
+    precedingInput: IToken[]
   ): ISyntacticContentAssistPath[];
 
   /**
@@ -72,7 +72,7 @@ declare abstract class BaseParser {
    */
   protected BACKTRACK<T>(
     grammarRule: (...args: any[]) => T,
-    args?: any[],
+    args?: any[]
   ): () => boolean;
 
   /**
@@ -97,7 +97,7 @@ declare abstract class BaseParser {
   protected consume(
     idx: number,
     tokType: TokenType,
-    options?: ConsumeMethodOpts,
+    options?: ConsumeMethodOpts
   ): IToken;
 
   /**
@@ -110,7 +110,7 @@ declare abstract class BaseParser {
    */
   protected option<OUT>(
     idx: number,
-    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
   ): OUT | undefined;
 
   /**
@@ -134,7 +134,7 @@ declare abstract class BaseParser {
    */
   protected many(
     idx: number,
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>
   ): void;
 
   /**
@@ -147,7 +147,7 @@ declare abstract class BaseParser {
    */
   protected atLeastOne(
     idx: number,
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>
   ): void;
 
   /**
@@ -271,7 +271,7 @@ declare abstract class BaseParser {
    *          or `undefined` if not.
    */
   protected OPTION<OUT>(
-    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
   ): OUT | undefined;
 
   /**
@@ -279,7 +279,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected OPTION1<OUT>(
-    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
   ): OUT | undefined;
 
   /**
@@ -287,7 +287,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected OPTION2<OUT>(
-    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
   ): OUT | undefined;
 
   /**
@@ -295,7 +295,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected OPTION3<OUT>(
-    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
   ): OUT | undefined;
 
   /**
@@ -303,7 +303,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected OPTION4<OUT>(
-    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
   ): OUT | undefined;
 
   /**
@@ -311,7 +311,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected OPTION5<OUT>(
-    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
   ): OUT | undefined;
 
   /**
@@ -319,7 +319,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected OPTION6<OUT>(
-    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
   ): OUT | undefined;
 
   /**
@@ -327,7 +327,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected OPTION7<OUT>(
-    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
   ): OUT | undefined;
 
   /**
@@ -335,7 +335,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected OPTION8<OUT>(
-    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
   ): OUT | undefined;
 
   /**
@@ -343,7 +343,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected OPTION9<OUT>(
-    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
   ): OUT | undefined;
 
   /**
@@ -507,7 +507,7 @@ declare abstract class BaseParser {
    *
    */
   protected MANY(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>
   ): void;
 
   /**
@@ -515,7 +515,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected MANY1(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>
   ): void;
 
   /**
@@ -523,7 +523,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected MANY2(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>
   ): void;
 
   /**
@@ -531,7 +531,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected MANY3(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>
   ): void;
 
   /**
@@ -539,7 +539,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected MANY4(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>
   ): void;
 
   /**
@@ -547,7 +547,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected MANY5(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>
   ): void;
 
   /**
@@ -555,7 +555,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected MANY6(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>
   ): void;
 
   /**
@@ -563,7 +563,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected MANY7(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>
   ): void;
 
   /**
@@ -571,7 +571,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected MANY8(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>
   ): void;
 
   /**
@@ -579,7 +579,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected MANY9(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>
   ): void;
 
   /**
@@ -679,7 +679,7 @@ declare abstract class BaseParser {
    *
    */
   protected AT_LEAST_ONE(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>
   ): void;
 
   /**
@@ -687,7 +687,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected AT_LEAST_ONE1(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>
   ): void;
 
   /**
@@ -695,7 +695,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected AT_LEAST_ONE2(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>
   ): void;
 
   /**
@@ -703,7 +703,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected AT_LEAST_ONE3(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>
   ): void;
 
   /**
@@ -711,7 +711,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected AT_LEAST_ONE4(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>
   ): void;
 
   /**
@@ -719,7 +719,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected AT_LEAST_ONE5(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>
   ): void;
 
   /**
@@ -727,7 +727,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected AT_LEAST_ONE6(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>
   ): void;
 
   /**
@@ -735,7 +735,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected AT_LEAST_ONE7(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>
   ): void;
 
   /**
@@ -743,7 +743,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected AT_LEAST_ONE8(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>
   ): void;
 
   /**
@@ -751,7 +751,7 @@ declare abstract class BaseParser {
    * @hidden
    */
   protected AT_LEAST_ONE9(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>
   ): void;
 
   /**
@@ -849,7 +849,7 @@ declare abstract class BaseParser {
    * @deprecated - will be removed in the future
    */
   protected getNextPossibleTokenTypes(
-    grammarPath: ITokenGrammarPath,
+    grammarPath: ITokenGrammarPath
   ): TokenType[];
 
   input: IToken[];
@@ -893,7 +893,7 @@ export declare class CstParser extends BaseParser {
   protected RULE<F extends () => void>(
     name: string,
     implementation: F,
-    config?: IRuleConfig<CstNode>,
+    config?: IRuleConfig<CstNode>
   ): ParserMethod<Parameters<F>, CstNode>;
 
   /**
@@ -903,7 +903,7 @@ export declare class CstParser extends BaseParser {
   protected OVERRIDE_RULE<F extends () => void>(
     name: string,
     implementation: F,
-    config?: IRuleConfig<CstNode>,
+    config?: IRuleConfig<CstNode>
   ): ParserMethod<Parameters<F>, CstNode>;
 
   /**
@@ -917,7 +917,7 @@ export declare class CstParser extends BaseParser {
   protected subrule<ARGS extends unknown[]>(
     idx: number,
     ruleToCall: ParserMethod<ARGS, CstNode>,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): CstNode;
 
   /**
@@ -939,7 +939,7 @@ export declare class CstParser extends BaseParser {
    */
   protected SUBRULE<ARGS extends unknown[]>(
     ruleToCall: ParserMethod<ARGS, CstNode>,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): CstNode;
 
   /**
@@ -948,7 +948,7 @@ export declare class CstParser extends BaseParser {
    */
   protected SUBRULE1<ARGS extends unknown[]>(
     ruleToCall: ParserMethod<ARGS, CstNode>,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): CstNode;
 
   /**
@@ -957,7 +957,7 @@ export declare class CstParser extends BaseParser {
    */
   protected SUBRULE2<ARGS extends unknown[]>(
     ruleToCall: ParserMethod<ARGS, CstNode>,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): CstNode;
 
   /**
@@ -966,7 +966,7 @@ export declare class CstParser extends BaseParser {
    */
   protected SUBRULE3<ARGS extends unknown[]>(
     ruleToCall: ParserMethod<ARGS, CstNode>,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): CstNode;
 
   /**
@@ -975,7 +975,7 @@ export declare class CstParser extends BaseParser {
    */
   protected SUBRULE4<ARGS extends unknown[]>(
     ruleToCall: ParserMethod<ARGS, CstNode>,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): CstNode;
 
   /**
@@ -984,7 +984,7 @@ export declare class CstParser extends BaseParser {
    */
   protected SUBRULE5<ARGS extends unknown[]>(
     ruleToCall: ParserMethod<ARGS, CstNode>,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): CstNode;
 
   /**
@@ -993,7 +993,7 @@ export declare class CstParser extends BaseParser {
    */
   protected SUBRULE6<ARGS extends unknown[]>(
     ruleToCall: ParserMethod<ARGS, CstNode>,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): CstNode;
 
   /**
@@ -1002,7 +1002,7 @@ export declare class CstParser extends BaseParser {
    */
   protected SUBRULE7<ARGS extends unknown[]>(
     ruleToCall: ParserMethod<ARGS, CstNode>,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): CstNode;
 
   /**
@@ -1011,7 +1011,7 @@ export declare class CstParser extends BaseParser {
    */
   protected SUBRULE8<ARGS extends unknown[]>(
     ruleToCall: ParserMethod<ARGS, CstNode>,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): CstNode;
 
   /**
@@ -1020,7 +1020,7 @@ export declare class CstParser extends BaseParser {
    */
   protected SUBRULE9<ARGS extends unknown[]>(
     ruleToCall: ParserMethod<ARGS, CstNode>,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): CstNode;
 }
 
@@ -1040,7 +1040,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
   protected RULE<F extends (...args: any[]) => any>(
     name: string,
     implementation: F,
-    config?: IRuleConfig<ReturnType<F>>,
+    config?: IRuleConfig<ReturnType<F>>
   ): ParserMethod<Parameters<F>, ReturnType<F>>;
 
   /**
@@ -1050,7 +1050,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
   protected OVERRIDE_RULE<F extends (...args: any[]) => any>(
     name: string,
     implementation: F,
-    config?: IRuleConfig<ReturnType<F>>,
+    config?: IRuleConfig<ReturnType<F>>
   ): ParserMethod<Parameters<F>, ReturnType<F>>;
 
   /**
@@ -1064,7 +1064,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
   protected subrule<ARGS extends unknown[], R>(
     idx: number,
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): R;
 
   /**
@@ -1086,7 +1086,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    */
   protected SUBRULE<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): R;
 
   /**
@@ -1095,7 +1095,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    */
   protected SUBRULE1<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): R;
 
   /**
@@ -1104,7 +1104,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    */
   protected SUBRULE2<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): R;
 
   /**
@@ -1113,7 +1113,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    */
   protected SUBRULE3<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): R;
 
   /**
@@ -1122,7 +1122,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    */
   protected SUBRULE4<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): R;
 
   /**
@@ -1131,7 +1131,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    */
   protected SUBRULE5<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): R;
 
   /**
@@ -1140,7 +1140,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    */
   protected SUBRULE6<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): R;
 
   /**
@@ -1149,7 +1149,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    */
   protected SUBRULE7<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): R;
 
   /**
@@ -1158,7 +1158,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    */
   protected SUBRULE8<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): R;
 
   /**
@@ -1167,7 +1167,7 @@ export declare class EmbeddedActionsParser extends BaseParser {
    */
   protected SUBRULE9<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): R;
 }
 
@@ -1226,7 +1226,7 @@ export declare class Lexer {
    */
   constructor(
     lexerDefinition: TokenType[] | IMultiModeLexerDefinition,
-    config?: ILexerConfig,
+    config?: ILexerConfig
   );
 
   /**
@@ -1400,7 +1400,7 @@ export interface ILexerErrorMessageProvider {
     startOffset: number,
     length: number,
     line?: number,
-    column?: number,
+    column?: number
   ): string;
 
   /**
@@ -1571,7 +1571,7 @@ export declare function createTokenInstance(
   startLine: number,
   endLine: number,
   startColumn: number,
-  endColumn: number,
+  endColumn: number
 ): IToken;
 
 /**
@@ -1595,7 +1595,7 @@ export declare type CustomPatternMatcherFunc = (
    */
   groups: {
     [groupName: string]: IToken[];
-  },
+  }
 ) => CustomPatternMatcherReturn | RegExpExecArray | null; // RegExpExecArray included for legacy reasons
 
 export type CustomPatternMatcherReturn = [string] & { payload?: any };
@@ -2140,12 +2140,12 @@ export interface ILLkLookaheadValidator {
 
   validateAmbiguousAlternationAlternatives(
     rules: Rule[],
-    maxLookahead: number,
+    maxLookahead: number
   ): ILookaheadValidationError[];
 
   validateSomeNonEmptyLookaheadPath(
     rules: Rule[],
-    maxLookahead: number,
+    maxLookahead: number
   ): ILookaheadValidationError[];
 }
 
@@ -2153,9 +2153,8 @@ export interface ILLkLookaheadValidator {
  * @experimental
  */
 export interface ILLkLookaheadStrategyConstructor {
-  new (options?: {
-    maxLookahead?: number;
-  }): ILookaheadStrategy & ILLkLookaheadValidator;
+  new (options?: { maxLookahead?: number }): ILookaheadStrategy &
+    ILLkLookaheadValidator;
 }
 
 /**
@@ -2529,7 +2528,7 @@ export abstract class GAstVisitor {
   abstract visitRepetitionMandatory(node: RepetitionMandatory): any;
 
   abstract visitRepetitionMandatoryWithSeparator(
-    node: RepetitionMandatoryWithSeparator,
+    node: RepetitionMandatoryWithSeparator
   ): any;
 
   abstract visitRepetitionWithSeparator(node: RepetitionWithSeparator): any;
@@ -2753,7 +2752,7 @@ export interface ICreateSyntaxDiagramsConfig {
  */
 export declare function createSyntaxDiagramsCode(
   grammar: ISerializedGast[],
-  config?: ICreateSyntaxDiagramsConfig,
+  config?: ICreateSyntaxDiagramsConfig
 ): string;
 
 /**
@@ -2771,7 +2770,7 @@ export declare function createSyntaxDiagramsCode(
  */
 export declare function generateCstDts(
   productions: Record<string, Rule>,
-  options?: GenerateDtsOptions,
+  options?: GenerateDtsOptions
 ): string;
 
 export declare type GenerateDtsOptions = {

@@ -71,7 +71,7 @@ const RECORDING_PHASE_TOKEN = createTokenInstance(
   -1,
   -1,
   -1,
-  -1,
+  -1
 );
 Object.freeze(RECORDING_PHASE_TOKEN);
 
@@ -205,7 +205,7 @@ export class GastRecorder {
   // Executing backtracking logic will break our recording logic assumptions
   BACKTRACK_RECORD<T>(
     grammarRule: (...args: any[]) => T,
-    args?: any[],
+    args?: any[]
   ): () => boolean {
     return () => true;
   }
@@ -246,7 +246,7 @@ export class GastRecorder {
   optionInternalRecord<OUT>(
     this: MixedInParser,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
-    occurrence: number,
+    occurrence: number
   ): OUT {
     return recordProd.call(this, Option, actionORMethodDef, occurrence);
   }
@@ -254,7 +254,7 @@ export class GastRecorder {
   atLeastOneInternalRecord<OUT>(
     this: MixedInParser,
     occurrence: number,
-    actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
   ): void {
     recordProd.call(this, RepetitionMandatory, actionORMethodDef, occurrence);
   }
@@ -262,21 +262,21 @@ export class GastRecorder {
   atLeastOneSepFirstInternalRecord<OUT>(
     this: MixedInParser,
     occurrence: number,
-    options: AtLeastOneSepMethodOpts<OUT>,
+    options: AtLeastOneSepMethodOpts<OUT>
   ): void {
     recordProd.call(
       this,
       RepetitionMandatoryWithSeparator,
       options,
       occurrence,
-      HANDLE_SEPARATOR,
+      HANDLE_SEPARATOR
     );
   }
 
   manyInternalRecord<OUT>(
     this: MixedInParser,
     occurrence: number,
-    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
   ): void {
     recordProd.call(this, Repetition, actionORMethodDef, occurrence);
   }
@@ -284,21 +284,21 @@ export class GastRecorder {
   manySepFirstInternalRecord<OUT>(
     this: MixedInParser,
     occurrence: number,
-    options: ManySepMethodOpts<OUT>,
+    options: ManySepMethodOpts<OUT>
   ): void {
     recordProd.call(
       this,
       RepetitionWithSeparator,
       options,
       occurrence,
-      HANDLE_SEPARATOR,
+      HANDLE_SEPARATOR
     );
   }
 
   orInternalRecord<T>(
     this: MixedInParser,
     altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>,
-    occurrence: number,
+    occurrence: number
   ): T {
     return recordOrProd.call(this, altsOrOpts, occurrence);
   }
@@ -307,18 +307,18 @@ export class GastRecorder {
     this: MixedInParser,
     ruleToCall: ParserMethodInternal<ARGS, R>,
     occurrence: number,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): R | CstNode {
     assertMethodIdxIsValid(occurrence);
     if (!ruleToCall || has(ruleToCall, "ruleName") === false) {
       const error: any = new Error(
         `<SUBRULE${getIdxSuffix(occurrence)}> argument is invalid` +
           ` expecting a Parser method reference but got: <${JSON.stringify(
-            ruleToCall,
+            ruleToCall
           )}>` +
           `\n inside top level rule: <${
             (<Rule>this.recordingProdStack[0]).name
-          }>`,
+          }>`
       );
       error.KNOWN_RECORDER_ERROR = true;
       throw error;
@@ -344,18 +344,18 @@ export class GastRecorder {
     this: MixedInParser,
     tokType: TokenType,
     occurrence: number,
-    options?: ConsumeMethodOpts,
+    options?: ConsumeMethodOpts
   ): IToken {
     assertMethodIdxIsValid(occurrence);
     if (!hasShortKeyProperty(tokType)) {
       const error: any = new Error(
         `<CONSUME${getIdxSuffix(occurrence)}> argument is invalid` +
           ` expecting a TokenType reference but got: <${JSON.stringify(
-            tokType,
+            tokType
           )}>` +
           `\n inside top level rule: <${
             (<Rule>this.recordingProdStack[0]).name
-          }>`,
+          }>`
       );
       error.KNOWN_RECORDER_ERROR = true;
       throw error;
@@ -376,7 +376,7 @@ function recordProd(
   prodConstructor: any,
   mainProdArg: any,
   occurrence: number,
-  handleSep: boolean = false,
+  handleSep: boolean = false
 ): any {
   assertMethodIdxIsValid(occurrence);
   const prevProd: any = peek(this.recordingProdStack);
@@ -448,7 +448,7 @@ function assertMethodIdxIsValid(idx: number): void {
       `Invalid DSL Method idx value: <${idx}>\n\t` +
         `Idx value must be a none negative value smaller than ${
           MAX_METHOD_IDX + 1
-        }`,
+        }`
     );
     error.KNOWN_RECORDER_ERROR = true;
     throw error;

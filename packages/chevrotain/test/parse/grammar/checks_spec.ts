@@ -133,10 +133,10 @@ describe("the grammar validations", () => {
       [qualifiedNameErr1, qualifiedNameErr2],
       [],
       defaultGrammarValidatorErrorProvider,
-      "bamba",
+      "bamba"
     );
     expect(actualErrors.map((e) => omit(e, "message"))).to.deep.equal(
-      expectedErrorsNoMsg,
+      expectedErrorsNoMsg
     );
   });
 
@@ -148,7 +148,7 @@ describe("the grammar validations", () => {
         new Rule({ name: "C", definition: [] }),
       ],
       "className",
-      defaultGrammarValidatorErrorProvider,
+      defaultGrammarValidatorErrorProvider
     );
     //noinspection BadExpressionStatementJS
     expect(noErrors).to.be.empty;
@@ -162,14 +162,14 @@ describe("the grammar validations", () => {
         new Rule({ name: "C", definition: [] }),
       ],
       "className",
-      defaultGrammarValidatorErrorProvider,
+      defaultGrammarValidatorErrorProvider
     );
     //noinspection BadExpressionStatementJS
     expect(duplicateErr).to.have.length(1);
     expect(duplicateErr[0]).to.have.property("message");
     expect(duplicateErr[0]).to.have.property(
       "type",
-      ParserDefinitionErrorType.DUPLICATE_RULE_NAME,
+      ParserDefinitionErrorType.DUPLICATE_RULE_NAME
     );
     expect(duplicateErr[0]).to.have.property("ruleName", "A");
   });
@@ -178,19 +178,19 @@ describe("the grammar validations", () => {
     const positive = validateRuleIsOverridden(
       "AAA",
       ["BBB", "CCC"],
-      "className",
+      "className"
     );
     expect(positive).to.have.lengthOf(1);
     expect(positive[0].message).to.contain("Invalid rule override");
     expect(positive[0].type).to.equal(
-      ParserDefinitionErrorType.INVALID_RULE_OVERRIDE,
+      ParserDefinitionErrorType.INVALID_RULE_OVERRIDE
     );
     expect(positive[0].ruleName).to.equal("AAA");
 
     const negative = validateRuleIsOverridden(
       "AAA",
       ["BBB", "CCC", "AAA"],
-      "className",
+      "className"
     );
     expect(negative).to.have.lengthOf(0);
   });
@@ -199,42 +199,42 @@ describe("the grammar validations", () => {
 describe("identifyProductionForDuplicates function", () => {
   it("generates DSL code for a ProdRef", () => {
     const dslCode = identifyProductionForDuplicates(
-      new NonTerminal({ nonTerminalName: "ActionDeclaration" }),
+      new NonTerminal({ nonTerminalName: "ActionDeclaration" })
     );
     expect(dslCode).to.equal("SUBRULE_#_1_#_ActionDeclaration");
   });
 
   it("generates DSL code for a OPTION", () => {
     const dslCode = identifyProductionForDuplicates(
-      new Option({ definition: [], idx: 3 }),
+      new Option({ definition: [], idx: 3 })
     );
     expect(dslCode).to.equal("OPTION_#_3_#_");
   });
 
   it("generates DSL code for a AT_LEAST_ONE", () => {
     const dslCode = identifyProductionForDuplicates(
-      new RepetitionMandatory({ definition: [] }),
+      new RepetitionMandatory({ definition: [] })
     );
     expect(dslCode).to.equal("AT_LEAST_ONE_#_1_#_");
   });
 
   it("generates DSL code for a MANY", () => {
     const dslCode = identifyProductionForDuplicates(
-      new Repetition({ definition: [], idx: 5 }),
+      new Repetition({ definition: [], idx: 5 })
     );
     expect(dslCode).to.equal("MANY_#_5_#_");
   });
 
   it("generates DSL code for a OR", () => {
     const dslCode = identifyProductionForDuplicates(
-      new Alternation({ definition: [], idx: 1 }),
+      new Alternation({ definition: [], idx: 1 })
     );
     expect(dslCode).to.equal("OR_#_1_#_");
   });
 
   it("generates DSL code for a Terminal", () => {
     const dslCode = identifyProductionForDuplicates(
-      new Terminal({ terminalType: getIdentTok(), idx: 4 }),
+      new Terminal({ terminalType: getIdentTok(), idx: 4 })
     );
     expect(dslCode).to.equal("CONSUME_#_4_#_IdentTok");
   });
@@ -520,7 +520,7 @@ describe("the getFirstNoneTerminal function", () => {
               referencedRule: dummyRule,
             }),
           ],
-        }),
+        })
       );
     }
 
@@ -531,13 +531,13 @@ describe("the getFirstNoneTerminal function", () => {
 
     const actual = validateTooManyAlts(
       ruleWithTooManyAlts,
-      defaultGrammarValidatorErrorProvider,
+      defaultGrammarValidatorErrorProvider
     );
     expect(actual).to.have.lengthOf(1);
     expect(actual[0].type).to.equal(ParserDefinitionErrorType.TOO_MANY_ALTS);
     expect(actual[0].ruleName).to.equal("blah");
     expect(actual[0].message).to.contain(
-      "An Alternation cannot have more than 256 alternatives",
+      "An Alternation cannot have more than 256 alternatives"
     );
   });
 });
@@ -582,10 +582,10 @@ describe("The duplicate occurrence validations full flow", () => {
     }
 
     expect(() => new ErroneousOccurrenceNumUsageParser1()).to.throw(
-      "->SUBRULE1<- with argument: ->anotherRule<-",
+      "->SUBRULE1<- with argument: ->anotherRule<-"
     );
     expect(() => new ErroneousOccurrenceNumUsageParser1()).to.throw(
-      "appears more than once (2 times) in the top level rule: ->duplicateRef<-",
+      "appears more than once (2 times) in the top level rule: ->duplicateRef<-"
     );
   });
 
@@ -607,7 +607,7 @@ describe("The duplicate occurrence validations full flow", () => {
     expect(() => new ErroneousOccurrenceNumUsageParser2()).to.throw("3");
     expect(() => new ErroneousOccurrenceNumUsageParser2()).to.throw("PlusTok");
     expect(() => new ErroneousOccurrenceNumUsageParser2()).to.throw(
-      "duplicateTerminal",
+      "duplicateTerminal"
     );
   });
 
@@ -631,10 +631,10 @@ describe("The duplicate occurrence validations full flow", () => {
 
     expect(() => new ErroneousOccurrenceNumUsageParser3()).to.throw("->MANY<-");
     expect(() => new ErroneousOccurrenceNumUsageParser3()).to.throw(
-      "appears more than once (2 times) in the top level rule: ->duplicateMany<-",
+      "appears more than once (2 times) in the top level rule: ->duplicateMany<-"
     );
     expect(() => new ErroneousOccurrenceNumUsageParser3()).to.throw(
-      "https://chevrotain.io/docs/FAQ.html#NUMERICAL_SUFFIXES",
+      "https://chevrotain.io/docs/FAQ.html#NUMERICAL_SUFFIXES"
     );
   });
 
@@ -747,7 +747,7 @@ describe("The Recorder runtime checks full flow", () => {
     expect(() => new InvalidRefParser()).to.throw("argument is invalid");
     expect(() => new InvalidRefParser()).to.throw("but got: <undefined>");
     expect(() => new InvalidRefParser()).to.throw(
-      "inside top level rule: <one>",
+      "inside top level rule: <one>"
     );
   });
 
@@ -768,7 +768,7 @@ describe("The Recorder runtime checks full flow", () => {
     expect(() => new InvalidTokTypeParser()).to.throw("argument is invalid");
     expect(() => new InvalidTokTypeParser()).to.throw("but got: <null>");
     expect(() => new InvalidTokTypeParser()).to.throw(
-      "inside top level rule: <two>",
+      "inside top level rule: <two>"
     );
   });
 
@@ -789,10 +789,10 @@ describe("The Recorder runtime checks full flow", () => {
         }
 
         expect(() => new InvalidIdxParser()).to.throw(
-          "Invalid DSL Method idx value: <256>",
+          "Invalid DSL Method idx value: <256>"
         );
         expect(() => new InvalidIdxParser()).to.throw(
-          "Idx value must be a none negative value smaller than 256",
+          "Idx value must be a none negative value smaller than 256"
         );
       });
 
@@ -815,10 +815,10 @@ describe("The Recorder runtime checks full flow", () => {
         }
 
         expect(() => new InvalidIdxParser()).to.throw(
-          "Invalid DSL Method idx value: <-1>",
+          "Invalid DSL Method idx value: <-1>"
         );
         expect(() => new InvalidIdxParser()).to.throw(
-          "Idx value must be a none negative value smaller than 256",
+          "Idx value must be a none negative value smaller than 256"
         );
       });
 
@@ -838,10 +838,10 @@ describe("The Recorder runtime checks full flow", () => {
         }
 
         expect(() => new InvalidIdxParser()).to.throw(
-          "Invalid DSL Method idx value: <666>",
+          "Invalid DSL Method idx value: <666>"
         );
         expect(() => new InvalidIdxParser()).to.throw(
-          "Idx value must be a none negative value smaller than 256",
+          "Idx value must be a none negative value smaller than 256"
         );
       });
 
@@ -861,10 +861,10 @@ describe("The Recorder runtime checks full flow", () => {
         }
 
         expect(() => new InvalidIdxParser()).to.throw(
-          "Invalid DSL Method idx value: <-333>",
+          "Invalid DSL Method idx value: <-333>"
         );
         expect(() => new InvalidIdxParser()).to.throw(
-          "Idx value must be a none negative value smaller than 256",
+          "Idx value must be a none negative value smaller than 256"
         );
       });
 
@@ -884,10 +884,10 @@ describe("The Recorder runtime checks full flow", () => {
         }
 
         expect(() => new InvalidIdxParser()).to.throw(
-          "Invalid DSL Method idx value: <1999>",
+          "Invalid DSL Method idx value: <1999>"
         );
         expect(() => new InvalidIdxParser()).to.throw(
-          "Idx value must be a none negative value smaller than 256",
+          "Idx value must be a none negative value smaller than 256"
         );
       });
 
@@ -911,13 +911,13 @@ describe("The Recorder runtime checks full flow", () => {
         }
 
         expect(() => new InvalidIdxParser()).to.throw(
-          "Invalid DSL Method idx value: <543>",
+          "Invalid DSL Method idx value: <543>"
         );
         expect(() => new InvalidIdxParser()).to.throw(
-          "Idx value must be a none negative value smaller than 256",
+          "Idx value must be a none negative value smaller than 256"
         );
       });
-    },
+    }
   );
 
   context("augmenting error messages", () => {
@@ -935,7 +935,7 @@ describe("The Recorder runtime checks full flow", () => {
       }
 
       expect(() => new OtherRecordingErrorParser()).to.throw(
-        'This error was thrown during the "grammar recording phase"',
+        'This error was thrown during the "grammar recording phase"'
       );
     });
 
@@ -980,15 +980,15 @@ describe("The reference resolver validation full flow", () => {
       }
 
       Object.getPrototypeOf(
-        EmbeddedActionsParser,
+        EmbeddedActionsParser
       ).DEFER_DEFINITION_ERRORS_HANDLING = true;
       expect(() => new DupConsumeParser()).to.not.throw();
       expect(() => new DupConsumeParser()).to.not.throw();
       expect(() => new DupConsumeParser()).to.not.throw();
       Object.getPrototypeOf(
-        EmbeddedActionsParser,
+        EmbeddedActionsParser
       ).DEFER_DEFINITION_ERRORS_HANDLING = false;
-    },
+    }
   );
 });
 
@@ -1013,7 +1013,7 @@ describe("The rule names validation full flow", () => {
       public two = this.RULE("oops_duplicate", () => {});
     }
     expect(() => new DuplicateRulesParser()).to.throw(
-      "is already defined in the grammar",
+      "is already defined in the grammar"
     );
     expect(() => new DuplicateRulesParser()).to.throw("DuplicateRulesParser");
     expect(() => new DuplicateRulesParser()).to.throw("oops_duplicate");
@@ -1043,16 +1043,16 @@ describe("The rule names validation full flow", () => {
         public two = this.RULE("oops_duplicate", () => {});
       }
       Object.getPrototypeOf(
-        EmbeddedActionsParser,
+        EmbeddedActionsParser
       ).DEFER_DEFINITION_ERRORS_HANDLING = true;
       expect(() => new InvalidRuleNameParser()).to.not.throw();
       expect(() => new InvalidRuleNameParser()).to.not.throw();
       expect(() => new DuplicateRulesParser()).to.not.throw();
       expect(() => new DuplicateRulesParser()).to.not.throw();
       Object.getPrototypeOf(
-        EmbeddedActionsParser,
+        EmbeddedActionsParser
       ).DEFER_DEFINITION_ERRORS_HANDLING = false;
-    },
+    }
   );
 });
 
@@ -1110,24 +1110,24 @@ class ComplexInDirectlyLeftRecursive extends EmbeddedActionsParser {
 describe("The left recursion detection full flow", () => {
   it("will throw an error when trying to init a parser with direct left recursion", () => {
     expect(() => new DirectlyLeftRecursive()).to.throw(
-      "Left Recursion found in grammar",
+      "Left Recursion found in grammar"
     );
     expect(() => new DirectlyLeftRecursive()).to.throw("A --> A");
   });
 
   it("will throw an error when trying to init a parser with indirect left recursion", () => {
     expect(() => new InDirectlyLeftRecursive()).to.throw(
-      "Left Recursion found in grammar",
+      "Left Recursion found in grammar"
     );
     expect(() => new InDirectlyLeftRecursive()).to.throw("A --> B --> A");
   });
 
   it("will throw an error when trying to init a parser with indirect left recursion - complex", () => {
     expect(() => new ComplexInDirectlyLeftRecursive()).to.throw(
-      "Left Recursion found in grammar",
+      "Left Recursion found in grammar"
     );
     expect(() => new ComplexInDirectlyLeftRecursive()).to.throw(
-      "A --> B --> A",
+      "A --> B --> A"
     );
   });
 });
@@ -1162,7 +1162,7 @@ describe("The empty alternative detection full flow", () => {
       });
     }
     expect(() => new EmptyAltAmbiguityParser()).to.throw(
-      "Ambiguous empty alternative",
+      "Ambiguous empty alternative"
     );
     expect(() => new EmptyAltAmbiguityParser()).to.throw("3");
     expect(() => new EmptyAltAmbiguityParser()).to.throw("2");
@@ -1201,7 +1201,7 @@ describe("The empty alternative detection full flow", () => {
       public emptyRule = this.RULE("emptyRule", () => {});
     }
     expect(() => new EmptyAltIndirectAmbiguityParser()).to.throw(
-      "Ambiguous empty alternative",
+      "Ambiguous empty alternative"
     );
     expect(() => new EmptyAltIndirectAmbiguityParser()).to.throw("3");
     expect(() => new EmptyAltIndirectAmbiguityParser()).to.throw("2");
@@ -1233,12 +1233,12 @@ describe("The empty alternative detection full flow", () => {
       });
     }
     expect(() => new AltAmbiguityParserImplicitOccurence()).to.throw(
-      "Ambiguous Alternatives Detected",
+      "Ambiguous Alternatives Detected"
     );
     expect(() => new AltAmbiguityParserImplicitOccurence()).to.throw("1");
     expect(() => new AltAmbiguityParserImplicitOccurence()).to.throw("2");
     expect(() => new AltAmbiguityParserImplicitOccurence()).to.throw(
-      "<PlusTok, StarTok> may appears as a prefix path",
+      "<PlusTok, StarTok> may appears as a prefix path"
     );
   });
 
@@ -1270,16 +1270,16 @@ describe("The empty alternative detection full flow", () => {
               },
             ],
           });
-        },
+        }
       );
     }
     expect(() => new AltAmbiguityParserImplicitOccurrence()).to.throw(
-      "Ambiguous Alternatives Detected",
+      "Ambiguous Alternatives Detected"
     );
     expect(() => new AltAmbiguityParserImplicitOccurrence()).to.throw("1");
     expect(() => new AltAmbiguityParserImplicitOccurrence()).to.throw("2");
     expect(() => new AltAmbiguityParserImplicitOccurrence()).to.throw(
-      "<PlusTok> may appears as a prefix path",
+      "<PlusTok> may appears as a prefix path"
     );
   });
 
@@ -1379,11 +1379,11 @@ describe("The empty alternative detection full flow", () => {
       });
     }
     expect(() => new EmptyAltAmbiguityParser2()).to.throw(
-      "Ambiguous empty alternative",
+      "Ambiguous empty alternative"
     );
     expect(() => new EmptyAltAmbiguityParser2()).to.throw("1");
     expect(() => new EmptyAltAmbiguityParser2()).to.throw(
-      "Only the last alternative may be an empty alternative.",
+      "Only the last alternative may be an empty alternative."
     );
     expect(() => new EmptyAltAmbiguityParser2()).to.not.throw("undefined");
   });
@@ -1423,11 +1423,11 @@ describe("The prefix ambiguity detection full flow", () => {
     expect(() => new PrefixAltAmbiguity()).to.throw("OR3");
     expect(() => new PrefixAltAmbiguity()).to.throw("Ambiguous alternatives");
     expect(() => new PrefixAltAmbiguity()).to.throw(
-      "due to common lookahead prefix",
+      "due to common lookahead prefix"
     );
     expect(() => new PrefixAltAmbiguity()).to.throw("<B, A>");
     expect(() => new PrefixAltAmbiguity()).to.throw(
-      "https://chevrotain.io/docs/guide/resolving_grammar_errors.html#COMMON_PREFIX",
+      "https://chevrotain.io/docs/guide/resolving_grammar_errors.html#COMMON_PREFIX"
     );
   });
 
@@ -1468,16 +1468,16 @@ describe("The prefix ambiguity detection full flow", () => {
       });
     }
     expect(() => new AlternativesAmbiguityParser()).to.throw(
-      "Ambiguous Alternatives Detected: <1 ,2>",
+      "Ambiguous Alternatives Detected: <1 ,2>"
     );
     expect(() => new AlternativesAmbiguityParser()).to.throw(
-      "in <OR> inside <main> Rule",
+      "in <OR> inside <main> Rule"
     );
     expect(() => new AlternativesAmbiguityParser()).to.throw(
-      "Comma, Comma, Comma, Comma",
+      "Comma, Comma, Comma, Comma"
     );
     expect(() => new AlternativesAmbiguityParser()).to.throw(
-      "https://chevrotain.io/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES",
+      "https://chevrotain.io/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES"
     );
   });
 
@@ -1519,14 +1519,14 @@ describe("The prefix ambiguity detection full flow", () => {
       });
     }
     expect(() => new AlternativesAmbiguityParser()).to.throw(
-      "Ambiguous Alternatives Detected: <1 ,2>",
+      "Ambiguous Alternatives Detected: <1 ,2>"
     );
     expect(() => new AlternativesAmbiguityParser()).to.throw(
-      "in <OR> inside <main> Rule",
+      "in <OR> inside <main> Rule"
     );
     expect(() => new AlternativesAmbiguityParser()).to.throw("D, D, D, D");
     expect(() => new AlternativesAmbiguityParser()).to.throw(
-      "https://chevrotain.io/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES",
+      "https://chevrotain.io/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES"
     );
   });
 
@@ -1560,11 +1560,11 @@ describe("The prefix ambiguity detection full flow", () => {
     expect(() => new PrefixAltAmbiguity2()).to.throw("OR");
     expect(() => new PrefixAltAmbiguity2()).to.throw("Ambiguous alternatives");
     expect(() => new PrefixAltAmbiguity2()).to.throw(
-      "due to common lookahead prefix",
+      "due to common lookahead prefix"
     );
     expect(() => new PrefixAltAmbiguity2()).to.throw("<PlusTok, MinusTok>");
     expect(() => new PrefixAltAmbiguity2()).to.throw(
-      "https://chevrotain.io/docs/guide/resolving_grammar_errors.html#COMMON_PREFIX",
+      "https://chevrotain.io/docs/guide/resolving_grammar_errors.html#COMMON_PREFIX"
     );
   });
 });
@@ -1592,7 +1592,7 @@ describe("The namespace conflict detection full flow", () => {
     }
 
     expect(() => new NameSpaceConflict([])).to.throw(
-      "The grammar has both a Terminal(Token) and a Non-Terminal(Rule) named: <Bamba>",
+      "The grammar has both a Terminal(Token) and a Non-Terminal(Rule) named: <Bamba>"
     );
   });
 });
@@ -1607,14 +1607,14 @@ describe("The no non-empty lookahead validation", () => {
       }
 
       public someRule = this.RULE("someRule", () =>
-        this.AT_LEAST_ONE(() => {}),
+        this.AT_LEAST_ONE(() => {})
       );
     }
     expect(() => new EmptyLookaheadParserAtLeastOne()).to.throw(
-      "The repetition <AT_LEAST_ONE>",
+      "The repetition <AT_LEAST_ONE>"
     );
     expect(() => new EmptyLookaheadParserAtLeastOne()).to.throw(
-      "<someRule> can never consume any tokens",
+      "<someRule> can never consume any tokens"
     );
   });
 
@@ -1630,14 +1630,14 @@ describe("The no non-empty lookahead validation", () => {
         this.AT_LEAST_ONE_SEP5({
           SEP: PlusTok,
           DEF: () => {},
-        }),
+        })
       );
     }
     expect(() => new EmptyLookaheadParserAtLeastOneSep()).to.throw(
-      "The repetition <AT_LEAST_ONE_SEP5>",
+      "The repetition <AT_LEAST_ONE_SEP5>"
     );
     expect(() => new EmptyLookaheadParserAtLeastOneSep()).to.throw(
-      "within Rule <someRule>",
+      "within Rule <someRule>"
     );
   });
 
@@ -1652,10 +1652,10 @@ describe("The no non-empty lookahead validation", () => {
       public someRule = this.RULE("someRule", () => this.MANY2(() => {}));
     }
     expect(() => new EmptyLookaheadParserMany()).to.throw(
-      "The repetition <MANY2>",
+      "The repetition <MANY2>"
     );
     expect(() => new EmptyLookaheadParserMany()).to.throw(
-      "<someRule> can never consume any tokens",
+      "<someRule> can never consume any tokens"
     );
   });
 
@@ -1671,14 +1671,14 @@ describe("The no non-empty lookahead validation", () => {
         this.MANY_SEP3({
           SEP: PlusTok,
           DEF: () => {},
-        }),
+        })
       );
     }
     expect(() => new EmptyLookaheadParserManySep()).to.throw(
-      "The repetition <MANY_SEP3>",
+      "The repetition <MANY_SEP3>"
     );
     expect(() => new EmptyLookaheadParserManySep()).to.throw(
-      "within Rule <someRule>",
+      "within Rule <someRule>"
     );
   });
 });

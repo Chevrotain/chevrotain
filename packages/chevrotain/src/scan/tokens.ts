@@ -14,7 +14,7 @@ import { IToken, TokenType } from "@chevrotain/types";
 
 export function tokenStructuredMatcher(
   tokInstance: IToken,
-  tokConstructor: TokenType,
+  tokConstructor: TokenType
 ) {
   const instanceType = tokInstance.tokenTypeIdx;
   if (instanceType === tokConstructor.tokenTypeIdx) {
@@ -31,7 +31,7 @@ export function tokenStructuredMatcher(
 // Being so tiny it is much more likely to be in-lined and this avoid the function call overhead
 export function tokenStructuredMatcherNoCategories(
   token: IToken,
-  tokType: TokenType,
+  tokType: TokenType
 ) {
   return token.tokenTypeIdx === tokType.tokenTypeIdx;
 }
@@ -62,7 +62,7 @@ export function expandCategories(tokenTypes: TokenType[]): TokenType[] {
   let searching = true;
   while (searching) {
     categories = compact(
-      flatten(map(categories, (currTokType) => currTokType.CATEGORIES)),
+      flatten(map(categories, (currTokType) => currTokType.CATEGORIES))
     );
 
     const newCategories = difference(categories, result);
@@ -115,7 +115,7 @@ export function assignCategoriesTokensProp(tokenTypes: TokenType[]): void {
     currTokType.categoryMatches = [];
     forEach(currTokType.categoryMatchesMap!, (val, key) => {
       currTokType.categoryMatches!.push(
-        tokenIdxToClass[key as unknown as number].tokenTypeIdx!,
+        tokenIdxToClass[key as unknown as number].tokenTypeIdx!
       );
     });
   });
@@ -129,7 +129,7 @@ export function assignCategoriesMapProp(tokenTypes: TokenType[]): void {
 
 export function singleAssignCategoriesToksMap(
   path: TokenType[],
-  nextNode: TokenType,
+  nextNode: TokenType
 ): void {
   forEach(path, (pathNode) => {
     nextNode.categoryMatchesMap![pathNode.tokenTypeIdx!] = true;
@@ -157,7 +157,7 @@ export function hasExtendingTokensTypesProperty(tokType: TokenType): boolean {
 }
 
 export function hasExtendingTokensTypesMapProperty(
-  tokType: TokenType,
+  tokType: TokenType
 ): boolean {
   return has(tokType, "categoryMatchesMap");
 }

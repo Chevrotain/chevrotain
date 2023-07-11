@@ -85,7 +85,7 @@ export class RecognizerEngine {
 
   initRecognizerEngine(
     tokenVocabulary: TokenVocabulary,
-    config: IParserConfig,
+    config: IParserConfig
   ) {
     this.className = this.constructor.name;
     // TODO: would using an ES6 Map or plain object be faster (CST building scenario)
@@ -106,7 +106,7 @@ export class RecognizerEngine {
       throw Error(
         "The Parser's configuration can no longer contain a <serializedGrammar> property.\n" +
           "\tSee: https://chevrotain.io/docs/changes/BREAKING_CHANGES.html#_6-0-0\n" +
-          "\tFor Further details.",
+          "\tFor Further details."
       );
     }
 
@@ -118,7 +118,7 @@ export class RecognizerEngine {
         throw Error(
           "A Token Vocabulary cannot be empty.\n" +
             "\tNote that the first argument for the parser constructor\n" +
-            "\tis no longer a Token vector (since v4.0).",
+            "\tis no longer a Token vector (since v4.0)."
         );
       }
 
@@ -126,7 +126,7 @@ export class RecognizerEngine {
         throw Error(
           "The Parser constructor no longer accepts a token vector as the first argument.\n" +
             "\tSee: https://chevrotain.io/docs/changes/BREAKING_CHANGES.html#_4-0-0\n" +
-            "\tFor Further details.",
+            "\tFor Further details."
         );
       }
     }
@@ -138,7 +138,7 @@ export class RecognizerEngine {
           acc[tokType.name] = tokType;
           return acc;
         },
-        {} as { [tokenName: string]: TokenType },
+        {} as { [tokenName: string]: TokenType }
       );
     } else if (
       has(tokenVocabulary, "modes") &&
@@ -152,14 +152,14 @@ export class RecognizerEngine {
           acc[tokType.name] = tokType;
           return acc;
         },
-        {} as { [tokenName: string]: TokenType },
+        {} as { [tokenName: string]: TokenType }
       );
     } else if (isObject(tokenVocabulary)) {
       this.tokensMap = clone(tokenVocabulary as TokenTypeDictionary);
     } else {
       throw new Error(
         "<tokensDictionary> argument must be An Array of Token constructors," +
-          " A dictionary of Token constructors or an IMultiModeLexerDefinition",
+          " A dictionary of Token constructors or an IMultiModeLexerDefinition"
       );
     }
 
@@ -171,7 +171,7 @@ export class RecognizerEngine {
       ? flatten(values((<any>tokenVocabulary).modes))
       : values(tokenVocabulary);
     const noTokenCategoriesUsed = every(allTokenTypes, (tokenConstructor) =>
-      isEmpty(tokenConstructor.categoryMatches),
+      isEmpty(tokenConstructor.categoryMatches)
     );
 
     this.tokenMatcher = noTokenCategoriesUsed
@@ -188,12 +188,12 @@ export class RecognizerEngine {
     this: MixedInParser,
     ruleName: string,
     impl: (...args: ARGS) => R,
-    config: IRuleConfig<R>,
+    config: IRuleConfig<R>
   ): ParserMethodInternal<ARGS, R> {
     if (this.selfAnalysisDone) {
       throw Error(
         `Grammar rule <${ruleName}> may not be defined after the 'performSelfAnalysis' method has been called'\n` +
-          `Make sure that all grammar rule definitions are done before 'performSelfAnalysis' is called.`,
+          `Make sure that all grammar rule definitions are done before 'performSelfAnalysis' is called.`
       );
     }
     const resyncEnabled: boolean = has(config, "resyncEnabled")
@@ -251,7 +251,7 @@ export class RecognizerEngine {
 
     const wrappedGrammarRule: ParserMethodInternal<ARGS, R> = Object.assign(
       invokeRuleWithTry as any,
-      { ruleName, originalGrammarAction: impl },
+      { ruleName, originalGrammarAction: impl }
     );
 
     return wrappedGrammarRule;
@@ -261,7 +261,7 @@ export class RecognizerEngine {
     this: MixedInParser,
     e: Error,
     resyncEnabledConfig: boolean,
-    recoveryValueFunc: Function,
+    recoveryValueFunc: Function
   ): unknown {
     const isFirstInvokedRule = this.RULE_STACK.length === 1;
     // note the reSync is always enabled for the first rule invocation, because we must always be able to
@@ -315,7 +315,7 @@ export class RecognizerEngine {
   optionInternal<OUT>(
     this: MixedInParser,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
-    occurrence: number,
+    occurrence: number
   ): OUT | undefined {
     const key = this.getKeyForAutomaticLookahead(OPTION_IDX, occurrence);
     return this.optionInternalLogic(actionORMethodDef, occurrence, key);
@@ -325,7 +325,7 @@ export class RecognizerEngine {
     this: MixedInParser,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
     occurrence: number,
-    key: number,
+    key: number
   ): OUT | undefined {
     let lookAheadFunc = this.getLaFuncFromCache(key);
     let action: GrammarAction<OUT>;
@@ -352,16 +352,16 @@ export class RecognizerEngine {
   atLeastOneInternal<OUT>(
     this: MixedInParser,
     prodOccurrence: number,
-    actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
   ): void {
     const laKey = this.getKeyForAutomaticLookahead(
       AT_LEAST_ONE_IDX,
-      prodOccurrence,
+      prodOccurrence
     );
     return this.atLeastOneInternalLogic(
       prodOccurrence,
       actionORMethodDef,
-      laKey,
+      laKey
     );
   }
 
@@ -369,7 +369,7 @@ export class RecognizerEngine {
     this: MixedInParser,
     prodOccurrence: number,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
-    key: number,
+    key: number
   ): void {
     let lookAheadFunc = this.getLaFuncFromCache(key);
     let action;
@@ -399,7 +399,7 @@ export class RecognizerEngine {
       throw this.raiseEarlyExitException(
         prodOccurrence,
         PROD_TYPE.REPETITION_MANDATORY,
-        (<DSLMethodOptsWithErr<OUT>>actionORMethodDef).ERR_MSG,
+        (<DSLMethodOptsWithErr<OUT>>actionORMethodDef).ERR_MSG
       );
     }
 
@@ -414,18 +414,18 @@ export class RecognizerEngine {
       <any>lookAheadFunc,
       AT_LEAST_ONE_IDX,
       prodOccurrence,
-      NextTerminalAfterAtLeastOneWalker,
+      NextTerminalAfterAtLeastOneWalker
     );
   }
 
   atLeastOneSepFirstInternal<OUT>(
     this: MixedInParser,
     prodOccurrence: number,
-    options: AtLeastOneSepMethodOpts<OUT>,
+    options: AtLeastOneSepMethodOpts<OUT>
   ): void {
     const laKey = this.getKeyForAutomaticLookahead(
       AT_LEAST_ONE_SEP_IDX,
-      prodOccurrence,
+      prodOccurrence
     );
     this.atLeastOneSepFirstInternalLogic(prodOccurrence, options, laKey);
   }
@@ -434,7 +434,7 @@ export class RecognizerEngine {
     this: MixedInParser,
     prodOccurrence: number,
     options: AtLeastOneSepMethodOpts<OUT>,
-    key: number,
+    key: number
   ): void {
     const action = options.DEF;
     const separator = options.SEP;
@@ -473,13 +473,13 @@ export class RecognizerEngine {
         separatorLookAheadFunc,
         AT_LEAST_ONE_SEP_IDX,
         prodOccurrence,
-        NextTerminalAfterAtLeastOneSepWalker,
+        NextTerminalAfterAtLeastOneSepWalker
       );
     } else {
       throw this.raiseEarlyExitException(
         prodOccurrence,
         PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR,
-        options.ERR_MSG,
+        options.ERR_MSG
       );
     }
   }
@@ -487,7 +487,7 @@ export class RecognizerEngine {
   manyInternal<OUT>(
     this: MixedInParser,
     prodOccurrence: number,
-    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
   ): void {
     const laKey = this.getKeyForAutomaticLookahead(MANY_IDX, prodOccurrence);
     return this.manyInternalLogic(prodOccurrence, actionORMethodDef, laKey);
@@ -497,7 +497,7 @@ export class RecognizerEngine {
     this: MixedInParser,
     prodOccurrence: number,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
-    key: number,
+    key: number
   ) {
     let lookaheadFunction = this.getLaFuncFromCache(key);
     let action;
@@ -533,18 +533,18 @@ export class RecognizerEngine {
       // An infinite loop cannot occur as:
       // - Either the lookahead is guaranteed to consume something (Single Token Separator)
       // - AT_LEAST_ONE by definition is guaranteed to consume something (or error out).
-      notStuck,
+      notStuck
     );
   }
 
   manySepFirstInternal<OUT>(
     this: MixedInParser,
     prodOccurrence: number,
-    options: ManySepMethodOpts<OUT>,
+    options: ManySepMethodOpts<OUT>
   ): void {
     const laKey = this.getKeyForAutomaticLookahead(
       MANY_SEP_IDX,
-      prodOccurrence,
+      prodOccurrence
     );
     this.manySepFirstInternalLogic(prodOccurrence, options, laKey);
   }
@@ -553,7 +553,7 @@ export class RecognizerEngine {
     this: MixedInParser,
     prodOccurrence: number,
     options: ManySepMethodOpts<OUT>,
-    key: number,
+    key: number
   ): void {
     const action = options.DEF;
     const separator = options.SEP;
@@ -588,7 +588,7 @@ export class RecognizerEngine {
         separatorLookAheadFunc,
         MANY_SEP_IDX,
         prodOccurrence,
-        NextTerminalAfterManySepWalker,
+        NextTerminalAfterManySepWalker
       );
     }
   }
@@ -599,7 +599,7 @@ export class RecognizerEngine {
     separator: TokenType,
     separatorLookAheadFunc: () => boolean,
     action: GrammarAction<OUT>,
-    nextTerminalAfterWalker: typeof AbstractNextTerminalAfterProductionWalker,
+    nextTerminalAfterWalker: typeof AbstractNextTerminalAfterProductionWalker
   ): void {
     while (separatorLookAheadFunc()) {
       // note that this CONSUME will never enter recovery because
@@ -626,7 +626,7 @@ export class RecognizerEngine {
       separatorLookAheadFunc,
       AT_LEAST_ONE_SEP_IDX,
       prodOccurrence,
-      nextTerminalAfterWalker,
+      nextTerminalAfterWalker
     );
   }
 
@@ -643,7 +643,7 @@ export class RecognizerEngine {
   orInternal<T>(
     this: MixedInParser,
     altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>,
-    occurrence: number,
+    occurrence: number
   ): T {
     const laKey = this.getKeyForAutomaticLookahead(OR_IDX, occurrence);
     const alts = isArray(altsOrOpts) ? altsOrOpts : altsOrOpts.DEF;
@@ -656,7 +656,7 @@ export class RecognizerEngine {
     }
     this.raiseNoAltException(
       occurrence,
-      (altsOrOpts as OrMethodOpts<unknown>).ERR_MSG,
+      (altsOrOpts as OrMethodOpts<unknown>).ERR_MSG
     );
   }
 
@@ -674,7 +674,7 @@ export class RecognizerEngine {
         ruleName: this.getCurrRuleFullName(),
       });
       this.SAVE_ERROR(
-        new NotAllInputParsedException(errMsg, firstRedundantTok),
+        new NotAllInputParsedException(errMsg, firstRedundantTok)
       );
     }
   }
@@ -683,7 +683,7 @@ export class RecognizerEngine {
     this: MixedInParser,
     ruleToCall: ParserMethodInternal<ARGS, R>,
     idx: number,
-    options?: SubruleMethodOpts<ARGS>,
+    options?: SubruleMethodOpts<ARGS>
   ): R {
     let ruleResult;
     try {
@@ -694,7 +694,7 @@ export class RecognizerEngine {
         ruleResult,
         options !== undefined && options.LABEL !== undefined
           ? options.LABEL
-          : ruleToCall.ruleName,
+          : ruleToCall.ruleName
       );
       return ruleResult;
     } catch (e) {
@@ -706,14 +706,14 @@ export class RecognizerEngine {
     this: MixedInParser,
     e: any,
     options: SubruleMethodOpts<unknown[]> | undefined,
-    ruleName: string,
+    ruleName: string
   ): void {
     if (isRecognitionException(e) && e.partialCstResult !== undefined) {
       this.cstPostNonTerminal(
         e.partialCstResult,
         options !== undefined && options.LABEL !== undefined
           ? options.LABEL
-          : ruleName,
+          : ruleName
       );
 
       delete e.partialCstResult;
@@ -725,7 +725,7 @@ export class RecognizerEngine {
     this: MixedInParser,
     tokType: TokenType,
     idx: number,
-    options: ConsumeMethodOpts | undefined,
+    options: ConsumeMethodOpts | undefined
   ): IToken {
     let consumedToken!: IToken;
     try {
@@ -740,7 +740,7 @@ export class RecognizerEngine {
       consumedToken = this.consumeInternalRecovery(
         tokType,
         idx,
-        eFromConsumption,
+        eFromConsumption
       );
     }
 
@@ -748,7 +748,7 @@ export class RecognizerEngine {
       options !== undefined && options.LABEL !== undefined
         ? options.LABEL
         : tokType.name,
-      consumedToken,
+      consumedToken
     );
     return consumedToken;
   }
@@ -757,7 +757,7 @@ export class RecognizerEngine {
     this: MixedInParser,
     tokType: TokenType,
     nextToken: IToken,
-    options: ConsumeMethodOpts | undefined,
+    options: ConsumeMethodOpts | undefined
   ): void {
     let msg;
     const previousToken = this.LA(0);
@@ -772,7 +772,7 @@ export class RecognizerEngine {
       });
     }
     throw this.SAVE_ERROR(
-      new MismatchedTokenException(msg, nextToken, previousToken),
+      new MismatchedTokenException(msg, nextToken, previousToken)
     );
   }
 
@@ -780,7 +780,7 @@ export class RecognizerEngine {
     this: MixedInParser,
     tokType: TokenType,
     idx: number,
-    eFromConsumption: Error,
+    eFromConsumption: Error
   ): IToken {
     // no recovery allowed during backtracking, otherwise backtracking may recover invalid syntax and accept it
     // but the original syntax could have been parsed successfully without any backtracking + recovery
@@ -829,7 +829,7 @@ export class RecognizerEngine {
     this: MixedInParser,
     shortName: number,
     fullName: string,
-    idxInCallingRule: number,
+    idxInCallingRule: number
   ): void {
     this.RULE_OCCURRENCE_STACK.push(idxInCallingRule);
     this.RULE_STACK.push(shortName);

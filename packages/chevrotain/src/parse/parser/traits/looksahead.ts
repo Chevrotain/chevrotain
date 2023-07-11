@@ -79,7 +79,7 @@ export class LooksAhead {
             const key = getKeyForAutomaticLookahead(
               this.fullRuleNameToShort[currRule.name],
               OR_IDX,
-              currProd.idx,
+              currProd.idx
             );
             this.setLaFuncCache(key, laFunc);
           });
@@ -92,7 +92,7 @@ export class LooksAhead {
             MANY_IDX,
             "Repetition",
             currProd.maxLookahead,
-            getProductionDslName(currProd),
+            getProductionDslName(currProd)
           );
         });
 
@@ -103,7 +103,7 @@ export class LooksAhead {
             OPTION_IDX,
             "Option",
             currProd.maxLookahead,
-            getProductionDslName(currProd),
+            getProductionDslName(currProd)
           );
         });
 
@@ -114,7 +114,7 @@ export class LooksAhead {
             AT_LEAST_ONE_IDX,
             "RepetitionMandatory",
             currProd.maxLookahead,
-            getProductionDslName(currProd),
+            getProductionDslName(currProd)
           );
         });
 
@@ -125,7 +125,7 @@ export class LooksAhead {
             AT_LEAST_ONE_SEP_IDX,
             "RepetitionMandatoryWithSeparator",
             currProd.maxLookahead,
-            getProductionDslName(currProd),
+            getProductionDslName(currProd)
           );
         });
 
@@ -136,7 +136,7 @@ export class LooksAhead {
             MANY_SEP_IDX,
             "RepetitionWithSeparator",
             currProd.maxLookahead,
-            getProductionDslName(currProd),
+            getProductionDslName(currProd)
           );
         });
       });
@@ -150,7 +150,7 @@ export class LooksAhead {
     prodKey: number,
     prodType: OptionalProductionType,
     prodMaxLookahead: number | undefined,
-    dslMethodName: string,
+    dslMethodName: string
   ): void {
     this.TRACE_INIT(
       `${dslMethodName}${prodOccurrence === 0 ? "" : prodOccurrence}`,
@@ -165,10 +165,10 @@ export class LooksAhead {
         const key = getKeyForAutomaticLookahead(
           this.fullRuleNameToShort[rule.name],
           prodKey,
-          prodOccurrence,
+          prodOccurrence
         );
         this.setLaFuncCache(key, laFunc);
-      },
+      }
     );
   }
 
@@ -176,13 +176,13 @@ export class LooksAhead {
   getKeyForAutomaticLookahead(
     this: MixedInParser,
     dslMethodIdx: number,
-    occurrence: number,
+    occurrence: number
   ): number {
     const currRuleShortName: any = this.getLastExplicitRuleShortName();
     return getKeyForAutomaticLookahead(
       currRuleShortName,
       dslMethodIdx,
-      occurrence,
+      occurrence
     );
   }
 
@@ -237,7 +237,7 @@ class DslMethodsCollectorVisitor extends GAstVisitor {
   }
 
   public visitRepetitionMandatoryWithSeparator(
-    atLeastOneSep: RepetitionMandatoryWithSeparator,
+    atLeastOneSep: RepetitionMandatoryWithSeparator
   ): void {
     this.dslMethods.repetitionMandatoryWithSeparator.push(atLeastOneSep);
   }

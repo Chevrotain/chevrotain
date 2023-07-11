@@ -10,7 +10,7 @@ function parseBench(
   parser,
   rootRule,
   options,
-  parserConfig,
+  parserConfig
 ) {
   if (lexerInstance === undefined) {
     if (customLexer !== undefined) {

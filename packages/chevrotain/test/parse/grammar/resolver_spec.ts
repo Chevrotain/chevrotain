@@ -12,18 +12,18 @@ describe("The RefResolverVisitor", () => {
     topLevelRules["TOP"] = topLevel;
     const resolver = new GastRefResolverVisitor(
       topLevelRules,
-      defaultGrammarResolverErrorProvider,
+      defaultGrammarResolverErrorProvider
     );
     resolver.resolveRefs();
     expect(resolver.errors).to.have.lengthOf(1);
     expect(resolver.errors[0].message).to.contain(
-      "Invalid grammar, reference to a rule which is not defined: ->missingRule<-",
+      "Invalid grammar, reference to a rule which is not defined: ->missingRule<-"
     );
     expect(resolver.errors[0].message).to.contain(
-      "inside top level rule: ->TOP<-",
+      "inside top level rule: ->TOP<-"
     );
     expect(resolver.errors[0].type).to.equal(
-      ParserDefinitionErrorType.UNRESOLVED_SUBRULE_REF,
+      ParserDefinitionErrorType.UNRESOLVED_SUBRULE_REF
     );
     expect(resolver.errors[0].ruleName).to.equal("TOP");
   });

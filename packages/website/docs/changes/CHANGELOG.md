@@ -1217,7 +1217,7 @@ so not many changes will be needed (if at all) for most users.
     function () {
       /* ... */
     },
-    { resyncEnabled: false },
+    { resyncEnabled: false }
   );
   ```
 

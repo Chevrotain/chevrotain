@@ -9,7 +9,7 @@ const defaultOptions: Required<GenerateDtsOptions> = {
 
 export function generateCstDts(
   productions: Record<string, Rule>,
-  options?: GenerateDtsOptions,
+  options?: GenerateDtsOptions
 ): string {
   const effectiveOptions = {
     ...defaultOptions,

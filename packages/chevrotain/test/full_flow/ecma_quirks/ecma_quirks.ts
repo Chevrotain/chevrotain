@@ -79,7 +79,7 @@ function deferredInitTokens() {
     forEach(allTokens, (currTokType) => {
       currTokType.PATTERN = new RegExp(
         (currTokType.PATTERN as RegExp).source,
-        "y",
+        "y"
       );
     });
   }
@@ -116,7 +116,7 @@ class EcmaScriptQuirksLookaheadStrategy implements ILookaheadStrategy {
 
     if (
       !every(alts, (currPath) =>
-        every(currPath, (currAlt) => currAlt.length === 1),
+        every(currPath, (currAlt) => currAlt.length === 1)
       )
     ) {
       throw Error("This scannerLess parser only supports LL(1) lookahead.");
@@ -283,7 +283,7 @@ class EcmaScriptQuirksParser extends EmbeddedActionsParser {
   consumeInternal(
     this: MixedInParser & EcmaScriptQuirksParser,
     tokClass: TokenType,
-    idx: number,
+    idx: number
   ): IToken {
     this.skipWhitespace();
     const nextToken = this.consumeExpected(tokClass);
@@ -304,7 +304,7 @@ class EcmaScriptQuirksParser extends EmbeddedActionsParser {
         ruleName: this.getCurrRuleFullName(),
       });
       throw this.SAVE_ERROR(
-        new MismatchedTokenException(msg, errorToken, previousToken),
+        new MismatchedTokenException(msg, errorToken, previousToken)
       );
     }
   }
