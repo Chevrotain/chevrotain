@@ -50,7 +50,7 @@
     "ci": "pnpm run build test",
     "build": "npm-run-all clean compile bundle",
     "test": "npm-run-all coverage",
-    "version": "tsc ./src/version.ts --outDir lib/src && node ./scripts/version-update.js",
+    "version": "pnpm run compile && node ./scripts/version-update.js",
     "---------- DEV FLOWS --------": "",
     "watch": "tsc -w",
     "unit-tests": "mocha --enable-source-maps",
