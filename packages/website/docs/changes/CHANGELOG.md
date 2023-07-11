@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 11.0.0 (7-11-2023)
 
 #### Breaking Changes
 

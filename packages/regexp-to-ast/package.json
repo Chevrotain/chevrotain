@@ -1,6 +1,6 @@
 {
   "name": "@chevrotain/regexp-to-ast",
-  "version": "10.5.0",
+  "version": "11.0.0",
   "description": "Parses a Regular Expression and outputs an AST",
   "keywords": [
     "regExp",
@@ -38,8 +38,6 @@
     "compile": "tsc",
     "coverage": "c8 mocha"
   },
-  "dependencies": {},
-  "devDependencies": {},
   "publishConfig": {
     "access": "public"
   }

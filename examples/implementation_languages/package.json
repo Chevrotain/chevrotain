@@ -1,6 +1,6 @@
 {
   "name": "chevrotain_examples_implementation_languages",
-  "version": "10.5.0",
+  "version": "11.0.0",
   "type": "module",
   "scripts": {
     "ci": "pnpm run build test",
@@ -9,7 +9,7 @@
     "test": "mocha \"*spec.js\""
   },
   "dependencies": {
-    "chevrotain": "10.5.0"
+    "chevrotain": "11.0.0"
   },
   "devDependencies": {
     "coffee-script": "^1.11.1",
