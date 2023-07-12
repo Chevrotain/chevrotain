@@ -14,14 +14,13 @@ function getUrlParameter(sParam) {
   }
 }
 
-var orgLexer = chevrotain.Lexer;
-
 /**
  * Modifies chevrotain's Lexer to by default enable the deferred error handling
  * This should not normally be done in productive flows, but it is very important for the playground
  * as the deferred errors are displayed in the UI...
  */
 function wrapChevrotainLexer() {
+  var orgLexer = chevrotain.Lexer;
   chevrotain.Lexer = function (definition, config) {
     if (config) {
       // always override this in playground context

@@ -20,11 +20,24 @@
     />
     <link rel="stylesheet" type="text/css" href="CSS/playground.css" />
 
+    <script>
+      window.ChevrotainLoadedPromise = new Promise((resolve, reject) => {
+        function checkChevLoaded() {
+          if (window.chevrotain !== undefined) {
+            resolve();
+          } else {
+            setTimeout(checkChevLoaded, 100);
+          }
+        }
+        checkChevLoaded();
+      });
+    </script>
+    <script type="module" src="./chevrotain-esm-to-global.mjs"></script>
+
     <script src="../bower_components/lodash/lodash.js"></script>
     <script src="../bower_components/jquery/dist/jquery.js"></script>
     <script src="libs/jquery.svg.js"></script>
     <script src="libs/jquery.svgdom.js"></script>
-    <script src="https://unpkg.com/chevrotain/temp/chevrotain.internal.temp.js"></script>
     <script src="../bower_components/CodeMirror/lib/codemirror.js"></script>
     <script src="../bower_components/CodeMirror/mode/javascript/javascript.js"></script>
     <script src="../bower_components/xregexp/xregexp-all.js"></script>
@@ -157,85 +170,89 @@
       var inputEditorDiv = null;
       var outputEditorDiv = null;
 
-      wrapChevrotainLexer();
+      // hack to wait for Chevrotain ESM bundle to load first as this playground
+      // is legacy code relying on globals and sync "in-order" loading of scripts
+      window.ChevrotainLoadedPromise.then(() => {
+        wrapChevrotainLexer();
 
-      $(document).ready(function init() {
-        // defer error handling so we can display error markers visually
-        // instead of using the default chevrotain behavior of throwing exceptions.
-        chevrotain.Parser.DEFER_DEFINITION_ERRORS_HANDLING = true;
+        $(document).ready(function init() {
+          // defer error handling so we can display error markers visually
+          // instead of using the default chevrotain behavior of throwing exceptions.
+          chevrotain.Parser.DEFER_DEFINITION_ERRORS_HANDLING = true;
 
-        // init global state
-        examplesDropdown = $("#example-choice");
-        samplesDropdown = $("#samples-choice");
-        diagramsDiv = _.first($("#diagramsDiv"));
-        diagramsHeaderOrgHtml = diagramsDiv.innerHTML;
+          // init global state
+          examplesDropdown = $("#example-choice");
+          samplesDropdown = $("#samples-choice");
+          diagramsDiv = _.first($("#diagramsDiv"));
+          diagramsHeaderOrgHtml = diagramsDiv.innerHTML;
 
-        var implTextArea = $("#parserImplementationEditor");
-        javaScriptEditor = CodeMirror.fromTextArea(_.first(implTextArea), {
-          lineNumbers: true,
-          viewportMargin: 10,
-        });
-
-        javaScriptEditor.on(
-          "change",
-          _.debounce(onImplementationEditorContentChange, 250)
-        );
-
-        inputEditor = CodeMirror.fromTextArea(
-          _.first($("#parserInputEditor")),
-          {
+          var implTextArea = $("#parserImplementationEditor");
+          javaScriptEditor = CodeMirror.fromTextArea(_.first(implTextArea), {
             lineNumbers: true,
             viewportMargin: 10,
+          });
+
+          javaScriptEditor.on(
+            "change",
+            _.debounce(onImplementationEditorContentChange, 250)
+          );
+
+          inputEditor = CodeMirror.fromTextArea(
+            _.first($("#parserInputEditor")),
+            {
+              lineNumbers: true,
+              viewportMargin: 10,
+            }
+          );
+
+          inputEditor.on("change", _.debounce(onInputEditorContentChange, 250));
+
+          parserOutput = CodeMirror.fromTextArea(_.first($("#parserOutput")), {
+            lineNumbers: true,
+            viewportMargin: 10,
+            readOnly: true,
+          });
+
+          inputEditor.setOption("mode", "text");
+          parserOutput.setOption("mode", "text");
+
+          javaScriptEditor.setSize("100%", "100%");
+          inputEditor.setSize("100%", "100%");
+          parserOutput.setSize("100%", "100%");
+
+          initCodeMirrorVScroll();
+
+          initExamplesDropDown();
+          examplesDropdown.change(function () {
+            loadExample(examplesDropdown.val());
+          });
+
+          var urlParamExample = getUrlParameter("example");
+          if (urlParamExample) {
+            examplesDropdown.value = urlParamExample;
+            $(examplesDropdown).val(urlParamExample);
+            loadExample(urlParamExample, true);
+          } else {
+            loadExample("JSON grammar and CST output", true);
           }
-        );
+          updateSamplesDropDown();
 
-        inputEditor.on("change", _.debounce(onInputEditorContentChange, 250));
+          samplesDropdown.change(function () {
+            loadSamples(samplesDropdown.val());
+          });
 
-        parserOutput = CodeMirror.fromTextArea(_.first($("#parserOutput")), {
-          lineNumbers: true,
-          viewportMargin: 10,
-          readOnly: true,
+          $(document).mouseup(endResize);
+          $(document).mousemove(resizeRoot);
+
+          impelEditorDiv = _.first($("#impel").find(".cm-s-default"));
+          impelEditorDiv.id = "impelEditorDiv";
+          inputEditorDiv = _.first($("#input").find(".cm-s-default"));
+          inputEditorDiv.id = "inputEditorDiv";
+          outputEditorDiv = _.first($("#output").find(".cm-s-default"));
+          outputEditorDiv.id = "outputEditorDiv";
+
+          initCodeMirrorDivsViewPortHeight();
         });
-
-        inputEditor.setOption("mode", "text");
-        parserOutput.setOption("mode", "text");
-
-        javaScriptEditor.setSize("100%", "100%");
-        inputEditor.setSize("100%", "100%");
-        parserOutput.setSize("100%", "100%");
-
-        initCodeMirrorVScroll();
-
-        initExamplesDropDown();
-        examplesDropdown.change(function () {
-          loadExample(examplesDropdown.val());
-        });
-
-        var urlParamExample = getUrlParameter("example");
-        if (urlParamExample) {
-          examplesDropdown.value = urlParamExample;
-          $(examplesDropdown).val(urlParamExample);
-          loadExample(urlParamExample, true);
-        } else {
-          loadExample("JSON grammar and CST output", true);
-        }
-        updateSamplesDropDown();
-
-        samplesDropdown.change(function () {
-          loadSamples(samplesDropdown.val());
-        });
-
-        $(document).mouseup(endResize);
-        $(document).mousemove(resizeRoot);
-
-        impelEditorDiv = _.first($("#impel").find(".cm-s-default"));
-        impelEditorDiv.id = "impelEditorDiv";
-        inputEditorDiv = _.first($("#input").find(".cm-s-default"));
-        inputEditorDiv.id = "inputEditorDiv";
-        outputEditorDiv = _.first($("#output").find(".cm-s-default"));
-        outputEditorDiv.id = "outputEditorDiv";
-
-        initCodeMirrorDivsViewPortHeight();
       });
     </script>
   </body>
