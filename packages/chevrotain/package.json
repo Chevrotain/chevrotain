@@ -37,8 +37,8 @@
     "README.md",
     "LICENSE.TXT",
     "diagrams/**/*.*",
-    "CHANGELOG.md",
-    "temp/*.js"
+    "BREAKING_CHANGES.md",
+    "CHANGELOG.md"
   ],
   "repository": {
     "type": "git",
@@ -62,8 +62,6 @@
     "coverage": "c8 mocha --enable-source-maps",
     "---------- BUNDLING --------": "",
     "bundle": "npm-run-all bundle:**",
-    "bundle:regular": "webpack --config webpack_release.config.js",
-    "bundle:min": "webpack --config webpack_release_min.config.js",
     "bundle:esm:regular": "esbuild ./lib/src/api.js --bundle --sourcemap --format=esm --outfile=lib/chevrotain.mjs",
     "bundle:esm:min": "esbuild ./lib/src/api.js --bundle --minify --format=esm --sourcemap --outfile=lib/chevrotain.min.mjs"
   },
@@ -89,8 +87,6 @@
     "require-from-string": "2.0.2",
     "sinon": "15.2.0",
     "sinon-chai": "3.7.0",
-    "webpack": "5.88.1",
-    "webpack-cli": "5.1.4",
     "xregexp": "5.1.1"
   }
 }
