@@ -262,7 +262,7 @@ function toAst(inputText) {
   if (parserInstance.errors.length > 0) {
     throw Error(
       "Sad sad panda, parsing errors detected!\n" +
-        parserInstance.errors[0].message
+        parserInstance.errors[0].message,
     );
   }
 

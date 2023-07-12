@@ -9,7 +9,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const packagePath = path.join(__dirname, "../package.json");
 export const changeLogPath = path.join(
   __dirname,
-  "../docs/changes/CHANGELOG.md"
+  "../docs/changes/CHANGELOG.md",
 );
 
 const docsDirPath = path.join(__dirname, "../docs");
@@ -30,11 +30,11 @@ export const markdownDocsFiles = _.reduce(
     if (fs.lstatSync(currPath).isDirectory()) {
       const nestedFiles = fs.readdirSync(currPath);
       const nestedPaths = _.map(nestedFiles, (currFile) =>
-        path.join(currPath, currFile)
+        path.join(currPath, currFile),
       );
       const newMarkdowns = _.filter(
         nestedPaths,
-        (currPath) => _.endsWith(currPath, ".md") && notChangesDocs(currPath)
+        (currPath) => _.endsWith(currPath, ".md") && notChangesDocs(currPath),
       );
 
       result = result.concat(newMarkdowns);
@@ -48,7 +48,7 @@ export const markdownDocsFiles = _.reduce(
 
     return result;
   },
-  []
+  [],
 );
 
 const pkgJson = jf.readFileSync(packagePath);

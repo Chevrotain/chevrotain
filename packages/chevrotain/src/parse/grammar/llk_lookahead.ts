@@ -43,11 +43,11 @@ export class LLkLookaheadStrategy implements ILookaheadStrategy {
       const emptyAltErrors = this.validateEmptyOrAlternatives(options.rules);
       const ambiguousAltsErrors = this.validateAmbiguousAlternationAlternatives(
         options.rules,
-        this.maxLookahead
+        this.maxLookahead,
       );
       const emptyRepetitionErrors = this.validateSomeNonEmptyLookaheadPath(
         options.rules,
-        this.maxLookahead
+        this.maxLookahead,
       );
       const allErrors = [
         ...leftRecursionErrors,
@@ -65,8 +65,8 @@ export class LLkLookaheadStrategy implements ILookaheadStrategy {
       validateNoLeftRecursion(
         currTopRule,
         currTopRule,
-        defaultGrammarValidatorErrorProvider
-      )
+        defaultGrammarValidatorErrorProvider,
+      ),
     );
   }
 
@@ -74,32 +74,32 @@ export class LLkLookaheadStrategy implements ILookaheadStrategy {
     return flatMap(rules, (currTopRule) =>
       validateEmptyOrAlternative(
         currTopRule,
-        defaultGrammarValidatorErrorProvider
-      )
+        defaultGrammarValidatorErrorProvider,
+      ),
     );
   }
 
   validateAmbiguousAlternationAlternatives(
     rules: Rule[],
-    maxLookahead: number
+    maxLookahead: number,
   ): IParserDefinitionError[] {
     return flatMap(rules, (currTopRule) =>
       validateAmbiguousAlternationAlternatives(
         currTopRule,
         maxLookahead,
-        defaultGrammarValidatorErrorProvider
-      )
+        defaultGrammarValidatorErrorProvider,
+      ),
     );
   }
 
   validateSomeNonEmptyLookaheadPath(
     rules: Rule[],
-    maxLookahead: number
+    maxLookahead: number,
   ): IParserDefinitionError[] {
     return validateSomeNonEmptyLookaheadPath(
       rules,
       maxLookahead,
-      defaultGrammarValidatorErrorProvider
+      defaultGrammarValidatorErrorProvider,
     );
   }
 
@@ -116,7 +116,7 @@ export class LLkLookaheadStrategy implements ILookaheadStrategy {
       options.maxLookahead,
       options.hasPredicates,
       options.dynamicTokensEnabled,
-      buildAlternativesLookAheadFunc
+      buildAlternativesLookAheadFunc,
     );
   }
 
@@ -133,7 +133,7 @@ export class LLkLookaheadStrategy implements ILookaheadStrategy {
       options.maxLookahead,
       options.dynamicTokensEnabled,
       getProdType(options.prodType),
-      buildSingleAlternativeLookaheadFunction
+      buildSingleAlternativeLookaheadFunction,
     );
   }
 }

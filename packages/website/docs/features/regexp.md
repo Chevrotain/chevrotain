@@ -35,7 +35,7 @@ $.RULE("statement", () => {
     name: "FloatValue",
     pattern: MAKE_PATTERN(
       // This regExp would be very hard to read without "named fragments"
-      "{{IntegerPart}}{{FractionalPart}}({{ExponentPart}})?|{{IntegerPart}}{{ExponentPart}}"
+      "{{IntegerPart}}{{FractionalPart}}({{ExponentPart}})?|{{IntegerPart}}{{ExponentPart}}",
     ),
   });
 });

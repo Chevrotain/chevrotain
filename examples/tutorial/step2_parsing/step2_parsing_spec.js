@@ -12,10 +12,10 @@ describe("Chevrotain Tutorial", () => {
       // missing table name
       let inputText = "SELECT FROM table2";
       expect(() => parse(inputText)).to.throw(
-        "expecting at least one iteration which starts with one of these possible Token sequences"
+        "expecting at least one iteration which starts with one of these possible Token sequences",
       );
       expect(() => parse(inputText)).to.throw(
-        "<[Identifier]>\nbut found: 'FROM'"
+        "<[Identifier]>\nbut found: 'FROM'",
       );
     });
   });

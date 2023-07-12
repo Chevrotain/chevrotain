@@ -34,17 +34,17 @@ import { expect } from "chai";
 describe("getProdType", () => {
   it("handles `Option`", () => {
     expect(getProdType(new Option({ definition: [] }))).to.equal(
-      PROD_TYPE.OPTION
+      PROD_TYPE.OPTION,
     );
   });
   it("handles `Repetition`", () => {
     expect(getProdType(new Repetition({ definition: [] }))).to.equal(
-      PROD_TYPE.REPETITION
+      PROD_TYPE.REPETITION,
     );
   });
   it("handles `RepetitionMandatory`", () => {
     expect(getProdType(new RepetitionMandatory({ definition: [] }))).to.equal(
-      PROD_TYPE.REPETITION_MANDATORY
+      PROD_TYPE.REPETITION_MANDATORY,
     );
   });
   it("handles `RepetitionWithSeparator`", () => {
@@ -53,8 +53,8 @@ describe("getProdType", () => {
         new RepetitionWithSeparator({
           definition: [],
           separator: createToken({ name: "Comma" }),
-        })
-      )
+        }),
+      ),
     ).to.equal(PROD_TYPE.REPETITION_WITH_SEPARATOR);
   });
   it("handles `RepetitionMandatoryWithSeparator`", () => {
@@ -63,13 +63,13 @@ describe("getProdType", () => {
         new RepetitionMandatoryWithSeparator({
           definition: [],
           separator: createToken({ name: "Comma" }),
-        })
-      )
+        }),
+      ),
     ).to.equal(PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR);
   });
   it("handles `Alternation`", () => {
     expect(getProdType(new Alternation({ definition: [] }))).to.equal(
-      PROD_TYPE.ALTERNATION
+      PROD_TYPE.ALTERNATION,
     );
   });
 });
@@ -316,7 +316,7 @@ context("lookahead specs", () => {
         1,
         false,
         PROD_TYPE.OPTION,
-        buildSingleAlternativeLookaheadFunction
+        buildSingleAlternativeLookaheadFunction,
       );
 
       expect(laFunc.call(colonMock)).to.equal(false);
@@ -333,7 +333,7 @@ context("lookahead specs", () => {
         1,
         false,
         PROD_TYPE.OPTION,
-        buildSingleAlternativeLookaheadFunction
+        buildSingleAlternativeLookaheadFunction,
       );
 
       expect(laFunc.call(colonParserMock)).to.equal(true);
@@ -364,7 +364,7 @@ context("lookahead specs", () => {
         1,
         false,
         PROD_TYPE.OPTION,
-        buildSingleAlternativeLookaheadFunction
+        buildSingleAlternativeLookaheadFunction,
       );
 
       const laMock = {
@@ -387,7 +387,7 @@ context("lookahead specs", () => {
         1,
         false,
         PROD_TYPE.REPETITION,
-        buildSingleAlternativeLookaheadFunction
+        buildSingleAlternativeLookaheadFunction,
       );
 
       expect(laFunc.call(commaParserMock)).to.equal(true);
@@ -406,7 +406,7 @@ context("lookahead specs", () => {
         1,
         false,
         false,
-        buildAlternativesLookAheadFunc
+        buildAlternativesLookAheadFunc,
       );
 
       expect(laFunc.call(commaParserMock)).to.equal(0);
@@ -452,7 +452,7 @@ context("lookahead specs", () => {
         1,
         false,
         false,
-        buildAlternativesLookAheadFunc
+        buildAlternativesLookAheadFunc,
       );
 
       const laMock = {
@@ -476,7 +476,7 @@ context("lookahead specs", () => {
         1,
         false,
         false,
-        buildAlternativesLookAheadFunc
+        buildAlternativesLookAheadFunc,
       );
 
       expect(laFunc.call(keyParserMock)).to.equal(0);
@@ -742,7 +742,7 @@ context("lookahead specs", () => {
 
         constructor(public inputConstructors: TokenType[]) {
           this.input = map(inputConstructors, (currConst) =>
-            createRegularToken(currConst)
+            createRegularToken(currConst),
           );
         }
 
@@ -765,7 +765,7 @@ context("lookahead specs", () => {
           alternatives,
           false,
           tokenStructuredMatcher,
-          false
+          false,
         );
 
         expect(laFunc.call(new MockParser([Alpha]))).to.equal(2);
@@ -783,7 +783,7 @@ context("lookahead specs", () => {
           alternatives,
           false,
           tokenStructuredMatcher,
-          false
+          false,
         );
 
         expect(laFunc.call(new MockParser([Alpha]))).to.equal(0);
@@ -802,7 +802,7 @@ context("lookahead specs", () => {
           alternatives,
           false,
           tokenStructuredMatcher,
-          false
+          false,
         );
 
         expect(laFunc.call(new MockParser([]))).to.be.undefined;
@@ -822,12 +822,12 @@ context("lookahead specs", () => {
           alternatives,
           false,
           tokenStructuredMatcher,
-          false
+          false,
         );
 
         expect(laFunc.call(new MockParser([Alpha, Beta, Gamma]))).to.equal(0);
         expect(
-          laFunc.call(new MockParser([Alpha, Beta, Gamma, Delta]))
+          laFunc.call(new MockParser([Alpha, Beta, Gamma, Delta])),
         ).to.equal(0);
         expect(laFunc.call(new MockParser([Alpha, Beta, Delta]))).to.equal(0);
         expect(laFunc.call(new MockParser([Alpha, Beta, Beta]))).to.equal(1);
@@ -847,7 +847,7 @@ context("lookahead specs", () => {
           alternatives,
           false,
           tokenStructuredMatcher,
-          false
+          false,
         );
 
         expect(laFunc.call(new MockParser([]))).to.be.undefined;
@@ -868,12 +868,12 @@ context("lookahead specs", () => {
           alternatives,
           false,
           tokenStructuredMatcher,
-          false
+          false,
         );
 
         expect(laFunc.call(new MockParser([Alpha, Beta]))).to.equal(1);
         expect(laFunc.call(new MockParser([ExtendsAlphaAlpha, Beta]))).to.equal(
-          0
+          0,
         );
         // expect(
         //     laFunc.call(new MockParser([ExtendsAlpha, Beta]))
@@ -890,7 +890,7 @@ context("lookahead specs", () => {
           alternatives,
           false,
           tokenStructuredMatcher,
-          false
+          false,
         );
 
         expect(laFunc.call(new MockParser([Alpha, Beta]))).to.be.undefined;
@@ -907,7 +907,7 @@ context("lookahead specs", () => {
           alternatives,
           false,
           tokenStructuredMatcher,
-          false
+          false,
         );
 
         expect(laFunc.call(new MockParser([Alpha]))).to.equal(0);
@@ -920,7 +920,7 @@ context("lookahead specs", () => {
         const laFunc = buildSingleAlternativeLookaheadFunction(
           alternative,
           tokenStructuredMatcher,
-          false
+          false,
         );
 
         expect(laFunc.call(new MockParser([Alpha]))).to.be.true;
@@ -933,7 +933,7 @@ context("lookahead specs", () => {
         const laFunc = buildSingleAlternativeLookaheadFunction(
           alternative,
           tokenStructuredMatcher,
-          false
+          false,
         );
 
         expect(laFunc.call(new MockParser([Delta]))).to.be.false;
@@ -945,7 +945,7 @@ context("lookahead specs", () => {
         const laFunc = buildSingleAlternativeLookaheadFunction(
           alternative,
           tokenStructuredMatcher,
-          false
+          false,
         );
 
         expect(laFunc.call(new MockParser([Alpha, Beta, Gamma]))).to.be.true;
@@ -958,7 +958,7 @@ context("lookahead specs", () => {
         const laFunc = buildSingleAlternativeLookaheadFunction(
           alternative,
           tokenStructuredMatcher,
-          false
+          false,
         );
 
         expect(laFunc.call(new MockParser([Alpha, Charlie, Gamma]))).to.be
@@ -972,21 +972,25 @@ context("lookahead specs", () => {
         const laFunc = buildSingleAlternativeLookaheadFunction(
           alternative,
           tokenStructuredMatcher,
-          false
+          false,
         );
 
         expect(
-          laFunc.call(new MockParser([Alpha, ExtendsAlpha, ExtendsAlphaAlpha]))
+          laFunc.call(new MockParser([Alpha, ExtendsAlpha, ExtendsAlphaAlpha])),
         ).to.be.true;
         expect(
           laFunc.call(
-            new MockParser([ExtendsAlpha, ExtendsAlpha, ExtendsAlphaAlpha])
-          )
+            new MockParser([ExtendsAlpha, ExtendsAlpha, ExtendsAlphaAlpha]),
+          ),
         ).to.be.true;
         expect(
           laFunc.call(
-            new MockParser([ExtendsAlphaAlpha, ExtendsAlpha, ExtendsAlphaAlpha])
-          )
+            new MockParser([
+              ExtendsAlphaAlpha,
+              ExtendsAlpha,
+              ExtendsAlphaAlpha,
+            ]),
+          ),
         ).to.be.true;
         expect(
           laFunc.call(
@@ -994,8 +998,8 @@ context("lookahead specs", () => {
               ExtendsAlphaAlpha,
               ExtendsAlphaAlpha,
               ExtendsAlphaAlpha,
-            ])
-          )
+            ]),
+          ),
         ).to.be.true;
       });
 
@@ -1004,19 +1008,19 @@ context("lookahead specs", () => {
         const laFunc = buildSingleAlternativeLookaheadFunction(
           alternative,
           tokenStructuredMatcher,
-          false
+          false,
         );
 
         expect(
-          laFunc.call(new MockParser([Gamma, ExtendsAlpha, ExtendsAlphaAlpha]))
+          laFunc.call(new MockParser([Gamma, ExtendsAlpha, ExtendsAlphaAlpha])),
         ).to.be.false;
         expect(
-          laFunc.call(new MockParser([ExtendsAlpha, Alpha, ExtendsAlphaAlpha]))
+          laFunc.call(new MockParser([ExtendsAlpha, Alpha, ExtendsAlphaAlpha])),
         ).to.be.false;
         expect(
           laFunc.call(
-            new MockParser([ExtendsAlphaAlpha, ExtendsAlpha, ExtendsAlpha])
-          )
+            new MockParser([ExtendsAlphaAlpha, ExtendsAlpha, ExtendsAlpha]),
+          ),
         ).to.be.false;
       });
     });

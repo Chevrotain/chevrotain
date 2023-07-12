@@ -192,7 +192,7 @@
     [
       /* token vector */
     ],
-    {}
+    {},
   );
 
   // New API

@@ -207,7 +207,7 @@
     FakeSVG.call(this, "svg", { class: Diagram.DIAGRAM_CLASS });
     if (stackAtIllegalPosition(items)) {
       throw new RangeError(
-        "Stack() must only occur at the very last position of Diagram()."
+        "Stack() must only occur at the very last position of Diagram().",
       );
     }
     this.items = items.map(wrapString);
@@ -224,13 +224,13 @@
       null,
       this.items.map(function (x) {
         return x.up;
-      })
+      }),
     );
     this.down = Math.max.apply(
       null,
       this.items.map(function (x) {
         return x.down;
-      })
+      }),
     );
     this.formatted = false;
   }
@@ -248,7 +248,7 @@
     y += this.up;
     var g = FakeSVG(
       "g",
-      Diagram.STROKE_ODD_PIXEL_LENGTH ? { transform: "translate(.5 .5)" } : {}
+      Diagram.STROKE_ODD_PIXEL_LENGTH ? { transform: "translate(.5 .5)" } : {},
     );
     for (var i = 0; i < this.items.length; i++) {
       var item = this.items[i];
@@ -308,7 +308,7 @@
     FakeSVG.call(this, "g");
     if (stackAtIllegalPosition(items)) {
       throw new RangeError(
-        "Stack() must only occur at the very last position of Sequence()."
+        "Stack() must only occur at the very last position of Sequence().",
       );
     }
     this.items = items.map(wrapString);
@@ -358,7 +358,7 @@
     FakeSVG.call(this, "g");
     if (stackAtIllegalPosition(items)) {
       throw new RangeError(
-        "Stack() must only occur at the very last position of Stack()."
+        "Stack() must only occur at the very last position of Stack().",
       );
     }
     if (items.length === 0) {
@@ -415,7 +415,7 @@
         .format(
           x,
           y,
-          Math.max(item.width + item.offsetX, Diagram.ARC_RADIUS * 2)
+          Math.max(item.width + item.offsetX, Diagram.ARC_RADIUS * 2),
         )
         .addTo(this);
       x += Math.max(item.width + item.offsetX, Diagram.ARC_RADIUS * 2);
@@ -459,7 +459,7 @@
       throw new TypeError("The first argument of Choice() must be an integer.");
     } else if (normal < 0 || normal >= items.length) {
       throw new RangeError(
-        "The first argument of Choice() must be an index for one of the items."
+        "The first argument of Choice() must be an index for one of the items.",
       );
     } else {
       this.normal = normal;
@@ -478,7 +478,7 @@
       if (i < normal) {
         this.up += Math.max(
           Diagram.ARC_RADIUS,
-          item.up + item.height + item.down + Diagram.VERTICAL_SEPARATION
+          item.up + item.height + item.down + Diagram.VERTICAL_SEPARATION,
         );
       }
       if (i == normal) {
@@ -488,7 +488,7 @@
       if (i > normal) {
         this.down += Math.max(
           Diagram.ARC_RADIUS,
-          Diagram.VERTICAL_SEPARATION + item.up + item.down + item.height
+          Diagram.VERTICAL_SEPARATION + item.up + item.down + item.height,
         );
       }
     }
@@ -515,7 +515,7 @@
           this.items[i + 1].up +
             Diagram.VERTICAL_SEPARATION +
             item.height +
-            item.down
+            item.down,
         );
       }
       Path(x, y)
@@ -528,14 +528,14 @@
         .addTo(this);
       Path(
         x + Diagram.ARC_RADIUS * 2 + innerWidth,
-        y - distanceFromY + item.height
+        y - distanceFromY + item.height,
       )
         .arc("ne")
         .down(
           distanceFromY -
             item.height +
             this.items[this.normal].height -
-            Diagram.ARC_RADIUS * 2
+            Diagram.ARC_RADIUS * 2,
         )
         .arc("ws")
         .addTo(this);
@@ -543,7 +543,7 @@
         Diagram.ARC_RADIUS,
         item.up +
           Diagram.VERTICAL_SEPARATION +
-          (i == 0 ? 0 : this.items[i - 1].down + this.items[i - 1].height)
+          (i == 0 ? 0 : this.items[i - 1].down + this.items[i - 1].height),
       );
     }
 
@@ -567,7 +567,7 @@
           this.items[i - 1].height +
             this.items[i - 1].down +
             Diagram.VERTICAL_SEPARATION +
-            item.up
+            item.up,
         );
       }
       Path(x, y)
@@ -580,14 +580,14 @@
         .addTo(this);
       Path(
         x + Diagram.ARC_RADIUS * 2 + innerWidth,
-        y + distanceFromY + item.height
+        y + distanceFromY + item.height,
       )
         .arc("se")
         .up(
           distanceFromY -
             Diagram.ARC_RADIUS * 2 +
             item.height -
-            this.items[this.normal].height
+            this.items[this.normal].height,
         )
         .arc("wn")
         .addTo(this);
@@ -596,7 +596,7 @@
         item.height +
           item.down +
           Diagram.VERTICAL_SEPARATION +
-          (i == last ? 0 : this.items[i + 1].up)
+          (i == last ? 0 : this.items[i + 1].up),
       );
     }
 
@@ -626,7 +626,7 @@
         Diagram.VERTICAL_SEPARATION +
         this.rep.up +
         this.rep.height +
-        this.rep.down
+        this.rep.down,
     );
   }
   subclassOf(OneOrMore, FakeSVG);
@@ -655,7 +655,7 @@
       this.item.height +
         this.item.down +
         Diagram.VERTICAL_SEPARATION +
-        this.rep.up
+        this.rep.up,
     );
     Path(x + Diagram.ARC_RADIUS, y)
       .arc("nw")
@@ -666,19 +666,19 @@
       .format(
         x + Diagram.ARC_RADIUS,
         y + distanceFromY,
-        this.width - Diagram.ARC_RADIUS * 2
+        this.width - Diagram.ARC_RADIUS * 2,
       )
       .addTo(this);
     Path(
       x + this.width - Diagram.ARC_RADIUS,
-      y + distanceFromY + this.rep.height
+      y + distanceFromY + this.rep.height,
     )
       .arc("se")
       .up(
         distanceFromY -
           Diagram.ARC_RADIUS * 2 +
           this.rep.height -
-          this.item.height
+          this.item.height,
       )
       .arc("en")
       .addTo(this);
@@ -738,7 +738,7 @@
     occurrenceIdx,
     topRuleName,
     dslRuleName,
-    tokenName
+    tokenName,
   ) {
     if (!(this instanceof Terminal))
       return new Terminal(
@@ -748,7 +748,7 @@
         occurrenceIdx,
         topRuleName,
         dslRuleName,
-        tokenName
+        tokenName,
       );
     FakeSVG.call(this, "g", { class: "terminal" });
     this.text = text;
@@ -798,7 +798,7 @@
         tokenName: this.tokenName,
         label: this.label,
       },
-      this.text
+      this.text,
     );
     var title = FakeSVG("title", {}, this.title);
     if (this.href)
@@ -853,7 +853,7 @@
         topRuleName: this.topRuleName,
         ruleName: this.ruleName,
       },
-      this.text
+      this.text,
     );
     if (this.href)
       FakeSVG("a", { "xlink:href": this.href }, [text]).addTo(this);
@@ -889,7 +889,7 @@
         y: y + 5,
         class: "comment",
       },
-      this.text
+      this.text,
     ).addTo(this);
     return this;
   };

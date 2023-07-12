@@ -19,11 +19,11 @@ const OyVeyErrorMessageProvider = {
     // eslint-disable-next-line  no-unused-vars -- template
     line,
     // eslint-disable-next-line  no-unused-vars -- template
-    column
+    column,
   ) {
     return (
       `Oy Vey!!! unexpected character: ->${fullText.charAt(
-        startOffset
+        startOffset,
       )}<- at offset: ${startOffset},` + ` skipped ${length} characters.`
     );
   },

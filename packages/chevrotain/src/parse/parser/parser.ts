@@ -45,7 +45,7 @@ export const END_OF_FILE = createTokenInstance(
   NaN,
   NaN,
   NaN,
-  NaN
+  NaN,
 );
 Object.freeze(END_OF_FILE);
 
@@ -142,7 +142,7 @@ export class Parser {
   static performSelfAnalysis(parserInstance: Parser): void {
     throw Error(
       "The **static** `performSelfAnalysis` method has been deprecated." +
-        "\t\nUse the **instance** method with the same name instead."
+        "\t\nUse the **instance** method with the same name instead.",
     );
   }
 
@@ -173,7 +173,7 @@ export class Parser {
             this.TRACE_INIT(`${currRuleName} Rule`, () => {
               recordedRuleGast = this.topLevelRuleRecord(
                 currRuleName,
-                originalGrammarAction
+                originalGrammarAction,
               );
             });
             this.gastProductionsCache[currRuleName] = recordedRuleGast;
@@ -209,7 +209,7 @@ export class Parser {
           });
           this.definitionErrors = this.definitionErrors.concat(
             validationErrors,
-            lookaheadValidationErrors
+            lookaheadValidationErrors,
           );
         }
       });
@@ -220,7 +220,7 @@ export class Parser {
         if (this.recoveryEnabled) {
           this.TRACE_INIT("computeAllProdsFollows", () => {
             const allFollows = computeAllProdsFollows(
-              values(this.gastProductionsCache)
+              values(this.gastProductionsCache),
             );
             this.resyncFollows = allFollows;
           });
@@ -240,12 +240,12 @@ export class Parser {
       ) {
         defErrorsMsgs = map(
           this.definitionErrors,
-          (defError) => defError.message
+          (defError) => defError.message,
         );
         throw new Error(
           `Parser Definition Errors detected:\n ${defErrorsMsgs.join(
-            "\n-------------------------------\n"
-          )}`
+            "\n-------------------------------\n",
+          )}`,
         );
       }
     });
@@ -272,7 +272,7 @@ export class Parser {
         "The <ignoredIssues> IParserConfig property has been deprecated.\n\t" +
           "Please use the <IGNORE_AMBIGUITIES> flag on the relevant DSL method instead.\n\t" +
           "See: https://chevrotain.io/docs/guide/resolving_grammar_errors.html#IGNORING_AMBIGUITIES\n\t" +
-          "For further details."
+          "For further details.",
       );
     }
 
@@ -298,7 +298,7 @@ applyMixins(Parser, [
 export class CstParser extends Parser {
   constructor(
     tokenVocabulary: TokenVocabulary,
-    config: IParserConfigInternal = DEFAULT_PARSER_CONFIG
+    config: IParserConfigInternal = DEFAULT_PARSER_CONFIG,
   ) {
     const configClone = clone(config);
     configClone.outputCst = true;
@@ -309,7 +309,7 @@ export class CstParser extends Parser {
 export class EmbeddedActionsParser extends Parser {
   constructor(
     tokenVocabulary: TokenVocabulary,
-    config: IParserConfigInternal = DEFAULT_PARSER_CONFIG
+    config: IParserConfigInternal = DEFAULT_PARSER_CONFIG,
   ) {
     const configClone = clone(config);
     configClone.outputCst = false;

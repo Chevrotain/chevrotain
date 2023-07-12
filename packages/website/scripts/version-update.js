@@ -22,7 +22,7 @@ const nowDate = new Date();
 const nowDateString = nowDate.toLocaleDateString("en-US").replace(/\//g, "-");
 const changeLogDate = changeLogString.replace(
   dateTemplateRegExp,
-  "## " + newVersion + " " + "(" + nowDateString + ")"
+  "## " + newVersion + " " + "(" + nowDateString + ")",
 );
 fs.writeFileSync(changeLogPath, changeLogDate);
 
@@ -35,7 +35,7 @@ _.forEach(markdownDocsFiles, function (currDocPath) {
   const currItemContents = fs.readFileSync(currDocPath, "utf8").toString();
   const bumpedItemContents = currItemContents.replace(
     /\d+_\d+_\d+/g,
-    newVersion.replace(/\./g, "_")
+    newVersion.replace(/\./g, "_"),
   );
   fs.writeFileSync(currDocPath, bumpedItemContents);
 });

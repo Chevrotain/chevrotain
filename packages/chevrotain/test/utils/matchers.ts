@@ -15,7 +15,7 @@ export function createRegularToken(
   startColumn?: number,
   endOffset?: number,
   endLine?: number,
-  endColumn?: number
+  endColumn?: number,
 ): IToken {
   return {
     image: image,

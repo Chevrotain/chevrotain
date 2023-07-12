@@ -10,21 +10,21 @@ import {
 
 export function genDts(
   model: CstNodeTypeDefinition[],
-  options: Required<GenerateDtsOptions>
+  options: Required<GenerateDtsOptions>,
 ): string {
   let contentParts: string[] = [];
 
   contentParts = contentParts.concat(
-    `import type { CstNode, ICstVisitor, IToken } from "chevrotain";`
+    `import type { CstNode, ICstVisitor, IToken } from "chevrotain";`,
   );
 
   contentParts = contentParts.concat(
-    flatten(map(model, (node) => genCstNodeTypes(node)))
+    flatten(map(model, (node) => genCstNodeTypes(node))),
   );
 
   if (options.includeVisitorInterface) {
     contentParts = contentParts.concat(
-      genVisitor(options.visitorInterfaceName, model)
+      genVisitor(options.visitorInterfaceName, model),
     );
   }
 

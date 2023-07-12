@@ -14,7 +14,7 @@ function createTokenVector(tokTypes: TokenType[]): any[] {
 
 const tokenStructuredMatcher = tokenStructuredMatcherStrict as (
   a: CstElement,
-  b: TokenType
+  b: TokenType,
 ) => boolean;
 
 function defineTestSuite(recoveryMode: boolean) {
@@ -103,7 +103,7 @@ function defineTestSuite(recoveryMode: boolean) {
       expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true;
       expect(cst.children.myOtherLabel[0].name).to.equal("bamba");
       expect(
-        tokenStructuredMatcher(cst.children.myOtherLabel[0].children.C[0], C)
+        tokenStructuredMatcher(cst.children.myOtherLabel[0].children.C[0], C),
       ).to.be.true;
     });
 
@@ -718,7 +718,7 @@ function defineTestSuite(recoveryMode: boolean) {
         const cst = parser.root();
         expect(parser.errors).to.have.lengthOf(1);
         expect(parser.errors[0].message).to.include(
-          "Expecting token of type --> B <--"
+          "Expecting token of type --> B <--",
         );
         expect(parser.errors[0].resyncedTokens).to.have.lengthOf(1);
         expect(tokenStructuredMatcher(parser.errors[0].resyncedTokens[0], E)).to
@@ -797,7 +797,7 @@ function defineTestSuite(recoveryMode: boolean) {
         const cst = parser.root();
         expect(parser.errors).to.have.lengthOf(1);
         expect(parser.errors[0].message).to.include(
-          "Expecting token of type --> B <--"
+          "Expecting token of type --> B <--",
         );
         expect(parser.errors[0].resyncedTokens).to.have.lengthOf(1);
         expect(tokenStructuredMatcher(parser.errors[0].resyncedTokens[0], E)).to

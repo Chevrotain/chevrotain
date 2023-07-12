@@ -42,7 +42,7 @@ function defineLexerSpecs(
   createToken: (c: ITokenConfig) => TokenType,
   tokenMatcher: TokenMatcher,
   skipValidationChecks = false,
-  lexerConfig: ILexerConfig
+  lexerConfig: ILexerConfig,
 ) {
   const testFull = lexerConfig.positionTracking === "full";
   const testStart = lexerConfig.positionTracking === "onlyStart" || testFull;
@@ -80,7 +80,7 @@ function defineLexerSpecs(
         ],
         {
           positionTracking: "onlyOffset",
-        }
+        },
       );
     });
 
@@ -264,7 +264,7 @@ function defineLexerSpecs(
         let input = "a";
         let result = testLexer.tokenize(input);
         expect(
-          tokenMatcher(result.tokens[0], SingleCharacterWithIgnoreCaseFlagTok)
+          tokenMatcher(result.tokens[0], SingleCharacterWithIgnoreCaseFlagTok),
         ).to.be.true;
         expect(result.tokens[0].image).to.equal("a");
         expect(result.tokens[0].startOffset).to.equal(0);
@@ -272,7 +272,7 @@ function defineLexerSpecs(
         input = "A";
         result = testLexer.tokenize(input);
         expect(
-          tokenMatcher(result.tokens[0], SingleCharacterWithIgnoreCaseFlagTok)
+          tokenMatcher(result.tokens[0], SingleCharacterWithIgnoreCaseFlagTok),
         ).to.be.true;
         expect(result.tokens[0].image).to.equal("A");
         expect(result.tokens[0].startOffset).to.equal(0);
@@ -359,7 +359,7 @@ function defineLexerSpecs(
           expect(result.errors.length).to.equal(1);
           expect(result.errors[0].tokenTypes).to.deep.equal([MissingPattern]);
           expect(result.errors[0].type).to.equal(
-            LexerDefinitionErrorType.MISSING_PATTERN
+            LexerDefinitionErrorType.MISSING_PATTERN,
           );
           expect(result.errors[0].message).to.contain("MissingPattern");
           expect(result.valid).to.deep.equal([ValidNaPattern]);
@@ -387,7 +387,7 @@ function defineLexerSpecs(
           expect(result.errors.length).to.equal(1);
           expect(result.errors[0].tokenTypes).to.deep.equal([InvalidPattern]);
           expect(result.errors[0].type).to.equal(
-            LexerDefinitionErrorType.INVALID_PATTERN
+            LexerDefinitionErrorType.INVALID_PATTERN,
           );
           expect(result.errors[0].message).to.contain("InvalidPattern");
           expect(result.valid).to.deep.equal([ValidNaPattern]);
@@ -409,7 +409,7 @@ function defineLexerSpecs(
           expect(errors.length).to.equal(1);
           expect(errors[0].tokenTypes).to.deep.equal([MultiLinePattern]);
           expect(errors[0].type).to.equal(
-            LexerDefinitionErrorType.UNSUPPORTED_FLAGS_FOUND
+            LexerDefinitionErrorType.UNSUPPORTED_FLAGS_FOUND,
           );
           expect(errors[0].message).to.contain("MultiLinePattern");
         });
@@ -420,7 +420,7 @@ function defineLexerSpecs(
           expect(errors.length).to.equal(1);
           expect(errors[0].tokenTypes).to.deep.equal([GlobalPattern]);
           expect(errors[0].type).to.equal(
-            LexerDefinitionErrorType.UNSUPPORTED_FLAGS_FOUND
+            LexerDefinitionErrorType.UNSUPPORTED_FLAGS_FOUND,
           );
           expect(errors[0].message).to.contain("GlobalPattern");
         });
@@ -451,7 +451,7 @@ function defineLexerSpecs(
           expect(errors.length).to.equal(1);
           expect(errors[0].tokenTypes).to.deep.equal([InvalidToken]);
           expect(errors[0].type).to.equal(
-            LexerDefinitionErrorType.EOI_ANCHOR_FOUND
+            LexerDefinitionErrorType.EOI_ANCHOR_FOUND,
           );
           expect(errors[0].message).to.contain("InvalidToken");
         });
@@ -471,7 +471,7 @@ function defineLexerSpecs(
           expect(errors.length).to.equal(1);
           expect(errors[0].tokenTypes).to.deep.equal([InvalidToken]);
           expect(errors[0].type).to.equal(
-            LexerDefinitionErrorType.SOI_ANCHOR_FOUND
+            LexerDefinitionErrorType.SOI_ANCHOR_FOUND,
           );
           expect(errors[0].message).to.contain("InvalidToken");
         });
@@ -495,7 +495,7 @@ function defineLexerSpecs(
             ClassKeyword,
           ]);
           expect(errors[0].type).to.equal(
-            LexerDefinitionErrorType.UNREACHABLE_PATTERN
+            LexerDefinitionErrorType.UNREACHABLE_PATTERN,
           );
           expect(errors[0].message).to.contain("can never be matched");
         });
@@ -523,7 +523,7 @@ function defineLexerSpecs(
             IntegerValid,
           ]);
           expect(errors[0].type).to.equal(
-            LexerDefinitionErrorType.DUPLICATE_PATTERNS_FOUND
+            LexerDefinitionErrorType.DUPLICATE_PATTERNS_FOUND,
           );
           expect(errors[0].message).to.contain("IntegerValid");
           expect(errors[0].message).to.contain("DecimalInvalid");
@@ -541,11 +541,11 @@ function defineLexerSpecs(
           expect(errors.length).to.equal(1);
           expect(errors[0].tokenTypes).to.deep.equal([emptyMatch]);
           expect(errors[0].type).to.equal(
-            LexerDefinitionErrorType.EMPTY_MATCH_PATTERN
+            LexerDefinitionErrorType.EMPTY_MATCH_PATTERN,
           );
           expect(errors[0].message).to.contain("emptyMatch");
           expect(errors[0].message).to.contain(
-            "must not match an empty string"
+            "must not match an empty string",
           );
         });
 
@@ -561,7 +561,7 @@ function defineLexerSpecs(
           expect(errors.length).to.equal(1);
           expect(errors[0].tokenTypes).to.deep.equal([InvalidGroupNumber]);
           expect(errors[0].type).to.equal(
-            LexerDefinitionErrorType.INVALID_GROUP_TYPE_FOUND
+            LexerDefinitionErrorType.INVALID_GROUP_TYPE_FOUND,
           );
           expect(errors[0].message).to.contain("InvalidGroupNumber");
         });
@@ -671,7 +671,7 @@ function defineLexerSpecs(
 
           const allPatterns = map(
             analyzeResult.patternIdxToConfig,
-            (currConfig) => currConfig.pattern
+            (currConfig) => currConfig.pattern,
           );
 
           expect(allPatterns.length).to.equal(8);
@@ -691,7 +691,7 @@ function defineLexerSpecs(
 
           const patternIdxToClass = map(
             analyzeResult.patternIdxToConfig,
-            (currConfig) => currConfig.tokenType
+            (currConfig) => currConfig.tokenType,
           );
           expect(keys(patternIdxToClass).length).to.equal(8);
           expect(patternIdxToClass[0]).to.equal(If);
@@ -725,7 +725,7 @@ function defineLexerSpecs(
           });
           const allPatterns = map(
             analyzeResult.patternIdxToConfig,
-            (currConfig) => currConfig.pattern
+            (currConfig) => currConfig.pattern,
           );
           expect(allPatterns.length).to.equal(8);
           const allPatternsString = map(allPatterns, (pattern) => {
@@ -749,7 +749,7 @@ function defineLexerSpecs(
           });
           const patternIdxToClass = map(
             analyzeResult.patternIdxToConfig,
-            (currConfig) => currConfig.tokenType
+            (currConfig) => currConfig.tokenType,
           );
           expect(keys(patternIdxToClass).length).to.equal(8);
           expect(patternIdxToClass[0]).to.equal(If);
@@ -992,7 +992,7 @@ function defineLexerSpecs(
             Whitespace,
             NewLine,
           ],
-          lexerConfig
+          lexerConfig,
         );
         //noinspection BadExpressionStatementJS
         expect(ifElseLexer.lexerDefinitionErrors).to.be.empty;
@@ -1136,13 +1136,13 @@ function defineLexerSpecs(
             () =>
               new Lexer([], {
                 positionTracking: <any>"oops",
-              })
+              }),
           ).to.throw("Invalid <positionTracking> config option:" + ' "oops"');
         });
 
         it("Will throw an error during the creation of a Lexer if the lexer config argument is a boolean", () => {
           expect(() => new Lexer([], <any>false)).to.throw(
-            "The second argument to the Lexer constructor is now an ILexerConfig"
+            "The second argument to the Lexer constructor is now an ILexerConfig",
           );
         });
 
@@ -1151,19 +1151,19 @@ function defineLexerSpecs(
             "line terminators without specifying the lineTerminatorCharacters",
           () => {
             expect(
-              () => new Lexer([], { lineTerminatorsPattern: /\n/g })
+              () => new Lexer([], { lineTerminatorsPattern: /\n/g }),
             ).to.throw(
-              "Error: Missing <lineTerminatorCharacters> property on the Lexer config."
+              "Error: Missing <lineTerminatorCharacters> property on the Lexer config.",
             );
-          }
+          },
         );
 
         it("Will throw an error during the creation of a Lexer if the Lexer's definition is invalid", () => {
           expect(
-            () => new Lexer([EndOfInputAnchor, If, Else], lexerConfig)
+            () => new Lexer([EndOfInputAnchor, If, Else], lexerConfig),
           ).to.throw(/Errors detected in definition of Lexer/);
           expect(
-            () => new Lexer([EndOfInputAnchor, If, Else], lexerConfig)
+            () => new Lexer([EndOfInputAnchor, If, Else], lexerConfig),
           ).to.throw(/EndOfInputAnchor/);
         });
 
@@ -1173,14 +1173,14 @@ function defineLexerSpecs(
               new Lexer([EndOfInputAnchor, If, Else], {
                 positionTracking: "onlyOffset",
                 deferDefinitionErrorsHandling: true,
-              })
+              }),
           ).to.not.throw(/Errors detected in definition of Lexer/);
           expect(
             () =>
               new Lexer([EndOfInputAnchor, If, Else], {
                 positionTracking: "onlyOffset",
                 deferDefinitionErrorsHandling: true,
-              })
+              }),
           ).to.not.throw(/EndOfInputAnchor/);
 
           const lexerWithErrs = new Lexer([EndOfInputAnchor, If, Else], {
@@ -1191,10 +1191,10 @@ function defineLexerSpecs(
           expect(lexerWithErrs.lexerDefinitionErrors).to.not.be.empty;
           // even when the Error handling is deferred, actual usage of an invalid lexer is not permitted!
           expect(() => lexerWithErrs.tokenize("else")).to.throw(
-            /Unable to Tokenize because Errors detected in definition of Lexer/
+            /Unable to Tokenize because Errors detected in definition of Lexer/,
           );
           expect(() => lexerWithErrs.tokenize("else")).to.throw(
-            /EndOfInputAnchor/
+            /EndOfInputAnchor/,
           );
         });
       }
@@ -1213,7 +1213,7 @@ function defineLexerSpecs(
             Whitespace,
             NewLine,
           ],
-          lexerConfig
+          lexerConfig,
         );
 
         const input = "if (666) return 1@#$@#$\n" + "\telse return 2";
@@ -1317,7 +1317,7 @@ function defineLexerSpecs(
             Whitespace,
             NewLine,
           ],
-          lexerConfig
+          lexerConfig,
         );
 
         const input = "if&&&&&&&&&&&&&&&&&&&&&&&&&&&&";
@@ -1359,7 +1359,7 @@ function defineLexerSpecs(
           {
             ...lexerConfig,
             recoveryEnabled: false,
-          }
+          },
         );
 
         const input = "if (666) return 1@#$@#$\n" + "\telse return 2";
@@ -1430,7 +1430,7 @@ function defineLexerSpecs(
       it("can deal with line terminators inside multi-line Tokens", () => {
         const ifElseLexer = new Lexer(
           [If, Else, WhitespaceNotSkipped],
-          lexerConfig
+          lexerConfig,
         );
 
         const input = "if\r\r\telse\rif\n";
@@ -1582,7 +1582,7 @@ function defineLexerSpecs(
       it("supports Token groups", () => {
         const ifElseLexer = new Lexer(
           [If, Else, Comment, NewLine],
-          lexerConfig
+          lexerConfig,
         );
         const input = "if//else";
         const lexResult = ifElseLexer.tokenize(input);
@@ -1618,7 +1618,7 @@ function defineLexerSpecs(
       it("won't have leftover state when using token groups", () => {
         const ifElseLexer = new Lexer(
           [If, Else, Comment, NewLine],
-          lexerConfig
+          lexerConfig,
         );
         const input = "if//else";
         let lexResult = ifElseLexer.tokenize(input);
@@ -1747,7 +1747,7 @@ function defineLexerSpecs(
           const lexResult = ModeLexer.tokenize(input);
           expect(lexResult.errors).to.have.lengthOf(1);
           expect(lexResult.errors[0].message).to.equal(
-            "unexpected character: ->+<- at offset: 23, skipped 1 characters."
+            "unexpected character: ->+<- at offset: 23, skipped 1 characters.",
           );
         });
 
@@ -1841,16 +1841,16 @@ function defineLexerSpecs(
             EnterNumbers,
           ]);
           expect(badLexer.lexerDefinitionErrors[0].type).to.equal(
-            LexerDefinitionErrorType.PUSH_MODE_DOES_NOT_EXIST
+            LexerDefinitionErrorType.PUSH_MODE_DOES_NOT_EXIST,
           );
           expect(badLexer.lexerDefinitionErrors[0].message).to.include(
-            "PUSH_MODE"
+            "PUSH_MODE",
           );
           expect(badLexer.lexerDefinitionErrors[0].message).to.include(
-            "EnterNumbers"
+            "EnterNumbers",
           );
           expect(badLexer.lexerDefinitionErrors[0].message).to.include(
-            "which does not exist"
+            "which does not exist",
           );
         });
 
@@ -1869,13 +1869,13 @@ function defineLexerSpecs(
           });
           expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(1);
           expect(badLexer.lexerDefinitionErrors[0].type).to.equal(
-            LexerDefinitionErrorType.MULTI_MODE_LEXER_WITHOUT_MODES_PROPERTY
+            LexerDefinitionErrorType.MULTI_MODE_LEXER_WITHOUT_MODES_PROPERTY,
           );
           expect(badLexer.lexerDefinitionErrors[0].message).to.include(
-            "MultiMode Lexer cannot be initialized"
+            "MultiMode Lexer cannot be initialized",
           );
           expect(badLexer.lexerDefinitionErrors[0].message).to.include(
-            "without a <modes> property"
+            "without a <modes> property",
           );
         });
 
@@ -1892,13 +1892,13 @@ function defineLexerSpecs(
           });
           expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(1);
           expect(badLexer.lexerDefinitionErrors[0].type).to.equal(
-            LexerDefinitionErrorType.MULTI_MODE_LEXER_WITHOUT_DEFAULT_MODE
+            LexerDefinitionErrorType.MULTI_MODE_LEXER_WITHOUT_DEFAULT_MODE,
           );
           expect(badLexer.lexerDefinitionErrors[0].message).to.include(
-            "MultiMode Lexer cannot be initialized"
+            "MultiMode Lexer cannot be initialized",
           );
           expect(badLexer.lexerDefinitionErrors[0].message).to.include(
-            "without a <defaultMode> property"
+            "without a <defaultMode> property",
           );
         });
 
@@ -1919,18 +1919,18 @@ function defineLexerSpecs(
             });
             expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(1);
             expect(badLexer.lexerDefinitionErrors[0].type).to.equal(
-              LexerDefinitionErrorType.MULTI_MODE_LEXER_DEFAULT_MODE_VALUE_DOES_NOT_EXIST
+              LexerDefinitionErrorType.MULTI_MODE_LEXER_DEFAULT_MODE_VALUE_DOES_NOT_EXIST,
             );
             expect(badLexer.lexerDefinitionErrors[0].message).to.include(
-              "MultiMode Lexer cannot be initialized"
+              "MultiMode Lexer cannot be initialized",
             );
             expect(badLexer.lexerDefinitionErrors[0].message).to.include(
-              "which does not exist"
+              "which does not exist",
             );
             expect(badLexer.lexerDefinitionErrors[0].message).to.include(
-              "bisli"
+              "bisli",
             );
-          }
+          },
         );
 
         it("Will detect a Lexer definition which has undefined Token Typees", () => {
@@ -1941,10 +1941,10 @@ function defineLexerSpecs(
           });
           expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(1);
           expect(badLexer.lexerDefinitionErrors[0].type).to.equal(
-            LexerDefinitionErrorType.LEXER_DEFINITION_CANNOT_CONTAIN_UNDEFINED
+            LexerDefinitionErrorType.LEXER_DEFINITION_CANNOT_CONTAIN_UNDEFINED,
           );
           expect(badLexer.lexerDefinitionErrors[0].message).to.include(
-            "A Lexer cannot be initialized using an undefined Token Type"
+            "A Lexer cannot be initialized using an undefined Token Type",
           );
           expect(badLexer.lexerDefinitionErrors[0].message).to.include("2");
         });
@@ -1970,10 +1970,10 @@ function defineLexerSpecs(
           expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(1);
           const error = badLexer.lexerDefinitionErrors[0];
           expect(error.type).to.equal(
-            LexerDefinitionErrorType.MULTI_MODE_LEXER_LONGER_ALT_NOT_IN_CURRENT_MODE
+            LexerDefinitionErrorType.MULTI_MODE_LEXER_LONGER_ALT_NOT_IN_CURRENT_MODE,
           );
           expect(error.message).to.include(
-            "A MultiMode Lexer cannot be initialized with a longer_alt"
+            "A MultiMode Lexer cannot be initialized with a longer_alt",
           );
           expect(error.message).to.include("<LongerAlt>");
           expect(error.message).to.include("on token");
@@ -1993,10 +1993,10 @@ function defineLexerSpecs(
               startOffset: number,
               length: number,
               line?: number,
-              column?: number
+              column?: number,
             ): string {
               return `[${line}, ${column}] Unknown character ${fullText.charAt(
-                startOffset
+                startOffset,
               )} at position ${startOffset} skipped ${length}`;
             },
           };
@@ -2010,7 +2010,7 @@ function defineLexerSpecs(
             const lexResult = ModeLexerWithCustomErrors.tokenize(input);
             expect(lexResult.errors).to.have.lengthOf(1);
             expect(lexResult.errors[0].message).to.equal(
-              "[1, 24] Unknown character + at position 23 skipped 1"
+              "[1, 24] Unknown character + at position 23 skipped 1",
             );
           });
 
@@ -2019,7 +2019,7 @@ function defineLexerSpecs(
             const lexResult = ModeLexerWithCustomErrors.tokenize(input);
             expect(lexResult.errors).to.have.lengthOf(1);
             expect(lexResult.errors[0].message).to.equal(
-              "No pop for you EXIT_NUMBERS"
+              "No pop for you EXIT_NUMBERS",
             );
           });
         });
@@ -2031,7 +2031,7 @@ function defineLexerSpecs(
             text: string,
             offset: number,
             tokens: IToken[],
-            groups: { [group: string]: IToken[] }
+            groups: { [group: string]: IToken[] },
           ) {
             const result = /^B/.exec(text.substring(offset));
             if (result !== null) {
@@ -2138,11 +2138,11 @@ describe("debugging and messages and optimizations", () => {
         new Lexer([One], {
           ensureOptimizations: true,
           positionTracking: "onlyOffset",
-        })
+        }),
     ).to.throw("Lexer Modes: < defaultMode > cannot be optimized.");
     expect(console.error).to.have.been.called;
     expect(consoleErrorSpy.args[0][0]).to.include(
-      "The regexp unicode flag is not currently supported by the regexp-to-ast library"
+      "The regexp unicode flag is not currently supported by the regexp-to-ast library",
     );
   });
 
@@ -2160,7 +2160,7 @@ describe("debugging and messages and optimizations", () => {
     expect(() => new Lexer([Five, NewLine])).to.not.throw();
     expect(console.warn).to.have.been.called;
     expect(consoleWarnSpy.args[0][0]).to.include(
-      "Warning: A Custom Token Pattern should specify the <line_breaks> option"
+      "Warning: A Custom Token Pattern should specify the <line_breaks> option",
     );
   });
 
@@ -2176,11 +2176,11 @@ describe("debugging and messages and optimizations", () => {
         new Lexer([One], {
           ensureOptimizations: true,
           positionTracking: "onlyOffset",
-        })
+        }),
     ).to.throw("Lexer Modes: < defaultMode > cannot be optimized.");
     expect(console.error).to.have.been.called;
     expect(consoleErrorSpy.args[0][0]).to.include(
-      "TokenType: <One> is using a custom token pattern without providing <start_chars_hint>"
+      "TokenType: <One> is using a custom token pattern without providing <start_chars_hint>",
     );
   });
 
@@ -2193,9 +2193,9 @@ describe("debugging and messages and optimizations", () => {
           safeMode: true,
           ensureOptimizations: true,
           positionTracking: "onlyOffset",
-        })
+        }),
     ).to.throw(
-      '"safeMode" and "ensureOptimizations" flags are mutually exclusive.'
+      '"safeMode" and "ensureOptimizations" flags are mutually exclusive.',
     );
   });
 
@@ -2217,7 +2217,7 @@ describe("debugging and messages and optimizations", () => {
     });
     expect(
       (<any>alphaLexerNoSafeMode).charCodeToPatternIdxToConfig
-        .defaultMode[97][0].tokenType
+        .defaultMode[97][0].tokenType,
     ).to.equal(Alpha);
   });
 });
@@ -2250,14 +2250,14 @@ defineLexerSpecs(
   createToken,
   tokenStructuredMatcher,
   false,
-  { positionTracking: "full" }
+  { positionTracking: "full" },
 );
 defineLexerSpecs(
   "Regular Tokens Mode (custom mode)",
   wrapWithCustom(createToken),
   tokenStructuredMatcher,
   true,
-  { positionTracking: "full" }
+  { positionTracking: "full" },
 );
 
 defineLexerSpecs(
@@ -2265,14 +2265,14 @@ defineLexerSpecs(
   createToken,
   tokenStructuredMatcher,
   false,
-  { positionTracking: "onlyStart" }
+  { positionTracking: "onlyStart" },
 );
 defineLexerSpecs(
   "Regular Tokens Mode (custom mode) - only start",
   wrapWithCustom(createToken),
   tokenStructuredMatcher,
   true,
-  { positionTracking: "onlyStart" }
+  { positionTracking: "onlyStart" },
 );
 
 defineLexerSpecs(
@@ -2280,12 +2280,12 @@ defineLexerSpecs(
   createToken,
   tokenStructuredMatcher,
   false,
-  { positionTracking: "onlyOffset" }
+  { positionTracking: "onlyOffset" },
 );
 defineLexerSpecs(
   "Regular Tokens Mode (custom mode)",
   wrapWithCustom(createToken),
   tokenStructuredMatcher,
   true,
-  { positionTracking: "onlyOffset" }
+  { positionTracking: "onlyOffset" },
 );

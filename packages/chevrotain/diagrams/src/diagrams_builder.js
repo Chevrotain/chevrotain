@@ -34,7 +34,7 @@
     topRules.forEach(function (production) {
       var currDiagramHtml = convertProductionToDiagram(
         production,
-        production.name
+        production.name,
       );
       diagramsHtml +=
         '<h2 class="diagramHeader">' +
@@ -78,7 +78,7 @@
       prod.occurrenceInParent,
       topRuleName,
       dslRuleName,
-      prod.name
+      prod.name,
     );
   }
 
@@ -98,7 +98,7 @@
         getNonTerminalName(prod),
         undefined,
         prod.occurrenceInParent,
-        topRuleName
+        topRuleName,
       );
     } else if (prod.type !== "Terminal") {
       var subDiagrams = definitionsToSubDiagrams(prod.definition, topRuleName);
@@ -147,13 +147,13 @@
                       createTerminalFromSerializedGast(
                         prod.separator,
                         topRuleName,
-                        "many_sep"
+                        "many_sep",
                       ),
-                    ].concat(subDiagrams)
-                  )
+                    ].concat(subDiagrams),
+                  ),
                 ),
-              ])
-            )
+              ]),
+            ),
           );
         } else {
           throw Error("Empty Optional production, OOPS!");
@@ -171,12 +171,12 @@
                     createTerminalFromSerializedGast(
                       prod.separator,
                       topRuleName,
-                      "at_least_one_sep"
+                      "at_least_one_sep",
                     ),
-                  ].concat(subDiagrams)
-                )
+                  ].concat(subDiagrams),
+                ),
               ),
-            ])
+            ]),
           );
         } else {
           throw Error("Empty Optional production, OOPS!");

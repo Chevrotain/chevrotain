@@ -23,7 +23,7 @@ describe("Chevrotain's Parsing Exceptions", () => {
       const exceptionInstance = new EarlyExitException(
         "error message",
         currentToken,
-        previousToken
+        previousToken,
       );
       expect(exceptionInstance).to.be.an.instanceOf(EarlyExitException);
       expect(exceptionInstance).to.be.an.instanceOf(Error);
@@ -38,7 +38,7 @@ describe("Chevrotain's Parsing Exceptions", () => {
       const exceptionInstance = new NoViableAltException(
         "error message",
         currentToken,
-        previousToken
+        previousToken,
       );
       expect(exceptionInstance).to.be.an.instanceOf(NoViableAltException);
       expect(exceptionInstance).to.be.an.instanceOf(Error);
@@ -52,7 +52,7 @@ describe("Chevrotain's Parsing Exceptions", () => {
     it("NotAllInputParsedException", () => {
       const exceptionInstance = new NotAllInputParsedException(
         "error message",
-        currentToken
+        currentToken,
       );
       expect(exceptionInstance).to.be.an.instanceOf(NotAllInputParsedException);
       expect(exceptionInstance).to.be.an.instanceOf(Error);
@@ -66,7 +66,7 @@ describe("Chevrotain's Parsing Exceptions", () => {
       const exceptionInstance = new MismatchedTokenException(
         "error message",
         currentToken,
-        previousToken
+        previousToken,
       );
       expect(exceptionInstance).to.be.an.instanceOf(MismatchedTokenException);
       expect(exceptionInstance).to.be.an.instanceOf(Error);
@@ -90,7 +90,7 @@ describe("Chevrotain's Parsing Exceptions", () => {
 
     it("EarlyExitException", () => {
       const exceptionInstance = throwAndCatchException(
-        () => new EarlyExitException("", dummyToken, dummyToken)
+        () => new EarlyExitException("", dummyToken, dummyToken),
       );
       const stacktrace = ErrorStackParser.parse(exceptionInstance);
       expect(stacktrace[0].functionName).to.equal("<anonymous>"); // lambda function
@@ -99,7 +99,7 @@ describe("Chevrotain's Parsing Exceptions", () => {
 
     it("NoViableAltException", () => {
       const exceptionInstance = throwAndCatchException(
-        () => new NoViableAltException("", dummyToken, dummyToken)
+        () => new NoViableAltException("", dummyToken, dummyToken),
       );
       const stacktrace = ErrorStackParser.parse(exceptionInstance);
       expect(stacktrace[0].functionName).to.equal("<anonymous>"); // lambda function
@@ -108,7 +108,7 @@ describe("Chevrotain's Parsing Exceptions", () => {
 
     it("NotAllInputParsedException", () => {
       const exceptionInstance = throwAndCatchException(
-        () => new NotAllInputParsedException("", dummyToken)
+        () => new NotAllInputParsedException("", dummyToken),
       );
       const stacktrace = ErrorStackParser.parse(exceptionInstance);
       expect(stacktrace[0].functionName).to.equal("<anonymous>"); // lambda function
@@ -117,7 +117,7 @@ describe("Chevrotain's Parsing Exceptions", () => {
 
     it("MismatchedTokenException", () => {
       const exceptionInstance = throwAndCatchException(
-        () => new MismatchedTokenException("", dummyToken, dummyToken)
+        () => new MismatchedTokenException("", dummyToken, dummyToken),
       );
       const stacktrace = ErrorStackParser.parse(exceptionInstance);
       expect(stacktrace[0].functionName).to.equal("<anonymous>"); // lambda function

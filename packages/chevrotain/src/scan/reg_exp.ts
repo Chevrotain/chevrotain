@@ -19,14 +19,14 @@ export const failedOptimizationPrefixMsg =
 
 export function getOptimizedStartCodesIndices(
   regExp: RegExp,
-  ensureOptimizations = false
+  ensureOptimizations = false,
 ): number[] {
   try {
     const ast = getRegExpAst(regExp);
     const firstChars = firstCharOptimizedIndices(
       ast.value,
       {},
-      ast.flags.ignoreCase
+      ast.flags.ignoreCase,
     );
     return firstChars;
   } catch (e) {
@@ -40,7 +40,7 @@ export function getOptimizedStartCodesIndices(
             `\tUnable to optimize: < ${regExp.toString()} >\n` +
             "\tComplement Sets cannot be automatically optimized.\n" +
             "\tThis will disable the lexer's first char optimizations.\n" +
-            "\tSee: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#COMPLEMENT for details."
+            "\tSee: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#COMPLEMENT for details.",
         );
       }
     } else {
@@ -55,7 +55,7 @@ export function getOptimizedStartCodesIndices(
           `\tFailed parsing: < ${regExp.toString()} >\n` +
           `\tUsing the @chevrotain/regexp-to-ast library\n` +
           "\tPlease open an issue at: https://github.com/chevrotain/chevrotain/issues" +
-          msgSuffix
+          msgSuffix,
       );
     }
   }
@@ -66,7 +66,7 @@ export function getOptimizedStartCodesIndices(
 export function firstCharOptimizedIndices(
   ast: ASTNode,
   result: { [charCode: number]: number },
-  ignoreCase: boolean
+  ignoreCase: boolean,
 ): number[] {
   switch (ast.type) {
     case "Disjunction":
@@ -187,7 +187,7 @@ export function firstCharOptimizedIndices(
 function addOptimizedIdxToResult(
   code: number,
   result: { [charCode: number]: number },
-  ignoreCase: boolean
+  ignoreCase: boolean,
 ) {
   const optimizedCharIdx = charCodeToOptimizedIndex(code);
   result[optimizedCharIdx] = optimizedCharIdx;
@@ -199,7 +199,7 @@ function addOptimizedIdxToResult(
 
 function handleIgnoreCase(
   code: number,
-  result: { [charCode: number]: number }
+  result: { [charCode: number]: number },
 ) {
   const char = String.fromCharCode(code);
   const upperChar = char.toUpperCase();
@@ -211,7 +211,7 @@ function handleIgnoreCase(
     const lowerChar = char.toLowerCase();
     if (lowerChar !== char) {
       const optimizedCharIdx = charCodeToOptimizedIndex(
-        lowerChar.charCodeAt(0)
+        lowerChar.charCodeAt(0),
       );
       result[optimizedCharIdx] = optimizedCharIdx;
     }
@@ -228,7 +228,7 @@ function findCode(setNode: Set, targetCharCodes: number[]) {
       return (
         find(
           targetCharCodes,
-          (targetCode) => range.from <= targetCode && targetCode <= range.to
+          (targetCode) => range.from <= targetCode && targetCode <= range.to,
         ) !== undefined
       );
     }
@@ -298,7 +298,7 @@ class CharCodeFinder extends BaseRegExpVisitor {
 
 export function canMatchCharCode(
   charCodes: number[],
-  pattern: RegExp | string
+  pattern: RegExp | string,
 ) {
   if (pattern instanceof RegExp) {
     const ast = getRegExpAst(pattern);

@@ -65,7 +65,7 @@ const createNotToken = function (config) {
 
   // All matching keywords now match the category of the NOT token.
   matchingKeywords.forEach((keywordTokType) =>
-    keywordTokType.CATEGORIES.push(newNotTokenCategory)
+    keywordTokType.CATEGORIES.push(newNotTokenCategory),
   );
 
   // Name always matches the Not token
@@ -251,20 +251,20 @@ const IntValue = createToken({
 const FloatValue = createToken({
   name: "FloatValue",
   pattern: MAKE_PATTERN(
-    "{{IntegerPart}}{{FractionalPart}}({{ExponentPart}})?|{{IntegerPart}}{{ExponentPart}}"
+    "{{IntegerPart}}{{FractionalPart}}({{ExponentPart}})?|{{IntegerPart}}{{ExponentPart}}",
   ),
 });
 FRAGMENT("EscapedCharacter", '[\\\\/"bfnrt]');
 FRAGMENT("EscapedUnicode", "[0-9a-fA-F]{4}");
 FRAGMENT(
   "StringCharacter",
-  '(?:[^\\\\"\\n\\r]|\\\\(?:{{EscapedUnicode}}|u{{EscapedCharacter}}))'
+  '(?:[^\\\\"\\n\\r]|\\\\(?:{{EscapedUnicode}}|u{{EscapedCharacter}}))',
 );
 FRAGMENT("BlockStringCharacter", '\\\\"""|[^"]|"(?!"")');
 const StringValue = createToken({
   name: "StringValue",
   pattern: MAKE_PATTERN(
-    '"""(?:{{BlockStringCharacter}})*"""|"(?:{{StringCharacter}})*"'
+    '"""(?:{{BlockStringCharacter}})*"""|"(?:{{StringCharacter}})*"',
   ),
 });
 

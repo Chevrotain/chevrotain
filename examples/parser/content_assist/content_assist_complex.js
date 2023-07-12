@@ -157,7 +157,7 @@ export function getContentAssistSuggestions(text, symbolTable) {
 
   const syntacticSuggestions = parserInstance.computeContentAssist(
     "startRule",
-    assistanceTokenVector
+    assistanceTokenVector,
   );
 
   let finalSuggestions = [];

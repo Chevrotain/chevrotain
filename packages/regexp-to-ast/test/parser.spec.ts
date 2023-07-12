@@ -1140,7 +1140,7 @@ describe("The RegExp to Ast parser", () => {
 
         it("invalid hex", () => {
           expect(() => parser.pattern("/\\x2v/")).to.throw(
-            "Expecting a HexDecimal digits"
+            "Expecting a HexDecimal digits",
           );
         });
 
@@ -1439,7 +1439,7 @@ describe("The RegExp to Ast parser", () => {
 
         it("invalid range", () => {
           expect(() => parser.pattern("/[B-A]/")).to.throw(
-            "Range out of order in character class"
+            "Range out of order in character class",
           );
         });
 

@@ -8,7 +8,7 @@ export function applyMixins(derivedCtor: any, baseCtors: any[]) {
 
       const basePropDescriptor = Object.getOwnPropertyDescriptor(
         baseProto,
-        propName
+        propName,
       );
       // Handle Accessors
       if (
@@ -18,7 +18,7 @@ export function applyMixins(derivedCtor: any, baseCtors: any[]) {
         Object.defineProperty(
           derivedCtor.prototype,
           propName,
-          basePropDescriptor
+          basePropDescriptor,
         );
       } else {
         derivedCtor.prototype[propName] = baseCtor.prototype[propName];

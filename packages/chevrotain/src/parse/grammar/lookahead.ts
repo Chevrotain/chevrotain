@@ -37,7 +37,7 @@ export enum PROD_TYPE {
 }
 
 export function getProdType(
-  prod: IProduction | LookaheadProductionType
+  prod: IProduction | LookaheadProductionType,
 ): PROD_TYPE {
   /* istanbul ignore else */
   if (prod instanceof Option || prod === "Option") {
@@ -81,7 +81,7 @@ export function getLookaheadPaths(options: {
       occurrence,
       rule,
       type,
-      maxLookahead
+      maxLookahead,
     );
   }
 }
@@ -92,12 +92,12 @@ export function buildLookaheadFuncForOr(
   maxLookahead: number,
   hasPredicates: boolean,
   dynamicTokensEnabled: boolean,
-  laFuncBuilder: Function
+  laFuncBuilder: Function,
 ): (orAlts?: IOrAlt<any>[]) => number | undefined {
   const lookAheadPaths = getLookaheadPathsForOr(
     occurrence,
     ruleGrammar,
-    maxLookahead
+    maxLookahead,
   );
 
   const tokenMatcher = areTokenCategoriesNotUsed(lookAheadPaths)
@@ -108,7 +108,7 @@ export function buildLookaheadFuncForOr(
     lookAheadPaths,
     hasPredicates,
     tokenMatcher,
-    dynamicTokensEnabled
+    dynamicTokensEnabled,
   );
 }
 
@@ -133,14 +133,14 @@ export function buildLookaheadFuncForOptionalProd(
   lookaheadBuilder: (
     lookAheadSequence: LookaheadSequence,
     tokenMatcher: TokenMatcher,
-    dynamicTokensEnabled: boolean
-  ) => () => boolean
+    dynamicTokensEnabled: boolean,
+  ) => () => boolean,
 ): () => boolean {
   const lookAheadPaths = getLookaheadPathsForOptionalProd(
     occurrence,
     ruleGrammar,
     prodType,
-    k
+    k,
   );
 
   const tokenMatcher = areTokenCategoriesNotUsed(lookAheadPaths)
@@ -150,7 +150,7 @@ export function buildLookaheadFuncForOptionalProd(
   return lookaheadBuilder(
     lookAheadPaths[0],
     tokenMatcher,
-    dynamicTokensEnabled
+    dynamicTokensEnabled,
   );
 }
 
@@ -160,7 +160,7 @@ export function buildAlternativesLookAheadFunc(
   alts: LookaheadSequence[],
   hasPredicates: boolean,
   tokenMatcher: TokenMatcher,
-  dynamicTokensEnabled: boolean
+  dynamicTokensEnabled: boolean,
 ): (orAlts: IOrAlt<any>[]) => number | undefined {
   const numOfAlts = alts.length;
   const areAllOneTokenLookahead = every(alts, (currAlt) => {
@@ -176,14 +176,14 @@ export function buildAlternativesLookAheadFunc(
      */
     return function (
       this: BaseParser,
-      orAlts: IOrAlt<any>[]
+      orAlts: IOrAlt<any>[],
     ): number | undefined {
       // unfortunately the predicates must be extracted every single time
       // as they cannot be cached due to references to parameters(vars) which are no longer valid.
       // note that in the common case of no predicates, no cpu time will be wasted on this (see else block)
       const predicates: (Predicate | undefined)[] = map(
         orAlts,
-        (currAlt) => currAlt.GATE
+        (currAlt) => currAlt.GATE,
       );
 
       for (let t = 0; t < numOfAlts; t++) {
@@ -238,7 +238,7 @@ export function buildAlternativesLookAheadFunc(
         });
         return result;
       },
-      {} as Record<number, number>
+      {} as Record<number, number>,
     );
 
     /**
@@ -285,7 +285,7 @@ export function buildAlternativesLookAheadFunc(
 export function buildSingleAlternativeLookaheadFunction(
   alt: LookaheadSequence,
   tokenMatcher: TokenMatcher,
-  dynamicTokensEnabled: boolean
+  dynamicTokensEnabled: boolean,
 ): () => boolean {
   const areAllOneTokenLookahead = every(alt, (currPath) => {
     return currPath.length === 1;
@@ -318,7 +318,7 @@ export function buildSingleAlternativeLookaheadFunction(
           });
           return result;
         },
-        [] as boolean[]
+        [] as boolean[],
       );
 
       return function (this: BaseParser): boolean {
@@ -355,7 +355,7 @@ class RestDefinitionFinderWalker extends RestWalker {
   constructor(
     private topProd: Rule,
     private targetOccurrence: number,
-    private targetProdType: PROD_TYPE
+    private targetProdType: PROD_TYPE,
   ) {
     super();
   }
@@ -369,7 +369,7 @@ class RestDefinitionFinderWalker extends RestWalker {
     node: IProductionWithOccurrence,
     expectedProdType: PROD_TYPE,
     currRest: IProduction[],
-    prevRest: IProduction[]
+    prevRest: IProduction[],
   ): boolean {
     if (
       node.idx === this.targetOccurrence &&
@@ -385,7 +385,7 @@ class RestDefinitionFinderWalker extends RestWalker {
   walkOption(
     optionProd: Option,
     currRest: IProduction[],
-    prevRest: IProduction[]
+    prevRest: IProduction[],
   ): void {
     if (!this.checkIsTarget(optionProd, PROD_TYPE.OPTION, currRest, prevRest)) {
       super.walkOption(optionProd, currRest, prevRest);
@@ -395,14 +395,14 @@ class RestDefinitionFinderWalker extends RestWalker {
   walkAtLeastOne(
     atLeastOneProd: RepetitionMandatory,
     currRest: IProduction[],
-    prevRest: IProduction[]
+    prevRest: IProduction[],
   ): void {
     if (
       !this.checkIsTarget(
         atLeastOneProd,
         PROD_TYPE.REPETITION_MANDATORY,
         currRest,
-        prevRest
+        prevRest,
       )
     ) {
       super.walkOption(atLeastOneProd, currRest, prevRest);
@@ -412,14 +412,14 @@ class RestDefinitionFinderWalker extends RestWalker {
   walkAtLeastOneSep(
     atLeastOneSepProd: RepetitionMandatoryWithSeparator,
     currRest: IProduction[],
-    prevRest: IProduction[]
+    prevRest: IProduction[],
   ): void {
     if (
       !this.checkIsTarget(
         atLeastOneSepProd,
         PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR,
         currRest,
-        prevRest
+        prevRest,
       )
     ) {
       super.walkOption(atLeastOneSepProd, currRest, prevRest);
@@ -429,7 +429,7 @@ class RestDefinitionFinderWalker extends RestWalker {
   walkMany(
     manyProd: Repetition,
     currRest: IProduction[],
-    prevRest: IProduction[]
+    prevRest: IProduction[],
   ): void {
     if (
       !this.checkIsTarget(manyProd, PROD_TYPE.REPETITION, currRest, prevRest)
@@ -441,14 +441,14 @@ class RestDefinitionFinderWalker extends RestWalker {
   walkManySep(
     manySepProd: RepetitionWithSeparator,
     currRest: IProduction[],
-    prevRest: IProduction[]
+    prevRest: IProduction[],
   ): void {
     if (
       !this.checkIsTarget(
         manySepProd,
         PROD_TYPE.REPETITION_WITH_SEPARATOR,
         currRest,
-        prevRest
+        prevRest,
       )
     ) {
       super.walkOption(manySepProd, currRest, prevRest);
@@ -465,14 +465,14 @@ class InsideDefinitionFinderVisitor extends GAstVisitor {
   constructor(
     private targetOccurrence: number,
     private targetProdType: PROD_TYPE,
-    private targetRef?: any
+    private targetRef?: any,
   ) {
     super();
   }
 
   private checkIsTarget(
     node: { definition: IProduction[] } & IProductionWithOccurrence,
-    expectedProdName: PROD_TYPE
+    expectedProdName: PROD_TYPE,
   ): void {
     if (
       node.idx === this.targetOccurrence &&
@@ -496,7 +496,7 @@ class InsideDefinitionFinderVisitor extends GAstVisitor {
   }
 
   public visitRepetitionMandatoryWithSeparator(
-    node: RepetitionMandatoryWithSeparator
+    node: RepetitionMandatoryWithSeparator,
   ): void {
     this.checkIsTarget(node, PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR);
   }
@@ -547,7 +547,7 @@ function pathToHashKeys(path: TokenType[]): string[] {
 function isUniquePrefixHash(
   altKnownPathsKeys: Record<string, boolean>[],
   searchPathKeys: string[],
-  idx: number
+  idx: number,
 ): boolean {
   for (
     let currAltIdx = 0;
@@ -572,10 +572,10 @@ function isUniquePrefixHash(
 
 export function lookAheadSequenceFromAlternatives(
   altsDefs: IProduction[],
-  k: number
+  k: number,
 ): LookaheadSequence[] {
   const partialAlts = map(altsDefs, (currAlt) =>
-    possiblePathsFrom([currAlt], 1)
+    possiblePathsFrom([currAlt], 1),
   );
   const finalResult = initializeArrayOfArrays(partialAlts.length);
   const altsHashes = map(partialAlts, (currAltPaths) => {
@@ -626,7 +626,7 @@ export function lookAheadSequenceFromAlternatives(
           const newPartialPathsAndSuffixes = possiblePathsFrom(
             suffixDef,
             pathLength + 1,
-            currPathPrefix
+            currPathPrefix,
           );
           newData[altIdx] = newData[altIdx].concat(newPartialPathsAndSuffixes);
 
@@ -649,12 +649,12 @@ export function getLookaheadPathsForOr(
   occurrence: number,
   ruleGrammar: Rule,
   k: number,
-  orProd?: Alternation
+  orProd?: Alternation,
 ): LookaheadSequence[] {
   const visitor = new InsideDefinitionFinderVisitor(
     occurrence,
     PROD_TYPE.ALTERNATION,
-    orProd
+    orProd,
   );
   ruleGrammar.accept(visitor);
   return lookAheadSequenceFromAlternatives(visitor.result, k);
@@ -664,11 +664,11 @@ export function getLookaheadPathsForOptionalProd(
   occurrence: number,
   ruleGrammar: Rule,
   prodType: PROD_TYPE,
-  k: number
+  k: number,
 ): LookaheadSequence[] {
   const insideDefVisitor = new InsideDefinitionFinderVisitor(
     occurrence,
-    prodType
+    prodType,
   );
   ruleGrammar.accept(insideDefVisitor);
   const insideDef = insideDefVisitor.result;
@@ -676,7 +676,7 @@ export function getLookaheadPathsForOptionalProd(
   const afterDefWalker = new RestDefinitionFinderWalker(
     ruleGrammar,
     occurrence,
-    prodType
+    prodType,
   );
   const afterDef = afterDefWalker.startWalking();
 
@@ -688,7 +688,7 @@ export function getLookaheadPathsForOptionalProd(
 
 export function containsPath(
   alternative: Alternative,
-  searchPath: TokenType[]
+  searchPath: TokenType[],
 ): boolean {
   compareOtherPath: for (let i = 0; i < alternative.length; i++) {
     const otherPath = alternative[i];
@@ -714,7 +714,7 @@ export function containsPath(
 
 export function isStrictPrefixOfPath(
   prefix: TokenType[],
-  other: TokenType[]
+  other: TokenType[],
 ): boolean {
   return (
     prefix.length < other.length &&
@@ -729,11 +729,11 @@ export function isStrictPrefixOfPath(
 }
 
 export function areTokenCategoriesNotUsed(
-  lookAheadPaths: LookaheadSequence[]
+  lookAheadPaths: LookaheadSequence[],
 ): boolean {
   return every(lookAheadPaths, (singleAltPaths) =>
     every(singleAltPaths, (singlePath) =>
-      every(singlePath, (token) => isEmpty(token.categoryMatches!))
-    )
+      every(singlePath, (token) => isEmpty(token.categoryMatches!)),
+    ),
   );
 }

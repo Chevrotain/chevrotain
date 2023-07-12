@@ -32,7 +32,10 @@ abstract class RecognitionException
   context: IRecognizerContext;
   resyncedTokens: IToken[] = [];
 
-  protected constructor(message: string, public token: IToken) {
+  protected constructor(
+    message: string,
+    public token: IToken,
+  ) {
     super(message);
 
     // fix prototype chain when typescript target is ES5
@@ -46,14 +49,22 @@ abstract class RecognitionException
 }
 
 export class MismatchedTokenException extends RecognitionException {
-  constructor(message: string, token: IToken, public previousToken: IToken) {
+  constructor(
+    message: string,
+    token: IToken,
+    public previousToken: IToken,
+  ) {
     super(message, token);
     this.name = MISMATCHED_TOKEN_EXCEPTION;
   }
 }
 
 export class NoViableAltException extends RecognitionException {
-  constructor(message: string, token: IToken, public previousToken: IToken) {
+  constructor(
+    message: string,
+    token: IToken,
+    public previousToken: IToken,
+  ) {
     super(message, token);
     this.name = NO_VIABLE_ALT_EXCEPTION;
   }
@@ -67,7 +78,11 @@ export class NotAllInputParsedException extends RecognitionException {
 }
 
 export class EarlyExitException extends RecognitionException {
-  constructor(message: string, token: IToken, public previousToken: IToken) {
+  constructor(
+    message: string,
+    token: IToken,
+    public previousToken: IToken,
+  ) {
     super(message, token);
     this.name = EARLY_EXIT_EXCEPTION;
   }

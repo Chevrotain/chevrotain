@@ -198,7 +198,7 @@ export class RegExpParser {
   }
 
   protected quantifier(
-    isBacktracking: boolean = false
+    isBacktracking: boolean = false,
   ): Quantifier | undefined {
     let range: Partial<Quantifier> | undefined = undefined;
     const begin = this.idx;
@@ -824,7 +824,7 @@ export class RegExpParser {
           "' but found: '" +
           this.input[this.idx] +
           "' at offset: " +
-          this.idx
+          this.idx,
       );
     }
 

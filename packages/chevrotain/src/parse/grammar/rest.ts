@@ -47,19 +47,19 @@ export abstract class RestWalker {
   walkTerminal(
     terminal: Terminal,
     currRest: IProduction[],
-    prevRest: IProduction[]
+    prevRest: IProduction[],
   ): void {}
 
   walkProdRef(
     refProd: NonTerminal,
     currRest: IProduction[],
-    prevRest: IProduction[]
+    prevRest: IProduction[],
   ): void {}
 
   walkFlat(
     flatProd: Alternative,
     currRest: IProduction[],
-    prevRest: IProduction[]
+    prevRest: IProduction[],
   ): void {
     // ABCDEF => after the D the rest is EF
     const fullOrRest = currRest.concat(prevRest);
@@ -69,7 +69,7 @@ export abstract class RestWalker {
   walkOption(
     optionProd: Option,
     currRest: IProduction[],
-    prevRest: IProduction[]
+    prevRest: IProduction[],
   ): void {
     // ABC(DE)?F => after the (DE)? the rest is F
     const fullOrRest = currRest.concat(prevRest);
@@ -79,7 +79,7 @@ export abstract class RestWalker {
   walkAtLeastOne(
     atLeastOneProd: RepetitionMandatory,
     currRest: IProduction[],
-    prevRest: IProduction[]
+    prevRest: IProduction[],
   ): void {
     // ABC(DE)+F => after the (DE)+ the rest is (DE)?F
     const fullAtLeastOneRest: IProduction[] = [
@@ -91,13 +91,13 @@ export abstract class RestWalker {
   walkAtLeastOneSep(
     atLeastOneSepProd: RepetitionMandatoryWithSeparator,
     currRest: IProduction[],
-    prevRest: IProduction[]
+    prevRest: IProduction[],
   ): void {
     // ABC DE(,DE)* F => after the (,DE)+ the rest is (,DE)?F
     const fullAtLeastOneSepRest = restForRepetitionWithSeparator(
       atLeastOneSepProd,
       currRest,
-      prevRest
+      prevRest,
     );
     this.walk(atLeastOneSepProd, fullAtLeastOneSepRest);
   }
@@ -105,7 +105,7 @@ export abstract class RestWalker {
   walkMany(
     manyProd: Repetition,
     currRest: IProduction[],
-    prevRest: IProduction[]
+    prevRest: IProduction[],
   ): void {
     // ABC(DE)*F => after the (DE)* the rest is (DE)?F
     const fullManyRest: IProduction[] = [
@@ -117,13 +117,13 @@ export abstract class RestWalker {
   walkManySep(
     manySepProd: RepetitionWithSeparator,
     currRest: IProduction[],
-    prevRest: IProduction[]
+    prevRest: IProduction[],
   ): void {
     // ABC (DE(,DE)*)? F => after the (,DE)* the rest is (,DE)?F
     const fullManySepRest = restForRepetitionWithSeparator(
       manySepProd,
       currRest,
-      prevRest
+      prevRest,
     );
     this.walk(manySepProd, fullManySepRest);
   }
@@ -131,7 +131,7 @@ export abstract class RestWalker {
   walkOr(
     orProd: Alternation,
     currRest: IProduction[],
-    prevRest: IProduction[]
+    prevRest: IProduction[],
   ): void {
     // ABC(D|E|F)G => when finding the (D|E|F) the rest is G
     const fullOrRest = currRest.concat(prevRest);
@@ -149,7 +149,7 @@ export abstract class RestWalker {
 function restForRepetitionWithSeparator(
   repSepProd: RepetitionWithSeparator,
   currRest: IProduction[],
-  prevRest: IProduction[]
+  prevRest: IProduction[],
 ) {
   const repSepRest = [
     new Option({

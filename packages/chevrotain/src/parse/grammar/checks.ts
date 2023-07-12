@@ -81,21 +81,22 @@ export function validateGrammar(
   topLevels: Rule[],
   tokenTypes: TokenType[],
   errMsgProvider: IGrammarValidatorErrorMessageProvider,
-  grammarName: string
+  grammarName: string,
 ): IParserDefinitionError[] {
   const duplicateErrors: IParserDefinitionError[] = flatMap(
     topLevels,
-    (currTopLevel) => validateDuplicateProductions(currTopLevel, errMsgProvider)
+    (currTopLevel) =>
+      validateDuplicateProductions(currTopLevel, errMsgProvider),
   );
 
   const termsNamespaceConflictErrors = checkTerminalAndNoneTerminalsNameSpace(
     topLevels,
     tokenTypes,
-    errMsgProvider
+    errMsgProvider,
   );
 
   const tooManyAltsErrors = flatMap(topLevels, (curRule) =>
-    validateTooManyAlts(curRule, errMsgProvider)
+    validateTooManyAlts(curRule, errMsgProvider),
   );
 
   const duplicateRulesError = flatMap(topLevels, (curRule) =>
@@ -103,20 +104,20 @@ export function validateGrammar(
       curRule,
       topLevels,
       grammarName,
-      errMsgProvider
-    )
+      errMsgProvider,
+    ),
   );
 
   return duplicateErrors.concat(
     termsNamespaceConflictErrors,
     tooManyAltsErrors,
-    duplicateRulesError
+    duplicateRulesError,
   );
 }
 
 function validateDuplicateProductions(
   topLevelRule: Rule,
-  errMsgProvider: IGrammarValidatorErrorMessageProvider
+  errMsgProvider: IGrammarValidatorErrorMessageProvider,
 ): IParserDuplicatesDefinitionError[] {
   const collectorVisitor = new OccurrenceValidationCollector();
   topLevelRule.accept(collectorVisitor);
@@ -124,7 +125,7 @@ function validateDuplicateProductions(
 
   const productionGroups = groupBy(
     allRuleProductions,
-    identifyProductionForDuplicates
+    identifyProductionForDuplicates,
   );
 
   const duplicates: any = pickBy(productionGroups, (currGroup) => {
@@ -135,7 +136,7 @@ function validateDuplicateProductions(
     const firstProd: any = first(currDuplicates);
     const msg = errMsgProvider.buildDuplicateFoundError(
       topLevelRule,
-      currDuplicates
+      currDuplicates,
     );
     const dslName = getProductionDslName(firstProd);
     const defError: IParserDuplicatesDefinitionError = {
@@ -157,7 +158,7 @@ function validateDuplicateProductions(
 }
 
 export function identifyProductionForDuplicates(
-  prod: IProductionWithOccurrence
+  prod: IProductionWithOccurrence,
 ): string {
   return `${getProductionDslName(prod)}_#_${
     prod.idx
@@ -194,7 +195,7 @@ export class OccurrenceValidationCollector extends GAstVisitor {
   }
 
   public visitRepetitionMandatoryWithSeparator(
-    atLeastOneSep: RepetitionMandatoryWithSeparator
+    atLeastOneSep: RepetitionMandatoryWithSeparator,
   ): void {
     this.allProductions.push(atLeastOneSep);
   }
@@ -216,7 +217,7 @@ export function validateRuleDoesNotAlreadyExist(
   rule: Rule,
   allRules: Rule[],
   className: string,
-  errMsgProvider: IGrammarValidatorErrorMessageProvider
+  errMsgProvider: IGrammarValidatorErrorMessageProvider,
 ): IParserDefinitionError[] {
   const errors = [];
   const occurrences = reduce(
@@ -227,7 +228,7 @@ export function validateRuleDoesNotAlreadyExist(
       }
       return result;
     },
-    0
+    0,
   );
   if (occurrences > 1) {
     const errMsg = errMsgProvider.buildDuplicateRuleNameError({
@@ -250,7 +251,7 @@ export function validateRuleDoesNotAlreadyExist(
 export function validateRuleIsOverridden(
   ruleName: string,
   definedRulesNames: string[],
-  className: string
+  className: string,
 ): IParserDefinitionError[] {
   const errors = [];
   let errMsg;
@@ -273,7 +274,7 @@ export function validateNoLeftRecursion(
   topRule: Rule,
   currRule: Rule,
   errMsgProvider: IGrammarValidatorErrorMessageProvider,
-  path: Rule[] = []
+  path: Rule[] = [],
 ): IParserDefinitionError[] {
   const errors: IParserDefinitionError[] = [];
   const nextNonTerminals = getFirstNoneTerminal(currRule.definition);
@@ -303,7 +304,7 @@ export function validateNoLeftRecursion(
         topRule,
         currRefRule,
         errMsgProvider,
-        newPath
+        newPath,
       );
     });
 
@@ -330,14 +331,14 @@ export function getFirstNoneTerminal(definition: IProduction[]): Rule[] {
     firstProd instanceof Repetition
   ) {
     result = result.concat(
-      getFirstNoneTerminal(<IProduction[]>firstProd.definition)
+      getFirstNoneTerminal(<IProduction[]>firstProd.definition),
     );
   } else if (firstProd instanceof Alternation) {
     // each sub definition in alternation is a FLAT
     result = flatten(
       map(firstProd.definition, (currSubDef) =>
-        getFirstNoneTerminal((<AlternativeGAST>currSubDef).definition)
-      )
+        getFirstNoneTerminal((<AlternativeGAST>currSubDef).definition),
+      ),
     );
   } else if (firstProd instanceof Terminal) {
     // nothing to see, move along
@@ -365,7 +366,7 @@ class OrCollector extends GAstVisitor {
 
 export function validateEmptyOrAlternative(
   topLevelRule: Rule,
-  errMsgProvider: IGrammarValidatorErrorMessageProvider
+  errMsgProvider: IGrammarValidatorErrorMessageProvider,
 ): IParserEmptyAlternativeDefinitionError[] {
   const orCollector = new OrCollector();
   topLevelRule.accept(orCollector);
@@ -380,7 +381,7 @@ export function validateEmptyOrAlternative(
           [currAlternative],
           [],
           tokenStructuredMatcher,
-          1
+          1,
         );
         if (isEmpty(possibleFirstInAlt)) {
           return [
@@ -400,7 +401,7 @@ export function validateEmptyOrAlternative(
           return [];
         }
       });
-    }
+    },
   );
 
   return errors;
@@ -409,7 +410,7 @@ export function validateEmptyOrAlternative(
 export function validateAmbiguousAlternationAlternatives(
   topLevelRule: Rule,
   globalMaxLookahead: number,
-  errMsgProvider: IGrammarValidatorErrorMessageProvider
+  errMsgProvider: IGrammarValidatorErrorMessageProvider,
 ): IParserAmbiguousAlternativesDefinitionError[] {
   const orCollector = new OrCollector();
   topLevelRule.accept(orCollector);
@@ -426,19 +427,19 @@ export function validateAmbiguousAlternationAlternatives(
       currOccurrence,
       topLevelRule,
       actualMaxLookahead,
-      currOr
+      currOr,
     );
     const altsAmbiguityErrors = checkAlternativesAmbiguities(
       alternatives,
       currOr,
       topLevelRule,
-      errMsgProvider
+      errMsgProvider,
     );
     const altsPrefixAmbiguityErrors = checkPrefixAlternativesAmbiguities(
       alternatives,
       currOr,
       topLevelRule,
-      errMsgProvider
+      errMsgProvider,
     );
 
     return altsAmbiguityErrors.concat(altsPrefixAmbiguityErrors);
@@ -461,7 +462,7 @@ export class RepetitionCollector extends GAstVisitor {
   }
 
   public visitRepetitionMandatoryWithSeparator(
-    atLeastOneSep: RepetitionMandatoryWithSeparator
+    atLeastOneSep: RepetitionMandatoryWithSeparator,
   ): void {
     this.allProductions.push(atLeastOneSep);
   }
@@ -473,7 +474,7 @@ export class RepetitionCollector extends GAstVisitor {
 
 export function validateTooManyAlts(
   topLevelRule: Rule,
-  errMsgProvider: IGrammarValidatorErrorMessageProvider
+  errMsgProvider: IGrammarValidatorErrorMessageProvider,
 ): IParserDefinitionError[] {
   const orCollector = new OrCollector();
   topLevelRule.accept(orCollector);
@@ -503,7 +504,7 @@ export function validateTooManyAlts(
 export function validateSomeNonEmptyLookaheadPath(
   topLevelRules: Rule[],
   maxLookahead: number,
-  errMsgProvider: IGrammarValidatorErrorMessageProvider
+  errMsgProvider: IGrammarValidatorErrorMessageProvider,
 ): IParserDefinitionError[] {
   const errors: IParserDefinitionError[] = [];
   forEach(topLevelRules, (currTopRule) => {
@@ -518,7 +519,7 @@ export function validateSomeNonEmptyLookaheadPath(
         currOccurrence,
         currTopRule,
         prodType,
-        actualMaxLookahead
+        actualMaxLookahead,
       );
       const pathsInsideProduction = paths[0];
       if (isEmpty(flatten(pathsInsideProduction))) {
@@ -547,7 +548,7 @@ function checkAlternativesAmbiguities(
   alternatives: Alternative[],
   alternation: Alternation,
   rule: Rule,
-  errMsgProvider: IGrammarValidatorErrorMessageProvider
+  errMsgProvider: IGrammarValidatorErrorMessageProvider,
 ): IParserAmbiguousAlternativesDefinitionError[] {
   const foundAmbiguousPaths: Alternative = [];
   const identicalAmbiguities = reduce(
@@ -584,13 +585,13 @@ function checkAlternativesAmbiguities(
       });
       return result;
     },
-    [] as { alts: number[]; path: TokenType[] }[]
+    [] as { alts: number[]; path: TokenType[] }[],
   );
 
   const currErrors = map(identicalAmbiguities, (currAmbDescriptor) => {
     const ambgIndices = map(
       currAmbDescriptor.alts,
-      (currAltIdx) => currAltIdx + 1
+      (currAltIdx) => currAltIdx + 1,
     );
 
     const currMessage = errMsgProvider.buildAlternationAmbiguityError({
@@ -616,7 +617,7 @@ export function checkPrefixAlternativesAmbiguities(
   alternatives: Alternative[],
   alternation: Alternation,
   rule: Rule,
-  errMsgProvider: IGrammarValidatorErrorMessageProvider
+  errMsgProvider: IGrammarValidatorErrorMessageProvider,
 ): IParserAmbiguousAlternativesDefinitionError[] {
   // flatten
   const pathsAndIndices = reduce(
@@ -627,7 +628,7 @@ export function checkPrefixAlternativesAmbiguities(
       });
       return result.concat(currPathsAndIdx);
     },
-    [] as { idx: number; path: TokenType[] }[]
+    [] as { idx: number; path: TokenType[] }[],
   );
 
   const errors = compact(
@@ -653,7 +654,7 @@ export function checkPrefixAlternativesAmbiguities(
             // will be be detected using a different validation.
             isStrictPrefixOfPath(searchPathAndIdx.path, targetPath)
           );
-        }
+        },
       );
 
       const currPathPrefixErrors = map(
@@ -675,11 +676,11 @@ export function checkPrefixAlternativesAmbiguities(
             occurrence: occurrence,
             alternatives: ambgIndices,
           };
-        }
+        },
       );
 
       return currPathPrefixErrors;
-    })
+    }),
   );
 
   return errors;
@@ -688,7 +689,7 @@ export function checkPrefixAlternativesAmbiguities(
 function checkTerminalAndNoneTerminalsNameSpace(
   topLevels: Rule[],
   tokenTypes: TokenType[],
-  errMsgProvider: IGrammarValidatorErrorMessageProvider
+  errMsgProvider: IGrammarValidatorErrorMessageProvider,
 ): IParserDefinitionError[] {
   const errors: IParserDefinitionError[] = [];
 

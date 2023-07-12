@@ -164,7 +164,7 @@ describe("The Grammar Interpeter namespace", () => {
 
       const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
-        caPath
+        caPath,
       ).startWalking();
       expect(possibleNextTokTypes.length).to.equal(1);
       expect(possibleNextTokTypes[0]).to.equal(getIdentTok());
@@ -180,7 +180,7 @@ describe("The Grammar Interpeter namespace", () => {
 
       const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
-        caPath
+        caPath,
       ).startWalking();
       expect(possibleNextTokTypes.length).to.equal(1);
       expect(possibleNextTokTypes[0]).to.equal(LParenTok);
@@ -196,7 +196,7 @@ describe("The Grammar Interpeter namespace", () => {
 
       const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
-        caPath
+        caPath,
       ).startWalking();
       expect(possibleNextTokTypes.length).to.equal(2);
       setEquality(possibleNextTokTypes, [getIdentTok(), RParenTok]);
@@ -212,7 +212,7 @@ describe("The Grammar Interpeter namespace", () => {
 
       const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
-        caPath
+        caPath,
       ).startWalking();
       expect(possibleNextTokTypes.length).to.equal(1);
       expect(possibleNextTokTypes[0]).to.equal(getIdentTok());
@@ -228,7 +228,7 @@ describe("The Grammar Interpeter namespace", () => {
 
       const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
-        caPath
+        caPath,
       ).startWalking();
       expect(possibleNextTokTypes.length).to.equal(2);
       setEquality(possibleNextTokTypes, [SemicolonTok, getColonTok()]);
@@ -244,7 +244,7 @@ describe("The Grammar Interpeter namespace", () => {
 
       const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
-        caPath
+        caPath,
       ).startWalking();
       expect(possibleNextTokTypes.length).to.equal(1);
       expect(possibleNextTokTypes[0]).to.equal(getIdentTok());
@@ -260,7 +260,7 @@ describe("The Grammar Interpeter namespace", () => {
 
       const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
-        caPath
+        caPath,
       ).startWalking();
       expect(possibleNextTokTypes.length).to.equal(0);
     });
@@ -275,7 +275,7 @@ describe("The Grammar Interpeter namespace", () => {
 
       const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
-        caPath
+        caPath,
       ).startWalking();
       expect(possibleNextTokTypes.length).to.equal(1);
       expect(possibleNextTokTypes[0]).to.equal(getColonTok());
@@ -291,7 +291,7 @@ describe("The Grammar Interpeter namespace", () => {
 
       const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
-        caPath
+        caPath,
       ).startWalking();
       expect(possibleNextTokTypes.length).to.equal(1);
       expect(possibleNextTokTypes[0]).to.equal(getIdentTok());
@@ -307,7 +307,7 @@ describe("The Grammar Interpeter namespace", () => {
 
       const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
-        caPath
+        caPath,
       ).startWalking();
       expect(possibleNextTokTypes.length).to.equal(1);
       expect(possibleNextTokTypes[0]).to.equal(getRSquareTok());
@@ -323,7 +323,7 @@ describe("The Grammar Interpeter namespace", () => {
 
       const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
-        caPath
+        caPath,
       ).startWalking();
       expect(possibleNextTokTypes.length).to.equal(2);
       setEquality(possibleNextTokTypes, [CommaTok, RParenTok]);
@@ -339,7 +339,7 @@ describe("The Grammar Interpeter namespace", () => {
 
       const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
-        caPath
+        caPath,
       ).startWalking();
       expect(possibleNextTokTypes.length).to.equal(1);
       expect(possibleNextTokTypes[0]).to.equal(getColonTok());
@@ -355,7 +355,7 @@ describe("The Grammar Interpeter namespace", () => {
 
       const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
-        caPath
+        caPath,
       ).startWalking();
       expect(possibleNextTokTypes.length).to.equal(1);
       expect(possibleNextTokTypes[0]).to.equal(getIdentTok());
@@ -371,7 +371,7 @@ describe("The Grammar Interpeter namespace", () => {
 
       const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
-        caPath
+        caPath,
       ).startWalking();
       expect(possibleNextTokTypes.length).to.equal(1);
       expect(possibleNextTokTypes[0]).to.equal(getRSquareTok());
@@ -387,7 +387,7 @@ describe("The Grammar Interpeter namespace", () => {
 
       const possibleNextTokTypes = new NextAfterTokenWalker(
         actionDec,
-        caPath
+        caPath,
       ).startWalking();
       expect(possibleNextTokTypes.length).to.equal(2);
       setEquality(possibleNextTokTypes, [CommaTok, RParenTok]);
@@ -406,7 +406,7 @@ describe("The Grammar Interpeter namespace", () => {
 
         const possibleNextTokTypes = new NextAfterTokenWalker(
           actionDec,
-          caPath
+          caPath,
         ).startWalking();
         expect(possibleNextTokTypes.length).to.equal(4);
         setEquality(possibleNextTokTypes, [
@@ -415,7 +415,7 @@ describe("The Grammar Interpeter namespace", () => {
           CommaTok,
           RParenTok,
         ]);
-      }
+      },
     );
 
     it(
@@ -431,11 +431,11 @@ describe("The Grammar Interpeter namespace", () => {
 
         const possibleNextTokTypes = new NextAfterTokenWalker(
           actionDec,
-          caPath
+          caPath,
         ).startWalking();
         expect(possibleNextTokTypes.length).to.equal(1);
         expect(possibleNextTokTypes[0]).to.equal(getIdentTok());
-      }
+      },
     );
 
     it(
@@ -451,7 +451,7 @@ describe("The Grammar Interpeter namespace", () => {
 
         const possibleNextTokTypes = new NextAfterTokenWalker(
           actionDec,
-          caPath
+          caPath,
         ).startWalking();
         expect(possibleNextTokTypes.length).to.equal(4);
         setEquality(possibleNextTokTypes, [
@@ -460,7 +460,7 @@ describe("The Grammar Interpeter namespace", () => {
           CommaTok,
           RParenTok,
         ]);
-      }
+      },
     );
 
     it(
@@ -476,11 +476,11 @@ describe("The Grammar Interpeter namespace", () => {
 
         const possibleNextTokTypes = new NextAfterTokenWalker(
           getParamSpec(),
-          caPath
+          caPath,
         ).startWalking();
         expect(possibleNextTokTypes.length).to.equal(2);
         setEquality(possibleNextTokTypes, [getDotTok(), getLSquareTok()]);
-      }
+      },
     );
 
     it(
@@ -496,11 +496,11 @@ describe("The Grammar Interpeter namespace", () => {
 
         const possibleNextTokTypes = new NextAfterTokenWalker(
           getParamSpec(),
-          caPath
+          caPath,
         ).startWalking();
         expect(possibleNextTokTypes.length).to.equal(1);
         expect(possibleNextTokTypes[0]).to.equal(getIdentTok());
-      }
+      },
     );
 
     it(
@@ -516,11 +516,11 @@ describe("The Grammar Interpeter namespace", () => {
 
         const possibleNextTokTypes = new NextAfterTokenWalker(
           getParamSpec(),
-          caPath
+          caPath,
         ).startWalking();
         expect(possibleNextTokTypes.length).to.equal(2);
         setEquality(possibleNextTokTypes, [getDotTok(), getLSquareTok()]);
-      }
+      },
     );
 
     it("will fail if we try to compute the next token starting from a rule that does not match the path", () => {
@@ -533,7 +533,7 @@ describe("The Grammar Interpeter namespace", () => {
 
       const walker = new NextAfterTokenWalker(getParamSpec(), caPath);
       expect(() => walker.startWalking()).to.throw(
-        "The path does not start with the walker's top Rule!"
+        "The path does not start with the walker's top Rule!",
       );
     });
   });
@@ -578,7 +578,7 @@ describe("The Grammar Interpeter namespace", () => {
     it("can compute the next possible token types after the MANY in paramSpec inside ActionDec", () => {
       const result = new NextTerminalAfterManyWalker(
         actionDec,
-        1
+        1,
       ).startWalking();
       expect(result.occurrence).to.equal(1);
       expect(result.token).to.equal(RParenTok);
@@ -603,7 +603,7 @@ describe("The Grammar Interpeter namespace", () => {
       });
       const result = new NextTerminalAfterManySepWalker(
         callArguments,
-        1
+        1,
       ).startWalking();
       //noinspection BadExpressionStatementJS
       expect(result.occurrence).to.be.undefined;
@@ -647,7 +647,7 @@ describe("The Grammar Interpeter namespace", () => {
       });
       const result = new NextTerminalAfterManySepWalker(
         actionDecSep,
-        1
+        1,
       ).startWalking();
       expect(result.occurrence).to.equal(1);
       expect(result.token).to.equal(RParenTok);
@@ -681,21 +681,21 @@ describe("The Grammar Interpeter namespace", () => {
 
       const result = new NextTerminalAfterAtLeastOneWalker(
         atLeastOneRule,
-        1
+        1,
       ).startWalking();
       expect(result.occurrence).to.equal(2);
       expect(result.token).to.equal(getDotTok());
 
       const result2 = new NextTerminalAfterAtLeastOneWalker(
         atLeastOneRule,
-        2
+        2,
       ).startWalking();
       expect(result2.occurrence).to.equal(1);
       expect(result2.token).to.equal(getDotTok());
 
       const result3 = new NextTerminalAfterAtLeastOneWalker(
         atLeastOneRule,
-        3
+        3,
       ).startWalking();
       expect(result3.occurrence).to.equal(1);
       expect(result3.token).to.equal(CommaTok);
@@ -718,7 +718,7 @@ describe("The Grammar Interpeter namespace", () => {
 
       const result = new NextTerminalAfterAtLeastOneWalker(
         atLeastOneRule,
-        1
+        1,
       ).startWalking();
       expect(result.occurrence).to.be.undefined;
       expect(result.token).to.be.undefined;
@@ -755,21 +755,21 @@ describe("The Grammar Interpeter namespace", () => {
 
       const result = new NextTerminalAfterAtLeastOneSepWalker(
         atLeastOneSepRule,
-        1
+        1,
       ).startWalking();
       expect(result.occurrence).to.equal(2);
       expect(result.token).to.equal(getDotTok());
 
       const result2 = new NextTerminalAfterAtLeastOneSepWalker(
         atLeastOneSepRule,
-        2
+        2,
       ).startWalking();
       expect(result2.occurrence).to.equal(1);
       expect(result2.token).to.equal(getDotTok());
 
       const result3 = new NextTerminalAfterAtLeastOneSepWalker(
         atLeastOneSepRule,
-        3
+        3,
       ).startWalking();
       expect(result3.occurrence).to.equal(1);
       expect(result3.token).to.equal(CommaTok);
@@ -787,7 +787,7 @@ describe("The Grammar Interpeter namespace", () => {
       });
       const result = new NextTerminalAfterAtLeastOneSepWalker(
         qualifiedNameSep,
-        1
+        1,
       ).startWalking();
       //noinspection BadExpressionStatementJS
       expect(result.occurrence).to.be.undefined;
@@ -958,19 +958,19 @@ describe("The Grammar Interpeter namespace", () => {
         ];
 
         expect(
-          extractPartialPaths(possiblePathsFrom(repMand, 1))
+          extractPartialPaths(possiblePathsFrom(repMand, 1)),
         ).to.deep.equal([[Alpha]]);
         expect(
-          extractPartialPaths(possiblePathsFrom(repMand, 2))
+          extractPartialPaths(possiblePathsFrom(repMand, 2)),
         ).to.deep.equal([[Alpha, Alpha]]);
         expect(
-          extractPartialPaths(possiblePathsFrom(repMand, 3))
+          extractPartialPaths(possiblePathsFrom(repMand, 3)),
         ).to.deep.equal([
           [Alpha, Alpha, Alpha],
           [Alpha, Alpha, Gamma],
         ]);
         expect(
-          extractPartialPaths(possiblePathsFrom(repMand, 4))
+          extractPartialPaths(possiblePathsFrom(repMand, 4)),
         ).to.deep.equal([
           [Alpha, Alpha, Alpha, Alpha],
           [Alpha, Alpha, Gamma],
@@ -1025,19 +1025,19 @@ describe("The Grammar Interpeter namespace", () => {
         ];
 
         expect(
-          extractPartialPaths(possiblePathsFrom(repMandSep, 1))
+          extractPartialPaths(possiblePathsFrom(repMandSep, 1)),
         ).to.deep.equal([[Alpha]]);
         expect(
-          extractPartialPaths(possiblePathsFrom(repMandSep, 2))
+          extractPartialPaths(possiblePathsFrom(repMandSep, 2)),
         ).to.deep.equal([[Alpha, Alpha]]);
         expect(
-          extractPartialPaths(possiblePathsFrom(repMandSep, 3))
+          extractPartialPaths(possiblePathsFrom(repMandSep, 3)),
         ).to.deep.equal([
           [Alpha, Alpha, Comma],
           [Alpha, Alpha, Gamma],
         ]);
         expect(
-          extractPartialPaths(possiblePathsFrom(repMandSep, 4))
+          extractPartialPaths(possiblePathsFrom(repMandSep, 4)),
         ).to.deep.equal([
           [Alpha, Alpha, Comma, Alpha],
           [Alpha, Alpha, Gamma],
@@ -1096,9 +1096,9 @@ describe("The Grammar Interpeter namespace", () => {
 
         setEquality(
           pluckTokenTypes(
-            nextPossibleTokensAfter(seq, INPUT([]), tokenStructuredMatcher, 5)
+            nextPossibleTokensAfter(seq, INPUT([]), tokenStructuredMatcher, 5),
           ),
-          [Alpha]
+          [Alpha],
         );
         setEquality(
           pluckTokenTypes(
@@ -1106,10 +1106,10 @@ describe("The Grammar Interpeter namespace", () => {
               seq,
               INPUT([Alpha]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Beta]
+          [Beta],
         );
         setEquality(
           pluckTokenTypes(
@@ -1117,10 +1117,10 @@ describe("The Grammar Interpeter namespace", () => {
               seq,
               INPUT([Alpha, Beta]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Gamma]
+          [Gamma],
         );
       });
 
@@ -1141,19 +1141,24 @@ describe("The Grammar Interpeter namespace", () => {
             seq,
             INPUT([Alpha, Beta, Gamma]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
         expect(
           nextPossibleTokensAfter(
             seq,
             INPUT([Alpha, Gamma]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
         expect(
-          nextPossibleTokensAfter(seq, INPUT([Beta]), tokenStructuredMatcher, 5)
+          nextPossibleTokensAfter(
+            seq,
+            INPUT([Beta]),
+            tokenStructuredMatcher,
+            5,
+          ),
         ).to.be.empty;
       });
 
@@ -1173,10 +1178,10 @@ describe("The Grammar Interpeter namespace", () => {
               seq,
               INPUT([Alpha]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Beta, Gamma]
+          [Beta, Gamma],
         );
         // setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([Alpha, Beta]), tokenStructuredMatcher, 5)), [Gamma])
       });
@@ -1191,23 +1196,28 @@ describe("The Grammar Interpeter namespace", () => {
         ];
 
         expect(
-          nextPossibleTokensAfter(seq, INPUT([Beta]), tokenStructuredMatcher, 5)
+          nextPossibleTokensAfter(
+            seq,
+            INPUT([Beta]),
+            tokenStructuredMatcher,
+            5,
+          ),
         ).to.be.empty;
         expect(
           nextPossibleTokensAfter(
             seq,
             INPUT([Alpha, Alpha]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
         expect(
           nextPossibleTokensAfter(
             seq,
             INPUT([Alpha, Beta, Gamma]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
       });
 
@@ -1240,9 +1250,9 @@ describe("The Grammar Interpeter namespace", () => {
 
         setEquality(
           pluckTokenTypes(
-            nextPossibleTokensAfter(alts, INPUT([]), tokenStructuredMatcher, 5)
+            nextPossibleTokensAfter(alts, INPUT([]), tokenStructuredMatcher, 5),
           ),
-          [Alpha, Beta, Beta, Gamma]
+          [Alpha, Beta, Beta, Gamma],
         );
         setEquality(
           pluckTokenTypes(
@@ -1250,10 +1260,10 @@ describe("The Grammar Interpeter namespace", () => {
               alts,
               INPUT([Beta]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Beta, Alpha]
+          [Beta, Alpha],
         );
         setEquality(
           pluckTokenTypes(
@@ -1261,10 +1271,10 @@ describe("The Grammar Interpeter namespace", () => {
               alts,
               INPUT([Beta, Alpha]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Gamma]
+          [Gamma],
         );
       });
 
@@ -1297,32 +1307,32 @@ describe("The Grammar Interpeter namespace", () => {
             alts,
             INPUT([Alpha]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
         expect(
           nextPossibleTokensAfter(
             alts,
             INPUT([Gamma, Alpha]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
         expect(
           nextPossibleTokensAfter(
             alts,
             INPUT([Beta, Beta]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
         expect(
           nextPossibleTokensAfter(
             alts,
             INPUT([Gamma]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
       });
 
@@ -1339,9 +1349,9 @@ describe("The Grammar Interpeter namespace", () => {
 
         setEquality(
           pluckTokenTypes(
-            nextPossibleTokensAfter(rep, INPUT([]), tokenStructuredMatcher, 5)
+            nextPossibleTokensAfter(rep, INPUT([]), tokenStructuredMatcher, 5),
           ),
-          [Alpha, Gamma]
+          [Alpha, Gamma],
         );
         setEquality(
           pluckTokenTypes(
@@ -1349,10 +1359,10 @@ describe("The Grammar Interpeter namespace", () => {
               rep,
               INPUT([Alpha]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Beta]
+          [Beta],
         );
         setEquality(
           pluckTokenTypes(
@@ -1360,10 +1370,10 @@ describe("The Grammar Interpeter namespace", () => {
               rep,
               INPUT([Alpha, Beta]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Alpha, Gamma]
+          [Alpha, Gamma],
         );
         setEquality(
           pluckTokenTypes(
@@ -1371,10 +1381,10 @@ describe("The Grammar Interpeter namespace", () => {
               rep,
               INPUT([Alpha, Beta, Alpha]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Beta]
+          [Beta],
         );
         setEquality(
           pluckTokenTypes(
@@ -1382,10 +1392,10 @@ describe("The Grammar Interpeter namespace", () => {
               rep,
               INPUT([Alpha, Beta, Alpha, Beta]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Alpha, Gamma]
+          [Alpha, Gamma],
         );
       });
 
@@ -1401,31 +1411,36 @@ describe("The Grammar Interpeter namespace", () => {
         ];
 
         expect(
-          nextPossibleTokensAfter(rep, INPUT([Beta]), tokenStructuredMatcher, 5)
+          nextPossibleTokensAfter(
+            rep,
+            INPUT([Beta]),
+            tokenStructuredMatcher,
+            5,
+          ),
         ).to.be.empty;
         expect(
           nextPossibleTokensAfter(
             rep,
             INPUT([Alpha, Gamma]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
         expect(
           nextPossibleTokensAfter(
             rep,
             INPUT([Alpha, Beta, Alpha, Gamma]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
         expect(
           nextPossibleTokensAfter(
             rep,
             INPUT([Alpha, Beta, Alpha, Beta, Gamma]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
       });
 
@@ -1446,10 +1461,10 @@ describe("The Grammar Interpeter namespace", () => {
               repMand,
               INPUT([]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Alpha]
+          [Alpha],
         );
         setEquality(
           pluckTokenTypes(
@@ -1457,10 +1472,10 @@ describe("The Grammar Interpeter namespace", () => {
               repMand,
               INPUT([Alpha]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Beta]
+          [Beta],
         );
         setEquality(
           pluckTokenTypes(
@@ -1468,10 +1483,10 @@ describe("The Grammar Interpeter namespace", () => {
               repMand,
               INPUT([Alpha, Beta]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Alpha, Gamma]
+          [Alpha, Gamma],
         );
         setEquality(
           pluckTokenTypes(
@@ -1479,10 +1494,10 @@ describe("The Grammar Interpeter namespace", () => {
               repMand,
               INPUT([Alpha, Beta, Alpha]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Beta]
+          [Beta],
         );
         setEquality(
           pluckTokenTypes(
@@ -1490,10 +1505,10 @@ describe("The Grammar Interpeter namespace", () => {
               repMand,
               INPUT([Alpha, Beta, Alpha, Beta]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Alpha, Gamma]
+          [Alpha, Gamma],
         );
       });
 
@@ -1513,32 +1528,32 @@ describe("The Grammar Interpeter namespace", () => {
             repMand,
             INPUT([Beta]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
         expect(
           nextPossibleTokensAfter(
             repMand,
             INPUT([Alpha, Gamma]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
         expect(
           nextPossibleTokensAfter(
             repMand,
             INPUT([Alpha, Beta, Alpha, Gamma]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
         expect(
           nextPossibleTokensAfter(
             repMand,
             INPUT([Alpha, Beta, Alpha, Beta, Gamma]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
       });
 
@@ -1560,10 +1575,10 @@ describe("The Grammar Interpeter namespace", () => {
               repSep,
               INPUT([]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Alpha, Gamma]
+          [Alpha, Gamma],
         );
         setEquality(
           pluckTokenTypes(
@@ -1571,10 +1586,10 @@ describe("The Grammar Interpeter namespace", () => {
               repSep,
               INPUT([Alpha]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Beta]
+          [Beta],
         );
         setEquality(
           pluckTokenTypes(
@@ -1582,10 +1597,10 @@ describe("The Grammar Interpeter namespace", () => {
               repSep,
               INPUT([Alpha, Beta]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Comma, Gamma]
+          [Comma, Gamma],
         );
         setEquality(
           pluckTokenTypes(
@@ -1593,10 +1608,10 @@ describe("The Grammar Interpeter namespace", () => {
               repSep,
               INPUT([Alpha, Beta, Comma]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Alpha]
+          [Alpha],
         );
         setEquality(
           pluckTokenTypes(
@@ -1604,10 +1619,10 @@ describe("The Grammar Interpeter namespace", () => {
               repSep,
               INPUT([Alpha, Beta, Comma, Alpha, Beta]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Comma, Gamma]
+          [Comma, Gamma],
         );
       });
 
@@ -1628,32 +1643,32 @@ describe("The Grammar Interpeter namespace", () => {
             repMand,
             INPUT([Comma]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
         expect(
           nextPossibleTokensAfter(
             repMand,
             INPUT([Alpha, Gamma]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
         expect(
           nextPossibleTokensAfter(
             repMand,
             INPUT([Alpha, Beta, Comma, Alpha, Gamma]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
         expect(
           nextPossibleTokensAfter(
             repMand,
             INPUT([Alpha, Beta, Comma, Alpha, Beta, Gamma]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
       });
 
@@ -1675,10 +1690,10 @@ describe("The Grammar Interpeter namespace", () => {
               repSep,
               INPUT([]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Alpha]
+          [Alpha],
         );
         setEquality(
           pluckTokenTypes(
@@ -1686,10 +1701,10 @@ describe("The Grammar Interpeter namespace", () => {
               repSep,
               INPUT([Alpha]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Beta]
+          [Beta],
         );
         setEquality(
           pluckTokenTypes(
@@ -1697,10 +1712,10 @@ describe("The Grammar Interpeter namespace", () => {
               repSep,
               INPUT([Alpha, Beta]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Comma, Gamma]
+          [Comma, Gamma],
         );
         setEquality(
           pluckTokenTypes(
@@ -1708,10 +1723,10 @@ describe("The Grammar Interpeter namespace", () => {
               repSep,
               INPUT([Alpha, Beta, Comma]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Alpha]
+          [Alpha],
         );
         setEquality(
           pluckTokenTypes(
@@ -1719,10 +1734,10 @@ describe("The Grammar Interpeter namespace", () => {
               repSep,
               INPUT([Alpha, Beta, Comma, Alpha, Beta]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Comma, Gamma]
+          [Comma, Gamma],
         );
       });
 
@@ -1743,40 +1758,40 @@ describe("The Grammar Interpeter namespace", () => {
             repMand,
             INPUT([Comma]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
         expect(
           nextPossibleTokensAfter(
             repMand,
             INPUT([Alpha, Gamma]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
         expect(
           nextPossibleTokensAfter(
             repMand,
             INPUT([Gamma]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
         expect(
           nextPossibleTokensAfter(
             repMand,
             INPUT([Alpha, Beta, Comma, Alpha, Gamma]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
         expect(
           nextPossibleTokensAfter(
             repMand,
             INPUT([Alpha, Beta, Comma, Alpha, Beta, Gamma]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
       });
 
@@ -1797,9 +1812,9 @@ describe("The Grammar Interpeter namespace", () => {
 
         setEquality(
           pluckTokenTypes(
-            nextPossibleTokensAfter(seq, INPUT([]), tokenStructuredMatcher, 5)
+            nextPossibleTokensAfter(seq, INPUT([]), tokenStructuredMatcher, 5),
           ),
-          [Alpha]
+          [Alpha],
         );
         setEquality(
           pluckTokenTypes(
@@ -1807,10 +1822,10 @@ describe("The Grammar Interpeter namespace", () => {
               seq,
               INPUT([Alpha]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Beta]
+          [Beta],
         );
         setEquality(
           pluckTokenTypes(
@@ -1818,10 +1833,10 @@ describe("The Grammar Interpeter namespace", () => {
               seq,
               INPUT([Alpha, Beta]),
               tokenStructuredMatcher,
-              5
-            )
+              5,
+            ),
           ),
-          [Gamma]
+          [Gamma],
         );
       });
 
@@ -1841,23 +1856,28 @@ describe("The Grammar Interpeter namespace", () => {
         ];
 
         expect(
-          nextPossibleTokensAfter(seq, INPUT([Beta]), tokenStructuredMatcher, 5)
+          nextPossibleTokensAfter(
+            seq,
+            INPUT([Beta]),
+            tokenStructuredMatcher,
+            5,
+          ),
         ).to.be.empty;
         expect(
           nextPossibleTokensAfter(
             seq,
             INPUT([Alpha, Gamma]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
         expect(
           nextPossibleTokensAfter(
             seq,
             INPUT([Alpha, Beta, Gamma]),
             tokenStructuredMatcher,
-            5
-          )
+            5,
+          ),
         ).to.be.empty;
       });
     });
@@ -1937,7 +1957,7 @@ describe("The Grammar Interpeter namespace", () => {
       }
 
       expect(() => new Issue391Parser([])).to.not.throw(
-        "Ambiguous alternatives: <1 ,2>"
+        "Ambiguous alternatives: <1 ,2>",
       );
       const myParser = new Issue391Parser([]);
 

@@ -8,7 +8,7 @@
     // like Node.
     module.exports = factory(
       require("./diagrams_builder"),
-      require("./diagrams_behavior")
+      require("./diagrams_behavior"),
     );
   } else {
     // Browser globals (root is window)

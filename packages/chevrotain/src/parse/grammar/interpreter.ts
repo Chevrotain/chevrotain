@@ -41,7 +41,10 @@ export abstract class AbstractNextPossibleTokensWalker extends RestWalker {
   protected found = false;
   protected isAtEndOfPath = false;
 
-  constructor(protected topProd: Rule, protected path: IGrammarPath) {
+  constructor(
+    protected topProd: Rule,
+    protected path: IGrammarPath,
+  ) {
     super();
   }
 
@@ -68,7 +71,7 @@ export abstract class AbstractNextPossibleTokensWalker extends RestWalker {
 
   walk(
     prod: { definition: IProduction[] },
-    prevRest: IProduction[] = []
+    prevRest: IProduction[] = [],
   ): void {
     // stop scanning once we found the path
     if (!this.found) {
@@ -79,7 +82,7 @@ export abstract class AbstractNextPossibleTokensWalker extends RestWalker {
   walkProdRef(
     refProd: NonTerminal,
     currRest: IProduction[],
-    prevRest: IProduction[]
+    prevRest: IProduction[],
   ): void {
     // found the next production, need to keep walking in it
     if (
@@ -111,7 +114,10 @@ export class NextAfterTokenWalker extends AbstractNextPossibleTokensWalker {
   private nextTerminalName = "";
   private nextTerminalOccurrence = 0;
 
-  constructor(topProd: Rule, protected path: ITokenGrammarPath) {
+  constructor(
+    topProd: Rule,
+    protected path: ITokenGrammarPath,
+  ) {
     super(topProd, path);
     this.nextTerminalName = this.path.lastTok.name;
     this.nextTerminalOccurrence = this.path.lastTokOccurrence;
@@ -120,7 +126,7 @@ export class NextAfterTokenWalker extends AbstractNextPossibleTokensWalker {
   walkTerminal(
     terminal: Terminal,
     currRest: IProduction[],
-    prevRest: IProduction[]
+    prevRest: IProduction[],
   ): void {
     if (
       this.isAtEndOfPath &&
@@ -155,7 +161,10 @@ export class AbstractNextTerminalAfterProductionWalker extends RestWalker {
     isEndOfRule: undefined,
   };
 
-  constructor(protected topRule: Rule, protected occurrence: number) {
+  constructor(
+    protected topRule: Rule,
+    protected occurrence: number,
+  ) {
     super();
   }
 
@@ -169,7 +178,7 @@ export class NextTerminalAfterManyWalker extends AbstractNextTerminalAfterProduc
   walkMany(
     manyProd: Repetition,
     currRest: IProduction[],
-    prevRest: IProduction[]
+    prevRest: IProduction[],
   ): void {
     if (manyProd.idx === this.occurrence) {
       const firstAfterMany = _first(currRest.concat(prevRest));
@@ -188,7 +197,7 @@ export class NextTerminalAfterManySepWalker extends AbstractNextTerminalAfterPro
   walkManySep(
     manySepProd: RepetitionWithSeparator,
     currRest: IProduction[],
-    prevRest: IProduction[]
+    prevRest: IProduction[],
   ): void {
     if (manySepProd.idx === this.occurrence) {
       const firstAfterManySep = _first(currRest.concat(prevRest));
@@ -207,7 +216,7 @@ export class NextTerminalAfterAtLeastOneWalker extends AbstractNextTerminalAfter
   walkAtLeastOne(
     atLeastOneProd: RepetitionMandatory,
     currRest: IProduction[],
-    prevRest: IProduction[]
+    prevRest: IProduction[],
   ): void {
     if (atLeastOneProd.idx === this.occurrence) {
       const firstAfterAtLeastOne = _first(currRest.concat(prevRest));
@@ -227,11 +236,11 @@ export class NextTerminalAfterAtLeastOneSepWalker extends AbstractNextTerminalAf
   walkAtLeastOneSep(
     atleastOneSepProd: RepetitionMandatoryWithSeparator,
     currRest: IProduction[],
-    prevRest: IProduction[]
+    prevRest: IProduction[],
   ): void {
     if (atleastOneSepProd.idx === this.occurrence) {
       const firstAfterfirstAfterAtLeastOneSep = _first(
-        currRest.concat(prevRest)
+        currRest.concat(prevRest),
       );
       this.result.isEndOfRule = firstAfterfirstAfterAtLeastOneSep === undefined;
       if (firstAfterfirstAfterAtLeastOneSep instanceof Terminal) {
@@ -252,7 +261,7 @@ export interface PartialPathAndSuffixes {
 export function possiblePathsFrom(
   targetDef: IProduction[],
   maxLength: number,
-  currPath: TokenType[] = []
+  currPath: TokenType[] = [],
 ): PartialPathAndSuffixes[] {
   // avoid side effects
   currPath = clone(currPath);
@@ -269,7 +278,7 @@ export function possiblePathsFrom(
     const alternatives = possiblePathsFrom(
       remainingPathWith(definition),
       maxLength,
-      currPath
+      currPath,
     );
     return result.concat(alternatives);
   }
@@ -303,7 +312,7 @@ export function possiblePathsFrom(
         new Alternative({ definition: prod.definition }),
         new Repetition({
           definition: [new Terminal({ terminalType: prod.separator })].concat(
-            <any>prod.definition
+            <any>prod.definition,
           ),
         }),
       ];
@@ -312,7 +321,7 @@ export function possiblePathsFrom(
       const newDef = prod.definition.concat([
         new Repetition({
           definition: [new Terminal({ terminalType: prod.separator })].concat(
-            <any>prod.definition
+            <any>prod.definition,
           ),
         }),
       ]);
@@ -361,7 +370,7 @@ export function nextPossibleTokensAfter(
   initialDef: IProduction[],
   tokenVector: IToken[],
   tokMatcher: TokenMatcher,
-  maxLookAhead: number
+  maxLookAhead: number,
 ): ISyntacticContentAssistPath[] {
   const EXIT_NON_TERMINAL: any = "EXIT_NONE_TERMINAL";
   // to avoid creating a new Array each time.
@@ -583,7 +592,7 @@ export function nextPossibleTokensAfter(
     } else if (prod instanceof Rule) {
       // last because we should only encounter at most a single one of these per invocation.
       possiblePaths.push(
-        expandTopLevelRule(prod, currIdx, currRuleStack, currOccurrenceStack)
+        expandTopLevelRule(prod, currIdx, currRuleStack, currOccurrenceStack),
       );
     } else {
       throw Error("non exhaustive match");
@@ -596,7 +605,7 @@ function expandTopLevelRule(
   topRule: Rule,
   currIdx: number,
   currRuleStack: string[],
-  currOccurrenceStack: number[]
+  currOccurrenceStack: number[],
 ): IPathToExamine {
   const newRuleStack = clone(currRuleStack);
   newRuleStack.push(topRule.name);

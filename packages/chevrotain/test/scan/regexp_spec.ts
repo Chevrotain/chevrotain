@@ -40,8 +40,8 @@ describe("the regExp analysis", () => {
     it("can compute for string literal", () => {
       expect(
         getOptimizedStartCodesIndices(
-          /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
-        )
+          /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/,
+        ),
       ).to.deep.equal([34]);
     });
 

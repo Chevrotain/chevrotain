@@ -117,12 +117,12 @@ export class Lexer {
 
   constructor(
     protected lexerDefinition: TokenType[] | IMultiModeLexerDefinition,
-    config: ILexerConfig = DEFAULT_LEXER_CONFIG
+    config: ILexerConfig = DEFAULT_LEXER_CONFIG,
   ) {
     if (typeof config === "boolean") {
       throw Error(
         "The second argument to the Lexer constructor is now an ILexerConfig Object.\n" +
-          "a boolean 2nd argument is no longer supported"
+          "a boolean 2nd argument is no longer supported",
       );
     }
 
@@ -156,19 +156,19 @@ export class Lexer {
           ) {
             throw Error(
               "Error: Missing <lineTerminatorCharacters> property on the Lexer config.\n" +
-                "\tFor details See: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#MISSING_LINE_TERM_CHARS"
+                "\tFor details See: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#MISSING_LINE_TERM_CHARS",
             );
           }
         }
 
         if (config.safeMode && config.ensureOptimizations) {
           throw Error(
-            '"safeMode" and "ensureOptimizations" flags are mutually exclusive.'
+            '"safeMode" and "ensureOptimizations" flags are mutually exclusive.',
           );
         }
 
         this.trackStartLines = /full|onlyStart/i.test(
-          this.config.positionTracking
+          this.config.positionTracking,
         );
         this.trackEndLines = /full/i.test(this.config.positionTracking);
 
@@ -191,8 +191,8 @@ export class Lexer {
             performRuntimeChecks(
               actualDefinition,
               this.trackStartLines,
-              this.config.lineTerminatorCharacters
-            )
+              this.config.lineTerminatorCharacters,
+            ),
           );
         });
 
@@ -201,8 +201,8 @@ export class Lexer {
             performWarningRuntimeChecks(
               actualDefinition,
               this.trackStartLines,
-              this.config.lineTerminatorCharacters
-            )
+              this.config.lineTerminatorCharacters,
+            ),
           );
         });
       }
@@ -217,7 +217,7 @@ export class Lexer {
       forEach(actualDefinition.modes, (currModeValue, currModeName) => {
         actualDefinition.modes[currModeName] = reject<TokenType>(
           currModeValue,
-          (currTokType) => isUndefined(currTokType)
+          (currTokType) => isUndefined(currTokType),
         );
       });
 
@@ -232,7 +232,7 @@ export class Lexer {
             if (this.config.skipValidations === false) {
               this.TRACE_INIT(`validatePatterns`, () => {
                 this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(
-                  validatePatterns(currModDef, allModeNames)
+                  validatePatterns(currModDef, allModeNames),
                 );
               });
             }
@@ -264,7 +264,7 @@ export class Lexer {
               this.emptyGroups = assign(
                 {},
                 this.emptyGroups,
-                currAnalyzeResult.emptyGroups
+                currAnalyzeResult.emptyGroups,
               ) as any;
 
               this.hasCustom = currAnalyzeResult.hasCustom || this.hasCustom;
@@ -273,7 +273,7 @@ export class Lexer {
                 currAnalyzeResult.canBeOptimized;
             }
           });
-        }
+        },
       );
 
       this.defaultMode = actualDefinition.defaultMode;
@@ -286,10 +286,10 @@ export class Lexer {
           return error.message;
         });
         const allErrMessagesString = allErrMessages.join(
-          "-----------------------\n"
+          "-----------------------\n",
         );
         throw new Error(
-          "Errors detected in definition of Lexer:\n" + allErrMessagesString
+          "Errors detected in definition of Lexer:\n" + allErrMessagesString,
         );
       }
 
@@ -330,7 +330,7 @@ export class Lexer {
           this.createTokenInstance = this.createOffsetOnlyToken;
         } else {
           throw Error(
-            `Invalid <positionTracking> config option: "${this.config.positionTracking}"`
+            `Invalid <positionTracking> config option: "${this.config.positionTracking}"`,
           );
         }
 
@@ -352,16 +352,16 @@ export class Lexer {
             }
             return cannotBeOptimized;
           },
-          [] as string[]
+          [] as string[],
         );
 
         if (config.ensureOptimizations && !isEmpty(unOptimizedModes)) {
           throw Error(
             `Lexer Modes: < ${unOptimizedModes.join(
-              ", "
+              ", ",
             )} > cannot be optimized.\n` +
               '\t Disable the "ensureOptimizations" lexer config flag to silently ignore this and run the lexer in an un-optimized mode.\n' +
-              "\t Or inspect the console log for details on how to resolve these issues."
+              "\t Or inspect the console log for details on how to resolve these issues.",
           );
         }
       });
@@ -378,18 +378,18 @@ export class Lexer {
 
   public tokenize(
     text: string,
-    initialMode: string = this.defaultMode
+    initialMode: string = this.defaultMode,
   ): ILexingResult {
     if (!isEmpty(this.lexerDefinitionErrors)) {
       const allErrMessages = map(this.lexerDefinitionErrors, (error) => {
         return error.message;
       });
       const allErrMessagesString = allErrMessages.join(
-        "-----------------------\n"
+        "-----------------------\n",
       );
       throw new Error(
         "Unable to Tokenize because Errors detected in definition of Lexer:\n" +
-          allErrMessagesString
+          allErrMessagesString,
       );
     }
 
@@ -475,7 +475,7 @@ export class Lexer {
         // thus the pop is ignored, an error will be created and the lexer will continue parsing in the previous mode.
         const msg =
           this.config.errorMessageProvider.buildUnableToPopLexerModeMessage(
-            popToken
+            popToken,
           );
 
         errors.push({
@@ -554,7 +554,7 @@ export class Lexer {
             orgText,
             offset,
             matchedTokens,
-            groups
+            groups,
           );
           if (match !== null) {
             matchedImage = match[0];
@@ -589,7 +589,7 @@ export class Lexer {
                   orgText,
                   offset,
                   matchedTokens,
-                  groups
+                  groups,
                 );
                 if (match !== null) {
                   matchAltImage = match[0];
@@ -606,7 +606,7 @@ export class Lexer {
                 matchAltImage = this.match(
                   longerAltPattern as RegExp,
                   text,
-                  offset
+                  offset,
                 );
               }
 
@@ -639,7 +639,7 @@ export class Lexer {
             currConfig.tokenType,
             line,
             column,
-            imageLength
+            imageLength,
           );
 
           this.handlePayload(newToken, payload);
@@ -649,7 +649,7 @@ export class Lexer {
             matchedTokensIndex = this.addToken(
               matchedTokens,
               matchedTokensIndex,
-              newToken
+              newToken,
             );
           } else {
             groups[group].push(newToken);
@@ -684,7 +684,7 @@ export class Lexer {
               numOfLTsInMatch,
               line,
               column,
-              imageLength
+              imageLength,
             );
           }
         }
@@ -718,7 +718,7 @@ export class Lexer {
                   orgText,
                   offset,
                   matchedTokens,
-                  groups
+                  groups,
                 ) !== null;
             } else {
               this.updateLastIndex(currPattern as RegExp, offset);
@@ -738,7 +738,7 @@ export class Lexer {
           errorStartOffset,
           errLength,
           errorLine,
-          errorColumn
+          errorColumn,
         );
         errors.push({
           offset: errorStartOffset,
@@ -772,7 +772,7 @@ export class Lexer {
     config: IPatternConfig,
     pop_mode: (tok: IToken) => void,
     push_mode: (this: Lexer, pushMode: string) => void,
-    newToken: IToken
+    newToken: IToken,
   ) {
     if (config.pop === true) {
       // need to save the PUSH_MODE property as if the mode is popped
@@ -803,7 +803,7 @@ export class Lexer {
     numOfLTsInMatch: number,
     line: number,
     column: number,
-    imageLength: number
+    imageLength: number,
   ): void {
     let lastCharIsLT, fixForEndingInLT;
     if (group !== undefined) {
@@ -833,7 +833,7 @@ export class Lexer {
     image: string,
     startOffset: number,
     tokenTypeIdx: number,
-    tokenType: TokenType
+    tokenType: TokenType,
   ) {
     return {
       image,
@@ -849,7 +849,7 @@ export class Lexer {
     tokenTypeIdx: number,
     tokenType: TokenType,
     startLine: number,
-    startColumn: number
+    startColumn: number,
   ) {
     return {
       image,
@@ -868,7 +868,7 @@ export class Lexer {
     tokenType: TokenType,
     startLine: number,
     startColumn: number,
-    imageLength: number
+    imageLength: number,
   ): IToken {
     return {
       image,
@@ -888,13 +888,13 @@ export class Lexer {
   private addToken!: (
     tokenVector: IToken[],
     index: number,
-    tokenToAdd: IToken
+    tokenToAdd: IToken,
   ) => number;
 
   private addTokenUsingPush(
     tokenVector: IToken[],
     index: number,
-    tokenToAdd: IToken
+    tokenToAdd: IToken,
   ): number {
     tokenVector.push(tokenToAdd);
     return index;
@@ -903,7 +903,7 @@ export class Lexer {
   private addTokenUsingMemberAccess(
     tokenVector: IToken[],
     index: number,
-    tokenToAdd: IToken
+    tokenToAdd: IToken,
   ): number {
     tokenVector[index] = tokenToAdd;
     index++;
@@ -925,13 +925,13 @@ export class Lexer {
   private match!: (
     pattern: RegExp,
     text: string,
-    offset: number
+    offset: number,
   ) => string | null;
 
   private matchWithTest(
     pattern: RegExp,
     text: string,
-    offset: number
+    offset: number,
   ): string | null {
     const found = pattern.test(text);
     if (found === true) {

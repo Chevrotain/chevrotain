@@ -15,7 +15,7 @@ import { GAstVisitor, NonTerminal } from "@chevrotain/gast";
 import { assign, flatten, groupBy, map, some, values } from "lodash-es";
 
 export function buildModel(
-  productions: Record<string, Rule>
+  productions: Record<string, Rule>,
 ): CstNodeTypeDefinition[] {
   const generator = new CstNodeDefinitionGenerator();
   const allRules = values(productions);
@@ -89,7 +89,7 @@ class CstNodeDefinitionGenerator extends GAstVisitor {
   }
 
   visitRepetitionMandatoryWithSeparator(
-    node: RepetitionMandatoryWithSeparator
+    node: RepetitionMandatoryWithSeparator,
   ) {
     return this.visitEach(node.definition).concat({
       propertyName: node.separator.name,
@@ -134,11 +134,11 @@ class CstNodeDefinitionGenerator extends GAstVisitor {
 
   private visitEachAndOverrideWith(
     definition: IProduction[],
-    override: Partial<PropertyTupleElement>
+    override: Partial<PropertyTupleElement>,
   ) {
     return map(
       this.visitEach(definition),
-      (definition) => assign({}, definition, override) as PropertyTupleElement
+      (definition) => assign({}, definition, override) as PropertyTupleElement,
     );
   }
 
@@ -146,8 +146,8 @@ class CstNodeDefinitionGenerator extends GAstVisitor {
     return flatten<PropertyTupleElement>(
       map(
         definition,
-        (definition) => this.visit(definition) as PropertyTupleElement[]
-      )
+        (definition) => this.visit(definition) as PropertyTupleElement[],
+      ),
     );
   }
 }
@@ -159,7 +159,7 @@ type PropertyTupleElement = {
 };
 
 function getType(
-  production: Terminal | NonTerminal | TokenType
+  production: Terminal | NonTerminal | TokenType,
 ): TokenArrayType | RuleArrayType {
   if (production instanceof NonTerminal) {
     return {

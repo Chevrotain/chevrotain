@@ -32,11 +32,11 @@ export class TreeBuilder {
   // dynamically assigned Methods
   setNodeLocationFromNode: (
     nodeLocation: CstNodeLocation,
-    locationInformation: CstNodeLocation
+    locationInformation: CstNodeLocation,
   ) => void;
   setNodeLocationFromToken: (
     nodeLocation: CstNodeLocation,
-    locationInformation: CstNodeLocation
+    locationInformation: CstNodeLocation,
   ) => void;
   cstPostRule: (this: MixedInParser, ruleCstNode: CstNode) => void;
 
@@ -93,7 +93,7 @@ export class TreeBuilder {
         this.setInitialNodeLocation = noop;
       } else {
         throw Error(
-          `Invalid <nodeLocationTracking> config option: "${config.nodeLocationTracking}"`
+          `Invalid <nodeLocationTracking> config option: "${config.nodeLocationTracking}"`,
         );
       }
     }
@@ -101,7 +101,7 @@ export class TreeBuilder {
 
   setInitialNodeLocationOnlyOffsetRecovery(
     this: MixedInParser,
-    cstNode: any
+    cstNode: any,
   ): void {
     cstNode.location = {
       startOffset: NaN,
@@ -111,7 +111,7 @@ export class TreeBuilder {
 
   setInitialNodeLocationOnlyOffsetRegular(
     this: MixedInParser,
-    cstNode: any
+    cstNode: any,
   ): void {
     cstNode.location = {
       // without error recovery the starting Location of a new CstNode is guaranteed
@@ -204,7 +204,7 @@ export class TreeBuilder {
   cstPostTerminal(
     this: MixedInParser,
     key: string,
-    consumedToken: IToken
+    consumedToken: IToken,
   ): void {
     const rootCst = this.CST_STACK[this.CST_STACK.length - 1];
     addTerminalToCst(rootCst, consumedToken, key);
@@ -215,7 +215,7 @@ export class TreeBuilder {
   cstPostNonTerminal(
     this: MixedInParser,
     ruleCstResult: CstNode,
-    ruleName: string
+    ruleName: string,
   ): void {
     const preCstNode = this.CST_STACK[this.CST_STACK.length - 1];
     addNoneTerminalToCst(preCstNode, ruleName, ruleCstResult);
@@ -224,14 +224,14 @@ export class TreeBuilder {
   }
 
   getBaseCstVisitorConstructor<IN = any, OUT = any>(
-    this: MixedInParser
+    this: MixedInParser,
   ): {
     new (...args: any[]): ICstVisitor<IN, OUT>;
   } {
     if (isUndefined(this.baseCstVisitorConstructor)) {
       const newBaseCstVisitorConstructor = createBaseSemanticVisitorConstructor(
         this.className,
-        keys(this.gastProductionsCache)
+        keys(this.gastProductionsCache),
       );
       this.baseCstVisitorConstructor = newBaseCstVisitorConstructor;
       return newBaseCstVisitorConstructor;
@@ -241,7 +241,7 @@ export class TreeBuilder {
   }
 
   getBaseCstVisitorConstructorWithDefaults<IN = any, OUT = any>(
-    this: MixedInParser
+    this: MixedInParser,
   ): {
     new (...args: any[]): ICstVisitor<IN, OUT>;
   } {
@@ -249,7 +249,7 @@ export class TreeBuilder {
       const newConstructor = createBaseVisitorConstructorWithDefaults(
         this.className,
         keys(this.gastProductionsCache),
-        this.getBaseCstVisitorConstructor()
+        this.getBaseCstVisitorConstructor(),
       );
       this.baseCstVisitorWithDefaultsConstructor = newConstructor;
       return newConstructor;

@@ -30,7 +30,7 @@ onmessage = function (event) {
         parser,
         startRule,
         options,
-        parserConfig
+        parserConfig,
       );
       postMessage(0);
     } catch (e) {

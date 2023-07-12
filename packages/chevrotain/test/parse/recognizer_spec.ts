@@ -26,7 +26,7 @@ function defineRecognizerSpecs(
   contextName: string,
   createToken: (c: ITokenConfig) => TokenType,
   createTokenInstance: typeof createRegularToken,
-  tokenMatcher: TokenMatcher
+  tokenMatcher: TokenMatcher,
 ) {
   context("Recognizer  " + contextName, () => {
     let PlusTok: TokenType;
@@ -125,7 +125,7 @@ function defineRecognizerSpecs(
                 this.numbers += numFromCaller;
                 this.letters += charFromCaller;
               });
-            }
+            },
           );
 
           public subRule2 = this.RULE(
@@ -137,7 +137,7 @@ function defineRecognizerSpecs(
                 this.numbers += numFromCaller;
                 this.letters += charFromCaller;
               });
-            }
+            },
           );
         }
 
@@ -263,7 +263,7 @@ function defineRecognizerSpecs(
           this.parseQualifiedName,
           {
             recoveryValueFunc: () => ["666"],
-          }
+          },
         );
 
         private parseQualifiedName(): string[] {
@@ -298,7 +298,7 @@ function defineRecognizerSpecs(
           this.parseQualifiedName,
           {
             recoveryValueFunc: () => ["333"],
-          }
+          },
         );
 
         private parseQualifiedName(): string[] {
@@ -332,7 +332,7 @@ function defineRecognizerSpecs(
 
         public qualifiedName = this.RULE(
           "qualifiedName",
-          this.parseQualifiedName
+          this.parseQualifiedName,
         );
         public identifier = this.RULE("identifier", this.parseIdentifier);
         public idents: string[] = [];
@@ -377,7 +377,7 @@ function defineRecognizerSpecs(
           this.parseQualifiedName,
           {
             recoveryValueFunc: () => ["777"],
-          }
+          },
         );
 
         private parseQualifiedName(): string[] {
@@ -413,7 +413,7 @@ function defineRecognizerSpecs(
           this.parseQualifiedName,
           {
             recoveryValueFunc: () => ["999"],
-          }
+          },
         );
 
         private parseQualifiedName(): string[] {
@@ -459,7 +459,7 @@ function defineRecognizerSpecs(
         const parser: any = new EmbeddedActionsParser([PlusTok], {});
         parser.isBackTrackingStack.push(1);
         expect(parser.shouldInRepetitionRecoveryBeTried(MinusTok, 1)).to.equal(
-          false
+          false,
         );
       });
 
@@ -705,22 +705,23 @@ function defineRecognizerSpecs(
     describe("The BaseRecognizer", () => {
       it("Cannot be initialized with a token vector (pre v4.0 API) ", () => {
         expect(
-          () => new EmbeddedActionsParser([createTokenInstance(PlusTok)] as any)
+          () =>
+            new EmbeddedActionsParser([createTokenInstance(PlusTok)] as any),
         ).to.throw(
-          "The Parser constructor no longer accepts a token vector as the first argument"
+          "The Parser constructor no longer accepts a token vector as the first argument",
         );
       });
 
       it("Cannot be initialized with a serializedGrammar property (pre v6.0 API)", () => {
         const config: any = { serializedGrammar: {} };
         expect(() => new EmbeddedActionsParser([], config)).to.throw(
-          "The Parser's configuration can no longer contain a <serializedGrammar> property."
+          "The Parser's configuration can no longer contain a <serializedGrammar> property.",
         );
       });
 
       it("Cannot be initialized with an empty Token vocabulary", () => {
         expect(() => new EmbeddedActionsParser([])).to.throw(
-          "A Token Vocabulary cannot be empty"
+          "A Token Vocabulary cannot be empty",
         );
       });
 
@@ -742,16 +743,16 @@ function defineRecognizerSpecs(
 
         expect(() => new SkipValidationsParser(true)).to.not.throw();
         expect(() => new SkipValidationsParser(false)).to.throw(
-          "Parser Definition Errors detected:"
+          "Parser Definition Errors detected:",
         );
       });
 
       it("can only SAVE_ERROR for recognition exceptions", () => {
         const parser: any = new EmbeddedActionsParser([IntTok]);
         expect(() =>
-          parser.SAVE_ERROR(new Error("I am some random Error"))
+          parser.SAVE_ERROR(new Error("I am some random Error")),
         ).to.throw(
-          "Trying to save an Error which is not a RecognitionException"
+          "Trying to save an Error which is not a RecognitionException",
         );
         expect(parser.input).to.be.an.instanceof(Array);
       });
@@ -822,16 +823,16 @@ function defineRecognizerSpecs(
           },
           () => {
             return true;
-          }
+          },
         );
         expect(() => backTrackingThrows.call(parser)).to.throw(
-          "division by zero, boom"
+          "division by zero, boom",
         );
 
         const throwsRecogError = () => {
           throw new NotAllInputParsedException(
             "sad sad panda",
-            createTokenInstance(PlusTok)
+            createTokenInstance(PlusTok),
           );
         };
         const backTrackingFalse = parser.BACKTRACK(throwsRecogError, () => {
@@ -859,7 +860,7 @@ function defineRecognizerSpecs(
         expect(() => {
           new WrongOrderOfSelfAnalysisParser().input = [];
         }).to.throw(
-          `Missing <performSelfAnalysis> invocation at the end of the Parser's constructor.`
+          `Missing <performSelfAnalysis> invocation at the end of the Parser's constructor.`,
         );
       });
 
@@ -880,7 +881,7 @@ function defineRecognizerSpecs(
         }
 
         expect(() => new WrongOrderOfSelfAnalysisParser()).to.throw(
-          "Grammar rule <badRule> may not be defined after the 'performSelfAnalysis' method has been called"
+          "Grammar rule <badRule> may not be defined after the 'performSelfAnalysis' method has been called",
         );
       });
 
@@ -901,7 +902,7 @@ function defineRecognizerSpecs(
         }
 
         expect(() => new WrongOrderOfSelfAnalysisParser()).to.throw(
-          "Grammar rule <badRule> may not be defined after the 'performSelfAnalysis' method has been called"
+          "Grammar rule <badRule> may not be defined after the 'performSelfAnalysis' method has been called",
         );
       });
 
@@ -1047,7 +1048,7 @@ function defineRecognizerSpecs(
             },
             {
               resyncEnabled: false,
-            }
+            },
           );
         }
         const parser: any = new RethrowOtherErrors([
@@ -1123,7 +1124,7 @@ function defineRecognizerSpecs(
         parser.myStatement();
         expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException);
         expect(parser.errors[0].message).to.equal(
-          "expecting semiColon at end of myStatement"
+          "expecting semiColon at end of myStatement",
         );
         expect(parser.errors[0].context.ruleStack).to.deep.equal([
           "myStatement",
@@ -1156,7 +1157,7 @@ function defineRecognizerSpecs(
         parser.myStatement();
         expect(parser.errors[0]).to.be.an.instanceof(NoViableAltException);
         expect(parser.errors[0].message).to.include(
-          "None of the alternatives matched"
+          "None of the alternatives matched",
         );
         expect(parser.errors[0].context.ruleStack).to.deep.equal([
           "myStatement",
@@ -1350,7 +1351,7 @@ function defineRecognizerSpecs(
         parser.rule();
         expect(parser.errors[0]).to.be.an.instanceof(EarlyExitException);
         expect(parser.errors[0].message).to.contain(
-          "expecting at least one iteration"
+          "expecting at least one iteration",
         );
         expect(parser.errors[0].message).to.contain("MinusTok");
         expect(parser.errors[0].message).to.contain("+");
@@ -1445,7 +1446,7 @@ function defineRecognizerSpecs(
         parser.rule();
         expect(parser.errors[0]).to.be.an.instanceof(EarlyExitException);
         expect(parser.errors[0].message).to.contain(
-          "expecting at least one iteration"
+          "expecting at least one iteration",
         );
         expect(parser.errors[0].message).to.contain("MinusTok");
         expect(parser.errors[0].message).to.contain("+");
@@ -1560,11 +1561,11 @@ function defineRecognizerSpecs(
               ruleStack: ["topRule", "rule2"],
               occurrenceStack: [1, 4],
             },
-          ]
+          ],
         );
 
         expect(() =>
-          parser.computeContentAssist("invalid_rule_name", [])
+          parser.computeContentAssist("invalid_rule_name", []),
         ).to.throw("does not exist in this grammar");
       });
     });
@@ -1575,5 +1576,5 @@ defineRecognizerSpecs(
   "Regular Tokens Mode",
   createToken,
   createRegularToken,
-  tokenStructuredMatcher
+  tokenStructuredMatcher,
 );

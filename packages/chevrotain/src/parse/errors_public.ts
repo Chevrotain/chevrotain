@@ -51,21 +51,21 @@ export const defaultParserErrorProvider: IParserErrorMessageProvider = {
       const allLookAheadPaths = reduce(
         expectedPathsPerAlt,
         (result, currAltPaths) => result.concat(currAltPaths),
-        [] as TokenType[][]
+        [] as TokenType[][],
       );
       const nextValidTokenSequences = map(
         allLookAheadPaths,
         (currPath) =>
           `[${map(currPath, (currTokenType) => tokenLabel(currTokenType)).join(
-            ", "
-          )}]`
+            ", ",
+          )}]`,
       );
       const nextValidSequenceItems = map(
         nextValidTokenSequences,
-        (itemMsg, idx) => `  ${idx + 1}. ${itemMsg}`
+        (itemMsg, idx) => `  ${idx + 1}. ${itemMsg}`,
       );
       const calculatedDescription = `one of these possible Token sequences:\n${nextValidSequenceItems.join(
-        "\n"
+        "\n",
       )}`;
 
       return errPrefix + calculatedDescription + errSuffix;
@@ -90,8 +90,8 @@ export const defaultParserErrorProvider: IParserErrorMessageProvider = {
         expectedIterationPaths,
         (currPath) =>
           `[${map(currPath, (currTokenType) => tokenLabel(currTokenType)).join(
-            ","
-          )}]`
+            ",",
+          )}]`,
       );
       const calculatedDescription =
         `expecting at least one iteration which starts with one of these possible Token sequences::\n  ` +
@@ -108,7 +108,7 @@ export const defaultGrammarResolverErrorProvider: IGrammarResolverErrorMessagePr
   {
     buildRuleNotFoundError(
       topLevelRule: Rule,
-      undefinedRule: NonTerminal
+      undefinedRule: NonTerminal,
     ): string {
       const msg =
         "Invalid grammar, reference to a rule which is not defined: ->" +
@@ -125,10 +125,10 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
   {
     buildDuplicateFoundError(
       topLevelRule: Rule,
-      duplicateProds: IProductionWithOccurrence[]
+      duplicateProds: IProductionWithOccurrence[],
     ): string {
       function getExtraProductionArgument(
-        prod: IProductionWithOccurrence
+        prod: IProductionWithOccurrence,
       ): string {
         if (prod instanceof Terminal) {
           return prod.terminalType.name;
@@ -180,13 +180,13 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
       alternation: Alternation;
     }): string {
       const pathMsg = map(options.prefixPath, (currTok) =>
-        tokenLabel(currTok)
+        tokenLabel(currTok),
       ).join(", ");
       const occurrence =
         options.alternation.idx === 0 ? "" : options.alternation.idx;
       const errMsg =
         `Ambiguous alternatives: <${options.ambiguityIndices.join(
-          " ,"
+          " ,",
         )}> due to common lookahead prefix\n` +
         `in <OR${occurrence}> inside <${options.topLevelRule.name}> Rule,\n` +
         `<${pathMsg}> may appears as a prefix path in all these alternatives.\n` +
@@ -203,13 +203,13 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
       alternation: Alternation;
     }): string {
       const pathMsg = map(options.prefixPath, (currtok) =>
-        tokenLabel(currtok)
+        tokenLabel(currtok),
       ).join(", ");
       const occurrence =
         options.alternation.idx === 0 ? "" : options.alternation.idx;
       let currMessage =
         `Ambiguous Alternatives Detected: <${options.ambiguityIndices.join(
-          " ,"
+          " ,",
         )}> in <OR${occurrence}>` +
         ` inside <${options.topLevelRule.name}> Rule,\n` +
         `<${pathMsg}> may appears as a prefix path in all these alternatives.\n`;
@@ -282,7 +282,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
       const ruleName = options.topLevelRule.name;
       const pathNames = map(
         options.leftRecursionPath,
-        (currRule) => currRule.name
+        (currRule) => currRule.name,
       );
       const leftRecursivePath = `${ruleName} --> ${pathNames
         .concat([ruleName])

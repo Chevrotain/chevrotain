@@ -26,7 +26,7 @@ describe("Chevrotain's Lexer Init Performance Tracing", () => {
     expect(consoleLogSpy).to.have.been.called;
     expect(consoleLogSpy.args[0][0]).to.include("--> <Lexer Constructor>");
     expect(consoleLogSpy.args[1][0]).to.include(
-      "\t--> <Lexer Config handling>"
+      "\t--> <Lexer Config handling>",
     );
   });
 

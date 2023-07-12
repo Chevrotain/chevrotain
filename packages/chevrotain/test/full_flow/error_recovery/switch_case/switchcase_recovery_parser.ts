@@ -57,7 +57,7 @@ export class SwitchCaseRecoveryParser extends EmbeddedActionsParser {
       { ...allTokens },
       {
         recoveryEnabled: true,
-      }
+      },
     );
     this.performSelfAnalysis();
   }
@@ -88,7 +88,7 @@ export class SwitchCaseRecoveryParser extends EmbeddedActionsParser {
   public canTokenTypeBeInsertedInRecovery(tokType: TokenType) {
     return !includes(
       this.tokTypesThatCannotBeInsertedInRecovery,
-      tokType as unknown
+      tokType as unknown,
     );
   }
 

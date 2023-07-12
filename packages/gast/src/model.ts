@@ -18,7 +18,7 @@ function tokenLabel(tokType: TokenType): string {
 
 // TODO: duplicated code to avoid extracting another sub-package -- how to avoid?
 function hasTokenLabel(
-  obj: TokenType
+  obj: TokenType,
 ): obj is TokenType & Pick<Required<TokenType>, "LABEL"> {
   return isString(obj.LABEL) && obj.LABEL !== "";
 }
@@ -61,7 +61,7 @@ export class NonTerminal
     super([]);
     assign(
       this,
-      pickBy(options, (v) => v !== undefined)
+      pickBy(options, (v) => v !== undefined),
     );
   }
 
@@ -94,7 +94,7 @@ export class Rule extends AbstractProduction {
     super(options.definition);
     assign(
       this,
-      pickBy(options, (v) => v !== undefined)
+      pickBy(options, (v) => v !== undefined),
     );
   }
 }
@@ -109,7 +109,7 @@ export class Alternative extends AbstractProduction {
     super(options.definition);
     assign(
       this,
-      pickBy(options, (v) => v !== undefined)
+      pickBy(options, (v) => v !== undefined),
     );
   }
 }
@@ -129,7 +129,7 @@ export class Option
     super(options.definition);
     assign(
       this,
-      pickBy(options, (v) => v !== undefined)
+      pickBy(options, (v) => v !== undefined),
     );
   }
 }
@@ -149,7 +149,7 @@ export class RepetitionMandatory
     super(options.definition);
     assign(
       this,
-      pickBy(options, (v) => v !== undefined)
+      pickBy(options, (v) => v !== undefined),
     );
   }
 }
@@ -170,7 +170,7 @@ export class RepetitionMandatoryWithSeparator
     super(options.definition);
     assign(
       this,
-      pickBy(options, (v) => v !== undefined)
+      pickBy(options, (v) => v !== undefined),
     );
   }
 }
@@ -191,7 +191,7 @@ export class Repetition
     super(options.definition);
     assign(
       this,
-      pickBy(options, (v) => v !== undefined)
+      pickBy(options, (v) => v !== undefined),
     );
   }
 }
@@ -212,7 +212,7 @@ export class RepetitionWithSeparator
     super(options.definition);
     assign(
       this,
-      pickBy(options, (v) => v !== undefined)
+      pickBy(options, (v) => v !== undefined),
     );
   }
 }
@@ -243,7 +243,7 @@ export class Alternation
     super(options.definition);
     assign(
       this,
-      pickBy(options, (v) => v !== undefined)
+      pickBy(options, (v) => v !== undefined),
     );
   }
 }
@@ -260,7 +260,7 @@ export class Terminal implements IProductionWithOccurrence {
   }) {
     assign(
       this,
-      pickBy(options, (v) => v !== undefined)
+      pickBy(options, (v) => v !== undefined),
     );
   }
 

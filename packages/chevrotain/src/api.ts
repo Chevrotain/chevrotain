@@ -71,7 +71,7 @@ export function clearCache() {
   console.warn(
     "The clearCache function was 'soft' removed from the Chevrotain API." +
       "\n\t It performs no action other than printing this message." +
-      "\n\t Please avoid using it as it will be completely removed in the future"
+      "\n\t Please avoid using it as it will be completely removed in the future",
   );
 }
 
@@ -81,7 +81,7 @@ export class Parser {
   constructor() {
     throw new Error(
       "The Parser class has been deprecated, use CstParser or EmbeddedActionsParser instead.\t\n" +
-        "See: https://chevrotain.io/docs/changes/BREAKING_CHANGES.html#_7-0-0"
+        "See: https://chevrotain.io/docs/changes/BREAKING_CHANGES.html#_7-0-0",
     );
   }
 }

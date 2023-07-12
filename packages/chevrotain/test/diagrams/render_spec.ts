@@ -44,7 +44,7 @@ describe("The Chevrotain diagrams rendering APIs", function () {
           done(e);
         }
       },
-      false
+      false,
     );
   });
 
@@ -74,7 +74,7 @@ describe("The Chevrotain diagrams rendering APIs", function () {
           done(e);
         }
       },
-      false
+      false,
     );
   });
 });

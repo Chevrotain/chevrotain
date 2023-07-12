@@ -8,7 +8,7 @@ describe("The Chevrotain Lexer First Char Optimization", () => {
     const firstChars = firstCharOptimizedIndices(
       ast.value,
       {},
-      ast.flags.ignoreCase
+      ast.flags.ignoreCase,
     );
     expect(firstChars).to.deep.equal([65, 97]);
   });
@@ -18,7 +18,7 @@ describe("The Chevrotain Lexer First Char Optimization", () => {
     const firstChars = firstCharOptimizedIndices(
       ast.value,
       {},
-      ast.flags.ignoreCase
+      ast.flags.ignoreCase,
     );
     expect(firstChars).to.deep.equal([65, 66, 97, 98]);
   });
@@ -28,7 +28,7 @@ describe("The Chevrotain Lexer First Char Optimization", () => {
     const firstChars = firstCharOptimizedIndices(
       ast.value,
       {},
-      ast.flags.ignoreCase
+      ast.flags.ignoreCase,
     );
     expect(firstChars).to.deep.equal([256, 257, 258, 259]);
   });
@@ -38,7 +38,7 @@ describe("The Chevrotain Lexer First Char Optimization", () => {
     const firstChars = firstCharOptimizedIndices(
       ast.value,
       {},
-      ast.flags.ignoreCase
+      ast.flags.ignoreCase,
     );
     expect(firstChars).to.deep.equal([255, 256, 257, 258, 259]);
   });

@@ -14,7 +14,10 @@ export interface IRange {
 }
 
 export class Range implements IRange {
-  constructor(public start: number, public end: number) {
+  constructor(
+    public start: number,
+    public end: number,
+  ) {
     if (!isValidRange(start, end)) {
       throw new Error("INVALID RANGE");
     }

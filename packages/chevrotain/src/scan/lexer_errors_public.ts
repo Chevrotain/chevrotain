@@ -10,11 +10,11 @@ export const defaultLexerErrorProvider: ILexerErrorMessageProvider = {
     startOffset: number,
     length: number,
     line?: number,
-    column?: number
+    column?: number,
   ): string {
     return (
       `unexpected character: ->${fullText.charAt(
-        startOffset
+        startOffset,
       )}<- at offset: ${startOffset},` + ` skipped ${length} characters.`
     );
   },

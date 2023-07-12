@@ -78,7 +78,7 @@ export class Recoverable {
       NaN,
       NaN,
       NaN,
-      NaN
+      NaN,
     );
     tokToInsert.isInsertedInRecovery = true;
     return tokToInsert;
@@ -97,7 +97,7 @@ export class Recoverable {
     grammarRule: Function,
     grammarRuleArgs: any[],
     lookAheadFunc: () => boolean,
-    expectedTokType: TokenType
+    expectedTokType: TokenType,
   ): void {
     // TODO: can the resyncTokenType be cached?
     const reSyncTokType = this.findReSyncTokenType();
@@ -121,7 +121,7 @@ export class Recoverable {
       const error = new MismatchedTokenException(
         msg,
         nextTokenWithoutResync,
-        this.LA(0)
+        this.LA(0),
       );
       // the first token here will be the original cause of the error, this is not part of the resyncedTokens property.
       error.resyncedTokens = dropRight(resyncedTokens);
@@ -157,7 +157,7 @@ export class Recoverable {
     this: MixedInParser,
     expectTokAfterLastMatch: TokenType,
     nextTokIdx: number,
-    notStuck: boolean | undefined
+    notStuck: boolean | undefined,
   ): boolean {
     // Edge case of arriving from a MANY repetition which is stuck
     // Attempting recovery in this case could cause an infinite loop
@@ -182,7 +182,7 @@ export class Recoverable {
     if (
       this.canPerformInRuleRecovery(
         expectTokAfterLastMatch,
-        this.getFollowsForInRuleRecovery(expectTokAfterLastMatch, nextTokIdx)
+        this.getFollowsForInRuleRecovery(expectTokAfterLastMatch, nextTokIdx),
       )
     ) {
       return false;
@@ -195,7 +195,7 @@ export class Recoverable {
   getFollowsForInRuleRecovery(
     this: MixedInParser,
     tokType: TokenType,
-    tokIdxInRule: number
+    tokIdxInRule: number,
   ): TokenType[] {
     const grammarPath = this.getCurrentGrammarPath(tokType, tokIdxInRule);
     const follows = this.getNextPossibleTokenTypes(grammarPath);
@@ -205,7 +205,7 @@ export class Recoverable {
   tryInRuleRecovery(
     this: MixedInParser,
     expectedTokType: TokenType,
-    follows: TokenType[]
+    follows: TokenType[],
   ): IToken {
     if (this.canRecoverWithSingleTokenInsertion(expectedTokType, follows)) {
       const tokToInsert = this.getTokenToInsert(expectedTokType);
@@ -224,7 +224,7 @@ export class Recoverable {
   canPerformInRuleRecovery(
     this: MixedInParser,
     expectedToken: TokenType,
-    follows: TokenType[]
+    follows: TokenType[],
   ): boolean {
     return (
       this.canRecoverWithSingleTokenInsertion(expectedToken, follows) ||
@@ -235,7 +235,7 @@ export class Recoverable {
   canRecoverWithSingleTokenInsertion(
     this: MixedInParser,
     expectedTokType: TokenType,
-    follows: TokenType[]
+    follows: TokenType[],
   ): boolean {
     if (!this.canTokenTypeBeInsertedInRecovery(expectedTokType)) {
       return false;
@@ -257,7 +257,7 @@ export class Recoverable {
 
   canRecoverWithSingleTokenDeletion(
     this: MixedInParser,
-    expectedTokType: TokenType
+    expectedTokType: TokenType,
   ): boolean {
     if (!this.canTokenTypeBeDeletedInRecovery(expectedTokType)) {
       return false;
@@ -265,14 +265,14 @@ export class Recoverable {
 
     const isNextTokenWhatIsExpected = this.tokenMatcher(
       this.LA(2),
-      expectedTokType
+      expectedTokType,
     );
     return isNextTokenWhatIsExpected;
   }
 
   isInCurrentRuleReSyncSet(
     this: MixedInParser,
-    tokenTypeIdx: TokenType
+    tokenTypeIdx: TokenType,
   ): boolean {
     const followKey = this.getCurrFollowKey();
     const currentRuleReSyncSet = this.getFollowSetFromFollowKey(followKey);
@@ -338,7 +338,7 @@ export class Recoverable {
 
   getFollowSetFromFollowKey(
     this: MixedInParser,
-    followKey: IFollowKey
+    followKey: IFollowKey,
   ): TokenType[] {
     if (followKey === EOF_FOLLOW_KEY) {
       return [EOF];
@@ -355,7 +355,7 @@ export class Recoverable {
   addToResyncTokens(
     this: MixedInParser,
     token: IToken,
-    resyncTokens: IToken[]
+    resyncTokens: IToken[],
   ): IToken[] {
     if (!this.tokenMatcher(token, EOF)) {
       resyncTokens.push(token);
@@ -382,7 +382,7 @@ export class Recoverable {
     dslMethodIdx: number,
     prodOccurrence: number,
     nextToksWalker: typeof AbstractNextTerminalAfterProductionWalker,
-    notStuck?: boolean
+    notStuck?: boolean,
   ): void {
     // by default this is a NO-OP
     // The actual implementation is with the function(not method) below
@@ -391,7 +391,7 @@ export class Recoverable {
   getCurrentGrammarPath(
     this: MixedInParser,
     tokType: TokenType,
-    tokIdxInRule: number
+    tokIdxInRule: number,
   ): ITokenGrammarPath {
     const pathRuleStack: string[] = this.getHumanReadableRuleStack();
     const pathOccurrenceStack: number[] = clone(this.RULE_OCCURRENCE_STACK);
@@ -406,7 +406,7 @@ export class Recoverable {
   }
   getHumanReadableRuleStack(this: MixedInParser): string[] {
     return map(this.RULE_STACK, (currShortName) =>
-      this.shortRuleNameToFullName(currShortName)
+      this.shortRuleNameToFullName(currShortName),
     );
   }
 }
@@ -419,7 +419,7 @@ export function attemptInRepetitionRecovery(
   dslMethodIdx: number,
   prodOccurrence: number,
   nextToksWalker: typeof AbstractNextTerminalAfterProductionWalker,
-  notStuck?: boolean
+  notStuck?: boolean,
 ): void {
   const key = this.getKeyForAutomaticLookahead(dslMethodIdx, prodOccurrence);
   let firstAfterRepInfo = this.firstAfterRepMap[key];
@@ -457,7 +457,7 @@ export function attemptInRepetitionRecovery(
     this.shouldInRepetitionRecoveryBeTried(
       expectTokAfterLastMatch,
       nextTokIdx,
-      notStuck
+      notStuck,
     )
   ) {
     // TODO: performance optimization: instead of passing the original args here, we modify
@@ -467,7 +467,7 @@ export function attemptInRepetitionRecovery(
       prodFunc,
       args,
       lookaheadFunc,
-      expectTokAfterLastMatch
+      expectTokAfterLastMatch,
     );
   }
 }

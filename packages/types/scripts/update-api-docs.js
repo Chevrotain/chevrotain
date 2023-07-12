@@ -13,7 +13,7 @@ const version = pkg.version;
 const noDotsVersion = version.replace(/\./g, "_");
 const newVersionApiDocsDir = join(
   __dirname,
-  "../gh-pages/documentation/" + noDotsVersion
+  "../gh-pages/documentation/" + noDotsVersion,
 );
 
 try {
@@ -30,14 +30,14 @@ try {
 // Update redirect to latest docs
 const docsIndexHtmlPath = join(
   __dirname,
-  "../gh-pages/documentation/index.html"
+  "../gh-pages/documentation/index.html",
 );
 const docsIndexHtmlString = fs
   .readFileSync(docsIndexHtmlPath, "utf8")
   .toString();
 const bumpedDocsIndexHtmlString = docsIndexHtmlString.replace(
   /\d+_\d+_\d+/,
-  noDotsVersion
+  noDotsVersion,
 );
 fs.writeFileSync(docsIndexHtmlPath, bumpedDocsIndexHtmlString);
 

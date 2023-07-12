@@ -59,7 +59,7 @@ class ECMAScript5Parser extends ChevrotainParser {
             { ALT: () => $.SUBRULE($.ArrayLiteral) },
             { ALT: () => $.SUBRULE($.ObjectLiteral) },
             { ALT: () => $.SUBRULE($.ParenthesisExpression) },
-          ])
+          ]),
       );
     });
 
@@ -245,7 +245,7 @@ class ECMAScript5Parser extends ChevrotainParser {
                   { ALT: () => $.CONSUME(t.Minus) },
                   { ALT: () => $.CONSUME(t.Tilde) },
                   { ALT: () => $.CONSUME(t.Exclamation) },
-                ])
+                ]),
             );
             $.SUBRULE($.UnaryExpression);
           },
@@ -275,7 +275,7 @@ class ECMAScript5Parser extends ChevrotainParser {
                 ALT: () => $.CONSUME(t.AbsMultiplicativeOperator),
               },
               { ALT: () => $.CONSUME(t.AbsAdditiveOperator) },
-            ])
+            ]),
         );
         $.SUBRULE2($.UnaryExpression);
       });
@@ -302,7 +302,7 @@ class ECMAScript5Parser extends ChevrotainParser {
                 ALT: () => $.CONSUME(t.AbsMultiplicativeOperator),
               },
               { ALT: () => $.CONSUME(t.AbsAdditiveOperator) },
-            ])
+            ]),
         );
         $.SUBRULE2($.UnaryExpression);
       });
@@ -371,7 +371,7 @@ class ECMAScript5Parser extends ChevrotainParser {
             { ALT: () => $.SUBRULE($.ThrowStatement) },
             { ALT: () => $.SUBRULE($.TryStatement) },
             { ALT: () => $.SUBRULE($.DebuggerStatement) },
-          ])
+          ]),
       );
     });
 
@@ -568,7 +568,7 @@ class ECMAScript5Parser extends ChevrotainParser {
             },
           },
         ]);
-      }
+      },
     );
 
     // See 12.7
@@ -684,9 +684,9 @@ class ECMAScript5Parser extends ChevrotainParser {
         // happening in this case because that type of recovery can only happen if CONSUME(...) was invoked.
         this.SAVE_ERROR(
           new chevrotain.exceptions.MismatchedTokenException(
-            "Line Terminator not allowed before Expression in Throw Statement"
+            "Line Terminator not allowed before Expression in Throw Statement",
             // TODO: create line terminator token on the fly?
-          )
+          ),
         );
       }
       $.SUBRULE($.Expression);

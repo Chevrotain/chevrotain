@@ -22,15 +22,15 @@ describe("Chevrotain's Lexer Init Performance Tracing", () => {
     const consoleArgs = flatten(consoleLogSpy.args);
 
     const runtimeChecksArg = find(consoleArgs, (item: string) =>
-      /performRuntimeChecks/.test(item)
+      /performRuntimeChecks/.test(item),
     );
     expect(runtimeChecksArg).to.not.be.undefined;
     const warningRuntimeChecksAra = find(consoleArgs, (item: string) =>
-      /performWarningRuntimeChecks/.test(item)
+      /performWarningRuntimeChecks/.test(item),
     );
     expect(warningRuntimeChecksAra).to.not.be.undefined;
     const validateArg = find(consoleArgs, (item: string) =>
-      /validatePatterns/.test(item)
+      /validatePatterns/.test(item),
     );
     expect(validateArg).to.not.be.undefined;
   });
@@ -42,15 +42,15 @@ describe("Chevrotain's Lexer Init Performance Tracing", () => {
     const consoleArgs = flatten(consoleLogSpy.args);
 
     const runtimeChecksArg = find(consoleArgs, (item: string) =>
-      /performRuntimeChecks/.test(item)
+      /performRuntimeChecks/.test(item),
     );
     expect(runtimeChecksArg).to.be.undefined;
     const warningRuntimeChecksAra = find(consoleArgs, (item: string) =>
-      /performWarningRuntimeChecks/.test(item)
+      /performWarningRuntimeChecks/.test(item),
     );
     expect(warningRuntimeChecksAra).to.be.undefined;
     const validateArg = find(consoleArgs, (item: string) =>
-      /validatePatterns/.test(item)
+      /validatePatterns/.test(item),
     );
     expect(validateArg).to.be.undefined;
   });

@@ -74,6 +74,6 @@ describe("The Official Content Assist Feature example Example", () => {
           .to.have.members(["function"])
           .and.to.have.lengthOf(1);
       });
-    }
+    },
   );
 });
