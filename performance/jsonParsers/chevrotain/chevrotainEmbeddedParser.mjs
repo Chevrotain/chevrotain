@@ -1,6 +1,7 @@
 // importing from globals currently,
-// TODO: replace with ESM imports...
-const { createToken, Lexer, EmbeddedActionsParser } = chevrotain;
+import { createToken, Lexer, EmbeddedActionsParser } from "https://unpkg.com/chevrotain/lib/chevrotain.min.mjs"
+
+export { JsonParser, jsonLexer}
 
 // ----------------- Lexer -----------------
 const True = createToken({ name: "True", pattern: "true" });
@@ -43,14 +44,11 @@ const jsonTokens = [
   Null,
 ];
 // Tracking only the offset provides a small speed boost.
-const ChevJsonLexer = new Lexer(jsonTokens, { positionTracking: "onlyOffset" });
+const jsonLexer = new Lexer(jsonTokens, { positionTracking: "onlyOffset" });
 
 // ----------------- parser -----------------
 
-// https://chevrotain.io/docs/guide/performance.html#using-a-singleton-parser
-// (Do not create a new Parser instance for each new input.)
-
-class ChevrotainJsonParser extends EmbeddedActionsParser {
+class JsonParser extends EmbeddedActionsParser {
   constructor(options) {
     super(jsonTokens, options);
 
