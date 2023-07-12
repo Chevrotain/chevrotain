@@ -1,17 +1,24 @@
 <!DOCTYPE html>
 <!--100vh needed for IE 11 (maybe others too) otherwise html.height will return 3 -->
 <html style="height: 100vh">
-
-<head lang="en">
-    <link rel="icon"
-          type="image/jpeg"
-          href="../photos/chevrotain.jpg">
-    <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="https://unpkg.com/chevrotain/diagrams/diagrams.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="CSS/gh-fork-ribbon.css">
-    <link rel="stylesheet" href="../bower_components/CodeMirror/lib/codemirror.css">
-    <link rel="stylesheet" type="text/css" href="CSS/playground.css">
+  <head lang="en">
+    <link rel="icon" type="image/jpeg" href="../photos/chevrotain.jpg" />
+    <meta charset="UTF-8" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://unpkg.com/chevrotain/diagrams/diagrams.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css"
+    />
+    <link rel="stylesheet" type="text/css" href="CSS/gh-fork-ribbon.css" />
+    <link
+      rel="stylesheet"
+      href="../bower_components/CodeMirror/lib/codemirror.css"
+    />
+    <link rel="stylesheet" type="text/css" href="CSS/playground.css" />
 
     <script src="../bower_components/lodash/lodash.js"></script>
     <script src="../bower_components/jquery/dist/jquery.js"></script>
@@ -35,177 +42,201 @@
     <script src="https://unpkg.com/chevrotain/diagrams/src/diagrams_behavior.js"></script>
 
     <title>Playground</title>
-</head>
-<body style="background-color: #f1f1f1; margin-left: 0.7vh; margin-right:0.7vh">
-
-<div class="github-fork-ribbon-wrapper right">
-    <div class="github-fork-ribbon ">
+  </head>
+  <body
+    style="background-color: #f1f1f1; margin-left: 0.7vh; margin-right: 0.7vh"
+  >
+    <div class="github-fork-ribbon-wrapper right">
+      <div class="github-fork-ribbon">
         <a href="https://github.com/Chevrotain/chevrotain">Fork me on GitHub</a>
+      </div>
     </div>
-</div>
 
-<div id="left" class="sideEditor leftSide">
-    <div id="impel" class="card" style="width: 100%; overflow:hidden; height: 76vh">
+    <div id="left" class="sideEditor leftSide">
+      <div
+        id="impel"
+        class="card"
+        style="width: 100%; overflow: hidden; height: 76vh"
+      >
         <div class="boxHeader">
-            <h1>Parser</h1>
+          <h1>Parser</h1>
 
-            <div style="float: right;">
-                <h3 style="float: left;">Grammar:</h3>
-                <label for="example-choice"></label>
-                <select id="example-choice" class="select"></select>
-            </div>
+          <div style="float: right">
+            <h3 style="float: left">Grammar:</h3>
+            <label for="example-choice"></label>
+            <select id="example-choice" class="select"></select>
+          </div>
         </div>
         <label for="parserImplementationEditor"></label>
         <textarea id="parserImplementationEditor"></textarea>
-    </div>
+      </div>
 
-    <div class="horizontalSeparator"
-         onmousedown="startVerticalLeft(event)">
+      <div class="horizontalSeparator" onmousedown="startVerticalLeft(event)">
         <i class="fa fa-ellipsis-h horizontalDragHandle"> </i>
-    </div>
+      </div>
 
-    <div id="input" class="card" style="width: 100%; overflow: hidden; height: 21vh">
+      <div
+        id="input"
+        class="card"
+        style="width: 100%; overflow: hidden; height: 21vh"
+      >
         <div class="boxHeader">
-            <h1>Input</h1>
+          <h1>Input</h1>
 
-            <div style="float: right">
-                <h3 style="float: left">Sample:</h3>
-                <label for="samples-choice"></label>
-                <select id="samples-choice" class="select"></select>
-            </div>
+          <div style="float: right">
+            <h3 style="float: left">Sample:</h3>
+            <label for="samples-choice"></label>
+            <select id="samples-choice" class="select"></select>
+          </div>
         </div>
         <label for="parserInputEditor"></label>
         <textarea id="parserInputEditor"></textarea>
+      </div>
     </div>
-</div>
 
-<div class="verticalSeparator" onmousedown="startResizeHorizontal(event)">
-    <i class="fa fa-ellipsis-v verticalDragHandle"> </i>
-</div>
+    <div class="verticalSeparator" onmousedown="startResizeHorizontal(event)">
+      <i class="fa fa-ellipsis-v verticalDragHandle"> </i>
+    </div>
 
-<div id="right" class="sideEditor rightSide">
-
-    <div id="rightTop" class="card" style="width: 100%; overflow:hidden; height: 76vh">
+    <div id="right" class="sideEditor rightSide">
+      <div
+        id="rightTop"
+        class="card"
+        style="width: 100%; overflow: hidden; height: 76vh"
+      >
         <div class="boxHeader">
-            <h1>Syntax Diagrams</h1>
+          <h1>Syntax Diagrams</h1>
         </div>
 
-        <div id="diagramsDiv" class="card" align="center" style="width: 100%; height:71.3vh; overflow-y: scroll"></div>
-    </div>
+        <div
+          id="diagramsDiv"
+          class="card"
+          align="center"
+          style="width: 100%; height: 71.3vh; overflow-y: scroll"
+        ></div>
+      </div>
 
-
-    <div id="rightHorizontalSeparator" class="horizontalSeparator" onmousedown="startVerticalRight(event)">
+      <div
+        id="rightHorizontalSeparator"
+        class="horizontalSeparator"
+        onmousedown="startVerticalRight(event)"
+      >
         <i class="fa fa-ellipsis-h horizontalDragHandle"> </i>
-    </div>
+      </div>
 
-    <div id="output" class="card" style="width: 100%; overflow: hidden; height: 21vh">
+      <div
+        id="output"
+        class="card"
+        style="width: 100%; overflow: hidden; height: 21vh"
+      >
         <div class="boxHeader">
-            <h1>Output</h1>
+          <h1>Output</h1>
         </div>
         <label for="parserOutput"></label>
         <textarea id="parserOutput"></textarea>
+      </div>
     </div>
-</div>
 
-<script>
+    <script>
+      // global state
+      var lexer = null;
+      var parser = null;
+      var visitor = null;
+      var defaultRuleName = null;
+      var javaScriptEditor = null;
+      var inputEditor = null;
+      var inputEditorMarkers = [];
+      var lexerErrorsMarkers = [];
+      var parserErrorsMarkers = [];
+      var examplesDropdown = null;
+      var samplesDropdown = null;
+      var parserOutput = null;
+      var diagramsDiv = null;
+      var diagramsHeaderOrgHtml = null;
+      var impelEditorDiv = null;
+      var inputEditorDiv = null;
+      var outputEditorDiv = null;
 
-    // global state
-    var lexer = null
-    var parser = null
-    var visitor = null
-    var defaultRuleName = null
-    var javaScriptEditor = null
-    var inputEditor = null
-    var inputEditorMarkers = []
-    var lexerErrorsMarkers = []
-    var parserErrorsMarkers = []
-    var examplesDropdown = null
-    var samplesDropdown = null
-    var parserOutput = null
-    var diagramsDiv = null
-    var diagramsHeaderOrgHtml = null
-    var impelEditorDiv = null
-    var inputEditorDiv = null
-    var outputEditorDiv = null
+      wrapChevrotainLexer();
 
-    wrapChevrotainLexer()
-
-
-    $(document).ready(function init() {
+      $(document).ready(function init() {
         // defer error handling so we can display error markers visually
         // instead of using the default chevrotain behavior of throwing exceptions.
-        chevrotain.Parser.DEFER_DEFINITION_ERRORS_HANDLING = true
+        chevrotain.Parser.DEFER_DEFINITION_ERRORS_HANDLING = true;
 
         // init global state
-        examplesDropdown = $("#example-choice")
-        samplesDropdown = $("#samples-choice")
-        diagramsDiv = _.first($("#diagramsDiv"))
-        diagramsHeaderOrgHtml = diagramsDiv.innerHTML
+        examplesDropdown = $("#example-choice");
+        samplesDropdown = $("#samples-choice");
+        diagramsDiv = _.first($("#diagramsDiv"));
+        diagramsHeaderOrgHtml = diagramsDiv.innerHTML;
 
-        var implTextArea = $("#parserImplementationEditor")
+        var implTextArea = $("#parserImplementationEditor");
         javaScriptEditor = CodeMirror.fromTextArea(_.first(implTextArea), {
-            lineNumbers: true,
-            viewportMargin: 10
-        })
+          lineNumbers: true,
+          viewportMargin: 10,
+        });
 
-        javaScriptEditor.on("change", _.debounce(onImplementationEditorContentChange, 250))
+        javaScriptEditor.on(
+          "change",
+          _.debounce(onImplementationEditorContentChange, 250)
+        );
 
-        inputEditor = CodeMirror.fromTextArea(_.first($("#parserInputEditor")), {
-            lineNumbers: true,
-            viewportMargin: 10
-        })
-
-        inputEditor.on("change", _.debounce(onInputEditorContentChange, 250))
-
-        parserOutput = CodeMirror.fromTextArea(_.first($("#parserOutput")), {
+        inputEditor = CodeMirror.fromTextArea(
+          _.first($("#parserInputEditor")),
+          {
             lineNumbers: true,
             viewportMargin: 10,
-            readOnly: true
-        })
+          }
+        );
 
-        inputEditor.setOption("mode", "text")
-        parserOutput.setOption("mode", "text")
+        inputEditor.on("change", _.debounce(onInputEditorContentChange, 250));
 
-        javaScriptEditor.setSize("100%", "100%")
-        inputEditor.setSize("100%", "100%")
-        parserOutput.setSize("100%", "100%")
+        parserOutput = CodeMirror.fromTextArea(_.first($("#parserOutput")), {
+          lineNumbers: true,
+          viewportMargin: 10,
+          readOnly: true,
+        });
 
-        initCodeMirrorVScroll()
+        inputEditor.setOption("mode", "text");
+        parserOutput.setOption("mode", "text");
 
-        initExamplesDropDown()
+        javaScriptEditor.setSize("100%", "100%");
+        inputEditor.setSize("100%", "100%");
+        parserOutput.setSize("100%", "100%");
+
+        initCodeMirrorVScroll();
+
+        initExamplesDropDown();
         examplesDropdown.change(function () {
-            loadExample(examplesDropdown.val())
-        })
+          loadExample(examplesDropdown.val());
+        });
 
-        var urlParamExample = getUrlParameter("example")
+        var urlParamExample = getUrlParameter("example");
         if (urlParamExample) {
-            examplesDropdown.value = urlParamExample
-            $(examplesDropdown).val(urlParamExample);
-            loadExample(urlParamExample, true)
+          examplesDropdown.value = urlParamExample;
+          $(examplesDropdown).val(urlParamExample);
+          loadExample(urlParamExample, true);
+        } else {
+          loadExample("JSON grammar and CST output", true);
         }
-        else {
-            loadExample("JSON grammar and CST output", true)
-        }
-        updateSamplesDropDown()
+        updateSamplesDropDown();
 
         samplesDropdown.change(function () {
-            loadSamples(samplesDropdown.val())
-        })
+          loadSamples(samplesDropdown.val());
+        });
 
-        $(document).mouseup(endResize)
-        $(document).mousemove(resizeRoot)
+        $(document).mouseup(endResize);
+        $(document).mousemove(resizeRoot);
 
-        impelEditorDiv = _.first($("#impel").find(".cm-s-default"))
-        impelEditorDiv.id = "impelEditorDiv"
-        inputEditorDiv = _.first($("#input").find(".cm-s-default"))
-        inputEditorDiv.id = "inputEditorDiv"
-        outputEditorDiv = _.first($("#output").find(".cm-s-default"))
-        outputEditorDiv.id = "outputEditorDiv"
+        impelEditorDiv = _.first($("#impel").find(".cm-s-default"));
+        impelEditorDiv.id = "impelEditorDiv";
+        inputEditorDiv = _.first($("#input").find(".cm-s-default"));
+        inputEditorDiv.id = "inputEditorDiv";
+        outputEditorDiv = _.first($("#output").find(".cm-s-default"));
+        outputEditorDiv.id = "outputEditorDiv";
 
-        initCodeMirrorDivsViewPortHeight()
-    })
-</script>
-
-</body>
+        initCodeMirrorDivsViewPortHeight();
+      });
+    </script>
+  </body>
 </html>
-
