@@ -5,15 +5,15 @@ const options = {
   next: {
     // this path seems to be relative to the `worker_impel.js` file
     // where this path will be imported using `WorkerGlobalScope.importScripts()`
-    bundle: "../../temp/chevrotain.internal.temp.js",
+    bundle: "./esm_wrappers/chevrotain_next.mjs",
     parserConfig: {
       maxLookahead: 2,
       outputCst: false,
     },
   },
-  current: {
+  latest: {
     // bundle: "../chevrotain.js",
-    bundle: "https://unpkg.com/chevrotain/temp/chevrotain.internal.temp.js",
+    bundle: "./esm_wrappers/chevrotain_latest.mjs",
     parserConfig: {
       maxLookahead: 2,
       outputCst: false,

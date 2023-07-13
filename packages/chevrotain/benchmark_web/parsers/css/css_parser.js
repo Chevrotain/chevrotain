@@ -239,7 +239,7 @@ var Ident = createToken({
 
 var Minus = createToken({ name: "Minus", pattern: /-/ });
 
-var lexerDefinition = cssTokens;
+self.lexerDefinition = cssTokens;
 
 var ChevrotainParser = self.parserConfig.outputCst
   ? chevrotain.CstParser
@@ -594,4 +594,4 @@ class parser extends ChevrotainParser {
   }
 }
 
-// ----------------- wrapping it all together -----------------
+self.parser = parser;

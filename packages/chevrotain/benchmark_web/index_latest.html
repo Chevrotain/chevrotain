@@ -18,7 +18,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tinysort/2.3.6/tinysort.min.js"></script>
 
     <div class="container">
-      <h1 style="text-align: center">Current</h1>
+      <h1 style="text-align: center">Latest</h1>
       <!-- left part -->
       <div class="row">
         <!--right part-->
@@ -101,18 +101,18 @@
 
     <script src="lib/iframe_loader.js"></script>
     <script>
-      self.mode = "current"
-      var jsonCurrentFrame = includeTestIFrame(
+      self.mode = "latest"
+      var jsonLatestFrame = includeTestIFrame(
         "JSON",
         "./parsers/json/json.html",
         self.mode
       )
-      var cssCurrentFrame = includeTestIFrame(
+      var cssLatestFrame = includeTestIFrame(
         "CSS",
         "./parsers/css/css.html",
         self.mode
       )
-      var ecma5CurrentFrame = includeTestIFrame(
+      var ecma5LatestFrame = includeTestIFrame(
         "ECMA5",
         "./parsers/ecma5/ecma5.html",
         self.mode
@@ -120,15 +120,15 @@
 
       var testCases = {
         JSON: function (suite) {
-          addTest(suite, "JSON", jsonCurrentFrame.parse)
+          addTest(suite, "JSON", jsonLatestFrame.parse)
         },
 
         CSS: function (suite) {
-          addTest(suite, "CSS", cssCurrentFrame.parse)
+          addTest(suite, "CSS", cssLatestFrame.parse)
         },
 
         ECMA5: function (suite) {
-          addTest(suite, "ECMA5", ecma5CurrentFrame.parse)
+          addTest(suite, "ECMA5", ecma5LatestFrame.parse)
         }
       }
     </script>

@@ -1,12 +1,16 @@
-var initialized = false;
-var startRule;
-var parserConfig = {};
-onmessage = function (event) {
+self.initialized = false;
+
+onmessage = async function (event) {
   if (!initialized) {
-    initialized = true;
-    event.data.importScripts.forEach(function (elem) {
-      importScripts(elem);
-    });
+    self.initialized = true;
+
+    if (event.data.parserConfig) {
+      self.parserConfig = event.data.parserConfig;
+    }
+
+    for (const elem of event.data.importScripts) {
+      await import(elem);
+    }
 
     if (event.data.sampleUrl) {
       var xhrObj = new XMLHttpRequest();
@@ -15,16 +19,13 @@ onmessage = function (event) {
 
       self.sample = xhrObj.responseText;
     }
-    startRule = event.data.startRule;
-    if (event.data.parserConfig) {
-      parserConfig = event.data.parserConfig;
-    }
+    self.startRule = event.data.startRule;
   } else {
     var options = event.data[0];
 
     try {
-      parseBench(
-        sample,
+      self.parseBench(
+        self.sample,
         self.lexerDefinition || undefined,
         self.customLexer || undefined,
         parser,

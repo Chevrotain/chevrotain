@@ -3,7 +3,7 @@ var parserInstance;
 var lexerInstance;
 var lexResult;
 
-function parseBench(
+self.parseBench = function (
   text,
   lexerDefinition,
   customLexer,
@@ -66,4 +66,4 @@ function parseBench(
       parseErrors: parserInstance.errors,
     };
   }
-}
+};

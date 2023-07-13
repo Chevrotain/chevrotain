@@ -45,7 +45,7 @@ var jsonTokens = [
   Null,
 ];
 
-var lexerDefinition = jsonTokens;
+self.lexerDefinition = jsonTokens;
 
 // ----------------- parser -----------------
 
@@ -159,3 +159,5 @@ class parser extends ChevrotainParser {
     this.performSelfAnalysis();
   }
 }
+
+self.parser = parser;

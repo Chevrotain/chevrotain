@@ -1,4 +1,4 @@
-var sample = `
+self.sample = `
 
 @charset "UTF-8";
 
