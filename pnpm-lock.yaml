@@ -69,7 +69,7 @@ importers:
         specifier: 8.8.0
         version: 8.8.0
       chevrotain:
-        specifier: 11.0.0
+        specifier: 11.0.1
         version: link:../../packages/chevrotain
       xregexp:
         specifier: 5.1.1
@@ -82,7 +82,7 @@ importers:
   examples/implementation_languages:
     dependencies:
       chevrotain:
-        specifier: 11.0.0
+        specifier: 11.0.1
         version: link:../../packages/chevrotain
     devDependencies:
       coffee-script:
@@ -101,7 +101,7 @@ importers:
   examples/lexer:
     dependencies:
       chevrotain:
-        specifier: 11.0.0
+        specifier: 11.0.1
         version: link:../../packages/chevrotain
       lodash:
         specifier: 4.17.21
@@ -110,7 +110,7 @@ importers:
   examples/parser:
     dependencies:
       chevrotain:
-        specifier: 11.0.0
+        specifier: 11.0.1
         version: link:../../packages/chevrotain
       lodash:
         specifier: 4.17.21
@@ -123,7 +123,7 @@ importers:
   examples/tutorial:
     dependencies:
       chevrotain:
-        specifier: 11.0.0
+        specifier: 11.0.1
         version: link:../../packages/chevrotain
       lodash:
         specifier: 4.17.21
@@ -132,19 +132,19 @@ importers:
   packages/chevrotain:
     dependencies:
       '@chevrotain/cst-dts-gen':
-        specifier: 11.0.0
+        specifier: 11.0.1
         version: link:../cst-dts-gen
       '@chevrotain/gast':
-        specifier: 11.0.0
+        specifier: 11.0.1
         version: link:../gast
       '@chevrotain/regexp-to-ast':
-        specifier: 11.0.0
+        specifier: 11.0.1
         version: link:../regexp-to-ast
       '@chevrotain/types':
-        specifier: 11.0.0
+        specifier: 11.0.1
         version: link:../types
       '@chevrotain/utils':
-        specifier: 11.0.0
+        specifier: 11.0.1
         version: link:../utils
       lodash-es:
         specifier: 4.17.21
@@ -196,10 +196,10 @@ importers:
   packages/cst-dts-gen:
     dependencies:
       '@chevrotain/gast':
-        specifier: 11.0.0
+        specifier: 11.0.1
         version: link:../gast
       '@chevrotain/types':
-        specifier: 11.0.0
+        specifier: 11.0.1
         version: link:../types
       lodash-es:
         specifier: 4.17.21
@@ -212,16 +212,16 @@ importers:
   packages/cst-dts-gen-test:
     dependencies:
       '@chevrotain/cst-dts-gen':
-        specifier: 11.0.0
+        specifier: 11.0.1
         version: link:../cst-dts-gen
       '@chevrotain/gast':
-        specifier: 11.0.0
+        specifier: 11.0.1
         version: link:../gast
       '@chevrotain/types':
-        specifier: 11.0.0
+        specifier: 11.0.1
         version: link:../types
       chevrotain:
-        specifier: 11.0.0
+        specifier: 11.0.1
         version: link:../chevrotain
       lodash-es:
         specifier: 4.17.21
@@ -237,7 +237,7 @@ importers:
   packages/gast:
     dependencies:
       '@chevrotain/types':
-        specifier: 11.0.0
+        specifier: 11.0.1
         version: link:../types
       lodash-es:
         specifier: 4.17.21

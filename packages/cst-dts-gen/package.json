@@ -1,6 +1,6 @@
 {
   "name": "@chevrotain/cst-dts-gen",
-  "version": "11.0.0",
+  "version": "11.0.1",
   "description": "Generates type definitions for Chevrotain CST nodes",
   "keywords": [],
   "bugs": {
@@ -34,8 +34,8 @@
     "compile": "tsc"
   },
   "dependencies": {
-    "@chevrotain/gast": "11.0.0",
-    "@chevrotain/types": "11.0.0",
+    "@chevrotain/gast": "11.0.1",
+    "@chevrotain/types": "11.0.1",
     "lodash-es": "4.17.21"
   },
   "devDependencies": {
