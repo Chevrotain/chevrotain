@@ -1,3 +1,10 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+- [fix: add types to package.json exports](https://github.com/Chevrotain/chevrotain/issues/1968)
+  - Thanks to [@msujew](https://github.com/nupthale) :thumbsup:
+
 ## 11.0.0 (7-11-2023)
 
 #### Breaking Changes
