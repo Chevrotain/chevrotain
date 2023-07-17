@@ -11,7 +11,8 @@
   "types": "./lib/src/api.d.ts",
   "exports": {
     ".": {
-      "import": "./lib/src/api.js"
+      "import": "./lib/src/api.js",
+      "types": "./lib/src/api.d.ts"
     }
   },
   "files": [

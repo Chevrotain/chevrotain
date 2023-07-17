@@ -11,10 +11,11 @@
     "name": "Shahar Soel"
   },
   "type": "module",
-  "typings": "lib/src/api.d.ts",
+  "types": "./lib/src/api.d.ts",
   "exports": {
     ".": {
-      "import": "./lib/src/api.js"
+      "import": "./lib/src/api.js",
+      "types": "./lib/src/api.d.ts"
     }
   },
   "files": [
