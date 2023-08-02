@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+- [fix: missing source maps and \*.ts sources](https://github.com/Chevrotain/chevrotain/commit/ea3a55b7f11151e32027210133e86f5998cf25eb)
+
 ## 11.0.1 (7-18-2023)
 
 #### Bug Fixes
