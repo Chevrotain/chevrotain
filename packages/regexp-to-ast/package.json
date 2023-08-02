@@ -19,7 +19,6 @@
       "types": "./types.d.ts"
     }
   },
-  "## COMMENT": "Not exposing the generated *.d.ts as it seems to conflict with types.d.ts when `moduleResolution=nodenext`in tsconfig...",
   "files": [
     "lib/src/**/*.js",
     "lib/src/**/*.map",
