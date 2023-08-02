@@ -35,8 +35,8 @@
     "lib/chevrotain.min.mjs",
     "lib/chevrotain.mjs",
     "lib/src/**/*.js",
-    "README.md",
-    "LICENSE.TXT",
+    "lib/src/**/*.map",
+    "src/**/*.ts",
     "diagrams/**/*.*",
     "BREAKING_CHANGES.md",
     "CHANGELOG.md"

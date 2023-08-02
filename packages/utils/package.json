@@ -20,9 +20,9 @@
   },
   "files": [
     "lib/src/**/*.js",
+    "lib/src/**/*.map",
     "lib/src/**/*.d.ts",
-    "README.md",
-    "LICENSE.TXT"
+    "src/**/*.ts"
   ],
   "repository": {
     "type": "git",
