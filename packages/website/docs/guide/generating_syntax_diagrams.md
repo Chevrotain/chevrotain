@@ -19,7 +19,7 @@ library by @tabatkins.
 
 ## Instructions
 
-Chevrotain provides the [**createSyntaxDiagramsCode**](https://chevrotain.io/documentation/11_0_1/modules.html#createsyntaxdiagramscode) API to generate the **html source code**
+Chevrotain provides the [**createSyntaxDiagramsCode**](https://chevrotain.io/documentation/11_0_2/modules.html#createsyntaxdiagramscode) API to generate the **html source code**
 of syntax diagrams. This html source code can then be used by an end user in either node.js or a browser:
 
 1.  By writing it directly to the disk in a pure node.js runtime scenario.
