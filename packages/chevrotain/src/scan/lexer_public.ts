@@ -732,6 +732,7 @@ export class Lexer {
         }
 
         errLength = offset - errorStartOffset;
+        column = this.computeNewColumn(column!, errLength);
         // at this point we either re-synced or reached the end of the input text
         msg = this.config.errorMessageProvider.buildUnexpectedCharactersMessage(
           orgText,

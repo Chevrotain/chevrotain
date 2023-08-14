@@ -277,6 +277,32 @@ function defineLexerSpecs(
         expect(result.tokens[0].image).to.equal("A");
         expect(result.tokens[0].startOffset).to.equal(0);
       });
+
+      // reproduce bug: https://github.com/Chevrotain/chevrotain/issues/1969
+      it("will report the correct column after lexer error recovery", () => {
+        const digits = createToken({
+          name: "digit",
+          pattern: /\d+/,
+        });
+
+        const myLexer = new Lexer([digits], {
+          positionTracking: "onlyStart",
+        });
+        const input = "--123++";
+        const result = myLexer.tokenize(input);
+
+        expect(result.errors).to.have.lengthOf(2);
+        expect(result.errors[0].message).to.include("-");
+        expect(result.errors[0].column).to.equal(1);
+        expect(result.errors[1].message).to.include("+");
+        expect(result.errors[1].column).to.equal(6);
+
+        expect(result.tokens).to.have.lengthOf(1);
+        const digitsToken = result.tokens[0];
+        expect(tokenMatcher(digitsToken, digits)).to.be.true;
+        expect(digitsToken.image).to.equal("123");
+        expect(digitsToken.startColumn).to.equal(3);
+      });
     });
 
     const ValidNaPattern = createToken({

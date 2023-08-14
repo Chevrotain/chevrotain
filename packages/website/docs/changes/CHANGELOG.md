@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+- [fix: columns position incorrect after lexer recovery](https://github.com/Chevrotain/chevrotain/issues/1969)
+
 ## 11.0.2 (8-3-2023)
 
 #### Bug Fixes
