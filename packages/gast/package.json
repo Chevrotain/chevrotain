@@ -1,6 +1,6 @@
 {
   "name": "@chevrotain/gast",
-  "version": "11.0.2",
+  "version": "11.0.3",
   "description": "Grammar AST structure for Chevrotain Parsers",
   "keywords": [],
   "bugs": {
@@ -39,7 +39,7 @@
     "coverage": "c8 mocha --enable-source-maps"
   },
   "dependencies": {
-    "@chevrotain/types": "11.0.2",
+    "@chevrotain/types": "11.0.3",
     "lodash-es": "4.17.21"
   },
   "devDependencies": {

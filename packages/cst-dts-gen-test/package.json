@@ -1,6 +1,6 @@
 {
   "name": "@chevrotain/cst-dts-gen-test",
-  "version": "11.0.2",
+  "version": "11.0.3",
   "private": true,
   "description": "tests for @chevrotain/cst-dts-gen",
   "license": "Apache-2.0",
@@ -23,10 +23,10 @@
     "coverage": "c8 mocha --enable-source-maps"
   },
   "dependencies": {
-    "@chevrotain/cst-dts-gen": "11.0.2",
-    "@chevrotain/gast": "11.0.2",
-    "@chevrotain/types": "11.0.2",
-    "chevrotain": "11.0.2",
+    "@chevrotain/cst-dts-gen": "11.0.3",
+    "@chevrotain/gast": "11.0.3",
+    "@chevrotain/types": "11.0.3",
+    "chevrotain": "11.0.3",
     "lodash-es": "4.17.21"
   },
   "devDependencies": {

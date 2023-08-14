@@ -1,6 +1,6 @@
 {
   "name": "chevrotain_examples_grammars",
-  "version": "11.0.2",
+  "version": "11.0.3",
   "type": "module",
   "scripts": {
     "ci": "pnpm run test && pnpm run bundle:graphql",
@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "acorn": "8.8.0",
-    "chevrotain": "11.0.2",
+    "chevrotain": "11.0.3",
     "xregexp": "5.1.1"
   },
   "devDependencies": {
