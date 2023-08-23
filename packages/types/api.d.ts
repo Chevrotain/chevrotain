@@ -852,7 +852,8 @@ declare abstract class BaseParser {
     grammarPath: ITokenGrammarPath,
   ): TokenType[];
 
-  input: IToken[];
+  set input(value: IToken[]);
+  get input(): IToken[];
 
   /**
    * Will consume a single token and return the **next** token, meaning
