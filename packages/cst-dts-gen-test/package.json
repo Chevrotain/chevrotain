@@ -30,7 +30,7 @@
     "lodash-es": "4.17.21"
   },
   "devDependencies": {
-    "@types/lodash-es": "4.17.7",
+    "@types/lodash-es": "4.17.8",
     "glob": "10.3.3"
   }
 }
