@@ -693,18 +693,24 @@ export class RecognizerEngine {
     options?: SubruleMethodOpts<ARGS>,
   ): R {
     let ruleResult;
+    const isBackTracking = this.isBackTracking();
     try {
       const args = options !== undefined ? options.ARGS : undefined;
       this.subruleIdx = idx;
       ruleResult = ruleToCall.apply(this, args);
-      this.cstPostNonTerminal(
-        ruleResult,
-        options !== undefined && options.LABEL !== undefined
-          ? options.LABEL
-          : ruleToCall.ruleName,
-      );
+      if (!isBackTracking) {
+        this.cstPostNonTerminal(
+          ruleResult,
+          options !== undefined && options.LABEL !== undefined
+            ? options.LABEL
+            : ruleToCall.ruleName,
+        );
+      }
       return ruleResult;
     } catch (e) {
+      if (isBackTracking) {
+        throw e;
+      }
       throw this.subruleInternalError(e, options, ruleToCall.ruleName);
     }
   }
