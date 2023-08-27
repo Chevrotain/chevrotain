@@ -223,8 +223,11 @@ export class RecognizerEngine {
       ): R {
         try {
           this.ruleInvocationStateUpdate(shortName, ruleName, this.subruleIdx);
-          impl.apply(this, args);
-          const cst = this.CST_STACK[this.CST_STACK.length - 1];
+          let cst = impl.apply(this, args);
+          if (this.isBackTracking()) {
+            return cst;
+          }
+          cst = this.CST_STACK[this.CST_STACK.length - 1];
           this.cstPostRule(cst);
           return cst as unknown as R;
         } catch (e) {
@@ -664,12 +667,12 @@ export class RecognizerEngine {
     this.RULE_STACK.pop();
     this.RULE_OCCURRENCE_STACK.pop();
 
-    // NOOP when cst is disabled
-    this.cstFinallyStateUpdate();
-
     if (this.isBackTracking()) {
       return;
     }
+
+    // NOOP when cst is disabled
+    this.cstFinallyStateUpdate();
 
     if (this.RULE_STACK.length === 0 && this.isAtEndOfInput() === false) {
       const firstRedundantTok = this.LA(1);
@@ -757,12 +760,14 @@ export class RecognizerEngine {
       );
     }
 
-    this.cstPostTerminal(
-      options !== undefined && options.LABEL !== undefined
-        ? options.LABEL
-        : tokType.name,
-      consumedToken,
-    );
+    if (!this.isBackTracking()) {
+      this.cstPostTerminal(
+        options !== undefined && options.LABEL !== undefined
+          ? options.LABEL
+          : tokType.name,
+        consumedToken,
+      );
+    }
     return consumedToken;
   }
 
@@ -843,7 +848,9 @@ export class RecognizerEngine {
     this.RULE_OCCURRENCE_STACK.push(idxInCallingRule);
     this.RULE_STACK.push(shortName);
     // NOOP when cst is disabled
-    this.cstInvocationStateUpdate(fullName);
+    if (!this.isBackTracking()) {
+      this.cstInvocationStateUpdate(fullName);
+    }
   }
 
   isBackTracking(this: MixedInParser): boolean {
