@@ -732,7 +732,6 @@ export class RecognizerEngine {
     options: ConsumeMethodOpts | undefined,
   ): IToken {
     let consumedToken!: IToken;
-    const isBackTracking = this.isBackTracking();
     let backtrackingError!: Error;
     try {
       const nextToken = this.LA(1);
@@ -740,7 +739,7 @@ export class RecognizerEngine {
         this.consumeToken();
         consumedToken = nextToken;
       } else {
-        if (isBackTracking) {
+        if (this.isBackTracking()) {
           backtrackingError = new Error();
           backtrackingError.name = "MismatchedTokenException";
           throw backtrackingError;
