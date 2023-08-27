@@ -667,6 +667,10 @@ export class RecognizerEngine {
     // NOOP when cst is disabled
     this.cstFinallyStateUpdate();
 
+    if (this.isBackTracking()) {
+      return;
+    }
+
     if (this.RULE_STACK.length === 0 && this.isAtEndOfInput() === false) {
       const firstRedundantTok = this.LA(1);
       const errMsg = this.errorMessageProvider.buildNotAllInputParsedMessage({
@@ -728,15 +732,25 @@ export class RecognizerEngine {
     options: ConsumeMethodOpts | undefined,
   ): IToken {
     let consumedToken!: IToken;
+    const isBackTracking = this.isBackTracking();
+    let backtrackingError!: Error;
     try {
       const nextToken = this.LA(1);
       if (this.tokenMatcher(nextToken, tokType) === true) {
         this.consumeToken();
         consumedToken = nextToken;
       } else {
+        if (isBackTracking) {
+          backtrackingError = new Error();
+          backtrackingError.name = "MismatchedTokenException";
+          throw backtrackingError;
+        }
         this.consumeInternalError(tokType, nextToken, options);
       }
     } catch (eFromConsumption) {
+      if (eFromConsumption === backtrackingError) {
+        throw backtrackingError;
+      }
       consumedToken = this.consumeInternalRecovery(
         tokType,
         idx,
@@ -787,8 +801,7 @@ export class RecognizerEngine {
     if (
       this.recoveryEnabled &&
       // TODO: more robust checking of the exception type. Perhaps Typescript extending expressions?
-      eFromConsumption.name === "MismatchedTokenException" &&
-      !this.isBackTracking()
+      eFromConsumption.name === "MismatchedTokenException"
     ) {
       const follows = this.getFollowsForInRuleRecovery(<any>tokType, idx);
       try {
@@ -809,10 +822,8 @@ export class RecognizerEngine {
 
   saveRecogState(this: MixedInParser): IParserState {
     // errors is a getter which will clone the errors array
-    const savedErrors = this.errors;
     const savedRuleStack = clone(this.RULE_STACK);
     return {
-      errors: savedErrors,
       lexerState: this.exportLexerState(),
       RULE_STACK: savedRuleStack,
       CST_STACK: this.CST_STACK,
@@ -820,7 +831,6 @@ export class RecognizerEngine {
   }
 
   reloadRecogState(this: MixedInParser, newState: IParserState) {
-    this.errors = newState.errors;
     this.importLexerState(newState.lexerState);
     this.RULE_STACK = newState.RULE_STACK;
   }

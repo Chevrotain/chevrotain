@@ -13,7 +13,6 @@ import {
 import {
   CstNode,
   IParserConfig,
-  IRecognitionException,
   IRuleConfig,
   IToken,
   TokenType,
@@ -111,7 +110,6 @@ export interface IParserUnresolvedRefDefinitionError
 }
 
 export interface IParserState {
-  errors: IRecognitionException[];
   lexerState: any;
   RULE_STACK: number[];
   CST_STACK: CstNode[];
