@@ -17,6 +17,7 @@ import {
 import { MixedInParser } from "./parser_traits.js";
 import { DEFAULT_PARSER_CONFIG } from "../parser.js";
 
+const BACKTRACKING_ERROR = "Error during backtracking attempt";
 /**
  * Trait responsible for runtime parsing errors.
  */
@@ -64,6 +65,9 @@ export class ErrorHandler {
     prodType: PROD_TYPE,
     userDefinedErrMsg: string | undefined,
   ): never {
+    if (this.isBackTracking()) {
+      throw new EarlyExitException(BACKTRACKING_ERROR, this.LA(1), this.LA(0));
+    }
     const ruleName = this.getCurrRuleFullName();
     const ruleGrammar = this.getGAstProductions()[ruleName];
     const lookAheadPathsPerAlternative = getLookaheadPathsForOptionalProd(
@@ -94,6 +98,13 @@ export class ErrorHandler {
     occurrence: number,
     errMsgTypes: string | undefined,
   ): never {
+    if (this.isBackTracking()) {
+      throw new NoViableAltException(
+        BACKTRACKING_ERROR,
+        this.LA(1),
+        this.LA(0),
+      );
+    }
     const ruleName = this.getCurrRuleFullName();
     const ruleGrammar = this.getGAstProductions()[ruleName];
     // TODO: getLookaheadPathsForOr can be slow for large enough maxLookahead and certain grammars, consider caching ?

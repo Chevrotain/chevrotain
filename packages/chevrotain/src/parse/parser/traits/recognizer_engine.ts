@@ -223,8 +223,11 @@ export class RecognizerEngine {
       ): R {
         try {
           this.ruleInvocationStateUpdate(shortName, ruleName, this.subruleIdx);
-          impl.apply(this, args);
-          const cst = this.CST_STACK[this.CST_STACK.length - 1];
+          let cst = impl.apply(this, args);
+          if (this.isBackTracking()) {
+            return cst;
+          }
+          cst = this.CST_STACK[this.CST_STACK.length - 1];
           this.cstPostRule(cst);
           return cst as unknown as R;
         } catch (e) {
@@ -664,6 +667,10 @@ export class RecognizerEngine {
     this.RULE_STACK.pop();
     this.RULE_OCCURRENCE_STACK.pop();
 
+    if (this.isBackTracking()) {
+      return;
+    }
+
     // NOOP when cst is disabled
     this.cstFinallyStateUpdate();
 
@@ -686,18 +693,24 @@ export class RecognizerEngine {
     options?: SubruleMethodOpts<ARGS>,
   ): R {
     let ruleResult;
+    const isBackTracking = this.isBackTracking();
     try {
       const args = options !== undefined ? options.ARGS : undefined;
       this.subruleIdx = idx;
       ruleResult = ruleToCall.apply(this, args);
-      this.cstPostNonTerminal(
-        ruleResult,
-        options !== undefined && options.LABEL !== undefined
-          ? options.LABEL
-          : ruleToCall.ruleName,
-      );
+      if (!isBackTracking) {
+        this.cstPostNonTerminal(
+          ruleResult,
+          options !== undefined && options.LABEL !== undefined
+            ? options.LABEL
+            : ruleToCall.ruleName,
+        );
+      }
       return ruleResult;
     } catch (e) {
+      if (isBackTracking) {
+        throw e;
+      }
       throw this.subruleInternalError(e, options, ruleToCall.ruleName);
     }
   }
@@ -728,15 +741,24 @@ export class RecognizerEngine {
     options: ConsumeMethodOpts | undefined,
   ): IToken {
     let consumedToken!: IToken;
+    let backtrackingError!: Error;
     try {
       const nextToken = this.LA(1);
       if (this.tokenMatcher(nextToken, tokType) === true) {
         this.consumeToken();
         consumedToken = nextToken;
       } else {
+        if (this.isBackTracking()) {
+          backtrackingError = new Error();
+          backtrackingError.name = "MismatchedTokenException";
+          throw backtrackingError;
+        }
         this.consumeInternalError(tokType, nextToken, options);
       }
     } catch (eFromConsumption) {
+      if (eFromConsumption === backtrackingError) {
+        throw backtrackingError;
+      }
       consumedToken = this.consumeInternalRecovery(
         tokType,
         idx,
@@ -744,12 +766,14 @@ export class RecognizerEngine {
       );
     }
 
-    this.cstPostTerminal(
-      options !== undefined && options.LABEL !== undefined
-        ? options.LABEL
-        : tokType.name,
-      consumedToken,
-    );
+    if (!this.isBackTracking()) {
+      this.cstPostTerminal(
+        options !== undefined && options.LABEL !== undefined
+          ? options.LABEL
+          : tokType.name,
+        consumedToken,
+      );
+    }
     return consumedToken;
   }
 
@@ -787,8 +811,7 @@ export class RecognizerEngine {
     if (
       this.recoveryEnabled &&
       // TODO: more robust checking of the exception type. Perhaps Typescript extending expressions?
-      eFromConsumption.name === "MismatchedTokenException" &&
-      !this.isBackTracking()
+      eFromConsumption.name === "MismatchedTokenException"
     ) {
       const follows = this.getFollowsForInRuleRecovery(<any>tokType, idx);
       try {
@@ -809,10 +832,8 @@ export class RecognizerEngine {
 
   saveRecogState(this: MixedInParser): IParserState {
     // errors is a getter which will clone the errors array
-    const savedErrors = this.errors;
     const savedRuleStack = clone(this.RULE_STACK);
     return {
-      errors: savedErrors,
       lexerState: this.exportLexerState(),
       RULE_STACK: savedRuleStack,
       CST_STACK: this.CST_STACK,
@@ -820,7 +841,6 @@ export class RecognizerEngine {
   }
 
   reloadRecogState(this: MixedInParser, newState: IParserState) {
-    this.errors = newState.errors;
     this.importLexerState(newState.lexerState);
     this.RULE_STACK = newState.RULE_STACK;
   }
@@ -834,7 +854,9 @@ export class RecognizerEngine {
     this.RULE_OCCURRENCE_STACK.push(idxInCallingRule);
     this.RULE_STACK.push(shortName);
     // NOOP when cst is disabled
-    this.cstInvocationStateUpdate(fullName);
+    if (!this.isBackTracking()) {
+      this.cstInvocationStateUpdate(fullName);
+    }
   }
 
   isBackTracking(this: MixedInParser): boolean {
