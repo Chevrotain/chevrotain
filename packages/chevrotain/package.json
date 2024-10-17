@@ -67,11 +67,11 @@
     "bundle:esm:min": "esbuild ./lib/src/api.js --bundle --minify --format=esm --sourcemap --outfile=lib/chevrotain.min.mjs"
   },
   "dependencies": {
-    "@chevrotain/cst-dts-gen": "11.0.3",
-    "@chevrotain/gast": "11.0.3",
-    "@chevrotain/regexp-to-ast": "11.0.3",
-    "@chevrotain/types": "11.0.3",
-    "@chevrotain/utils": "11.0.3",
+    "@chevrotain/cst-dts-gen": "workspace:*",
+    "@chevrotain/gast": "workspace:*",
+    "@chevrotain/regexp-to-ast": "workspace:*",
+    "@chevrotain/types": "workspace:*",
+    "@chevrotain/utils": "workspace:*",
     "lodash-es": "4.17.21"
   },
   "devDependencies": {

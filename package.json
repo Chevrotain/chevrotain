@@ -7,9 +7,7 @@
       "examples/*"
     ]
   },
-  "engines": {
-    "pnpm": ">=9.12.2"
-  },
+  "packageManager": "pnpm@9.12.2",
   "scripts": {
     "version": "pnpm install && git add pnpm-lock.yaml",
     "preinstall": "npx only-allow pnpm",
