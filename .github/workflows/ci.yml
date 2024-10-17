@@ -13,19 +13,19 @@ jobs:
     strategy:
       matrix:
         node_version:
-          - 16.x
           - 18.x
           - 20.x
+          - 22.x
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node_version }}
 
-      - uses: pnpm/action-setup@v2.2.4
+      - uses: pnpm/action-setup@v4
         with:
-          version: 8.6.5
+          version: 9.12.2
 
       - name: Install dependencies
         run: pnpm install

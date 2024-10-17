@@ -8,7 +8,7 @@
     ]
   },
   "engines": {
-    "pnpm": ">=7"
+    "pnpm": ">=9.12.2"
   },
   "scripts": {
     "version": "pnpm install && git add pnpm-lock.yaml",
