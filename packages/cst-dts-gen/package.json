@@ -36,8 +36,8 @@
     "compile": "tsc"
   },
   "dependencies": {
-    "@chevrotain/gast": "11.0.3",
-    "@chevrotain/types": "11.0.3",
+    "@chevrotain/gast": "workspace:*",
+    "@chevrotain/types": "workspace:*",
     "lodash-es": "4.17.21"
   },
   "devDependencies": {
