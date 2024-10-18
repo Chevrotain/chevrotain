@@ -40,7 +40,7 @@
     "api-site:upload": "./scripts/api-site-upload.sh"
   },
   "devDependencies": {
-    "typedoc": "0.24.8",
+    "typedoc": "0.26.10",
     "typescript": "5.1.6"
   },
   "publishConfig": {
