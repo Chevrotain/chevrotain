@@ -263,8 +263,8 @@ importers:
   packages/website:
     devDependencies:
       '@mdit-vue/shared':
-        specifier: 0.12.0
-        version: 0.12.0
+        specifier: 0.12.1
+        version: 0.12.1
       '@vuepress/client':
         specifier: 2.0.0-beta.64
         version: 2.0.0-beta.64(typescript@5.6.3)
@@ -975,9 +975,6 @@ packages:
 
   '@mdit-vue/plugin-toc@0.12.1':
     resolution: {integrity: sha512-nFGwTwVa8GLCKJMV7cGST7lYuljSjEiCTPgKIpQ/WifwouHsQaL/rnBDr22kpzY2hRTAhM3+TT5GDwLyxa/e6A==}
-
-  '@mdit-vue/shared@0.12.0':
-    resolution: {integrity: sha512-E+sGSubhvnp+Gmb2hJXFDxdLwwQD1H52EVbA4yrxxI5q/cwtnPIN2eJU3zlZB9KcvzXYDFFwt/x2mfhK8RZKBg==}
 
   '@mdit-vue/shared@0.12.1':
     resolution: {integrity: sha512-bXgd0KThe4jC2leCFDFsyrudXIckvTwV4WnQK/rRMrXq0/BAuVdSNdIv1LGCWZxD5+oDyPyEPd0lalTIFwqsmg==}
@@ -5254,7 +5251,7 @@ snapshots:
       '@types/node': 20.5.1
       chalk: 4.1.2
       cosmiconfig: 8.3.6(typescript@5.6.3)
-      cosmiconfig-typescript-loader: 4.4.0(@types/node@20.5.1)(cosmiconfig@8.3.6(typescript@5.6.3))(ts-node@10.9.2(@types/node@18.19.56)(typescript@5.6.3))(typescript@5.6.3)
+      cosmiconfig-typescript-loader: 4.4.0(@types/node@20.5.1)(cosmiconfig@8.3.6(typescript@5.6.3))(ts-node@10.9.2(@types/node@20.5.1)(typescript@5.6.3))(typescript@5.6.3)
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       lodash.uniq: 4.5.0
@@ -5720,12 +5717,6 @@ snapshots:
       '@types/markdown-it': 13.0.9
       markdown-it: 13.0.2
 
-  '@mdit-vue/shared@0.12.0':
-    dependencies:
-      '@mdit-vue/types': 0.12.0
-      '@types/markdown-it': 12.2.3
-      markdown-it: 13.0.2
-
   '@mdit-vue/shared@0.12.1':
     dependencies:
       '@mdit-vue/types': 0.12.0
@@ -6129,7 +6120,7 @@ snapshots:
 
   '@types/markdown-it-emoji@2.0.5':
     dependencies:
-      '@types/markdown-it': 12.2.3
+      '@types/markdown-it': 13.0.9
 
   '@types/markdown-it@12.2.3':
     dependencies:
@@ -6321,7 +6312,7 @@ snapshots:
       '@mdit-vue/plugin-sfc': 0.12.1
       '@mdit-vue/plugin-title': 0.12.1
       '@mdit-vue/plugin-toc': 0.12.1
-      '@mdit-vue/shared': 0.12.0
+      '@mdit-vue/shared': 0.12.1
       '@mdit-vue/types': 0.12.0
       '@types/markdown-it': 12.2.3
       '@types/markdown-it-emoji': 2.0.5
@@ -7107,7 +7098,7 @@ snapshots:
 
   core-util-is@1.0.3: {}
 
-  cosmiconfig-typescript-loader@4.4.0(@types/node@20.5.1)(cosmiconfig@8.3.6(typescript@5.6.3))(ts-node@10.9.2(@types/node@18.19.56)(typescript@5.6.3))(typescript@5.6.3):
+  cosmiconfig-typescript-loader@4.4.0(@types/node@20.5.1)(cosmiconfig@8.3.6(typescript@5.6.3))(ts-node@10.9.2(@types/node@20.5.1)(typescript@5.6.3))(typescript@5.6.3):
     dependencies:
       '@types/node': 20.5.1
       cosmiconfig: 8.3.6(typescript@5.6.3)
