@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "@mdit-vue/shared": "2.1.3",
-    "@vuepress/client": "2.0.0-beta.64",
+    "@vuepress/client": "2.0.0-rc.2",
     "@vuepress/plugin-docsearch": "2.0.0-beta.64",
     "@vuepress/theme-default": "2.0.0-beta.64",
     "gitty": "3.7.2",
