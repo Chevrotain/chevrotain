@@ -42,7 +42,7 @@
     "typescript": "5.6.3",
     "fs-extra": "11.1.1",
     "husky": "9.1.6",
-    "lerna": "7.1.5",
+    "lerna": "8.1.8",
     "lint-staged": "15.2.10",
     "mocha": "10.2.0",
     "npm-run-all2": "5.0.0",
