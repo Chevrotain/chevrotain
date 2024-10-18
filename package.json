@@ -41,7 +41,7 @@
     "chai": "5.1.1",
     "typescript": "5.6.3",
     "fs-extra": "11.1.1",
-    "husky": "8.0.3",
+    "husky": "9.1.6",
     "lerna": "7.1.5",
     "lint-staged": "15.2.10",
     "mocha": "10.2.0",
