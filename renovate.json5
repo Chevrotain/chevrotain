@@ -17,10 +17,5 @@
       matchDepTypes: ["devDependencies"],
       matchUpdateTypes: ["minor", "patch"],
     },
-    {
-      groupName: "vuepress and related deps",
-      extends: ["monorepo:vuepress"],
-      matchPackageNames: ["vuepress", "@vuepress/**", "@mdit-vue/**"],
-    },
   ],
 }
