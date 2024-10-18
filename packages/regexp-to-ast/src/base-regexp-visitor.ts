@@ -62,6 +62,12 @@ export class BaseRegExpVisitor {
       case "NegativeLookahead":
         this.visitNegativeLookahead(node);
         break;
+      case "Lookbehind":
+        this.visitLookbehind(node);
+        break;
+      case "NegativeLookbehind":
+        this.visitNegativeLookbehind(node);
+        break;
       case "Character":
         this.visitCharacter(node);
         break;
@@ -102,6 +108,10 @@ export class BaseRegExpVisitor {
   public visitLookahead(node: Assertion): void {}
 
   public visitNegativeLookahead(node: Assertion): void {}
+
+  public visitLookbehind(node: Assertion): void {}
+
+  public visitNegativeLookbehind(node: Assertion): void {}
 
   // atoms
   public visitCharacter(node: Character): void {}
