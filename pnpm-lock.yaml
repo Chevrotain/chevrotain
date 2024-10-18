@@ -21,8 +21,8 @@ importers:
         specifier: 10.0.1
         version: 10.0.1
       '@types/node':
-        specifier: 16.18.44
-        version: 16.18.44
+        specifier: 18.19.56
+        version: 18.19.56
       c8:
         specifier: 8.0.1
         version: 8.0.1
@@ -31,7 +31,7 @@ importers:
         version: 4.3.7
       cz-conventional-changelog:
         specifier: 3.3.0
-        version: 3.3.0(@types/node@16.18.44)(typescript@5.1.6)
+        version: 3.3.0(@types/node@18.19.56)(typescript@5.6.3)
       fs-extra:
         specifier: 11.1.1
         version: 11.1.1
@@ -60,8 +60,8 @@ importers:
         specifier: 0.5.21
         version: 0.5.21
       typescript:
-        specifier: 5.1.6
-        version: 5.1.6
+        specifier: 5.6.3
+        version: 5.6.3
 
   examples/grammars:
     dependencies:
@@ -95,8 +95,8 @@ importers:
         specifier: ^4.1.5
         version: 4.1.5
       typescript:
-        specifier: 4.2.3
-        version: 4.2.3
+        specifier: 5.6.3
+        version: 5.6.3
 
   examples/lexer:
     dependencies:
@@ -1370,6 +1370,9 @@ packages:
 
   '@types/node@16.18.44':
     resolution: {integrity: sha512-PZXtT+wqSMHnLPVExTh+tMt1VK+GvjRLsGZMbcQ4Mb/cG63xJig/TUmgrDa9aborl2i22UnpIzHYNu7s97NbBQ==}
+
+  '@types/node@18.19.56':
+    resolution: {integrity: sha512-4EMJlWwwGnVPflJAtM14p9eVSa6BOv5b92mCsh5zcM1UagNtEtrbbtaE6WE1tw2TabavatnwqXjlIpcAEuJJNg==}
 
   '@types/node@20.5.1':
     resolution: {integrity: sha512-4tT2UrL5LBqDwoed9wZ6N3umC4Yhz3W3FloMmiiG4JwmUJWpie0c7lcnUNd4gtMKuDEO4wRVS8B6Xa0uMRsMKg==}
@@ -4554,11 +4557,6 @@ packages:
     peerDependencies:
       typescript: 4.6.x || 4.7.x || 4.8.x || 4.9.x || 5.0.x || 5.1.x
 
-  typescript@4.2.3:
-    resolution: {integrity: sha512-qOcYwxaByStAWrBf4x0fibwZvMRG+r4cQoTjbPtUlrWjBHbmCAww1i448U0GJ+3cNNEtebDteo/cHOR3xJ4wEw==}
-    engines: {node: '>=4.2.0'}
-    hasBin: true
-
   typescript@5.1.6:
     resolution: {integrity: sha512-zaWCozRZ6DLEWAWFrVDz1H6FVXzUSfTy5FUMWsQlU8Ym5JP9eO4xkTIROFCQvhQf61z6O/G6ugw3SgAnvvm+HA==}
     engines: {node: '>=14.17'}
@@ -4579,6 +4577,9 @@ packages:
 
   unbox-primitive@1.0.2:
     resolution: {integrity: sha512-61pPlCD9h51VoreyJ0BReideM3MDKMKnh6+V9L08331ipq6Q8OFXZYiqP6n/tbHx4s5I9uRhcye6BrbkizkBDw==}
+
+  undici-types@5.26.5:
+    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
 
   unique-filename@2.0.1:
     resolution: {integrity: sha512-ODWHtkkdx3IAR+veKxFV+VBkUMcN+FaqzUUd7IZzt+0zhDZFPFxhlqwPF3YQvMHx1TD0tdgYl+kuPnJ8E6ql7A==}
@@ -5131,15 +5132,15 @@ snapshots:
       - '@swc/core'
       - '@swc/wasm'
 
-  '@commitlint/load@19.5.0(@types/node@16.18.44)(typescript@5.1.6)':
+  '@commitlint/load@19.5.0(@types/node@18.19.56)(typescript@5.6.3)':
     dependencies:
       '@commitlint/config-validator': 19.5.0
       '@commitlint/execute-rule': 19.5.0
       '@commitlint/resolve-extends': 19.5.0
       '@commitlint/types': 19.5.0
       chalk: 5.3.0
-      cosmiconfig: 9.0.0(typescript@5.1.6)
-      cosmiconfig-typescript-loader: 5.0.0(@types/node@16.18.44)(cosmiconfig@9.0.0(typescript@5.1.6))(typescript@5.1.6)
+      cosmiconfig: 9.0.0(typescript@5.6.3)
+      cosmiconfig-typescript-loader: 5.0.0(@types/node@18.19.56)(cosmiconfig@9.0.0(typescript@5.6.3))(typescript@5.6.3)
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       lodash.uniq: 4.5.0
@@ -5472,7 +5473,7 @@ snapshots:
       execa: 5.0.0
       strong-log-transformer: 2.1.0
 
-  '@lerna/create@7.1.5(encoding@0.1.13)(typescript@5.1.6)':
+  '@lerna/create@7.1.5(encoding@0.1.13)(typescript@5.6.3)':
     dependencies:
       '@lerna/child-process': 7.1.5
       '@npmcli/run-script': 6.0.2
@@ -5486,7 +5487,7 @@ snapshots:
       columnify: 1.6.0
       conventional-changelog-core: 5.0.1
       conventional-recommended-bump: 7.0.1
-      cosmiconfig: 8.3.6(typescript@5.1.6)
+      cosmiconfig: 8.3.6(typescript@5.6.3)
       dedent: 0.7.0
       execa: 5.0.0
       fs-extra: 11.1.1
@@ -5928,7 +5929,7 @@ snapshots:
 
   '@types/conventional-commits-parser@5.0.0':
     dependencies:
-      '@types/node': 16.18.44
+      '@types/node': 18.19.56
     optional: true
 
   '@types/debug@4.1.12':
@@ -5938,7 +5939,7 @@ snapshots:
   '@types/fs-extra@11.0.4':
     dependencies:
       '@types/jsonfile': 6.1.4
-      '@types/node': 16.18.44
+      '@types/node': 18.19.56
 
   '@types/hash-sum@1.0.2': {}
 
@@ -5952,7 +5953,7 @@ snapshots:
 
   '@types/jsonfile@6.1.4':
     dependencies:
-      '@types/node': 16.18.44
+      '@types/node': 18.19.56
 
   '@types/linkify-it@3.0.5': {}
 
@@ -5991,6 +5992,10 @@ snapshots:
   '@types/ms@0.7.34': {}
 
   '@types/node@16.18.44': {}
+
+  '@types/node@18.19.56':
+    dependencies:
+      undici-types: 5.26.5
 
   '@types/node@20.5.1': {}
 
@@ -6829,10 +6834,10 @@ snapshots:
 
   commander@12.1.0: {}
 
-  commitizen@4.3.1(@types/node@16.18.44)(typescript@5.1.6):
+  commitizen@4.3.1(@types/node@18.19.56)(typescript@5.6.3):
     dependencies:
       cachedir: 2.3.0
-      cz-conventional-changelog: 3.3.0(@types/node@16.18.44)(typescript@5.1.6)
+      cz-conventional-changelog: 3.3.0(@types/node@18.19.56)(typescript@5.6.3)
       dedent: 0.7.0
       detect-indent: 6.1.0
       find-node-modules: 2.1.3
@@ -6938,22 +6943,13 @@ snapshots:
       ts-node: 10.9.2(@types/node@20.5.1)(typescript@5.6.3)
       typescript: 5.6.3
 
-  cosmiconfig-typescript-loader@5.0.0(@types/node@16.18.44)(cosmiconfig@9.0.0(typescript@5.1.6))(typescript@5.1.6):
+  cosmiconfig-typescript-loader@5.0.0(@types/node@18.19.56)(cosmiconfig@9.0.0(typescript@5.6.3))(typescript@5.6.3):
     dependencies:
-      '@types/node': 16.18.44
-      cosmiconfig: 9.0.0(typescript@5.1.6)
+      '@types/node': 18.19.56
+      cosmiconfig: 9.0.0(typescript@5.6.3)
       jiti: 1.21.6
-      typescript: 5.1.6
+      typescript: 5.6.3
     optional: true
-
-  cosmiconfig@8.3.6(typescript@5.1.6):
-    dependencies:
-      import-fresh: 3.3.0
-      js-yaml: 4.1.0
-      parse-json: 5.2.0
-      path-type: 4.0.0
-    optionalDependencies:
-      typescript: 5.1.6
 
   cosmiconfig@8.3.6(typescript@5.6.3):
     dependencies:
@@ -6964,14 +6960,14 @@ snapshots:
     optionalDependencies:
       typescript: 5.6.3
 
-  cosmiconfig@9.0.0(typescript@5.1.6):
+  cosmiconfig@9.0.0(typescript@5.6.3):
     dependencies:
       env-paths: 2.2.1
       import-fresh: 3.3.0
       js-yaml: 4.1.0
       parse-json: 5.2.0
     optionalDependencies:
-      typescript: 5.1.6
+      typescript: 5.6.3
     optional: true
 
   create-require@1.1.1: {}
@@ -6996,16 +6992,16 @@ snapshots:
 
   csstype@3.1.3: {}
 
-  cz-conventional-changelog@3.3.0(@types/node@16.18.44)(typescript@5.1.6):
+  cz-conventional-changelog@3.3.0(@types/node@18.19.56)(typescript@5.6.3):
     dependencies:
       chalk: 2.4.2
-      commitizen: 4.3.1(@types/node@16.18.44)(typescript@5.1.6)
+      commitizen: 4.3.1(@types/node@18.19.56)(typescript@5.6.3)
       conventional-commit-types: 3.0.0
       lodash.map: 4.6.0
       longest: 2.0.1
       word-wrap: 1.2.5
     optionalDependencies:
-      '@commitlint/load': 19.5.0(@types/node@16.18.44)(typescript@5.1.6)
+      '@commitlint/load': 19.5.0(@types/node@18.19.56)(typescript@5.6.3)
     transitivePeerDependencies:
       - '@types/node'
       - typescript
@@ -8191,7 +8187,7 @@ snapshots:
   lerna@7.1.5(encoding@0.1.13):
     dependencies:
       '@lerna/child-process': 7.1.5
-      '@lerna/create': 7.1.5(encoding@0.1.13)(typescript@5.1.6)
+      '@lerna/create': 7.1.5(encoding@0.1.13)(typescript@5.6.3)
       '@npmcli/run-script': 6.0.2
       '@nx/devkit': 16.10.0(nx@16.10.0)
       '@octokit/plugin-enterprise-rest': 6.0.1
@@ -8204,7 +8200,7 @@ snapshots:
       conventional-changelog-angular: 6.0.0
       conventional-changelog-core: 5.0.1
       conventional-recommended-bump: 7.0.1
-      cosmiconfig: 8.3.6(typescript@5.1.6)
+      cosmiconfig: 8.3.6(typescript@5.6.3)
       dedent: 0.7.0
       envinfo: 7.8.1
       execa: 5.0.0
@@ -8256,7 +8252,7 @@ snapshots:
       strong-log-transformer: 2.1.0
       tar: 6.1.11
       temp-dir: 1.0.0
-      typescript: 5.1.6
+      typescript: 5.6.3
       upath: 2.0.1
       uuid: 9.0.1
       validate-npm-package-license: 3.0.4
@@ -9865,8 +9861,6 @@ snapshots:
       shiki: 0.14.7
       typescript: 5.1.6
 
-  typescript@4.2.3: {}
-
   typescript@5.1.6: {}
 
   typescript@5.6.3: {}
@@ -9882,6 +9876,8 @@ snapshots:
       has-bigints: 1.0.2
       has-symbols: 1.0.3
       which-boxed-primitive: 1.0.2
+
+  undici-types@5.26.5: {}
 
   unique-filename@2.0.1:
     dependencies:
