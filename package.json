@@ -35,10 +35,10 @@
     ]
   },
   "devDependencies": {
-    "@types/chai": "4.3.5",
+    "@types/chai": "5.0.0",
     "@types/mocha": "10.0.1",
     "@types/node": "18.19.56",
-    "chai": "4.3.7",
+    "chai": "5.1.1",
     "typescript": "5.6.3",
     "fs-extra": "11.1.1",
     "husky": "8.0.3",
