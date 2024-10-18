@@ -19,7 +19,7 @@
     "website:upload": "./scripts/website-upload.sh"
   },
   "devDependencies": {
-    "@mdit-vue/shared": "0.12.0",
+    "@mdit-vue/shared": "2.1.3",
     "@vuepress/client": "2.0.0-beta.64",
     "@vuepress/plugin-docsearch": "2.0.0-beta.64",
     "@vuepress/theme-default": "2.0.0-beta.64",
