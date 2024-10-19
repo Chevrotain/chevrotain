@@ -6,7 +6,7 @@
     "chevrotain": "^0.31.0"
   },
   "scripts": {
-    "pack_antlr4": "esbuild --outfile=./performance/jsonParsers/antlr/dist/antlr_4_13_2.js --format=iife --global-name=antlr4 --allow-overwrite ./node_modules/antlr4/dist/antlr4.web.cjs",
+    "pack_antlr4": "esbuild --outfile=./performance/jsonParsers/antlr/dist/antlr_4_13_2.js --format=iife --minify --global-name=antlr4 --allow-overwrite ./node_modules/antlr4/dist/antlr4.web.cjs",
     "gen_peggy": "peggy -e peggyJsonLexerAndParser --format globals -o ./performance/jsonParsers/peggy/peggy_jison_parser.js ./performance/jsonParsers/peggy/json.peggy"
   },
   "devDependencies": {
