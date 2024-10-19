@@ -11,5 +11,5 @@ coverage/
 /lib
 /dev
 /packages
-
+/.husky
 .idea
