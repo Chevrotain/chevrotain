@@ -6,14 +6,14 @@
     "chevrotain": "^0.31.0"
   },
   "scripts": {
-    "pack_antlr4": "browserify ./node_modules/antlr4/src/antlr4/index.js -o ./bower_components/antlr4/antlr4.js -s antlr4",
+    "pack_antlr4": "esbuild --outfile=./performance/jsonParsers/antlr/dist/antlr_4_13_2.js --format=iife --global-name=antlr4 --allow-overwrite ./node_modules/antlr4/dist/antlr4.web.cjs",
     "gen_peggy": "peggy -e peggyJsonLexerAndParser --format globals -o ./performance/jsonParsers/peggy/peggy_jison_parser.js ./performance/jsonParsers/peggy/json.peggy"
   },
   "devDependencies": {
     "fs-extra": "^5.0.0",
     "peggy": "4.1.1",
-    "antlr4": "4.9.2",
-    "browserify": "^12.0.1",
+    "antlr4": "4.13.2",
+    "esbuild": "0.24.0",
     "gitty": "^3.3.2",
     "jison": "*",
     "jison-lex": "*",

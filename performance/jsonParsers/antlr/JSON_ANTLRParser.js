@@ -2,62 +2,39 @@
 var antlr4Json;
 (function (antlr4Json) {
 
-// Generated from JSON_ANTLR.g4 by ANTLR 4.9.2
+// Generated from JSON_ANTLR.g4 by ANTLR 4.13.2
 // jshint ignore: start
-
-const serializedATN = ["\u0003\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786",
-    "\u5964\u0003\u000e<\u0004\u0002\t\u0002\u0004\u0003\t\u0003\u0004\u0004",
-    "\t\u0004\u0004\u0005\t\u0005\u0004\u0006\t\u0006\u0003\u0002\u0003\u0002",
-    "\u0005\u0002\u000f\n\u0002\u0003\u0003\u0003\u0003\u0003\u0003\u0003",
-    "\u0003\u0007\u0003\u0015\n\u0003\f\u0003\u000e\u0003\u0018\u000b\u0003",
-    "\u0003\u0003\u0003\u0003\u0003\u0003\u0003\u0003\u0005\u0003\u001e\n",
-    "\u0003\u0003\u0004\u0003\u0004\u0003\u0004\u0003\u0004\u0003\u0005\u0003",
-    "\u0005\u0003\u0005\u0003\u0005\u0007\u0005(\n\u0005\f\u0005\u000e\u0005",
-    "+\u000b\u0005\u0003\u0005\u0003\u0005\u0003\u0005\u0003\u0005\u0005",
-    "\u00051\n\u0005\u0003\u0006\u0003\u0006\u0003\u0006\u0003\u0006\u0003",
-    "\u0006\u0003\u0006\u0003\u0006\u0005\u0006:\n\u0006\u0003\u0006\u0002",
-    "\u0002\u0007\u0002\u0004\u0006\b\n\u0002\u0002\u0002A\u0002\u000e\u0003",
-    "\u0002\u0002\u0002\u0004\u001d\u0003\u0002\u0002\u0002\u0006\u001f\u0003",
-    "\u0002\u0002\u0002\b0\u0003\u0002\u0002\u0002\n9\u0003\u0002\u0002\u0002",
-    "\f\u000f\u0005\u0004\u0003\u0002\r\u000f\u0005\b\u0005\u0002\u000e\f",
-    "\u0003\u0002\u0002\u0002\u000e\r\u0003\u0002\u0002\u0002\u000f\u0003",
-    "\u0003\u0002\u0002\u0002\u0010\u0011\u0007\u0003\u0002\u0002\u0011\u0016",
-    "\u0005\u0006\u0004\u0002\u0012\u0013\u0007\u0004\u0002\u0002\u0013\u0015",
-    "\u0005\u0006\u0004\u0002\u0014\u0012\u0003\u0002\u0002\u0002\u0015\u0018",
-    "\u0003\u0002\u0002\u0002\u0016\u0014\u0003\u0002\u0002\u0002\u0016\u0017",
-    "\u0003\u0002\u0002\u0002\u0017\u0019\u0003\u0002\u0002\u0002\u0018\u0016",
-    "\u0003\u0002\u0002\u0002\u0019\u001a\u0007\u0005\u0002\u0002\u001a\u001e",
-    "\u0003\u0002\u0002\u0002\u001b\u001c\u0007\u0003\u0002\u0002\u001c\u001e",
-    "\u0007\u0005\u0002\u0002\u001d\u0010\u0003\u0002\u0002\u0002\u001d\u001b",
-    "\u0003\u0002\u0002\u0002\u001e\u0005\u0003\u0002\u0002\u0002\u001f ",
-    "\u0007\r\u0002\u0002 !\u0007\u0006\u0002\u0002!\"\u0005\n\u0006\u0002",
-    "\"\u0007\u0003\u0002\u0002\u0002#$\u0007\u0007\u0002\u0002$)\u0005\n",
-    "\u0006\u0002%&\u0007\u0004\u0002\u0002&(\u0005\n\u0006\u0002\'%\u0003",
-    "\u0002\u0002\u0002(+\u0003\u0002\u0002\u0002)\'\u0003\u0002\u0002\u0002",
-    ")*\u0003\u0002\u0002\u0002*,\u0003\u0002\u0002\u0002+)\u0003\u0002\u0002",
-    "\u0002,-\u0007\b\u0002\u0002-1\u0003\u0002\u0002\u0002./\u0007\u0007",
-    "\u0002\u0002/1\u0007\b\u0002\u00020#\u0003\u0002\u0002\u00020.\u0003",
-    "\u0002\u0002\u00021\t\u0003\u0002\u0002\u00022:\u0007\r\u0002\u0002",
-    "3:\u0007\u000e\u0002\u00024:\u0005\u0004\u0003\u00025:\u0005\b\u0005",
-    "\u00026:\u0007\t\u0002\u00027:\u0007\n\u0002\u00028:\u0007\u000b\u0002",
-    "\u000292\u0003\u0002\u0002\u000293\u0003\u0002\u0002\u000294\u0003\u0002",
-    "\u0002\u000295\u0003\u0002\u0002\u000296\u0003\u0002\u0002\u000297\u0003",
-    "\u0002\u0002\u000298\u0003\u0002\u0002\u0002:\u000b\u0003\u0002\u0002",
-    "\u0002\b\u000e\u0016\u001d)09"].join("");
+const serializedATN = [4,1,12,58,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,
+1,0,1,0,3,0,13,8,0,1,1,1,1,1,1,1,1,5,1,19,8,1,10,1,12,1,22,9,1,1,1,1,1,1,
+1,1,1,3,1,28,8,1,1,2,1,2,1,2,1,2,1,3,1,3,1,3,1,3,5,3,38,8,3,10,3,12,3,41,
+9,3,1,3,1,3,1,3,1,3,3,3,47,8,3,1,4,1,4,1,4,1,4,1,4,1,4,1,4,3,4,56,8,4,1,
+4,0,0,5,0,2,4,6,8,0,0,63,0,12,1,0,0,0,2,27,1,0,0,0,4,29,1,0,0,0,6,46,1,0,
+0,0,8,55,1,0,0,0,10,13,3,2,1,0,11,13,3,6,3,0,12,10,1,0,0,0,12,11,1,0,0,0,
+13,1,1,0,0,0,14,15,5,1,0,0,15,20,3,4,2,0,16,17,5,2,0,0,17,19,3,4,2,0,18,
+16,1,0,0,0,19,22,1,0,0,0,20,18,1,0,0,0,20,21,1,0,0,0,21,23,1,0,0,0,22,20,
+1,0,0,0,23,24,5,3,0,0,24,28,1,0,0,0,25,26,5,1,0,0,26,28,5,3,0,0,27,14,1,
+0,0,0,27,25,1,0,0,0,28,3,1,0,0,0,29,30,5,11,0,0,30,31,5,4,0,0,31,32,3,8,
+4,0,32,5,1,0,0,0,33,34,5,5,0,0,34,39,3,8,4,0,35,36,5,2,0,0,36,38,3,8,4,0,
+37,35,1,0,0,0,38,41,1,0,0,0,39,37,1,0,0,0,39,40,1,0,0,0,40,42,1,0,0,0,41,
+39,1,0,0,0,42,43,5,6,0,0,43,47,1,0,0,0,44,45,5,5,0,0,45,47,5,6,0,0,46,33,
+1,0,0,0,46,44,1,0,0,0,47,7,1,0,0,0,48,56,5,11,0,0,49,56,5,12,0,0,50,56,3,
+2,1,0,51,56,3,6,3,0,52,56,5,7,0,0,53,56,5,8,0,0,54,56,5,9,0,0,55,48,1,0,
+0,0,55,49,1,0,0,0,55,50,1,0,0,0,55,51,1,0,0,0,55,52,1,0,0,0,55,53,1,0,0,
+0,55,54,1,0,0,0,56,9,1,0,0,0,6,12,20,27,39,46,55];
 
 
 const atn = new antlr4.atn.ATNDeserializer().deserialize(serializedATN);
 
 const decisionsToDFA = atn.decisionToState.map( (ds, index) => new antlr4.dfa.DFA(ds, index) );
 
-const sharedContextCache = new antlr4.PredictionContextCache();
+const sharedContextCache = new antlr4.atn.PredictionContextCache();
 
 class JSON_ANTLRParser extends antlr4.Parser {
 
     static grammarFileName = "JSON_ANTLR.g4";
-    static literalNames = [ null, "'{'", "','", "'}'", "':'", "'['", "']'", 
+    static literalNames = [ null, "'{'", "','", "'}'", "':'", "'['", "']'",
                             "'true'", "'false'", "'null'" ];
-    static symbolicNames = [ null, null, null, null, null, null, null, null, 
+    static symbolicNames = [ null, null, null, null, null, null, null, null,
                              null, null, "WS", "STRING", "NUMBER" ];
     static ruleNames = [ "json", "object", "pair", "array", "value" ];
 
@@ -69,10 +46,6 @@ class JSON_ANTLRParser extends antlr4.Parser {
         this.symbolicNames = JSON_ANTLRParser.symbolicNames;
     }
 
-    get atn() {
-        return atn;
-    }
-
 
 
 	json() {
@@ -82,12 +55,12 @@ class JSON_ANTLRParser extends antlr4.Parser {
 	        this.state = 12;
 	        this._errHandler.sync(this);
 	        switch(this._input.LA(1)) {
-	        case JSON_ANTLRParser.T__0:
+	        case 1:
 	            this.enterOuterAlt(localctx, 1);
 	            this.state = 10;
 	            this.object();
 	            break;
-	        case JSON_ANTLRParser.T__4:
+	        case 5:
 	            this.enterOuterAlt(localctx, 2);
 	            this.state = 11;
 	            this.array();
@@ -114,7 +87,7 @@ class JSON_ANTLRParser extends antlr4.Parser {
 	object() {
 	    let localctx = new ObjectContext(this, this._ctx, this.state);
 	    this.enterRule(localctx, 2, JSON_ANTLRParser.RULE_object);
-	    var _la = 0; // Token type
+	    var _la = 0;
 	    try {
 	        this.state = 27;
 	        this._errHandler.sync(this);
@@ -129,7 +102,7 @@ class JSON_ANTLRParser extends antlr4.Parser {
 	            this.state = 20;
 	            this._errHandler.sync(this);
 	            _la = this._input.LA(1);
-	            while(_la===JSON_ANTLRParser.T__1) {
+	            while(_la===2) {
 	                this.state = 16;
 	                this.match(JSON_ANTLRParser.T__1);
 	                this.state = 17;
@@ -197,7 +170,7 @@ class JSON_ANTLRParser extends antlr4.Parser {
 	array() {
 	    let localctx = new ArrayContext(this, this._ctx, this.state);
 	    this.enterRule(localctx, 6, JSON_ANTLRParser.RULE_array);
-	    var _la = 0; // Token type
+	    var _la = 0;
 	    try {
 	        this.state = 46;
 	        this._errHandler.sync(this);
@@ -212,7 +185,7 @@ class JSON_ANTLRParser extends antlr4.Parser {
 	            this.state = 39;
 	            this._errHandler.sync(this);
 	            _la = this._input.LA(1);
-	            while(_la===JSON_ANTLRParser.T__1) {
+	            while(_la===2) {
 	                this.state = 35;
 	                this.match(JSON_ANTLRParser.T__1);
 	                this.state = 36;
@@ -257,37 +230,37 @@ class JSON_ANTLRParser extends antlr4.Parser {
 	        this.state = 55;
 	        this._errHandler.sync(this);
 	        switch(this._input.LA(1)) {
-	        case JSON_ANTLRParser.STRING:
+	        case 11:
 	            this.enterOuterAlt(localctx, 1);
 	            this.state = 48;
 	            this.match(JSON_ANTLRParser.STRING);
 	            break;
-	        case JSON_ANTLRParser.NUMBER:
+	        case 12:
 	            this.enterOuterAlt(localctx, 2);
 	            this.state = 49;
 	            this.match(JSON_ANTLRParser.NUMBER);
 	            break;
-	        case JSON_ANTLRParser.T__0:
+	        case 1:
 	            this.enterOuterAlt(localctx, 3);
 	            this.state = 50;
 	            this.object();
 	            break;
-	        case JSON_ANTLRParser.T__4:
+	        case 5:
 	            this.enterOuterAlt(localctx, 4);
 	            this.state = 51;
 	            this.array();
 	            break;
-	        case JSON_ANTLRParser.T__6:
+	        case 7:
 	            this.enterOuterAlt(localctx, 5);
 	            this.state = 52;
 	            this.match(JSON_ANTLRParser.T__6);
 	            break;
-	        case JSON_ANTLRParser.T__7:
+	        case 8:
 	            this.enterOuterAlt(localctx, 6);
 	            this.state = 53;
 	            this.match(JSON_ANTLRParser.T__7);
 	            break;
-	        case JSON_ANTLRParser.T__8:
+	        case 9:
 	            this.enterOuterAlt(localctx, 7);
 	            this.state = 54;
 	            this.match(JSON_ANTLRParser.T__8);
@@ -482,10 +455,10 @@ class ValueContext extends antlr4.ParserRuleContext {
 
 
 
-JSON_ANTLRParser.JsonContext = JsonContext; 
-JSON_ANTLRParser.ObjectContext = ObjectContext; 
-JSON_ANTLRParser.PairContext = PairContext; 
-JSON_ANTLRParser.ArrayContext = ArrayContext; 
+JSON_ANTLRParser.JsonContext = JsonContext;
+JSON_ANTLRParser.ObjectContext = ObjectContext;
+JSON_ANTLRParser.PairContext = PairContext;
+JSON_ANTLRParser.ArrayContext = ArrayContext;
 JSON_ANTLRParser.ValueContext = ValueContext;
 
 	// change to generated code: 'exporting' via ns object
