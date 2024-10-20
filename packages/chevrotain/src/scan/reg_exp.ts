@@ -263,7 +263,7 @@ class CharCodeFinder extends BaseRegExpVisitor {
       return;
     }
 
-    // switch lookaheads as they do not actually consume any characters thus
+    // switch lookaheads / lookbehinds as they do not actually consume any characters thus
     // finding a charCode at lookahead context does not mean that regexp can actually contain it in a match.
     switch (node.type) {
       case "Lookahead":
@@ -272,7 +272,13 @@ class CharCodeFinder extends BaseRegExpVisitor {
       case "NegativeLookahead":
         this.visitNegativeLookahead(node);
         return;
-    }
+      case "Lookbehind":
+        this.visitLookbehind(node);
+        return;
+      case "NegativeLookbehind":
+        this.visitNegativeLookbehind(node);
+        return;
+      }
 
     super.visitChildren(node);
   }

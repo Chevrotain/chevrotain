@@ -55,7 +55,9 @@ export interface Assertion extends IRegExpAST {
     | "WordBoundary"
     | "NonWordBoundary"
     | "Lookahead"
-    | "NegativeLookahead";
+    | "NegativeLookahead"
+    | "Lookbehind"
+    | "NegativeLookbehind";
 
   value?: Disjunction;
 }
@@ -126,6 +128,8 @@ export class BaseRegExpVisitor {
   visitNonWordBoundary(node: Assertion): void;
   visitLookahead(node: Assertion): void;
   visitNegativeLookahead(node: Assertion): void;
+  visitLookbehind(node: Assertion): void;
+  visitNegativeLookbehind(node: Assertion): void;
   visitCharacter(node: Character): void;
   visitSet(node: Set): void;
   visitGroup(Node: Group): void;
