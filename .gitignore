@@ -13,3 +13,4 @@ coverage/
 /packages
 /.husky
 .idea
+.husky

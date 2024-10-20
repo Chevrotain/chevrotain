@@ -1,0 +1,6 @@
+{
+  // codemirror seems to display the examples source code with wrong indentation
+  // if we use the default prettier options.
+  // see: https://github.com/Chevrotain/chevrotain/issues/2037
+  "tabWidth": 4,
+}

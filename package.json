@@ -10,6 +10,7 @@
     "gen_peggy": "peggy -e peggyJsonLexerAndParser --format globals -o ./performance/jsonParsers/peggy/peggy_jison_parser.js ./performance/jsonParsers/peggy/json.peggy"
   },
   "devDependencies": {
+    "prettier" : "3.3.3",
     "fs-extra": "^5.0.0",
     "peggy": "4.1.1",
     "antlr4": "4.13.2",
