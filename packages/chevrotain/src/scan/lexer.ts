@@ -66,6 +66,7 @@ export interface IAnalyzeResult {
   emptyGroups: { [groupName: string]: IToken[] };
   hasCustom: boolean;
   canBeOptimized: boolean;
+  unoptimizedPatterns: IPatternConfig[];
 }
 
 export let SUPPORT_STICKY =
@@ -306,6 +307,7 @@ export function analyzeTokenTypes(
   });
 
   let canBeOptimized = true;
+  let unoptimizedPatterns: IPatternConfig[] = [];
   let charCodeToPatternIdxToConfig: { [charCode: number]: IPatternConfig[] } =
     [];
 
@@ -317,7 +319,12 @@ export function analyzeTokenTypes(
           if (typeof currTokType.PATTERN === "string") {
             const charCode = currTokType.PATTERN.charCodeAt(0);
             const optimizedIdx = charCodeToOptimizedIndex(charCode);
-            addToMapOfArrays(result, optimizedIdx, patternIdxToConfig[idx]);
+            addToMapOfArrays(
+              result,
+              optimizedIdx,
+              patternIdxToConfig[idx],
+              unoptimizedPatterns,
+            );
           } else if (isArray(currTokType.START_CHARS_HINT)) {
             let lastOptimizedIdx: number;
             forEach(currTokType.START_CHARS_HINT, (charOrInt) => {
@@ -336,21 +343,31 @@ export function analyzeTokenTypes(
                   result,
                   currOptimizedIdx,
                   patternIdxToConfig[idx],
+                  unoptimizedPatterns,
                 );
               }
             });
           } else if (isRegExp(currTokType.PATTERN)) {
             if (currTokType.PATTERN.unicode) {
-              canBeOptimized = false;
+              forEach(Object.keys(result), (code) => {
+                addToMapOfArrays(
+                  result,
+                  Number(code),
+                  patternIdxToConfig[idx],
+                  unoptimizedPatterns,
+                );
+              });
+              unoptimizedPatterns.push(patternIdxToConfig[idx]);
               if (options.ensureOptimizations) {
                 PRINT_ERROR(
                   `${failedOptimizationPrefixMsg}` +
                     `\tUnable to analyze < ${currTokType.PATTERN.toString()} > pattern.\n` +
                     "\tThe regexp unicode flag is not currently supported by the regexp-to-ast library.\n" +
-                    "\tThis will disable the lexer's first char optimizations.\n" +
+                    "\tThis reduces lexer performance.\n" +
                     "\tFor details See: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#UNICODE_OPTIMIZE",
                 );
               }
+              canBeOptimized = false;
             } else {
               const optimizedCodes = getOptimizedStartCodesIndices(
                 currTokType.PATTERN,
@@ -358,27 +375,49 @@ export function analyzeTokenTypes(
               );
               /* istanbul ignore if */
               // start code will only be empty given an empty regExp or failure of regexp-to-ast library
-              // the first should be a different validation and the second cannot be tested.
               if (isEmpty(optimizedCodes)) {
                 // we cannot understand what codes may start possible matches
-                // The optimization correctness requires knowing start codes for ALL patterns.
-                // Not actually sure this is an error, no debug message
+                // instead, simply add the token to all known start characters
+                forEach(Object.keys(result), (code) => {
+                  addToMapOfArrays(
+                    result,
+                    Number(code),
+                    patternIdxToConfig[idx],
+                    unoptimizedPatterns,
+                  );
+                });
+                unoptimizedPatterns.push(patternIdxToConfig[idx]);
                 canBeOptimized = false;
+              } else {
+                forEach(optimizedCodes, (code) => {
+                  addToMapOfArrays(
+                    result,
+                    code,
+                    patternIdxToConfig[idx],
+                    unoptimizedPatterns,
+                  );
+                });
               }
-              forEach(optimizedCodes, (code) => {
-                addToMapOfArrays(result, code, patternIdxToConfig[idx]);
-              });
             }
           } else {
             if (options.ensureOptimizations) {
               PRINT_ERROR(
                 `${failedOptimizationPrefixMsg}` +
                   `\tTokenType: <${currTokType.name}> is using a custom token pattern without providing <start_chars_hint> parameter.\n` +
-                  "\tThis will disable the lexer's first char optimizations.\n" +
+                  "\tThis reduces lexer performance.\n" +
                   "\tFor details See: https://chevrotain.io/docs/guide/resolving_lexer_errors.html#CUSTOM_OPTIMIZE",
               );
             }
             canBeOptimized = false;
+            forEach(Object.keys(result), (code) => {
+              addToMapOfArrays(
+                result,
+                Number(code),
+                patternIdxToConfig[idx],
+                unoptimizedPatterns,
+              );
+            });
+            unoptimizedPatterns.push(patternIdxToConfig[idx]);
           }
 
           return result;
@@ -389,11 +428,12 @@ export function analyzeTokenTypes(
   }
 
   return {
-    emptyGroups: emptyGroups,
-    patternIdxToConfig: patternIdxToConfig,
-    charCodeToPatternIdxToConfig: charCodeToPatternIdxToConfig,
-    hasCustom: hasCustom,
-    canBeOptimized: canBeOptimized,
+    emptyGroups,
+    patternIdxToConfig,
+    charCodeToPatternIdxToConfig,
+    hasCustom,
+    canBeOptimized,
+    unoptimizedPatterns,
   };
 }
 
@@ -1125,9 +1165,10 @@ function addToMapOfArrays<T>(
   map: Record<number, T[]>,
   key: number,
   value: T,
+  initial: T[],
 ): void {
   if (map[key] === undefined) {
-    map[key] = [value];
+    map[key] = [...initial, value];
   } else {
     map[key].push(value);
   }
