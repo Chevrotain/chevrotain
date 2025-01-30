@@ -104,6 +104,12 @@
                        href="https://github.com/Chevrotain/chevrotain/blob/gh-pages/performance/jsonParsers/ohm/ohm_json_parser.js">parser</a>
                 </p></li>
 
+                <li><p>
+                    <a rel="nofollow" href="https://github.com/egemadra/recursive-descent">Recursive-Descent</a> Parser Builder
+                    <a rel="nofollow"
+                       href="https://github.com/Chevrotain/chevrotain/blob/gh-pages/performance/jsonParsers/recursive-descent/json.grammar">grammar</a>
+                </p></li>
+
             </ol>
 
             <p>
@@ -262,6 +268,18 @@
                         <div class="benchInclude"><input type="checkbox"/></div>
 
                     </div>
+
+                    <div class="dataRow RecursiveDescent">
+
+                        <div class="benchName"><a rel="nofollow" href="https://github.com/egemadra/recursive-descent">Recursive-Descent</a></div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox"/></div>
+
+                    </div>
                 </div>
             </div>
             <canvas id="parsersResultChart"></canvas>
@@ -292,6 +310,7 @@
     var parsimmonFrame = includeTestIFrame("parsimmon", "./jsonParsers/parsimmon/parsimmon.html")
     var pegjsFrame = includeTestIFrame("pegjs", "./jsonParsers/pegjs/pegjs.html")
     var peggyFrame = includeTestIFrame("peggy", "./jsonParsers/peggy/peggy.html")
+    var recursiveDescentFrame = includeTestIFrame("recursive-descent", "./jsonParsers/recursive-descent/recursive-descent.html")
 
     $("iframe").css("visibility", "hidden")
 
@@ -439,6 +458,10 @@
 
         Ohm: function (suite) {
             addTest(suite, 'Ohm', ohmFrame.parse)
+        },
+
+        RecursiveDescent: function (suite) {
+            addTest(suite, 'RecursiveDescent', recursiveDescentFrame.parse)
         }
     }
 

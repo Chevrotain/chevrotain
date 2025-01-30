@@ -1,0 +1,26 @@
+//based on
+//https://github.com/antlr/grammars-v4/blob/master/json/JSON.g4
+
+ignore = ~[ \t\n\r]+~ ;
+
+false = 'false';
+true  = 'true';
+null  = 'null';
+
+program : value ;
+
+value : string | number | object | array | true | false | null ;
+
+object : '{' object_body? '}' ;
+
+object_body : pair <(',' pair)* ;
+
+pair : string ':' value ;
+
+array : '[' array_body? ']' ;
+
+array_body : value <(',' value)* ;
+
+string = ~"((\\u[A-Fa-f0-9]{4})|[^\\"\u0000-\u001F]|(\\[bfnrt"\\]))*"~ ;
+
+number = ~\-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+\-]?(0|[1-9][0-9]*))?~ ;
