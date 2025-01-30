@@ -10,17 +10,18 @@
     "gen_peggy": "peggy -e peggyJsonLexerAndParser --format globals -o ./performance/jsonParsers/peggy/peggy_jison_parser.js ./performance/jsonParsers/peggy/json.peggy"
   },
   "devDependencies": {
-    "prettier" : "3.3.3",
-    "fs-extra": "^5.0.0",
-    "peggy": "4.1.1",
     "antlr4": "4.13.2",
     "esbuild": "0.24.0",
+    "fs-extra": "^5.0.0",
     "gitty": "^3.3.2",
     "jison": "*",
     "jison-lex": "*",
     "jsonfile": "^2.2.3",
     "lodash": "^3.10.1",
     "nearley": "2.20.1",
+    "peggy": "4.1.1",
+    "prettier": "3.3.3",
+    "recursive-descent": "^0.1.2",
     "wrench": "^1.5.8"
   },
   "private": true
