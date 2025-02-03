@@ -190,3 +190,28 @@ These are only required if you are trying to squeeze every tiny bit of performan
 
     The \*\_SEP DSL methods also collect the separator Tokens parsed. Creating these arrays has a small overhead (several percentage).
     Which is a complete waste in most cases where those separators tokens are not needed for any output data structure.
+    For example:
+
+    ```javascript
+    $.RULE("parameterList", () => {
+        $.AT_LEAST_ONE_SEP({
+            SEP: Comma,
+            DEF: () => {
+                $.CONSUME(Identifier);
+            } 
+        });
+    });
+    ```
+
+    Could be rewritten as:
+    
+    ```javascript 
+    $.RULE("parameterList", () => {
+        $.CONSUME(Identifier);
+
+        while ($.LA(1).tokenType == Comma) {
+            $.SKIP_TOKEN();
+            $.CONSUME2(Identifier);
+        }
+    });
+    ```
