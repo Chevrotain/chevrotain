@@ -97,6 +97,7 @@ export class Lexer {
   public lexerDefinitionWarning: ILexerDefinitionError[] = [];
 
   protected patternIdxToConfig: Record<string, IPatternConfig[]> = {};
+  protected unoptimizedPatterns: Record<string, IPatternConfig[]> = {};
   protected charCodeToPatternIdxToConfig: {
     [modeName: string]: { [charCode: number]: IPatternConfig[] };
   } = {};
@@ -261,6 +262,9 @@ export class Lexer {
               this.charCodeToPatternIdxToConfig[currModName] =
                 currAnalyzeResult.charCodeToPatternIdxToConfig;
 
+              this.unoptimizedPatterns[currModName] =
+                currAnalyzeResult.unoptimizedPatterns;
+
               this.emptyGroups = assign(
                 {},
                 this.emptyGroups,
@@ -344,6 +348,11 @@ export class Lexer {
       });
 
       this.TRACE_INIT("Failed Optimization Warnings", () => {
+        if (config.ensureOptimizations !== true) {
+          // Return early
+          return;
+        }
+
         const unOptimizedModes = reduce(
           this.canModeBeOptimized,
           (cannotBeOptimized, canBeOptimized, modeName) => {
@@ -355,7 +364,7 @@ export class Lexer {
           [] as string[],
         );
 
-        if (config.ensureOptimizations && !isEmpty(unOptimizedModes)) {
+        if (!isEmpty(unOptimizedModes)) {
           throw Error(
             `Lexer Modes: < ${unOptimizedModes.join(
               ", ",
@@ -438,14 +447,13 @@ export class Lexer {
 
     let currModePatternsLength = 0;
     let patternIdxToConfig: IPatternConfig[] = [];
+    let unoptimizedPatterns: IPatternConfig[] = [];
     let currCharCodeToPatternIdxToConfig: {
       [charCode: number]: IPatternConfig[];
     } = [];
 
     const modeStack: string[] = [];
 
-    const emptyArray: IPatternConfig[] = [];
-    Object.freeze(emptyArray);
     let getPossiblePatterns!: (charCode: number) => IPatternConfig[];
 
     function getPossiblePatternsSlow() {
@@ -457,7 +465,7 @@ export class Lexer {
       const possiblePatterns =
         currCharCodeToPatternIdxToConfig[optimizedCharIdx];
       if (possiblePatterns === undefined) {
-        return emptyArray;
+        return unoptimizedPatterns;
       } else {
         return possiblePatterns;
       }
@@ -492,10 +500,12 @@ export class Lexer {
         currCharCodeToPatternIdxToConfig =
           this.charCodeToPatternIdxToConfig[newMode];
         currModePatternsLength = patternIdxToConfig.length;
-        const modeCanBeOptimized =
-          this.canModeBeOptimized[newMode] && this.config.safeMode === false;
+        unoptimizedPatterns = this.unoptimizedPatterns[newMode];
 
-        if (currCharCodeToPatternIdxToConfig && modeCanBeOptimized) {
+        if (
+          currCharCodeToPatternIdxToConfig &&
+          this.config.safeMode === false
+        ) {
           getPossiblePatterns = getPossiblePatternsOptimized;
         } else {
           getPossiblePatterns = getPossiblePatternsSlow;
@@ -508,14 +518,14 @@ export class Lexer {
       currCharCodeToPatternIdxToConfig =
         this.charCodeToPatternIdxToConfig[newMode];
 
+      unoptimizedPatterns = this.unoptimizedPatterns[newMode];
+
       patternIdxToConfig = this.patternIdxToConfig[newMode];
       currModePatternsLength = patternIdxToConfig.length;
 
       currModePatternsLength = patternIdxToConfig.length;
-      const modeCanBeOptimized =
-        this.canModeBeOptimized[newMode] && this.config.safeMode === false;
 
-      if (currCharCodeToPatternIdxToConfig && modeCanBeOptimized) {
+      if (currCharCodeToPatternIdxToConfig && this.config.safeMode === false) {
         getPossiblePatterns = getPossiblePatternsOptimized;
       } else {
         getPossiblePatterns = getPossiblePatternsSlow;
