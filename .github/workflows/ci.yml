@@ -23,9 +23,8 @@ jobs:
         with:
           node-version: ${{ matrix.node_version }}
 
+      # pnpm version is taken form package.json `packageManager`
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9.12.2
 
       - name: Install dependencies
         run: pnpm install
