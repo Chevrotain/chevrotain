@@ -55,7 +55,7 @@ This causes several important limitations:
 These limitations may seem daunting at first, but should not cause great problems in actual practice.
 The following sections will discuss each limitation in details.
 
-## Performance.
+## Performance
 
 An order of magnitude slower performance may at first sound like a horrible thing.
 Lets put this in perspective for relevant use cases:
@@ -143,7 +143,7 @@ return Math.max(five, six)
 
 6.  However if we only send the text of the third statement ("let six = 1 + ") content assist will work successfully.
 
-## Gates / Predicates.
+## Gates / Predicates
 
 Gates / Predicates behave is limiters of the available grammar. These constructs are not often used in grammars
 which reduces the severity of this limitation.
