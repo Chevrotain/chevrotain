@@ -27,7 +27,7 @@ of syntax diagrams. This html source code can then be used by an end user in eit
 
 **Examples:**
 
-- [Generating syntax diagrams to a file](https://github.com/chevrotain/chevrotain/blob/master/examples/parser/diagrams/gen_diagrams.js)
+- [Generating syntax diagrams to a file](https://github.com/chevrotain/chevrotain/blob/master/examples/parser/diagrams/creating_html_file.js)
 
   - Self contained, no need for Chevrotain or the grammar when rendering the html.
 
