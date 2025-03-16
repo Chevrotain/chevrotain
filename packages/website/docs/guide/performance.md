@@ -174,7 +174,7 @@ These are only required if you are trying to squeeze every tiny bit of performan
 
 2.  **Avoid creating parsing rules which only parse a single Terminal.**
 
-    There is a certain fixed overhead for the invocation of each parsing rule.
+    There is a small fixed overhead for the invocation of each parsing rule.
     Normally there is no reason to pay it for a Rule which only consumes a single Terminal.
     For example:
 
@@ -184,9 +184,4 @@ These are only required if you are trying to squeeze every tiny bit of performan
     });
     ```
 
-    Instead such a rule's contents should be (manually) in-lined in its call sites.
-
-3.  **Avoid \*\_SEP DSL methods (MANY_SEP / AT_LEAST_ONE_SEP).**
-
-    The \*\_SEP DSL methods also collect the separator Tokens parsed. Creating these arrays has a small overhead (several percentage).
-    Which is a complete waste in most cases where those separators tokens are not needed for any output data structure.
+    Instead, such a rule's contents should be (manually) inlined in its call sites.
