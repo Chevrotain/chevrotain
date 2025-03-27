@@ -1395,6 +1395,8 @@ export interface ILexerErrorMessageProvider {
    *
    * @param column - Column number where the error occurred. (optional)
    *                    Will not be provided when lexer is not defined to track lines/columns
+   *
+   * @param mode - The current lexer mode.
    */
   buildUnexpectedCharactersMessage(
     fullText: string,
@@ -1402,6 +1404,7 @@ export interface ILexerErrorMessageProvider {
     length: number,
     line?: number,
     column?: number,
+    mode?: string,
   ): string;
 
   /**

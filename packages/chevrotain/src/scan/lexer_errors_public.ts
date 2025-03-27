@@ -11,6 +11,7 @@ export const defaultLexerErrorProvider: ILexerErrorMessageProvider = {
     length: number,
     line?: number,
     column?: number,
+    mode?: string,
   ): string {
     return (
       `unexpected character: ->${fullText.charAt(
