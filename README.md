@@ -21,7 +21,7 @@ and [**feature rich**](http://chevrotain.io/docs/features/blazing_fast.html)
 **Parser Building Toolkit** for **JavaScript** with built-in support for **LL(K)**.
 Grammars and [3rd party plugin for **LL(\*)**](https://github.com/langium/chevrotain-allstar) grammars.
 It can be used to build parsers/compilers/interpreters for various use cases ranging from simple configuration files,
-to full-fledged programing languages.
+to full-fledged programming languages.
 
 Grammars are written as [**pure JavaScript sources**](https://chevrotain.io/docs/FAQ.html#VS_GENERATORS) without a code generation phase,
 
