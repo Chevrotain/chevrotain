@@ -1514,7 +1514,7 @@ export interface ITokenConfig {
    * cannot be resolved (only) by the ordering of the Tokens in the lexer definition.
    *
    * - Note that the `longer_alt` capability **cannot be chained**.
-   * - Note that the **first** matched `longer_alt` takes precendence.
+   * - Note that the **first** matched `longer_alt` takes precedence.
    *
    * For example see: https://github.com/chevrotain/chevrotain/tree/master/examples/lexer/keywords_vs_identifiers
    * For resolving the keywords vs Identifier ambiguity.
