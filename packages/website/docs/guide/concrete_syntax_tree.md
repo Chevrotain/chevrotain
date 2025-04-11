@@ -309,7 +309,7 @@ output = {
     Select: ["select"],
     Identifier: ["age, persons"],
     From: ["from"],
-    // No "Where" key d,ue to the parse error
+    // No "Where" key due to the parse error
     // No "expression" key due to the parse error
   },
   // This marks a recovered node.
