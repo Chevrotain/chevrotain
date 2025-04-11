@@ -131,7 +131,7 @@ export class Parser {
   // Set this flag to true if you don't want the Parser to throw error when problems in it's definition are detected.
   // (normally during the parser's constructor).
   // This is a design time flag, it will not affect the runtime error handling of the parser, just design time errors,
-  // for example: duplicate rule names, referencing an unresolved subrule, ect...
+  // for example: duplicate rule names, referencing an unresolved subrule, etc...
   // This flag should not be enabled during normal usage, it is used in special situations, for example when
   // needing to display the parser definition errors in some GUI(online playground).
   static DEFER_DEFINITION_ERRORS_HANDLING: boolean = false;

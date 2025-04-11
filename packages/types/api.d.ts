@@ -1923,7 +1923,7 @@ export interface ICstVisitor<IN, OUT> {
  * This is unlike an AST (Abstract Syntax Tree) where some of the syntactic information is missing.
  *
  * For example given an ECMAScript grammar, an AST would normally not contain information on the location
- * of Commas, Semi colons, redundant parenthesis ect, however a CST would have that information.
+ * of Commas, Semi colons, redundant parenthesis etc, however a CST would have that information.
  */
 export interface CstNode {
   readonly name: string;
