@@ -867,7 +867,7 @@ declare abstract class BaseParser {
    * LA(n) is the nth Token ahead.
    * LA(0) is the previously consumed Token.
    *
-   * Looking beyond the end of the Token Vector or before its begining
+   * Looking beyond the end of the Token Vector or before its beginning
    * will return in an IToken of type EOF {@link EOF}.
    * This behavior can be used to avoid infinite loops.
    *
