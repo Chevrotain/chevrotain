@@ -157,7 +157,7 @@ const parser = new CalculatorPure([]);
 // Obtains the default CstVisitor constructor to extend.
 const BaseCstVisitor = parser.getBaseCstVisitorConstructor();
 
-// All our semantics go into the visitor, completly separated from the grammar.
+// All our semantics go into the visitor, completely separated from the grammar.
 class CalculatorInterpreter extends BaseCstVisitor {
   constructor() {
     super();
