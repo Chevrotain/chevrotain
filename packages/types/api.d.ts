@@ -867,7 +867,7 @@ declare abstract class BaseParser {
    * LA(n) is the nth Token ahead.
    * LA(0) is the previously consumed Token.
    *
-   * Looking beyond the end of the Token Vector or before its begining
+   * Looking beyond the end of the Token Vector or before its beginning
    * will return in an IToken of type EOF {@link EOF}.
    * This behavior can be used to avoid infinite loops.
    *
@@ -1514,7 +1514,7 @@ export interface ITokenConfig {
    * cannot be resolved (only) by the ordering of the Tokens in the lexer definition.
    *
    * - Note that the `longer_alt` capability **cannot be chained**.
-   * - Note that the **first** matched `longer_alt` takes precendence.
+   * - Note that the **first** matched `longer_alt` takes precedence.
    *
    * For example see: https://github.com/chevrotain/chevrotain/tree/master/examples/lexer/keywords_vs_identifiers
    * For resolving the keywords vs Identifier ambiguity.
@@ -1923,7 +1923,7 @@ export interface ICstVisitor<IN, OUT> {
  * This is unlike an AST (Abstract Syntax Tree) where some of the syntactic information is missing.
  *
  * For example given an ECMAScript grammar, an AST would normally not contain information on the location
- * of Commas, Semi colons, redundant parenthesis ect, however a CST would have that information.
+ * of Commas, Semi colons, redundant parenthesis etc, however a CST would have that information.
  */
 export interface CstNode {
   readonly name: string;

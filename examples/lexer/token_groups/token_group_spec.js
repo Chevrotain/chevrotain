@@ -3,7 +3,7 @@ import { tokenize, Comment, Whitespace } from "./token_groups.js";
 import { tokenMatcher } from "chevrotain";
 
 describe("The Chevrotain Lexer ability to group the Tokens.", () => {
-  it("will output the comments into a separate ouput object and will ignore whitespaces", () => {
+  it("will output the comments into a separate output object and will ignore whitespaces", () => {
     const text =
       "if (666) // some comment!\n" +
       "   return 333\n" +

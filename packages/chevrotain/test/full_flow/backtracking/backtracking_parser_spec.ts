@@ -76,7 +76,7 @@ describe("Simple backtracking example", () => {
       createRegularToken(IdentTok, "A"),
       createRegularToken(ColonTok, ":"),
       largeFqnTokenVector,
-      createRegularToken(DefaultTok, "deafult"),
+      createRegularToken(DefaultTok, "default"),
       createRegularToken(NumberTok, "666"),
       createRegularToken(SemiColonTok, ";"),
     ]);

@@ -1315,7 +1315,7 @@ so not many changes will be needed (if at all) for most users.
 
 - [Reorganized projected structure to be consistent and use "lib" folder](#155)
   Chevrotain's aggregated artifacts are now located under the **lib** folder instead of the **bin** folder in the npm package
-  or the **release** folder in the bower pacakge.
+  or the **release** folder in the bower package.
 
   This means that references to "bower_components/chevrotain/**release**/..." or "node_modules/chevrotain/**bin**/..."
   Will have to be replaced with references to ".../**lib**/...".

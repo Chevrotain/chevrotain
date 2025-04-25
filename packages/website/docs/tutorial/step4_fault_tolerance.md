@@ -8,7 +8,7 @@
 
 In the previous tutorial steps we have learned how to build a parser for a simple grammar.
 Our parser can handle valid inputs just fine, but what happens if the input is not perfectly valid?
-For example when building an editor for a programing language, the input is often not completely valid,
+For example when building an editor for a programming language, the input is often not completely valid,
 yet the editor is still expected to provide functionality (outline/auto-complete/navigation/error locations...)
 even for invalid inputs.
 

@@ -100,7 +100,7 @@ function getParamSpec(): Rule {
   return paramSpecCache;
 }
 
-describe("The Grammar Interpeter namespace", () => {
+describe("The Grammar Interpreter namespace", () => {
   let actionDec: Rule;
   let SemicolonTok: TokenType;
   let CommaTok: TokenType;

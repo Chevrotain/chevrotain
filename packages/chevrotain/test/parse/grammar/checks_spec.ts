@@ -365,7 +365,7 @@ describe("the getFirstNoneTerminal function", () => {
   });
 
   it("can find the firstNoneTerminal of a sequence with two items", () => {
-    const sqeuence = [
+    const sequence = [
       new NonTerminal({
         nonTerminalName: "dummyRule",
         referencedRule: dummyRule,
@@ -375,13 +375,13 @@ describe("the getFirstNoneTerminal function", () => {
         referencedRule: dummyRule2,
       }),
     ];
-    const result = getFirstNoneTerminal(sqeuence);
+    const result = getFirstNoneTerminal(sequence);
     expect(result).to.have.length(1);
     expect(first(result)!.name).to.equal("dummyRule");
   });
 
   it("can find the firstNoneTerminal of a sequence with two items where the first is optional", () => {
-    const sqeuence = [
+    const sequence = [
       new Option({
         definition: [
           new NonTerminal({
@@ -395,7 +395,7 @@ describe("the getFirstNoneTerminal function", () => {
         referencedRule: dummyRule2,
       }),
     ];
-    const result = getFirstNoneTerminal(sqeuence);
+    const result = getFirstNoneTerminal(sequence);
     expect(result).to.have.length(2);
     const resultRuleNames = map(result, (currItem) => currItem.name);
     expect(resultRuleNames).to.include.members(["dummyRule", "dummyRule2"]);

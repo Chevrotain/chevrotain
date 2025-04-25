@@ -178,7 +178,7 @@ $.RULE("statements", () => {
     {
       ALT: () => {
         $.CONSUME(Let);
-        $.CONSUME(Identifer);
+        $.CONSUME(Identifier);
         $.CONSUME(Equals);
         $.SUBRULE($.expression);
       },
@@ -187,9 +187,9 @@ $.RULE("statements", () => {
     {
       ALT: () => {
         $.CONSUME(Select);
-        $.CONSUME2(Identifer);
+        $.CONSUME2(Identifier);
         $.CONSUME(From);
-        $.CONSUME3(Identifer);
+        $.CONSUME3(Identifier);
         $.CONSUME(Where);
         $.SUBRULE($.expression);
       },
@@ -292,9 +292,9 @@ the "Where" token:
 ```javascript
 $.RULE("SelectClause", () => {
   $.CONSUME(Select);
-  $.CONSUME2(Identifer);
+  $.CONSUME2(Identifier);
   $.CONSUME(From);
-  $.CONSUME3(Identifer);
+  $.CONSUME3(Identifier);
   $.CONSUME(Where);
   $.SUBRULE($.expression);
 });
@@ -309,7 +309,7 @@ output = {
     Select: ["select"],
     Identifier: ["age, persons"],
     From: ["from"],
-    // No "Where" key d,ue to the parse error
+    // No "Where" key due to the parse error
     // No "expression" key due to the parse error
   },
   // This marks a recovered node.

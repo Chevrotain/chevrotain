@@ -1,5 +1,5 @@
 /**
- * A parser for the TinyC programing language
+ * A parser for the TinyC programming language
  * https://tomassetti.me/ebnf/#examples (Scroll down a bit)
  */
 

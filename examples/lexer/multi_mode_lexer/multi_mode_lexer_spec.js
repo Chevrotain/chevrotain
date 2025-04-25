@@ -10,7 +10,7 @@ describe("The Chevrotain Lexer ability switch between Lexer modes", () => {
     const images = lexResult.tokens.map((currTok) => currTok.image);
     expect(images).to.deep.equal([
       // By default, starting with the "first" mode "numbers_mode."
-      // The ".tokenize" method can accept an optional inital mode argument as the second parameter.
+      // The ".tokenize" method can accept an optional initial mode argument as the second parameter.
       "1",
       "LETTERS", // entering "letters_mode"
       "G",
