@@ -20,6 +20,8 @@ const OyVeyErrorMessageProvider = {
     line,
     // eslint-disable-next-line  no-unused-vars -- template
     column,
+    // eslint-disable-next-line  no-unused-vars -- template
+    mode,
   ) {
     return (
       `Oy Vey!!! unexpected character: ->${fullText.charAt(

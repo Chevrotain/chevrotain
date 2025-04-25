@@ -740,6 +740,7 @@ export class Lexer {
           errLength,
           errorLine,
           errorColumn,
+          last(modeStack),
         );
         errors.push({
           offset: errorStartOffset,

@@ -11,6 +11,7 @@ describe("The Chevrotain default lexer error message provider", () => {
       1,
       0,
       23,
+      "example_mode",
     );
 
     expect(msg).to.equal(

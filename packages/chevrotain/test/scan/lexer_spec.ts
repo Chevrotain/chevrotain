@@ -2020,10 +2020,11 @@ function defineLexerSpecs(
               length: number,
               line?: number,
               column?: number,
+              mode?: string,
             ): string {
               return `[${line}, ${column}] Unknown character ${fullText.charAt(
                 startOffset,
-              )} at position ${startOffset} skipped ${length}`;
+              )} at position ${startOffset} skipped ${length} (mode ${mode})`;
             },
           };
 
@@ -2036,7 +2037,7 @@ function defineLexerSpecs(
             const lexResult = ModeLexerWithCustomErrors.tokenize(input);
             expect(lexResult.errors).to.have.lengthOf(1);
             expect(lexResult.errors[0].message).to.equal(
-              "[1, 24] Unknown character + at position 23 skipped 1",
+              "[1, 24] Unknown character + at position 23 skipped 1 (mode numbers)",
             );
           });
 
