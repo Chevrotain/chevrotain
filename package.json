@@ -45,7 +45,7 @@
     "lerna": "8.1.8",
     "lint-staged": "15.2.10",
     "mocha": "11.1.0",
-    "npm-run-all2": "6.2.4",
+    "npm-run-all2": "7.0.2",
     "prettier": "3.3.3",
     "shx": "0.3.4",
     "cz-conventional-changelog": "3.3.0",
