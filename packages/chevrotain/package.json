@@ -86,7 +86,7 @@
     "jsdom": "26.1.0",
     "jsonfile": "6.1.0",
     "require-from-string": "2.0.2",
-    "sinon": "20.0.0",
+    "sinon": "21.0.0",
     "sinon-chai": "4.0.0",
     "xregexp": "5.1.2"
   }
