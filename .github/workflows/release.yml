@@ -13,7 +13,7 @@ jobs:
           node-version: lts/*
       - uses: pnpm/action-setup@v4
         with:
-          version: 9.12.2
+          version: 9.15.9
       - name: Install dependencies
         run: pnpm install
       - name: Build
