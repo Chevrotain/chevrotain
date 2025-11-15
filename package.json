@@ -19,7 +19,7 @@
     "ci:subpackages": "pnpm -r run ci",
     "format:fix": "prettier --write \"**/*.@(ts|js|json|md|yml)\"",
     "format:validate": "prettier --check \"**/*.@(ts|js|json|md|yml)\"",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "prettier": {
     "endOfLine": "lf"
