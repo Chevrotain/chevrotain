@@ -38,7 +38,7 @@
     "@types/chai": "5.2.1",
     "@types/mocha": "10.0.10",
     "@types/node": "20.19.25",
-    "chai": "5.2.0",
+    "chai": "6.2.1",
     "typescript": "5.8.3",
     "fs-extra": "11.3.0",
     "husky": "9.1.7",
