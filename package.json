@@ -7,7 +7,7 @@
       "examples/*"
     ]
   },
-  "packageManager": "pnpm@10.9.0",
+  "packageManager": "pnpm@10.22.0",
   "scripts": {
     "version": "pnpm install && git add pnpm-lock.yaml",
     "preinstall": "npx only-allow pnpm",
