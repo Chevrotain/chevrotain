@@ -16,11 +16,9 @@ However in some circumstances the capability to provide a custom pattern matchin
 There are a few use cases in which a custom pattern could be used:
 
 - We want to collect additional properties on the token objects.
-
   - See [Custom Payloads](#custom-payloads) section.
 
 - The token cannot be easily (or at all) be defined using pure regular expressions.
-
   - When context on previously lexed tokens is needed.
     For example: [Lexing Python like indentation using Chevrotain](https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/python_indentation/python_indentation.js).
 

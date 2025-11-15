@@ -45,7 +45,6 @@
 #### Bug Fixes
 
 - [chore: add types at package.json exports](https://github.com/Chevrotain/chevrotain/pull/1881)
-
   - Thanks to [@msujew](https://github.com/mshima) :thumbsup:
 
 ## 10.4.1 (11-4-2022)
@@ -53,7 +52,6 @@
 #### Bug Fixes
 
 - [fix: missing call to lookahead initialization for **experimental** lookahead plugins](https://github.com/Chevrotain/chevrotain/pull/1878)
-
   - Thanks to [@msujew](https://github.com/msujew) :thumbsup:
 
 #### Documentation
@@ -71,7 +69,6 @@
 #### Documentation
 
 - [docs: IRecognitionException should extend 'Error'](https://github.com/Chevrotain/chevrotain/pull/1850)
-
   - Thanks to [@benhohner](https://github.com/benhohner) :thumbsup:
 
 ## 10.3.0 (8-21-2022)
@@ -94,7 +91,6 @@
 #### Bug Fixes
 
 - [Lexer throws uncaught error when longer_alt token is not in mode](https://github.com/Chevrotain/chevrotain/issues/1825)
-
   - Thanks to [@msujew](https://github.com/msujew) :thumbsup:
 
 - ["unreachable code after return statement" warning in Firefox](https://github.com/Chevrotain/chevrotain/issues/1787)
@@ -103,7 +99,6 @@
 #### Documentation
 
 - [TypeScript Signatures: add generics to `getBaseCstVisitorConstructor` functions](https://github.com/Chevrotain/chevrotain/pull/1774)
-
   - Thanks to [@jackhenry](https://github.com/jackhenry) :thumbsup:
 
 - [docs: document SKIP_TOKEN()](https://github.com/Chevrotain/chevrotain/issues/1699)
@@ -135,7 +130,6 @@ Patch release as a workaround for release process issues...
 #### Bug Fixes
 
 - [Wrong CST d.ts type generation with same label for different alternatives](https://github.com/Chevrotain/chevrotain/issues/1745)
-
   - Thanks to [@medihack](https://github.com/medihack) :thumbsup:
 
 - [Recovery Re-Sync logic ignores Token Categories](https://github.com/Chevrotain/chevrotain/issues/1055)
@@ -228,7 +222,6 @@ Patch release after migration to new github org with updated metadata in package
 #### Minor Changes
 
 - [fix: add missing members to parser exception type declarations](https://github.com/chevrotain/chevrotain/pull/1322)
-
   - Thanks to [@mbett7](https://github.com/mbett7) :thumbsup
 
 - [fix: update type declaration for CstChildrenDictionary](https://github.com/chevrotain/chevrotain/pull/1315)
@@ -270,7 +263,6 @@ Patch release after migration to new github org with updated metadata in package
 #### Minor Changes
 
 - [Improved Type Signature for 'OR' method](https://github.com/chevrotain/chevrotain/issues/970)
-
   - Thanks to [@OmarTawfik](https://github.com/OmarTawfik) :thumbsup
 
 - [Include source maps and original \*.ts sources in npm package](https://github.com/chevrotain/chevrotain/issues/1167)
@@ -278,7 +270,6 @@ Patch release after migration to new github org with updated metadata in package
 #### Bug Fixes
 
 - [Literal single token character "ignore case" flag bug.](https://github.com/chevrotain/chevrotain/issues/1141)
-
   - Thanks to [@janisdd](https://github.com/janisdd) :thumbsup
 
 - [IParserErrorMessageProvider properties must be implemented as **own** properties.](https://github.com/chevrotain/chevrotain/issues/1129)
@@ -378,7 +369,6 @@ Patch release after migration to new github org with updated metadata in package
 #### Major Changes
 
 - [Remove usage of Function.prototype.toString().](https://github.com/chevrotain/chevrotain/issues/998)
-
   - Means **no more bundling/minification/transpiling issues!** with WebPack/Babel/UglifyJS/other...
   - Provides a ~20% performance boost to most parsers initialization time.
   - These improved analysis capabilities will also enable multiple new features in future versions.
@@ -462,14 +452,12 @@ Patch release after migration to new github org with updated metadata in package
 #### Minor Changes
 
 - [Updated regexp-to-ast to version 0.4.0](https://github.com/chevrotain/chevrotain/issues/877).
-
   - This should provide a performance boost to the initialization time of large lexers.
   - Thanks to [@morwen](https://github.com/morwen) :thumbsup
 
 #### Bug Fixes
 
 - [Fix broken link to docs in lexer disallowed anchors error message](https://github.com/chevrotain/chevrotain/pull/903).
-
   - Thanks [@triplepointfive](https://github.com/triplepointfive) :thumbsup
 
 ## 4.2.0 (1-26-2019)

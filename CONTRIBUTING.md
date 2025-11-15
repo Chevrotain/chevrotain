@@ -99,7 +99,6 @@ The release process **requires push permissions to master**.
   - Github Actions will execute a deployment to npmjs.com due to this new tag.
   - Additionally, new website contents will be pushed to the gh-pages branch.
 - Check that the release was successful.
-
   - On [Github Actions release build](https://github.com/Chevrotain/chevrotain/actions/workflows/release.yml)
   - On [npmjs.com](https://www.npmjs.com/package/chevrotain)
   - On [The website](https://chevrotain.io/docs/changes/CHANGELOG.html)

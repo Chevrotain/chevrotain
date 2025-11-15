@@ -12,25 +12,21 @@ With the **Next** version (locally built version on latest branch).
 - This will generate `chevrotain.js` artifact in the lib directory.
 
 2. open `index_latest.html` in a browser
-
    - The **latest** flow has to run first because it saves the benchmark results to the browser's localStorage.
      These results will be used to calculate the **relative** results of **Next** versus **latest**.
 
 3. Choose the scenario (Lexer only / Parser Only / Both).
 
 4. Execute the benchmark scenario several times
-
    - JS Engines, hotspot optimizations can slightly improve the results on consecutive runs.
 
 5. **Close** the `index_latest.html` browser window.
-
    - This sounds a little strange, but closing the window seems to prevent random strange results.
      Perhaps there is some shared state inside some ECMAScript engines that is affecting the hot-spot optimization?
 
 6. open `index_next.html` in a browser
 
 7. Execute the benchmark several times.
-
    - JS Engines, hotspot optimizations can slightly improve the results on consecutive runs.
 
 8. Inspect the `Relative Speed` column in `index_next.html`, e.g:

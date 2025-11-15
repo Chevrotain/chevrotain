@@ -264,7 +264,6 @@ on each CstNode would be populated with the relevant information.
 Caveats
 
 - In order to track the CstNodes location **every** Token in the input Token vector must include its own location information.
-
   - This is enabled by default in the Chevrotain Lexer, See [ILexerConfig.positionTracking](https://chevrotain.io/documentation/11_0_3/interfaces/ILexerConfig.html#positionTracking).
     However, if a third party Lexer is used in conjunction with a Chevrotain Parser, the Tokens produced by such a lexer
     must include the relevant location properties to allow the chevrotain parser to compute the CstNode locations.
@@ -429,7 +428,6 @@ class SqlToAstVisitor extends BaseCstVisitor {
 - Each visit method can return a value which can be used to combine the traversal results.
 
 - The **this.validateVisitor()** method can be used to detect missing or redundant visitor methods.
-
   - For example due to a refactoring of the grammar or a typo.
 
 - Visitor methods support an optional "IN" parameter.

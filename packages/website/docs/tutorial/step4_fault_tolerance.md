@@ -185,7 +185,6 @@ For the following invalid json input:
 ```
 
 - When encountering the redundant colon the rule stack will be as follows:
-
   - **object** --> top level object
   - **objectItem** --> "someData": ... - second item in the top level object
   - **value** --> { "bad" :: "part" } - the value of the "someData" key
@@ -197,7 +196,6 @@ For the following invalid json input:
   which alternative to take as none would match.
 
 - This means the parser needs to find a token to synchronize to, lets check the options:
-
   - After value called by ObjectItem --> none
   - After objectItem called by object --> comma.
   - After object called by value --> none.

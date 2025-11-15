@@ -61,7 +61,6 @@ An order of magnitude slower performance may at first sound like a horrible thin
 Lets put this in perspective for relevant use cases:
 
 - Being an order of magnitude slower also means approximately the same speed as Jison.
-
   - Tested on Chrome 68, See: [performance benchmark](https://chevrotain.io/performance/).
 
 - **Smaller input Size 1**: Content Assist is requested for an offset inside a text, this means that on average only half the text input
@@ -80,7 +79,6 @@ Lets put this in perspective for relevant use cases:
   of handling partially invalid inputs. What this means is that if a code editor is already (as it should be) incremental.
   It could invoke the call to **computeContentAssist** on a subset of the input as well. This subset could easily
   be **several** orders of magnitudes smaller, thus all performance concerns are resolved.
-
   - Example: Imagine a 1,000 lines JavaScript file where a single 10 lines function is being edited and content assist
     is requested inside that small function.
 
