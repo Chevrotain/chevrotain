@@ -52,7 +52,6 @@ The building blocks are as follows:
   - [Upgraded ApplyMixings with setter/getter handling](https://github.com/chevrotain/chevrotain/blob/8a1c3594165849c179f6c9fd67078ba96af0ea34/src/utils/utils.ts#L433-L460)
 
 * Pros
-
   - Avoid duplication.
   - Allows splitting up large classes to multiple files if/when class composition is not appropriate.
     - a.k.a ["partial classes"](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/partial-classes-and-methods).

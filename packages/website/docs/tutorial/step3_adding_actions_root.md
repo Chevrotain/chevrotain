@@ -14,7 +14,6 @@ We refer to the logic that computes that result or builds that data structure as
 Chevrotain supports two **very different** solutions to this problem:
 
 - **Separation** of grammar(syntax) and user actions (semantics) using a **CST Visitor**.
-
   - [Example](https://github.com/chevrotain/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js)
 
 - **Embedding** user actions (semantics) inside the grammar rules.
@@ -37,7 +36,6 @@ but that is not the case:
 
 - Chevrotain is [so fast](https://chevrotain.io/performance/) that even with that performance penalty
   it would beat other parsing solutions.
-
   - Tested on Modern V8
 
 - The Parsing step is normally just one step of a larger flow, a large performance penalty in one step

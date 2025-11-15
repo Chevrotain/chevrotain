@@ -73,7 +73,6 @@
 - The IParserConfig's `ignoredIssues` property has been deprecated.
   Any Parser still using this property will throw an exception on initialization.
   If any ambiguities need be ignored, the `IGNORE_AMBIGUITIES` property should be used instead on specific DSL rules.
-
   - see: [Ignoring Ambiguities Docs](https://chevrotain.io/docs/guide/resolving_grammar_errors.html#IGNORING_AMBIGUITIES)
 
 - Nested / In-Lined rules via the `NAME` parameter for DSL rules have been deprecated, e.g:
@@ -228,7 +227,6 @@
   - If a parser already uses CST output no change is needed in 4.0
 
 - DSL repetitions no longer return any values in **embedded actions** mode:
-
   - **MANY** / **AT_LEAST_ONE** no longer return an array of the iteration results.
     The iterations results should be collected manually instead:
 

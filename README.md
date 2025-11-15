@@ -48,7 +48,6 @@ A more in depth review of Chevrotain can be found in this great article on: [Par
 - **[Other Examples](https://github.com/chevrotain/chevrotain/blob/master/examples)**.
 
 - **[HTML API docs](https://chevrotain.io/documentation).**
-
   - [The Parsing DSL Docs](https://chevrotain.io/documentation/10_0_0/classes/BaseParser.html#AT_LEAST_ONE).
 
 - [ALL(\*) Lookahead in Langium](https://www.typefox.io/blog/allstar-lookahead)
@@ -69,21 +68,17 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 A small-curated list:
 
 1. [HyperFormula](https://github.com/handsontable/hyperformula)
-
    - HyperFormula is an open source, spreadsheet-like calculation engine
    - [source](https://github.com/handsontable/hyperformula/blob/5749f9ce57a3006109ccadc4a2e7d064c846ff78/src/parser/FormulaParser.ts)
 
 2. [Langium](https://github.com/langium/langium)
-
    - Langium is a language engineering tool with built-in support for the Language Server Protocol.
 
 3. [Prettier-Java](https://github.com/jhipster/prettier-java)
-
    - A Prettier Plugin for Java
    - [source](https://github.com/jhipster/prettier-java/tree/main/packages/java-parser)
 
 4. [JHipster Domain Language](https://www.jhipster.tech/jdl/intro)
-
    - The JDL is a JHipster-specific domain language where you can describe all your applications, deployments, entities
      and their relationships in a single file (or more than one) with a user-friendly syntax.
    - [source](https://github.com/jhipster/generator-jhipster/tree/main/jdl/parsing)
