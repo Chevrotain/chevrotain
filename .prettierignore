@@ -29,3 +29,4 @@ coverage
 
 # nyc test coverage
 .nyc_output
+/.nx/workspace-data
