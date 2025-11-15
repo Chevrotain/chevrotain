@@ -24,7 +24,7 @@
     "@vuepress/plugin-docsearch": "2.0.0-beta.64",
     "@vuepress/theme-default": "2.0.0-beta.64",
     "gitty": "3.7.2",
-    "jsonfile": "6.1.0",
+    "jsonfile": "6.2.0",
     "lodash": "4.17.21",
     "vuepress": "2.0.0-beta.64"
   }
