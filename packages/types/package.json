@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "typedoc": "0.26.10",
-    "typescript": "5.8.3"
+    "typescript": "5.9.3"
   },
   "publishConfig": {
     "access": "public"
