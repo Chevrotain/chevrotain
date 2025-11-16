@@ -27,6 +27,7 @@
   "exports": {
     ".": {
       "import": "./lib/src/api.js",
+      "require": "./lib/src/api.js",
       "types": "./chevrotain.d.ts"
     }
   },
