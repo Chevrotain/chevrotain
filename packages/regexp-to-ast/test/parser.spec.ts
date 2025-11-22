@@ -1,5 +1,5 @@
-import { RegExpParser } from "../src/regexp-parser.js";
 import { expect } from "chai";
+import { RegExpParser } from "../src/regexp-parser.js";
 
 describe("The RegExp to Ast parser", () => {
   let parser: RegExpParser;
@@ -470,92 +470,128 @@ describe("The RegExp to Ast parser", () => {
     });
 
     it("lookbehind assertion", () => {
-      const ast = parser.pattern("/a(?<=b)/");
+      const ast = parser.pattern("/(?<=a)b/");
       expect(ast.value).to.deep.equal({
         type: "Disjunction",
-        loc: { begin: 1, end: 7 },
         value: [
           {
             type: "Alternative",
-            loc: { begin: 1, end: 7 },
             value: [
               {
-                type: "Character",
-                loc: { begin: 1, end: 2 },
-                value: 97,
-              },
-              {
                 type: "Lookbehind",
-                loc: { begin: 2, end: 7 },
                 value: {
                   type: "Disjunction",
-                  loc: { begin: 5, end: 6 },
                   value: [
                     {
                       type: "Alternative",
-                      loc: { begin: 5, end: 6 },
                       value: [
                         {
                           type: "Character",
+                          value: 97,
                           loc: {
                             begin: 5,
                             end: 6,
                           },
-                          value: 98,
                         },
                       ],
+                      loc: {
+                        begin: 5,
+                        end: 6,
+                      },
                     },
                   ],
+                  loc: {
+                    begin: 5,
+                    end: 6,
+                  },
+                },
+                loc: {
+                  begin: 1,
+                  end: 7,
+                },
+              },
+              {
+                type: "Character",
+                value: 98,
+                loc: {
+                  begin: 7,
+                  end: 8,
                 },
               },
             ],
+            loc: {
+              begin: 1,
+              end: 8,
+            },
           },
         ],
+        loc: {
+          begin: 1,
+          end: 8,
+        },
       });
     });
 
-    it("lookbehind assertion", () => {
-      const ast = parser.pattern("/a(?<!b)/");
+    it("negative lookbehind assertion", () => {
+      const ast = parser.pattern("/(?<!a)b/");
       expect(ast.value).to.deep.equal({
         type: "Disjunction",
-        loc: { begin: 1, end: 7 },
         value: [
           {
             type: "Alternative",
-            loc: { begin: 1, end: 7 },
             value: [
               {
-                type: "Character",
-                loc: { begin: 1, end: 2 },
-                value: 97,
-              },
-              {
                 type: "NegativeLookbehind",
-                loc: { begin: 2, end: 7 },
                 value: {
                   type: "Disjunction",
-                  loc: { begin: 5, end: 6 },
                   value: [
                     {
                       type: "Alternative",
-                      loc: { begin: 5, end: 6 },
                       value: [
                         {
                           type: "Character",
+                          value: 97,
                           loc: {
                             begin: 5,
                             end: 6,
                           },
-                          value: 98,
                         },
                       ],
+                      loc: {
+                        begin: 5,
+                        end: 6,
+                      },
                     },
                   ],
+                  loc: {
+                    begin: 5,
+                    end: 6,
+                  },
+                },
+                loc: {
+                  begin: 1,
+                  end: 7,
+                },
+              },
+              {
+                type: "Character",
+                value: 98,
+                loc: {
+                  begin: 7,
+                  end: 8,
                 },
               },
             ],
+            loc: {
+              begin: 1,
+              end: 8,
+            },
           },
         ],
+        loc: {
+          begin: 1,
+          end: 8,
+        },
       });
     });
   });

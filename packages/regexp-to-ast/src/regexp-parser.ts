@@ -166,13 +166,18 @@ export class RegExpParser {
               loc: this.loc(begin),
             };
         }
-        // istanbul ignore next
+        /* c8 ignore next */
         throw Error("Invalid Assertion Escape");
       // '(?=' or '(?!'
       case "(":
         this.consumeChar("?");
 
-        let type: "Lookahead" | "NegativeLookahead" | undefined;
+        let type:
+          | "Lookahead"
+          | "NegativeLookahead"
+          | "Lookbehind"
+          | "NegativeLookbehind"
+          | undefined;
         switch (this.popChar()) {
           case "=":
             type = "Lookahead";
@@ -180,6 +185,16 @@ export class RegExpParser {
           case "!":
             type = "NegativeLookahead";
             break;
+          case "<": {
+            switch (this.popChar()) {
+              case "=":
+                type = "Lookbehind";
+                break;
+              case "!":
+                type = "NegativeLookbehind";
+            }
+            break;
+          }
         }
         ASSERT_EXISTS(type);
 
@@ -747,11 +762,14 @@ export class RegExpParser {
           default:
             return false;
         }
-      // '(?=' or '(?!'
+      // '(?=' or '(?!' or `(?<=` or `(?<!`
       case "(":
         return (
           this.peekChar(1) === "?" &&
-          (this.peekChar(2) === "=" || this.peekChar(2) === "!")
+          (this.peekChar(2) === "=" ||
+            this.peekChar(2) === "!" ||
+            (this.peekChar(2) === "<" &&
+              (this.peekChar(3) === "=" || this.peekChar(3) === "!")))
         );
       default:
         return false;
