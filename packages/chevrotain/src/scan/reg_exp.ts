@@ -89,6 +89,8 @@ export function firstCharOptimizedIndices(
           // assertions do not affect potential starting codes
           case "Lookahead":
           case "NegativeLookahead":
+          case "Lookbehind":
+          case "NegativeLookbehind":
           case "StartAnchor":
           case "WordBoundary":
           case "NonWordBoundary":
