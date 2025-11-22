@@ -138,7 +138,6 @@ describe("The regexp AST visitor", () => {
     new NegativeLookaheadVisitor().visit(ast);
   });
 
-
   it("Can visit Lookbehind", () => {
     const ast = parser.pattern("/a(?<=a|b)/");
     class LookbehindVisitor extends BaseRegExpVisitor {

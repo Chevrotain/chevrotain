@@ -278,7 +278,7 @@ class CharCodeFinder extends BaseRegExpVisitor {
       case "NegativeLookbehind":
         this.visitNegativeLookbehind(node);
         return;
-      }
+    }
 
     super.visitChildren(node);
   }
