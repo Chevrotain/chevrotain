@@ -3,7 +3,7 @@ import { Lexer } from "../../src/scan/lexer_public.js";
 import { expect } from "chai";
 
 describe("Chevrotain Lexer support for Tokens with lookbehind assertions ", () => {
-  it("Supports positive lookbehind assertions", () => {
+  it("Supports lookbehind assertions", () => {
     const DollarAmount = createToken({
       name: "DollarAmount",
       pattern: /(?<=\$)\d+/, // $25
@@ -47,5 +47,35 @@ describe("Chevrotain Lexer support for Tokens with lookbehind assertions ", () =
     expect(lexResults.tokens[2].tokenType).to.equal(DollarSign);
     expect(lexResults.tokens[3].image).to.equal("25");
     expect(lexResults.tokens[3].tokenType).to.equal(DollarAmount);
+  });
+
+  it("Supports negative lookbehind assertions", () => {
+    const BWithoutA = createToken({
+      name: "BWithoutA",
+      pattern: /(?<!a)b/,
+    });
+
+    const B = createToken({
+      name: "B",
+      pattern: /b/,
+    });
+
+    const A = createToken({
+      name: "A",
+      pattern: /a/,
+    });
+
+    const currentAmountsLexer = new Lexer([BWithoutA, B, A], {
+      ensureOptimizations: true,
+      // Lexer incorrectly identifies that Token B can never be matched
+      // TODO: can we ignore this false positive?
+      skipValidations: true,
+    });
+    const lexResults = currentAmountsLexer.tokenize("bab");
+    expect(lexResults.errors).to.be.empty;
+    expect(lexResults.tokens).to.have.lengthOf(3);
+    expect(lexResults.tokens[0].tokenType).to.equal(BWithoutA);
+    expect(lexResults.tokens[1].tokenType).to.equal(A);
+    expect(lexResults.tokens[2].tokenType).to.equal(B);
   });
 });
