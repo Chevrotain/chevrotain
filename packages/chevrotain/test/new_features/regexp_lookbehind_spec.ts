@@ -67,9 +67,6 @@ describe("Chevrotain Lexer support for Tokens with lookbehind assertions ", () =
 
     const currentAmountsLexer = new Lexer([BWithoutA, B, A], {
       ensureOptimizations: true,
-      // Lexer incorrectly identifies that Token B can never be matched
-      // TODO: can we ignore this false positive?
-      skipValidations: true,
     });
     const lexResults = currentAmountsLexer.tokenize("bab");
     expect(lexResults.errors).to.be.empty;
