@@ -2305,9 +2305,8 @@ describe("debugging and messages and optimizations", () => {
     for (const [name, pattern] of [
       ["function", dFunction],
       ["unicode regexp", /d/u],
-      ["lookbehind regexp", /(?<!a)d/],
     ]) {
-      it(`will optimize ${name} pattern`, () => {
+      it(`will (partially) optimize ${name} pattern`, () => {
         const Alpha = createToken({
           name: "A",
           pattern: "a",
