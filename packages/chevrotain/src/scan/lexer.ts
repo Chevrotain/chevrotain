@@ -763,18 +763,18 @@ export function findUnreachablePatterns(
     [] as { str: string; idx: number; tokenType: TokenType }[],
   );
 
-  forEach(tokenTypes, (tokType, testIdx) => {
-    forEach(canBeTested, ({ str, idx, tokenType }) => {
-      if (testIdx < idx && testTokenType(str, tokType.PATTERN)) {
+  forEach(tokenTypes, (aTokType, aIdx) => {
+    forEach(canBeTested, ({ str: bStr, idx: bIdx, tokenType: bTokType }) => {
+      if (aIdx < bIdx && tryToMatchStrToPattern(bStr, aTokType.PATTERN)) {
         const msg =
-          `Token: ->${tokenType.name}<- can never be matched.\n` +
-          `Because it appears AFTER the Token Type ->${tokType.name}<-` +
+          `Token: ->${bTokType.name}<- can never be matched.\n` +
+          `Because it appears AFTER the Token Type ->${aTokType.name}<-` +
           `in the lexer's definition.\n` +
           `See https://chevrotain.io/docs/guide/resolving_lexer_errors.html#UNREACHABLE`;
         errors.push({
           message: msg,
           type: LexerDefinitionErrorType.UNREACHABLE_PATTERN,
-          tokenTypes: [tokType, tokenType],
+          tokenTypes: [aTokType, bTokType],
         });
       }
     });
@@ -783,9 +783,15 @@ export function findUnreachablePatterns(
   return errors;
 }
 
-function testTokenType(str: string, pattern: any): boolean {
-  /* istanbul ignore else */
+function tryToMatchStrToPattern(str: string, pattern: any): boolean {
   if (isRegExp(pattern)) {
+    if (usesLookAheadOrBehind(pattern)) {
+      // if lookahead or lookbehind assertions are used
+      // we assume they would be responsible for disambiguating the match
+      // The alternative is to risk false positive unreachable pattern errors.
+      // e.g.: /(?<!a)b/ and /b/ tokens would cause such false positives.
+      return false;
+    }
     const regExpArray = pattern.exec(str);
     return regExpArray !== null && regExpArray.index === 0;
   } else if (isFunction(pattern)) {
@@ -821,6 +827,10 @@ function noMetaChar(regExp: RegExp): boolean {
   return (
     find(metaChars, (char) => regExp.source.indexOf(char) !== -1) === undefined
   );
+}
+
+function usesLookAheadOrBehind(regExp: RegExp): boolean {
+  return /(\(\?=)|(\(\?!)|(\(\?<=)|(\(\?<!)/.test(regExp.source);
 }
 
 export function addStartOfInput(pattern: RegExp): RegExp {

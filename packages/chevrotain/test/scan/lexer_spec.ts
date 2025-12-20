@@ -1745,7 +1745,10 @@ function defineLexerSpecs(
           defaultMode: "numbers",
         };
 
-        const ModeLexer = new Lexer(modeLexerDefinition, lexerConfig);
+        let ModeLexer: Lexer;
+        before(() => {
+          ModeLexer = new Lexer(modeLexerDefinition, lexerConfig);
+        });
 
         it("supports 'context' lexer modes full flow", () => {
           const input = "1 LETTERS G A G SIGNS & EXIT_SIGNS B EXIT_LETTERS 3";
@@ -2028,11 +2031,10 @@ function defineLexerSpecs(
             },
           };
 
-          const ModeLexerWithCustomErrors = new Lexer(modeLexerDefinition, {
-            errorMessageProvider: customErrorProvider,
-          });
-
           it("supports custom unexpected characters lexer error message", () => {
+            const ModeLexerWithCustomErrors = new Lexer(modeLexerDefinition, {
+              errorMessageProvider: customErrorProvider,
+            });
             const input = "1 LETTERS EXIT_LETTERS +";
             const lexResult = ModeLexerWithCustomErrors.tokenize(input);
             expect(lexResult.errors).to.have.lengthOf(1);
@@ -2042,6 +2044,9 @@ function defineLexerSpecs(
           });
 
           it("supports custom unable to pop lexer mode error message", () => {
+            const ModeLexerWithCustomErrors = new Lexer(modeLexerDefinition, {
+              errorMessageProvider: customErrorProvider,
+            });
             const input = "1 EXIT_NUMBERS 2";
             const lexResult = ModeLexerWithCustomErrors.tokenize(input);
             expect(lexResult.errors).to.have.lengthOf(1);
