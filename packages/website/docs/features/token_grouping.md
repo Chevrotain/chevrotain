@@ -3,7 +3,7 @@
 Chevrotain lexers support grouping Tokens Types **separately** from the main token vector in the lexing result.
 This is often useful to **collect** a specific set of Token Types for later processing, for example to collect comments tokens.
 
-To group a Token Type simply specify the [**group**](https://chevrotain.io/documentation/11_0_3/interfaces/ITokenConfig.html#group) property in its configuration.
+To group a Token Type simply specify the [**group**](https://chevrotain.io/documentation/11_1_0/interfaces/ITokenConfig.html#group) property in its configuration.
 For example:
 
 ```javascript

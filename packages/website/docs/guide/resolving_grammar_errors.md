@@ -68,7 +68,7 @@ due to performance and grammar complexity reasons.
 From a performance perspective this is particularly problematic as some analysis
 done on the grammar (during initialization) may become **exponentially** more complex as the maxLookahead grows.
 
-We could also specify the [MAX_LOOKAHEAD](https://chevrotain.io/documentation/11_0_3/interfaces/OrMethodOpts.html#IGNORE_AMBIGUITIES)
+We could also specify the [MAX_LOOKAHEAD](https://chevrotain.io/documentation/11_1_0/interfaces/OrMethodOpts.html#IGNORE_AMBIGUITIES)
 config on the **specific** DSL method invocation where the problem occurs, This is still not the optimal solution in this case.
 
 **_The recommended solution in this case would be to refactor the grammar to require a smaller lookahead_**.
@@ -201,5 +201,5 @@ For example:
   ]);
   ```
 
-[maxlookahead]: https://chevrotain.io/documentation/11_0_3/interfaces/IParserConfig.html#maxLookAhead
-[ignore_ambiguities]: https://chevrotain.io/documentation/11_0_3/interfaces/OrMethodOpts.html#IGNORE_AMBIGUITIES
+[maxlookahead]: https://chevrotain.io/documentation/11_1_0/interfaces/IParserConfig.html#maxLookAhead
+[ignore_ambiguities]: https://chevrotain.io/documentation/11_1_0/interfaces/OrMethodOpts.html#IGNORE_AMBIGUITIES

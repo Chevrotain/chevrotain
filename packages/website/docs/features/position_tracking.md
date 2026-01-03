@@ -10,7 +10,7 @@ token_skipping
 - start and end lines.
 - start and end columns.
 
-The level of position information tracking can be reduced by using the [**positionTracking**](https://chevrotain.io/documentation/11_0_3/interfaces/ILexerConfig.html#positionTracking) lexer config option.
+The level of position information tracking can be reduced by using the [**positionTracking**](https://chevrotain.io/documentation/11_1_0/interfaces/ILexerConfig.html#positionTracking) lexer config option.
 For example:
 
 ```javascript
