@@ -1,0 +1,104 @@
+<!DOCTYPE html><html class="default" lang="en"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>@chevrotain/types</title><meta name="description" content="Documentation for @chevrotain/types"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script defer src="assets/main.js"></script><script async src="assets/icons.js" id="tsd-icons-script"></script><script async src="assets/search.js" id="tsd-search-script"></script><script async src="assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><div class="table-cell" id="tsd-search" data-base="."><div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="assets/icons.svg#icon-search"></use></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div><div class="field"><div id="tsd-toolbar-links"></div></div><ul class="results"><li class="state loading">Preparing search index...</li><li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">@chevrotain/types</a></div><div class="table-cell" id="tsd-widgets"><a href="#" class="tsd-widget tsd-toolbar-icon menu no-caption" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="assets/icons.svg#icon-menu"></use></svg></a></div></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><h1>@chevrotain/types</h1></div><div class="tsd-panel tsd-typography"><p><a href="https://github.com/Chevrotain/chevrotain/discussions" target="_blank" class="external"><img src="https://img.shields.io/github/discussions/chevrotain/chevrotain?style=flat-square" alt="Discussions"></a>
+<a href="https://www.npmjs.com/package/chevrotain" target="_blank" class="external"><img src="https://img.shields.io/npm/v/chevrotain.svg" alt="npm"></a>
+<img src="https://img.shields.io/npm/dm/chevrotain" alt="npm">
+<a href="https://github.com/Chevrotain/chevrotain/actions/workflows/ci.yml" target="_blank" class="external"><img src="https://github.com/Chevrotain/chevrotain/actions/workflows/ci.yml/badge.svg" alt="Continuous Integration"></a>
+<a href="https://github.com/prettier/prettier" target="_blank" class="external"><img src="https://img.shields.io/badge/styled_with-prettier-ff69b4.svg" alt="styled with prettier"></a>
+<a href="http://commitizen.github.io/cz-cli/" target="_blank" class="external"><img src="https://img.shields.io/badge/commitizen-friendly-brightgreen.svg" alt="Commitizen friendly"></a></p>
+<a id="md:chevrotain" class="tsd-anchor"></a><h1 class="tsd-anchor-link">Chevrotain<a href="#md:chevrotain" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1><a id="md:tldr" class="tsd-anchor"></a><h2 class="tsd-anchor-link">TLDR<a href="#md:tldr" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li><a href="https://chevrotain.io/playground/" target="_blank" class="external"><strong>Online Playground</strong></a></li>
+<li><a href="https://chevrotain.io/docs/tutorial/step0_introduction.html" target="_blank" class="external"><strong>Getting Started Tutorial</strong></a></li>
+<li><a href="https://www.youtube.com/watch?v=l-jMsoAY64k" target="_blank" class="external"><strong>YouTube Video</strong>: Introduction to Lexers, Parsers and Interpreters with Chevrotain</a></li>
+<li><a href="https://chevrotain.io/performance/" target="_blank" class="external"><strong>Performance benchmark</strong></a></li>
+</ul>
+<a id="md:introduction" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Introduction<a href="#md:introduction" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>Chevrotain is a <a href="https://chevrotain.io/performance/" target="_blank" class="external"><strong>blazing fast</strong></a>
+and <a href="http://chevrotain.io/docs/features/blazing_fast.html" target="_blank" class="external"><strong>feature rich</strong></a>
+<strong>Parser Building Toolkit</strong> for <strong>JavaScript</strong> with built-in support for <strong>LL(K)</strong>.
+Grammars and <a href="https://github.com/langium/chevrotain-allstar" target="_blank" class="external">3rd party plugin for <strong>LL(*)</strong></a> grammars.
+It can be used to build parsers/compilers/interpreters for various use cases ranging from simple configuration files,
+to full-fledged programming languages.</p>
+<p>Grammars are written as <a href="https://chevrotain.io/docs/FAQ.html#VS_GENERATORS" target="_blank" class="external"><strong>pure JavaScript sources</strong></a> without a code generation phase,</p>
+<p>A more in depth review of Chevrotain can be found in this great article on: <a href="https://tomassetti.me/parsing-in-javascript/#chevrotain" target="_blank" class="external">Parsing in JavaScript: Tools and Libraries</a>.</p>
+<a id="md:installation" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Installation<a href="#md:installation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li><strong>npm</strong>: <code>npm install chevrotain</code></li>
+<li><strong>Browser</strong> <strong>ESM</strong> bundled versions:
+These can be downloaded directly via <a href="https://unpkg.com/" target="_blank" class="external">UNPKG</a> or other NPM cdn services, e.g.:
+<ul>
+<li>Latest:
+<ul>
+<li><code>https://unpkg.com/chevrotain/lib/chevrotain.mjs</code></li>
+<li><code>https://unpkg.com/chevrotain/lib/chevrotain.min.mjs</code></li>
+</ul>
+</li>
+<li>Explicit version number:
+<ul>
+<li><code>https://unpkg.com/chevrotain@11.1.0/lib/chevrotain.mjs</code></li>
+<li><code>https://unpkg.com/chevrotain@11.1.0/lib/chevrotain.min.mjs</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<a id="md:documentation--resources" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Documentation &amp; Resources<a href="#md:documentation--resources" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li>
+<p><strong><a href="https://github.com/chevrotain/chevrotain/blob/master/examples/grammars" target="_blank" class="external">Sample Grammars</a></strong>.</p>
+</li>
+<li>
+<p><strong><a href="https://chevrotain.io/docs/FAQ.html" target="_blank" class="external">FAQ</a>.</strong></p>
+</li>
+<li>
+<p><strong><a href="https://github.com/chevrotain/chevrotain/blob/master/examples" target="_blank" class="external">Other Examples</a></strong>.</p>
+</li>
+<li>
+<p><strong><a href="https://chevrotain.io/documentation" target="_blank" class="external">HTML API docs</a>.</strong></p>
+<ul>
+<li><a href="https://chevrotain.io/documentation/10_0_0/classes/BaseParser.html#AT_LEAST_ONE" target="_blank" class="external">The Parsing DSL Docs</a>.</li>
+</ul>
+</li>
+<li>
+<p><a href="https://www.typefox.io/blog/allstar-lookahead" target="_blank" class="external">ALL(*) Lookahead in Langium</a></p>
+</li>
+</ul>
+<a id="md:compatibility" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Compatibility<a href="#md:compatibility" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>Chevrotain will run on any <strong>modern</strong> JavaScript ES2015 runtime.
+That includes nodejs maintenance/active/current version, modern major browsers,
+but <strong>not</strong> legacy ES5.1 runtimes such as IE11.</p>
+<a id="md:contributions" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Contributions<a href="#md:contributions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>Contributions are <strong>greatly</strong> appreciated.
+See <a href="media/CONTRIBUTING.md">CONTRIBUTING.md</a> for details.</p>
+<a id="md:where-used" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Where used<a href="#md:where-used" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>A small-curated list:</p>
+<ol>
+<li>
+<p><a href="https://github.com/handsontable/hyperformula" target="_blank" class="external">HyperFormula</a></p>
+<ul>
+<li>HyperFormula is an open source, spreadsheet-like calculation engine</li>
+<li><a href="https://github.com/handsontable/hyperformula/blob/5749f9ce57a3006109ccadc4a2e7d064c846ff78/src/parser/FormulaParser.ts" target="_blank" class="external">source</a></li>
+</ul>
+</li>
+<li>
+<p><a href="https://github.com/langium/langium" target="_blank" class="external">Langium</a></p>
+<ul>
+<li>Langium is a language engineering tool with built-in support for the Language Server Protocol.</li>
+</ul>
+</li>
+<li>
+<p><a href="https://github.com/jhipster/prettier-java" target="_blank" class="external">Prettier-Java</a></p>
+<ul>
+<li>A Prettier Plugin for Java</li>
+<li><a href="https://github.com/jhipster/prettier-java/tree/main/packages/java-parser" target="_blank" class="external">source</a></li>
+</ul>
+</li>
+<li>
+<p><a href="https://www.jhipster.tech/jdl/intro" target="_blank" class="external">JHipster Domain Language</a></p>
+<ul>
+<li>The JDL is a JHipster-specific domain language where you can describe all your applications, deployments, entities
+and their relationships in a single file (or more than one) with a user-friendly syntax.</li>
+<li><a href="https://github.com/jhipster/generator-jhipster/tree/main/jdl/parsing" target="_blank" class="external">source</a></li>
+</ul>
+</li>
+<li>
+<p><a href="https://github.com/christianvoigt/argdown" target="_blank" class="external">Argdown</a></p>
+<ul>
+<li>Argdown is a simple syntax for analyzing complex argumentation.</li>
+<li><a href="https://github.com/christianvoigt/argdown/blob/master/packages/argdown-core/src/parser.ts" target="_blank" class="external">source</a></li>
+</ul>
+</li>
+</ol>
+</div></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="assets/icons.svg#icon-chevronDown"></use></svg>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="assets/icons.svg#icon-chevronDown"></use></svg>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#md:chevrotain"><span>Chevrotain</span></a><ul><li><a href="#md:tldr"><span>TLDR</span></a></li><li><a href="#md:introduction"><span>Introduction</span></a></li><li><a href="#md:installation"><span>Installation</span></a></li><li><a href="#md:documentation--resources"><span>Documentation &amp; <wbr/>Resources</span></a></li><li><a href="#md:compatibility"><span>Compatibility</span></a></li><li><a href="#md:contributions"><span>Contributions</span></a></li><li><a href="#md:where-used"><span>Where used</span></a></li></ul></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="modules.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="assets/icons.svg#icon-1"></use></svg><span>@chevrotain/types</span></a><ul class="tsd-small-nested-navigation" id="tsd-nav-container" data-base="."><li>Loading...</li></ul></nav></div></div></div><footer><p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer><div class="overlay"></div></body></html>
