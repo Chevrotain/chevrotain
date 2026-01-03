@@ -3,6 +3,11 @@ on:
   push:
     tags:
       - "v*"
+
+permissions:
+  id-token: write # Required for OIDC (npmjs trusted publishers)
+  contents: read
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -18,15 +23,5 @@ jobs:
         run: pnpm install
       - name: Build
         run: pnpm run ci
-      - name: npm auth setup
-        run: |
-          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
-          # avoids lerna validations failing the release due to changed tracked file.
-          git update-index --assume-unchanged ".npmrc"
-          pnpm whoami
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Publish to NPM
         run: pnpm run release:publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
