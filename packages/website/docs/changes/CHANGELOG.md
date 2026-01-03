@@ -1,3 +1,15 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+- [Support RegExp Lookbehind assertions](https://github.com/Chevrotain/chevrotain/pull/2134)
+  - Thanks to [@luiz290788](https://github.com/luiz290788) :thumbsup:
+
+#### Bug Fixes
+
+- [Support "Loading ECMAScript modules using require()" of latest nodejs versions](https://github.com/Chevrotain/chevrotain/issues/2018)
+  - Chevrotain is still officially ESM only, but this minimal metadata fix may allow some CJS in modern nodejs versions to load chevrotain using CJS `require()`.
+
 ## 11.0.3 (8-15-2023)
 
 #### Bug Fixes
