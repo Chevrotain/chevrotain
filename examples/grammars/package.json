@@ -1,6 +1,6 @@
 {
   "name": "chevrotain_examples_grammars",
-  "version": "11.1.0",
+  "version": "11.1.1",
   "type": "module",
   "scripts": {
     "ci": "pnpm run test && pnpm run bundle:graphql",
