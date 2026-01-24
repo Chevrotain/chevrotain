@@ -97,6 +97,12 @@
                 </p></li>
 
                 <li><p>
+                    <a rel="nofollow" href="https://github.com/michalusio/Parser">parser-combinators</a> Parser Combinator
+                    <a rel="nofollow"
+                       href="https://github.com/Chevrotain/chevrotain/blob/gh-pages/performance/jsonParsers/parser-combinators/parser-combinators_json_parser.js">implementation</a>
+                </p></li>
+
+                <li><p>
                     <a rel="nofollow" href="https://github.com/cdglabs/ohm">Ohm-js</a> Parser Library
                     <a rel="nofollow"
                        href="https://github.com/Chevrotain/chevrotain/blob/gh-pages/performance/jsonParsers/ohm/ohm_json_grammar.js">grammar</a>
@@ -252,6 +258,18 @@
 
                     </div>
 
+                    <div class="dataRow ParserCombinators">
+
+                        <div class="benchName"><a rel="nofollow" href="https://github.com/michalusio/Parser/">parser-combinators</a></div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                    </div>
+
                     <div class="dataRow Ohm">
 
                         <div class="benchName"><a rel="nofollow" href="https://github.com/cdglabs/ohm">Ohm-js</a></div>
@@ -293,6 +311,7 @@
     var parsimmonFrame = includeTestIFrame("parsimmon", "./jsonParsers/parsimmon/parsimmon.html")
     var pegjsFrame = includeTestIFrame("pegjs", "./jsonParsers/pegjs/pegjs.html")
     var peggyFrame = includeTestIFrame("peggy", "./jsonParsers/peggy/peggy.html")
+    var parserCombinatorsFrame = includeTestIFrame("parserCombinators", "./jsonParsers/parser-combinators/parser-combinators.html")
 
     $("iframe").css("visibility", "hidden")
 
@@ -435,6 +454,11 @@
 
         Nearley: function (suite) {
             addTest(suite, 'Nearley', nearleyFrame.parse)
+
+        },
+
+        ParserCombinators: function (suite) {
+            addTest(suite, 'ParserCombinators', parserCombinatorsFrame.parse)
 
         },
 
