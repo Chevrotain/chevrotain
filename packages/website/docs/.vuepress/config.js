@@ -1,9 +1,9 @@
 import path, { dirname } from "path";
-import _ from "lodash";
 import jf from "jsonfile";
 import { slugify } from "@mdit-vue/shared";
 import { defaultTheme } from "@vuepress/theme-default";
 import { docsearchPlugin } from "@vuepress/plugin-docsearch";
+import { viteBundler } from "@vuepress/bundler-vite";
 import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -49,18 +49,18 @@ const slugMap = {
     "MISSING_LINE_TERM_CHARS",
 };
 
-const slugMapUsed = _.mapValues(slugMap, () => false);
-
 export default {
   title: "Chevrotain",
+  bundler: viteBundler({
+    viteOptions: {},
+    vuePluginOptions: {},
+  }),
   base: "/docs/",
   description: "Parser Building Toolkit for JavaScript",
   markdown: {
     slugify: function (str) {
       const mappedSlug = slugMap[str];
       if (mappedSlug) {
-        // TODO: can we test all mappings have been used?
-        slugMapUsed[str] = true;
         return mappedSlug;
       }
 
