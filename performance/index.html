@@ -53,22 +53,12 @@
                 </p></li>
 
                 <li><p>
-                    <a rel="nofollow" href="https://peggyjs.org">Peggy</a> Parser Generator
+                    <a rel="nofollow" href="https://peggyjs.org">Peggy</a> Parser Generator (fork of PEG.js)
                     <a rel="nofollow"
                        href="https://github.com/Chevrotain/chevrotain/blob/gh-pages/performance/jsonParsers/peggy/json.peggy">grammar</a>
                     ->
                     <a rel="nofollow"
                        href="https://github.com/Chevrotain/chevrotain/blob/gh-pages/performance/jsonParsers/peggy/peggy_jison_parser.js">generated
-                        code</a>
-                </p></li>
-
-                <li><p>
-                    <i>abandoned:</i> <s><a rel="nofollow" href="https://github.com/pegjs/pegjs">PEG.js</a> Parser Generator</s>
-                    <a rel="nofollow"
-                       href="https://github.com/Chevrotain/chevrotain/blob/gh-pages/performance/jsonParsers/pegjs/json.pegjs">grammar</a>
-                    ->
-                    <a rel="nofollow"
-                       href="https://github.com/Chevrotain/chevrotain/blob/gh-pages/performance/jsonParsers/pegjs/pegjs_jison_parser.js">generated
                         code</a>
                 </p></li>
 
@@ -222,17 +212,6 @@
 
                     </div>
 
-                    <div class="dataRow Peg">
-
-                        <div class="benchName"><a rel="nofollow" href="http://pegjs.org/">PEG.js</a></div>
-                        <div class="benchRate">
-                            <div class="value">&nbsp;</div>
-                            <div class="delta">&nbsp;</div>
-                        </div>
-                        <div class="benchSpeed">&nbsp;</div>
-                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
-
-                    </div>
 
                     <div class="dataRow Jison">
 
@@ -309,7 +288,6 @@
     var nearleyFrame = includeTestIFrame("nearley", "./jsonParsers/nearley/nearley.html")
     var ohmFrame = includeTestIFrame("ohm", "./jsonParsers/ohm/ohm.html")
     var parsimmonFrame = includeTestIFrame("parsimmon", "./jsonParsers/parsimmon/parsimmon.html")
-    var pegjsFrame = includeTestIFrame("pegjs", "./jsonParsers/pegjs/pegjs.html")
     var peggyFrame = includeTestIFrame("peggy", "./jsonParsers/peggy/peggy.html")
     var parserCombinatorsFrame = includeTestIFrame("parserCombinators", "./jsonParsers/parser-combinators/parser-combinators.html")
 
@@ -438,10 +416,6 @@
 
         Antlr: function (suite) {
             addTest(suite, 'Antlr', antlrFrame.parse)
-        },
-
-        Peg: function (suite) {
-            addTest(suite, 'Peg', pegjsFrame.parse)
         },
 
         Peggy: function (suite) {
