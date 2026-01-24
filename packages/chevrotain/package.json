@@ -73,7 +73,7 @@
     "@chevrotain/regexp-to-ast": "workspace:*",
     "@chevrotain/types": "workspace:*",
     "@chevrotain/utils": "workspace:*",
-    "lodash-es": "4.17.21"
+    "lodash-es": "4.17.23"
   },
   "devDependencies": {
     "@types/jsdom": "27.0.0",
