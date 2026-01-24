@@ -1,1 +1,0 @@
-const t=JSON.parse('{"key":"v-16397db8","path":"/features/blazing_fast.html","title":"Blazing Fast","lang":"en-US","frontmatter":{},"headers":[],"git":{"updatedTime":1614549192000,"contributors":[{"name":"Shahar Soel","email":"4233843+bd82@users.noreply.github.com","commits":1}]},"filePathRelative":"features/blazing_fast.md"}');export{t as data};
