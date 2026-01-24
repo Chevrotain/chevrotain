@@ -1,6 +1,6 @@
 ## X.Y.Z (INSERT_DATE_HERE)
 
-#### Dep Bumps
+#### Dependencies Bumps
 
 - [update dependency lodash-es to v4.17.23](https://github.com/Chevrotain/chevrotain/pull/2137)
 - To address CVE: [CVE-2025-13465](https://www.cve.org/CVERecord?id=CVE-2025-13465)
