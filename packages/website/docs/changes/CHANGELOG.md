@@ -1,3 +1,12 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Dep Bumps
+
+- [update dependency lodash-es to v4.17.23](https://github.com/Chevrotain/chevrotain/pull/2137)
+- To address CVE: [CVE-2025-13465](https://www.cve.org/CVERecord?id=CVE-2025-13465)
+- There were no usages of `_.omit` or `_.unset` in the published codebase, (only in test files)
+  So this update should have no functional impact, instead it is meant to address security scanners alerts.
+
 ## 11.1.0 (1-4-2026)
 
 #### Minor Changes
