@@ -2242,6 +2242,7 @@ describe("debugging and messages and optimizations", () => {
     });
     expect((<any>alphaLexerSafeMode).charCodeToPatternIdxToConfig.defaultMode)
       .to.be.empty;
+    const safeModeResult = alphaLexerSafeMode.tokenize("a");
 
     // compare to safeMode disabled
     const alphaLexerNoSafeMode = new Lexer([Alpha], {
@@ -2251,6 +2252,105 @@ describe("debugging and messages and optimizations", () => {
       (<any>alphaLexerNoSafeMode).charCodeToPatternIdxToConfig
         .defaultMode[97][0].tokenType,
     ).to.equal(Alpha);
+    const noSafeModeResult = alphaLexerNoSafeMode.tokenize("a");
+    expect(safeModeResult).to.deep.equal(noSafeModeResult);
+  });
+
+  it("won't optimize with safe mode enabled - multi mode lexer", () => {
+    const Alpha = createToken({
+      name: "A",
+      pattern: /a/,
+      push_mode: "b",
+    });
+    const Beta = createToken({
+      name: "B",
+      pattern: /b/,
+      pop_mode: true,
+    });
+    const tokens = {
+      modes: {
+        a: [Alpha],
+        b: [Beta],
+      },
+      defaultMode: "a",
+    };
+    const text = "abab";
+    const lexerSafeMode = new Lexer(tokens, {
+      positionTracking: "onlyOffset",
+      safeMode: true,
+    });
+    expect((<any>lexerSafeMode).charCodeToPatternIdxToConfig.a).to.be.empty;
+    const safeModeResult = lexerSafeMode.tokenize(text);
+
+    // compare to safeMode disabled
+    const lexerNoSafeMode = new Lexer(tokens, {
+      positionTracking: "onlyOffset",
+    });
+    expect(
+      (<any>lexerNoSafeMode).charCodeToPatternIdxToConfig.a[97][0].tokenType,
+    ).to.equal(Alpha);
+    const noSafeModeResult = lexerNoSafeMode.tokenize(text);
+    expect(safeModeResult).to.deep.equal(noSafeModeResult);
+  });
+
+  context("lexer optimization", () => {
+    const dFunction = (text: string, offset: number) => {
+      if (text.charAt(offset) === "d") {
+        return ["d"] as [string];
+      } else {
+        return null;
+      }
+    };
+
+    for (const [name, pattern] of [
+      ["function", dFunction],
+      ["unicode regexp", /d/u],
+    ]) {
+      it(`will (partially) optimize ${name} pattern`, () => {
+        const Alpha = createToken({
+          name: "A",
+          pattern: "a",
+        });
+        const Beta = createToken({
+          name: "B",
+          pattern: "b",
+        });
+        const Delta = createToken({
+          name: "D",
+          pattern,
+        });
+        const optimizedLexer = new Lexer([Alpha, Delta, Beta], {
+          positionTracking: "onlyOffset",
+        });
+        // Assert that the pattern will be added to all character codes
+        // Also assert that the ordering gets preserved
+        expect(
+          (<any>optimizedLexer).charCodeToPatternIdxToConfig.defaultMode[
+            "a".charCodeAt(0)
+          ].map((e: any) => e.tokenType),
+        ).to.deep.equal([Alpha, Delta]);
+        expect(
+          (<any>optimizedLexer).charCodeToPatternIdxToConfig.defaultMode[
+            "b".charCodeAt(0)
+          ].map((e: any) => e.tokenType),
+        ).to.deep.equal([Delta, Beta]);
+        // The lexer cannot identify that the pattern is only for the character 'd'
+        expect(
+          (<any>optimizedLexer).charCodeToPatternIdxToConfig.defaultMode[
+            "d".charCodeAt(0)
+          ],
+        ).to.be.undefined;
+        expect(optimizedLexer.tokenize("a").tokens[0].tokenType).to.deep.equal(
+          Alpha,
+        );
+        expect(optimizedLexer.tokenize("b").tokens[0].tokenType).to.deep.equal(
+          Beta,
+        );
+        expect(optimizedLexer.tokenize("d").tokens[0].tokenType).to.deep.equal(
+          Delta,
+        );
+      });
+    }
   });
 });
 
