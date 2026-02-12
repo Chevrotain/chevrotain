@@ -22,7 +22,7 @@
     "@mdit-vue/shared": "3.0.2",
     "@vuepress/client": "2.0.0-rc.26",
     "@vuepress/plugin-docsearch": "2.0.0-rc.121",
-    "@vuepress/theme-default": "2.0.0-rc.121",
+    "@vuepress/theme-default": "2.0.0-rc.123",
     "@vuepress/bundler-vite": "2.0.0-rc.26",
     "gitty": "3.7.2",
     "jsonfile": "6.2.0",
