@@ -834,14 +834,20 @@ function usesLookAheadOrBehind(regExp: RegExp): boolean {
 }
 
 export function addStartOfInput(pattern: RegExp): RegExp {
-  const flags = pattern.ignoreCase ? "i" : "";
+  let flags = pattern.ignoreCase ? "i" : "";
+  if (pattern.unicode) {
+    flags += "u";
+  }
   // always wrapping in a none capturing group preceded by '^' to make sure matching can only work on start of input.
   // duplicate/redundant start of input markers have no meaning (/^^^^A/ === /^A/)
   return new RegExp(`^(?:${pattern.source})`, flags);
 }
 
 export function addStickyFlag(pattern: RegExp): RegExp {
-  const flags = pattern.ignoreCase ? "iy" : "y";
+  let flags = pattern.ignoreCase ? "iy" : "y";
+  if (pattern.unicode) {
+    flags += "u";
+  }
   // always wrapping in a none capturing group preceded by '^' to make sure matching can only work on start of input.
   // duplicate/redundant start of input markers have no meaning (/^^^^A/ === /^A/)
   return new RegExp(`${pattern.source}`, flags);
