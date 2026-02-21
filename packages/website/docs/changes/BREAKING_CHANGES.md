@@ -1,5 +1,13 @@
 # Breaking Changes
 
+## TODO: decide if diagrams links counts as a breaking change
+
+e.g.:
+
+```html
+<script src="https://unpkg.com/chevrotain/diagrams/vendor/railroad-diagrams.js"></script>
+```
+
 ## 11.0.0
 
 - Chevrotain is now **ESM only**.

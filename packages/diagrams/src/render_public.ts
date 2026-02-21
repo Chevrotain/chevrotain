@@ -1,11 +1,11 @@
-import { VERSION } from "../version.js";
+import { VERSION } from "./version.js";
 import { ISerializedGast } from "@chevrotain/types";
 
 export function createSyntaxDiagramsCode(
   grammar: ISerializedGast[],
   {
-    resourceBase = `https://unpkg.com/chevrotain@${VERSION}/diagrams/`,
-    css = `https://unpkg.com/chevrotain@${VERSION}/diagrams/diagrams.css`,
+    resourceBase = `https://unpkg.com/@chevrotain/diagrams@${VERSION}/diagrams/`,
+    css = `https://unpkg.com/@chevrotain/diagrams@${VERSION}/diagrams/diagrams.css`,
   }: {
     resourceBase?: string;
     css?: string;

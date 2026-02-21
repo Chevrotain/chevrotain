@@ -28,14 +28,14 @@ of syntax diagrams. This html source code can then be used by an end user in eit
 **Examples:**
 
 - [Generating syntax diagrams to a file](https://github.com/chevrotain/chevrotain/blob/master/examples/parser/diagrams/creating_html_file.js)
-  - Self contained, no need for Chevrotain or the grammar when rendering the html.
+  - Self-contained, no need for Chevrotain or the grammar when rendering the html.
 
-- [Generating syntax diagrams dynamically into an iframe](https://github.com/chevrotain/chevrotain/blob/master/examples/parser/diagrams/diagrams_browser.html)
+- [Generating syntax diagrams dynamically into an iframe](https://github.com/Chevrotain/chevrotain/tree/master/examples/parser/diagrams#dynamically-rendering-the-diagrams-inside-an-existing-html-file)
   - Requires loading **both** Chevrotain and the grammar (and dependencies!) when rendering the html.
 
 ## Customization
 
-The [logic for generating the HTML](https://github.com/Chevrotain/chevrotain/blob/master/packages/chevrotain/src/diagrams/render_public.ts)
+The [logic for generating the HTML](https://github.com/Chevrotain/chevrotain/blob/master/packages/diagrams/src/diagrams/render_public.ts)
 is quite trivial and the generated code itself is also very simple with a decent separation of concerns.
 These can be used as a basis for creating more advanced custom scenarios, for example:
 

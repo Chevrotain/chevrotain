@@ -1,0 +1,50 @@
+{
+  "name": "@chevrotain/diagrams",
+  "version": "11.1.1",
+  "description": "Syntax Diagrams rendering for Chevrotain Parsers",
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/Chevrotain/chevrotain/issues"
+  },
+  "license": "Apache-2.0",
+  "type": "module",
+  "types": "./lib/src/api.d.ts",
+  "exports": {
+    ".": {
+      "import": "./lib/src/api.js",
+      "types": "./lib/src/api.d.ts"
+    }
+  },
+  "files": [
+    "lib/src/**/*.js",
+    "lib/src/**/*.map",
+    "lib/src/**/*.d.ts",
+    "src/**/*.ts",
+    "diagrams/**/*.*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Chevrotain/chevrotain.git"
+  },
+  "scripts": {
+    "---------- CI FLOWS --------": "",
+    "ci": "pnpm run build test",
+    "build": "npm-run-all clean compile",
+    "test": "npm-run-all coverage",
+    "---------- BUILD STEPS --------": "",
+    "clean": "shx rm -rf lib coverage",
+    "compile:watch": "tsc -w",
+    "compile": "tsc",
+    "coverage": "c8 mocha --enable-source-maps"
+  },
+  "dependencies": {
+    "@chevrotain/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/jsdom": "27.0.0",
+    "jsdom": "27.2.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

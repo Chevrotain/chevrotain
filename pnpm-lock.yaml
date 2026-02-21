@@ -134,6 +134,9 @@ importers:
       '@chevrotain/cst-dts-gen':
         specifier: workspace:*
         version: link:../cst-dts-gen
+      '@chevrotain/diagrams':
+        specifier: workspace:*
+        version: link:../diagrams
       '@chevrotain/gast':
         specifier: workspace:*
         version: link:../gast
@@ -150,9 +153,6 @@ importers:
         specifier: 4.17.23
         version: 4.17.23
     devDependencies:
-      '@types/jsdom':
-        specifier: 27.0.0
-        version: 27.0.0
       '@types/lodash-es':
         specifier: 4.17.12
         version: 4.17.12
@@ -174,9 +174,6 @@ importers:
       gitty:
         specifier: 3.7.2
         version: 3.7.2
-      jsdom:
-        specifier: 27.2.0
-        version: 27.2.0
       jsonfile:
         specifier: 6.2.0
         version: 6.2.0
@@ -233,6 +230,19 @@ importers:
       glob:
         specifier: 13.0.0
         version: 13.0.0
+
+  packages/diagrams:
+    dependencies:
+      '@chevrotain/types':
+        specifier: workspace:*
+        version: link:../types
+    devDependencies:
+      '@types/jsdom':
+        specifier: 27.0.0
+        version: 27.0.0
+      jsdom:
+        specifier: 27.2.0
+        version: 27.2.0
 
   packages/gast:
     dependencies:
@@ -7084,7 +7094,7 @@ snapshots:
     dependencies:
       '@types/node': 20.19.25
       '@types/tough-cookie': 4.0.5
-      parse5: 7.2.1
+      parse5: 7.3.0
 
   '@types/jsonfile@6.1.4':
     dependencies:

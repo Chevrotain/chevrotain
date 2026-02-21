@@ -75,7 +75,7 @@ export function clearCache() {
   );
 }
 
-export { createSyntaxDiagramsCode } from "./diagrams/render_public.js";
+export { createSyntaxDiagramsCode } from "@chevrotain/diagrams";
 
 export class Parser {
   constructor() {
