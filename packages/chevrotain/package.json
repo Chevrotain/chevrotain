@@ -56,7 +56,7 @@
     "---------- DEV FLOWS --------": "",
     "watch": "tsc -w",
     "unit-tests": "mocha --enable-source-maps",
-    "quick-build": "tsc && npm-run-all run bundle",
+    "quick-build": "tsc && npm-run-all build bundle",
     "---------- BUILD STEPS --------": "",
     "clean": "shx rm -rf coverage dev lib temp",
     "compile": "tsc",
