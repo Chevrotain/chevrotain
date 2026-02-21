@@ -102,8 +102,6 @@ The release process **requires push permissions to master**.
   - On [Github Actions release build](https://github.com/Chevrotain/chevrotain/actions/workflows/release.yml)
   - On [npmjs.com](https://www.npmjs.com/package/chevrotain)
   - On [The website](https://chevrotain.io/docs/changes/CHANGELOG.html)
-  - On [The APIs webpage](https://chevrotain.io/documentation/)
-    - The URL being redirected to should include the latest version number.
 
 #### Legal
 

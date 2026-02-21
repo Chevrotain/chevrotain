@@ -1,16 +1,7 @@
-import path, { dirname } from "path";
-import jf from "jsonfile";
 import { slugify } from "@mdit-vue/shared";
 import { defaultTheme } from "@vuepress/theme-default";
 import { docsearchPlugin } from "@vuepress/plugin-docsearch";
 import { viteBundler } from "@vuepress/bundler-vite";
-import { fileURLToPath } from "url";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-const packagePath = path.join(__dirname, "../../package.json");
-const version = jf.readFileSync(packagePath).version;
-const versionWithLowDashs = version.replace(/\./g, "_");
 
 const slugMap = {
   "Common Prefix Ambiguities": "COMMON_PREFIX",
@@ -89,10 +80,6 @@ export default {
       { text: "FAQ", link: "/FAQ" },
       { text: "Changes", link: "/changes/BREAKING_CHANGES" },
 
-      {
-        text: "APIs",
-        link: `https://chevrotain.io/documentation/${versionWithLowDashs}/modules.html`,
-      },
       {
         text: "Playground",
         link: "https://chevrotain.io/playground/",
