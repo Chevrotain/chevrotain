@@ -1,4 +1,3 @@
-import { flatten, map, uniq } from "lodash-es";
 import {
   isBranchingProd,
   isOptionalProd,
@@ -50,19 +49,18 @@ export function firstForSequence(prod: {
     hasInnerProdsRemaining = seq.length > nextSubProdIdx;
   }
 
-  return uniq(firstSet);
+  return [...new Set(firstSet)];
 }
 
 export function firstForBranching(prod: {
   definition: IProduction[];
 }): TokenType[] {
-  const allAlternativesFirsts: TokenType[][] = map(
-    prod.definition,
+  const allAlternativesFirsts: TokenType[][] = prod.definition.map(
     (innerProd) => {
       return first(innerProd);
     },
   );
-  return uniq(flatten<TokenType>(allAlternativesFirsts));
+  return [...new Set(allAlternativesFirsts.flat())];
 }
 
 export function firstForTerminal(terminal: Terminal): TokenType[] {

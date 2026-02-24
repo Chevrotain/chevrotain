@@ -8,16 +8,7 @@ import {
   IFirstAfterRepetition,
   NextAfterTokenWalker,
 } from "../../grammar/interpreter.js";
-import {
-  dropRight,
-  find,
-  first,
-  flatten,
-  has,
-  includes,
-  isEmpty,
-  map,
-} from "lodash-es";
+
 import {
   IParserConfig,
   IToken,
@@ -58,9 +49,10 @@ export class Recoverable {
     this.firstAfterRepMap = {};
     this.resyncFollows = {};
 
-    this.recoveryEnabled = has(config, "recoveryEnabled")
-      ? (config.recoveryEnabled as boolean) // assumes end user provides the correct config value/type
-      : DEFAULT_PARSER_CONFIG.recoveryEnabled;
+    this.recoveryEnabled =
+      "recoveryEnabled" in config
+        ? (config.recoveryEnabled as boolean) // assumes end user provides the correct config value/type
+        : DEFAULT_PARSER_CONFIG.recoveryEnabled;
 
     // performance optimization, NOOP will be inlined which
     // effectively means that this optional feature does not exist
@@ -125,7 +117,7 @@ export class Recoverable {
         this.LA(0),
       );
       // the first token here will be the original cause of the error, this is not part of the resyncedTokens property.
-      error.resyncedTokens = dropRight(resyncedTokens);
+      error.resyncedTokens = resyncedTokens.slice(0, -1);
       this.SAVE_ERROR(error);
     };
 
@@ -198,7 +190,7 @@ export class Recoverable {
     this: MixedInParser,
     grammarPath: ITokenGrammarPath,
   ): TokenType[] {
-    const topRuleName = first(grammarPath.ruleStack)!;
+    const topRuleName = grammarPath.ruleStack[0]!;
     const gastProductions = this.getGAstProductions();
     const topProduction = gastProductions[topRuleName];
     const nextPossibleTokenTypes = new NextAfterTokenWalker(
@@ -259,13 +251,13 @@ export class Recoverable {
     }
 
     // must know the possible following tokens to perform single token insertion
-    if (isEmpty(follows)) {
+    if (follows.length === 0) {
       return false;
     }
 
     const mismatchedTok = this.LA_FAST(1);
     const isMisMatchedTokInFollows =
-      find(follows, (possibleFollowsTokType: TokenType) => {
+      follows.find((possibleFollowsTokType: TokenType) => {
         return this.tokenMatcher(mismatchedTok, possibleFollowsTokType);
       }) !== undefined;
 
@@ -295,7 +287,7 @@ export class Recoverable {
   ): boolean {
     const followKey = this.getCurrFollowKey();
     const currentRuleReSyncSet = this.getFollowSetFromFollowKey(followKey);
-    return includes(currentRuleReSyncSet, tokenTypeIdx);
+    return currentRuleReSyncSet.includes(tokenTypeIdx);
   }
 
   findReSyncTokenType(this: MixedInParser): TokenType {
@@ -304,7 +296,7 @@ export class Recoverable {
     let nextToken = this.LA_FAST(1);
     let k = 2;
     while (true) {
-      const foundMatch = find(allPossibleReSyncTokTypes, (resyncTokType) => {
+      const foundMatch = allPossibleReSyncTokTypes.find((resyncTokType) => {
         const canMatch = tokenMatcher(nextToken, resyncTokType);
         return canMatch;
       });
@@ -353,10 +345,10 @@ export class Recoverable {
   }
 
   flattenFollowSet(this: MixedInParser): TokenType[] {
-    const followStack = map(this.buildFullFollowKeyStack(), (currKey) => {
+    const followStack = this.buildFullFollowKeyStack().map((currKey) => {
       return this.getFollowSetFromFollowKey(currKey);
     });
-    return <any>flatten(followStack);
+    return <any>followStack.flat();
   }
 
   getFollowSetFromFollowKey(
@@ -394,7 +386,7 @@ export class Recoverable {
       this.addToResyncTokens(nextTok, resyncedTokens);
     }
     // the last token is not part of the error.
-    return dropRight(resyncedTokens);
+    return resyncedTokens.slice(0, -1);
   }
 
   attemptInRepetitionRecovery(

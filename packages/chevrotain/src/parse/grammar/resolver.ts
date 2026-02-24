@@ -2,7 +2,6 @@ import {
   IParserUnresolvedRefDefinitionError,
   ParserDefinitionErrorType,
 } from "../parser/parser.js";
-import { forEach, values } from "lodash-es";
 import { GAstVisitor, NonTerminal, Rule } from "@chevrotain/gast";
 import {
   IGrammarResolverErrorMessageProvider,
@@ -30,7 +29,7 @@ export class GastRefResolverVisitor extends GAstVisitor {
   }
 
   public resolveRefs(): void {
-    forEach(values(this.nameToTopRule), (prod) => {
+    Object.values(this.nameToTopRule).forEach((prod) => {
       this.currTopLevel = prod;
       prod.accept(this);
     });

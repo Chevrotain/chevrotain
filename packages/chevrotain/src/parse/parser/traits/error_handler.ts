@@ -8,7 +8,6 @@ import {
   isRecognitionException,
   NoViableAltException,
 } from "../../exceptions_public.js";
-import { clone, has } from "lodash-es";
 import {
   getLookaheadPathsForOptionalProd,
   getLookaheadPathsForOr,
@@ -26,9 +25,10 @@ export class ErrorHandler {
 
   initErrorHandler(config: IParserConfig) {
     this._errors = [];
-    this.errorMessageProvider = has(config, "errorMessageProvider")
-      ? (config.errorMessageProvider as IParserErrorMessageProvider) // assumes end user provides the correct config value/type
-      : DEFAULT_PARSER_CONFIG.errorMessageProvider;
+    this.errorMessageProvider =
+      "errorMessageProvider" in config
+        ? (config.errorMessageProvider as IParserErrorMessageProvider) // assumes end user provides the correct config value/type
+        : DEFAULT_PARSER_CONFIG.errorMessageProvider;
   }
 
   SAVE_ERROR(
@@ -53,7 +53,7 @@ export class ErrorHandler {
   }
 
   get errors(): IRecognitionException[] {
-    return clone(this._errors);
+    return [...this._errors];
   }
 
   set errors(newErrors: IRecognitionException[]) {

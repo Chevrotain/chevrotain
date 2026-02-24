@@ -1,12 +1,3 @@
-import {
-  clone,
-  drop,
-  dropRight,
-  first as _first,
-  forEach,
-  isEmpty,
-  last,
-} from "lodash-es";
 import { first } from "./first.js";
 import { RestWalker } from "./rest.js";
 import { TokenMatcher } from "../parser/parser.js";
@@ -60,8 +51,8 @@ export abstract class AbstractNextPossibleTokensWalker extends RestWalker {
     }
 
     // immutable for the win
-    this.ruleStack = clone(this.path.ruleStack).reverse(); // intelij bug requires assertion
-    this.occurrenceStack = clone(this.path.occurrenceStack).reverse(); // intelij bug requires assertion
+    this.ruleStack = [...this.path.ruleStack].reverse(); // intelij bug requires assertion
+    this.occurrenceStack = [...this.path.occurrenceStack].reverse(); // intelij bug requires assertion
 
     // already verified that the first production is valid, we now seek the 2nd production
     this.ruleStack.pop();
@@ -101,7 +92,7 @@ export abstract class AbstractNextPossibleTokensWalker extends RestWalker {
 
   updateExpectedNext(): void {
     // need to consume the Terminal
-    if (isEmpty(this.ruleStack)) {
+    if (this.ruleStack.length === 0) {
       // must reset nextProductionXXX to avoid walking down another Top Level production while what we are
       // really seeking is the last Terminal...
       this.nextProductionName = "";
@@ -185,7 +176,7 @@ export class NextTerminalAfterManyWalker extends AbstractNextTerminalAfterProduc
     prevRest: IProduction[],
   ): void {
     if (manyProd.idx === this.occurrence) {
-      const firstAfterMany = _first(currRest.concat(prevRest));
+      const firstAfterMany = currRest.concat(prevRest)[0];
       this.result.isEndOfRule = firstAfterMany === undefined;
       if (firstAfterMany instanceof Terminal) {
         this.result.token = firstAfterMany.terminalType;
@@ -204,7 +195,7 @@ export class NextTerminalAfterManySepWalker extends AbstractNextTerminalAfterPro
     prevRest: IProduction[],
   ): void {
     if (manySepProd.idx === this.occurrence) {
-      const firstAfterManySep = _first(currRest.concat(prevRest));
+      const firstAfterManySep = currRest.concat(prevRest)[0];
       this.result.isEndOfRule = firstAfterManySep === undefined;
       if (firstAfterManySep instanceof Terminal) {
         this.result.token = firstAfterManySep.terminalType;
@@ -223,7 +214,7 @@ export class NextTerminalAfterAtLeastOneWalker extends AbstractNextTerminalAfter
     prevRest: IProduction[],
   ): void {
     if (atLeastOneProd.idx === this.occurrence) {
-      const firstAfterAtLeastOne = _first(currRest.concat(prevRest));
+      const firstAfterAtLeastOne = currRest.concat(prevRest)[0];
       this.result.isEndOfRule = firstAfterAtLeastOne === undefined;
       if (firstAfterAtLeastOne instanceof Terminal) {
         this.result.token = firstAfterAtLeastOne.terminalType;
@@ -243,9 +234,7 @@ export class NextTerminalAfterAtLeastOneSepWalker extends AbstractNextTerminalAf
     prevRest: IProduction[],
   ): void {
     if (atleastOneSepProd.idx === this.occurrence) {
-      const firstAfterfirstAfterAtLeastOneSep = _first(
-        currRest.concat(prevRest),
-      );
+      const firstAfterfirstAfterAtLeastOneSep = currRest.concat(prevRest)[0];
       this.result.isEndOfRule = firstAfterfirstAfterAtLeastOneSep === undefined;
       if (firstAfterfirstAfterAtLeastOneSep instanceof Terminal) {
         this.result.token = firstAfterfirstAfterAtLeastOneSep.terminalType;
@@ -268,13 +257,13 @@ export function possiblePathsFrom(
   currPath: TokenType[] = [],
 ): PartialPathAndSuffixes[] {
   // avoid side effects
-  currPath = clone(currPath);
+  currPath = [...currPath];
   let result: PartialPathAndSuffixes[] = [];
   let i = 0;
 
   // TODO: avoid inner funcs
   function remainingPathWith(nextDef: IProduction[]) {
-    return nextDef.concat(drop(targetDef, i + 1));
+    return nextDef.concat(targetDef.slice(i + 1));
   }
 
   // TODO: avoid inner funcs
@@ -338,11 +327,11 @@ export function possiblePathsFrom(
       ]);
       result = getAlternativesForProd(newDef);
     } else if (prod instanceof Alternation) {
-      forEach(prod.definition, (currAlt) => {
+      prod.definition.forEach((currAlt) => {
         // TODO: this is a limited check for empty alternatives
         //   It would prevent a common case of infinite loops during parser initialization.
         //   However **in-directly** empty alternatives may still cause issues.
-        if (isEmpty(currAlt.definition) === false) {
+        if (currAlt.definition.length !== 0) {
           result = getAlternativesForProd(currAlt.definition);
         }
       });
@@ -357,7 +346,7 @@ export function possiblePathsFrom(
   }
   result.push({
     partialPath: currPath,
-    suffixDef: drop(targetDef, i),
+    suffixDef: targetDef.slice(i),
   });
 
   return result;
@@ -395,14 +384,14 @@ export function nextPossibleTokensAfter(
     occurrenceStack: [],
   });
 
-  while (!isEmpty(possiblePaths)) {
+  while (possiblePaths.length !== 0) {
     const currPath = possiblePaths.pop()!;
 
     // skip alternatives if no more results can be found (assuming deterministic grammar with fixed lookahead)
     if (currPath === EXIT_ALTERNATIVE) {
       if (
         foundCompletePath &&
-        last(possiblePaths)!.idx <= minimalAlternativesIndex
+        possiblePaths.at(-1)!.idx <= minimalAlternativesIndex
       ) {
         // remove irrelevant alternative
         possiblePaths.pop();
@@ -416,7 +405,7 @@ export function nextPossibleTokensAfter(
     const currOccurrenceStack = currPath.occurrenceStack;
 
     // For Example: an empty path could exist in a valid grammar in the case of an EMPTY_ALT
-    if (isEmpty(currDef)) {
+    if (currDef.length === 0) {
       continue;
     }
 
@@ -425,9 +414,9 @@ export function nextPossibleTokensAfter(
     if (prod === EXIT_NON_TERMINAL) {
       const nextPath = {
         idx: currIdx,
-        def: drop(currDef),
-        ruleStack: dropRight(currRuleStack),
-        occurrenceStack: dropRight(currOccurrenceStack),
+        def: currDef.slice(1),
+        ruleStack: currRuleStack.slice(0, -1),
+        occurrenceStack: currOccurrenceStack.slice(0, -1),
       };
       possiblePaths.push(nextPath);
     } else if (prod instanceof Terminal) {
@@ -438,7 +427,7 @@ export function nextPossibleTokensAfter(
         if (tokMatcher!(actualToken, prod.terminalType)) {
           const nextPath = {
             idx: nextIdx,
-            def: drop(currDef),
+            def: currDef.slice(1),
             ruleStack: currRuleStack,
             occurrenceStack: currOccurrenceStack,
           };
@@ -458,15 +447,15 @@ export function nextPossibleTokensAfter(
         throw Error("non exhaustive match");
       }
     } else if (prod instanceof NonTerminal) {
-      const newRuleStack = clone(currRuleStack);
+      const newRuleStack = [...currRuleStack];
       newRuleStack.push(prod.nonTerminalName);
 
-      const newOccurrenceStack = clone(currOccurrenceStack);
+      const newOccurrenceStack = [...currOccurrenceStack];
       newOccurrenceStack.push(prod.idx);
 
       const nextPath = {
         idx: currIdx,
-        def: prod.definition.concat(EXIT_NON_TERMINAL_ARR, drop(currDef)),
+        def: prod.definition.concat(EXIT_NON_TERMINAL_ARR, currDef.slice(1)),
         ruleStack: newRuleStack,
         occurrenceStack: newOccurrenceStack,
       };
@@ -475,7 +464,7 @@ export function nextPossibleTokensAfter(
       // the order of alternatives is meaningful, FILO (Last path will be traversed first).
       const nextPathWithout = {
         idx: currIdx,
-        def: drop(currDef),
+        def: currDef.slice(1),
         ruleStack: currRuleStack,
         occurrenceStack: currOccurrenceStack,
       };
@@ -485,7 +474,7 @@ export function nextPossibleTokensAfter(
 
       const nextPathWith = {
         idx: currIdx,
-        def: prod.definition.concat(drop(currDef)),
+        def: prod.definition.concat(currDef.slice(1)),
         ruleStack: currRuleStack,
         occurrenceStack: currOccurrenceStack,
       };
@@ -496,7 +485,10 @@ export function nextPossibleTokensAfter(
         definition: prod.definition,
         idx: prod.idx,
       });
-      const nextDef = prod.definition.concat([secondIteration], drop(currDef));
+      const nextDef = prod.definition.concat(
+        [secondIteration],
+        currDef.slice(1),
+      );
       const nextPath = {
         idx: currIdx,
         def: nextDef,
@@ -513,7 +505,10 @@ export function nextPossibleTokensAfter(
         definition: [<any>separatorGast].concat(prod.definition),
         idx: prod.idx,
       });
-      const nextDef = prod.definition.concat([secondIteration], drop(currDef));
+      const nextDef = prod.definition.concat(
+        [secondIteration],
+        currDef.slice(1),
+      );
       const nextPath = {
         idx: currIdx,
         def: nextDef,
@@ -525,7 +520,7 @@ export function nextPossibleTokensAfter(
       // the order of alternatives is meaningful, FILO (Last path will be traversed first).
       const nextPathWithout = {
         idx: currIdx,
-        def: drop(currDef),
+        def: currDef.slice(1),
         ruleStack: currRuleStack,
         occurrenceStack: currOccurrenceStack,
       };
@@ -540,7 +535,7 @@ export function nextPossibleTokensAfter(
         definition: [<any>separatorGast].concat(prod.definition),
         idx: prod.idx,
       });
-      const nextDef = prod.definition.concat([nthRepetition], drop(currDef));
+      const nextDef = prod.definition.concat([nthRepetition], currDef.slice(1));
       const nextPathWith = {
         idx: currIdx,
         def: nextDef,
@@ -552,7 +547,7 @@ export function nextPossibleTokensAfter(
       // the order of alternatives is meaningful, FILO (Last path will be traversed first).
       const nextPathWithout = {
         idx: currIdx,
-        def: drop(currDef),
+        def: currDef.slice(1),
         ruleStack: currRuleStack,
         occurrenceStack: currOccurrenceStack,
       };
@@ -565,7 +560,7 @@ export function nextPossibleTokensAfter(
         definition: prod.definition,
         idx: prod.idx,
       });
-      const nextDef = prod.definition.concat([nthRepetition], drop(currDef));
+      const nextDef = prod.definition.concat([nthRepetition], currDef.slice(1));
       const nextPathWith = {
         idx: currIdx,
         def: nextDef,
@@ -579,7 +574,7 @@ export function nextPossibleTokensAfter(
         const currAlt: any = prod.definition[i];
         const currAltPath = {
           idx: currIdx,
-          def: currAlt.definition.concat(drop(currDef)),
+          def: currAlt.definition.concat(currDef.slice(1)),
           ruleStack: currRuleStack,
           occurrenceStack: currOccurrenceStack,
         };
@@ -589,7 +584,7 @@ export function nextPossibleTokensAfter(
     } else if (prod instanceof Alternative) {
       possiblePaths.push({
         idx: currIdx,
-        def: prod.definition.concat(drop(currDef)),
+        def: prod.definition.concat(currDef.slice(1)),
         ruleStack: currRuleStack,
         occurrenceStack: currOccurrenceStack,
       });
@@ -611,10 +606,10 @@ function expandTopLevelRule(
   currRuleStack: string[],
   currOccurrenceStack: number[],
 ): IPathToExamine {
-  const newRuleStack = clone(currRuleStack);
+  const newRuleStack = [...currRuleStack];
   newRuleStack.push(topRule.name);
 
-  const newCurrOccurrenceStack = clone(currOccurrenceStack);
+  const newCurrOccurrenceStack = [...currOccurrenceStack];
   // top rule is always assumed to have been called with occurrence index 1
   newCurrOccurrenceStack.push(1);
 

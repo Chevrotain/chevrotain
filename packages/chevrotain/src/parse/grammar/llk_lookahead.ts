@@ -6,7 +6,6 @@ import {
   Rule,
   TokenType,
 } from "@chevrotain/types";
-import { flatMap, isEmpty } from "lodash-es";
 import { defaultGrammarValidatorErrorProvider } from "../errors_public.js";
 import { DEFAULT_PARSER_CONFIG } from "../parser/parser.js";
 import {
@@ -39,7 +38,7 @@ export class LLkLookaheadStrategy implements ILookaheadStrategy {
   }): ILookaheadValidationError[] {
     const leftRecursionErrors = this.validateNoLeftRecursion(options.rules);
 
-    if (isEmpty(leftRecursionErrors)) {
+    if (leftRecursionErrors.length === 0) {
       const emptyAltErrors = this.validateEmptyOrAlternatives(options.rules);
       const ambiguousAltsErrors = this.validateAmbiguousAlternationAlternatives(
         options.rules,
@@ -61,7 +60,7 @@ export class LLkLookaheadStrategy implements ILookaheadStrategy {
   }
 
   validateNoLeftRecursion(rules: Rule[]): IParserDefinitionError[] {
-    return flatMap(rules, (currTopRule) =>
+    return rules.flatMap((currTopRule) =>
       validateNoLeftRecursion(
         currTopRule,
         currTopRule,
@@ -71,7 +70,7 @@ export class LLkLookaheadStrategy implements ILookaheadStrategy {
   }
 
   validateEmptyOrAlternatives(rules: Rule[]): IParserDefinitionError[] {
-    return flatMap(rules, (currTopRule) =>
+    return rules.flatMap((currTopRule) =>
       validateEmptyOrAlternative(
         currTopRule,
         defaultGrammarValidatorErrorProvider,
@@ -83,7 +82,7 @@ export class LLkLookaheadStrategy implements ILookaheadStrategy {
     rules: Rule[],
     maxLookahead: number,
   ): IParserDefinitionError[] {
-    return flatMap(rules, (currTopRule) =>
+    return rules.flatMap((currTopRule) =>
       validateAmbiguousAlternationAlternatives(
         currTopRule,
         maxLookahead,
