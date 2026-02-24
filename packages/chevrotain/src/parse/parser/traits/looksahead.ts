@@ -37,20 +37,17 @@ export class LooksAhead {
   lookaheadStrategy: ILookaheadStrategy;
 
   initLooksAhead(config: IParserConfig) {
-    this.dynamicTokensEnabled =
-      "dynamicTokensEnabled" in config
-        ? (config.dynamicTokensEnabled as boolean) // assumes end user provides the correct config value/type
-        : DEFAULT_PARSER_CONFIG.dynamicTokensEnabled;
+    this.dynamicTokensEnabled = Object.hasOwn(config, "dynamicTokensEnabled")
+      ? (config.dynamicTokensEnabled as boolean) // assumes end user provides the correct config value/type
+      : DEFAULT_PARSER_CONFIG.dynamicTokensEnabled;
 
-    this.maxLookahead =
-      "maxLookahead" in config
-        ? (config.maxLookahead as number) // assumes end user provides the correct config value/type
-        : DEFAULT_PARSER_CONFIG.maxLookahead;
+    this.maxLookahead = Object.hasOwn(config, "maxLookahead")
+      ? (config.maxLookahead as number) // assumes end user provides the correct config value/type
+      : DEFAULT_PARSER_CONFIG.maxLookahead;
 
-    this.lookaheadStrategy =
-      "lookaheadStrategy" in config
-        ? (config.lookaheadStrategy as ILookaheadStrategy) // assumes end user provides the correct config value/type
-        : new LLkLookaheadStrategy({ maxLookahead: this.maxLookahead });
+    this.lookaheadStrategy = Object.hasOwn(config, "lookaheadStrategy")
+      ? (config.lookaheadStrategy as ILookaheadStrategy) // assumes end user provides the correct config value/type
+      : new LLkLookaheadStrategy({ maxLookahead: this.maxLookahead });
 
     this.lookAheadFuncsCache = new Map();
   }

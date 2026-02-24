@@ -12,7 +12,7 @@ export class PerformanceTracer {
   traceInitIndent: number;
 
   initPerformanceTracer(config: IParserConfig) {
-    if ("traceInitPerf" in config) {
+    if (Object.hasOwn(config, "traceInitPerf")) {
       const userTraceInitPerf = config.traceInitPerf;
       const traceIsNumber = typeof userTraceInitPerf === "number";
       this.traceInitMaxIdent = traceIsNumber
