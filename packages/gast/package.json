@@ -39,11 +39,7 @@
     "coverage": "c8 mocha --enable-source-maps"
   },
   "dependencies": {
-    "@chevrotain/types": "workspace:*",
-    "lodash-es": "4.17.23"
-  },
-  "devDependencies": {
-    "@types/lodash-es": "4.17.12"
+    "@chevrotain/types": "workspace:*"
   },
   "publishConfig": {
     "access": "public"
