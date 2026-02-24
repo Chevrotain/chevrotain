@@ -91,7 +91,7 @@ export class RecognizerEngine {
     this.RULE_OCCURRENCE_STACK = [];
     this.gastProductionsCache = {};
 
-    if ("serializedGrammar" in config) {
+    if (Object.hasOwn(config, "serializedGrammar")) {
       throw Error(
         "The Parser's configuration can no longer contain a <serializedGrammar> property.\n" +
           "\tSee: https://chevrotain.io/docs/changes/BREAKING_CHANGES.html#_6-0-0\n" +
@@ -129,7 +129,7 @@ export class RecognizerEngine {
         {} as { [tokenName: string]: TokenType },
       );
     } else if (
-      "modes" in tokenVocabulary &&
+      Object.hasOwn(tokenVocabulary, "modes") &&
       (Object.values((<any>tokenVocabulary).modes) as any[][])
         .flat()
         .every(isTokenType)
@@ -191,14 +191,12 @@ export class RecognizerEngine {
           `Make sure that all grammar rule definitions are done before 'performSelfAnalysis' is called.`,
       );
     }
-    const resyncEnabled: boolean =
-      "resyncEnabled" in config
-        ? (config.resyncEnabled as boolean) // assumes end user provides the correct config value/type
-        : DEFAULT_RULE_CONFIG.resyncEnabled;
-    const recoveryValueFunc =
-      "recoveryValueFunc" in config
-        ? (config.recoveryValueFunc as () => R) // assumes end user provides the correct config value/type
-        : DEFAULT_RULE_CONFIG.recoveryValueFunc;
+    const resyncEnabled: boolean = Object.hasOwn(config, "resyncEnabled")
+      ? (config.resyncEnabled as boolean) // assumes end user provides the correct config value/type
+      : DEFAULT_RULE_CONFIG.resyncEnabled;
+    const recoveryValueFunc = Object.hasOwn(config, "recoveryValueFunc")
+      ? (config.recoveryValueFunc as () => R) // assumes end user provides the correct config value/type
+      : DEFAULT_RULE_CONFIG.recoveryValueFunc;
 
     // performance optimization: Use small integers as keys for the longer human readable "full" rule names.
     // this greatly improves Map access time (as much as 8% for some performance benchmarks).

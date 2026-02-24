@@ -48,10 +48,9 @@ export class Recoverable {
     this.firstAfterRepMap = {};
     this.resyncFollows = {};
 
-    this.recoveryEnabled =
-      "recoveryEnabled" in config
-        ? (config.recoveryEnabled as boolean) // assumes end user provides the correct config value/type
-        : DEFAULT_PARSER_CONFIG.recoveryEnabled;
+    this.recoveryEnabled = Object.hasOwn(config, "recoveryEnabled")
+      ? (config.recoveryEnabled as boolean) // assumes end user provides the correct config value/type
+      : DEFAULT_PARSER_CONFIG.recoveryEnabled;
 
     // performance optimization, NOOP will be inlined which
     // effectively means that this optional feature does not exist

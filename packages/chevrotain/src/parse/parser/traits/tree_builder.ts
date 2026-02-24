@@ -48,10 +48,9 @@ export class TreeBuilder {
     // outputCst is no longer exposed/defined in the pubic API
     this.outputCst = (config as any).outputCst;
 
-    this.nodeLocationTracking =
-      "nodeLocationTracking" in config
-        ? (config.nodeLocationTracking as nodeLocationTrackingOptions) // assumes end user provides the correct config value/type
-        : DEFAULT_PARSER_CONFIG.nodeLocationTracking;
+    this.nodeLocationTracking = Object.hasOwn(config, "nodeLocationTracking")
+      ? (config.nodeLocationTracking as nodeLocationTrackingOptions) // assumes end user provides the correct config value/type
+      : DEFAULT_PARSER_CONFIG.nodeLocationTracking;
 
     if (!this.outputCst) {
       this.cstInvocationStateUpdate = () => {};
