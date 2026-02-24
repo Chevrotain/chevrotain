@@ -1,4 +1,3 @@
-import { every, includes, some } from "lodash-es";
 import {
   AbstractProduction,
   Alternation,
@@ -46,18 +45,17 @@ export function isOptionalProd(
   // may be indirectly optional ((A?B?C?) | (D?E?F?))
   if (prod instanceof Alternation) {
     // for OR its enough for just one of the alternatives to be optional
-    return some((<Alternation>prod).definition, (subProd: IProduction) => {
+    return (<Alternation>prod).definition.some((subProd: IProduction) => {
       return isOptionalProd(subProd, alreadyVisited);
     });
-  } else if (prod instanceof NonTerminal && includes(alreadyVisited, prod)) {
+  } else if (prod instanceof NonTerminal && alreadyVisited.includes(prod)) {
     // avoiding stack overflow due to infinite recursion
     return false;
   } else if (prod instanceof AbstractProduction) {
     if (prod instanceof NonTerminal) {
       alreadyVisited.push(prod);
     }
-    return every(
-      (<AbstractProduction>prod).definition,
+    return (<AbstractProduction>prod).definition.every(
       (subProd: IProduction) => {
         return isOptionalProd(subProd, alreadyVisited);
       },
