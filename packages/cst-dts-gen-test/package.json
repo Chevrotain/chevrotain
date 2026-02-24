@@ -26,11 +26,9 @@
     "@chevrotain/cst-dts-gen": "workspace:*",
     "@chevrotain/gast": "workspace:*",
     "@chevrotain/types": "workspace:*",
-    "chevrotain": "workspace:*",
-    "lodash-es": "4.17.23"
+    "chevrotain": "workspace:*"
   },
   "devDependencies": {
-    "@types/lodash-es": "4.17.12",
     "glob": "13.0.0"
   }
 }
