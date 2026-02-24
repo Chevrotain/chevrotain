@@ -303,7 +303,7 @@ export class GastRecorder {
     options?: SubruleMethodOpts<ARGS>,
   ): R | CstNode {
     assertMethodIdxIsValid(occurrence);
-    if (!ruleToCall || !("ruleName" in ruleToCall)) {
+    if (!ruleToCall || !Object.hasOwn(ruleToCall, "ruleName")) {
       const error: any = new Error(
         `<SUBRULE${getIdxSuffix(occurrence)}> argument is invalid` +
           ` expecting a Parser method reference but got: <${JSON.stringify(
@@ -380,7 +380,7 @@ function recordProd(
   if (handleSep) {
     newProd.separator = mainProdArg.SEP;
   }
-  if ("MAX_LOOKAHEAD" in mainProdArg) {
+  if (Object.hasOwn(mainProdArg, "MAX_LOOKAHEAD")) {
     newProd.maxLookahead = mainProdArg.MAX_LOOKAHEAD;
   }
 
@@ -405,7 +405,7 @@ function recordOrProd(mainProdArg: any, occurrence: number): any {
     idx: occurrence,
     ignoreAmbiguities: hasOptions && mainProdArg.IGNORE_AMBIGUITIES === true,
   });
-  if ("MAX_LOOKAHEAD" in mainProdArg) {
+  if (Object.hasOwn(mainProdArg, "MAX_LOOKAHEAD")) {
     newOrProd.maxLookahead = mainProdArg.MAX_LOOKAHEAD;
   }
 
@@ -419,11 +419,11 @@ function recordOrProd(mainProdArg: any, occurrence: number): any {
   alts.forEach((currAlt) => {
     const currAltFlat = new Alternative({ definition: [] });
     newOrProd.definition.push(currAltFlat);
-    if ("IGNORE_AMBIGUITIES" in currAlt) {
+    if (Object.hasOwn(currAlt, "IGNORE_AMBIGUITIES")) {
       currAltFlat.ignoreAmbiguities = currAlt.IGNORE_AMBIGUITIES as boolean; // assumes end user provides the correct config value/type
     }
     // **implicit** ignoreAmbiguities due to usage of gate
-    else if ("GATE" in currAlt) {
+    else if (Object.hasOwn(currAlt, "GATE")) {
       currAltFlat.ignoreAmbiguities = true;
     }
     this.recordingProdStack.push(currAltFlat);
