@@ -4,7 +4,6 @@ import {
   setNodeLocationFull,
   setNodeLocationOnlyOffset,
 } from "../../cst/cst.js";
-import { has, isUndefined, keys, noop } from "lodash-es";
 import {
   createBaseSemanticVisitorConstructor,
   createBaseVisitorConstructorWithDefaults,
@@ -49,26 +48,27 @@ export class TreeBuilder {
     // outputCst is no longer exposed/defined in the pubic API
     this.outputCst = (config as any).outputCst;
 
-    this.nodeLocationTracking = has(config, "nodeLocationTracking")
-      ? (config.nodeLocationTracking as nodeLocationTrackingOptions) // assumes end user provides the correct config value/type
-      : DEFAULT_PARSER_CONFIG.nodeLocationTracking;
+    this.nodeLocationTracking =
+      "nodeLocationTracking" in config
+        ? (config.nodeLocationTracking as nodeLocationTrackingOptions) // assumes end user provides the correct config value/type
+        : DEFAULT_PARSER_CONFIG.nodeLocationTracking;
 
     if (!this.outputCst) {
-      this.cstInvocationStateUpdate = noop;
-      this.cstFinallyStateUpdate = noop;
-      this.cstPostTerminal = noop;
-      this.cstPostNonTerminal = noop;
-      this.cstPostRule = noop;
+      this.cstInvocationStateUpdate = () => {};
+      this.cstFinallyStateUpdate = () => {};
+      this.cstPostTerminal = () => {};
+      this.cstPostNonTerminal = () => {};
+      this.cstPostRule = () => {};
     } else {
       if (/full/i.test(this.nodeLocationTracking)) {
         if (this.recoveryEnabled) {
           this.setNodeLocationFromToken = setNodeLocationFull;
           this.setNodeLocationFromNode = setNodeLocationFull;
-          this.cstPostRule = noop;
+          this.cstPostRule = () => {};
           this.setInitialNodeLocation = this.setInitialNodeLocationFullRecovery;
         } else {
-          this.setNodeLocationFromToken = noop;
-          this.setNodeLocationFromNode = noop;
+          this.setNodeLocationFromToken = () => {};
+          this.setNodeLocationFromNode = () => {};
           this.cstPostRule = this.cstPostRuleFull;
           this.setInitialNodeLocation = this.setInitialNodeLocationFullRegular;
         }
@@ -76,21 +76,21 @@ export class TreeBuilder {
         if (this.recoveryEnabled) {
           this.setNodeLocationFromToken = <any>setNodeLocationOnlyOffset;
           this.setNodeLocationFromNode = <any>setNodeLocationOnlyOffset;
-          this.cstPostRule = noop;
+          this.cstPostRule = () => {};
           this.setInitialNodeLocation =
             this.setInitialNodeLocationOnlyOffsetRecovery;
         } else {
-          this.setNodeLocationFromToken = noop;
-          this.setNodeLocationFromNode = noop;
+          this.setNodeLocationFromToken = () => {};
+          this.setNodeLocationFromNode = () => {};
           this.cstPostRule = this.cstPostRuleOnlyOffset;
           this.setInitialNodeLocation =
             this.setInitialNodeLocationOnlyOffsetRegular;
         }
       } else if (/none/i.test(this.nodeLocationTracking)) {
-        this.setNodeLocationFromToken = noop;
-        this.setNodeLocationFromNode = noop;
-        this.cstPostRule = noop;
-        this.setInitialNodeLocation = noop;
+        this.setNodeLocationFromToken = () => {};
+        this.setNodeLocationFromNode = () => {};
+        this.cstPostRule = () => {};
+        this.setInitialNodeLocation = () => {};
       } else {
         throw Error(
           `Invalid <nodeLocationTracking> config option: "${config.nodeLocationTracking}"`,
@@ -228,10 +228,10 @@ export class TreeBuilder {
   ): {
     new (...args: any[]): ICstVisitor<IN, OUT>;
   } {
-    if (isUndefined(this.baseCstVisitorConstructor)) {
+    if (this.baseCstVisitorConstructor === undefined) {
       const newBaseCstVisitorConstructor = createBaseSemanticVisitorConstructor(
         this.className,
-        keys(this.gastProductionsCache),
+        Object.keys(this.gastProductionsCache),
       );
       this.baseCstVisitorConstructor = newBaseCstVisitorConstructor;
       return newBaseCstVisitorConstructor;
@@ -245,10 +245,10 @@ export class TreeBuilder {
   ): {
     new (...args: any[]): ICstVisitor<IN, OUT>;
   } {
-    if (isUndefined(this.baseCstVisitorWithDefaultsConstructor)) {
+    if (this.baseCstVisitorWithDefaultsConstructor === undefined) {
       const newConstructor = createBaseVisitorConstructorWithDefaults(
         this.className,
-        keys(this.gastProductionsCache),
+        Object.keys(this.gastProductionsCache),
         this.getBaseCstVisitorConstructor(),
       );
       this.baseCstVisitorWithDefaultsConstructor = newConstructor;

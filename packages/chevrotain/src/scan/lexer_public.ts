@@ -11,21 +11,6 @@ import {
   SUPPORT_STICKY,
   validatePatterns,
 } from "./lexer.js";
-import {
-  assign,
-  clone,
-  forEach,
-  identity,
-  isArray,
-  isEmpty,
-  isUndefined,
-  keys,
-  last,
-  map,
-  noop,
-  reduce,
-  reject,
-} from "lodash-es";
 import { PRINT_WARNING, timer, toFastProperties } from "@chevrotain/utils";
 import { augmentTokenTypes } from "./tokens.js";
 import {
@@ -127,7 +112,7 @@ export class Lexer {
     }
 
     // todo: defaults func?
-    this.config = assign({}, DEFAULT_LEXER_CONFIG, config) as any;
+    this.config = Object.assign({}, DEFAULT_LEXER_CONFIG, config) as any;
 
     const traceInitVal = this.config.traceInitPerf;
     if (traceInitVal === true) {
@@ -173,15 +158,17 @@ export class Lexer {
         this.trackEndLines = /full/i.test(this.config.positionTracking);
 
         // Convert SingleModeLexerDefinition into a IMultiModeLexerDefinition.
-        if (isArray(lexerDefinition)) {
+        if (Array.isArray(lexerDefinition)) {
           actualDefinition = {
-            modes: { defaultMode: clone(lexerDefinition) },
+            modes: { defaultMode: [...lexerDefinition] },
             defaultMode: DEFAULT_MODE,
           };
         } else {
           // no conversion needed, input should already be a IMultiModeLexerDefinition
           hasOnlySingleMode = false;
-          actualDefinition = clone(<IMultiModeLexerDefinition>lexerDefinition);
+          actualDefinition = {
+            ...(<IMultiModeLexerDefinition>lexerDefinition),
+          };
         }
       });
 
@@ -214,18 +201,18 @@ export class Lexer {
 
       // an error of undefined TokenTypes will be detected in "performRuntimeChecks" above.
       // this transformation is to increase robustness in the case of partially invalid lexer definition.
-      forEach(actualDefinition.modes, (currModeValue, currModeName) => {
-        actualDefinition.modes[currModeName] = reject<TokenType>(
-          currModeValue,
-          (currTokType) => isUndefined(currTokType),
-        );
-      });
+      Object.entries(actualDefinition.modes).forEach(
+        ([currModeName, currModeValue]) => {
+          actualDefinition.modes[currModeName] = currModeValue.filter(
+            (currTokType: TokenType) => currTokType !== undefined,
+          );
+        },
+      );
 
-      const allModeNames = keys(actualDefinition.modes);
+      const allModeNames = Object.keys(actualDefinition.modes);
 
-      forEach(
-        actualDefinition.modes,
-        (currModDef: TokenType[], currModName) => {
+      Object.entries(actualDefinition.modes).forEach(
+        ([currModName, currModDef]: [string, TokenType[]]) => {
           this.TRACE_INIT(`Mode: <${currModName}> processing`, () => {
             this.modes.push(currModName);
 
@@ -240,7 +227,7 @@ export class Lexer {
             // If definition errors were encountered, the analysis phase may fail unexpectedly/
             // Considering a lexer with definition errors may never be used, there is no point
             // to performing the analysis anyhow...
-            if (isEmpty(this.lexerDefinitionErrors)) {
+            if (this.lexerDefinitionErrors.length === 0) {
               augmentTokenTypes(currModDef);
 
               let currAnalyzeResult!: IAnalyzeResult;
@@ -261,7 +248,7 @@ export class Lexer {
               this.charCodeToPatternIdxToConfig[currModName] =
                 currAnalyzeResult.charCodeToPatternIdxToConfig;
 
-              this.emptyGroups = assign(
+              this.emptyGroups = Object.assign(
                 {},
                 this.emptyGroups,
                 currAnalyzeResult.emptyGroups,
@@ -279,10 +266,10 @@ export class Lexer {
       this.defaultMode = actualDefinition.defaultMode;
 
       if (
-        !isEmpty(this.lexerDefinitionErrors) &&
+        this.lexerDefinitionErrors.length > 0 &&
         !this.config.deferDefinitionErrorsHandling
       ) {
-        const allErrMessages = map(this.lexerDefinitionErrors, (error) => {
+        const allErrMessages = this.lexerDefinitionErrors.map((error) => {
           return error.message;
         });
         const allErrMessagesString = allErrMessages.join(
@@ -294,7 +281,7 @@ export class Lexer {
       }
 
       // Only print warning if there are no errors, This will avoid pl
-      forEach(this.lexerDefinitionWarning, (warningDescriptor) => {
+      this.lexerDefinitionWarning.forEach((warningDescriptor) => {
         PRINT_WARNING(warningDescriptor.message);
       });
 
@@ -303,23 +290,23 @@ export class Lexer {
         // These implementations should be in-lined by the JavaScript engine
         // to provide optimal performance in each scenario.
         if (SUPPORT_STICKY) {
-          this.chopInput = <any>identity;
+          this.chopInput = <any>((x: any) => x);
           this.match = this.matchWithTest;
         } else {
-          this.updateLastIndex = noop;
+          this.updateLastIndex = () => {};
           this.match = this.matchWithExec;
         }
 
         if (hasOnlySingleMode) {
-          this.handleModes = noop;
+          this.handleModes = () => {};
         }
 
         if (this.trackStartLines === false) {
-          this.computeNewColumn = identity;
+          this.computeNewColumn = (x: any) => x;
         }
 
         if (this.trackEndLines === false) {
-          this.updateTokenEndLineColumnLocation = noop;
+          this.updateTokenEndLineColumnLocation = () => {};
         }
 
         if (/full/i.test(this.config.positionTracking)) {
@@ -344,9 +331,8 @@ export class Lexer {
       });
 
       this.TRACE_INIT("Failed Optimization Warnings", () => {
-        const unOptimizedModes = reduce(
-          this.canModeBeOptimized,
-          (cannotBeOptimized, canBeOptimized, modeName) => {
+        const unOptimizedModes = Object.entries(this.canModeBeOptimized).reduce(
+          (cannotBeOptimized, [modeName, canBeOptimized]) => {
             if (canBeOptimized === false) {
               cannotBeOptimized.push(modeName);
             }
@@ -355,7 +341,7 @@ export class Lexer {
           [] as string[],
         );
 
-        if (config.ensureOptimizations && !isEmpty(unOptimizedModes)) {
+        if (config.ensureOptimizations && unOptimizedModes.length > 0) {
           throw Error(
             `Lexer Modes: < ${unOptimizedModes.join(
               ", ",
@@ -380,8 +366,8 @@ export class Lexer {
     text: string,
     initialMode: string = this.defaultMode,
   ): ILexingResult {
-    if (!isEmpty(this.lexerDefinitionErrors)) {
-      const allErrMessages = map(this.lexerDefinitionErrors, (error) => {
+    if (this.lexerDefinitionErrors.length > 0) {
+      const allErrMessages = this.lexerDefinitionErrors.map((error) => {
         return error.message;
       });
       const allErrMessagesString = allErrMessages.join(
@@ -487,7 +473,7 @@ export class Lexer {
         });
       } else {
         modeStack.pop();
-        const newMode = last(modeStack)!;
+        const newMode = modeStack.at(-1)!;
         patternIdxToConfig = this.patternIdxToConfig[newMode];
         currCharCodeToPatternIdxToConfig =
           this.charCodeToPatternIdxToConfig[newMode];
@@ -740,7 +726,7 @@ export class Lexer {
           errLength,
           errorLine,
           errorColumn,
-          last(modeStack),
+          modeStack.at(-1),
         );
         errors.push({
           offset: errorStartOffset,

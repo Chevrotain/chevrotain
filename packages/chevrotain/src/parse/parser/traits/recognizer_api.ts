@@ -13,7 +13,6 @@ import {
   SubruleMethodOpts,
   TokenType,
 } from "@chevrotain/types";
-import { includes, values } from "lodash-es";
 import { isRecognitionException } from "../../exceptions_public.js";
 import { DEFAULT_RULE_CONFIG, ParserDefinitionErrorType } from "../parser.js";
 import { defaultGrammarValidatorErrorProvider } from "../../errors_public.js";
@@ -642,7 +641,7 @@ export class RecognizerApi {
     implementation: (...implArgs: any[]) => T,
     config: IRuleConfig<T> = DEFAULT_RULE_CONFIG,
   ): (idxInCallingRule?: number, ...args: any[]) => T | any {
-    if (includes(this.definedRulesNames, name)) {
+    if (this.definedRulesNames.includes(name)) {
       const errMsg =
         defaultGrammarValidatorErrorProvider.buildDuplicateRuleNameError({
           topLevelRule: name,
@@ -714,6 +713,6 @@ export class RecognizerApi {
   }
 
   public getSerializedGastProductions(this: MixedInParser): ISerializedGast[] {
-    return serializeGrammar(values(this.gastProductionsCache));
+    return serializeGrammar(Object.values(this.gastProductionsCache));
   }
 }
