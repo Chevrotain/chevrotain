@@ -228,7 +228,7 @@ export function buildAlternativesLookAheadFunc(
             result[currTokType.tokenTypeIdx!] = idx;
           }
           currTokType.categoryMatches!.forEach((currExtendingType) => {
-            if (!(currExtendingType in result)) {
+            if (!Object.hasOwn(result, currExtendingType)) {
               result[currExtendingType] = idx;
             }
           });
