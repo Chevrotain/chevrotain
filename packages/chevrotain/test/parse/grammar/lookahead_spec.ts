@@ -9,7 +9,7 @@ import {
   lookAheadSequenceFromAlternatives,
   PROD_TYPE,
 } from "../../../src/parse/grammar/lookahead.js";
-import { map } from "lodash-es";
+
 import {
   augmentTokenTypes,
   tokenStructuredMatcher,
@@ -741,7 +741,7 @@ context("lookahead specs", () => {
         public input: IToken[];
 
         constructor(public inputConstructors: TokenType[]) {
-          this.input = map(inputConstructors, (currConst) =>
+          this.input = inputConstructors.map((currConst) =>
             createRegularToken(currConst),
           );
         }

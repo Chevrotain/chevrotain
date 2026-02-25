@@ -12,7 +12,7 @@ import {
   RET_TYPE,
   SemiColonTok,
 } from "./backtracking_parser.js";
-import { flatten } from "lodash-es";
+
 import { createRegularToken } from "../../utils/matchers.js";
 
 describe("Simple backtracking example", () => {
@@ -50,7 +50,7 @@ describe("Simple backtracking example", () => {
   });
 
   it("can parse an element with Equals and a very long qualified name", () => {
-    const input: any = flatten([
+    const input: any = [
       // element A:ns1.ns2.ns3.ns4.ns5.ns6.ns7.ns8.ns9.ns10.ns11.ns12 = 666;
       createRegularToken(ElementTok, "element"),
       createRegularToken(IdentTok, "A"),
@@ -59,7 +59,7 @@ describe("Simple backtracking example", () => {
       createRegularToken(EqualsTok, "="),
       createRegularToken(NumberTok, "666"),
       createRegularToken(SemiColonTok, ";"),
-    ]);
+    ].flat();
 
     const parser = new BackTrackingParser();
     parser.input = input;
@@ -70,7 +70,7 @@ describe("Simple backtracking example", () => {
   });
 
   it("can parse an element with Default and a very long qualified name", () => {
-    const input: any = flatten([
+    const input: any = [
       // element A:ns1.ns2.ns3.ns4.ns5.ns6.ns7.ns8.ns9.ns10.ns11.ns12 default 666;
       createRegularToken(ElementTok, "element"),
       createRegularToken(IdentTok, "A"),
@@ -79,7 +79,7 @@ describe("Simple backtracking example", () => {
       createRegularToken(DefaultTok, "default"),
       createRegularToken(NumberTok, "666"),
       createRegularToken(SemiColonTok, ";"),
-    ]);
+    ].flat();
 
     const parser = new BackTrackingParser();
     parser.input = input;

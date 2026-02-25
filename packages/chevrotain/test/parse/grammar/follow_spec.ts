@@ -12,7 +12,7 @@ import {
   Rule,
   Terminal,
 } from "@chevrotain/gast";
-import { keys } from "lodash-es";
+
 import { expect } from "chai";
 import { createToken } from "../../../src/scan/tokens_public.js";
 import { TokenType } from "@chevrotain/types";
@@ -137,7 +137,7 @@ describe("The Grammar Ast Follows model", () => {
 
   it("can compute the follows for Top level production ref in ActionDec", () => {
     const actual = new ResyncFollowsWalker(actionDec).startWalking();
-    const actualFollowNames = keys(actual);
+    const actualFollowNames = Object.keys(actual);
     expect(actualFollowNames.length).to.equal(3);
     expect(actual["paramSpec1_~IN~_actionDec"].length).to.equal(2);
     setEquality(actual["paramSpec1_~IN~_actionDec"], [CommaTok, RParenTok]);
@@ -149,6 +149,6 @@ describe("The Grammar Ast Follows model", () => {
 
   it("can compute all follows for a set of top level productions", () => {
     const actual = computeAllProdsFollows([actionDec]);
-    expect(keys(actual).length).to.equal(3);
+    expect(Object.keys(actual).length).to.equal(3);
   });
 });

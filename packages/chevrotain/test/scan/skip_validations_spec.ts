@@ -1,5 +1,5 @@
 import { Lexer } from "../../src/scan/lexer_public.js";
-import { find, flatten } from "lodash-es";
+
 import { expect } from "chai";
 import { SinonSpy, spy } from "sinon";
 
@@ -19,17 +19,17 @@ describe("Chevrotain's Lexer Init Performance Tracing", () => {
     new Lexer([], { traceInitPerf: true });
 
     expect(consoleLogSpy).to.have.been.called;
-    const consoleArgs = flatten(consoleLogSpy.args);
+    const consoleArgs = consoleLogSpy.args.flat();
 
-    const runtimeChecksArg = find(consoleArgs, (item: string) =>
+    const runtimeChecksArg = consoleArgs.find((item: string) =>
       /performRuntimeChecks/.test(item),
     );
     expect(runtimeChecksArg).to.not.be.undefined;
-    const warningRuntimeChecksAra = find(consoleArgs, (item: string) =>
+    const warningRuntimeChecksAra = consoleArgs.find((item: string) =>
       /performWarningRuntimeChecks/.test(item),
     );
     expect(warningRuntimeChecksAra).to.not.be.undefined;
-    const validateArg = find(consoleArgs, (item: string) =>
+    const validateArg = consoleArgs.find((item: string) =>
       /validatePatterns/.test(item),
     );
     expect(validateArg).to.not.be.undefined;
@@ -39,17 +39,17 @@ describe("Chevrotain's Lexer Init Performance Tracing", () => {
     new Lexer([], { traceInitPerf: true, skipValidations: true });
 
     expect(consoleLogSpy).to.have.been.called;
-    const consoleArgs = flatten(consoleLogSpy.args);
+    const consoleArgs = consoleLogSpy.args.flat();
 
-    const runtimeChecksArg = find(consoleArgs, (item: string) =>
+    const runtimeChecksArg = consoleArgs.find((item: string) =>
       /performRuntimeChecks/.test(item),
     );
     expect(runtimeChecksArg).to.be.undefined;
-    const warningRuntimeChecksAra = find(consoleArgs, (item: string) =>
+    const warningRuntimeChecksAra = consoleArgs.find((item: string) =>
       /performWarningRuntimeChecks/.test(item),
     );
     expect(warningRuntimeChecksAra).to.be.undefined;
-    const validateArg = find(consoleArgs, (item: string) =>
+    const validateArg = consoleArgs.find((item: string) =>
       /validatePatterns/.test(item),
     );
     expect(validateArg).to.be.undefined;

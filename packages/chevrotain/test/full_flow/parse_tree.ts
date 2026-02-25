@@ -1,4 +1,3 @@
-import { compact, isFunction, isUndefined } from "lodash-es";
 import { IToken, TokenType } from "@chevrotain/types";
 
 export class ParseTree {
@@ -32,13 +31,13 @@ export function PT(
   tokenOrTokenClass: TokenType | IToken,
   children: ParseTree[] = [],
 ): ParseTree | null {
-  const childrenCompact = compact(children);
+  const childrenCompact = children.filter(Boolean);
 
   if ((<IToken>tokenOrTokenClass).image !== undefined) {
     return new ParseTree(<IToken>tokenOrTokenClass, childrenCompact);
-  } else if (isFunction(tokenOrTokenClass)) {
+  } else if (typeof tokenOrTokenClass === "function") {
     return new ParseTree(new (<any>tokenOrTokenClass)(), childrenCompact);
-  } else if (isUndefined(tokenOrTokenClass) || tokenOrTokenClass === null) {
+  } else if (tokenOrTokenClass === undefined || tokenOrTokenClass === null) {
     return null;
   } else {
     throw `Invalid parameter ${tokenOrTokenClass} to PT factory.`;
