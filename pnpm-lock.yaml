@@ -201,13 +201,6 @@ importers:
       '@chevrotain/types':
         specifier: workspace:*
         version: link:../types
-      lodash-es:
-        specifier: 4.17.23
-        version: 4.17.23
-    devDependencies:
-      '@types/lodash-es':
-        specifier: 4.17.12
-        version: 4.17.12
 
   packages/cst-dts-gen-test:
     dependencies:
@@ -223,13 +216,7 @@ importers:
       chevrotain:
         specifier: workspace:*
         version: link:../chevrotain
-      lodash-es:
-        specifier: 4.17.23
-        version: 4.17.23
     devDependencies:
-      '@types/lodash-es':
-        specifier: 4.17.12
-        version: 4.17.12
       glob:
         specifier: 13.0.0
         version: 13.0.0
@@ -239,13 +226,6 @@ importers:
       '@chevrotain/types':
         specifier: workspace:*
         version: link:../types
-      lodash-es:
-        specifier: 4.17.23
-        version: 4.17.23
-    devDependencies:
-      '@types/lodash-es':
-        specifier: 4.17.12
-        version: 4.17.12
 
   packages/regexp-to-ast: {}
 
