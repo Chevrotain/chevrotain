@@ -1,4 +1,3 @@
-import { includes } from "lodash-es";
 import {
   IRecognitionException,
   IRecognizerContext,
@@ -22,7 +21,7 @@ Object.freeze(RECOGNITION_EXCEPTION_NAMES);
 // hacks to bypass no support for custom Errors in javascript/typescript
 export function isRecognitionException(error: Error) {
   // can't do instanceof on hacked custom js exceptions
-  return includes(RECOGNITION_EXCEPTION_NAMES, error.name);
+  return RECOGNITION_EXCEPTION_NAMES.includes(error.name);
 }
 
 abstract class RecognitionException

@@ -16,18 +16,7 @@ import {
   TokenTypeDictionary,
   TokenVocabulary,
 } from "@chevrotain/types";
-import {
-  clone,
-  every,
-  flatten,
-  has,
-  isArray,
-  isEmpty,
-  isObject,
-  reduce,
-  uniq,
-  values,
-} from "lodash-es";
+
 import {
   AT_LEAST_ONE_IDX,
   AT_LEAST_ONE_SEP_IDX,
@@ -102,7 +91,7 @@ export class RecognizerEngine {
     this.RULE_OCCURRENCE_STACK = [];
     this.gastProductionsCache = {};
 
-    if (has(config, "serializedGrammar")) {
+    if (Object.hasOwn(config, "serializedGrammar")) {
       throw Error(
         "The Parser's configuration can no longer contain a <serializedGrammar> property.\n" +
           "\tSee: https://chevrotain.io/docs/changes/BREAKING_CHANGES.html#_6-0-0\n" +
@@ -110,11 +99,11 @@ export class RecognizerEngine {
       );
     }
 
-    if (isArray(tokenVocabulary)) {
+    if (Array.isArray(tokenVocabulary)) {
       // This only checks for Token vocabularies provided as arrays.
       // That is good enough because the main objective is to detect users of pre-V4.0 APIs
       // rather than all edge cases of empty Token vocabularies.
-      if (isEmpty(tokenVocabulary as any[])) {
+      if ((tokenVocabulary as any[]).length === 0) {
         throw Error(
           "A Token Vocabulary cannot be empty.\n" +
             "\tNote that the first argument for the parser constructor\n" +
@@ -131,31 +120,36 @@ export class RecognizerEngine {
       }
     }
 
-    if (isArray(tokenVocabulary)) {
-      this.tokensMap = reduce(
-        tokenVocabulary,
-        (acc, tokType: TokenType) => {
+    if (Array.isArray(tokenVocabulary)) {
+      this.tokensMap = (tokenVocabulary as TokenType[]).reduce(
+        (acc: { [tokenName: string]: TokenType }, tokType: TokenType) => {
           acc[tokType.name] = tokType;
           return acc;
         },
         {} as { [tokenName: string]: TokenType },
       );
     } else if (
-      has(tokenVocabulary, "modes") &&
-      every(flatten(values((<any>tokenVocabulary).modes)), isTokenType)
+      Object.hasOwn(tokenVocabulary, "modes") &&
+      (Object.values((<any>tokenVocabulary).modes) as any[][])
+        .flat()
+        .every(isTokenType)
     ) {
-      const allTokenTypes = flatten(values((<any>tokenVocabulary).modes));
-      const uniqueTokens = uniq(allTokenTypes);
-      this.tokensMap = <any>reduce(
-        uniqueTokens,
-        (acc, tokType: TokenType) => {
+      const allTokenTypes = (
+        Object.values((<any>tokenVocabulary).modes) as any[][]
+      ).flat();
+      const uniqueTokens = [...new Set(allTokenTypes)];
+      this.tokensMap = <any>uniqueTokens.reduce(
+        (acc: { [tokenName: string]: TokenType }, tokType: TokenType) => {
           acc[tokType.name] = tokType;
           return acc;
         },
         {} as { [tokenName: string]: TokenType },
       );
-    } else if (isObject(tokenVocabulary)) {
-      this.tokensMap = clone(tokenVocabulary as TokenTypeDictionary);
+    } else if (
+      typeof tokenVocabulary === "object" &&
+      tokenVocabulary !== null
+    ) {
+      this.tokensMap = { ...(tokenVocabulary as TokenTypeDictionary) };
     } else {
       throw new Error(
         "<tokensDictionary> argument must be An Array of Token constructors," +
@@ -167,11 +161,12 @@ export class RecognizerEngine {
     // parsed with a clear error message ("expecting EOF but found ...")
     this.tokensMap["EOF"] = EOF;
 
-    const allTokenTypes = has(tokenVocabulary, "modes")
-      ? flatten(values((<any>tokenVocabulary).modes))
-      : values(tokenVocabulary);
-    const noTokenCategoriesUsed = every(allTokenTypes, (tokenConstructor) =>
-      isEmpty(tokenConstructor.categoryMatches),
+    const allTokenTypes = Object.hasOwn(tokenVocabulary, "modes")
+      ? (Object.values((<any>tokenVocabulary).modes) as any[][]).flat()
+      : Object.values(tokenVocabulary);
+    const noTokenCategoriesUsed = allTokenTypes.every(
+      // intentional "==" to also cover "undefined"
+      (tokenConstructor: any) => tokenConstructor.categoryMatches?.length == 0,
     );
 
     this.tokenMatcher = noTokenCategoriesUsed
@@ -181,7 +176,7 @@ export class RecognizerEngine {
     // Because ES2015+ syntax should be supported for creating Token classes
     // We cannot assume that the Token classes were created using the "extendToken" utilities
     // Therefore we must augment the Token classes both on Lexer initialization and on Parser initialization
-    augmentTokenTypes(values(this.tokensMap));
+    augmentTokenTypes(Object.values(this.tokensMap));
   }
 
   defineRule<ARGS extends unknown[], R>(
@@ -196,10 +191,10 @@ export class RecognizerEngine {
           `Make sure that all grammar rule definitions are done before 'performSelfAnalysis' is called.`,
       );
     }
-    const resyncEnabled: boolean = has(config, "resyncEnabled")
+    const resyncEnabled: boolean = Object.hasOwn(config, "resyncEnabled")
       ? (config.resyncEnabled as boolean) // assumes end user provides the correct config value/type
       : DEFAULT_RULE_CONFIG.resyncEnabled;
-    const recoveryValueFunc = has(config, "recoveryValueFunc")
+    const recoveryValueFunc = Object.hasOwn(config, "recoveryValueFunc")
       ? (config.recoveryValueFunc as () => R) // assumes end user provides the correct config value/type
       : DEFAULT_RULE_CONFIG.recoveryValueFunc;
 
@@ -646,7 +641,7 @@ export class RecognizerEngine {
     occurrence: number,
   ): T {
     const laKey = this.getKeyForAutomaticLookahead(OR_IDX, occurrence);
-    const alts = isArray(altsOrOpts) ? altsOrOpts : altsOrOpts.DEF;
+    const alts = Array.isArray(altsOrOpts) ? altsOrOpts : altsOrOpts.DEF;
 
     const laFunc = this.getLaFuncFromCache(laKey);
     const altIdxToTake = laFunc.call(this, alts);
@@ -810,7 +805,7 @@ export class RecognizerEngine {
   saveRecogState(this: MixedInParser): IParserState {
     // errors is a getter which will clone the errors array
     const savedErrors = this.errors;
-    const savedRuleStack = clone(this.RULE_STACK);
+    const savedRuleStack = [...this.RULE_STACK];
     return {
       errors: savedErrors,
       lexerState: this.exportLexerState(),

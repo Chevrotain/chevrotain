@@ -103,18 +103,12 @@ importers:
       chevrotain:
         specifier: workspace:*
         version: link:../../packages/chevrotain
-      lodash:
-        specifier: 4.17.21
-        version: 4.17.21
 
   examples/parser:
     dependencies:
       chevrotain:
         specifier: workspace:*
         version: link:../../packages/chevrotain
-      lodash:
-        specifier: 4.17.21
-        version: 4.17.21
     devDependencies:
       esbuild:
         specifier: 0.18.11
@@ -125,9 +119,6 @@ importers:
       chevrotain:
         specifier: workspace:*
         version: link:../../packages/chevrotain
-      lodash:
-        specifier: 4.17.21
-        version: 4.17.21
 
   packages/chevrotain:
     dependencies:
@@ -146,16 +137,10 @@ importers:
       '@chevrotain/utils':
         specifier: workspace:*
         version: link:../utils
-      lodash-es:
-        specifier: 4.17.23
-        version: 4.17.23
     devDependencies:
       '@types/jsdom':
         specifier: 27.0.0
         version: 27.0.0
-      '@types/lodash-es':
-        specifier: 4.17.12
-        version: 4.17.12
       '@types/sinon':
         specifier: 21.0.0
         version: 21.0.0
@@ -201,13 +186,6 @@ importers:
       '@chevrotain/types':
         specifier: workspace:*
         version: link:../types
-      lodash-es:
-        specifier: 4.17.23
-        version: 4.17.23
-    devDependencies:
-      '@types/lodash-es':
-        specifier: 4.17.12
-        version: 4.17.12
 
   packages/cst-dts-gen-test:
     dependencies:
@@ -223,13 +201,7 @@ importers:
       chevrotain:
         specifier: workspace:*
         version: link:../chevrotain
-      lodash-es:
-        specifier: 4.17.23
-        version: 4.17.23
     devDependencies:
-      '@types/lodash-es':
-        specifier: 4.17.12
-        version: 4.17.12
       glob:
         specifier: 13.0.0
         version: 13.0.0
@@ -239,13 +211,6 @@ importers:
       '@chevrotain/types':
         specifier: workspace:*
         version: link:../types
-      lodash-es:
-        specifier: 4.17.23
-        version: 4.17.23
-    devDependencies:
-      '@types/lodash-es':
-        specifier: 4.17.12
-        version: 4.17.12
 
   packages/regexp-to-ast: {}
 
@@ -1741,12 +1706,6 @@ packages:
 
   '@types/linkify-it@5.0.0':
     resolution: {integrity: sha512-sVDA58zAw4eWAffKOaQH5/5j3XeayukzDk+ewSsnv3p4yJEZHCCzMDiZM8e0OUrRvmpGZ85jf4yDHkHsgBNr9Q==}
-
-  '@types/lodash-es@4.17.12':
-    resolution: {integrity: sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==}
-
-  '@types/lodash@4.17.10':
-    resolution: {integrity: sha512-YpS0zzoduEhuOWjAotS6A5AVCva7X4lVlYLF0FYHAY9sdraBfnatttHItlWeZdGhuEkf+OzMNg2ZYAx8t+52uQ==}
 
   '@types/markdown-it-emoji@3.0.1':
     resolution: {integrity: sha512-cz1j8R35XivBqq9mwnsrP2fsz2yicLhB8+PDtuVkKOExwEdsVBNI+ROL3sbhtR5occRZ66vT0QnwFZCqdjf3pA==}
@@ -3779,9 +3738,6 @@ packages:
   locate-path@7.2.0:
     resolution: {integrity: sha512-gvVijfZvn7R+2qyPX8mAuKcFGDf6Nc61GdvGafQsHL0sBIxfKzA+usWn4GFC/bk+QdwPUD4kWFJLhElipq+0VA==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
-
-  lodash-es@4.17.23:
-    resolution: {integrity: sha512-kVI48u3PZr38HdYz98UmfPnXl2DXrpdctLrFLCd3kOx1xUkOmpFPx7gCWWM5MPkL/fD8zb+Ph0QzjGFs4+hHWg==}
 
   lodash.camelcase@4.3.0:
     resolution: {integrity: sha512-TwuEnCnxbc3rAvhf/LbG7tJUDzhqXyFnv3dtzLOPgCG/hODL7WFnsbwktkD7yUV0RrreP/l1PALq/YSg6VvjlA==}
@@ -7092,12 +7048,6 @@ snapshots:
 
   '@types/linkify-it@5.0.0': {}
 
-  '@types/lodash-es@4.17.12':
-    dependencies:
-      '@types/lodash': 4.17.10
-
-  '@types/lodash@4.17.10': {}
-
   '@types/markdown-it-emoji@3.0.1':
     dependencies:
       '@types/markdown-it': 14.1.2
@@ -9617,8 +9567,6 @@ snapshots:
   locate-path@7.2.0:
     dependencies:
       p-locate: 6.0.0
-
-  lodash-es@4.17.23: {}
 
   lodash.camelcase@4.3.0: {}
 

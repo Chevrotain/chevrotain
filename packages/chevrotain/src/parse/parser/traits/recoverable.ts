@@ -7,16 +7,7 @@ import {
   AbstractNextTerminalAfterProductionWalker,
   IFirstAfterRepetition,
 } from "../../grammar/interpreter.js";
-import {
-  clone,
-  dropRight,
-  find,
-  flatten,
-  has,
-  includes,
-  isEmpty,
-  map,
-} from "lodash-es";
+
 import {
   IParserConfig,
   IToken,
@@ -57,7 +48,7 @@ export class Recoverable {
     this.firstAfterRepMap = {};
     this.resyncFollows = {};
 
-    this.recoveryEnabled = has(config, "recoveryEnabled")
+    this.recoveryEnabled = Object.hasOwn(config, "recoveryEnabled")
       ? (config.recoveryEnabled as boolean) // assumes end user provides the correct config value/type
       : DEFAULT_PARSER_CONFIG.recoveryEnabled;
 
@@ -124,7 +115,7 @@ export class Recoverable {
         this.LA(0),
       );
       // the first token here will be the original cause of the error, this is not part of the resyncedTokens property.
-      error.resyncedTokens = dropRight(resyncedTokens);
+      error.resyncedTokens = resyncedTokens.slice(0, -1);
       this.SAVE_ERROR(error);
     };
 
@@ -242,13 +233,13 @@ export class Recoverable {
     }
 
     // must know the possible following tokens to perform single token insertion
-    if (isEmpty(follows)) {
+    if (follows.length === 0) {
       return false;
     }
 
     const mismatchedTok = this.LA(1);
     const isMisMatchedTokInFollows =
-      find(follows, (possibleFollowsTokType: TokenType) => {
+      follows.find((possibleFollowsTokType: TokenType) => {
         return this.tokenMatcher(mismatchedTok, possibleFollowsTokType);
       }) !== undefined;
 
@@ -276,7 +267,7 @@ export class Recoverable {
   ): boolean {
     const followKey = this.getCurrFollowKey();
     const currentRuleReSyncSet = this.getFollowSetFromFollowKey(followKey);
-    return includes(currentRuleReSyncSet, tokenTypeIdx);
+    return currentRuleReSyncSet.includes(tokenTypeIdx);
   }
 
   findReSyncTokenType(this: MixedInParser): TokenType {
@@ -285,7 +276,7 @@ export class Recoverable {
     let nextToken = this.LA(1);
     let k = 2;
     while (true) {
-      const foundMatch = find(allPossibleReSyncTokTypes, (resyncTokType) => {
+      const foundMatch = allPossibleReSyncTokTypes.find((resyncTokType) => {
         const canMatch = tokenMatcher(nextToken, resyncTokType);
         return canMatch;
       });
@@ -317,7 +308,7 @@ export class Recoverable {
     const explicitRuleStack = this.RULE_STACK;
     const explicitOccurrenceStack = this.RULE_OCCURRENCE_STACK;
 
-    return map(explicitRuleStack, (ruleName, idx) => {
+    return explicitRuleStack.map((ruleName, idx) => {
       if (idx === 0) {
         return EOF_FOLLOW_KEY;
       }
@@ -330,10 +321,10 @@ export class Recoverable {
   }
 
   flattenFollowSet(this: MixedInParser): TokenType[] {
-    const followStack = map(this.buildFullFollowKeyStack(), (currKey) => {
+    const followStack = this.buildFullFollowKeyStack().map((currKey) => {
       return this.getFollowSetFromFollowKey(currKey);
     });
-    return <any>flatten(followStack);
+    return <any>followStack.flat();
   }
 
   getFollowSetFromFollowKey(
@@ -371,7 +362,7 @@ export class Recoverable {
       this.addToResyncTokens(nextTok, resyncedTokens);
     }
     // the last token is not part of the error.
-    return dropRight(resyncedTokens);
+    return resyncedTokens.slice(0, -1);
   }
 
   attemptInRepetitionRecovery(
@@ -394,7 +385,7 @@ export class Recoverable {
     tokIdxInRule: number,
   ): ITokenGrammarPath {
     const pathRuleStack: string[] = this.getHumanReadableRuleStack();
-    const pathOccurrenceStack: number[] = clone(this.RULE_OCCURRENCE_STACK);
+    const pathOccurrenceStack: number[] = [...this.RULE_OCCURRENCE_STACK];
     const grammarPath: any = {
       ruleStack: pathRuleStack,
       occurrenceStack: pathOccurrenceStack,
@@ -405,7 +396,7 @@ export class Recoverable {
     return grammarPath;
   }
   getHumanReadableRuleStack(this: MixedInParser): string[] {
-    return map(this.RULE_STACK, (currShortName) =>
+    return this.RULE_STACK.map((currShortName) =>
       this.shortRuleNameToFullName(currShortName),
     );
   }

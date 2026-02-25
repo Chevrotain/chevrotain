@@ -1,4 +1,3 @@
-import { assign, forEach, isRegExp, isString, map, pickBy } from "lodash-es";
 import type {
   IGASTVisitor,
   IProduction,
@@ -20,7 +19,7 @@ function tokenLabel(tokType: TokenType): string {
 function hasTokenLabel(
   obj: TokenType,
 ): obj is TokenType & Pick<Required<TokenType>, "LABEL"> {
-  return isString(obj.LABEL) && obj.LABEL !== "";
+  return typeof obj.LABEL === "string" && obj.LABEL !== "";
 }
 
 export abstract class AbstractProduction<T extends IProduction = IProduction>
@@ -37,7 +36,7 @@ export abstract class AbstractProduction<T extends IProduction = IProduction>
 
   accept(visitor: IGASTVisitor): void {
     visitor.visit(this);
-    forEach(this.definition, (prod) => {
+    this.definition.forEach((prod) => {
       prod.accept(visitor);
     });
   }
@@ -59,10 +58,7 @@ export class NonTerminal
     idx?: number;
   }) {
     super([]);
-    assign(
-      this,
-      pickBy(options, (v) => v !== undefined),
-    );
+    Object.assign(this, pickOnlyDefined(options));
   }
 
   set definition(definition: IProduction[]) {
@@ -92,10 +88,7 @@ export class Rule extends AbstractProduction {
     orgText?: string;
   }) {
     super(options.definition);
-    assign(
-      this,
-      pickBy(options, (v) => v !== undefined),
-    );
+    Object.assign(this, pickOnlyDefined(options));
   }
 }
 
@@ -107,10 +100,7 @@ export class Alternative extends AbstractProduction {
     ignoreAmbiguities?: boolean;
   }) {
     super(options.definition);
-    assign(
-      this,
-      pickBy(options, (v) => v !== undefined),
-    );
+    Object.assign(this, pickOnlyDefined(options));
   }
 }
 
@@ -127,10 +117,7 @@ export class Option
     maxLookahead?: number;
   }) {
     super(options.definition);
-    assign(
-      this,
-      pickBy(options, (v) => v !== undefined),
-    );
+    Object.assign(this, pickOnlyDefined(options));
   }
 }
 
@@ -147,10 +134,7 @@ export class RepetitionMandatory
     maxLookahead?: number;
   }) {
     super(options.definition);
-    assign(
-      this,
-      pickBy(options, (v) => v !== undefined),
-    );
+    Object.assign(this, pickOnlyDefined(options));
   }
 }
 
@@ -168,10 +152,7 @@ export class RepetitionMandatoryWithSeparator
     idx?: number;
   }) {
     super(options.definition);
-    assign(
-      this,
-      pickBy(options, (v) => v !== undefined),
-    );
+    Object.assign(this, pickOnlyDefined(options));
   }
 }
 
@@ -189,10 +170,7 @@ export class Repetition
     maxLookahead?: number;
   }) {
     super(options.definition);
-    assign(
-      this,
-      pickBy(options, (v) => v !== undefined),
-    );
+    Object.assign(this, pickOnlyDefined(options));
   }
 }
 
@@ -210,10 +188,7 @@ export class RepetitionWithSeparator
     idx?: number;
   }) {
     super(options.definition);
-    assign(
-      this,
-      pickBy(options, (v) => v !== undefined),
-    );
+    Object.assign(this, pickOnlyDefined(options));
   }
 }
 
@@ -241,10 +216,7 @@ export class Alternation
     maxLookahead?: number;
   }) {
     super(options.definition);
-    assign(
-      this,
-      pickBy(options, (v) => v !== undefined),
-    );
+    Object.assign(this, pickOnlyDefined(options));
   }
 }
 
@@ -258,10 +230,7 @@ export class Terminal implements IProductionWithOccurrence {
     label?: string;
     idx?: number;
   }) {
-    assign(
-      this,
-      pickBy(options, (v) => v !== undefined),
-    );
+    Object.assign(this, pickOnlyDefined(options));
   }
 
   accept(visitor: IGASTVisitor): void {
@@ -315,12 +284,12 @@ export type ISerializedGastAny =
   | ISerializedTerminalWithSeparator;
 
 export function serializeGrammar(topRules: Rule[]): ISerializedGast[] {
-  return map(topRules, serializeProduction);
+  return topRules.map(serializeProduction);
 }
 
 export function serializeProduction(node: IProduction): ISerializedGast {
   function convertDefinition(definition: IProduction[]): ISerializedGast[] {
-    return map(definition, serializeProduction);
+    return definition.map(serializeProduction);
   }
   /* istanbul ignore else */
   if (node instanceof NonTerminal) {
@@ -330,7 +299,7 @@ export function serializeProduction(node: IProduction): ISerializedGast {
       idx: node.idx,
     };
 
-    if (isString(node.label)) {
+    if (typeof node.label === "string") {
       serializedNonTerminal.label = node.label;
     }
 
@@ -390,15 +359,14 @@ export function serializeProduction(node: IProduction): ISerializedGast {
       idx: node.idx,
     };
 
-    if (isString(node.label)) {
+    if (typeof node.label === "string") {
       serializedTerminal.terminalLabel = node.label;
     }
 
     const pattern = node.terminalType.PATTERN;
     if (node.terminalType.PATTERN) {
-      serializedTerminal.pattern = isRegExp(pattern)
-        ? (<any>pattern).source
-        : pattern;
+      serializedTerminal.pattern =
+        pattern instanceof RegExp ? (<any>pattern).source : pattern;
     }
 
     return serializedTerminal;
@@ -413,4 +381,10 @@ export function serializeProduction(node: IProduction): ISerializedGast {
   } else {
     throw Error("non exhaustive match");
   }
+}
+
+function pickOnlyDefined(obj: Object): any {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([, v]) => v !== undefined),
+  );
 }

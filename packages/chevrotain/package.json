@@ -72,12 +72,10 @@
     "@chevrotain/gast": "workspace:*",
     "@chevrotain/regexp-to-ast": "workspace:*",
     "@chevrotain/types": "workspace:*",
-    "@chevrotain/utils": "workspace:*",
-    "lodash-es": "4.17.23"
+    "@chevrotain/utils": "workspace:*"
   },
   "devDependencies": {
     "@types/jsdom": "27.0.0",
-    "@types/lodash-es": "4.17.12",
     "@types/sinon": "21.0.0",
     "@types/sinon-chai": "4.0.0",
     "error-stack-parser": "2.1.4",

@@ -14,14 +14,7 @@ import {
   SubruleMethodOpts,
   TokenType,
 } from "@chevrotain/types";
-import {
-  forEach,
-  has,
-  isArray,
-  isFunction,
-  last as peek,
-  some,
-} from "lodash-es";
+
 import { MixedInParser } from "./parser_traits.js";
 import {
   Alternation,
@@ -310,7 +303,7 @@ export class GastRecorder {
     options?: SubruleMethodOpts<ARGS>,
   ): R | CstNode {
     assertMethodIdxIsValid(occurrence);
-    if (!ruleToCall || has(ruleToCall, "ruleName") === false) {
+    if (!ruleToCall || !Object.hasOwn(ruleToCall, "ruleName")) {
       const error: any = new Error(
         `<SUBRULE${getIdxSuffix(occurrence)}> argument is invalid` +
           ` expecting a Parser method reference but got: <${JSON.stringify(
@@ -324,7 +317,7 @@ export class GastRecorder {
       throw error;
     }
 
-    const prevProd: any = peek(this.recordingProdStack);
+    const prevProd: any = this.recordingProdStack.at(-1);
     const ruleName = ruleToCall.ruleName;
     const newNoneTerminal = new NonTerminal({
       idx: occurrence,
@@ -360,7 +353,7 @@ export class GastRecorder {
       error.KNOWN_RECORDER_ERROR = true;
       throw error;
     }
-    const prevProd: any = peek(this.recordingProdStack);
+    const prevProd: any = this.recordingProdStack.at(-1);
     const newNoneTerminal = new Terminal({
       idx: occurrence,
       terminalType: tokType,
@@ -379,14 +372,15 @@ function recordProd(
   handleSep: boolean = false,
 ): any {
   assertMethodIdxIsValid(occurrence);
-  const prevProd: any = peek(this.recordingProdStack);
-  const grammarAction = isFunction(mainProdArg) ? mainProdArg : mainProdArg.DEF;
+  const prevProd: any = this.recordingProdStack.at(-1);
+  const grammarAction =
+    typeof mainProdArg === "function" ? mainProdArg : mainProdArg.DEF;
 
   const newProd = new prodConstructor({ definition: [], idx: occurrence });
   if (handleSep) {
     newProd.separator = mainProdArg.SEP;
   }
-  if (has(mainProdArg, "MAX_LOOKAHEAD")) {
+  if (Object.hasOwn(mainProdArg, "MAX_LOOKAHEAD")) {
     newProd.maxLookahead = mainProdArg.MAX_LOOKAHEAD;
   }
 
@@ -400,9 +394,9 @@ function recordProd(
 
 function recordOrProd(mainProdArg: any, occurrence: number): any {
   assertMethodIdxIsValid(occurrence);
-  const prevProd: any = peek(this.recordingProdStack);
+  const prevProd: any = this.recordingProdStack.at(-1);
   // Only an array of alternatives
-  const hasOptions = isArray(mainProdArg) === false;
+  const hasOptions = Array.isArray(mainProdArg) === false;
   const alts: IOrAlt<unknown>[] =
     hasOptions === false ? mainProdArg : mainProdArg.DEF;
 
@@ -411,23 +405,25 @@ function recordOrProd(mainProdArg: any, occurrence: number): any {
     idx: occurrence,
     ignoreAmbiguities: hasOptions && mainProdArg.IGNORE_AMBIGUITIES === true,
   });
-  if (has(mainProdArg, "MAX_LOOKAHEAD")) {
+  if (Object.hasOwn(mainProdArg, "MAX_LOOKAHEAD")) {
     newOrProd.maxLookahead = mainProdArg.MAX_LOOKAHEAD;
   }
 
-  const hasPredicates = some(alts, (currAlt: any) => isFunction(currAlt.GATE));
+  const hasPredicates = alts.some(
+    (currAlt: any) => typeof currAlt.GATE === "function",
+  );
   newOrProd.hasPredicates = hasPredicates;
 
   prevProd.definition.push(newOrProd);
 
-  forEach(alts, (currAlt) => {
+  alts.forEach((currAlt) => {
     const currAltFlat = new Alternative({ definition: [] });
     newOrProd.definition.push(currAltFlat);
-    if (has(currAlt, "IGNORE_AMBIGUITIES")) {
+    if (Object.hasOwn(currAlt, "IGNORE_AMBIGUITIES")) {
       currAltFlat.ignoreAmbiguities = currAlt.IGNORE_AMBIGUITIES as boolean; // assumes end user provides the correct config value/type
     }
     // **implicit** ignoreAmbiguities due to usage of gate
-    else if (has(currAlt, "GATE")) {
+    else if (Object.hasOwn(currAlt, "GATE")) {
       currAltFlat.ignoreAmbiguities = true;
     }
     this.recordingProdStack.push(currAltFlat);

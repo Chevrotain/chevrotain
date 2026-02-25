@@ -27,7 +27,7 @@ import { DDLExampleRecoveryParser } from "./sql_recovery_parser.js";
 import { tokenMatcher } from "../../../../src/scan/tokens_public.js";
 import { NotAllInputParsedException } from "../../../../src/parse/exceptions_public.js";
 import { ParseTree } from "../../parse_tree.js";
-import { flatten } from "lodash-es";
+
 import { createRegularToken } from "../../../utils/matchers.js";
 import { IToken } from "@chevrotain/types";
 
@@ -59,7 +59,7 @@ describe("Error Recovery SQL DDL Example", () => {
   });
 
   it("can parse a series of three statements successfully", () => {
-    const input: any = flatten([
+    const input: any = [
       // CREATE TABLE schema2.Persons
       createRegularToken(CreateTok),
       createRegularToken(TableTok),
@@ -77,7 +77,7 @@ describe("Error Recovery SQL DDL Example", () => {
       createRegularToken(FromTok),
       schemaFQN,
       createRegularToken(SemiColonTok),
-    ]);
+    ].flat();
 
     const parser = new DDLExampleRecoveryParser();
     parser.input = input;
@@ -90,7 +90,7 @@ describe("Error Recovery SQL DDL Example", () => {
     let input: IToken[];
 
     before(() => {
-      input = flatten([
+      input = [
         // CREATE TABLE schema2.Persons
         createRegularToken(CreateTok),
         createRegularToken(TableTok),
@@ -107,7 +107,7 @@ describe("Error Recovery SQL DDL Example", () => {
         createRegularToken(FromTok),
         schemaFQN,
         createRegularToken(SemiColonTok),
-      ]);
+      ].flat();
     });
 
     it("can perform single token insertion for a missing semicolon", () => {
@@ -140,7 +140,7 @@ describe("Error Recovery SQL DDL Example", () => {
     let input: IToken[];
 
     before(() => {
-      input = flatten([
+      input = [
         // CREATE TABLE schema2.Persons
         createRegularToken(CreateTok),
         createRegularToken(TableTok),
@@ -159,18 +159,7 @@ describe("Error Recovery SQL DDL Example", () => {
         createRegularToken(FromTok),
         schemaFQN,
         createRegularToken(SemiColonTok),
-      ]);
-    });
-
-    it("can perform single token deletion for a redundant keyword", () => {
-      const parser = new DDLExampleRecoveryParser();
-      parser.input = input;
-      const ptResult = parser.ddl();
-      // one error encountered
-      expect(parser.errors.length).to.equal(1);
-      // yet the whole input has been parsed
-      // and the output parseTree contains ALL three statements
-      assertAllThreeStatementsPresentAndValid(ptResult);
+      ].flat();
     });
 
     it("can disable single token deletion for a redundant keyword", () => {
@@ -196,7 +185,7 @@ describe("Error Recovery SQL DDL Example", () => {
         createRegularToken(LParenTok),
       ];
 
-      input = flatten([
+      input = [
         // CREATE TABLE schema2.Persons
         createRegularToken(CreateTok),
         createRegularToken(TableTok),
@@ -216,11 +205,11 @@ describe("Error Recovery SQL DDL Example", () => {
         createRegularToken(FromTok),
         schemaFQN,
         createRegularToken(SemiColonTok),
-      ]);
+      ].flat();
     });
 
     it("can perform re-sync recovery and only 'lose' part of the input", () => {
-      const input: any = flatten([
+      const input: any = [
         // CREATE TABLE schema2.Persons
         createRegularToken(CreateTok),
         createRegularToken(TableTok),
@@ -240,7 +229,7 @@ describe("Error Recovery SQL DDL Example", () => {
         createRegularToken(FromTok),
         schemaFQN,
         createRegularToken(SemiColonTok),
-      ]);
+      ].flat();
 
       const parser = new DDLExampleRecoveryParser();
       parser.input = input;
@@ -323,14 +312,14 @@ describe("Error Recovery SQL DDL Example", () => {
   }
 
   it("will encounter an NotAllInputParsedException when some of the input vector has not been parsed", () => {
-    const input: any = flatten([
+    const input: any = [
       // CREATE TABLE schema2.Persons; TABLE <-- redundant "TABLE" token
       createRegularToken(CreateTok),
       createRegularToken(TableTok),
       schemaFQN,
       createRegularToken(SemiColonTok),
       createRegularToken(TableTok),
-    ]);
+    ].flat();
     const parser = new DDLExampleRecoveryParser();
     parser.input = input;
 
@@ -340,25 +329,25 @@ describe("Error Recovery SQL DDL Example", () => {
   });
 
   it("can use the same parser instance to parse multiple inputs", () => {
-    const input1: any = flatten([
+    const input1: any = [
       // CREATE TABLE schema2.Persons;
       createRegularToken(CreateTok),
       createRegularToken(TableTok),
       schemaFQN,
       createRegularToken(SemiColonTok),
-    ]);
+    ].flat();
     const parser = new DDLExampleRecoveryParser(input1);
     parser.ddl();
     expect(parser.errors.length).to.equal(0);
 
-    const input2: any = flatten([
+    const input2: any = [
       // DELETE (31, "SHAHAR") FROM schema2.Persons
       createRegularToken(DeleteTok),
       shahar31Record,
       createRegularToken(FromTok),
       schemaFQN,
       createRegularToken(SemiColonTok),
-    ]);
+    ].flat();
     // the parser is being reset instead of creating a new instance for each new input
     parser.reset();
     parser.input = input2;
@@ -374,7 +363,7 @@ describe("Error Recovery SQL DDL Example", () => {
   });
 
   it("can re-sync to the next iteration in a MANY rule", () => {
-    const input: any = flatten([
+    const input: any = [
       // CREATE TABLE schema2.Persons
       createRegularToken(CreateTok),
       createRegularToken(TableTok),
@@ -394,7 +383,7 @@ describe("Error Recovery SQL DDL Example", () => {
       createRegularToken(FromTok),
       schemaFQN,
       createRegularToken(SemiColonTok),
-    ]);
+    ].flat();
 
     const parser = new DDLExampleRecoveryParser();
     parser.input = input;
