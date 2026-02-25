@@ -1,5 +1,4 @@
 import { expect } from "chai";
-import _ from "lodash";
 import {
   Colon,
   LCurly,
@@ -20,9 +19,16 @@ describe("Chevrotain Tutorial", () => {
 
       // CstNode
       if (cstElement.children !== undefined) {
-        cstElement.children = _.omitBy(cstElement.children, _.isEmpty);
-        _.forEach(cstElement.children, (childArr) => {
-          _.forEach(childArr, minimizeCst);
+        // keep only none empty CST sub-nodes
+        // this is just to make the test assertions easier to read
+        // as we are only interested in the nodes that were actually parsed.
+        cstElement.children = Object.fromEntries(
+          Object.entries(cstElement.children).filter(
+            ([, v]) => v && v.length > 0,
+          ),
+        );
+        Object.values(cstElement.children).forEach((childArr) => {
+          childArr.forEach(minimizeCst);
         });
       }
 
