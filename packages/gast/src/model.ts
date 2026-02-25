@@ -58,12 +58,7 @@ export class NonTerminal
     idx?: number;
   }) {
     super([]);
-    Object.assign(
-      this,
-      Object.fromEntries(
-        Object.entries(options).filter(([, v]) => v !== undefined),
-      ),
-    );
+    Object.assign(this, pickOnlyDefined(options));
   }
 
   set definition(definition: IProduction[]) {
@@ -93,12 +88,7 @@ export class Rule extends AbstractProduction {
     orgText?: string;
   }) {
     super(options.definition);
-    Object.assign(
-      this,
-      Object.fromEntries(
-        Object.entries(options).filter(([, v]) => v !== undefined),
-      ),
-    );
+    Object.assign(this, pickOnlyDefined(options));
   }
 }
 
@@ -110,12 +100,7 @@ export class Alternative extends AbstractProduction {
     ignoreAmbiguities?: boolean;
   }) {
     super(options.definition);
-    Object.assign(
-      this,
-      Object.fromEntries(
-        Object.entries(options).filter(([, v]) => v !== undefined),
-      ),
-    );
+    Object.assign(this, pickOnlyDefined(options));
   }
 }
 
@@ -132,12 +117,7 @@ export class Option
     maxLookahead?: number;
   }) {
     super(options.definition);
-    Object.assign(
-      this,
-      Object.fromEntries(
-        Object.entries(options).filter(([, v]) => v !== undefined),
-      ),
-    );
+    Object.assign(this, pickOnlyDefined(options));
   }
 }
 
@@ -154,12 +134,7 @@ export class RepetitionMandatory
     maxLookahead?: number;
   }) {
     super(options.definition);
-    Object.assign(
-      this,
-      Object.fromEntries(
-        Object.entries(options).filter(([, v]) => v !== undefined),
-      ),
-    );
+    Object.assign(this, pickOnlyDefined(options));
   }
 }
 
@@ -177,12 +152,7 @@ export class RepetitionMandatoryWithSeparator
     idx?: number;
   }) {
     super(options.definition);
-    Object.assign(
-      this,
-      Object.fromEntries(
-        Object.entries(options).filter(([, v]) => v !== undefined),
-      ),
-    );
+    Object.assign(this, pickOnlyDefined(options));
   }
 }
 
@@ -200,12 +170,7 @@ export class Repetition
     maxLookahead?: number;
   }) {
     super(options.definition);
-    Object.assign(
-      this,
-      Object.fromEntries(
-        Object.entries(options).filter(([, v]) => v !== undefined),
-      ),
-    );
+    Object.assign(this, pickOnlyDefined(options));
   }
 }
 
@@ -223,12 +188,7 @@ export class RepetitionWithSeparator
     idx?: number;
   }) {
     super(options.definition);
-    Object.assign(
-      this,
-      Object.fromEntries(
-        Object.entries(options).filter(([, v]) => v !== undefined),
-      ),
-    );
+    Object.assign(this, pickOnlyDefined(options));
   }
 }
 
@@ -256,12 +216,7 @@ export class Alternation
     maxLookahead?: number;
   }) {
     super(options.definition);
-    Object.assign(
-      this,
-      Object.fromEntries(
-        Object.entries(options).filter(([, v]) => v !== undefined),
-      ),
-    );
+    Object.assign(this, pickOnlyDefined(options));
   }
 }
 
@@ -275,12 +230,7 @@ export class Terminal implements IProductionWithOccurrence {
     label?: string;
     idx?: number;
   }) {
-    Object.assign(
-      this,
-      Object.fromEntries(
-        Object.entries(options).filter(([, v]) => v !== undefined),
-      ),
-    );
+    Object.assign(this, pickOnlyDefined(options));
   }
 
   accept(visitor: IGASTVisitor): void {
@@ -431,4 +381,10 @@ export function serializeProduction(node: IProduction): ISerializedGast {
   } else {
     throw Error("non exhaustive match");
   }
+}
+
+function pickOnlyDefined(obj: Object): any {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([, v]) => v !== undefined),
+  );
 }
