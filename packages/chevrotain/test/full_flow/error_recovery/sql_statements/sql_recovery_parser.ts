@@ -5,7 +5,7 @@
  * INSERT (32, "SHAHAR") INTO schema2.Persons
  * DELETE (31, "SHAHAR") FROM schema2.Persons
  */
-import { values } from "lodash-es";
+
 import { EmbeddedActionsParser } from "../../../../src/parse/parser/traits/parser_traits.js";
 import * as allTokens from "./sql_recovery_tokens.js";
 import {
@@ -46,7 +46,7 @@ import { IToken, TokenType } from "@chevrotain/types";
 // deferred execution to only run "inside" a test
 function initTokens() {
   const allTokensToUse = { ...allTokens };
-  augmentTokenTypes(values(allTokensToUse));
+  augmentTokenTypes(Object.values(allTokensToUse));
   return allTokensToUse;
 }
 

@@ -2,12 +2,12 @@ import { createToken } from "../../src/scan/tokens_public.js";
 import { CstParser } from "../../src/parse/parser/traits/parser_traits.js";
 import { tokenStructuredMatcher as tokenStructuredMatcherStrict } from "../../src/scan/tokens.js";
 import { createRegularToken } from "../utils/matchers.js";
-import { map } from "lodash-es";
+
 import { CstElement, CstNode, IToken, TokenType } from "@chevrotain/types";
 import { expect } from "chai";
 
 function createTokenVector(tokTypes: TokenType[]): any[] {
-  return map(tokTypes, (curTokType) => {
+  return tokTypes.map((curTokType) => {
     return createRegularToken(curTokType);
   });
 }

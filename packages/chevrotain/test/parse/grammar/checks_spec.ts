@@ -17,7 +17,7 @@ import {
   validateTooManyAlts,
 } from "../../../src/parse/grammar/checks.js";
 import { createToken } from "../../../src/scan/tokens_public.js";
-import { first, map, omit } from "lodash-es";
+
 import {
   Alternation,
   Alternative,
@@ -135,9 +135,12 @@ describe("the grammar validations", () => {
       defaultGrammarValidatorErrorProvider,
       "bamba",
     );
-    expect(actualErrors.map((e) => omit(e, "message"))).to.deep.equal(
-      expectedErrorsNoMsg,
-    );
+    expect(
+      actualErrors.map((e) => {
+        const { message, ...rest } = e;
+        return rest;
+      }),
+    ).to.deep.equal(expectedErrorsNoMsg);
   });
 
   it("does not allow duplicate grammar rule names", () => {
@@ -361,7 +364,7 @@ describe("the getFirstNoneTerminal function", () => {
       }),
     ]);
     expect(result).to.have.length(1);
-    expect(first(result)!.name).to.equal("dummyRule");
+    expect(result[0]!.name).to.equal("dummyRule");
   });
 
   it("can find the firstNoneTerminal of a sequence with two items", () => {
@@ -377,7 +380,7 @@ describe("the getFirstNoneTerminal function", () => {
     ];
     const result = getFirstNoneTerminal(sequence);
     expect(result).to.have.length(1);
-    expect(first(result)!.name).to.equal("dummyRule");
+    expect(result[0]!.name).to.equal("dummyRule");
   });
 
   it("can find the firstNoneTerminal of a sequence with two items where the first is optional", () => {
@@ -397,7 +400,7 @@ describe("the getFirstNoneTerminal function", () => {
     ];
     const result = getFirstNoneTerminal(sequence);
     expect(result).to.have.length(2);
-    const resultRuleNames = map(result, (currItem) => currItem.name);
+    const resultRuleNames = result.map((currItem) => currItem.name);
     expect(resultRuleNames).to.include.members(["dummyRule", "dummyRule2"]);
   });
 
@@ -434,7 +437,7 @@ describe("the getFirstNoneTerminal function", () => {
     ];
     const result = getFirstNoneTerminal(alternation);
     expect(result).to.have.length(3);
-    const resultRuleNames = map(result, (currItem) => currItem.name);
+    const resultRuleNames = result.map((currItem) => currItem.name);
     expect(resultRuleNames).to.include.members([
       "dummyRule",
       "dummyRule2",
@@ -471,7 +474,7 @@ describe("the getFirstNoneTerminal function", () => {
     ];
     const result = getFirstNoneTerminal(alternation);
     expect(result).to.have.length(2);
-    const resultRuleNames = map(result, (currItem) => currItem.name);
+    const resultRuleNames = result.map((currItem) => currItem.name);
     expect(resultRuleNames).to.include.members(["dummyRule", "dummyRule3"]);
   });
 
@@ -504,7 +507,7 @@ describe("the getFirstNoneTerminal function", () => {
     ];
     const result = getFirstNoneTerminal(alternation);
     expect(result).to.have.length(1);
-    const resultRuleNames = map(result, (currItem) => currItem.name);
+    const resultRuleNames = result.map((currItem) => currItem.name);
     expect(resultRuleNames).to.include.members(["dummyRule"]);
   });
 

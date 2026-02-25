@@ -1,7 +1,7 @@
 import { createToken } from "../../src/scan/tokens_public.js";
 import { CstParser } from "../../src/parse/parser/traits/parser_traits.js";
 import { createRegularToken } from "../utils/matchers.js";
-import { keys } from "lodash-es";
+
 import { IToken, TokenType } from "@chevrotain/types";
 import { expect } from "chai";
 
@@ -63,12 +63,12 @@ describe("The CSTVisitor", () => {
       }
 
       testRule(ctx: any) {
-        expect(keys(ctx)).to.deep.equal(["A", "B", "bamba"]);
+        expect(Object.keys(ctx)).to.deep.equal(["A", "B", "bamba"]);
         return this.visit(ctx.bamba[0]);
       }
 
       bamba(ctx: any) {
-        expect(keys(ctx)).to.deep.equal(["C"]);
+        expect(Object.keys(ctx)).to.deep.equal(["C"]);
         return 666;
       }
     }
@@ -93,14 +93,14 @@ describe("The CSTVisitor", () => {
       }
 
       testRule(ctx: any, param: any) {
-        expect(keys(ctx)).to.deep.equal(["A", "B", "bamba"]);
+        expect(Object.keys(ctx)).to.deep.equal(["A", "B", "bamba"]);
         return this.visit(ctx.bamba[0], param);
       }
 
       bamba(ctx: any, param: any) {
         // inspecting handling of optional arguments
         expect(this.visit(ctx.missingKey)).to.be.undefined;
-        expect(keys(ctx)).to.deep.equal(["C"]);
+        expect(Object.keys(ctx)).to.deep.equal(["C"]);
         return 666 + param;
       }
     }
@@ -126,7 +126,7 @@ describe("The CSTVisitor", () => {
       }
 
       bamba(ctx: any) {
-        expect(keys(ctx)).to.deep.equal(["C"]);
+        expect(Object.keys(ctx)).to.deep.equal(["C"]);
         visited = true;
       }
     }
@@ -152,12 +152,12 @@ describe("The CSTVisitor", () => {
       }
 
       testRule(ctx: any, param: any) {
-        expect(keys(ctx)).to.deep.equal(["A", "B", "bamba"]);
+        expect(Object.keys(ctx)).to.deep.equal(["A", "B", "bamba"]);
         return this.visit(ctx["bamba"], param);
       }
 
       bamba(ctx: any, param: any) {
-        expect(keys(ctx)).to.deep.equal(["C"]);
+        expect(Object.keys(ctx)).to.deep.equal(["C"]);
         return 666 + param;
       }
     }
