@@ -7,7 +7,6 @@
  * "Public sta" --> ["static"]
  * "call f" --> ["foo"] // assuming foo is in the symbol table.
  */
-import _ from "lodash";
 import {
   createToken,
   Lexer,
@@ -140,7 +139,7 @@ export function getContentAssistSuggestions(text, symbolTable) {
     throw new Error("sad sad panda, lexing errors detected");
   }
 
-  const lastInputToken = _.last(lexResult.tokens);
+  const lastInputToken = lexResult.tokens.at(-1);
   let partialSuggestionMode = false;
   let assistanceTokenVector = lexResult.tokens;
 
@@ -151,7 +150,7 @@ export function getContentAssistSuggestions(text, symbolTable) {
       tokenMatcher(lastInputToken, Keyword)) &&
     /\w/.test(text[text.length - 1])
   ) {
-    assistanceTokenVector = _.dropRight(assistanceTokenVector);
+    assistanceTokenVector = assistanceTokenVector.slice(0, -1);
     partialSuggestionMode = true;
   }
 
@@ -166,14 +165,14 @@ export function getContentAssistSuggestions(text, symbolTable) {
     const currSyntaxSuggestion = syntacticSuggestions[i];
     const currTokenType = currSyntaxSuggestion.nextTokenType;
     const currRuleStack = currSyntaxSuggestion.ruleStack;
-    const lastRuleName = _.last(currRuleStack);
+    const lastRuleName = currRuleStack.at(-1);
 
     // easy case where a keyword is suggested.
     if (Keyword.categoryMatchesMap[currTokenType.tokenTypeIdx]) {
       finalSuggestions.push(currTokenType.PATTERN.source);
     } else if (currTokenType === Identifier) {
       // in declarations, should not provide content assist for new symbols (Identifiers)
-      if (_.includes(["enumStmt", "functionStmt"], lastRuleName)) {
+      if (["enumStmt", "functionStmt"].includes(lastRuleName)) {
         // NO-OP
       } else if (lastRuleName === "functionInvocation") {
         // Inside "functionInvocation" an Identifier is a usage of a symbol
@@ -192,11 +191,11 @@ export function getContentAssistSuggestions(text, symbolTable) {
 
   // throw away any suggestion that is not a suffix of the last partialToken.
   if (partialSuggestionMode) {
-    finalSuggestions = _.filter(finalSuggestions, (currSuggestion) => {
-      return _.startsWith(currSuggestion, lastInputToken.image);
+    finalSuggestions = finalSuggestions.filter((currSuggestion) => {
+      return currSuggestion.startsWith(lastInputToken.image);
     });
   }
 
   // we could have duplication because each suggestion also includes a Path, and the same Token may appear in multiple suggested paths.
-  return _.uniq(finalSuggestions);
+  return [...new Set(finalSuggestions)];
 }

@@ -109,9 +109,6 @@ importers:
       chevrotain:
         specifier: workspace:*
         version: link:../../packages/chevrotain
-      lodash:
-        specifier: 4.17.21
-        version: 4.17.21
     devDependencies:
       esbuild:
         specifier: 0.18.11
