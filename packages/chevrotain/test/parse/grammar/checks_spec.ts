@@ -1242,6 +1242,42 @@ describe("The empty alternative detection full flow", () => {
     );
   });
 
+  it("will detect alternative ambiguity with identical empty lookaheads", () => {
+    class EmptyAltsAmbiguityParser extends EmbeddedActionsParser {
+      constructor(input: IToken[] = []) {
+        super([PlusTok, StarTok]);
+        this.performSelfAnalysis();
+        this.input = input;
+      }
+
+      public noneLastEmpty = this.RULE("noneLastEmpty", () => {
+        this.OR([
+          {
+            ALT: () => {
+              // emptyAlt1
+            },
+          },
+          {
+            ALT: () => {
+              // emptyAlt2
+            },
+          },
+        ]);
+      });
+    }
+    expect(() => new EmptyAltsAmbiguityParser()).to.throw(
+      "Ambiguous Alternatives Detected",
+    );
+    expect(() => new EmptyAltsAmbiguityParser()).to.throw("1");
+    expect(() => new EmptyAltsAmbiguityParser()).to.throw("2");
+    expect(() => new EmptyAltsAmbiguityParser()).to.throw(
+      "These alternatives are all empty (match no tokens), making them indistinguishable",
+    );
+    expect(() => new EmptyAltsAmbiguityParser()).to.throw(
+      "Only the last alternative may be empty",
+    );
+  });
+
   it("will detect alternative ambiguity with identical lookahead - custom maxLookAhead", () => {
     class AltAmbiguityParserImplicitOccurrence extends EmbeddedActionsParser {
       constructor(input: IToken[] = []) {
