@@ -44,45 +44,45 @@ function createTokenInternal(config: ITokenConfig): TokenType {
     tokenType.PATTERN = pattern;
   }
 
-  if (PARENT in config) {
+  if (Object.hasOwn(config, PARENT)) {
     throw (
       "The parent property is no longer supported.\n" +
       "See: https://github.com/chevrotain/chevrotain/issues/564#issuecomment-349062346 for details."
     );
   }
 
-  if (CATEGORIES in config) {
+  if (Object.hasOwn(config, CATEGORIES)) {
     // casting to ANY as this will be fixed inside `augmentTokenTypes``
     tokenType.CATEGORIES = <any>config[CATEGORIES];
   }
 
   augmentTokenTypes([tokenType]);
 
-  if (LABEL in config) {
+  if (Object.hasOwn(config, LABEL)) {
     tokenType.LABEL = config[LABEL];
   }
 
-  if (GROUP in config) {
+  if (Object.hasOwn(config, GROUP)) {
     tokenType.GROUP = config[GROUP];
   }
 
-  if (POP_MODE in config) {
+  if (Object.hasOwn(config, POP_MODE)) {
     tokenType.POP_MODE = config[POP_MODE];
   }
 
-  if (PUSH_MODE in config) {
+  if (Object.hasOwn(config, PUSH_MODE)) {
     tokenType.PUSH_MODE = config[PUSH_MODE];
   }
 
-  if (LONGER_ALT in config) {
+  if (Object.hasOwn(config, LONGER_ALT)) {
     tokenType.LONGER_ALT = config[LONGER_ALT];
   }
 
-  if (LINE_BREAKS in config) {
+  if (Object.hasOwn(config, LINE_BREAKS)) {
     tokenType.LINE_BREAKS = config[LINE_BREAKS];
   }
 
-  if (START_CHARS_HINT in config) {
+  if (Object.hasOwn(config, START_CHARS_HINT)) {
     tokenType.START_CHARS_HINT = config[START_CHARS_HINT];
   }
 

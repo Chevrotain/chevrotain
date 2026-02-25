@@ -421,7 +421,7 @@ export function findMissingPatterns(
   tokenTypes: TokenType[],
 ): ILexerFilterResult {
   const tokenTypesWithMissingPattern = tokenTypes.filter((currType) => {
-    return !(PATTERN in currType);
+    return !Object.hasOwn(currType, PATTERN);
   });
 
   const errors = tokenTypesWithMissingPattern.map((currType) => {
@@ -826,7 +826,7 @@ export function performRuntimeChecks(
   const errors: ILexerDefinitionError[] = [];
 
   // some run time checks to help the end users.
-  if (!(DEFAULT_MODE in lexerDefinition)) {
+  if (!Object.hasOwn(lexerDefinition, DEFAULT_MODE)) {
     errors.push({
       message:
         "A MultiMode Lexer cannot be initialized without a <" +
@@ -835,7 +835,7 @@ export function performRuntimeChecks(
       type: LexerDefinitionErrorType.MULTI_MODE_LEXER_WITHOUT_DEFAULT_MODE,
     });
   }
-  if (!(MODES in lexerDefinition)) {
+  if (!Object.hasOwn(lexerDefinition, MODES)) {
     errors.push({
       message:
         "A MultiMode Lexer cannot be initialized without a <" +
@@ -846,9 +846,9 @@ export function performRuntimeChecks(
   }
 
   if (
-    MODES in lexerDefinition &&
-    DEFAULT_MODE in lexerDefinition &&
-    !(lexerDefinition.defaultMode in lexerDefinition.modes)
+    Object.hasOwn(lexerDefinition, MODES) &&
+    Object.hasOwn(lexerDefinition, DEFAULT_MODE) &&
+    !Object.hasOwn(lexerDefinition.modes, lexerDefinition.defaultMode)
   ) {
     errors.push({
       message:
@@ -858,7 +858,7 @@ export function performRuntimeChecks(
     });
   }
 
-  if (MODES in lexerDefinition) {
+  if (Object.hasOwn(lexerDefinition, MODES)) {
     Object.keys(lexerDefinition.modes).forEach((currModeName) => {
       const currModeValue = lexerDefinition.modes[currModeName];
       currModeValue.forEach((currTokType, currIdx) => {
