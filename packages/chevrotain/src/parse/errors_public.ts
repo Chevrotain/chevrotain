@@ -202,20 +202,29 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
       ambiguityIndices: number[];
       alternation: Alternation;
     }): string {
-      const pathMsg = map(options.prefixPath, (currtok) =>
-        tokenLabel(currtok),
-      ).join(", ");
       const occurrence =
         options.alternation.idx === 0 ? "" : options.alternation.idx;
+
+      const isEmptyPath = options.prefixPath.length === 0;
+
       let currMessage =
         `Ambiguous Alternatives Detected: <${options.ambiguityIndices.join(
           " ,",
         )}> in <OR${occurrence}>` +
-        ` inside <${options.topLevelRule.name}> Rule,\n` +
-        `<${pathMsg}> may appears as a prefix path in all these alternatives.\n`;
+        ` inside <${options.topLevelRule.name}> Rule,\n`;
 
-      currMessage =
-        currMessage +
+      if (isEmptyPath) {
+        currMessage +=
+          `These alternatives are all empty (match no tokens), making them indistinguishable.\n` +
+          `Only the last alternative may be empty.\n`;
+      } else {
+        const pathMsg = map(options.prefixPath, (currtok) =>
+          tokenLabel(currtok),
+        ).join(", ");
+        currMessage += `<${pathMsg}> may appears as a prefix path in all these alternatives.\n`;
+      }
+
+      currMessage +=
         `See: https://chevrotain.io/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES\n` +
         `For Further details.`;
       return currMessage;
