@@ -791,7 +791,8 @@ function defineLexerSpecs(
             pattern: /\d+/,
           }),
         ]);
-        const lastToken = last(ltCounter.tokenize("1\r\n1\r1").tokens)!;
+        const { tokens } = ltCounter.tokenize("1\r\n1\r1");
+        const lastToken = last(tokens)!;
         expect(lastToken.startLine).to.equal(3);
 
         const lastToken2 = last(ltCounter.tokenize("\r\r\r1234\r\n1").tokens)!;
