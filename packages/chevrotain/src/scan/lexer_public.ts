@@ -439,22 +439,7 @@ export class Lexer {
 
     const emptyArray: IPatternConfig[] = [];
     Object.freeze(emptyArray);
-    let getPossiblePatterns!: (charCode: number) => IPatternConfig[];
-
-    function getPossiblePatternsSlow() {
-      return patternIdxToConfig;
-    }
-
-    function getPossiblePatternsOptimized(charCode: number): IPatternConfig[] {
-      const optimizedCharIdx = charCodeToOptimizedIndex(charCode);
-      const possiblePatterns =
-        currCharCodeToPatternIdxToConfig[optimizedCharIdx];
-      if (possiblePatterns === undefined) {
-        return emptyArray;
-      } else {
-        return possiblePatterns;
-      }
-    }
+    let isOptimizedMode = false;
 
     const pop_mode = (popToken: IToken) => {
       // TODO: perhaps avoid this error in the edge case there is no more input?
@@ -489,9 +474,9 @@ export class Lexer {
           this.canModeBeOptimized[newMode] && this.config.safeMode === false;
 
         if (currCharCodeToPatternIdxToConfig && modeCanBeOptimized) {
-          getPossiblePatterns = getPossiblePatternsOptimized;
+          isOptimizedMode = true;
         } else {
-          getPossiblePatterns = getPossiblePatternsSlow;
+          isOptimizedMode = false;
         }
       }
     };
@@ -509,9 +494,9 @@ export class Lexer {
         this.canModeBeOptimized[newMode] && this.config.safeMode === false;
 
       if (currCharCodeToPatternIdxToConfig && modeCanBeOptimized) {
-        getPossiblePatterns = getPossiblePatternsOptimized;
+        isOptimizedMode = true;
       } else {
-        getPossiblePatterns = getPossiblePatternsSlow;
+        isOptimizedMode = false;
       }
     }
 
@@ -527,7 +512,16 @@ export class Lexer {
       matchedImage = null;
 
       const nextCharCode = orgText.charCodeAt(offset);
-      const chosenPatternIdxToConfig = getPossiblePatterns(nextCharCode);
+      let chosenPatternIdxToConfig: IPatternConfig[];
+      if (isOptimizedMode) {
+        const optimizedCharIdx = charCodeToOptimizedIndex(nextCharCode);
+        const possiblePatterns =
+          currCharCodeToPatternIdxToConfig[optimizedCharIdx];
+        chosenPatternIdxToConfig =
+          possiblePatterns !== undefined ? possiblePatterns : emptyArray;
+      } else {
+        chosenPatternIdxToConfig = patternIdxToConfig;
+      }
       const chosenPatternsLength = chosenPatternIdxToConfig.length;
 
       for (i = 0; i < chosenPatternsLength; i++) {
