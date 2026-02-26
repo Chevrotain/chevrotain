@@ -8,7 +8,6 @@ import {
   LineTerminatorOptimizedTester,
   performRuntimeChecks,
   performWarningRuntimeChecks,
-  SUPPORT_STICKY,
   validatePatterns,
 } from "./lexer.js";
 import {
@@ -299,17 +298,11 @@ export class Lexer {
       });
 
       this.TRACE_INIT("Choosing sub-methods implementations", () => {
+        this.match = this.matchWithTest;
+
         // Choose the relevant internal implementations for this specific parser.
         // These implementations should be in-lined by the JavaScript engine
         // to provide optimal performance in each scenario.
-        if (SUPPORT_STICKY) {
-          this.chopInput = <any>identity;
-          this.match = this.matchWithTest;
-        } else {
-          this.updateLastIndex = noop;
-          this.match = this.matchWithExec;
-        }
-
         if (hasOnlySingleMode) {
           this.handleModes = noop;
         }
@@ -655,7 +648,6 @@ export class Lexer {
             groups[group].push(newToken);
           }
         }
-        text = this.chopInput(text, imageLength);
         offset = offset + imageLength;
 
         // TODO: with newlines the column may be assigned twice
@@ -698,8 +690,6 @@ export class Lexer {
         let foundResyncPoint = recoveryEnabled === false;
 
         while (foundResyncPoint === false && offset < orgLength) {
-          // Identity Func (when sticky flag is enabled)
-          text = this.chopInput(text, 1);
           offset++;
           for (j = 0; j < currModePatternsLength; j++) {
             const currConfig = patternIdxToConfig[j];
@@ -787,10 +777,6 @@ export class Lexer {
     } else if (config.push !== undefined) {
       push_mode.call(this, config.push);
     }
-  }
-
-  private chopInput(text: string, length: number): string {
-    return text.substring(length);
   }
 
   private updateLastIndex(regExp: RegExp, newLastIndex: number): void {

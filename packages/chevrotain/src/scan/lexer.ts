@@ -68,31 +68,17 @@ export interface IAnalyzeResult {
   canBeOptimized: boolean;
 }
 
-export let SUPPORT_STICKY =
-  typeof (<any>new RegExp("(?:)")).sticky === "boolean";
-
-export function disableSticky() {
-  SUPPORT_STICKY = false;
-}
-
-export function enableSticky() {
-  SUPPORT_STICKY = true;
-}
-
 export function analyzeTokenTypes(
   tokenTypes: TokenType[],
   options: {
     positionTracking?: "full" | "onlyStart" | "onlyOffset";
     ensureOptimizations?: boolean;
     lineTerminatorCharacters?: (number | string)[];
-    // TODO: should `useSticky` be an argument here?
-    useSticky?: boolean;
     safeMode?: boolean;
     tracer?: (msg: string, action: () => void) => void;
   },
 ): IAnalyzeResult {
   options = defaults(options, {
-    useSticky: SUPPORT_STICKY,
     debug: false as boolean,
     safeMode: false as boolean,
     positionTracking: "full",
@@ -165,9 +151,7 @@ export function analyzeTokenTypes(
             // without the escaping "\"
             return regExpSource[1];
           } else {
-            return options.useSticky
-              ? addStickyFlag(currPattern)
-              : addStartOfInput(currPattern);
+            return addStickyFlag(currPattern);
           }
         } else if (isFunction(currPattern)) {
           hasCustom = true;
@@ -186,9 +170,7 @@ export function analyzeTokenTypes(
               "\\$&",
             );
             const wrappedRegExp = new RegExp(escapedRegExpString);
-            return options.useSticky
-              ? addStickyFlag(wrappedRegExp)
-              : addStartOfInput(wrappedRegExp);
+            return addStickyFlag(wrappedRegExp);
           }
         } else {
           throw Error("non exhaustive match");
@@ -842,8 +824,6 @@ export function addStartOfInput(pattern: RegExp): RegExp {
 
 export function addStickyFlag(pattern: RegExp): RegExp {
   const flags = pattern.ignoreCase ? "iy" : "y";
-  // always wrapping in a none capturing group preceded by '^' to make sure matching can only work on start of input.
-  // duplicate/redundant start of input markers have no meaning (/^^^^A/ === /^A/)
   return new RegExp(`${pattern.source}`, flags);
 }
 
