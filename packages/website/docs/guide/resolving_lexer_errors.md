@@ -65,7 +65,7 @@ To resolve this, choose one of the following:
 
 A Chevrotain lexer must be aware which of the Token Types may match a line terminator.
 This is required to compute the correct line and column position information.
-Normally Chevrotain can identify this information automatically using the [regexp-to-ast library][regexp_to_ast],
+Normally Chevrotain can identify this information automatically using the [regexp-to-ast][regexp_to_ast] package,
 however sometimes this logic fails. This is only a **warning** which will cause a small performance
 loss to the lexer and would **not** impact its correctness.
 
@@ -84,7 +84,7 @@ const MultiLineStringLiteral = createToken({
 });
 ```
 
-Also please open an issue in the [regexp-to-ast library][regexp_to_ast]
+Please report an issue in the Chevrotain [mono-repo](https://github.com/Chevrotain/chevrotain/issues),
 so the root problem can be tracked and resolved.
 
 ## A Custom Token Pattern should specify the <line_breaks> option
@@ -118,13 +118,13 @@ The Chevrotain Lexer performs optimizations by filtering the potential token mat
 using the next [charCode][mdn_char_code] to be consumed.
 To apply this optimization the first possible charCodes for **every** Token Type must be identified.
 
-This analysis is implemented using the [regexp-to-ast][regexp_to_ast] library,
-which means this **warning** usually indicates a bug in the regexp-to-ast library.
+This analysis is implemented using the [regexp-to-ast][regexp_to_ast] sub-package,
+which means this **warning** usually indicates a bug in the regexp-to-ast package.
 The impact is only that the optimization described above would become disabled.
 Lexing and Parsing will still work correctly, just slower.
 
-Please open a bug in the [regexp-to-ast][regexp_to_ast] library.
-This issue can be **worked around** by explicitly providing a "[start_chars_hint][start_chars_hint]" property.
+Please report an issue in the Chevrotain [mono-repo](https://github.com/Chevrotain/chevrotain/issues).
+This problem can be **worked around** by explicitly providing a "[start_chars_hint][start_chars_hint]" property.
 
 ```javascript
 const Integer = createToken({
@@ -144,7 +144,7 @@ The Chevrotain Lexer performs optimizations by filtering the potential token mat
 using the next [charCode][mdn_char_code] to be consumed.
 To apply this optimization the first possible charCodes for **every** TokenType must be identified.
 
-This analysis is implemented using the [regexp-to-ast][regexp_to_ast] library.
+This analysis is implemented using the [regexp-to-ast][regexp_to_ast] sub-package.
 This library currently does not support the [unicode regexp flag][unicode_mdn].
 The impact is that the optimization described above would become disabled.
 Lexing and Parsing will still work correctly, just slower.
@@ -365,7 +365,7 @@ const myLexer = new chevrotain.Lexer([], {
 [start_chars_hint]: https://chevrotain.io/documentation/11_1_1/interfaces/ITokenConfig.html#start_chars_hint
 [keywords_idents]: https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js
 [mdn_char_code]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/charCodeAt
-[regexp_to_ast]: https://github.com/bd82/regexp-to-ast
+[regexp_to_ast]: https://github.com/Chevrotain/chevrotain/tree/master/packages/regexp-to-ast
 [unicode_mdn]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/unicode
 [custom_token_patterns]: https://chevrotain.io/docs/guide/custom_token_patterns.html
 [line_terminator_pattern]: https://chevrotain.io/documentation/11_1_1/interfaces/ILexerConfig.html#lineTerminatorsPattern
