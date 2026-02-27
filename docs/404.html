@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="VuePress 2.0.0-rc.26" />
+    <style>
+      :root {
+        --vp-c-bg: #fff;
+      }
+
+      [data-theme='dark'] {
+        --vp-c-bg: #1b1b1f;
+      }
+
+      html,
+      body {
+        background-color: var(--vp-c-bg);
+      }
+    </style>
+    <script>
+      const useChoice = localStorage.getItem('vuepress-color-scheme')
+      const systemStatus =
+        'matchMedia' in window
+          ? window.matchMedia('(prefers-color-scheme: dark)').matches
+          : false
+
+      if (useChoice === 'light') {
+        document.documentElement.dataset.theme = 'light'
+      } else if (useChoice === 'dark' || systemStatus) {
+        document.documentElement.dataset.theme = 'dark'
+      }
+    </script>
+    <title>Chevrotain</title><meta name="description" content="Parser Building Toolkit for JavaScript">
+    <link rel="preload" href="/docs/assets/style-C_1sbLzA.css" as="style"><link rel="stylesheet" href="/docs/assets/style-C_1sbLzA.css">
+    <link rel="modulepreload" href="/docs/assets/app-BSd0-oVw.js"><link rel="modulepreload" href="/docs/assets/404.html-D7Fes3VN.js">
+    <link rel="prefetch" href="/docs/assets/FAQ.html-DHcZRkHr.js" as="script"><link rel="prefetch" href="/docs/assets/index.html-Club9eAt.js" as="script"><link rel="prefetch" href="/docs/assets/BREAKING_CHANGES.html-DhQQxP8w.js" as="script"><link rel="prefetch" href="/docs/assets/CHANGELOG.html-BTio3MCU.js" as="script"><link rel="prefetch" href="/docs/assets/backtracking.html-DaGjiYAZ.js" as="script"><link rel="prefetch" href="/docs/assets/blazing_fast.html-BRL70B04.js" as="script"><link rel="prefetch" href="/docs/assets/custom_errors.html-CotBErWz.js" as="script"><link rel="prefetch" href="/docs/assets/custom_token_patterns.html-D3uYsrU0.js" as="script"><link rel="prefetch" href="/docs/assets/easy_debugging.html-BHlqnxfe.js" as="script"><link rel="prefetch" href="/docs/assets/fault_tolerance.html-BfEaIrmT.js" as="script"><link rel="prefetch" href="/docs/assets/gates.html-D05Zhy6V.js" as="script"><link rel="prefetch" href="/docs/assets/grammar_inheritance.html-BIc7oxDm.js" as="script"><link rel="prefetch" href="/docs/assets/lexer_modes.html-CJ0qJHiV.js" as="script"><link rel="prefetch" href="/docs/assets/llk.html-0jgcD3U0.js" as="script"><link rel="prefetch" href="/docs/assets/multiple_start_rules.html-BM2gyH42.js" as="script"><link rel="prefetch" href="/docs/assets/parameterized_rules.html-DWQECnKD.js" as="script"><link rel="prefetch" href="/docs/assets/position_tracking.html-BFQ-e7g5.js" as="script"><link rel="prefetch" href="/docs/assets/regexp.html-DdENCal1.js" as="script"><link rel="prefetch" href="/docs/assets/separation.html-Cl1-RHU9.js" as="script"><link rel="prefetch" href="/docs/assets/syntactic_content_assist.html-mWyn0Pxq.js" as="script"><link rel="prefetch" href="/docs/assets/syntax_diagrams.html-CbfnxXls.js" as="script"><link rel="prefetch" href="/docs/assets/token_alternative_matches.html-eurJzNij.js" as="script"><link rel="prefetch" href="/docs/assets/token_categories.html-uKNHhZ4j.js" as="script"><link rel="prefetch" href="/docs/assets/token_grouping.html-Dp6jbwFz.js" as="script"><link rel="prefetch" href="/docs/assets/token_skipping.html-DWukYqc9.js" as="script"><link rel="prefetch" href="/docs/assets/concrete_syntax_tree.html-C7hiKzih.js" as="script"><link rel="prefetch" href="/docs/assets/custom_token_patterns.html-DNVgHlx5.js" as="script"><link rel="prefetch" href="/docs/assets/generating_syntax_diagrams.html-BVsyEnBR.js" as="script"><link rel="prefetch" href="/docs/assets/initialization_performance.html-2ns6Tr5b.js" as="script"><link rel="prefetch" href="/docs/assets/internals.html-Bnm5R0IG.js" as="script"><link rel="prefetch" href="/docs/assets/introduction.html-mjjMOtlM.js" as="script"><link rel="prefetch" href="/docs/assets/performance.html-lVCuNYuU.js" as="script"><link rel="prefetch" href="/docs/assets/resolving_grammar_errors.html-6y95x3jO.js" as="script"><link rel="prefetch" href="/docs/assets/resolving_lexer_errors.html-ByukhJcQ.js" as="script"><link rel="prefetch" href="/docs/assets/syntactic_content_assist.html-BV4PaF7H.js" as="script"><link rel="prefetch" href="/docs/assets/step0_introduction.html-fTG2E_It.js" as="script"><link rel="prefetch" href="/docs/assets/step1_lexing.html-rDVB8e1k.js" as="script"><link rel="prefetch" href="/docs/assets/step2_parsing.html-CWiFswkd.js" as="script"><link rel="prefetch" href="/docs/assets/step3_adding_actions_root.html-DUmCW5jA.js" as="script"><link rel="prefetch" href="/docs/assets/step3a_adding_actions_visitor.html-C70r8Z4W.js" as="script"><link rel="prefetch" href="/docs/assets/step3b_adding_actions_embedded.html-D1RmoNM9.js" as="script"><link rel="prefetch" href="/docs/assets/step4_fault_tolerance.html-_TRWAkbx.js" as="script"><link rel="prefetch" href="/docs/assets/index-BuqEEp8M.js" as="script">
+  </head>
+  <body>
+    <div id="app"><!--[--><div class="vp-theme-container" vp-container data-v-734571ca><main class="page" data-v-734571ca><div vp-content data-v-734571ca><h1 data-v-734571ca>404</h1><blockquote data-v-734571ca>There&#39;s nothing here.</blockquote><a class="route-link" href="/docs/" data-v-734571ca>Take me home</a></div></main></div><!--[--><!----><!--]--><!--]--></div>
+    <script type="module" src="/docs/assets/app-BSd0-oVw.js" defer></script>
+  </body>
+</html>
