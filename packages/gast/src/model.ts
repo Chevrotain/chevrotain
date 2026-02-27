@@ -23,9 +23,9 @@ function hasTokenLabel(
   return isString(obj.LABEL) && obj.LABEL !== "";
 }
 
-export abstract class AbstractProduction<T extends IProduction = IProduction>
-  implements IProduction
-{
+export abstract class AbstractProduction<
+  T extends IProduction = IProduction,
+> implements IProduction {
   public get definition(): T[] {
     return this._definition;
   }

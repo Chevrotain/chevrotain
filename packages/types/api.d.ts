@@ -2630,9 +2630,7 @@ export declare class RepetitionMandatory implements IProductionWithOccurrence {
 /**
  * The Grammar AST class representing a {@link BaseParser.AT_LEAST_ONE_SEP} call.
  */
-export declare class RepetitionMandatoryWithSeparator
-  implements IProductionWithOccurrence
-{
+export declare class RepetitionMandatoryWithSeparator implements IProductionWithOccurrence {
   separator: TokenType;
   idx: number;
   definition: IProduction[];
@@ -2667,9 +2665,7 @@ export declare class Repetition implements IProductionWithOccurrence {
 /**
  * The Grammar AST class representing a {@link BaseParser.MANY_SEP} call.
  */
-export declare class RepetitionWithSeparator
-  implements IProductionWithOccurrence
-{
+export declare class RepetitionWithSeparator implements IProductionWithOccurrence {
   separator: TokenType;
   idx: number;
   definition: IProduction[];
