@@ -1,6 +1,6 @@
 # Token Categories
 
-When parsing it is sometimes useful to match a terminal against a **set of Token Types**.
+When parsing, it is sometimes useful to match a terminal against a **set of Token Types**.
 This can be accomplished by using Token Categories.
 
 For example:
@@ -31,7 +31,7 @@ export const Class = createToken({
 ```javascript
 $.RULE("SomeRule", () => {
   // This would match either an Identifier or a keyword thus allowing for
-  // "None Reserved keywords"
+  // "non-reserved keywords"
   $.CONSUME(KeywordOrIdentifier);
 });
 ```

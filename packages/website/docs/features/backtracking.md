@@ -2,13 +2,13 @@
 
 Chevrotain supports backtracking to resolve ambiguities.
 Backtracking means **fully** trying an alternative instead of using a fixed
-token lookahead, this is similar to a DFS versus a BFS.
+token lookahead. This is similar to a DFS versus a BFS.
 
 Backtracking is not automatic and must be **explicitly** invoked.
 This is because it is inefficient and is mutually exclusive with error recovery.
 It is strongly recommended to avoid using backtracking if possible.
 
-Backtracking is implemented by using [Gates](https://chevrotain.io/docs/features/gates.html)
+Backtracking is implemented by using [Gates](https://chevrotain.io/docs/features/gates.html).
 
 For example, given the following grammar which is not LL(K), as
 both the alternatives in "statement" have a potentially infinitely long common prefix.

@@ -1,10 +1,10 @@
 # LL(K) Grammars
 
 Chevrotain can be used to build parsers for [LL(K)](https://en.wikipedia.org/wiki/LL_grammar) Grammars.
-This means that the number of lookahead tokens needed to disambiguate two alternatives must
+This means that the number of lookahead tokens needed to disambiguate alternatives must
 be a fixed number and known in advance.
 
-For example given the grammar
+For example, given the grammar
 
 ```antlr
 statement:
@@ -27,6 +27,6 @@ longRule:
    A+
 ```
 
-Chevrotain will throw a an error during the parser initialization in this case.
-This is because there is no fixed number of tokens we can use to choose between the alternatives
-that is due to a potentially **infinite** number of "A" tokens that can appear before the "B" - "C" tokens.
+Chevrotain will throw an error during parser initialization in this case.
+This is because there is no fixed number of tokens we can use to choose between the alternatives,
+due to a potentially **infinite** number of "A" tokens that can appear before the "B"|"C"|"D" tokens.

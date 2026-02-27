@@ -5,17 +5,15 @@ are just plain JavaScript source code without any additional levels of abstracti
 as in parser generators (EBNF vs generated code).
 
 In practical terms this means that debugging a Chevrotain parser is the same as debugging any
-other JavaScript code, just setup breakpoints or debugger statements using your favorite IDE.
+other JavaScript code. Just set up breakpoints or debugger statements using your favorite IDE.
 
 For example:
 
 ```javascript
-$.RULE("statement", () => {
+$.RULE("objectItem", () => {
+  $.CONSUME(StringLiteral);
   debugger;
-  $.RULE("objectItem", () => {
-    $.CONSUME(StringLiteral)
-    debugger;
-    $.CONSUME(Colon);
-    $.SUBRULE($.value);
-  });
+  $.CONSUME(Colon);
+  $.SUBRULE($.value);
+});
 ```

@@ -1,10 +1,7 @@
 # Position Tracking
 
-// TODO: we should document the location tracking for both Lexer and Parser in this section...
-
-Chevrotain lexers will track the full token position information by default.
+Chevrotain lexers track the full token position information by default.
 This means:
-token_skipping
 
 - start and end offsets.
 - start and end lines.

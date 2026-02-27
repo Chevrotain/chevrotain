@@ -11,7 +11,7 @@ See executable examples:
 - [Custom Parser Errors](https://github.com/chevrotain/chevrotain/blob/master/examples/parser/custom_errors/custom_errors.js).
 - [Custom Lexer Errors](https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/custom_errors/custom_errors.js).
 
-In addition it is also possible to directly provide strings values to be used in errors
+In addition, it is also possible to directly provide string values to be used in errors
 for specific parsing DSL methods, for example:
 
 ```javascript
