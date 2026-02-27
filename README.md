@@ -48,7 +48,6 @@ A more in depth review of Chevrotain can be found in this great article on: [Par
 - **[Other Examples](https://github.com/chevrotain/chevrotain/blob/master/examples)**.
 
 - **[HTML API docs](https://chevrotain.io/documentation).**
-  - [The Parsing DSL Docs](https://chevrotain.io/documentation/10_0_0/classes/BaseParser.html#AT_LEAST_ONE).
 
 - [ALL(\*) Lookahead in Langium](https://www.typefox.io/blog/allstar-lookahead)
 

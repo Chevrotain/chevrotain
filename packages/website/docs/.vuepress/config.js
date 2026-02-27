@@ -91,7 +91,7 @@ export default {
 
       {
         text: "APIs",
-        link: `https://chevrotain.io/documentation/${versionWithLowDashs}/modules.html`,
+        link: `https://chevrotain.io/documentation/${versionWithLowDashs}/index.html`,
       },
       {
         text: "Playground",
