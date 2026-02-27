@@ -1,7 +1,7 @@
 # Internals
 
-Chevrotain provides an abstraction for building Parsers, however no abstraction is prefect
-and at some point understand the implementation details may become necessary.
+Chevrotain provides an abstraction for building Parsers; however, no abstraction is perfect,
+and at some point understanding the implementation details may become necessary.
 
 ## Grammar Recording
 
@@ -15,7 +15,7 @@ resolve issues.
 
 **_Chevrotain needs to "understand" the grammar structure in order to run._**
 
-For example, in an alternation Chevrotain must able to choose the right alternative
+For example, in an alternation Chevrotain must be able to choose the right alternative to
 process, but in order to do so the **contents** (Grammar) of each alternative
 must be known **in advance**.
 
@@ -39,19 +39,19 @@ $.RULE("value", () => {
 ### The Solution
 
 Chevrotain solves the problem of "understanding" the grammar structure by running the Parser in a "Recording Mode"
-with **alternative implementations** of the parsing methods (OR/MANY/OPTION/...), the results of these "recordings" are saved
+with **alternative implementations** of the parsing methods (OR/MANY/OPTION/...). The results of these "recordings" are saved
 on the Parser instance and are accessible via the [getGastProductions](https://chevrotain.io/documentation/11_1_1/classes/BaseParser.html#getGAstProductions)
-method. However for this to work successfully there are a couple of implicit assumptions..
+method. However, for this to work successfully there are a couple of implicit assumptions.
 
 ### Assumption 1 - The Parser won't throw errors during recording.
 
-Any error thrown during the recording phase will obviously fail the recording and thus make the parser un-usable.
-These are normally easy to fix and identify by an end user as the runtime error message will be modified (By Chevrotain)
+Any error thrown during the recording phase will obviously fail the recording and thus make the parser unusable.
+These are normally easy to fix and identify by an end user, as the runtime error message will be modified (by Chevrotain)
 to indicate it occurred during the "recording phase" and the stack trace will easily "point" the end user towards the source of the problem.
 
-let us inspect some scenarios to fully understand the problem.
-The root issue is making assumptions on the structure and values returned by the Parsing DSL methods.
-Lets first consider an example that will **not** cause an error.
+Let us inspect some scenarios to fully understand the problem.
+The root issue is making assumptions about the structure and values returned by the Parsing DSL methods.
+Let's first consider an example that will **not** cause an error.
 
 ```javascript
 class SafeEmbeddedActionsExample extends EmbeddedActionsParser {
@@ -96,7 +96,7 @@ class ErrorEmbeddedActions1 extends EmbeddedActionsParser {
       const otherRuleVal = $.SUBRULE($.otherRule);
 
       // Will cause "undefined is not an object" runtime error
-      // because during the recording phase `SUBRULE` will not returned the expected value.
+      // because during the recording phase `SUBRULE` will not return the expected value.
       return otherRuleVal.foo.bar;
     });
 
@@ -143,7 +143,7 @@ Before moving on to possible solutions, note that all the above examples are cen
 When using the alternative: a Parser that outputs a [Concrete Syntax Tree](./concrete_syntax_tree.md)
 which is the [recommended approach](../tutorial/step3_adding_actions_root.md#alternatives),
 there would be very few (if any) embedded actions in the grammar.
-Thus it is a lot less likely that a CSTParser would raise errors during the recording phase, e.g:
+Thus it is a lot less likely that a CstParser would raise errors during the recording phase, e.g.:
 
 ```javascript
 class JsonParser extends CstParser {
@@ -164,7 +164,7 @@ class JsonParser extends CstParser {
 
 The solution is to simply **avoid executing any code that could raise such exceptions during the recording phase**.
 This can be easily accomplished by wrapping the relevant semantic actions with the [ACTION DSL method](https://chevrotain.io/documentation/11_1_1/classes/BaseParser.html#ACTION)
-for example lets resolve the two scenarios shown above:
+For example, let's resolve the two scenarios shown above:
 
 ```javascript
 class SolvedEmbeddedActions1 extends EmbeddedActionsParser {
@@ -221,16 +221,16 @@ class SolvedSemanticChecks extends EmbeddedActionsParser {
 
 Note:
 
-- Code wrapper by the `ACTION` wrapper **must not** include DSL methods (MANY/OR/OPTION/...) calls as this
-  would prevent those the grammar those methods represent from being recorded.
-- Not all semantic actions require wrapping in `ACTION`, only those that would throw errors during the
+- Code wrapped by the `ACTION` wrapper **must not** include DSL method (MANY/OR/OPTION/...) calls, as this
+  would prevent the grammar those methods represent from being recorded.
+- Not all semantic actions require wrapping in `ACTION` -- only those that would throw errors during the
   grammar recording phase.
-- Embedded actions reduce separation of concerns between parsing and semantics. However we can still maintain some of this separation
+- Embedded actions reduce separation of concerns between parsing and semantics. However, we can still maintain some of this separation
   by performing the Parsing "part" at the beginning of the rule and the semantic actions "part" at the end of the rule.
 
 ### Assumption 2 - There are no lasting side effects due to running the recording phase.
 
-If there are any **lasting** side effects from executing the parsing rules then their execution
+If there are any **lasting** side effects from executing the parsing rules, then their execution
 during the grammar recording phase may break logic dependent on those side effects.
 
 For example:
@@ -255,7 +255,7 @@ console.log(counter); // -> 1
 
 #### Solutions
 
-As before one of the solutions will be to wrap the relevant embedded semantic action using the
+As before, one of the solutions is to wrap the relevant embedded semantic action using the
 [ACTION DSL method](https://chevrotain.io/documentation/11_1_1/classes/BaseParser.html#ACTION).
 This is normally most suitable for handling **global state** outside the Parser's instance.
 
@@ -269,9 +269,9 @@ $.RULE("myRule", () => {
 });
 ```
 
-Because we are dealing with state here there is another option which is to override the Parser's
+Because we are dealing with state here, there is another option, which is to override the Parser's
 [reset method](https://chevrotain.io/documentation/11_1_1/classes/CstParser.html#reset).
-This is normally suitable for state that needs to be reset every time **new input** provided to the parser.
+This is normally suitable for state that needs to be reset every time **new input** is provided to the parser.
 
 ```javascript
 class FixedSideEffectsParser extends CstParser {
@@ -298,8 +298,8 @@ console.log(parser.instanceCounter); // -> 0
 
 ### Debugging Implications
 
-Due to the execution of the Parser rules during the "recording phase".
-Some break points inside Chevrotain Parsers will be hit during the Parser's initialization.
+Due to the execution of the Parser rules during the "recording phase",
+some breakpoints inside Chevrotain Parsers will be hit during the Parser's initialization.
 
-It is possible to workaround this issue by using **conditional breakpoints** that inspect that the
+It is possible to work around this issue by using **conditional breakpoints** that check whether the
 [RECORDING_PHASE flag](https://chevrotain.io/documentation/11_1_1/classes/BaseParser.html#RECORDING_PHASE) is disabled.

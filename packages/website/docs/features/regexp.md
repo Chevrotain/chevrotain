@@ -3,8 +3,8 @@
 Chevrotain Lexers are defined using **standard** ECMAScript regular expressions.
 This means there is no need to learn a new syntax and/or semantics.
 
-In addition existing JavaScript regExp libraries can be easily used,
-for example by using the awesome [xRegExp library](https://github.com/slevithan/XRegExp) one can simplify the creation of complex patterns and avoid code duplication.
+In addition, existing JavaScript regExp libraries can be easily used.
+For example, by using the [xRegExp library](https://github.com/slevithan/XRegExp) one can simplify the creation of complex patterns and avoid code duplication.
 
 ```javascript
 $.RULE("statement", () => {

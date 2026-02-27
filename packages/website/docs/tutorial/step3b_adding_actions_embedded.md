@@ -8,19 +8,19 @@
 
 In the [previous](./step2_parsing.md) tutorial step
 we have implemented a parser for a "mini" SQL Select grammar. The current problem is that our parser only
-validates the input conforms to the grammar. In most real world use cases the parser will also have to output some
+validates that the input conforms to the grammar. In most real-world use cases the parser will also have to output some
 result/data structure/value.
 
 This can be accomplished using two features of the Parsing DSL:
 
 - [CONSUME](https://chevrotain.io/documentation/11_1_1/classes/EmbeddedActionsParser.html#CONSUME) will return
-  The [IToken](https://chevrotain.io/documentation/11_1_1/interfaces/IToken.html) object consumed.
+  the [IToken](https://chevrotain.io/documentation/11_1_1/interfaces/IToken.html) object consumed.
 - [SUBRULE](https://chevrotain.io/documentation/11_1_1/classes/EmbeddedActionsParser.html#SUBRULE) will return
   the result of the grammar rule invoked.
 
 ### Enabling embedded actions
 
-For embedded actions to work as expected we need to extend the EmbeddedActionsParser class instead of the CstParser class.
+For embedded actions to work as expected, we need to extend the EmbeddedActionsParser class instead of the CstParser class.
 
 ```javascript
 const { EmbeddedActionsParser } = require("chevrotain");
@@ -32,12 +32,12 @@ class SelectParserEmbedded extends EmbeddedActionsParser {
 }
 ```
 
-Failing to disabled the CST creation would cause the Parser to return a CST of the grammar rule
-we invoked instead of of the expected output structure we will be creating (an AST).
+Failing to disable CST creation would cause the Parser to return a CST of the grammar rule
+we invoked instead of the expected output structure we will be creating (an AST).
 
 ## Simple Example
 
-Lets inspect a simple contrived example:
+Let's inspect a simple contrived example:
 
 ```javascript
 $.RULE("topRule", () => {
@@ -72,12 +72,12 @@ $.RULE("IntegerRule", () => {
 });
 ```
 
-The **decimalRule** and **IntegerRule** both return a javascript number (using parseInt/parseFloat).
+The **decimalRule** and **IntegerRule** both return a JavaScript number (using parseInt/parseFloat),
 and the **topRule** adds it to the final result.
 
 ## SQL Grammar
 
-Lets go back to the mini SQL Select grammar.
+Let's go back to the mini SQL Select grammar.
 
 For this grammar we will build a more complex data structure (an AST) instead of simply returning a number.
 Our selectStatement rule will now return an object with four properties:
@@ -105,7 +105,7 @@ $.RULE("selectStatement", () => {
 Three of those properties (selectClause / fromClause / whereClause) are the results of invoking
 other parser rules.
 
-Lets look at the "selectClause" rule implementation:
+Let's look at the "selectClause" rule implementation:
 
 ```javascript
 $.RULE("selectClause", () => {

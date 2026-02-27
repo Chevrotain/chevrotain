@@ -15,12 +15,12 @@ SELECT name, age FROM persons WHERE age > 100
 ```
 
 A Lexer transforms a string input into a [Token](https://chevrotain.io/documentation/11_1_1/interfaces/IToken.html) vector.
-Chevrotain has a built in Lexer engine based on Javascript Regular Expressions.
+Chevrotain has a built-in Lexer engine based on JavaScript Regular Expressions.
 
 ## Our First Token
 
-To use the Chevrotain lexer the Tokens must first be defined.
-Lets examine the definition for a "FROM" Token:
+To use the Chevrotain lexer, the Tokens must first be defined.
+Let's examine the definition for a "FROM" Token:
 
 ```javascript
 const createToken = chevrotain.createToken;
@@ -32,7 +32,7 @@ There is nothing much to it. We simply use the [**createToken** API](https://che
 to define the tokens, and provide it with a `name` property and a `pattern` property which is a RegExp which will be used when splitting up the input string
 into separate Tokens.
 
-## More complex Tokens
+## More Complex Tokens
 
 How can we define Tokens for Identifiers or Integers?
 
@@ -44,7 +44,7 @@ const Integer = createToken({ name: "Integer", pattern: /0|[1-9]\d*/ });
 
 ## Skipping Tokens
 
-The obvious use case in this language (and many others) is **whitespace**. skipping certain Tokens is easily
+The obvious use case in this language (and many others) is **whitespace**. Skipping certain Tokens is easily
 accomplished by marking them with the SKIP group.
 
 ```javascript
@@ -57,7 +57,7 @@ const WhiteSpace = createToken({
 
 ## All Our Tokens
 
-Lets examine all the needed Tokens definitions:
+Let's examine all the needed Token definitions:
 
 ```javascript
 const Identifier = createToken({ name: "Identifier", pattern: /[a-zA-Z]\w*/ });
@@ -119,7 +119,7 @@ let SelectLexer = new Lexer(allTokens);
 Note that:
 
 - The **order** of Token definitions passed to the Lexer is **important**.
-  The first PATTERN to match will be chosen not the longest.
+  The first PATTERN to match will be chosen, not the longest.
   - See how to resolve [Keywords vs Identifiers](https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js).
 
 - The lexer's `Tokenize` method is a **pure function**, thus only a **single Lexer** (per grammar) is needed.
@@ -127,7 +127,7 @@ Note that:
 - The lexer is **context unaware**, it lexes each token (pattern) individually.
   - If you need to distinguish between different contexts during the lexing phase, take a look at [Lexer Modes](../features/lexer_modes.md).
 
-- For more patterns requiring more complex constraints than a regular expression, take a look at [Custom Token Patterns](../features/custom_token_patterns.md).
+- For patterns requiring more complex constraints than a regular expression, take a look at [Custom Token Patterns](../features/custom_token_patterns.md).
 
 ## Using The Lexer
 
@@ -139,5 +139,5 @@ let lexingResult = SelectLexer.tokenize(inputText);
 The Lexing Result will contain:
 
 1.  A Token Vector.
-2.  the lexing errors (if any were encountered)
-3.  And other [Token groups](https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/token_groups/token_groups.js) (if grouping was used)
+2.  The lexing errors (if any were encountered).
+3.  Other [Token groups](https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/token_groups/token_groups.js) (if grouping was used).

@@ -4,8 +4,8 @@ This document lists tips and tricks to optimize runtime performance.
 
 ## Using a Singleton Parser
 
-Do not create a new Parser instance for each new input
-Instead re-use a single instance and reset its state between iterations. For example:
+Do not create a new Parser instance for each new input.
+Instead, re-use a single instance and reset its state between iterations. For example:
 
 ```javascript
 // reuse the same parser instance.
@@ -27,7 +27,7 @@ module.exports = function (text) {
 };
 ```
 
-Avoiding the creation of new instances is important to avoid re-paying the Parser's initialization costs
+Avoiding the creation of new instances is important to avoid re-paying the Parser's initialization costs.
 Additionally, re-using the same instance may leverage hot-spot optimizations of the respective JavaScript engine.
 
 Note that this means that if your parser "carries" additional state, that state should also be reset.
@@ -42,13 +42,13 @@ using the next [charCode](https://developer.mozilla.org/en-US/docs/Web/JavaScrip
 These optimizations can provide anywhere from a **30% boost** for small lexers
 to **several multiples** improvement in large Lexers with many TokenTypes.
 
-To apply this optimization the first possible charCodes for **every** TokenType must be identified.
+To apply this optimization, the first possible charCodes for **every** TokenType must be identified.
 Sometimes a TokenType's first charCodes cannot be automatically identified.
-In that case the lexer will **silently** revert to using the unoptimized algorithms.
+In that case, the lexer will **silently** revert to using the unoptimized algorithms.
 
 If the TokenType's first charCodes cannot be automatically identified, you can set the [`start_chars_hint`](https://chevrotain.io/documentation/11_1_1/interfaces/ITokenConfig.html#start_chars_hint) property when calling `createToken()`. If you define a custom [pattern](https://chevrotain.io/documentation/11_1_1/interfaces/ITokenConfig.html#pattern) for your token, then you should set `start_chars_hint` manually for optimal performance.
 
-It is possible to configure the Lexer **throw** an error
+It is possible to configure the Lexer to **throw** an error
 in case the optimizations cannot be enabled by turning on the
 "ensureOptimizations" flag:
 
@@ -62,13 +62,13 @@ const myLexer = new Lexer(
 );
 ```
 
-With the "ensureOptimizations" flag enabled the Lexer will also print error messages
-to the console with details on how to resolve optimizations errors.
+With the "ensureOptimizations" flag enabled, the Lexer will also print error messages
+to the console with details on how to resolve optimization errors.
 
 ## Caching Arrays of Alternatives
 
 The syntax for alternatives (OR) requires creating an array on every **single** invocation.
-For large enough arrays and in rules which are called often this can cause quite a large performance penalty.
+For large enough arrays and in rules which are called often, this can cause quite a large performance penalty.
 
 ```javascript
 $.RULE("value", () => {
@@ -110,8 +110,8 @@ Applying this pattern (in just a single location) on a JSON grammar provided 25-
 
 It is important to note that:
 
-- This pattern should only be applied on largish number of alternatives, testing on node.js 8.0 showed
-  it was only useful when there are at least four alternatives. In cases with fewer alternatives this pattern
+- This pattern should only be applied on a largish number of alternatives. Testing on Node.js 8.0 showed
+  it was only useful when there are at least four alternatives. In cases with fewer alternatives, this pattern
   would actually be **slower**!
 
 - This pattern can only be applied if there are no vars which can be accessed via closures.
@@ -159,7 +159,7 @@ It is important to note that:
   > "$.c1 || ($.c1 = ..." (\$ is 'this')
 
   Will cause a 'c1' property to be assigned to the parser instance.
-  This may seem innocent but if enough properties are added dynamically to an instance
+  This may seem innocent, but if enough properties are added dynamically to an instance,
   its V8 hidden class will change which could cause a severe performance reduction.
 
   To avoid this, simply define these "cache properties" in the constructor.
@@ -170,7 +170,7 @@ It is important to note that:
 These are only required if you are trying to squeeze every tiny bit of performance out of your parser.
 
 1.  **Reduce the amount of Token position tracking** the lexer performs.
-    See The [ILexerConfig.positionTracking](https://chevrotain.io/documentation/11_1_1/interfaces/ILexerConfig.html) property.
+    See the [ILexerConfig.positionTracking](https://chevrotain.io/documentation/11_1_1/interfaces/ILexerConfig.html) property.
 
 2.  **Avoid creating parsing rules which only parse a single Terminal.**
 

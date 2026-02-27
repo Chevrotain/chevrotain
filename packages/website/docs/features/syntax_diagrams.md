@@ -1,6 +1,6 @@
 # Syntax Diagrams
 
-Chevrotain exposes APIs to generate html syntax diagrams.
+Chevrotain exposes APIs to generate HTML syntax diagrams.
 These **visual** diagrams are a very useful development tool for grammars
 and can also be used as a kind of automatic self documentation.
 

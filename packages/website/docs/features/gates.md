@@ -1,6 +1,6 @@
 # Gates
 
-Chevrotain supports Gates on parsing DSL method.
+Chevrotain supports Gates on parsing DSL methods.
 Gates act as a type of **guard condition** that prevents an alternative
 from being taken. Gates are often used in combination with parametrized rules
 to represent multiple variants of the same parsing rule while avoiding code duplication.
@@ -36,7 +36,7 @@ $.RULE("FromClause", () => {
 });
 ```
 
-If **LIMIT** is an identifier or a keyword based on the surrounding tokens, looking ahead at subsequent tokens is required to know if the token should be consumed as an identifer or should be skipped to be parsed up by a subsequent rule.
+If **LIMIT** is an identifier or a keyword based on the surrounding tokens, looking ahead at subsequent tokens is required to know if the token should be consumed as an identifier or should be skipped to be picked up by a subsequent rule.
 
 See [executable example](https://github.com/chevrotain/chevrotain/tree/master/examples/parser/predicate_lookahead)
 for further details.

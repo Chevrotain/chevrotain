@@ -8,14 +8,14 @@
 
 In the previous tutorial steps we have learned how to build a parser for a simple grammar.
 Our parser can handle valid inputs just fine, but what happens if the input is not perfectly valid?
-For example when building an editor for a programming language, the input is often not completely valid,
+For example, when building an editor for a programming language, the input is often not completely valid,
 yet the editor is still expected to provide functionality (outline/auto-complete/navigation/error locations...)
 even for invalid inputs.
 
 Chevrotain uses several fault tolerance / error recovery heuristics, which generally follow error recovery heuristics
 used in Antlr3.
 
-## Single Token insertion
+## Single Token Insertion
 
 Happens when:
 
@@ -25,7 +25,7 @@ Happens when:
 
 A Y token will be automatically **inserted** into the token stream.
 
-For example: in a JSON Grammar colons are used between keys and values.
+For example, in a JSON grammar, colons are used between keys and values.
 
 ```javascript
 // GOOD
@@ -42,7 +42,7 @@ If we try parsing the "bad" example, after consuming:
 ```
 
 - We expect a colon token (Y).
-- We will find a number(666) token (X) in the remaining text: '666 }'.
+- We will find a number (666) token (X) in the remaining text: '666 }'.
 - After the colon token, a number token is valid.
 
 Therefore the missing colon will be automatically "inserted".
@@ -53,17 +53,17 @@ This heuristic's behavior can be customized by the following methods:
 
 - [getTokenToInsert](https://chevrotain.io/documentation/11_1_1/classes/CstParser.html#getTokenToInsert)
 
-## Single Token deletion:
+## Single Token Deletion
 
 Happens when:
 
 - A token Y is expected.
 - But a token X is found.
-- And immediately after X an Y is found.
+- And immediately after X, a Y is found.
 
 The unexpected token X will be skipped (**deleted**) and the parsing will continue.
 
-For example: lets look at the case of a
+For example:
 
 ```javascript
 // GOOD
@@ -80,10 +80,10 @@ If we try parsing the "bad" example, after consuming:
 ```
 
 - We are expecting a colon token (Y).
-- But we found right brackets (X) instead.
-- The next token (":") is a colon token (Y) which the one we originally expected.
+- But we found a right bracket (X) instead.
+- The next token (":") is a colon token (Y), which is the one we originally expected.
 
-Therefore the redundant right brackets "}" will be skipped (deleted) and the parser will consume the number token.
+Therefore the redundant right bracket "}" will be skipped (deleted) and the parser will consume the number token.
 
 This heuristic's behavior can be customized by the following method:
 
@@ -91,7 +91,7 @@ This heuristic's behavior can be customized by the following method:
 
 ## Re-Sync Recovery
 
-The following re-sync recovery examples use this sample json like grammar:
+The following re-sync recovery examples use this sample JSON-like grammar:
 
 ```ANTLR
 object
@@ -108,11 +108,11 @@ value
 
 Repetition re-sync recovery happens when:
 
-- The parser is in a repetition(MANY/AT_LEAST_ONE/MANY_SEP/AT_LEAST_ONE_SEP).
+- The parser is in a repetition (MANY/AT_LEAST_ONE/MANY_SEP/AT_LEAST_ONE_SEP).
 - The parser has consumed the last iteration and is about to "exit" the repetition.
 - The next token X is invalid right after the repetition ended.
 
-In such a situation the parser will attempt to skip tokens until it detects the beginning of a another iteration of
+In such a situation the parser will attempt to skip tokens until it detects the beginning of another iteration of
 the repetition **or** the token it originally expected after the last iteration.
 
 There are a couple of edge cases in which **other** recovery methods will be preferred:
@@ -141,12 +141,12 @@ If we try parsing this input example, after consuming:
   "key2" : 2
 ```
 
-- The parser in in a repetition of **(comma objectItem)\* **
+- The parser is in a repetition of **(comma objectItem)\***.
 - After consuming '"key2" : 2' the parser "thinks" it has consumed the last iteration as the next comma is missing.
 - The next token (X) encountered is "666" which is invalid in that position as the parser expected a "}" after the repetition ends.
-- The parser will throw away the following tokens [666, "key3", :, 3] and re-sync to the next comma (,) to continue a another iteration.
+- The parser will throw away the following tokens [666, "key3", :, 3] and re-sync to the next comma (,) to continue another iteration.
 
-Note that in such a situation some input would be lost, (the third key), however the fourth key will still be parsed successfully!
+Note that in such a situation some input would be lost (the third key); however, the fourth key will still be parsed successfully!
 
 ## General Re-Sync
 
@@ -154,7 +154,7 @@ General re-sync recovery happens when the parser encounters a parser error insid
 it cannot recover from in other ways.
 For example:
 
-- An unexpected Token as been found (MisMatchTokenException) but single token insertion/deletion cannot resolve it.
+- An unexpected Token has been found (MisMatchTokenException) but single token insertion/deletion cannot resolve it.
 - None of the alternatives in an OR match.
 - A Repetition of AT_LEAST_ONE cannot match even one iteration.
 - ...
@@ -165,14 +165,14 @@ The parser will try to skip as few tokens as possible and re-sync to the closest
 **An Abstract example:**
 
 - Grammar Rule A called Grammar Rule B which called Grammar Rule C (A -> B -> C).
-- In Grammar Rule C a parsing error happened which we can not recover from.
-- The Parser will now skip tokens until it find a token that can appear immediately after either:
+- In Grammar Rule C a parsing error happened which we cannot recover from.
+- The Parser will now skip tokens until it finds a token that can appear immediately after either:
   - The call of C in B
   - The call of B in A
 
 **A concrete example:**
 
-For the following invalid json input:
+For the following invalid JSON input:
 
 ```javascript
 {
@@ -195,40 +195,40 @@ For the following invalid json input:
 - The redundant colon will cause an error (NoViableAltException) as the value rule will not be able to decide
   which alternative to take as none would match.
 
-- This means the parser needs to find a token to synchronize to, lets check the options:
+- This means the parser needs to find a token to synchronize to. Let's check the options:
   - After value called by ObjectItem --> none
   - After objectItem called by object --> comma.
   - After object called by value --> none.
   - After value called by ObjectItem --> none
-  - after objectItem called by object --> comma (again).
+  - After objectItem called by object --> comma (again).
 
-- so the Parser will re-sync to the closest ObjectItem if it finds a comma in the remaining token stream.
+- So the Parser will re-sync to the closest objectItem if it finds a comma in the remaining token stream.
 
 - Therefore the following tokens will be skipped: [':', '"part"', '}']
 
-- And the Parser continue from the "nearest" objectItem rule as if it was successfully invoked.
+- And the Parser will continue from the "nearest" objectItem rule as if it was successfully invoked.
 
-- Thus the next two items will appear be parsed successfully even though they were preceded by a syntax error!
+- Thus the next two items will be parsed successfully even though they were preceded by a syntax error!
 
 ## Enabling
 
 By default fault tolerance and error recovery heuristics are **disabled**.
-They can be enabled by passing a optional **recoveryEnabled** parameter (default true)
-To the parser's constructor [constructor](https://chevrotain.io/documentation/11_1_1/classes/CstParser.html#constructor).
+They can be enabled by passing an optional **recoveryEnabled** parameter (default true)
+to the parser's [constructor](https://chevrotain.io/documentation/11_1_1/classes/CstParser.html#constructor).
 
-Once enabled specific rules may have their re-sync recovery disabled explicitly,
-This is can be done during the definition of the grammar rule [RULE](https://chevrotain.io/documentation/11_1_1/classes/CstParser.html#RULE).
-The third parameter(**config**) may contain a **resyncEnabled** property that controls whether or not re-sync is enabled for the
+Once enabled, specific rules may have their re-sync recovery disabled explicitly.
+This can be done during the definition of the grammar rule [RULE](https://chevrotain.io/documentation/11_1_1/classes/CstParser.html#RULE).
+The third parameter (**config**) may contain a **resyncEnabled** property that controls whether or not re-sync is enabled for the
 **specific** rule.
 
 ## CST Integration
 
-When using [Concrete Syntax Tree](../guide/concrete_syntax_tree.md) output
-A re-synced will return a CSTNode with the boolean ["recoveredNode"](https://chevrotain.io/documentation/11_1_1/interfaces/CstNode.html#recoveredNode) flag marked as true.
-Additionally a recovered node **may not** have all its contents (children dictionary) filled
-as only the Terminals and None-Terminals encountered **before** the error which triggered the re-sync
+When using [Concrete Syntax Tree](../guide/concrete_syntax_tree.md) output,
+a re-synced rule will return a CstNode with the boolean ["recoveredNode"](https://chevrotain.io/documentation/11_1_1/interfaces/CstNode.html#recoveredNode) flag marked as true.
+Additionally, a recovered node **may not** have all its contents (children dictionary) filled,
+as only the Terminals and Non-Terminals encountered **before** the error which triggered the re-sync
 will be present. This means that code that handles the CST (CST Walker or Visitor) **must not**
-assume certain content is always present on a CstNode. Instead it must be very defensive to avoid runtime
+assume certain content is always present on a CstNode. Instead, it must be very defensive to avoid runtime
 errors.
 
 ## Embedded Actions Integration
@@ -236,22 +236,22 @@ errors.
 Just being able to continue parsing is not enough, as "someone" probably expects a returned value
 from the sub-rule we have recovered from.
 
-By default **undefined** will be returned from a recovered rule, however this should most likely be customize
+By default **undefined** will be returned from a recovered rule; however, this should most likely be customized
 in any but the most simple cases.
 
 Customization is done during the definition of the grammar [RULE](https://chevrotain.io/documentation/11_1_1/classes/CstParser.html#RULE).
-The third parameter(**config**) may contain a **recoveryValueFunc** property which is a function that will be invoked to produce the returned value in
+The third parameter (**config**) may contain a **recoveryValueFunc** property, which is a function that will be invoked to produce the returned value in
 case of re-sync recovery.
 
 ## Types Of Recovery Strategies
 
-- Single Token insertion/deletion and repetition re-sync are "in rule" recovery strategies.
-- General re-sync Recovery is a "between rules" recovery strategy.
+- Single Token insertion/deletion and repetition re-sync are "in-rule" recovery strategies.
+- General re-sync recovery is a "between-rules" recovery strategy.
 
 The main difference is that "in-rule" recovery fixes the problem in the scope of a single rule
-without changes to the parser's rule stack and the parser's output will still be valid.
+without changes to the parser's rule stack, and the parser's output will still be valid.
 
-But "Between Rules" recovery will fail at least one parsing rule (and perhaps many more).
+But "between-rules" recovery will fail at least one parsing rule (and perhaps many more).
 Thus the latter tends to "lose" more of the original input, may
-potentially causes invalid output structure (e.g: partial CST structure)
-and require additional definitions (e.g: what should be returned value of a re-synced rule?).
+potentially cause invalid output structure (e.g. partial CST structure),
+and require additional definitions (e.g. what should be the returned value of a re-synced rule?).

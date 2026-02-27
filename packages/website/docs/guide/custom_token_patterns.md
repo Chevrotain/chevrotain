@@ -2,7 +2,7 @@
 
 ### TLDR
 
-See: [**Runnable example**](https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/custom_patterns/custom_patterns.js) for quick starting.
+See the [**Runnable example**](https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/custom_patterns/custom_patterns.js) for a quick start.
 
 ## Background
 
@@ -12,22 +12,22 @@ Normally a Token's pattern is defined using a JavaScript regular expression:
 const IntegerToken = createToken({ name: "IntegerToken", pattern: /\d+/ });
 ```
 
-However in some circumstances the capability to provide a custom pattern matching implementation may be required.
+However, in some circumstances the capability to provide a custom pattern matching implementation may be required.
 There are a few use cases in which a custom pattern could be used:
 
 - We want to collect additional properties on the token objects.
   - See [Custom Payloads](#custom-payloads) section.
 
-- The token cannot be easily (or at all) be defined using pure regular expressions.
+- The token cannot easily (or at all) be defined using pure regular expressions.
   - When context on previously lexed tokens is needed.
-    For example: [Lexing Python like indentation using Chevrotain](https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/python_indentation/python_indentation.js).
+    For example: [Lexing Python-like indentation using Chevrotain](https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/python_indentation/python_indentation.js).
 
 - Workaround possible performance issues/bugs in regExp engines.
 
 ## Usage
 
 A custom pattern has a similar API to the API of the [RegExp.prototype.exec](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec)
-function. But with a small constraint.
+function, but with a small constraint.
 
 - A custom pattern should behave as though the RegExp [sticky flag](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/sticky) has been set.
   This means that attempted matches must begin at the offset argument, **not** at the start of the input.
@@ -65,7 +65,7 @@ createToken({
 });
 ```
 
-Using an Object literal with only a single property is still a little verbose so an even more concise syntax is also supported:
+Using an Object literal with only a single property is still a little verbose, so an even more concise syntax is also supported:
 
 ```javascript
 // pattern is passed the matcher function directly.
@@ -74,11 +74,11 @@ createToken({ name: "IntegerToken", pattern: matchInteger });
 
 ## Lexing Context
 
-A custom token matcher has two optional arguments which allows accessing the current lexing context.
+A custom token matcher has two optional arguments which allow accessing the current lexing context.
 This context can be used to allow or disallow lexing certain Token Types depending
 on the previously lexed tokens.
 
-Lets expand the previous example to only allow lexing integers if the previous token was not an identifier (contrived example).
+Let's expand the previous example to only allow lexing integers if the previous token was not an identifier (contrived example).
 
 ```javascript
 import { tokenMatcher } from "chevrotain";
@@ -95,10 +95,10 @@ function matchInteger(text, offset, matchedTokens, groups) {
 }
 ```
 
-A larger and non contrived example can seen here: [Lexing Python like indentation using Chevrotain](https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/python_indentation/python_indentation.js).
+A larger and non-contrived example can be seen here: [Lexing Python-like indentation using Chevrotain](https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/python_indentation/python_indentation.js).
 
-It is important to note that The matchedTokens and groups arguments match the token and groups properties of the tokenize output ([ILexingResult](https://chevrotain.io/documentation/11_1_1/interfaces/ILexingResult.html)).
-These arguments are the current state of the lexing result so even if the lexer has performed error recovery any tokens found
+It is important to note that the matchedTokens and groups arguments match the token and groups properties of the tokenize output ([ILexingResult](https://chevrotain.io/documentation/11_1_1/interfaces/ILexingResult.html)).
+These arguments are the current state of the lexing result, so even if the lexer has performed error recovery, any tokens found
 in those arguments are still guaranteed to be in the final result.
 
 ## Custom Payloads
@@ -106,8 +106,8 @@ in those arguments are still guaranteed to be in the final result.
 Sometimes we want to collect additional properties on an IToken object, for example:
 
 - Save RegExp capturing groups on the token object.
-- Subsets of the matched text, e.g: strip away the quotes from string literals.
-- Computed values from the matched text, e.g: Integer values of Date parts (day/month/year).
+- Subsets of the matched text, e.g. strip away the quotes from string literals.
+- Computed values from the matched text, e.g. Integer values of Date parts (day/month/year).
 
 This can be done by attaching a **payload** property to our custom token matcher returned value,
 for example:
@@ -147,11 +147,11 @@ const StringLiteral = createToken({
 
 Note:
 
-- A custom pattern may be implemented using Regular Expressions, these concepts are **not mutually exclusive**.
-- The payload property may be **anything** e.g:
+- A custom pattern may be implemented using Regular Expressions; these concepts are **not mutually exclusive**.
+- The payload property may be **anything**, e.g.:
   - A single value (as in the example above).
   - A JavaScript object with multiple properties.
   - Capturing groups from a regExp exec method's results.
-  - The "groups" property of an regExp exec method's result (If [Named Capturing Groups are used](https://github.com/tc39/proposal-regexp-named-groups)).
+  - The "groups" property of a regExp exec method's result (if [Named Capturing Groups are used](https://github.com/tc39/proposal-regexp-named-groups)).
 
 Additional examples can be found here: [**Runnable example for custom payloads**](https://github.com/chevrotain/chevrotain/blob/master/examples/lexer/custom_patterns/custom_patterns_payloads.js).

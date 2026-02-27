@@ -20,7 +20,7 @@ const ClassKeyword = createToken({
 });
 ```
 
-Note that the `longer_alt` capability **cannot be chained**, only a single longer_alt will be checked for a specific Token. A token may define multiple longer alternatives using an array. As per usual with the lexer, the first matching token in the array will be chosen for lexing.
+Note that `longer_alt` lookups **are not chained** -- only a single level of `longer_alt` will be checked for a specific Token. However, a Token may define multiple longer alternatives using an array. As per usual with the lexer, the first matching token in the array will be chosen for lexing.
 
 See [executable example](https://github.com/chevrotain/chevrotain/tree/master/examples/lexer/keywords_vs_identifiers)
 for further details.

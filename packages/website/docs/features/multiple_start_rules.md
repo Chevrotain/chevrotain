@@ -2,7 +2,7 @@
 
 Chevrotain supports using **any** of the grammar rules as a starting rule.
 This means that any subset of a language can be parsed without being wrapped in
-other constructs, For example this can be used for:
+other constructs. For example, this can be used for:
 
 - Implementing "debugger watch expressions" and "evaluate expression" in an IDE.
 - Parsing only modified text in an IDE for performance.

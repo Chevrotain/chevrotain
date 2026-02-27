@@ -17,17 +17,17 @@ myRule:
 ```
 
 The first alternative is a prefix of the second alternative.
-Now lets consider the input ["A", "B"].
+Now let's consider the input ["A", "B"].
 For this input the first alternative would be matched as expected.
 
-However for the input ["A", "B", "C"] the first
+However, for the input ["A", "B", "C"] the first
 alternative would still be matched but this time **incorrectly**
 as alternation matches are attempted **in order**.
 
 There are two ways to resolve this:
 
 - Reorder the alternatives so that shorter common prefix lookahead
-  paths appears after the longer ones.
+  paths appear after the longer ones.
 
   ```antlr
   myRule:
@@ -51,7 +51,7 @@ Chevrotain "looks ahead" at most [K (3 by default)][maxlookahead]
 tokens to determine which alternative to pick. An Ambiguous Alternatives Error indicates
 that more than K tokens lookahead is needed.
 
-Lets consider a more concrete example:
+Let's consider a more concrete example:
 
 ```antlr
 fiveTokensLookahead:
@@ -61,15 +61,15 @@ fiveTokensLookahead:
 
 In order to decide between these two alternatives, Chevrotain must "look ahead" **five** tokens as the
 disambiguating tokens are "1" and "2".
-Five is a larger than the default [maxLookahead][maxlookahead] of four, so an error will be raised.
+Five is larger than the default [maxLookahead][maxlookahead] of four, so an error will be raised.
 
-We could solve this case by increasing the global [maxLookahead][maxlookahead] to 5, however this is **not** recommended
+We could solve this case by increasing the global [maxLookahead][maxlookahead] to 5; however, this is **not** recommended
 due to performance and grammar complexity reasons.
-From a performance perspective this is particularly problematic as some analysis
+From a performance perspective, this is particularly problematic as some analysis
 done on the grammar (during initialization) may become **exponentially** more complex as the maxLookahead grows.
 
 We could also specify the [MAX_LOOKAHEAD](https://chevrotain.io/documentation/11_1_1/interfaces/OrMethodOpts.html#IGNORE_AMBIGUITIES)
-config on the **specific** DSL method invocation where the problem occurs, This is still not the optimal solution in this case.
+config on the **specific** DSL method invocation where the problem occurs. This is still not the optimal solution in this case.
 
 **_The recommended solution in this case would be to refactor the grammar to require a smaller lookahead_**.
 In our trivial example the grammar can be refactored to be LL(1), meaning only one token of lookahead is needed.
@@ -104,9 +104,9 @@ oneTokenLookahead:
   )
 ```
 
-In some rare cases refactoring the grammar is not possible, in those cases it is still possible to resolve the
-ambiguity using the [backtracking feature](../features/backtracking.md)
-Although this is **strongly** discouraged due to performance and complexity reasons...
+In some rare cases refactoring the grammar is not possible. In those cases, it is still possible to resolve the
+ambiguity using the [backtracking feature](../features/backtracking.md),
+although this is **strongly** discouraged due to performance and complexity reasons.
 
 ## Terminal Token Name Not Found
 
@@ -122,7 +122,7 @@ if you have not yet upgraded.
 A repetition must consume at least one token in each iteration.
 Entering an iteration while failing to do so would cause an **infinite loop** because
 the condition to entering the next iteration would still be true while the parser state has
-not been changed. essentially this creates a flow that looks like:
+not been changed. Essentially this creates a flow that looks like:
 
 ```javascript
 // iteration lookahead condition (always true)
@@ -131,7 +131,7 @@ while (true) {
 }
 ```
 
-Lets look at a few real examples that can cause this error
+Let's look at a few real examples that can cause this error:
 
 ```javascript
 $.MANY(() => {
@@ -141,9 +141,9 @@ $.MANY(() => {
 });
 ```
 
-By returning early in the iteration grammar we prevent the parser from consuming
-The plus token and thus the next time the parser checks if it should enter the iteration
-The condition (nextToken === Plus) would still be true.
+By returning early in the iteration grammar, we prevent the parser from consuming
+the plus token, and thus the next time the parser checks if it should enter the iteration,
+the condition (nextToken === Plus) would still be true.
 
 ```javascript
 $.MANY(() => {
@@ -154,12 +154,12 @@ $.MANY(() => {
 });
 ```
 
-This is similar to the previous example as if the condition is false, once
+This is similar to the previous example: if the condition is false, once
 again the parser will consume nothing in the iteration.
 Modeling conditional grammar paths must be done using Chevrotain grammar constructs
 such as OPTION and/or [GATE](https://chevrotain.io/docs/features/gates.html).
 
-For example the above example should be written as:
+For example, the above should be written as:
 
 ```javascript
 $.MANY(() => {
@@ -171,7 +171,7 @@ $.MANY(() => {
 
 ## Ignoring Ambiguities
 
-In some rare cases the Parser may detect ambiguities that are not actually possible or are perhaps implicitly resolved, e.g:
+In some rare cases the Parser may detect ambiguities that are not actually possible or are perhaps implicitly resolved, e.g.:
 
 - by the order of alternatives (an alternation alternative is attempted in the order listed).
 

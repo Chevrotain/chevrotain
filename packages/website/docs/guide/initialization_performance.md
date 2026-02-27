@@ -1,7 +1,7 @@
 # Initialization Performance
 
-Chevrotain is (mostly) a runtime tool (No code generation).
-This means there is a fair bit of logic happening every time a Chevrotain Parser or Lexer are initialized.
+Chevrotain is (mostly) a runtime tool (no code generation).
+This means there is a fair bit of logic happening every time a Chevrotain Parser or Lexer is initialized.
 In some use cases this overhead may need to be reduced as much as possible.
 
 ## Enabling Initialization Performance Tracing
@@ -39,12 +39,12 @@ new Lexer([], {
 
 ## Use a smaller Global maxLookahead
 
-Chevrotain is a K tokens lookahead Parser, this means it peeks ahead (at most) K Tokens to
+Chevrotain is a K-tokens lookahead Parser. This means it peeks ahead (at most) K Tokens to
 determine the alternative to pick whenever it encounters a "branching" in the grammar.
 
-During initialization Chevrotain pre-computes and caches lookahead functions that would
+During initialization, Chevrotain pre-computes and caches lookahead functions that will
 later be used at runtime. The global [maxLookahead](https://chevrotain.io/documentation/11_1_1/interfaces/IParserConfig.html#maxLookAhead)
-setting can significantly affect the performance of this pre-computation due to the fact the number of possible "paths"
+setting can significantly affect the performance of this pre-computation because the number of possible "paths"
 in the grammar can grow **exponentially** as the max length of the possible paths increases.
 
 Example:
@@ -62,7 +62,7 @@ class LowLookaheadParser extends CstParser {
 }
 ```
 
-Note that the global maxLookahead can be overridden for **individual** DSL methods(OR/OPTION/MANY/...) invocations, For example:
+Note that the global maxLookahead can be overridden for **individual** DSL method (OR/OPTION/MANY/...) invocations. For example:
 
 ```javascript
 class LowLookaheadParser extends CstParser {
@@ -100,8 +100,8 @@ class LowLookaheadParser extends CstParser {
 
 ## Disabling Grammar Validations
 
-Chevrotain performs many validations during Lexer & Parser initialization, however those are not really relevant
-when the Lexer & Parser are known to be valid, These validations are a **development time** tool, and not really needed during productive flows.
+Chevrotain performs many validations during Lexer & Parser initialization; however, those are not really relevant
+when the Lexer & Parser are known to be valid. These validations are a **development-time** tool and not really needed during production flows.
 
 The [IParserConfig.skipValidations](https://chevrotain.io/documentation/11_1_1/interfaces/IParserConfig.html#skipValidations)
 config property can be used to avoid running these validations during **Parser** initialization.
@@ -119,7 +119,7 @@ class NaiveSkippedValidationsParser extends CstParser {
 }
 ```
 
-Similarly the [ILexerConfig.skipValidations](https://chevrotain.io/documentation/11_1_1/interfaces/ILexerConfig.html#skipValidations)
+Similarly, the [ILexerConfig.skipValidations](https://chevrotain.io/documentation/11_1_1/interfaces/ILexerConfig.html#skipValidations)
 config property can be used to skip the optional validations during **Lexer** initialization.
 
 ```javascript
@@ -146,9 +146,9 @@ class MoreRealisticSkippedValidationsParser extends CstParser {
 }
 ```
 
-Note that in a real world scenario the special condition to enable validations/tracing could be anything:
+Note that in a real-world scenario the special condition to enable validations/tracing could be anything:
 
-- env variable.
-- command line argument.
-- existence of a certain config file in the CWD.
+- Environment variable.
+- Command-line argument.
+- Existence of a certain config file in the CWD.
 - ...
