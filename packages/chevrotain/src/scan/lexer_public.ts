@@ -563,8 +563,6 @@ export class Lexer {
           longerAlt = currConfig.longerAlt;
           if (longerAlt !== undefined) {
             matchedImage = text.substring(offset, offset + imageLength);
-            // TODO: micro optimize, avoid extra prop access
-            // by saving/linking longerAlt on the original config?
             const longerAltLength = longerAlt.length;
             for (k = 0; k < longerAltLength; k++) {
               const longerAltConfig = patternIdxToConfig[longerAlt[k]];
@@ -635,7 +633,6 @@ export class Lexer {
 
           this.handlePayload(newToken, payload);
 
-          // TODO: optimize NOOP in case there are no special groups?
           if (group === false) {
             matchedTokensIndex = this.addToken(
               matchedTokens,
