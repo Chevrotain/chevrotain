@@ -1,3 +1,18 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Performance
+
+- [perf: Lexer small optimizations](https://github.com/Chevrotain/chevrotain/pull/2152)
+  - Up to ~8% for lexing flows.
+
+#### Bug Fixes
+
+- [fix: better error message for multiple empty alts](https://github.com/Chevrotain/chevrotain/pull/2151)
+
+#### Documentation
+
+- [boolean expressions and ini parser samples](https://github.com/Chevrotain/chevrotain/commit/bd4ac7e9f2a3efe26b44e5c4a832c0c4acc752b5)
+
 ## 11.1.1 (1-24-2026)
 
 #### Dependencies Bumps
