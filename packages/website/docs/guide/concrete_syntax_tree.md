@@ -19,7 +19,7 @@ for example: separate logic for compilation and for IDE support.
 There are two major differences.
 
 1.  An **A**bstract **S**yntax **T**ree would not normally contain all the syntactic information.
-    This mean the **exact original** text can not always be re-constructed from the AST.
+    This means the **exact original** text cannot always be re-constructed from the AST.
 
 2.  An **A**bstract **S**yntax **T**ree would not represent the whole syntactic parse tree.
     It would normally only contain nodes related to specific parse tree nodes,
@@ -49,7 +49,7 @@ The structure of the CST is very simple.
 
 - Explore it by running the CST creation example in the [**online playground**](https://chevrotain.io/playground/?example=JSON%20grammar%20and%20automatic%20CST%20output).
 
-- Note that the following examples are not runnable nor contain the full information.
+- Note that the following examples are neither runnable nor contain the full information.
   These are just snippets to explain the core concepts.
 
 ```TypeScript
@@ -100,7 +100,7 @@ output = {
 ```
 
 Non-Terminals are handled similarly to Terminals except each item in the value's array
-Is the CstNode of the corresponding Grammar Rule (Non-Terminal).
+is the CstNode of the corresponding Grammar Rule (Non-Terminal).
 
 ```javascript
 $.RULE("qualifiedName", () => {
@@ -131,7 +131,7 @@ output = {
 Note that Terminals and Non-Terminals will only appear in the children object
 if they were actually encountered during parsing.
 This means that optional grammar productions may or may not appear in a CST node
-depending on the actual input, e.g:
+depending on the actual input, e.g.:
 
 ```javascript
 $.RULE("variableStatement", () => {
@@ -167,7 +167,7 @@ output2 = {
 };
 ```
 
-## Extracting Alternatives to "sub" rules
+## Extracting Alternatives to "Sub" Rules
 
 So far the CST structure is quite simple, but how would a more complex grammar be handled?
 
@@ -214,8 +214,8 @@ if (cstResult.children.Let !== undefined) {
 }
 ```
 
-Alternatively it is possible to refactor the grammar in such a way that both alternatives
-Would be completely wrapped in their own Non-Terminal "sub" rules.
+Alternatively, it is possible to refactor the grammar in such a way that both alternatives
+would be completely wrapped in their own Non-Terminal "sub" rules.
 
 ```javascript
 $.RULE("statements", () => {
@@ -226,7 +226,7 @@ $.RULE("statements", () => {
 });
 ```
 
-This is the recommended approach in this case as more and more alternations are added the grammar rule
+This is the recommended approach, as when more and more alternations are added, the grammar rule
 will become too difficult to understand and maintain due to verbosity.
 
 ## CstNodes Location
@@ -234,7 +234,7 @@ will become too difficult to understand and maintain due to verbosity.
 Sometimes the information regarding the textual location (range) of each CstNode is needed.
 This information is normally **already present** on the CstNodes **nested** children simply because the CstNode's children
 include the Tokens provided by the Lexer. However, by default this information is not easily accessible
-as we would have to fully traverse a CstNode to understands its full location range information.
+as we would have to fully traverse a CstNode to understand its full location range information.
 
 The feature for providing CstNode location directly on the CstNodes objects is available since version 4.7.0.
 Tracking the CstNodes location is **disabled by default** and can be enabled
@@ -242,9 +242,9 @@ by setting the IParserConfig [nodeLocationTracking](https://chevrotain.io/docume
 to:
 
 - "full" (start/end for **all** offset/line/column)
-- or "onlyOffset", (start/end for **only** offsets)
+- or "onlyOffset" (start/end for **only** offsets)
 
-for example:
+For example:
 
 ```typescript
 import { CstParser } from "chevrotain";
@@ -258,24 +258,24 @@ class SelectParser extends CstParser {
 }
 ```
 
-Once this feature is enabled the optional [location property](https://chevrotain.io/documentation/11_1_1/interfaces/CstNode.html#location)
+Once this feature is enabled, the optional [location property](https://chevrotain.io/documentation/11_1_1/interfaces/CstNode.html#location)
 on each CstNode would be populated with the relevant information.
 
 Caveats
 
 - In order to track the CstNodes location **every** Token in the input Token vector must include its own location information.
-  - This is enabled by default in the Chevrotain Lexer, See [ILexerConfig.positionTracking](https://chevrotain.io/documentation/11_1_1/interfaces/ILexerConfig.html#positionTracking).
-    However, if a third party Lexer is used in conjunction with a Chevrotain Parser, the Tokens produced by such a lexer
-    must include the relevant location properties to allow the chevrotain parser to compute the CstNode locations.
+  - This is enabled by default in the Chevrotain Lexer. See [ILexerConfig.positionTracking](https://chevrotain.io/documentation/11_1_1/interfaces/ILexerConfig.html#positionTracking).
+    However, if a third-party Lexer is used in conjunction with a Chevrotain Parser, the Tokens produced by such a lexer
+    must include the relevant location properties to allow the Chevrotain Parser to compute the CstNode locations.
 
 - A CstNode may be empty, for example when the matching grammar rule has not matched any token.
   In that case the default value for the location properties is NaN.
 
-- This feature has a slight performance and memory cost,
-  this performance impact is **linear** and was measured at 5-10% for a full lexing + parsing flow.
-  In general the more complex a grammar is (in terms of more CstNodes created per N tokens)
+- This feature has a slight performance and memory cost.
+  This performance impact is **linear** and was measured at 5-10% for a full lexing + parsing flow.
+  In general, the more complex a grammar is (in terms of more CstNodes created per N tokens),
   the higher the impact. Additionally, if the Parser has activated the error recovery capabilities
-  of Chevrotain the impact would be at the high end of the given range,
+  of Chevrotain, the impact would be at the high end of the given range,
   as the location tracking logic is more complex when some Tokens may be virtual/invalid.
 
 ## Fault Tolerance
@@ -285,7 +285,7 @@ This combination is actually stronger than regular error recovery because
 even partially formed CstNodes will be present on the CST output and be marked
 using the `recoveredNode` boolean property.
 
-For example given this grammar and assuming the parser re-synced after a token mismatch at
+For example, given this grammar and assuming the parser re-synced after a token mismatch at
 the "Where" token:
 
 ```javascript
@@ -298,7 +298,7 @@ $.RULE("SelectClause", () => {
   $.SUBRULE($.expression);
 });
 
-// mismatch token due to typo at "wherrrre", parsing halts and re-syncs to upper rule so
+// mismatched token due to typo at "wherrrre", parsing halts and re-syncs to upper rule so
 // the suffix "wherrrre age > 25" is not parsed.
 input = "select age from persons wherrrre age > 25";
 
@@ -317,12 +317,12 @@ output = {
 ```
 
 This accessibility of **partial parsing results** means some post-parsing logic
-may be able to perform farther analysis.
-for example: offering auto-fix suggestions or provide better error messages.
+may be able to perform further analysis,
+for example offering auto-fix suggestions or providing better error messages.
 
 ## Traversing
 
-So, we now know how to create a CST, and it's internal structure.
+So, we now know how to create a CST and its internal structure.
 But how do we traverse this structure and perform semantic actions?
 Some examples for such semantic actions:
 
@@ -367,7 +367,7 @@ export function toAst(cst) {
 }
 ```
 
-This is a valid approach, however it can be somewhat error prone:
+This is a valid approach; however, it can be somewhat error-prone:
 
 - No validation that the case names match the real names of the CST Nodes.
 - The validation for missing case handler (default case) depends on attempting to run toAst with invalid input.
@@ -375,7 +375,7 @@ This is a valid approach, however it can be somewhat error prone:
 
 ## CST Visitor
 
-For the impatient, See a full runnable example: [Calculator Grammar with CSTVisitor interpreter](https://github.com/chevrotain/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js)
+For the impatient, see a full runnable example: [Calculator Grammar with CSTVisitor interpreter](https://github.com/chevrotain/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js).
 
 Chevrotain provides a CSTVisitor class which can make traversing the CST less error-prone.
 
@@ -419,11 +419,11 @@ class SqlToAstVisitor extends BaseCstVisitor {
 - Each visitor method will be invoked with the respective CSTNode's children as the first argument
   (called ctx in the above example).
 
-- Recursively visiting None-Terminals can be accomplished by using the **this.visit** method.
+- Recursively visiting Non-Terminals can be accomplished by using the **this.visit** method.
   It will invoke the appropriate visit method for the CSTNode argument.
 
-- The **this.visit** method can also be invoked on an array on CSTNodes in that case
-  It is equivalent to calling it on the first element of the input array.
+- The **this.visit** method can also be invoked on an array of CSTNodes; in that case
+  it is equivalent to calling it on the first element of the input array.
 
 - Each visit method can return a value which can be used to combine the traversal results.
 
@@ -434,10 +434,10 @@ class SqlToAstVisitor extends BaseCstVisitor {
 
 ### Do we always have to implement all the visit methods?
 
-**No**, sometimes we only need to handle a few specific CST Nodes
-In that case use **getBaseCstVisitorConstructorWithDefaults()** to get the base visitor constructor.
+**No**, sometimes we only need to handle a few specific CST Nodes.
+In that case, use **getBaseCstVisitorConstructorWithDefaults()** to get the base visitor constructor.
 This base visitor includes a default implementation for all visit methods
-which simply invokes **this.visit** on all none terminals in the CSTNode's children.
+which simply invokes **this.visit** on all non-terminals in the CSTNode's children.
 
 ```javascript
 // The base Visitor Class can be accessed via a Parser **instance**.
@@ -460,10 +460,10 @@ class SqlColumnNamesVisitor extends BaseCstVisitorWithDefaults {
 }
 ```
 
-Note that when using a visitor with default visit implementations
-It is not possible to return values from the visit methods because
-the default implementation does not return any value, only traverses the CST
-thus the chain of returned values will be broken.
+Note that when using a visitor with default visit implementations,
+it is not possible to return values from the visit methods because
+the default implementation does not return any value -- it only traverses the CST.
+Thus the chain of returned values will be broken.
 
 ## CST TypeScript Signatures
 
@@ -471,16 +471,16 @@ In the sections above we have seen that implementing a Chevrotain `CstParser` wo
 several data structures and APIs:
 
 1. A CSTNode for each grammar rule.
-2. A CST-Visitor API for the whole set of rules
+2. A CST-Visitor API for the whole set of rules.
 
 But what if we want **explicit** definitions for these data structures and APIs?
 
 - For example to easily implement our CST Visitors in TypeScript instead of over-using the `any` type...
 
-This capability is provided via the [generateCstDts](https://chevrotain.io/documentation/11_1_1/modules.html#generateCstDts) function.
-Which given a set of grammar `Rules` will generate the **source text** for the corresponding TypeScript signatures.
+This capability is provided via the [generateCstDts](https://chevrotain.io/documentation/11_1_1/modules.html#generateCstDts) function,
+which, given a set of grammar `Rules`, will generate the **source text** for the corresponding TypeScript signatures.
 
-For example, given the Parser rules for **arrays** in JSON.
+For example, given the Parser rules for **arrays** in JSON:
 
 ```typescript
 class JSONParser extends CstParser {
@@ -521,19 +521,19 @@ the contents to a file, see: minimal [generation script example](https://github.
 
 On V8 (Chrome/Node) building the CST was measured at anywhere from 35%-90% of the performance
 versus a pure grammar's runtime (no output) depending on the grammar used.
-Particularly on its level of rules nesting.
+Particularly depending on its level of rule nesting.
 
-This may be substantial yet please consider:
+This may be substantial, yet please consider:
 
-- Chevrotain is already [very fast](https://chevrotain.io/performance/)
-  So at worst at will degrade to just "fast"...
+- Chevrotain is already [very fast](https://chevrotain.io/performance/),
+  so at worst it will degrade to just "fast".
 
-- This comparison is not fair as a pure grammar that has no output also has very little use...
-  The right comparison would be to versus embedding actions that built some alternative CST/AST output structure.
+- This comparison is not fair, as a pure grammar that has no output also has very little use.
+  The right comparison would be against embedding actions that build some alternative CST/AST output structure.
 
 - Parsing is usually just one step in a larger flow, so the overall impact even in the slower edge cases
   would be reduced.
 
-It is therefore recommended using the CST creation capabilities
-as its benefits (modularity / ease of maintenance) by far outweigh the costs (potentially reduced performance).
+It is therefore recommended to use the CST creation capabilities,
+as its benefits (modularity / ease of maintenance) by far outweigh the costs (potentially reduced performance),
 except in unique edge cases.

@@ -19,19 +19,19 @@ library by @tabatkins.
 
 ## Instructions
 
-Chevrotain provides the [**createSyntaxDiagramsCode**](https://chevrotain.io/documentation/11_1_1/modules.html#createsyntaxdiagramscode) API to generate the **html source code**
-of syntax diagrams. This html source code can then be used by an end user in either node.js or a browser:
+Chevrotain provides the [**createSyntaxDiagramsCode**](https://chevrotain.io/documentation/11_1_1/modules.html#createsyntaxdiagramscode) API to generate the **HTML source code**
+of syntax diagrams. This HTML source code can then be used by an end user in either Node.js or a browser:
 
-1.  By writing it directly to the disk in a pure node.js runtime scenario.
+1.  By writing it directly to the disk in a pure Node.js runtime scenario.
 2.  By inserting it dynamically into an iframe in a browser scenario.
 
 **Examples:**
 
 - [Generating syntax diagrams to a file](https://github.com/chevrotain/chevrotain/blob/master/examples/parser/diagrams/creating_html_file.js)
-  - Self contained, no need for Chevrotain or the grammar when rendering the html.
+  - Self-contained, no need for Chevrotain or the grammar when rendering the HTML.
 
 - [Generating syntax diagrams dynamically into an iframe](https://github.com/chevrotain/chevrotain/blob/master/examples/parser/diagrams/diagrams_browser.html)
-  - Requires loading **both** Chevrotain and the grammar (and dependencies!) when rendering the html.
+  - Requires loading **both** Chevrotain and the grammar (and dependencies!) when rendering the HTML.
 
 ## Customization
 
@@ -39,7 +39,7 @@ The [logic for generating the HTML](https://github.com/Chevrotain/chevrotain/blo
 is quite trivial and the generated code itself is also very simple with a decent separation of concerns.
 These can be used as a basis for creating more advanced custom scenarios, for example:
 
-- Adding a module loader such as system.js/require.js
-- Dynamically rendering diagrams of a Grammar in an IDE.
-- Rendering diagrams of a pure EBNF grammar (Not a Chevrotain grammar) as the diagrams are rendered
+- Adding a module loader such as system.js/require.js.
+- Dynamically rendering diagrams of a grammar in an IDE.
+- Rendering diagrams of a pure EBNF grammar (not a Chevrotain grammar), as the diagrams are rendered
   using a serialized format.
