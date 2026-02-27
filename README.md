@@ -36,8 +36,8 @@ A more in depth review of Chevrotain can be found in this great article on: [Par
     - `https://unpkg.com/chevrotain/lib/chevrotain.mjs`
     - `https://unpkg.com/chevrotain/lib/chevrotain.min.mjs`
   - Explicit version number:
-    - `https://unpkg.com/chevrotain@11.1.1/lib/chevrotain.mjs`
-    - `https://unpkg.com/chevrotain@11.1.1/lib/chevrotain.min.mjs`
+    - `https://unpkg.com/chevrotain@11.1.2/lib/chevrotain.mjs`
+    - `https://unpkg.com/chevrotain@11.1.2/lib/chevrotain.min.mjs`
 
 ## Documentation & Resources
 

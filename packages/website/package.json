@@ -1,6 +1,6 @@
 {
   "name": "@chevrotain/website",
-  "version": "11.1.1",
+  "version": "11.1.2",
   "type": "module",
   "private": true,
   "description": "source Code for https://chevrotain.io/docs/",
@@ -20,13 +20,13 @@
   },
   "devDependencies": {
     "@mdit-vue/shared": "3.0.2",
+    "@vuepress/bundler-vite": "2.0.0-rc.26",
     "@vuepress/client": "2.0.0-rc.26",
     "@vuepress/plugin-docsearch": "2.0.0-rc.123",
     "@vuepress/theme-default": "2.0.0-rc.123",
-    "@vuepress/bundler-vite": "2.0.0-rc.26",
     "gitty": "3.7.2",
     "jsonfile": "6.2.0",
-    "vuepress": "2.0.0-rc.26",
-    "sass-embedded": "1.97.3"
+    "sass-embedded": "1.97.3",
+    "vuepress": "2.0.0-rc.26"
   }
 }

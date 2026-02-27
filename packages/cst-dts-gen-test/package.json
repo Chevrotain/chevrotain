@@ -1,6 +1,6 @@
 {
   "name": "@chevrotain/cst-dts-gen-test",
-  "version": "11.1.1",
+  "version": "11.1.2",
   "private": true,
   "description": "tests for @chevrotain/cst-dts-gen",
   "license": "Apache-2.0",
