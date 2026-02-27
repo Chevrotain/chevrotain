@@ -1,8 +1,7 @@
 {
-  "name": "Chevrotain Examples",
+  "name": "Chevrotain",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:24",
-  "postCreateCommand": "pnpm install",
-  "postAttachCommand": "code examples/grammars/README.md examples/grammars/json/json.js",
+  "postCreateCommand": "pnpm install && pnpm run compile",
   "customizations": {
     "vscode": {
       "settings": {
