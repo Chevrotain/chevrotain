@@ -1,0 +1,13 @@
+{
+  "name": "Chevrotain Examples",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:24",
+  "postCreateCommand": "corepack enable && corepack prepare pnpm@10.30.2 --activate && pnpm install",
+  "postAttachCommand": "code examples/grammars/README.md examples/grammars/json/json.js",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "workbench.startupEditor": "none"
+      }
+    }
+  }
+}
