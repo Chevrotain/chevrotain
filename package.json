@@ -7,7 +7,7 @@
       "examples/*"
     ]
   },
-  "packageManager": "pnpm@10.23.0",
+  "packageManager": "pnpm@10.30.3",
   "scripts": {
     "version": "pnpm install && git add pnpm-lock.yaml",
     "preinstall": "npx only-allow pnpm",
@@ -35,11 +35,14 @@
     ]
   },
   "devDependencies": {
+    "@commitlint/cli": "20.1.0",
+    "@commitlint/config-conventional": "20.0.0",
     "@types/chai": "5.2.3",
     "@types/mocha": "10.0.10",
     "@types/node": "20.19.25",
+    "c8": "10.1.3",
     "chai": "6.2.1",
-    "typescript": "5.9.3",
+    "cz-conventional-changelog": "3.3.0",
     "fs-extra": "11.3.2",
     "husky": "9.1.7",
     "lerna": "9.0.1",
@@ -48,10 +51,7 @@
     "npm-run-all2": "8.0.4",
     "prettier": "3.6.2",
     "shx": "0.4.0",
-    "cz-conventional-changelog": "3.3.0",
-    "@commitlint/cli": "20.1.0",
-    "@commitlint/config-conventional": "20.0.0",
     "source-map-support": "0.5.21",
-    "c8": "10.1.3"
+    "typescript": "5.9.3"
   }
 }
