@@ -10,8 +10,6 @@ import {
   addStartOfInput,
   analyzeTokenTypes,
   buildLineBreakIssueMessage,
-  disableSticky,
-  enableSticky,
   findDuplicatePatterns,
   findEmptyMatchRegExps,
   findEndOfInputAnchor,
@@ -21,7 +19,6 @@ import {
   findStartOfInputAnchor,
   findUnreachablePatterns,
   findUnsupportedFlags,
-  SUPPORT_STICKY,
 } from "../../src/scan/lexer.js";
 import { setEquality } from "../utils/matchers.js";
 import { tokenStructuredMatcher } from "../../src/scan/tokens.js";
@@ -34,8 +31,6 @@ import {
   TokenType,
 } from "@chevrotain/types";
 import { TokenMatcher } from "../../src/parse/parser/parser.js";
-
-const ORG_SUPPORT_STICKY = SUPPORT_STICKY;
 
 function defineLexerSpecs(
   contextName: string,
@@ -691,9 +686,8 @@ function defineLexerSpecs(
             Whitespace,
             NewLine,
           ];
-          const analyzeResult = analyzeTokenTypes(tokenClasses, {
-            useSticky: false,
-          });
+          // TODO: the problem was sticky:false here...
+          const analyzeResult = analyzeTokenTypes(tokenClasses, {});
 
           const allPatterns = map(
             analyzeResult.patternIdxToConfig,
@@ -705,14 +699,14 @@ function defineLexerSpecs(
             return isString(pattern) ? pattern : (pattern as RegExp).source;
           });
           setEquality(allPatternsString, [
-            "^(?:(\\t| ))",
-            "^(?:(\\n|\\r|\\r\\n))",
-            "^(?:[1-9]\\d*)",
+            "(\\t| )",
+            "(\\n|\\r|\\r\\n)",
+            "[1-9]\\d*",
             "(",
             ")",
-            "^(?:if)",
-            "^(?:else)",
-            "^(?:return)",
+            "if",
+            "else",
+            "return",
           ]);
 
           const patternIdxToClass = map(
@@ -731,7 +725,7 @@ function defineLexerSpecs(
         });
       }
 
-      if (!skipValidationChecks && ORG_SUPPORT_STICKY) {
+      if (!skipValidationChecks) {
         it("can transform/analyze an array of Token Types into matched/ignored/patternToClass - sticky", () => {
           const tokenClasses = [
             Keyword,
@@ -745,10 +739,7 @@ function defineLexerSpecs(
             Whitespace,
             NewLine,
           ];
-          // on newer node.js this will run with the 2nd argument as true.
-          const analyzeResult = analyzeTokenTypes(tokenClasses, {
-            useSticky: true,
-          });
+          const analyzeResult = analyzeTokenTypes(tokenClasses, {});
           const allPatterns = map(
             analyzeResult.patternIdxToConfig,
             (currConfig) => currConfig.pattern,
@@ -800,7 +791,8 @@ function defineLexerSpecs(
             pattern: /\d+/,
           }),
         ]);
-        const lastToken = last(ltCounter.tokenize("1\r\n1\r1").tokens)!;
+        const { tokens } = ltCounter.tokenize("1\r\n1\r1");
+        const lastToken = last(tokens)!;
         expect(lastToken.startLine).to.equal(3);
 
         const lastToken2 = last(ltCounter.tokenize("\r\r\r1234\r\n1").tokens)!;
@@ -2128,16 +2120,6 @@ function defineLexerSpecs(
   }
 
   context(contextName, lexerSpecs);
-
-  if (SUPPORT_STICKY === true) {
-    context(contextName + " NO STICKY", () => {
-      before(disableSticky);
-
-      lexerSpecs();
-
-      after(enableSticky);
-    });
-  }
 }
 
 describe("debugging and messages and optimizations", () => {

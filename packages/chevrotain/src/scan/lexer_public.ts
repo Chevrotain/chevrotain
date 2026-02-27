@@ -8,7 +8,6 @@ import {
   LineTerminatorOptimizedTester,
   performRuntimeChecks,
   performWarningRuntimeChecks,
-  SUPPORT_STICKY,
   validatePatterns,
 } from "./lexer.js";
 import {
@@ -126,7 +125,6 @@ export class Lexer {
       );
     }
 
-    // todo: defaults func?
     this.config = assign({}, DEFAULT_LEXER_CONFIG, config) as any;
 
     const traceInitVal = this.config.traceInitPerf;
@@ -207,7 +205,7 @@ export class Lexer {
         });
       }
 
-      // for extra robustness to avoid throwing an none informative error message
+      // for extra robustness to avoid throwing a none informative error message
       actualDefinition.modes = actualDefinition.modes
         ? actualDefinition.modes
         : {};
@@ -302,13 +300,6 @@ export class Lexer {
         // Choose the relevant internal implementations for this specific parser.
         // These implementations should be in-lined by the JavaScript engine
         // to provide optimal performance in each scenario.
-        if (SUPPORT_STICKY) {
-          this.chopInput = <any>identity;
-          this.match = this.matchWithTest;
-        } else {
-          this.updateLastIndex = noop;
-          this.match = this.matchWithExec;
-        }
 
         if (hasOnlySingleMode) {
           this.handleModes = noop;
@@ -414,7 +405,6 @@ export class Lexer {
       tokType,
       newToken: IToken,
       errLength,
-      droppedChar,
       msg,
       match;
     const orgText = text;
@@ -446,22 +436,7 @@ export class Lexer {
 
     const emptyArray: IPatternConfig[] = [];
     Object.freeze(emptyArray);
-    let getPossiblePatterns!: (charCode: number) => IPatternConfig[];
-
-    function getPossiblePatternsSlow() {
-      return patternIdxToConfig;
-    }
-
-    function getPossiblePatternsOptimized(charCode: number): IPatternConfig[] {
-      const optimizedCharIdx = charCodeToOptimizedIndex(charCode);
-      const possiblePatterns =
-        currCharCodeToPatternIdxToConfig[optimizedCharIdx];
-      if (possiblePatterns === undefined) {
-        return emptyArray;
-      } else {
-        return possiblePatterns;
-      }
-    }
+    let isOptimizedMode = false;
 
     const pop_mode = (popToken: IToken) => {
       // TODO: perhaps avoid this error in the edge case there is no more input?
@@ -496,9 +471,9 @@ export class Lexer {
           this.canModeBeOptimized[newMode] && this.config.safeMode === false;
 
         if (currCharCodeToPatternIdxToConfig && modeCanBeOptimized) {
-          getPossiblePatterns = getPossiblePatternsOptimized;
+          isOptimizedMode = true;
         } else {
-          getPossiblePatterns = getPossiblePatternsSlow;
+          isOptimizedMode = false;
         }
       }
     };
@@ -516,9 +491,9 @@ export class Lexer {
         this.canModeBeOptimized[newMode] && this.config.safeMode === false;
 
       if (currCharCodeToPatternIdxToConfig && modeCanBeOptimized) {
-        getPossiblePatterns = getPossiblePatternsOptimized;
+        isOptimizedMode = true;
       } else {
-        getPossiblePatterns = getPossiblePatternsSlow;
+        isOptimizedMode = false;
       }
     }
 
@@ -532,9 +507,19 @@ export class Lexer {
 
     while (offset < orgLength) {
       matchedImage = null;
+      imageLength = -1;
 
       const nextCharCode = orgText.charCodeAt(offset);
-      const chosenPatternIdxToConfig = getPossiblePatterns(nextCharCode);
+      let chosenPatternIdxToConfig: IPatternConfig[];
+      if (isOptimizedMode) {
+        const optimizedCharIdx = charCodeToOptimizedIndex(nextCharCode);
+        const possiblePatterns =
+          currCharCodeToPatternIdxToConfig[optimizedCharIdx];
+        chosenPatternIdxToConfig =
+          possiblePatterns !== undefined ? possiblePatterns : emptyArray;
+      } else {
+        chosenPatternIdxToConfig = patternIdxToConfig;
+      }
       const chosenPatternsLength = chosenPatternIdxToConfig.length;
 
       for (i = 0; i < chosenPatternsLength; i++) {
@@ -547,6 +532,7 @@ export class Lexer {
         if (singleCharCode !== false) {
           if (nextCharCode === singleCharCode) {
             // single character string
+            imageLength = 1;
             matchedImage = currPattern as string;
           }
         } else if (currConfig.isCustom === true) {
@@ -558,6 +544,7 @@ export class Lexer {
           );
           if (match !== null) {
             matchedImage = match[0];
+            imageLength = matchedImage.length;
             if ((match as CustomPatternMatcherReturn).payload !== undefined) {
               payload = (match as CustomPatternMatcherReturn).payload;
             }
@@ -565,17 +552,17 @@ export class Lexer {
             matchedImage = null;
           }
         } else {
-          this.updateLastIndex(currPattern as RegExp, offset);
-          matchedImage = this.match(currPattern as RegExp, text, offset);
+          (currPattern as RegExp).lastIndex = offset;
+          imageLength = this.matchLength(currPattern as RegExp, text, offset);
         }
 
-        if (matchedImage !== null) {
+        // longer alts handling
+        if (imageLength !== -1) {
           // even though this pattern matched we must try a another longer alternative.
           // this can be used to prioritize keywords over identifiers
           longerAlt = currConfig.longerAlt;
           if (longerAlt !== undefined) {
-            // TODO: micro optimize, avoid extra prop access
-            // by saving/linking longerAlt on the original config?
+            matchedImage = text.substring(offset, offset + imageLength);
             const longerAltLength = longerAlt.length;
             for (k = 0; k < longerAltLength; k++) {
               const longerAltConfig = patternIdxToConfig[longerAlt[k]];
@@ -602,7 +589,7 @@ export class Lexer {
                   matchAltImage = null;
                 }
               } else {
-                this.updateLastIndex(longerAltPattern as RegExp, offset);
+                (longerAltPattern as RegExp).lastIndex = offset;
                 matchAltImage = this.match(
                   longerAltPattern as RegExp,
                   text,
@@ -612,6 +599,7 @@ export class Lexer {
 
               if (matchAltImage && matchAltImage.length > matchedImage.length) {
                 matchedImage = matchAltImage;
+                imageLength = matchAltImage.length;
                 payload = altPayload;
                 currConfig = longerAltConfig;
                 // Exit the loop early after matching one of the longer alternatives
@@ -625,13 +613,14 @@ export class Lexer {
       }
 
       // successful match
-      if (matchedImage !== null) {
-        imageLength = matchedImage.length;
+      if (imageLength !== -1) {
         group = currConfig.group;
         if (group !== undefined) {
+          matchedImage =
+            matchedImage !== null
+              ? matchedImage // for custom Tokens we will already have the `matchedImage`
+              : text.substring(offset, offset + imageLength);
           tokType = currConfig.tokenTypeIdx;
-          // TODO: "offset + imageLength" and the new column may be computed twice in case of "full" location information inside
-          // createFullToken method
           newToken = this.createTokenInstance(
             matchedImage,
             offset,
@@ -644,7 +633,6 @@ export class Lexer {
 
           this.handlePayload(newToken, payload);
 
-          // TODO: optimize NOOP in case there are no special groups?
           if (group === false) {
             matchedTokensIndex = this.addToken(
               matchedTokens,
@@ -655,18 +643,19 @@ export class Lexer {
             groups[group].push(newToken);
           }
         }
-        text = this.chopInput(text, imageLength);
-        offset = offset + imageLength;
 
-        // TODO: with newlines the column may be assigned twice
-        column = this.computeNewColumn(column!, imageLength);
-
+        // line terminator handling
         if (trackLines === true && currConfig.canLineTerminator === true) {
           let numOfLTsInMatch = 0;
           let foundTerminator;
           let lastLTEndOffset: number;
           lineTerminatorPattern.lastIndex = 0;
           do {
+            // only for skipped tokens the matchedImage may be null at this point
+            matchedImage =
+              matchedImage !== null
+                ? matchedImage
+                : text.substring(offset, offset + imageLength);
             foundTerminator = lineTerminatorPattern.test(matchedImage);
             if (foundTerminator === true) {
               lastLTEndOffset = lineTerminatorPattern.lastIndex - 1;
@@ -686,8 +675,15 @@ export class Lexer {
               column,
               imageLength,
             );
+          } else {
+            column = this.computeNewColumn(column!, imageLength);
           }
+        } else {
+          column = this.computeNewColumn(column!, imageLength);
         }
+
+        offset = offset + imageLength;
+
         // will be NOOP if no modes present
         this.handleModes(currConfig, pop_mode, push_mode, newToken!);
       } else {
@@ -698,8 +694,6 @@ export class Lexer {
         let foundResyncPoint = recoveryEnabled === false;
 
         while (foundResyncPoint === false && offset < orgLength) {
-          // Identity Func (when sticky flag is enabled)
-          text = this.chopInput(text, 1);
           offset++;
           for (j = 0; j < currModePatternsLength; j++) {
             const currConfig = patternIdxToConfig[j];
@@ -721,7 +715,7 @@ export class Lexer {
                   groups,
                 ) !== null;
             } else {
-              this.updateLastIndex(currPattern as RegExp, offset);
+              (currPattern as RegExp).lastIndex = offset;
               foundResyncPoint = (currPattern as RegExp).exec(text) !== null;
             }
 
@@ -787,14 +781,6 @@ export class Lexer {
     } else if (config.push !== undefined) {
       push_mode.call(this, config.push);
     }
-  }
-
-  private chopInput(text: string, length: number): string {
-    return text.substring(length);
-  }
-
-  private updateLastIndex(regExp: RegExp, newLastIndex: number): void {
-    regExp.lastIndex = newLastIndex;
   }
 
   // TODO: decrease this under 600 characters? inspect stripping comments option in TSC compiler
@@ -923,18 +909,7 @@ export class Lexer {
     }
   }
 
-  // place holder to be replaced with chosen alternative at runtime
-  private match!: (
-    pattern: RegExp,
-    text: string,
-    offset: number,
-  ) => string | null;
-
-  private matchWithTest(
-    pattern: RegExp,
-    text: string,
-    offset: number,
-  ): string | null {
+  private match(pattern: RegExp, text: string, offset: number): string | null {
     const found = pattern.test(text);
     if (found === true) {
       return text.substring(offset, pattern.lastIndex);
@@ -942,9 +917,16 @@ export class Lexer {
     return null;
   }
 
-  private matchWithExec(pattern: RegExp, text: string): string | null {
-    const regExpArray = pattern.exec(text);
-    return regExpArray !== null ? regExpArray[0] : null;
+  private matchLength(
+    pattern: RegExp,
+    text: string,
+    offset: number,
+  ): number | -1 {
+    const found = pattern.test(text);
+    if (found === true) {
+      return pattern.lastIndex - offset;
+    }
+    return -1;
   }
 
   // Duplicated from the parser's perf trace trait to allow future extraction
