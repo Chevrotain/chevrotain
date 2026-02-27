@@ -533,7 +533,7 @@ export class Lexer {
           if (nextCharCode === singleCharCode) {
             // single character string
             imageLength = 1;
-            // matchedImage = currPattern as string;
+            matchedImage = currPattern as string;
           }
         } else if (currConfig.isCustom === true) {
           match = (currPattern as IRegExpExec).exec(
