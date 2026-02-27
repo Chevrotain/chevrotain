@@ -8,7 +8,7 @@
 
 In this tutorial we will implement a Parser for a simple SQL Select statement language
 introduced in the [previous](./step1_lexing.md) tutorial step.
-Note that this parse will only **recognize** the language and not
+Note that this parser will only **recognize** the language and not
 output any data structure (yet).
 
 The grammar for our language:
@@ -41,12 +41,12 @@ The grammar is defined using the [parsing DSL](https://chevrotain.io/documentati
 
 - [CONSUME](https://chevrotain.io/documentation/11_1_1/classes/CstParser.html#CONSUME) - 'eat' a Token.
 - [SUBRULE](https://chevrotain.io/documentation/11_1_1/classes/CstParser.html#SUBRULE) - reference to another rule.
-- [OR](https://chevrotain.io/documentation/11_1_1/classes/CstParser.html#OR) - Alternation
-- [OPTION](https://chevrotain.io/documentation/11_1_1/classes/CstParser.html#OPTION) - optional production.
-- [MANY](https://chevrotain.io/documentation/11_1_1/classes/CstParser.html#MANY) - repetition zero or more.
-- [AT_LEAST_ONE](https://chevrotain.io/documentation/11_1_1/classes/CstParser.html#AT_LEAST_ONE) - repetition one or more.
-- [MANY_SEP](https://chevrotain.io/documentation/11_1_1/classes/CstParser.html#MANY_SEP) - repetition (zero or more) with a separator between any two items
-- [AT_LEAST_ONE_SEP](https://chevrotain.io/documentation/11_1_1/classes/CstParser.html#AT_LEAST_ONE_SEP) - repetition (one or more) with a separator between any two items
+- [OR](https://chevrotain.io/documentation/11_1_1/classes/CstParser.html#OR) - Alternation.
+- [OPTION](https://chevrotain.io/documentation/11_1_1/classes/CstParser.html#OPTION) - Optional production.
+- [MANY](https://chevrotain.io/documentation/11_1_1/classes/CstParser.html#MANY) - Repetition zero or more.
+- [AT_LEAST_ONE](https://chevrotain.io/documentation/11_1_1/classes/CstParser.html#AT_LEAST_ONE) - Repetition one or more.
+- [MANY_SEP](https://chevrotain.io/documentation/11_1_1/classes/CstParser.html#MANY_SEP) - Repetition (zero or more) with a separator between any two items.
+- [AT_LEAST_ONE_SEP](https://chevrotain.io/documentation/11_1_1/classes/CstParser.html#AT_LEAST_ONE_SEP) - Repetition (one or more) with a separator between any two items.
 
 ## First Rule
 
@@ -66,7 +66,7 @@ $.RULE("selectStatement", () => {
 });
 ```
 
-Fairly straight forward translation:
+Fairly straightforward translation:
 
 - Non-Terminals --> SUBRULE
 - "?" --> OPTION
@@ -74,7 +74,7 @@ Fairly straight forward translation:
 ## Structure
 
 - What is 'this' in this context?
-- where do we write the grammar rules?
+- Where do we write the grammar rules?
 
 Each grammar rule is a property of a class that extends chevrotain.CstParser.
 
@@ -114,15 +114,15 @@ class SelectParser extends CstParser {
 
 Important to note that:
 
-- The **super** invocation has an array of the Tokens as the second parameter.
-  This is the same array we used to define the Lexer, In this context it is used to define the Parser's **vocabulary**.
+- The **super** invocation has an array of the Tokens as the parameter.
+  This is the same array we used to define the Lexer. In this context it is used to define the Parser's **vocabulary**.
 - The method **performSelfAnalysis** must be invoked at the end of the constructor.
   This is where much of the 'secret sauce' happens, including creating the inner grammar representation
   and performing static checks on the grammar.
 
 ## More Rules
 
-Let's look at two more grammar rule, this time with repetition and alternation.
+Let's look at two more grammar rules, this time with repetition and alternation.
 
 ```javascript
 $.RULE("selectClause", () => {
@@ -158,7 +158,7 @@ point in the grammar**.
 //   : "SELECT" IDENTIFIER ("," IDENTIFIER)*;
 $.RULE("selectClause", () => {
   $.CONSUME(Select);
-  // Can be debugged directly! no code generation.
+  // Can be debugged directly! No code generation.
   debugger;
   $.AT_LEAST_ONE_SEP({
     SEP: Comma,
@@ -214,8 +214,8 @@ It is aware of:
 Thus, the parser can dynamically create (and cache) the lookahead function to choose between the two alternatives.
 
 The same applies for any grammar rule where the parser has a choice,
-and even in somewhere there is no choice as that same in memory representation of the grammar
-can be used for error messages and fault tolerance as well as deciding which path to take.
+and even where there is no choice, as that same in-memory representation of the grammar
+can be used for error messages and fault tolerance, as well as deciding which path to take.
 
 ## Complete Parser
 
@@ -326,4 +326,4 @@ parseInput(inputText);
 ```
 
 - Note that any of the grammar rules can be invoked as the starting rule.
-  There is no 'special' top level entry rule.
+  There is no 'special' top-level entry rule.

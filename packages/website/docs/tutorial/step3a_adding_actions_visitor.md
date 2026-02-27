@@ -6,16 +6,16 @@
 
 In the [previous](./step2_parsing.md) tutorial step
 we have implemented a parser for a "mini" SQL Select grammar. The current problem is that our parser only
-validates the input conforms to the grammar, in other words it is just a recognizer.
-But in most real world use cases the parser will **also** have to output some result/data structure/value.
+validates that the input conforms to the grammar -- in other words, it is just a recognizer.
+But in most real-world use cases the parser will **also** have to output some result/data structure/value.
 
 This can be accomplished using a CST (Concrete Syntax Tree) Visitor defined **outside** our grammar:
 
-- See in depth documentation of Chevrotain's [CST capabilities](https://chevrotain.io/docs/guide/concrete_syntax_tree.html)
+- See the in-depth documentation of Chevrotain's [CST capabilities](https://chevrotain.io/docs/guide/concrete_syntax_tree.html)
 
 ## Enabling CST
 
-This feature is automatically enabled when a Parser extends the Chevrotain [CstParser](https://chevrotain.io/documentation/11_1_1/classes/CstParser.html) class
+This feature is automatically enabled when a Parser extends the Chevrotain [CstParser](https://chevrotain.io/documentation/11_1_1/classes/CstParser.html) class.
 
 The invocation of any grammar rule will now automatically create a CST.
 
@@ -31,7 +31,7 @@ function parseInput(text) {
 
 ## The CST Visitor
 
-Creating a CST is not enough, we also need to traverse this structure
+Creating a CST is not enough; we also need to traverse this structure
 and execute our actions (semantics).
 
 Each Chevrotain parser **instance** exposes two BaseVisitor classes
@@ -43,7 +43,7 @@ const parserInstance = new SelectParser();
 
 const BaseSQLVisitor = parserInstance.getBaseCstVisitorConstructor();
 
-// This BaseVisitor include default visit methods that simply traverse the CST.
+// This BaseVisitor includes default visit methods that simply traverse the CST.
 const BaseSQLVisitorWithDefaults =
   parserInstance.getBaseCstVisitorConstructorWithDefaults();
 
@@ -71,7 +71,7 @@ const myVisitorInstance = new myCustomVisitor();
 const myVisitorInstanceWithDefaults = new myCustomVisitorWithDefaults();
 ```
 
-In our example we will use the BaseVisitor constructor (**without** defaults )
+In our example we will use the BaseVisitor constructor (**without** defaults).
 
 ## Visitor Methods
 
@@ -86,7 +86,7 @@ selectClause:
   "SELECT" Identifier ("," Identifier)*;
 ```
 
-Lets create a visitor method for the selectClause rule.
+Let's create a visitor method for the selectClause rule.
 
 ```javascript
 class SQLToAstVisitor extends BaseSQLVisitor {
@@ -97,8 +97,8 @@ class SQLToAstVisitor extends BaseSQLVisitor {
 
   // The Ctx argument is the current CSTNode's children.
   selectClause(ctx) {
-    // Each Terminal or Non-Terminal in a grammar rule are collected into
-    // an array with the same name(key) in the ctx object.
+    // Each Terminal or Non-Terminal in a grammar rule is collected into
+    // an array with the same name (key) in the ctx object.
     let columns = ctx.Identifier.map((identToken) => identToken.image);
 
     return {
@@ -109,8 +109,8 @@ class SQLToAstVisitor extends BaseSQLVisitor {
 }
 ```
 
-So far pretty simple, now lets add another visit method for "selectStatement".
-First lets recall it's grammar.
+So far pretty simple. Now let's add another visit method for "selectStatement".
+First, let's recall its grammar.
 
 ```antlr
 selectStatement
@@ -132,7 +132,7 @@ class SQLToAstVisitor extends BaseSQLVisitor {
   }
 
   selectStatement(ctx) {
-    // "this.visit" can be used to visit none-terminals and will invoke the correct visit method for the CstNode passed.
+    // "this.visit" can be used to visit non-terminals and will invoke the correct visit method for the CstNode passed.
     let select = this.visit(ctx.selectClause);
 
     //  "this.visit" can work on either a CstNode or an Array of CstNodes.
@@ -174,7 +174,7 @@ relationalOperator
    : ">" | "<"
 ```
 
-lets implement those as well.
+Let's implement those as well.
 
 ```javascript
 class SQLToAstVisitor extends BaseSQLVisitor {
