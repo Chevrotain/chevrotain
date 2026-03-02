@@ -263,12 +263,10 @@ export class TreeBuilder {
   }
 
   getPreviousExplicitRuleShortName(this: MixedInParser): number {
-    const ruleStack = this.RULE_STACK;
-    return ruleStack[ruleStack.length - 2];
+    return this.RULE_STACK[this.RULE_STACK_IDX - 1];
   }
 
   getLastExplicitRuleOccurrenceIndex(this: MixedInParser): number {
-    const occurrenceStack = this.RULE_OCCURRENCE_STACK;
-    return occurrenceStack[occurrenceStack.length - 1];
+    return this.RULE_OCCURRENCE_STACK[this.RULE_OCCURRENCE_STACK_IDX];
   }
 }

@@ -8,7 +8,6 @@ import {
   IFirstAfterRepetition,
 } from "../../grammar/interpreter.js";
 import {
-  clone,
   dropRight,
   find,
   flatten,
@@ -301,7 +300,7 @@ export class Recoverable {
 
   getCurrFollowKey(this: MixedInParser): IFollowKey {
     // the length is at least one as we always add the ruleName to the stack before invoking the rule.
-    if (this.RULE_STACK.length === 1) {
+    if (this.RULE_STACK_IDX === 0) {
       return EOF_FOLLOW_KEY;
     }
     const currRuleShortName = this.currRuleShortName;
@@ -318,17 +317,21 @@ export class Recoverable {
   buildFullFollowKeyStack(this: MixedInParser): IFollowKey[] {
     const explicitRuleStack = this.RULE_STACK;
     const explicitOccurrenceStack = this.RULE_OCCURRENCE_STACK;
+    const len = this.RULE_STACK_IDX + 1;
 
-    return map(explicitRuleStack, (ruleName, idx) => {
+    const result: IFollowKey[] = new Array(len);
+    for (let idx = 0; idx < len; idx++) {
       if (idx === 0) {
-        return EOF_FOLLOW_KEY;
+        result[idx] = EOF_FOLLOW_KEY;
+      } else {
+        result[idx] = {
+          ruleName: this.shortRuleNameToFullName(explicitRuleStack[idx]),
+          idxInCallingRule: explicitOccurrenceStack[idx],
+          inRule: this.shortRuleNameToFullName(explicitRuleStack[idx - 1]),
+        };
       }
-      return {
-        ruleName: this.shortRuleNameToFullName(ruleName),
-        idxInCallingRule: explicitOccurrenceStack[idx],
-        inRule: this.shortRuleNameToFullName(explicitRuleStack[idx - 1]),
-      };
-    });
+    }
+    return result;
   }
 
   flattenFollowSet(this: MixedInParser): TokenType[] {
@@ -396,7 +399,10 @@ export class Recoverable {
     tokIdxInRule: number,
   ): ITokenGrammarPath {
     const pathRuleStack: string[] = this.getHumanReadableRuleStack();
-    const pathOccurrenceStack: number[] = clone(this.RULE_OCCURRENCE_STACK);
+    const pathOccurrenceStack: number[] = this.RULE_OCCURRENCE_STACK.slice(
+      0,
+      this.RULE_OCCURRENCE_STACK_IDX + 1,
+    );
     const grammarPath: any = {
       ruleStack: pathRuleStack,
       occurrenceStack: pathOccurrenceStack,
@@ -407,9 +413,12 @@ export class Recoverable {
     return grammarPath;
   }
   getHumanReadableRuleStack(this: MixedInParser): string[] {
-    return map(this.RULE_STACK, (currShortName) =>
-      this.shortRuleNameToFullName(currShortName),
-    );
+    const len = this.RULE_STACK_IDX + 1;
+    const result: string[] = new Array(len);
+    for (let i = 0; i < len; i++) {
+      result[i] = this.shortRuleNameToFullName(this.RULE_STACK[i]);
+    }
+    return result;
   }
 }
 
@@ -441,7 +450,7 @@ export function attemptInRepetitionRecovery(
   // special edge case of a TOP most repetition after which the input should END.
   // this will force an attempt for inRule recovery in that scenario.
   if (
-    this.RULE_STACK.length === 1 &&
+    this.RULE_STACK_IDX === 0 &&
     isEndOfRule &&
     expectTokAfterLastMatch === undefined
   ) {

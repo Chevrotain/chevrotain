@@ -78,6 +78,11 @@ export class RecognizerEngine {
   className: string;
   RULE_STACK: number[];
   RULE_OCCURRENCE_STACK: number[];
+  // Depth counters for the pre-allocated state stacks.
+  // Using index-based access (arr[++idx] = val / idx--) instead of push/pop
+  // avoids method-call overhead on every rule entry/exit.
+  RULE_STACK_IDX: number;
+  RULE_OCCURRENCE_STACK_IDX: number;
   definedRulesNames: string[];
   tokensMap: { [fqn: string]: TokenType };
   gastProductionsCache: Record<string, Rule>;
@@ -108,7 +113,9 @@ export class RecognizerEngine {
     this.tokensMap = {};
     this.isBackTrackingStack = [];
     this.RULE_STACK = [];
+    this.RULE_STACK_IDX = -1;
     this.RULE_OCCURRENCE_STACK = [];
+    this.RULE_OCCURRENCE_STACK_IDX = -1;
     this.gastProductionsCache = {};
 
     if (has(config, "serializedGrammar")) {
@@ -285,7 +292,7 @@ export class RecognizerEngine {
     resyncEnabledConfig: boolean,
     recoveryValueFunc: Function,
   ): unknown {
-    const isFirstInvokedRule = this.RULE_STACK.length === 1;
+    const isFirstInvokedRule = this.RULE_STACK_IDX === 0;
     // note the reSync is always enabled for the first rule invocation, because we must always be able to
     // reSync with EOF and just output some INVALID ParseTree
     // during backtracking reSync recovery is disabled, otherwise we can't be certain the backtracking
@@ -683,15 +690,14 @@ export class RecognizerEngine {
   }
 
   ruleFinallyStateUpdate(this: MixedInParser): void {
-    this.RULE_STACK.pop();
-    this.RULE_OCCURRENCE_STACK.pop();
+    this.RULE_STACK_IDX--;
+    this.RULE_OCCURRENCE_STACK_IDX--;
 
     // Restore the cached short name to the parent rule.
     // When the stack is empty (top-level rule exiting), the stale value
     // is harmless — no DSL methods will be called before the next ruleInvocationStateUpdate.
-    const ruleStack = this.RULE_STACK;
-    if (ruleStack.length > 0) {
-      this.currRuleShortName = ruleStack[ruleStack.length - 1];
+    if (this.RULE_STACK_IDX >= 0) {
+      this.currRuleShortName = this.RULE_STACK[this.RULE_STACK_IDX];
     }
 
     // NOOP when cst is disabled
@@ -831,7 +837,8 @@ export class RecognizerEngine {
   saveRecogState(this: MixedInParser): IParserState {
     // errors is a getter which will clone the errors array
     const savedErrors = this.errors;
-    const savedRuleStack = clone(this.RULE_STACK);
+    // Slice only the active portion of the pre-allocated stack
+    const savedRuleStack = this.RULE_STACK.slice(0, this.RULE_STACK_IDX + 1);
     return {
       errors: savedErrors,
       lexerState: this.exportLexerState(),
@@ -843,11 +850,15 @@ export class RecognizerEngine {
   reloadRecogState(this: MixedInParser, newState: IParserState) {
     this.errors = newState.errors;
     this.importLexerState(newState.lexerState);
-    this.RULE_STACK = newState.RULE_STACK;
+    // Copy saved stack back into the pre-allocated array and restore the index
+    const saved = newState.RULE_STACK;
+    for (let i = 0; i < saved.length; i++) {
+      this.RULE_STACK[i] = saved[i];
+    }
+    this.RULE_STACK_IDX = saved.length - 1;
     // Restore cached short name from the restored stack
-    const ruleStack = this.RULE_STACK;
-    if (ruleStack.length > 0) {
-      this.currRuleShortName = ruleStack[ruleStack.length - 1];
+    if (this.RULE_STACK_IDX >= 0) {
+      this.currRuleShortName = this.RULE_STACK[this.RULE_STACK_IDX];
     }
   }
 
@@ -857,8 +868,9 @@ export class RecognizerEngine {
     fullName: string,
     idxInCallingRule: number,
   ): void {
-    this.RULE_OCCURRENCE_STACK.push(idxInCallingRule);
-    this.RULE_STACK.push(shortName);
+    this.RULE_OCCURRENCE_STACK[++this.RULE_OCCURRENCE_STACK_IDX] =
+      idxInCallingRule;
+    this.RULE_STACK[++this.RULE_STACK_IDX] = shortName;
     this.currRuleShortName = shortName;
     // NOOP when cst is disabled
     this.cstInvocationStateUpdate(fullName);
@@ -887,10 +899,12 @@ export class RecognizerEngine {
     this.currRuleShortName = 0;
     this.isBackTrackingStack = [];
     this.errors = [];
-    this.RULE_STACK = [];
+    // Reset depth counters but keep arrays allocated to avoid re-allocation.
+    // Stale number values in unused slots are harmless.
+    this.RULE_STACK_IDX = -1;
+    this.RULE_OCCURRENCE_STACK_IDX = -1;
     // TODO: extract a specific reset for TreeBuilder trait
     this.CST_STACK = [];
-    this.RULE_OCCURRENCE_STACK = [];
   }
 
   /**

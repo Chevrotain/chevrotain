@@ -38,7 +38,10 @@ export class ErrorHandler {
     if (isRecognitionException(error)) {
       error.context = {
         ruleStack: this.getHumanReadableRuleStack(),
-        ruleOccurrenceStack: clone(this.RULE_OCCURRENCE_STACK),
+        ruleOccurrenceStack: this.RULE_OCCURRENCE_STACK.slice(
+          0,
+          this.RULE_OCCURRENCE_STACK_IDX + 1,
+        ),
       };
       this._errors.push(error);
       return error;

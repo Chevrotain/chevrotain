@@ -534,3 +534,25 @@ Tested by commenting out the call to `attemptInRepetitionRecovery` in `manyInter
 5-8% parsing (only) performance boost in combination with `LA_FAST()` method
 and `onBeforeParse` and `onAfterParse` to move redundant input checks to run only ONCE
 per parsing flow.
+
+#### 3. Cache Current Rule Short Name Instead of Array Lookups
+
+Added 3-6% perf boost on top of #2.
+
+#### 4. Cache Current CST Node to Avoid `CST_STACK[length-1]`
+
+- TODO: evaluate with CST building enabled.
+
+#### 5. Remove `try/catch` from `consumeInternal`/`subruleInternal` When Recovery Is Disabled
+
+Does not seem to have a measurable performance impact.
+It might speed up (only) CSS parser flow by ~1%, but not other benchmark grammars.
+So its probably not worth it.
+
+#### 6. Pre-Initialize CST `children` With Known Keys Per Rule
+
+- TODO: evaluate with CST building enabled.
+
+#### 7. Use Pre-Allocated Arrays With Depth Counter for State Stacks
+
+as much as +4% boost, probably worth it and won't be a breaking change.
