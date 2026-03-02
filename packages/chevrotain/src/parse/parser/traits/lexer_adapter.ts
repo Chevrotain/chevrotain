@@ -43,7 +43,7 @@ export class LexerAdapter {
   SKIP_TOKEN(this: MixedInParser): IToken {
     if (this.currIdx <= this.tokVectorLength - 2) {
       this.consumeToken();
-      return this.LA(1);
+      return this.LA_FAST(1);
     } else {
       return END_OF_FILE;
     }

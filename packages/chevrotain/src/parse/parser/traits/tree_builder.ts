@@ -118,7 +118,7 @@ export class TreeBuilder {
       // To be the next Token's startOffset (for valid inputs).
       // For invalid inputs there won't be any CSTOutput so this potential
       // inaccuracy does not matter
-      startOffset: this.LA(1).startOffset,
+      startOffset: this.LA_FAST(1).startOffset,
       endOffset: NaN,
     };
   }
@@ -140,7 +140,7 @@ export class TreeBuilder {
      * @param cstNode
      */
   setInitialNodeLocationFullRegular(this: MixedInParser, cstNode: any): void {
-    const nextToken = this.LA(1);
+    const nextToken = this.LA_FAST(1);
     cstNode.location = {
       startOffset: nextToken.startOffset,
       startLine: nextToken.startLine,
@@ -167,6 +167,9 @@ export class TreeBuilder {
 
   cstPostRuleFull(this: MixedInParser, ruleCstNode: CstNode): void {
     // casts to `required<CstNodeLocation>` are safe because `cstPostRuleFull` should only be invoked when full location is enabled
+    // TODO(perf): can we replace this with LA_FAST?
+    //       edge case is the empty CstNode on first rule invocation.
+    //       perhaps create a test case to verify correctness of LA vs LA_FAST in this scenario?
     const prevToken = this.LA(0) as Required<CstNodeLocation>;
     const loc = ruleCstNode.location as Required<CstNodeLocation>;
 
@@ -186,6 +189,7 @@ export class TreeBuilder {
   }
 
   cstPostRuleOnlyOffset(this: MixedInParser, ruleCstNode: CstNode): void {
+    // TODO: can we replace this with LA_FAST? see comment in `cstPostRuleFull()`
     const prevToken = this.LA(0);
     // `location' is not null because `cstPostRuleOnlyOffset` will only be invoked when location tracking is enabled.
     const loc = ruleCstNode.location!;

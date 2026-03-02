@@ -33,6 +33,11 @@ class JsonParserWithComments extends JsonParser {
     return super.LA(howMuch);
   }
 
+  // ensure the optimized `LA()` method also performs the runtime skipping
+  LA_FAST(howMuch) {
+    return this.LA(howMuch);
+  }
+
   cstPostTerminal(key, consumedToken) {
     super.cstPostTerminal(key, consumedToken);
 

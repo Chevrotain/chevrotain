@@ -105,8 +105,8 @@ export class Recoverable {
     const resyncedTokens: IToken[] = [];
     let passedResyncPoint = false;
 
-    const nextTokenWithoutResync = this.LA(1);
-    let currToken = this.LA(1);
+    const nextTokenWithoutResync = this.LA_FAST(1);
+    let currToken = this.LA_FAST(1);
 
     const generateErrorMessage = () => {
       const previousToken = this.LA(0);
@@ -166,7 +166,7 @@ export class Recoverable {
     }
 
     // no need to recover, next token is what we expect...
-    if (this.tokenMatcher(this.LA(1), expectTokAfterLastMatch)) {
+    if (this.tokenMatcher(this.LA_FAST(1), expectTokAfterLastMatch)) {
       return false;
     }
 
@@ -246,7 +246,7 @@ export class Recoverable {
       return false;
     }
 
-    const mismatchedTok = this.LA(1);
+    const mismatchedTok = this.LA_FAST(1);
     const isMisMatchedTokInFollows =
       find(follows, (possibleFollowsTokType: TokenType) => {
         return this.tokenMatcher(mismatchedTok, possibleFollowsTokType);
@@ -264,6 +264,8 @@ export class Recoverable {
     }
 
     const isNextTokenWhatIsExpected = this.tokenMatcher(
+      // not using LA_FAST because LA(2) might be un-safe with maxLookahead=1
+      // in some edge cases (?)
       this.LA(2),
       expectedTokType,
     );
@@ -282,7 +284,7 @@ export class Recoverable {
   findReSyncTokenType(this: MixedInParser): TokenType {
     const allPossibleReSyncTokTypes = this.flattenFollowSet();
     // this loop will always terminate as EOF is always in the follow stack and also always (virtually) in the input
-    let nextToken = this.LA(1);
+    let nextToken = this.LA_FAST(1);
     let k = 2;
     while (true) {
       const foundMatch = find(allPossibleReSyncTokTypes, (resyncTokType) => {
@@ -365,7 +367,7 @@ export class Recoverable {
 
   reSyncTo(this: MixedInParser, tokType: TokenType): IToken[] {
     const resyncedTokens: IToken[] = [];
-    let nextTok = this.LA(1);
+    let nextTok = this.LA_FAST(1);
     while (this.tokenMatcher(nextTok, tokType) === false) {
       nextTok = this.SKIP_TOKEN();
       this.addToResyncTokens(nextTok, resyncedTokens);

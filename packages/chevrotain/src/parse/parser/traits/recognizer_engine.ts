@@ -466,11 +466,11 @@ export class RecognizerEngine {
       //  TODO: Optimization can move this function construction into "attemptInRepetitionRecovery"
       //  because it is only needed in error recovery scenarios.
       const separatorLookAheadFunc = () => {
-        return this.tokenMatcher(this.LA(1), separator);
+        return this.tokenMatcher(this.LA_FAST(1), separator);
       };
 
       // 2nd..nth iterations
-      while (this.tokenMatcher(this.LA(1), separator) === true) {
+      while (this.tokenMatcher(this.LA_FAST(1), separator) === true) {
         // note that this CONSUME will never enter recovery because
         // the separatorLookAheadFunc checks that the separator really does exist.
         this.CONSUME(separator);
@@ -582,10 +582,10 @@ export class RecognizerEngine {
       action.call(this);
 
       const separatorLookAheadFunc = () => {
-        return this.tokenMatcher(this.LA(1), separator);
+        return this.tokenMatcher(this.LA_FAST(1), separator);
       };
       // 2nd..nth iterations
-      while (this.tokenMatcher(this.LA(1), separator) === true) {
+      while (this.tokenMatcher(this.LA_FAST(1), separator) === true) {
         // note that this CONSUME will never enter recovery because
         // the separatorLookAheadFunc checks that the separator really does exist.
         this.CONSUME(separator);
@@ -737,7 +737,7 @@ export class RecognizerEngine {
   ): IToken {
     let consumedToken!: IToken;
     try {
-      const nextToken = this.LA(1);
+      const nextToken = this.LA_FAST(1);
       if (this.tokenMatcher(nextToken, tokType) === true) {
         this.consumeToken();
         consumedToken = nextToken;
@@ -752,6 +752,7 @@ export class RecognizerEngine {
       );
     }
 
+    // TODO: is it better to check the options inside cstPostTermianl (which may be noop)?
     this.cstPostTerminal(
       options !== undefined && options.LABEL !== undefined
         ? options.LABEL

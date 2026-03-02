@@ -21,6 +21,7 @@ import {
   ITokenConfig,
   TokenType,
 } from "@chevrotain/types";
+import { MixedInParser } from "../../src/parse/parser/traits/parser_traits";
 
 function defineRecognizerSpecs(
   contextName: string,
@@ -456,11 +457,15 @@ function defineRecognizerSpecs(
       });
 
       it("will not perform inRepetition recovery while in backtracking mode", () => {
-        const parser: any = new EmbeddedActionsParser([PlusTok], {});
-        parser.isBackTrackingStack.push(1);
-        expect(parser.shouldInRepetitionRecoveryBeTried(MinusTok, 1)).to.equal(
-          false,
-        );
+        const parser: MixedInParser = new EmbeddedActionsParser(
+          [PlusTok],
+          {},
+        ) as any;
+        parser.isBackTrackingStack.push(true);
+        parser.onBeforeParse("someRule");
+        expect(
+          parser.shouldInRepetitionRecoveryBeTried(MinusTok, 1, true),
+        ).to.equal(false);
       });
 
       it("can perform in-repetition recovery for MANY grammar rule", () => {
