@@ -178,9 +178,8 @@ export class LooksAhead {
     dslMethodIdx: number,
     occurrence: number,
   ): number {
-    const currRuleShortName: any = this.getLastExplicitRuleShortName();
     return getKeyForAutomaticLookahead(
-      currRuleShortName,
+      this.currRuleShortName,
       dslMethodIdx,
       occurrence,
     );

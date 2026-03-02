@@ -87,6 +87,9 @@ export class RecognizerEngine {
   ruleShortNameIdx: number;
   tokenMatcher: TokenMatcher;
   subruleIdx: number;
+  // Cached value of the current rule's short name to avoid repeated RULE_STACK[length-1] lookups.
+  // Updated on rule entry/exit and state reload.
+  currRuleShortName: number;
 
   initRecognizerEngine(
     tokenVocabulary: TokenVocabulary,
@@ -99,6 +102,7 @@ export class RecognizerEngine {
     this.ruleShortNameIdx = 256;
     this.tokenMatcher = tokenStructuredMatcherNoCategories;
     this.subruleIdx = 0;
+    this.currRuleShortName = 0;
 
     this.definedRulesNames = [];
     this.tokensMap = {};
@@ -682,6 +686,14 @@ export class RecognizerEngine {
     this.RULE_STACK.pop();
     this.RULE_OCCURRENCE_STACK.pop();
 
+    // Restore the cached short name to the parent rule.
+    // When the stack is empty (top-level rule exiting), the stale value
+    // is harmless — no DSL methods will be called before the next ruleInvocationStateUpdate.
+    const ruleStack = this.RULE_STACK;
+    if (ruleStack.length > 0) {
+      this.currRuleShortName = ruleStack[ruleStack.length - 1];
+    }
+
     // NOOP when cst is disabled
     this.cstFinallyStateUpdate();
   }
@@ -832,6 +844,11 @@ export class RecognizerEngine {
     this.errors = newState.errors;
     this.importLexerState(newState.lexerState);
     this.RULE_STACK = newState.RULE_STACK;
+    // Restore cached short name from the restored stack
+    const ruleStack = this.RULE_STACK;
+    if (ruleStack.length > 0) {
+      this.currRuleShortName = ruleStack[ruleStack.length - 1];
+    }
   }
 
   ruleInvocationStateUpdate(
@@ -842,6 +859,7 @@ export class RecognizerEngine {
   ): void {
     this.RULE_OCCURRENCE_STACK.push(idxInCallingRule);
     this.RULE_STACK.push(shortName);
+    this.currRuleShortName = shortName;
     // NOOP when cst is disabled
     this.cstInvocationStateUpdate(fullName);
   }
@@ -851,7 +869,7 @@ export class RecognizerEngine {
   }
 
   getCurrRuleFullName(this: MixedInParser): string {
-    const shortName = this.getLastExplicitRuleShortName();
+    const shortName = this.currRuleShortName;
     return this.shortRuleNameToFull[shortName];
   }
 
@@ -866,6 +884,7 @@ export class RecognizerEngine {
   public reset(this: MixedInParser): void {
     this.resetLexerState();
     this.subruleIdx = 0;
+    this.currRuleShortName = 0;
     this.isBackTrackingStack = [];
     this.errors = [];
     this.RULE_STACK = [];

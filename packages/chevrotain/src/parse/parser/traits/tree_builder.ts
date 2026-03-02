@@ -262,11 +262,6 @@ export class TreeBuilder {
     return <any>this.baseCstVisitorWithDefaultsConstructor;
   }
 
-  getLastExplicitRuleShortName(this: MixedInParser): number {
-    const ruleStack = this.RULE_STACK;
-    return ruleStack[ruleStack.length - 1];
-  }
-
   getPreviousExplicitRuleShortName(this: MixedInParser): number {
     const ruleStack = this.RULE_STACK;
     return ruleStack[ruleStack.length - 2];

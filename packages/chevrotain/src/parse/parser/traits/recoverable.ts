@@ -304,7 +304,7 @@ export class Recoverable {
     if (this.RULE_STACK.length === 1) {
       return EOF_FOLLOW_KEY;
     }
-    const currRuleShortName = this.getLastExplicitRuleShortName();
+    const currRuleShortName = this.currRuleShortName;
     const currRuleIdx = this.getLastExplicitRuleOccurrenceIndex();
     const prevRuleShortName = this.getPreviousExplicitRuleShortName();
 
