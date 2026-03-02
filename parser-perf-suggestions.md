@@ -531,21 +531,6 @@ Tested by commenting out the call to `attemptInRepetitionRecovery` in `manyInter
 
 ### 2. Sentinel EOF Tokens to Eliminate Bounds Checking in `LA()`
 
-- Status: 34 failing tests
-- 3% boost for JSON benchmark
-- But only if we also remove the negative lookahead condition
-- It might be possible to implement a separate LA_NEGATIVE() method to only handle this lookbehind condition from call sites where it matters.
-  - There does not seem to be any call sites that do LA(-1)
-  - Perhaps this is just a breaking API change rather than functional flow breaking?
-- Problem: Mutating the input array is a breaking change
-  - alternative of shallow copying they array is inefficient, and can reduce per
-  - Although in CSS benchmark it seems even with copy we get +6-7% boost for parser flow
-    - but that is with RedundantInputCheck disabled.
-
-#### Conclusion:
-
-Try to refactor the code to distunguish the top level rule without conditional.
-That way we can:
-
-1. remove redudant input check on every rule exit
-2. revert input token array mutation before exiting parsing flow.
+5-8% parsing (only) performance boost in combination with `LA_FAST()` method
+and `onBeforeParse` and `onAfterParse` to move redundant input checks to run only ONCE
+per parsing flow.
