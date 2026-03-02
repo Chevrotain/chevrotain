@@ -51,7 +51,12 @@ import {
   NextTerminalAfterManySepWalker,
   NextTerminalAfterManyWalker,
 } from "../../grammar/interpreter.js";
-import { DEFAULT_RULE_CONFIG, IParserState, TokenMatcher } from "../parser.js";
+import {
+  DEFAULT_RULE_CONFIG,
+  END_OF_FILE,
+  IParserState,
+  TokenMatcher,
+} from "../parser.js";
 import { IN_RULE_RECOVERY_EXCEPTION } from "./recoverable.js";
 import { EOF } from "../../../scan/tokens_public.js";
 import { MixedInParser } from "./parser_traits.js";
@@ -212,12 +217,12 @@ export class RecognizerEngine {
     this.shortRuleNameToFull[shortName] = ruleName;
     this.fullRuleNameToShort[ruleName] = shortName;
 
-    let invokeRuleWithTry: ParserMethod<ARGS, R>;
+    let coreRuleFunction: ParserMethod<ARGS, R>;
 
     // Micro optimization, only check the condition **once** on rule definition
     // instead of **every single** rule invocation.
     if (this.outputCst === true) {
-      invokeRuleWithTry = function invokeRuleWithTry(
+      coreRuleFunction = function invokeRuleWithTry(
         this: MixedInParser,
         ...args: ARGS
       ): R {
@@ -234,7 +239,7 @@ export class RecognizerEngine {
         }
       };
     } else {
-      invokeRuleWithTry = function invokeRuleWithTryCst(
+      coreRuleFunction = function invokeRuleWithTryCst(
         this: MixedInParser,
         ...args: ARGS
       ): R {
@@ -249,9 +254,22 @@ export class RecognizerEngine {
       };
     }
 
+    // wrapper to allow before/after parsing hooks
+    const rootRuleFunction: ParserMethod<ARGS, R> = function rootRule(
+      this: MixedInParser,
+      ...args: ARGS
+    ): R {
+      this.onBeforeParse(ruleName);
+      try {
+        return coreRuleFunction.apply(this, args);
+      } finally {
+        this.onAfterParse(ruleName);
+      }
+    };
+
     const wrappedGrammarRule: ParserMethodInternal<ARGS, R> = Object.assign(
-      invokeRuleWithTry as any,
-      { ruleName, originalGrammarAction: impl },
+      rootRuleFunction as any,
+      { ruleName, originalGrammarAction: impl, coreRule: coreRuleFunction },
     );
 
     return wrappedGrammarRule;
@@ -666,17 +684,6 @@ export class RecognizerEngine {
 
     // NOOP when cst is disabled
     this.cstFinallyStateUpdate();
-
-    if (this.RULE_STACK.length === 0 && this.isAtEndOfInput() === false) {
-      const firstRedundantTok = this.LA(1);
-      const errMsg = this.errorMessageProvider.buildNotAllInputParsedMessage({
-        firstRedundant: firstRedundantTok,
-        ruleName: this.getCurrRuleFullName(),
-      });
-      this.SAVE_ERROR(
-        new NotAllInputParsedException(errMsg, firstRedundantTok),
-      );
-    }
   }
 
   subruleInternal<ARGS extends unknown[], R>(
@@ -689,7 +696,8 @@ export class RecognizerEngine {
     try {
       const args = options !== undefined ? options.ARGS : undefined;
       this.subruleIdx = idx;
-      ruleResult = ruleToCall.apply(this, args);
+      // Use coreRule to bypass root-level hooks (onBeforeParse/onAfterParse)
+      ruleResult = ruleToCall.coreRule.apply(this, args);
       this.cstPostNonTerminal(
         ruleResult,
         options !== undefined && options.LABEL !== undefined
@@ -863,5 +871,60 @@ export class RecognizerEngine {
     // TODO: extract a specific reset for TreeBuilder trait
     this.CST_STACK = [];
     this.RULE_OCCURRENCE_STACK = [];
+  }
+
+  /**
+   * Hook called before the root-level parsing rule is invoked.
+   * This is only called when a rule is invoked directly by the consumer
+   * (e.g., `parser.json()`), not when invoked as a sub-rule via SUBRULE.
+   *
+   * Override this method to perform actions before parsing begins.
+   * The default implementation is a no-op.
+   *
+   * @param ruleName - The name of the root rule being invoked.
+   */
+  onBeforeParse(this: MixedInParser, ruleName: string): void {
+    // Pad with sentinels for bounds-free forward LA()
+    for (let i = 0; i < this.maxLookahead + 1; i++) {
+      this.tokVector.push(END_OF_FILE);
+    }
+    // TODO: separate handling for LA(0) (breaking?)
+    //       as this seem to caues performance regression
+    //       maybe because it makes the tokvector not appear as a regular (dense?) array
+    //       for V8
+    // this.tokVector[-1] = END_OF_FILE;
+    // toFastProperties(this);
+  }
+
+  /**
+   * Hook called after the root-level parsing rule has completed (or thrown).
+   * This is only called when a rule is invoked directly by the consumer
+   * (e.g., `parser.json()`), not when invoked as a sub-rule via SUBRULE.
+   *
+   * This hook is called in a `finally` block, so it executes regardless of
+   * whether parsing succeeded or threw an error.
+   *
+   * Override this method to perform actions after parsing completes.
+   * The default implementation is a no-op.
+   *
+   * @param ruleName - The name of the root rule that was invoked.
+   */
+  onAfterParse(this: MixedInParser, ruleName: string): void {
+    if (this.isAtEndOfInput() === false) {
+      const firstRedundantTok = this.LA(1);
+      const errMsg = this.errorMessageProvider.buildNotAllInputParsedMessage({
+        firstRedundant: firstRedundantTok,
+        ruleName: this.getCurrRuleFullName(),
+      });
+      this.SAVE_ERROR(
+        new NotAllInputParsedException(errMsg, firstRedundantTok),
+      );
+    }
+
+    // undo the padding of sentinels for bounds-free forward LA() in onBeforeParse
+    this.tokVector.splice(-this.maxLookahead);
+    while (this.tokVector.at(-1) === END_OF_FILE) {
+      this.tokVector.pop();
+    }
   }
 }

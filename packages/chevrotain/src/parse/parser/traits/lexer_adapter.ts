@@ -41,7 +41,7 @@ export class LexerAdapter {
 
   // skips a token and returns the next token
   SKIP_TOKEN(this: MixedInParser): IToken {
-    if (this.currIdx <= this.tokVector.length - 2) {
+    if (this.currIdx <= this.tokVectorLength - 2) {
       this.consumeToken();
       return this.LA(1);
     } else {
@@ -51,6 +51,15 @@ export class LexerAdapter {
 
   // Lexer (accessing Token vector) related methods which can be overridden to implement lazy lexers
   // or lexers dependent on parser context.
+
+  // Performance Optimized version of LA without bound checks
+  // note that token beyond the end of the token vector EOF Token will still be returned
+  // due to using sentinels at the end of the token vector. (for K=max lookahead)
+  LA_FAST(this: MixedInParser, howMuch: number): IToken {
+    const soughtIdx = this.currIdx + howMuch;
+    return this.tokVector[soughtIdx];
+  }
+
   LA(this: MixedInParser, howMuch: number): IToken {
     const soughtIdx = this.currIdx + howMuch;
     if (soughtIdx < 0 || this.tokVectorLength <= soughtIdx) {
@@ -77,7 +86,7 @@ export class LexerAdapter {
   }
 
   moveToTerminatedState(this: MixedInParser): void {
-    this.currIdx = this.tokVector.length - 1;
+    this.currIdx = this.tokVectorLength - 1;
   }
 
   getLexerPosition(this: MixedInParser): number {
