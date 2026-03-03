@@ -770,7 +770,6 @@ export class RecognizerEngine {
       );
     }
 
-    // TODO: is it better to check the options inside cstPostTermianl (which may be noop)?
     this.cstPostTerminal(
       options !== undefined && options.LABEL !== undefined
         ? options.LABEL
@@ -922,12 +921,6 @@ export class RecognizerEngine {
     for (let i = 0; i < this.maxLookahead + 1; i++) {
       this.tokVector.push(END_OF_FILE);
     }
-    // TODO: separate handling for LA(0) (breaking?)
-    //       as this seem to caues performance regression
-    //       maybe because it makes the tokvector not appear as a regular (dense?) array
-    //       for V8
-    // this.tokVector[-1] = END_OF_FILE;
-    // toFastProperties(this);
   }
 
   /**
@@ -956,7 +949,6 @@ export class RecognizerEngine {
     }
 
     // undo the padding of sentinels for bounds-free forward LA() in onBeforeParse
-    this.tokVector.splice(-this.maxLookahead);
     while (this.tokVector.at(-1) === END_OF_FILE) {
       this.tokVector.pop();
     }
