@@ -1,6 +1,6 @@
 {
   "name": "@chevrotain/gast",
-  "version": "11.1.2",
+  "version": "11.2.0",
   "description": "Grammar AST structure for Chevrotain Parsers",
   "keywords": [],
   "bugs": {
