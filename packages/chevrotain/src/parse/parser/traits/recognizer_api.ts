@@ -687,12 +687,15 @@ export class RecognizerApi {
     grammarRule: (...args: any[]) => T,
     args?: any[],
   ): () => boolean {
+    // Use coreRule to bypass root-level hooks (onBeforeParse/onAfterParse).
+    // Backtracking is speculative and should not trigger parse lifecycle hooks.
+    const ruleToCall = (grammarRule as any).coreRule ?? grammarRule;
     return function () {
       // save org state
       this.isBackTrackingStack.push(1);
       const orgState = this.saveRecogState();
       try {
-        grammarRule.apply(this, args);
+        ruleToCall.apply(this, args);
         // if no exception was thrown we have succeed parsing the rule.
         return true;
       } catch (e) {

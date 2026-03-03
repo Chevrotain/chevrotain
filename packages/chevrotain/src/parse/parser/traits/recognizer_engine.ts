@@ -51,7 +51,12 @@ import {
   NextTerminalAfterManySepWalker,
   NextTerminalAfterManyWalker,
 } from "../../grammar/interpreter.js";
-import { DEFAULT_RULE_CONFIG, IParserState, TokenMatcher } from "../parser.js";
+import {
+  DEFAULT_RULE_CONFIG,
+  END_OF_FILE,
+  IParserState,
+  TokenMatcher,
+} from "../parser.js";
 import { IN_RULE_RECOVERY_EXCEPTION } from "./recoverable.js";
 import { EOF } from "../../../scan/tokens_public.js";
 import { MixedInParser } from "./parser_traits.js";
@@ -73,6 +78,11 @@ export class RecognizerEngine {
   className: string;
   RULE_STACK: number[];
   RULE_OCCURRENCE_STACK: number[];
+  // Depth counters for the pre-allocated state stacks.
+  // Using index-based access (arr[++idx] = val / idx--) instead of push/pop
+  // avoids method-call overhead on every rule entry/exit.
+  RULE_STACK_IDX: number;
+  RULE_OCCURRENCE_STACK_IDX: number;
   definedRulesNames: string[];
   tokensMap: { [fqn: string]: TokenType };
   gastProductionsCache: Record<string, Rule>;
@@ -82,6 +92,9 @@ export class RecognizerEngine {
   ruleShortNameIdx: number;
   tokenMatcher: TokenMatcher;
   subruleIdx: number;
+  // Cached value of the current rule's short name to avoid repeated RULE_STACK[length-1] lookups.
+  // Updated on rule entry/exit and state reload.
+  currRuleShortName: number;
 
   initRecognizerEngine(
     tokenVocabulary: TokenVocabulary,
@@ -94,12 +107,15 @@ export class RecognizerEngine {
     this.ruleShortNameIdx = 256;
     this.tokenMatcher = tokenStructuredMatcherNoCategories;
     this.subruleIdx = 0;
+    this.currRuleShortName = 0;
 
     this.definedRulesNames = [];
     this.tokensMap = {};
     this.isBackTrackingStack = [];
     this.RULE_STACK = [];
+    this.RULE_STACK_IDX = -1;
     this.RULE_OCCURRENCE_STACK = [];
+    this.RULE_OCCURRENCE_STACK_IDX = -1;
     this.gastProductionsCache = {};
 
     if (has(config, "serializedGrammar")) {
@@ -212,12 +228,12 @@ export class RecognizerEngine {
     this.shortRuleNameToFull[shortName] = ruleName;
     this.fullRuleNameToShort[ruleName] = shortName;
 
-    let invokeRuleWithTry: ParserMethod<ARGS, R>;
+    let coreRuleFunction: ParserMethod<ARGS, R>;
 
     // Micro optimization, only check the condition **once** on rule definition
     // instead of **every single** rule invocation.
     if (this.outputCst === true) {
-      invokeRuleWithTry = function invokeRuleWithTry(
+      coreRuleFunction = function invokeRuleWithTry(
         this: MixedInParser,
         ...args: ARGS
       ): R {
@@ -234,7 +250,7 @@ export class RecognizerEngine {
         }
       };
     } else {
-      invokeRuleWithTry = function invokeRuleWithTryCst(
+      coreRuleFunction = function invokeRuleWithTryCst(
         this: MixedInParser,
         ...args: ARGS
       ): R {
@@ -249,9 +265,22 @@ export class RecognizerEngine {
       };
     }
 
+    // wrapper to allow before/after parsing hooks
+    const rootRuleFunction: ParserMethod<ARGS, R> = function rootRule(
+      this: MixedInParser,
+      ...args: ARGS
+    ): R {
+      this.onBeforeParse(ruleName);
+      try {
+        return coreRuleFunction.apply(this, args);
+      } finally {
+        this.onAfterParse(ruleName);
+      }
+    };
+
     const wrappedGrammarRule: ParserMethodInternal<ARGS, R> = Object.assign(
-      invokeRuleWithTry as any,
-      { ruleName, originalGrammarAction: impl },
+      rootRuleFunction as any,
+      { ruleName, originalGrammarAction: impl, coreRule: coreRuleFunction },
     );
 
     return wrappedGrammarRule;
@@ -263,7 +292,7 @@ export class RecognizerEngine {
     resyncEnabledConfig: boolean,
     recoveryValueFunc: Function,
   ): unknown {
-    const isFirstInvokedRule = this.RULE_STACK.length === 1;
+    const isFirstInvokedRule = this.RULE_STACK_IDX === 0;
     // note the reSync is always enabled for the first rule invocation, because we must always be able to
     // reSync with EOF and just output some INVALID ParseTree
     // during backtracking reSync recovery is disabled, otherwise we can't be certain the backtracking
@@ -448,11 +477,11 @@ export class RecognizerEngine {
       //  TODO: Optimization can move this function construction into "attemptInRepetitionRecovery"
       //  because it is only needed in error recovery scenarios.
       const separatorLookAheadFunc = () => {
-        return this.tokenMatcher(this.LA(1), separator);
+        return this.tokenMatcher(this.LA_FAST(1), separator);
       };
 
       // 2nd..nth iterations
-      while (this.tokenMatcher(this.LA(1), separator) === true) {
+      while (this.tokenMatcher(this.LA_FAST(1), separator) === true) {
         // note that this CONSUME will never enter recovery because
         // the separatorLookAheadFunc checks that the separator really does exist.
         this.CONSUME(separator);
@@ -564,10 +593,10 @@ export class RecognizerEngine {
       action.call(this);
 
       const separatorLookAheadFunc = () => {
-        return this.tokenMatcher(this.LA(1), separator);
+        return this.tokenMatcher(this.LA_FAST(1), separator);
       };
       // 2nd..nth iterations
-      while (this.tokenMatcher(this.LA(1), separator) === true) {
+      while (this.tokenMatcher(this.LA_FAST(1), separator) === true) {
         // note that this CONSUME will never enter recovery because
         // the separatorLookAheadFunc checks that the separator really does exist.
         this.CONSUME(separator);
@@ -661,22 +690,18 @@ export class RecognizerEngine {
   }
 
   ruleFinallyStateUpdate(this: MixedInParser): void {
-    this.RULE_STACK.pop();
-    this.RULE_OCCURRENCE_STACK.pop();
+    this.RULE_STACK_IDX--;
+    this.RULE_OCCURRENCE_STACK_IDX--;
+
+    // Restore the cached short name to the parent rule.
+    // When the stack is empty (top-level rule exiting), the stale value
+    // is harmless — no DSL methods will be called before the next ruleInvocationStateUpdate.
+    if (this.RULE_STACK_IDX >= 0) {
+      this.currRuleShortName = this.RULE_STACK[this.RULE_STACK_IDX];
+    }
 
     // NOOP when cst is disabled
     this.cstFinallyStateUpdate();
-
-    if (this.RULE_STACK.length === 0 && this.isAtEndOfInput() === false) {
-      const firstRedundantTok = this.LA(1);
-      const errMsg = this.errorMessageProvider.buildNotAllInputParsedMessage({
-        firstRedundant: firstRedundantTok,
-        ruleName: this.getCurrRuleFullName(),
-      });
-      this.SAVE_ERROR(
-        new NotAllInputParsedException(errMsg, firstRedundantTok),
-      );
-    }
   }
 
   subruleInternal<ARGS extends unknown[], R>(
@@ -689,7 +714,8 @@ export class RecognizerEngine {
     try {
       const args = options !== undefined ? options.ARGS : undefined;
       this.subruleIdx = idx;
-      ruleResult = ruleToCall.apply(this, args);
+      // Use coreRule to bypass root-level hooks (onBeforeParse/onAfterParse)
+      ruleResult = ruleToCall.coreRule.apply(this, args);
       this.cstPostNonTerminal(
         ruleResult,
         options !== undefined && options.LABEL !== undefined
@@ -729,7 +755,7 @@ export class RecognizerEngine {
   ): IToken {
     let consumedToken!: IToken;
     try {
-      const nextToken = this.LA(1);
+      const nextToken = this.LA_FAST(1);
       if (this.tokenMatcher(nextToken, tokType) === true) {
         this.consumeToken();
         consumedToken = nextToken;
@@ -810,7 +836,8 @@ export class RecognizerEngine {
   saveRecogState(this: MixedInParser): IParserState {
     // errors is a getter which will clone the errors array
     const savedErrors = this.errors;
-    const savedRuleStack = clone(this.RULE_STACK);
+    // Slice only the active portion of the pre-allocated stack
+    const savedRuleStack = this.RULE_STACK.slice(0, this.RULE_STACK_IDX + 1);
     return {
       errors: savedErrors,
       lexerState: this.exportLexerState(),
@@ -822,7 +849,16 @@ export class RecognizerEngine {
   reloadRecogState(this: MixedInParser, newState: IParserState) {
     this.errors = newState.errors;
     this.importLexerState(newState.lexerState);
-    this.RULE_STACK = newState.RULE_STACK;
+    // Copy saved stack back into the pre-allocated array and restore the index
+    const saved = newState.RULE_STACK;
+    for (let i = 0; i < saved.length; i++) {
+      this.RULE_STACK[i] = saved[i];
+    }
+    this.RULE_STACK_IDX = saved.length - 1;
+    // Restore cached short name from the restored stack
+    if (this.RULE_STACK_IDX >= 0) {
+      this.currRuleShortName = this.RULE_STACK[this.RULE_STACK_IDX];
+    }
   }
 
   ruleInvocationStateUpdate(
@@ -831,8 +867,10 @@ export class RecognizerEngine {
     fullName: string,
     idxInCallingRule: number,
   ): void {
-    this.RULE_OCCURRENCE_STACK.push(idxInCallingRule);
-    this.RULE_STACK.push(shortName);
+    this.RULE_OCCURRENCE_STACK[++this.RULE_OCCURRENCE_STACK_IDX] =
+      idxInCallingRule;
+    this.RULE_STACK[++this.RULE_STACK_IDX] = shortName;
+    this.currRuleShortName = shortName;
     // NOOP when cst is disabled
     this.cstInvocationStateUpdate(fullName);
   }
@@ -842,7 +880,7 @@ export class RecognizerEngine {
   }
 
   getCurrRuleFullName(this: MixedInParser): string {
-    const shortName = this.getLastExplicitRuleShortName();
+    const shortName = this.currRuleShortName;
     return this.shortRuleNameToFull[shortName];
   }
 
@@ -857,11 +895,62 @@ export class RecognizerEngine {
   public reset(this: MixedInParser): void {
     this.resetLexerState();
     this.subruleIdx = 0;
+    this.currRuleShortName = 0;
     this.isBackTrackingStack = [];
     this.errors = [];
-    this.RULE_STACK = [];
+    // Reset depth counters but keep arrays allocated to avoid re-allocation.
+    // Stale number values in unused slots are harmless.
+    this.RULE_STACK_IDX = -1;
+    this.RULE_OCCURRENCE_STACK_IDX = -1;
     // TODO: extract a specific reset for TreeBuilder trait
     this.CST_STACK = [];
-    this.RULE_OCCURRENCE_STACK = [];
+  }
+
+  /**
+   * Hook called before the root-level parsing rule is invoked.
+   * This is only called when a rule is invoked directly by the consumer
+   * (e.g., `parser.json()`), not when invoked as a sub-rule via SUBRULE.
+   *
+   * Override this method to perform actions before parsing begins.
+   * The default implementation is a no-op.
+   *
+   * @param ruleName - The name of the root rule being invoked.
+   */
+  onBeforeParse(this: MixedInParser, ruleName: string): void {
+    // Pad with sentinels for bounds-free forward LA()
+    for (let i = 0; i < this.maxLookahead + 1; i++) {
+      this.tokVector.push(END_OF_FILE);
+    }
+  }
+
+  /**
+   * Hook called after the root-level parsing rule has completed (or thrown).
+   * This is only called when a rule is invoked directly by the consumer
+   * (e.g., `parser.json()`), not when invoked as a sub-rule via SUBRULE.
+   *
+   * This hook is called in a `finally` block, so it executes regardless of
+   * whether parsing succeeded or threw an error.
+   *
+   * Override this method to perform actions after parsing completes.
+   * The default implementation is a no-op.
+   *
+   * @param ruleName - The name of the root rule that was invoked.
+   */
+  onAfterParse(this: MixedInParser, ruleName: string): void {
+    if (this.isAtEndOfInput() === false) {
+      const firstRedundantTok = this.LA(1);
+      const errMsg = this.errorMessageProvider.buildNotAllInputParsedMessage({
+        firstRedundant: firstRedundantTok,
+        ruleName: this.getCurrRuleFullName(),
+      });
+      this.SAVE_ERROR(
+        new NotAllInputParsedException(errMsg, firstRedundantTok),
+      );
+    }
+
+    // undo the padding of sentinels for bounds-free forward LA() in onBeforeParse
+    while (this.tokVector.at(-1) === END_OF_FILE) {
+      this.tokVector.pop();
+    }
   }
 }

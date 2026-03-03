@@ -199,7 +199,7 @@ export function buildAlternativesLookAheadFunc(
           const currPath = currAlt[j];
           const currPathLength = currPath.length;
           for (let i = 0; i < currPathLength; i++) {
-            const nextToken = this.LA(i + 1);
+            const nextToken = this.LA_FAST(i + 1);
             if (tokenMatcher(nextToken, currPath[i]) === false) {
               // mismatch in current path
               // try the next pth
@@ -245,7 +245,7 @@ export function buildAlternativesLookAheadFunc(
      * @returns {number} - The chosen alternative index
      */
     return function (this: BaseParser): number {
-      const nextToken = this.LA(1);
+      const nextToken = this.LA_FAST(1);
       return choiceToAlt[nextToken.tokenTypeIdx];
     };
   } else {
@@ -262,7 +262,7 @@ export function buildAlternativesLookAheadFunc(
           const currPath = currAlt[j];
           const currPathLength = currPath.length;
           for (let i = 0; i < currPathLength; i++) {
-            const nextToken = this.LA(i + 1);
+            const nextToken = this.LA_FAST(i + 1);
             if (tokenMatcher(nextToken, currPath[i]) === false) {
               // mismatch in current path
               // try the next pth
@@ -306,7 +306,7 @@ export function buildSingleAlternativeLookaheadFunction(
       const expectedTokenUniqueKey = (<any>expectedTokenType).tokenTypeIdx;
 
       return function (this: BaseParser): boolean {
-        return this.LA(1).tokenTypeIdx === expectedTokenUniqueKey;
+        return this.LA_FAST(1).tokenTypeIdx === expectedTokenUniqueKey;
       };
     } else {
       const choiceToAlt = reduce(
@@ -322,7 +322,7 @@ export function buildSingleAlternativeLookaheadFunction(
       );
 
       return function (this: BaseParser): boolean {
-        const nextToken = this.LA(1);
+        const nextToken = this.LA_FAST(1);
         return choiceToAlt[nextToken.tokenTypeIdx] === true;
       };
     }
@@ -332,7 +332,7 @@ export function buildSingleAlternativeLookaheadFunction(
         const currPath = alt[j];
         const currPathLength = currPath.length;
         for (let i = 0; i < currPathLength; i++) {
-          const nextToken = this.LA(i + 1);
+          const nextToken = this.LA_FAST(i + 1);
           if (tokenMatcher(nextToken, currPath[i]) === false) {
             // mismatch in current path
             // try the next pth

@@ -257,6 +257,10 @@ context("lookahead specs", () => {
       LA(): IToken {
         return createRegularToken(ColonTok, ":");
       }
+
+      protected LA_FAST(howMuch: number): IToken {
+        return this.LA();
+      }
     }
     ColonParserMockVar = ColonParserMock;
 
@@ -267,6 +271,10 @@ context("lookahead specs", () => {
 
       LA(): IToken {
         return createRegularToken(IdentTok, "bamba");
+      }
+
+      protected LA_FAST(howMuch: number): IToken {
+        return this.LA();
       }
     }
     IdentParserMockVar = IdentParserMock;
@@ -279,6 +287,10 @@ context("lookahead specs", () => {
       LA(): IToken {
         return createRegularToken(CommaTok, ",");
       }
+
+      protected LA_FAST(howMuch: number): IToken {
+        return this.LA();
+      }
     }
     CommaParserMockVar = CommaParserMock;
 
@@ -290,6 +302,10 @@ context("lookahead specs", () => {
       LA(): IToken {
         return createRegularToken(EntityTok, ",");
       }
+
+      protected LA_FAST(howMuch: number): IToken {
+        return this.LA();
+      }
     }
     EntityParserMockVar = EntityParserMock;
 
@@ -300,6 +316,10 @@ context("lookahead specs", () => {
 
       LA(): IToken {
         return createRegularToken(KeyTok, ",");
+      }
+
+      protected LA_FAST(howMuch: number): IToken {
+        return this.LA();
       }
     }
     KeyParserMockVar = KeyParserMock;
@@ -370,6 +390,10 @@ context("lookahead specs", () => {
       const laMock = {
         LA(): IToken {
           return createRegularToken(C, "c");
+        },
+
+        LA_FAST(howMuch: number): IToken {
+          return this.LA();
         },
       };
 
@@ -458,6 +482,10 @@ context("lookahead specs", () => {
       const laMock = {
         LA(): IToken {
           return createRegularToken(C, "c");
+        },
+
+        LA_FAST(howMuch: number): IToken {
+          return this.LA();
         },
       };
 
@@ -744,6 +772,8 @@ context("lookahead specs", () => {
           this.input = map(inputConstructors, (currConst) =>
             createRegularToken(currConst),
           );
+          // simulation of sentinel EOF tokens.
+          this.input.push(END_OF_FILE);
         }
 
         LA(howMuch: number): IToken {
@@ -752,6 +782,10 @@ context("lookahead specs", () => {
           } else {
             return this.input[howMuch - 1];
           }
+        }
+
+        LA_FAST(howMuch: number): IToken {
+          return this.input[howMuch - 1];
         }
       }
 

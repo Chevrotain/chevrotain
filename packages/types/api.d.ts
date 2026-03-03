@@ -875,6 +875,15 @@ declare abstract class BaseParser {
    * https://chevrotain.io/docs/features/gates.html
    */
   protected LA(howMuch: number): IToken;
+
+  /**
+   * Variant of LA with limited bounds checking.
+   * Not safe for LA(0) at start of input
+   * Nor for LA(J) when: J >= (tokenVector + maxLookahead)
+   *
+   * See: {@link BaseParser.LA}
+   */
+  protected LA_FAST(howMuch: number): IToken;
 }
 
 /**

@@ -1,3 +1,12 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Performance
+
+- [perf: various parser flow perf improvements](https://github.com/Chevrotain/chevrotain/pull/2158)
+  - ~12-15% boost for pure parsing flows (excluding lexing).
+  - note this includes a soft breaking change, If your parser includes a custom [LA()](https://chevrotain.io/documentation/11_1_2/classes/BaseParser.html#la) method override with custom logic, you may now also need to override
+    the new LA_FAST() protected method. See: [Example](https://github.com/Chevrotain/chevrotain/pull/2158/changes#diff-01a912d685bb0c2843157b0a22b3ce0a0de0279c4c4d200af1f3e35e52db7e37)
+
 ## 11.1.2 (2-27-2026)
 
 #### Performance
