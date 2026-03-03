@@ -20,7 +20,48 @@ $.RULE("Value", (isConst) => {
 });
 ```
 
-Using the [Look Ahead](https://chevrotain.io/documentation/11_1_2/classes/CstParser.html#LA) method is often helpful with the use of Gates to determine if a path should be followed or not, for example:
+## Using the [Look Ahead](https://chevrotain.io/documentation/11_1_2/classes/CstParser.html#LA) method is often helpful with the use of Gates to determine if a path should be followed or not, for example:
+
+## Using the `LA(k)` Method with Gates
+
+The `LA(k)` (Look Ahead) method allows inspecting upcoming tokens
+without consuming them.
+
+- `LA(1)` → returns the next token
+- `LA(2)` → returns the second upcoming token.
+- and so on...
+
+This is especially useful when a parsing decision cannot be made
+based solely on the current token.
+
+### Example
+
+```javascript
+$.RULE("Statement", () => {
+  $.OR([
+    {
+      GATE: () => $.LA(1).tokenType === If,
+      ALT: () => {
+        $.CONSUME(If);
+      },
+    },
+    {
+      ALT: () => {
+        $.CONSUME(Identifier);
+      },
+    },
+  ]);
+});
+```
+
+In this example:
+
+- The parser checks the next token using `LA(1)`
+- If the next token is `If`, the first alternative is taken
+- Otherwise, the second alternative is chosen
+
+The key idea is that `LA()` does **not consume** the token —
+it only peeks ahead to help decide which parsing path to follow.
 
 ```javascript
 // SELECT LIMIT.ID FROM USER_LIMIT LIMIT
