@@ -123,7 +123,7 @@ pnpm run ci
 
 ### Architecture: Parser Traits/Mixins
 
-The Parser is decomposed into **10 trait classes** mixed together at runtime (see `packages/chevrotain/src/parse/parser/traits/README.md`):
+The Parser is decomposed into **9 trait classes** mixed together at runtime (see `packages/chevrotain/src/parse/parser/traits/README.md`):
 
 1. `ErrorHandler` — error handling
 2. `LexerAdapter` — bridges lexer and parser
@@ -132,9 +132,8 @@ The Parser is decomposed into **10 trait classes** mixed together at runtime (se
 5. `RecognizerEngine` — internal parsing engine
 6. `Recoverable` — fault tolerance/error recovery
 7. `TreeBuilder` — CST node construction
-8. `ContentAssist` — syntactic content assist
-9. `GastRecorder` — grammar recording phase
-10. `PerformanceTracer` — performance tracing
+8. `GastRecorder` — grammar recording phase
+9. `PerformanceTracer` — performance tracing
 
 The combined type is `MixedInParser`. The `applyMixins()` utility copies prototype methods onto the main parser class.
 

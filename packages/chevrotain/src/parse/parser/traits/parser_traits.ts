@@ -11,7 +11,6 @@ import {
   Parser as ParserConstructorImpel,
 } from "../parser.js";
 import * as defs from "@chevrotain/types";
-import { ContentAssist } from "./context_assist.js";
 import { GastRecorder } from "./gast_recorder.js";
 import { PerformanceTracer } from "./perf_tracer.js";
 
@@ -31,7 +30,6 @@ export type MixedInParser = ParserConstructorImpel &
   RecognizerEngine &
   Recoverable &
   TreeBuilder &
-  ContentAssist &
   GastRecorder &
   PerformanceTracer;
 

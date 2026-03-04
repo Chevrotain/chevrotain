@@ -1,5 +1,12 @@
 # Breaking Changes
 
+## 12.0.0
+
+- Removed Syntactic Content Assist feature and related APIs:
+  - [computeContentAssist()]
+  - [getNextPossibleTokenTypes()]
+  - See [related issue](https://github.com/Chevrotain/chevrotain/issues/1165) for more details.
+
 ## 11.0.0
 
 - Chevrotain is now **ESM only**.

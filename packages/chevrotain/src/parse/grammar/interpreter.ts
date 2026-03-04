@@ -25,11 +25,15 @@ import {
 import {
   IGrammarPath,
   IProduction,
-  ISyntacticContentAssistPath,
   IToken,
   ITokenGrammarPath,
   TokenType,
 } from "@chevrotain/types";
+
+export interface INextTokenPath extends IGrammarPath {
+  nextTokenType: TokenType;
+  nextTokenOccurrence: number;
+}
 
 export abstract class AbstractNextPossibleTokensWalker extends RestWalker {
   protected possibleTokTypes: TokenType[] = [];
@@ -371,7 +375,7 @@ export function nextPossibleTokensAfter(
   tokenVector: IToken[],
   tokMatcher: TokenMatcher,
   maxLookAhead: number,
-): ISyntacticContentAssistPath[] {
+): INextTokenPath[] {
   const EXIT_NON_TERMINAL: any = "EXIT_NONE_TERMINAL";
   // to avoid creating a new Array each time.
   const EXIT_NON_TERMINAL_ARR = [EXIT_NON_TERMINAL];
@@ -381,7 +385,7 @@ export function nextPossibleTokensAfter(
   const tokenVectorLength = tokenVector.length;
   const minimalAlternativesIndex = tokenVectorLength - maxLookAhead - 1;
 
-  const result: ISyntacticContentAssistPath[] = [];
+  const result: INextTokenPath[] = [];
 
   const possiblePaths: IPathToExamine[] = [];
   possiblePaths.push({
