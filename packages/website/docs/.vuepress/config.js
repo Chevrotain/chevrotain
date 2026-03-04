@@ -27,10 +27,12 @@ const slugMap = {
     "UNICODE_OPTIMIZE",
   "TokenType <...> is using a custom token pattern without providing <char_start_hint> parameter":
     "CUSTOM_OPTIMIZE",
-  "Why should I use a Parsing DSL instead of a Parser Generator?":
-    "VS_GENERATORS",
-  "What Differentiates Chevrotain from other JavaScript Parsing Solutions?":
-    "VS_OTHERS",
+  "How Does Chevrotain Compare to Other Parsing Tools?": "VS_OTHER_TOOLS",
+  "Grammar Definition: Code vs External Grammar Files": "GRAMMAR_DEFINITION",
+  "Parsing Algorithm and Grammar Class": "PARSING_ALGORITHM",
+  Performance: "PERFORMANCE",
+  "Error Recovery and Fault Tolerance": "ERROR_RECOVERY",
+  "Developer Experience": "DEVELOPER_EXPERIENCE",
   "Why are Error Recovery / Fault Tolerant capabilities needed in a Parser?":
     "WHY_ERROR_RECOVERY",
   "How do I debug my parser?": "DEBUGGING",
