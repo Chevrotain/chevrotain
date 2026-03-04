@@ -28,7 +28,6 @@ import { RecognizerEngine } from "./traits/recognizer_engine.js";
 
 import { ErrorHandler } from "./traits/error_handler.js";
 import { MixedInParser } from "./traits/parser_traits.js";
-import { ContentAssist } from "./traits/context_assist.js";
 import { GastRecorder } from "./traits/gast_recorder.js";
 import { PerformanceTracer } from "./traits/perf_tracer.js";
 import { applyMixins } from "./utils/apply_mixins.js";
@@ -259,7 +258,6 @@ export class Parser {
     that.initRecognizerEngine(tokenVocabulary, config);
     that.initRecoverable(config);
     that.initTreeBuilder(config);
-    that.initContentAssist();
     that.initGastRecorder(config);
     that.initPerformanceTracer(config);
 
@@ -286,7 +284,6 @@ applyMixins(Parser, [
   RecognizerEngine,
   RecognizerApi,
   ErrorHandler,
-  ContentAssist,
   GastRecorder,
   PerformanceTracer,
 ]);

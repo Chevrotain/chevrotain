@@ -56,15 +56,6 @@ declare abstract class BaseParser {
   getSerializedGastProductions(): ISerializedGast[];
 
   /**
-   * @param startRuleName
-   * @param precedingInput - The token vector up to (not including) the content assist point
-   */
-  computeContentAssist(
-    startRuleName: string,
-    precedingInput: IToken[],
-  ): ISyntacticContentAssistPath[];
-
-  /**
    * @param grammarRule - The rule to try and parse in backtracking mode.
    * @param args - argument to be passed to the grammar rule execution
    *
@@ -844,13 +835,6 @@ declare abstract class BaseParser {
    * The method receives the expected token type. The token that would be deleted can be received with {@link LA}.
    */
   protected canTokenTypeBeDeletedInRecovery(tokType: TokenType): boolean;
-
-  /**
-   * @deprecated - will be removed in the future
-   */
-  protected getNextPossibleTokenTypes(
-    grammarPath: ITokenGrammarPath,
-  ): TokenType[];
 
   set input(value: IToken[]);
   get input(): IToken[];
@@ -2335,11 +2319,6 @@ export interface IGrammarPath {
    * Used to distinguish between **different** invocations of the same subrule at the same top level rule.
    */
   occurrenceStack: number[];
-}
-
-export interface ISyntacticContentAssistPath extends IGrammarPath {
-  nextTokenType: TokenType;
-  nextTokenOccurrence: number;
 }
 
 export interface ITokenGrammarPath extends IGrammarPath {

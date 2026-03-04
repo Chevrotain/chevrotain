@@ -6,10 +6,12 @@ import {
 import {
   AbstractNextTerminalAfterProductionWalker,
   IFirstAfterRepetition,
+  NextAfterTokenWalker,
 } from "../../grammar/interpreter.js";
 import {
   dropRight,
   find,
+  first,
   flatten,
   has,
   includes,
@@ -188,6 +190,22 @@ export class Recoverable {
     }
 
     return true;
+  }
+
+  // TODO: should this be a member method or a utility? it does not have any state or usage of 'this'...
+  // TODO: should this be more explicitly part of the public API?
+  getNextPossibleTokenTypes(
+    this: MixedInParser,
+    grammarPath: ITokenGrammarPath,
+  ): TokenType[] {
+    const topRuleName = first(grammarPath.ruleStack)!;
+    const gastProductions = this.getGAstProductions();
+    const topProduction = gastProductions[topRuleName];
+    const nextPossibleTokenTypes = new NextAfterTokenWalker(
+      topProduction,
+      grammarPath,
+    ).startWalking();
+    return nextPossibleTokenTypes;
   }
 
   // Error Recovery functionality
