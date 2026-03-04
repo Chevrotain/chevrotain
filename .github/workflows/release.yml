@@ -13,15 +13,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      # pnpm must be installed before setup-node so the cache key can be computed
       - uses: pnpm/action-setup@v4
+        with:
+          cache: true
+
       - uses: actions/setup-node@v6
         with:
           node-version: lts/*
-          cache: "pnpm"
+
       - name: Install dependencies
         run: pnpm install
+
       - name: Build
         run: pnpm run ci
+
       - name: Publish to NPM
         run: pnpm run release:publish
