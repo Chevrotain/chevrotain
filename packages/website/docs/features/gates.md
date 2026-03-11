@@ -8,14 +8,12 @@ to represent multiple variants of the same parsing rule while avoiding code dupl
 For example:
 
 ```javascript
-// isConst is a parameter passed from another rule.
-$.RULE("Value", (isConst) => {
+// for (let x = 1; ...) — declaration allowed
+// for (x + 1; ...)     — expression only
+$.RULE("Statement", (allowDeclaration) => {
   $.OR([
-    // the Variable alternative is only possible when "isConst" is Falsey
-    { GATE: () => !isConst, ALT: () => $.SUBRULE($.Variable) },
-    { ALT: () => $.CONSUME(IntValue) },
-    { ALT: () => $.CONSUME(FloatValue) },
-    { ALT: () => $.CONSUME(StringValue) },
+    { GATE: () => allowDeclaration, ALT: () => $.SUBRULE($.Declaration) },
+    { ALT: () => $.SUBRULE($.Expression) },
   ]);
 });
 ```
@@ -23,20 +21,26 @@ $.RULE("Value", (isConst) => {
 Using the [Look Ahead](https://chevrotain.io/documentation/11_2_0/classes/CstParser.html#LA) method is often helpful with the use of Gates to determine if a path should be followed or not, for example:
 
 ```javascript
-// SELECT LIMIT.ID FROM USER_LIMIT LIMIT
-// SELECT ID, NAME FROM USER_LIMIT LIMIT 1
-$.RULE("FromClause", () => {
-  $.CONSUME(From);
-  $.CONSUME(Identifier);
-
-  $.OPTION({
-    GATE: () => $.LA(2).tokenType !== UnsignedInteger,
-    DEF: () => $.CONSUME1(Identifier, { LABEL: "alias" }),
+// foo(a, b, c)   - three arguments
+// foo(a, b,)     - two arguments with trailing comma
+$.RULE("ArgumentList", () => {
+  $.SUBRULE($.Expression);
+  $.MANY({
+    // stop consuming arguments if the token after the comma is ")"
+    GATE: () => $.LA(2).tokenType !== RParen,
+    DEF: () => {
+      $.CONSUME(Comma);
+      $.SUBRULE1($.Expression);
+    },
   });
+  $.OPTION(() => $.CONSUME1(Comma)); // optional trailing comma
 });
 ```
 
-If **LIMIT** is an identifier or a keyword based on the surrounding tokens, looking ahead at subsequent tokens is required to know if the token should be consumed as an identifier or should be skipped to be picked up by a subsequent rule.
+Here `$.LA(2)` peeks past the comma to check whether a closing parenthesis follows. If it does, the GATE prevents the MANY from consuming the trailing comma as the start of another argument, leaving it for the OPTION to handle instead.
 
-See [executable example](https://github.com/chevrotain/chevrotain/tree/master/examples/parser/predicate_lookahead)
-for further details.
+See executable examples for further details:
+
+- [Parametrized Rules](https://github.com/chevrotain/chevrotain/tree/master/examples/parser/parametrized_rules) — using Gates with parameterized rules to control grammar flow.
+- [Predicate Lookahead](https://github.com/chevrotain/chevrotain/tree/master/examples/parser/predicate_lookahead) — using Gates with external state to enable/disable alternatives.
+- [Backtracking](https://github.com/chevrotain/chevrotain/tree/master/examples/parser/backtracking) — using Gates with `BACKTRACK` to resolve ambiguous alternatives.
