@@ -2,6 +2,9 @@
 
 ## 12.0.0
 
+- Dropped support for nodejs v20.
+  The minimum nodejs version needed to run Chevrotain is now nodejs v22.
+
 - Removed Syntactic Content Assist feature and related APIs:
   - [computeContentAssist()]
   - [getNextPossibleTokenTypes()]

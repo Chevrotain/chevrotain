@@ -1,3 +1,19 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Breaking Changes
+
+- [BREAKING_CHANGES For V12](https://chevrotain.io/docs/changes/BREAKING_CHANGES.html#_12-0-0)
+
+#### Minor Changes
+
+- [refactor: remove lodash dependency](https://github.com/Chevrotain/chevrotain/pull/2149)
+  - `chevrotain.min.mjs` reduced to 110kb versus 142kb in prior version.
+  - `chevrotain.mjs` is now 238kb versus 349kb in prior version.
+
+#### Documentation
+
+- [Improved Docs for GATES](https://chevrotain.io/docs/features/gates.html)
+
 ## 11.2.0 (3-3-2026)
 
 #### Performance

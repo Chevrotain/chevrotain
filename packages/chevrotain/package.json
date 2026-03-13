@@ -15,6 +15,9 @@
     "fault",
     "tolerant"
   ],
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "bugs": {
     "url": "https://github.com/Chevrotain/chevrotain/issues"
   },
