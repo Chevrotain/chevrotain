@@ -1,6 +1,6 @@
 {
   "name": "@chevrotain/cst-dts-gen",
-  "version": "11.2.0",
+  "version": "12.0.0",
   "description": "Generates type definitions for Chevrotain CST nodes",
   "keywords": [],
   "bugs": {

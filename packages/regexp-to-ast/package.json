@@ -1,6 +1,6 @@
 {
   "name": "@chevrotain/regexp-to-ast",
-  "version": "11.2.0",
+  "version": "12.0.0",
   "description": "Parses a Regular Expression and outputs an AST",
   "keywords": [
     "regExp",

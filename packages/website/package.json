@@ -1,6 +1,6 @@
 {
   "name": "@chevrotain/website",
-  "version": "11.2.0",
+  "version": "12.0.0",
   "type": "module",
   "private": true,
   "description": "source Code for https://chevrotain.io/docs/",
