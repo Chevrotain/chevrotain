@@ -1,6 +1,6 @@
 /* eslint-disable -- config file */
-import * as chai from "chai"
-import sinonChai from "sinon-chai"
+import * as chai from "chai";
+import sinonChai from "sinon-chai";
 
-chai.use(sinonChai)
+chai.use(sinonChai);
 /* eslint-enable -- config file */

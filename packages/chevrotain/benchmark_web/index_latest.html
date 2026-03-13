@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head lang="en">
     <link rel="stylesheet" type="text/css" href="style.css" />
@@ -28,13 +28,13 @@
               Run Lex And Parse
             </button>
             <button
-              onclick="onRunAll({lexerOnly:true, parserOnly:false})"
+              onclick="onRunAll({ lexerOnly: true, parserOnly: false })"
               id="runAllButton_lexer"
             >
               Run Lexer Only
             </button>
             <button
-              onclick="onRunAll({lexerOnly:false, parserOnly:true})"
+              onclick="onRunAll({ lexerOnly: false, parserOnly: true })"
               id="runAllButton_parser"
             >
               Run Parser Only
@@ -101,36 +101,36 @@
 
     <script src="lib/iframe_loader.js"></script>
     <script>
-      self.mode = "latest"
+      self.mode = "latest";
       var jsonLatestFrame = includeTestIFrame(
         "JSON",
         "./parsers/json/json.html",
-        self.mode
-      )
+        self.mode,
+      );
       var cssLatestFrame = includeTestIFrame(
         "CSS",
         "./parsers/css/css.html",
-        self.mode
-      )
+        self.mode,
+      );
       var ecma5LatestFrame = includeTestIFrame(
         "ECMA5",
         "./parsers/ecma5/ecma5.html",
-        self.mode
-      )
+        self.mode,
+      );
 
       var testCases = {
         JSON: function (suite) {
-          addTest(suite, "JSON", jsonLatestFrame.parse)
+          addTest(suite, "JSON", jsonLatestFrame.parse);
         },
 
         CSS: function (suite) {
-          addTest(suite, "CSS", cssLatestFrame.parse)
+          addTest(suite, "CSS", cssLatestFrame.parse);
         },
 
         ECMA5: function (suite) {
-          addTest(suite, "ECMA5", ecma5LatestFrame.parse)
-        }
-      }
+          addTest(suite, "ECMA5", ecma5LatestFrame.parse);
+        },
+      };
     </script>
     <script src="lib/bench_logic.js"></script>
   </body>

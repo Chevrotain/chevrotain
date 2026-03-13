@@ -1,5 +1,5 @@
 <!--To view the diagrams first run the "bundle:graphql" script in "../package.json" -->
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -32,20 +32,20 @@
   <script type="module">
     import {
       GraphQLParser,
-      createSyntaxDiagramsCode
+      createSyntaxDiagramsCode,
       // extract the serialized grammar.
-    } from "./gen/graphql-bundled.min.mjs" // created by "bundle:graphql" script.
+    } from "./gen/graphql-bundled.min.mjs"; // created by "bundle:graphql" script.
 
     // extract the serialized grammar.
-    var parserInstance = new GraphQLParser([])
-    var serialziedGrammar = parserInstance.getSerializedGastProductions()
+    var parserInstance = new GraphQLParser([]);
+    var serialziedGrammar = parserInstance.getSerializedGastProductions();
 
     // create the HTML Text
-    var htmlText = createSyntaxDiagramsCode(serialziedGrammar)
-    var innerFrame = document.getElementById("innerFrame")
+    var htmlText = createSyntaxDiagramsCode(serialziedGrammar);
+    var innerFrame = document.getElementById("innerFrame");
 
     // Update the iframe src to visually render the diagrams.
     // https://stackoverflow.com/questions/10418644/creating-an-iframe-with-given-html-dynamically/10419102#10419102
-    innerFrame.src = "data:text/html;charset=utf-8," + encodeURI(htmlText)
+    innerFrame.src = "data:text/html;charset=utf-8," + encodeURI(htmlText);
   </script>
 </html>

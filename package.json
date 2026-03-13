@@ -17,16 +17,16 @@
     "compile": "turbo run clean && tsc --build",
     "compile:watch": "turbo run clean && tsc --build --watch",
     "ci:subpackages": "turbo run ci",
-    "format:fix": "prettier --write \"**/*.@(ts|js|json|md|yml)\"",
-    "format:validate": "prettier --check \"**/*.@(ts|js|json|md|yml)\"",
+    "format:fix": "prettier --experimental-cli --write \"**/*.{ts,js,cjs,mjs,json,md,yml,yaml,css,html}\"",
+    "format:validate": "prettier --experimental-cli --check \"**/*.{ts,js,cjs,mjs,json,md,yml,yaml,css,html}\"",
     "prepare": "husky"
   },
   "prettier": {
     "endOfLine": "lf"
   },
   "lint-staged": {
-    "*.{ts,js,json,md,yml}": [
-      "prettier --write"
+    "*.{ts,js,cjs,mjs,json,md,yml,yaml,css,html}": [
+      "prettier --experimental-cli --write"
     ]
   },
   "commitlint": {

@@ -5,45 +5,51 @@ This can be useful if your diagrams generating needs are more dynamic in nature
 node.js
 -->
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Syntax Diagrams generated dynamically in the browser</title>
-</head>
+  </head>
 
-<body>
-<!-- https://stackoverflow.com/a/14738668 -->
-<iframe id="innerFrame" src=""
-        style="position:fixed;
-        top:0px;
-        left:0px;
-        bottom:0px;
-        right:0px;
-        width:100%;
-        height:100%;
-        border:none;
-        margin:0;
-        padding:0;
-        overflow:hidden;
-        z-index:999999;">
-</iframe>
-</body>
+  <body>
+    <!-- https://stackoverflow.com/a/14738668 -->
+    <iframe
+      id="innerFrame"
+      src=""
+      style="
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        bottom: 0px;
+        right: 0px;
+        width: 100%;
+        height: 100%;
+        border: none;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        z-index: 999999;
+      "
+    >
+    </iframe>
+  </body>
 
-<script type="module">
-
-    import { JsonParser, createSyntaxDiagramsCode } from "./gen/grammar-bundled.min.mjs"
+  <script type="module">
+    import {
+      JsonParser,
+      createSyntaxDiagramsCode,
+    } from "./gen/grammar-bundled.min.mjs";
     // extract the serialized grammar.
-    var parserInstance = new JsonParser()
-    var serialziedGrammar = parserInstance.getSerializedGastProductions()
+    var parserInstance = new JsonParser();
+    var serialziedGrammar = parserInstance.getSerializedGastProductions();
 
     // create the HTML Text
-    var htmlText = createSyntaxDiagramsCode(serialziedGrammar)
-    var innerFrame = document.getElementById("innerFrame")
+    var htmlText = createSyntaxDiagramsCode(serialziedGrammar);
+    var innerFrame = document.getElementById("innerFrame");
 
     // Update the iframe src to visually render the diagrams.
     // https://stackoverflow.com/questions/10418644/creating-an-iframe-with-given-html-dynamically/10419102#10419102
-    innerFrame.src = 'data:text/html;charset=utf-8,' + encodeURI(htmlText);
-
-</script>
+    innerFrame.src = "data:text/html;charset=utf-8," + encodeURI(htmlText);
+  </script>
 </html>
