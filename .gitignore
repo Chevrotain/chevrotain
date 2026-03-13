@@ -40,3 +40,7 @@ coverage
 package-lock.json
 yarn.lock
 lerna-debug.log
+
+## Turborepo
+## https://turborepo.dev/docs/getting-started/add-to-existing-repository#edit-gitignore
+.turbo

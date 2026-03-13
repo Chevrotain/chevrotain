@@ -1,0 +1,39 @@
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "tasks": {
+    "clean": {
+      "cache": false,
+      "description": "Remove build artifacts (lib, coverage, dev, temp)"
+    },
+    "compile": {
+      "dependsOn": ["^compile"],
+      "outputs": ["lib/**"],
+      "description": "Compile TypeScript sources"
+    },
+    "bundle": {
+      "dependsOn": ["compile"],
+      "outputs": ["lib/**/*.mjs", "lib/**/*.mjs.map"],
+      "description": "Bundle with esbuild (only relevant for chevrotain)"
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["lib/**"],
+      "description": "Full build: clean + compile + bundle"
+    },
+    "test": {
+      "dependsOn": ["build"],
+      "outputs": ["coverage/**"],
+      "description": "Run tests with coverage"
+    },
+    "ci": {
+      "dependsOn": ["^ci"],
+      "outputs": ["lib/**", "coverage/**"],
+      "description": "Full CI: build + test for each package"
+    },
+    "compile:watch": {
+      "cache": false,
+      "persistent": true,
+      "description": "Compile TypeScript in watch mode"
+    }
+  }
+}

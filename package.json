@@ -14,9 +14,9 @@
     "release:version": "pnpm run ci && lerna version --force-publish",
     "release:publish": "lerna publish from-git --yes --no-verify-access",
     "ci": "npm-run-all format:validate ci:subpackages",
-    "compile": "pnpm -r run clean && tsc --build",
-    "compile:watch": "pnpm -r run clean  && tsc --build --watch",
-    "ci:subpackages": "pnpm -r run ci",
+    "compile": "turbo run clean && tsc --build",
+    "compile:watch": "turbo run clean && tsc --build --watch",
+    "ci:subpackages": "turbo run ci",
     "format:fix": "prettier --write \"**/*.@(ts|js|json|md|yml)\"",
     "format:validate": "prettier --check \"**/*.@(ts|js|json|md|yml)\"",
     "prepare": "husky"
@@ -52,6 +52,7 @@
     "prettier": "3.8.1",
     "shx": "0.4.0",
     "source-map-support": "0.5.21",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "turbo": "2.8.16"
   }
 }
