@@ -27,6 +27,9 @@ jobs:
         with:
           node-version: ${{ matrix.node_version }}
 
+      - name: Cache for Turbo
+        uses: rharkor/caching-for-turbo@v2.2.1
+
       - name: Install dependencies
         run: pnpm install
 
