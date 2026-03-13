@@ -7,7 +7,6 @@ import {
 
 import { END_OF_FILE } from "../../../src/parse/parser/parser.js";
 import { MismatchedTokenException } from "../../../src/parse/exceptions_public.js";
-import { every, flatten, forEach, map } from "lodash-es";
 
 import type {
   ILookaheadStrategy,
@@ -76,7 +75,7 @@ function deferredInitTokens() {
   // Avoids errors in browser tests where the bundled specs will execute this
   // file even if the tests will avoid running it.
   if (typeof (<any>new RegExp("(?:)")).sticky === "boolean") {
-    forEach(allTokens, (currTokType) => {
+    Object.values(allTokens).forEach((currTokType) => {
       currTokType.PATTERN = new RegExp(
         (currTokType.PATTERN as RegExp).source,
         "y",
@@ -115,14 +114,14 @@ class EcmaScriptQuirksLookaheadStrategy implements ILookaheadStrategy {
     });
 
     if (
-      !every(alts, (currPath) =>
-        every(currPath, (currAlt) => currAlt.length === 1),
+      !alts.every((currPath) =>
+        currPath.every((currAlt) => currAlt.length === 1),
       )
     ) {
       throw Error("This scannerLess parser only supports LL(1) lookahead.");
     }
 
-    const allTokenTypesPerAlt = map(alts, flatten);
+    const allTokenTypesPerAlt = alts.map((alt) => alt.flat());
 
     return function (this: EcmaScriptQuirksParser) {
       // save & restore lexer state as otherwise the text index will move ahead
@@ -162,11 +161,11 @@ class EcmaScriptQuirksLookaheadStrategy implements ILookaheadStrategy {
       prodType: options.prodType,
     })[0];
 
-    if (!every(alt, (currAlt) => currAlt.length === 1)) {
+    if (!alt.every((currAlt) => currAlt.length === 1)) {
       throw Error("This scannerLess parser only supports LL(1) lookahead.");
     }
 
-    const allTokenTypes = flatten(alt);
+    const allTokenTypes = alt.flat();
 
     return function (this: EcmaScriptQuirksParser) {
       // save & restore lexer state as otherwise the text index will move ahead

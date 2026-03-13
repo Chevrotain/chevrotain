@@ -1,5 +1,4 @@
 import { IParserConfig } from "@chevrotain/types";
-import { has } from "lodash-es";
 import { timer } from "@chevrotain/utils";
 import { MixedInParser } from "./parser_traits.js";
 import { DEFAULT_PARSER_CONFIG } from "../parser.js";
@@ -13,7 +12,7 @@ export class PerformanceTracer {
   traceInitIndent: number;
 
   initPerformanceTracer(config: IParserConfig) {
-    if (has(config, "traceInitPerf")) {
+    if (Object.hasOwn(config, "traceInitPerf")) {
       const userTraceInitPerf = config.traceInitPerf;
       const traceIsNumber = typeof userTraceInitPerf === "number";
       this.traceInitMaxIdent = traceIsNumber

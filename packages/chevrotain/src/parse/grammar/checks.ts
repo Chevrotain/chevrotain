@@ -1,24 +1,4 @@
 import {
-  clone,
-  compact,
-  difference,
-  drop,
-  dropRight,
-  filter,
-  first,
-  flatMap,
-  flatten,
-  forEach,
-  groupBy,
-  includes,
-  isEmpty,
-  map,
-  pickBy,
-  reduce,
-  reject,
-  values,
-} from "lodash-es";
-import {
   IParserAmbiguousAlternativesDefinitionError,
   IParserDuplicatesDefinitionError,
   IParserEmptyAlternativeDefinitionError,
@@ -71,7 +51,7 @@ export function validateLookahead(options: {
     tokenTypes: options.tokenTypes,
     grammarName: options.grammarName,
   });
-  return map(lookaheadValidationErrorMessages, (errorMessage) => ({
+  return lookaheadValidationErrorMessages.map((errorMessage) => ({
     type: ParserDefinitionErrorType.CUSTOM_LOOKAHEAD_VALIDATION,
     ...errorMessage,
   }));
@@ -83,8 +63,7 @@ export function validateGrammar(
   errMsgProvider: IGrammarValidatorErrorMessageProvider,
   grammarName: string,
 ): IParserDefinitionError[] {
-  const duplicateErrors: IParserDefinitionError[] = flatMap(
-    topLevels,
+  const duplicateErrors: IParserDefinitionError[] = topLevels.flatMap(
     (currTopLevel) =>
       validateDuplicateProductions(currTopLevel, errMsgProvider),
   );
@@ -95,11 +74,11 @@ export function validateGrammar(
     errMsgProvider,
   );
 
-  const tooManyAltsErrors = flatMap(topLevels, (curRule) =>
+  const tooManyAltsErrors = topLevels.flatMap((curRule) =>
     validateTooManyAlts(curRule, errMsgProvider),
   );
 
-  const duplicateRulesError = flatMap(topLevels, (curRule) =>
+  const duplicateRulesError = topLevels.flatMap((curRule) =>
     validateRuleDoesNotAlreadyExist(
       curRule,
       topLevels,
@@ -123,17 +102,19 @@ function validateDuplicateProductions(
   topLevelRule.accept(collectorVisitor);
   const allRuleProductions = collectorVisitor.allProductions;
 
-  const productionGroups = groupBy(
+  const productionGroups = Object.groupBy(
     allRuleProductions,
     identifyProductionForDuplicates,
   );
 
-  const duplicates: any = pickBy(productionGroups, (currGroup) => {
-    return currGroup.length > 1;
-  });
+  const duplicates = Object.fromEntries(
+    Object.entries(productionGroups).filter(
+      ([_k, currGroup]) => currGroup!.length > 1,
+    ),
+  );
 
-  const errors = map(values(duplicates), (currDuplicates: any) => {
-    const firstProd: any = first(currDuplicates);
+  const errors = Object.values(duplicates).map((currDuplicates: any) => {
+    const firstProd: any = currDuplicates[0];
     const msg = errMsgProvider.buildDuplicateFoundError(
       topLevelRule,
       currDuplicates,
@@ -220,16 +201,12 @@ export function validateRuleDoesNotAlreadyExist(
   errMsgProvider: IGrammarValidatorErrorMessageProvider,
 ): IParserDefinitionError[] {
   const errors = [];
-  const occurrences = reduce(
-    allRules,
-    (result, curRule) => {
-      if (curRule.name === rule.name) {
-        return result + 1;
-      }
-      return result;
-    },
-    0,
-  );
+  const occurrences = allRules.reduce((result, curRule) => {
+    if (curRule.name === rule.name) {
+      return result + 1;
+    }
+    return result;
+  }, 0);
   if (occurrences > 1) {
     const errMsg = errMsgProvider.buildDuplicateRuleNameError({
       topLevelRule: rule,
@@ -256,7 +233,7 @@ export function validateRuleIsOverridden(
   const errors = [];
   let errMsg;
 
-  if (!includes(definedRulesNames, ruleName)) {
+  if (!definedRulesNames.includes(ruleName)) {
     errMsg =
       `Invalid rule override, rule: ->${ruleName}<- cannot be overridden in the grammar: ->${className}<-` +
       `as it is not defined in any of the super grammars `;
@@ -278,11 +255,11 @@ export function validateNoLeftRecursion(
 ): IParserDefinitionError[] {
   const errors: IParserDefinitionError[] = [];
   const nextNonTerminals = getFirstNoneTerminal(currRule.definition);
-  if (isEmpty(nextNonTerminals)) {
+  if (nextNonTerminals.length === 0) {
     return [];
   } else {
     const ruleName = topRule.name;
-    const foundLeftRecursion = includes(nextNonTerminals, topRule);
+    const foundLeftRecursion = nextNonTerminals.includes(topRule);
     if (foundLeftRecursion) {
       errors.push({
         message: errMsgProvider.buildLeftRecursionError({
@@ -296,9 +273,12 @@ export function validateNoLeftRecursion(
 
     // we are only looking for cyclic paths leading back to the specific topRule
     // other cyclic paths are ignored, we still need this difference to avoid infinite loops...
-    const validNextSteps = difference(nextNonTerminals, path.concat([topRule]));
-    const errorsFromNextSteps = flatMap(validNextSteps, (currRefRule) => {
-      const newPath = clone(path);
+    const excluded = path.concat([topRule]);
+    const validNextSteps = nextNonTerminals.filter(
+      (x) => !excluded.includes(x),
+    );
+    const errorsFromNextSteps = validNextSteps.flatMap((currRefRule) => {
+      const newPath = [...path];
       newPath.push(currRefRule);
       return validateNoLeftRecursion(
         topRule,
@@ -314,10 +294,10 @@ export function validateNoLeftRecursion(
 
 export function getFirstNoneTerminal(definition: IProduction[]): Rule[] {
   let result: Rule[] = [];
-  if (isEmpty(definition)) {
+  if (definition.length === 0) {
     return result;
   }
-  const firstProd = first(definition);
+  const firstProd = definition[0];
 
   /* istanbul ignore else */
   if (firstProd instanceof NonTerminal) {
@@ -335,11 +315,11 @@ export function getFirstNoneTerminal(definition: IProduction[]): Rule[] {
     );
   } else if (firstProd instanceof Alternation) {
     // each sub definition in alternation is a FLAT
-    result = flatten(
-      map(firstProd.definition, (currSubDef) =>
+    result = firstProd.definition
+      .map((currSubDef) =>
         getFirstNoneTerminal((<AlternativeGAST>currSubDef).definition),
-      ),
-    );
+      )
+      .flat();
   } else if (firstProd instanceof Terminal) {
     // nothing to see, move along
   } else {
@@ -349,7 +329,7 @@ export function getFirstNoneTerminal(definition: IProduction[]): Rule[] {
   const isFirstOptional = isOptionalProd(firstProd);
   const hasMore = definition.length > 1;
   if (isFirstOptional && hasMore) {
-    const rest = drop(definition);
+    const rest = definition.slice(1);
     return result.concat(getFirstNoneTerminal(rest));
   } else {
     return result;
@@ -372,18 +352,17 @@ export function validateEmptyOrAlternative(
   topLevelRule.accept(orCollector);
   const ors = orCollector.alternations;
 
-  const errors = flatMap<Alternation, IParserEmptyAlternativeDefinitionError>(
-    ors,
+  const errors = ors.flatMap<IParserEmptyAlternativeDefinitionError>(
     (currOr) => {
-      const exceptLast = dropRight(currOr.definition);
-      return flatMap(exceptLast, (currAlternative, currAltIdx) => {
+      const exceptLast = currOr.definition.slice(0, -1);
+      return exceptLast.flatMap((currAlternative, currAltIdx) => {
         const possibleFirstInAlt = nextPossibleTokensAfter(
           [currAlternative],
           [],
           tokenStructuredMatcher,
           1,
         );
-        if (isEmpty(possibleFirstInAlt)) {
+        if (possibleFirstInAlt.length === 0) {
           return [
             {
               message: errMsgProvider.buildEmptyAlternationError({
@@ -418,9 +397,9 @@ export function validateAmbiguousAlternationAlternatives(
 
   // New Handling of ignoring ambiguities
   // - https://github.com/chevrotain/chevrotain/issues/869
-  ors = reject(ors, (currOr) => currOr.ignoreAmbiguities === true);
+  ors = ors.filter((currOr) => currOr.ignoreAmbiguities !== true);
 
-  const errors = flatMap(ors, (currOr: Alternation) => {
+  const errors = ors.flatMap((currOr: Alternation) => {
     const currOccurrence = currOr.idx;
     const actualMaxLookahead = currOr.maxLookahead || globalMaxLookahead;
     const alternatives = getLookaheadPathsForOr(
@@ -480,7 +459,7 @@ export function validateTooManyAlts(
   topLevelRule.accept(orCollector);
   const ors = orCollector.alternations;
 
-  const errors = flatMap(ors, (currOr) => {
+  const errors = ors.flatMap((currOr) => {
     if (currOr.definition.length > 255) {
       return [
         {
@@ -507,11 +486,11 @@ export function validateSomeNonEmptyLookaheadPath(
   errMsgProvider: IGrammarValidatorErrorMessageProvider,
 ): IParserDefinitionError[] {
   const errors: IParserDefinitionError[] = [];
-  forEach(topLevelRules, (currTopRule) => {
+  topLevelRules.forEach((currTopRule) => {
     const collectorVisitor = new RepetitionCollector();
     currTopRule.accept(collectorVisitor);
     const allRuleProductions = collectorVisitor.allProductions;
-    forEach(allRuleProductions, (currProd) => {
+    allRuleProductions.forEach((currProd) => {
       const prodType = getProdType(currProd);
       const actualMaxLookahead = currProd.maxLookahead || maxLookahead;
       const currOccurrence = currProd.idx;
@@ -522,7 +501,7 @@ export function validateSomeNonEmptyLookaheadPath(
         actualMaxLookahead,
       );
       const pathsInsideProduction = paths[0];
-      if (isEmpty(flatten(pathsInsideProduction))) {
+      if (pathsInsideProduction.flat().length === 0) {
         const errMsg = errMsgProvider.buildEmptyRepetitionError({
           topLevelRule: currTopRule,
           repetition: currProd,
@@ -551,17 +530,16 @@ function checkAlternativesAmbiguities(
   errMsgProvider: IGrammarValidatorErrorMessageProvider,
 ): IParserAmbiguousAlternativesDefinitionError[] {
   const foundAmbiguousPaths: Alternative = [];
-  const identicalAmbiguities = reduce(
-    alternatives,
+  const identicalAmbiguities = alternatives.reduce(
     (result, currAlt, currAltIdx) => {
       // ignore (skip) ambiguities with this alternative
       if (alternation.definition[currAltIdx].ignoreAmbiguities === true) {
         return result;
       }
 
-      forEach(currAlt, (currPath) => {
+      currAlt.forEach((currPath) => {
         const altsCurrPathAppearsIn = [currAltIdx];
-        forEach(alternatives, (currOtherAlt, currOtherAltIdx) => {
+        alternatives.forEach((currOtherAlt, currOtherAltIdx) => {
           if (
             currAltIdx !== currOtherAltIdx &&
             containsPath(currOtherAlt, currPath) &&
@@ -588,9 +566,8 @@ function checkAlternativesAmbiguities(
     [] as { alts: number[]; path: TokenType[] }[],
   );
 
-  const currErrors = map(identicalAmbiguities, (currAmbDescriptor) => {
-    const ambgIndices = map(
-      currAmbDescriptor.alts,
+  const currErrors = identicalAmbiguities.map((currAmbDescriptor) => {
+    const ambgIndices = currAmbDescriptor.alts.map(
       (currAltIdx) => currAltIdx + 1,
     );
 
@@ -620,10 +597,9 @@ export function checkPrefixAlternativesAmbiguities(
   errMsgProvider: IGrammarValidatorErrorMessageProvider,
 ): IParserAmbiguousAlternativesDefinitionError[] {
   // flatten
-  const pathsAndIndices = reduce(
-    alternatives,
+  const pathsAndIndices = alternatives.reduce(
     (result, currAlt, idx) => {
-      const currPathsAndIdx = map(currAlt, (currPath) => {
+      const currPathsAndIdx = currAlt.map((currPath) => {
         return { idx: idx, path: currPath };
       });
       return result.concat(currPathsAndIdx);
@@ -631,57 +607,53 @@ export function checkPrefixAlternativesAmbiguities(
     [] as { idx: number; path: TokenType[] }[],
   );
 
-  const errors = compact(
-    flatMap(pathsAndIndices, (currPathAndIdx) => {
-      const alternativeGast = alternation.definition[currPathAndIdx.idx];
-      // ignore (skip) ambiguities with this alternative
-      if (alternativeGast.ignoreAmbiguities === true) {
-        return [];
-      }
-      const targetIdx = currPathAndIdx.idx;
-      const targetPath = currPathAndIdx.path;
+  const errors = pathsAndIndices.flatMap((currPathAndIdx) => {
+    const alternativeGast = alternation.definition[currPathAndIdx.idx];
+    // ignore (skip) ambiguities with this alternative
+    if (alternativeGast.ignoreAmbiguities === true) {
+      return [];
+    }
+    const targetIdx = currPathAndIdx.idx;
+    const targetPath = currPathAndIdx.path;
 
-      const prefixAmbiguitiesPathsAndIndices = filter(
-        pathsAndIndices,
-        (searchPathAndIdx) => {
-          // prefix ambiguity can only be created from lower idx (higher priority) path
-          return (
-            // ignore (skip) ambiguities with this "other" alternative
-            alternation.definition[searchPathAndIdx.idx].ignoreAmbiguities !==
-              true &&
-            searchPathAndIdx.idx < targetIdx &&
-            // checking for strict prefix because identical lookaheads
-            // will be be detected using a different validation.
-            isStrictPrefixOfPath(searchPathAndIdx.path, targetPath)
-          );
-        },
-      );
+    const prefixAmbiguitiesPathsAndIndices = pathsAndIndices.filter(
+      (searchPathAndIdx) => {
+        // prefix ambiguity can only be created from lower idx (higher priority) path
+        return (
+          // ignore (skip) ambiguities with this "other" alternative
+          alternation.definition[searchPathAndIdx.idx].ignoreAmbiguities !==
+            true &&
+          searchPathAndIdx.idx < targetIdx &&
+          // checking for strict prefix because identical lookaheads
+          // will be be detected using a different validation.
+          isStrictPrefixOfPath(searchPathAndIdx.path, targetPath)
+        );
+      },
+    );
 
-      const currPathPrefixErrors = map(
-        prefixAmbiguitiesPathsAndIndices,
-        (currAmbPathAndIdx): IParserAmbiguousAlternativesDefinitionError => {
-          const ambgIndices = [currAmbPathAndIdx.idx + 1, targetIdx + 1];
-          const occurrence = alternation.idx === 0 ? "" : alternation.idx;
+    const currPathPrefixErrors = prefixAmbiguitiesPathsAndIndices.map(
+      (currAmbPathAndIdx): IParserAmbiguousAlternativesDefinitionError => {
+        const ambgIndices = [currAmbPathAndIdx.idx + 1, targetIdx + 1];
+        const occurrence = alternation.idx === 0 ? "" : alternation.idx;
 
-          const message = errMsgProvider.buildAlternationPrefixAmbiguityError({
-            topLevelRule: rule,
-            alternation: alternation,
-            ambiguityIndices: ambgIndices,
-            prefixPath: currAmbPathAndIdx.path,
-          });
-          return {
-            message: message,
-            type: ParserDefinitionErrorType.AMBIGUOUS_PREFIX_ALTS,
-            ruleName: rule.name,
-            occurrence: occurrence,
-            alternatives: ambgIndices,
-          };
-        },
-      );
+        const message = errMsgProvider.buildAlternationPrefixAmbiguityError({
+          topLevelRule: rule,
+          alternation: alternation,
+          ambiguityIndices: ambgIndices,
+          prefixPath: currAmbPathAndIdx.path,
+        });
+        return {
+          message: message,
+          type: ParserDefinitionErrorType.AMBIGUOUS_PREFIX_ALTS,
+          ruleName: rule.name,
+          occurrence: occurrence,
+          alternatives: ambgIndices,
+        };
+      },
+    );
 
-      return currPathPrefixErrors;
-    }),
-  );
+    return currPathPrefixErrors;
+  });
 
   return errors;
 }
@@ -693,11 +665,11 @@ function checkTerminalAndNoneTerminalsNameSpace(
 ): IParserDefinitionError[] {
   const errors: IParserDefinitionError[] = [];
 
-  const tokenNames = map(tokenTypes, (currToken) => currToken.name);
+  const tokenNames = tokenTypes.map((currToken) => currToken.name);
 
-  forEach(topLevels, (currRule) => {
+  topLevels.forEach((currRule) => {
     const currRuleName = currRule.name;
-    if (includes(tokenNames, currRuleName)) {
+    if (tokenNames.includes(currRuleName)) {
       const errMsg = errMsgProvider.buildNamespaceConflictError(currRule);
 
       errors.push({

@@ -14,7 +14,6 @@
  */
 
 import { createToken, createTokenInstance, Lexer } from "chevrotain";
-import _ from "lodash";
 
 // State required for matching the indentations
 let indentStack = [0];
@@ -31,9 +30,9 @@ let indentStack = [0];
  * @returns {*}
  */
 function matchIndentBase(text, offset, matchedTokens, groups, type) {
-  const noTokensMatchedYet = _.isEmpty(matchedTokens);
+  const noTokensMatchedYet = !matchedTokens || matchedTokens.length === 0;
   const newLines = groups.nl;
-  const noNewLinesMatchedYet = _.isEmpty(newLines);
+  const noNewLinesMatchedYet = !newLines || newLines.length === 0;
   const isFirstLine = noTokensMatchedYet && noNewLinesMatchedYet;
   const isStartOfLine =
     // only newlines matched so far
@@ -41,7 +40,7 @@ function matchIndentBase(text, offset, matchedTokens, groups, type) {
     // Both newlines and other Tokens have been matched AND the offset is just after the last newline
     (!noTokensMatchedYet &&
       !noNewLinesMatchedYet &&
-      offset === _.last(newLines).startOffset + 1);
+      offset === newLines.at(-1).startOffset + 1);
 
   // indentation can only be matched at the start of a line.
   if (isFirstLine || isStartOfLine) {
@@ -60,7 +59,7 @@ function matchIndentBase(text, offset, matchedTokens, groups, type) {
       currIndentLevel = 0;
     }
 
-    const prevIndentLevel = _.last(indentStack);
+    const prevIndentLevel = indentStack.at(-1);
     // deeper indentation
     if (currIndentLevel > prevIndentLevel && type === "indent") {
       indentStack.push(currIndentLevel);
@@ -68,8 +67,7 @@ function matchIndentBase(text, offset, matchedTokens, groups, type) {
     }
     // shallower indentation
     else if (currIndentLevel < prevIndentLevel && type === "outdent") {
-      const matchIndentIndex = _.findLastIndex(
-        indentStack,
+      const matchIndentIndex = indentStack.findLastIndex(
         (stackIndentDepth) => stackIndentDepth === currIndentLevel,
       );
 
@@ -109,8 +107,8 @@ function matchIndentBase(text, offset, matchedTokens, groups, type) {
 }
 
 // customize matchIndentBase to create separate functions of Indent and Outdent.
-export const matchIndent = _.partialRight(matchIndentBase, "indent");
-export const matchOutdent = _.partialRight(matchIndentBase, "outdent");
+export const matchIndent = (...args) => matchIndentBase(...args, "indent");
+export const matchOutdent = (...args) => matchIndentBase(...args, "outdent");
 
 export const If = createToken({ name: "If", pattern: /if/ });
 export const Else = createToken({ name: "Else", pattern: /else/ });

@@ -1,6 +1,5 @@
 import fs from "fs";
 import git from "gitty";
-import _ from "lodash";
 import {
   changeLogPath,
   changeLogString,
@@ -26,8 +25,8 @@ const changeLogDate = changeLogString.replace(
 );
 fs.writeFileSync(changeLogPath, changeLogDate);
 
-_.forEach(markdownDocsFiles, function (currDocPath) {
-  if (_.includes(currDocPath, "changes")) {
+markdownDocsFiles.forEach(function (currDocPath) {
+  if (currDocPath.includes("changes")) {
     console.log("SKIPPING bumping file: <" + currDocPath + ">");
     return;
   }

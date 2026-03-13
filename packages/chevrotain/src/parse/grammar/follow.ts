@@ -1,6 +1,5 @@
 import { RestWalker } from "./rest.js";
 import { first } from "./first.js";
-import { assign, forEach } from "lodash-es";
 import { IN } from "../constants.js";
 import { Alternative, NonTerminal, Rule, Terminal } from "@chevrotain/gast";
 import { IProduction, TokenType } from "@chevrotain/types";
@@ -47,9 +46,9 @@ export function computeAllProdsFollows(
 ): Record<string, TokenType[]> {
   const reSyncFollows = {};
 
-  forEach(topProductions, (topProd) => {
+  topProductions.forEach((topProd) => {
     const currRefsFollow = new ResyncFollowsWalker(topProd).startWalking();
-    assign(reSyncFollows, currRefsFollow);
+    Object.assign(reSyncFollows, currRefsFollow);
   });
   return reSyncFollows;
 }
