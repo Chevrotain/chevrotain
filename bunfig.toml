@@ -1,0 +1,5 @@
+[install]
+# Hoist specific transitive dependencies to root node_modules so tools
+# (e.g. Rollup/Vite inside VuePress) can resolve them via standard Node
+# module resolution. Equivalent to pnpm's public-hoist-pattern in .npmrc.
+publicHoistPattern = ["vue", "@types/node"]

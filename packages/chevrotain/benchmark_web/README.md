@@ -7,7 +7,7 @@ With the **Next** version (locally built version on latest branch).
 
 ## Instructions
 
-1.  `pnpm ci` in the root of this repo.
+1.  `bun ci` in the root of this repo.
 
 - This will generate `chevrotain.js` artifact in the lib directory.
 

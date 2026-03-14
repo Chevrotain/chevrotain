@@ -7,11 +7,10 @@
       "examples/*"
     ]
   },
-  "packageManager": "pnpm@10.30.3",
+  "packageManager": "bun@1.3.10",
   "scripts": {
-    "version": "pnpm install && git add pnpm-lock.yaml",
-    "preinstall": "npx only-allow pnpm",
-    "release:version": "pnpm run ci && lerna version --force-publish",
+    "version": "bun install && git add bun.lock",
+    "release:version": "bun run ci && lerna version --force-publish",
     "release:publish": "lerna publish from-git --yes --no-verify-access",
     "ci": "npm-run-all format:validate ci:subpackages",
     "compile": "turbo run clean && tsc --build",

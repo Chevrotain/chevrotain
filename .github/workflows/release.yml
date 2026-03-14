@@ -13,9 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
-        with:
-          cache: true
+      - uses: oven-sh/setup-bun@v2
 
       - uses: actions/setup-node@v6
         with:
@@ -24,10 +22,10 @@ jobs:
       # intentionally no caching for Turbo on **release** workflow, to ensure a **clean** build and publish
 
       - name: Install dependencies
-        run: pnpm install
+        run: bun install
 
       - name: Build
-        run: pnpm run ci
+        run: bun run ci
 
       - name: Publish to NPM
-        run: pnpm run release:publish
+        run: bun run release:publish

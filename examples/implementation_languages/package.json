@@ -3,7 +3,7 @@
   "version": "12.0.0",
   "type": "module",
   "scripts": {
-    "ci": "pnpm run build test",
+    "ci": "bun run build test",
     "build": "npm-run-all build:ts",
     "build:ts": "tsc && node ./typescript/scripts/gen_dts_signatures.js",
     "test": "mocha \"*spec.js\""

@@ -1,7 +1,7 @@
 {
   "name": "Chevrotain",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:24",
-  "postCreateCommand": "pnpm install && pnpm run compile",
+  "postCreateCommand": "bun install && bun run compile",
   "customizations": {
     "vscode": {
       "settings": {

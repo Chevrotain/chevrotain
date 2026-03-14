@@ -43,23 +43,23 @@ Chevrotain is developed as a mono-repo with a single (temporary state) productiv
 and multiple example packages.
 
 Chevrotain uses **npm** tasks for the development flows.
-and pnpm + lerna for the monorepo management.
+and bun + lerna for the monorepo management.
 
 #### Initial Setup
 
 In the root of this Repo:
 
-- `pnpm`
+- `bun install`
 
 #### Some basic dev flows to get started
 
 Chevrotain is written using Typescript, so compilation to JavaScript is needed.
 
-- `pnpm compile`
+- `bun compile`
 
 Alternatively during development one would want to recompile on file changes.
 
-- `pnpm compile:watch`
+- `bun compile:watch`
 
 The compilation result will appear in the **lib** folder in each sub-package.
 
@@ -68,14 +68,14 @@ The compilation result will appear in the **lib** folder in each sub-package.
 Chevrotain uses **prettier** to avoid caring about code formatting...
 To format your new code use:
 
-`pnpm format:fix`
+`bun format:fix`
 
 #### Running the central CI flow locally.
 
 This is just another npm task which performs the whole flow
 including linting / doc generation / d.ts API creation / ...
 
-- `pnpm ci`
+- `bun ci`
 
 #### Committing Changes
 
@@ -94,7 +94,7 @@ The release process **requires push permissions to master**.
 - Update the [BREAKING_CHANGES.md](./packages/website/docs/changes/BREAKING_CHANGES.md).
   - Only for major versions...
 - Push the changes related updates to master.
-- execute `pnpm release:version` and follow the instructions.
+- execute `bun release:version` and follow the instructions.
   - This will update version related files and push a new version **tag** to Github.
   - Github Actions will execute a deployment to npmjs.com due to this new tag.
   - Additionally, new website contents will be pushed to the gh-pages branch.

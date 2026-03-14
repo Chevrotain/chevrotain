@@ -3,7 +3,7 @@
   "version": "12.0.0",
   "type": "module",
   "scripts": {
-    "ci": "pnpm run test",
+    "ci": "bun run test",
     "test": "mocha \"!(node_modules)/**/*spec.js\""
   },
   "dependencies": {

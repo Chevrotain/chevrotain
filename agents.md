@@ -9,7 +9,7 @@ Chevrotain is a **Parser Building Toolkit for JavaScript/TypeScript**. It suppor
 
 ## Monorepo Structure
 
-This is a **pnpm workspace monorepo** using **Lerna** for versioning/publishing only. **pnpm** is the only allowed package manager (enforced via `only-allow` preinstall check).
+This is a **bun workspace monorepo** using **Lerna** for versioning/publishing only. **bun** is the only allowed package manager.
 
 ```
 packages/
@@ -44,26 +44,26 @@ chevrotain → @chevrotain/cst-dts-gen → @chevrotain/gast → @chevrotain/type
 ### Prerequisites
 
 - **Node.js**: 20.x, 22.x, or 24.x
-- **pnpm**: 10.23.0 (pinned via `packageManager` field in root `package.json`)
+- **bun**: 1.3.10 (pinned via `packageManager` field in root `package.json`)
 
 ### Key Commands
 
-| Command              | Description                                                 |
-| -------------------- | ----------------------------------------------------------- |
-| `pnpm install`       | Install all dependencies                                    |
-| `pnpm compile`       | Clean all packages, then `tsc --build` (project references) |
-| `pnpm compile:watch` | Compile in watch mode                                       |
-| `pnpm ci`            | Full CI: format validation + all subpackage CI checks       |
-| `pnpm format:fix`    | Run Prettier on all source files                            |
+| Command             | Description                                                 |
+| ------------------- | ----------------------------------------------------------- |
+| `bun install`       | Install all dependencies                                    |
+| `bun compile`       | Clean all packages, then `tsc --build` (project references) |
+| `bun compile:watch` | Compile in watch mode                                       |
+| `bun ci`            | Full CI: format validation + all subpackage CI checks       |
+| `bun format:fix`    | Run Prettier on all source files                            |
 
 ### Per-Package Commands (e.g., `packages/chevrotain`)
 
-| Command            | Description                     |
-| ------------------ | ------------------------------- |
-| `pnpm run ci`      | build + test                    |
-| `pnpm run build`   | clean + compile + bundle        |
-| `pnpm run compile` | TypeScript compilation (`tsc`)  |
-| `pnpm run test`    | Run Mocha tests (with coverage) |
+| Command           | Description                     |
+| ----------------- | ------------------------------- |
+| `bun run ci`      | build + test                    |
+| `bun run build`   | clean + compile + bundle        |
+| `bun run compile` | TypeScript compilation (`tsc`)  |
+| `bun run test`    | Run Mocha tests (with coverage) |
 
 ### TypeScript Configuration
 
@@ -89,11 +89,11 @@ Tests are written in TypeScript, compiled to `lib/test/`, and Mocha runs the com
 ### Running Tests
 
 ```bash
-pnpm compile                     # Must compile first
-pnpm ci                          # Full CI pipeline
+bun compile                      # Must compile first
+bun ci                           # Full CI pipeline
 # Or per-package [PKGNAME]::
 cd packages/[PKGNAME]
-pnpm run ci
+bun run ci
 ```
 
 ## Code Style & Conventions

@@ -52,7 +52,7 @@
   "homepage": "https://chevrotain.io/docs/",
   "scripts": {
     "---------- CI FLOWS --------": "",
-    "ci": "pnpm run build test",
+    "ci": "bun run build test",
     "build": "npm-run-all clean compile bundle",
     "test": "npm-run-all coverage",
     "version": "node ./scripts/version-update.js",

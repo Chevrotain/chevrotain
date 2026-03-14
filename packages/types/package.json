@@ -29,7 +29,7 @@
   "homepage": "https://chevrotain.io/documentation/",
   "scripts": {
     "---------- CI FLOWS --------": "",
-    "ci": "pnpm run build",
+    "ci": "bun run build",
     "build": "npm-run-all clean compile api-site:build",
     "postversion": "npm-run-all api-site:build api-site:upload",
     "---------- BUILD STEPS --------": "",

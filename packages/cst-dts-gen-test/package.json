@@ -11,7 +11,7 @@
   },
   "scripts": {
     "---------- CI FLOWS --------": "",
-    "ci": "pnpm run build test",
+    "ci": "bun run build test",
     "build": "npm-run-all clean compile",
     "test": "npm-run-all coverage",
     "---------- DEV FLOWS --------": "",
