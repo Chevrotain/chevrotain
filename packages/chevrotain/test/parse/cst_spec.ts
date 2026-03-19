@@ -669,6 +669,70 @@ function defineTestSuite(recoveryMode: boolean) {
       expect(cst.location).to.be.undefined;
     });
 
+    it("Can access the current CSTNode via currCSTNode", () => {
+      let capturedNodeInner: CstNode | undefined;
+      let capturedNodeOuter: CstNode | undefined;
+
+      class CurrCSTNodeParser extends CstParser {
+        constructor(input: IToken[] = []) {
+          super(ALL_TOKENS, { recoveryEnabled: recoveryMode });
+          this.performSelfAnalysis();
+          this.input = input;
+        }
+
+        public outerRule = this.RULE("outerRule", () => {
+          // Capture the current node at the start of the outer rule
+          capturedNodeOuter = this.currCSTNode;
+          this.CONSUME(A);
+          this.SUBRULE(this.innerRule);
+        });
+
+        public innerRule = this.RULE("innerRule", () => {
+          // Capture the current node at the start of the inner rule
+          capturedNodeInner = this.currCSTNode;
+          this.CONSUME(B);
+        });
+      }
+
+      const input = [createRegularToken(A), createRegularToken(B)];
+      const parser = new CurrCSTNodeParser(input);
+      const cst = parser.outerRule();
+
+      // The captured nodes should be the same objects as the returned CST nodes
+      expect(cst.name).to.equal("outerRule");
+      expect(capturedNodeOuter).to.equal(cst);
+
+      const innerCst = cst.children.innerRule[0] as CstNode;
+      expect(innerCst.name).to.equal("innerRule");
+      expect(capturedNodeInner).to.equal(innerCst);
+    });
+
+    it("Can attach custom properties to the current CSTNode via currCSTNode", () => {
+      class CurrCSTNodeCustomPropsParser extends CstParser {
+        constructor(input: IToken[] = []) {
+          super(ALL_TOKENS, { recoveryEnabled: recoveryMode });
+          this.performSelfAnalysis();
+          this.input = input;
+        }
+
+        public myRule = this.RULE("myRule", () => {
+          this.CONSUME(A);
+          this.CONSUME(B);
+          // Attach custom metadata to the CSTNode currently being built.
+          // ACTION() ensures this does not run during the grammar recording phase.
+          this.ACTION(() => {
+            (this.currCSTNode as any).customProp = "hello";
+          });
+        });
+      }
+
+      const input = [createRegularToken(A), createRegularToken(B)];
+      const parser = new CurrCSTNodeCustomPropsParser(input);
+      const cst = parser.myRule();
+
+      expect((cst as any).customProp).to.equal("hello");
+    });
+
     context("Error Recovery", () => {
       it("re-sync recovery", () => {
         class CstRecoveryParserReSync extends CstParser {

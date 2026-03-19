@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+- [feat: expose `currCSTNode` API to access the current CstNode during parsing](https://github.com/Chevrotain/chevrotain/issues/1032)
+
 ## 12.0.0 (3-13-2026)
 
 #### Breaking Changes

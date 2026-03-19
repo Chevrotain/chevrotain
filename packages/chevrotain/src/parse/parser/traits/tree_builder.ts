@@ -226,6 +226,12 @@ export class TreeBuilder {
     this.setNodeLocationFromNode(preCstNode.location!, ruleCstResult.location!);
   }
 
+  get currCSTNode(): CstNode {
+    // casting to unknown because: `TS2784: get and set accessors cannot declare this parameters.`
+    const mixedIn = this as unknown as MixedInParser;
+    return mixedIn.CST_STACK[mixedIn.CST_STACK.length - 1];
+  }
+
   getBaseCstVisitorConstructor<IN = any, OUT = any>(
     this: MixedInParser,
   ): {

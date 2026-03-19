@@ -868,6 +868,30 @@ declare abstract class BaseParser {
    * See: {@link BaseParser.LA}
    */
   protected LA_FAST(howMuch: number): IToken;
+
+  /**
+   * Returns the CstNode currently being built by the active rule.
+   *
+   * This allows accessing and modifying the current CST node from within
+   * a rule's implementation, without resorting to internal APIs.
+   *
+   * @example
+   * $.RULE("functionDecl", () => {
+   *   const startIdx = this.currIdx
+   *   $.CONSUME(FunctionKw)
+   *   $.CONSUME(Identifier)
+   *   $.CONSUME(LParen)
+   *   // ...
+   *   $.CONSUME(RParen)
+   *   // Attach the token vector range to the current CstNode for source mapping
+   *   this.ACTION(() => {
+   *     this.currCSTNode.tokVectorRange = { from: startIdx, to: this.currIdx }
+   *   })
+   * })
+   *
+   * Only available when the parser is configured to output CST (`CstParser`).
+   */
+  protected get currCSTNode(): CstNode;
 }
 
 /**
