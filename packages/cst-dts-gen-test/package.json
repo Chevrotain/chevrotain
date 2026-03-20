@@ -17,7 +17,7 @@
     "---------- DEV FLOWS --------": "",
     "update-snapshots": "node ./scripts/update-snapshots.js",
     "---------- BUILD STEPS --------": "",
-    "clean": "shx rm -rf lib coverage",
+    "clean": "rimraf lib coverage",
     "compile:watch": "tsc -w",
     "compile": "tsc",
     "coverage": "c8 mocha --enable-source-maps"

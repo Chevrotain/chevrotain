@@ -26,7 +26,7 @@
       "description": "Run tests with coverage"
     },
     "ci": {
-      "dependsOn": ["^ci"],
+      "dependsOn": ["^build"],
       "outputs": ["lib/**", "coverage/**"],
       "description": "Full CI: build + test for each package"
     },
