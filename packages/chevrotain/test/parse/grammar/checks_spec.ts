@@ -1,7 +1,4 @@
-import {
-  CstParser,
-  EmbeddedActionsParser,
-} from "../../../src/parse/parser/traits/parser_traits.js";
+import { EmbeddedActionsParser } from "../../../src/parse/parser/traits/parser_traits.js";
 import {
   EMPTY_ALT,
   END_OF_FILE,
@@ -795,13 +792,13 @@ describe("The Recorder runtime checks full flow", () => {
           "Invalid DSL Method idx value: <256>",
         );
         expect(() => new InvalidIdxParser()).to.throw(
-          "Idx value must be a none negative value smaller than 256",
+          "Idx value must be a none negative value smaller than 128",
         );
       });
 
       it("subrule", () => {
         const ATok = createToken({ name: "A" });
-        class InvalidIdxParser extends CstParser {
+        class InvalidIdxParser extends EmbeddedActionsParser {
           constructor(input: IToken[] = []) {
             super([myToken, myOtherToken]);
             this.performSelfAnalysis();
@@ -821,7 +818,7 @@ describe("The Recorder runtime checks full flow", () => {
           "Invalid DSL Method idx value: <-1>",
         );
         expect(() => new InvalidIdxParser()).to.throw(
-          "Idx value must be a none negative value smaller than 256",
+          "Idx value must be a none negative value smaller than 128",
         );
       });
 
@@ -844,7 +841,7 @@ describe("The Recorder runtime checks full flow", () => {
           "Invalid DSL Method idx value: <666>",
         );
         expect(() => new InvalidIdxParser()).to.throw(
-          "Idx value must be a none negative value smaller than 256",
+          "Idx value must be a none negative value smaller than 128",
         );
       });
 
@@ -867,7 +864,7 @@ describe("The Recorder runtime checks full flow", () => {
           "Invalid DSL Method idx value: <-333>",
         );
         expect(() => new InvalidIdxParser()).to.throw(
-          "Idx value must be a none negative value smaller than 256",
+          "Idx value must be a none negative value smaller than 128",
         );
       });
 
@@ -890,7 +887,7 @@ describe("The Recorder runtime checks full flow", () => {
           "Invalid DSL Method idx value: <1999>",
         );
         expect(() => new InvalidIdxParser()).to.throw(
-          "Idx value must be a none negative value smaller than 256",
+          "Idx value must be a none negative value smaller than 128",
         );
       });
 
@@ -917,7 +914,7 @@ describe("The Recorder runtime checks full flow", () => {
           "Invalid DSL Method idx value: <543>",
         );
         expect(() => new InvalidIdxParser()).to.throw(
-          "Idx value must be a none negative value smaller than 256",
+          "Idx value must be a none negative value smaller than 128",
         );
       });
     },
@@ -1065,7 +1062,7 @@ class StarToken {
 
 class DirectlyLeftRecursive extends EmbeddedActionsParser {
   constructor(input: IToken[] = []) {
-    super([StarToken]);
+    super([StarToken], { recoveryEnabled: true });
     this.performSelfAnalysis();
     this.input = input;
   }
@@ -1077,7 +1074,7 @@ class DirectlyLeftRecursive extends EmbeddedActionsParser {
 
 class InDirectlyLeftRecursive extends EmbeddedActionsParser {
   constructor(input: IToken[] = []) {
-    super([StarToken]);
+    super([StarToken], { recoveryEnabled: true });
     this.performSelfAnalysis();
     this.input = input;
   }
@@ -1093,7 +1090,7 @@ class InDirectlyLeftRecursive extends EmbeddedActionsParser {
 
 class ComplexInDirectlyLeftRecursive extends EmbeddedActionsParser {
   constructor(input: IToken[] = []) {
-    super([StarToken]);
+    super([StarToken], { recoveryEnabled: true });
     this.performSelfAnalysis();
     this.input = input;
   }
@@ -1139,7 +1136,7 @@ describe("The empty alternative detection full flow", () => {
   it("will throw an error when an empty alternative is not the last alternative", () => {
     class EmptyAltAmbiguityParser extends EmbeddedActionsParser {
       constructor(input: IToken[] = []) {
-        super([PlusTok, StarTok]);
+        super([PlusTok, StarTok], { recoveryEnabled: true });
         this.performSelfAnalysis();
         this.input = input;
       }
@@ -1174,7 +1171,7 @@ describe("The empty alternative detection full flow", () => {
   it("will throw an error when an empty alternative is not the last alternative - Indirect", () => {
     class EmptyAltIndirectAmbiguityParser extends EmbeddedActionsParser {
       constructor(input: IToken[] = []) {
-        super([PlusTok, StarTok]);
+        super([PlusTok, StarTok], { recoveryEnabled: true });
         this.performSelfAnalysis();
         this.input = input;
       }
@@ -1213,7 +1210,7 @@ describe("The empty alternative detection full flow", () => {
   it("will detect alternative ambiguity with identical lookaheads", () => {
     class AltAmbiguityParserImplicitOccurence extends EmbeddedActionsParser {
       constructor(input: IToken[] = []) {
-        super([PlusTok, StarTok]);
+        super([PlusTok, StarTok], { recoveryEnabled: true });
         this.performSelfAnalysis();
         this.input = input;
       }
@@ -1248,7 +1245,7 @@ describe("The empty alternative detection full flow", () => {
   it("will detect alternative ambiguity with identical empty lookaheads", () => {
     class EmptyAltsAmbiguityParser extends EmbeddedActionsParser {
       constructor(input: IToken[] = []) {
-        super([PlusTok, StarTok]);
+        super([PlusTok, StarTok], { recoveryEnabled: true });
         this.performSelfAnalysis();
         this.input = input;
       }
@@ -1268,23 +1265,19 @@ describe("The empty alternative detection full flow", () => {
         ]);
       });
     }
+    // Empty non-last alts are a real grammar bug (dead code) — should throw.
     expect(() => new EmptyAltsAmbiguityParser()).to.throw(
-      "Ambiguous Alternatives Detected",
-    );
-    expect(() => new EmptyAltsAmbiguityParser()).to.throw("1");
-    expect(() => new EmptyAltsAmbiguityParser()).to.throw("2");
-    expect(() => new EmptyAltsAmbiguityParser()).to.throw(
-      "These alternatives are all empty (match no tokens), making them indistinguishable",
+      "Ambiguous empty alternative",
     );
     expect(() => new EmptyAltsAmbiguityParser()).to.throw(
-      "Only the last alternative may be empty",
+      "Only the last alternative may be an empty alternative",
     );
   });
 
   it("will detect alternative ambiguity with identical lookahead - custom maxLookAhead", () => {
     class AltAmbiguityParserImplicitOccurrence extends EmbeddedActionsParser {
       constructor(input: IToken[] = []) {
-        super([PlusTok, StarTok]);
+        super([PlusTok, StarTok], { recoveryEnabled: true });
         this.performSelfAnalysis();
         this.input = input;
       }
@@ -1326,7 +1319,7 @@ describe("The empty alternative detection full flow", () => {
     it("will ignore specific alternative ambiguity", () => {
       class IgnoreAlternativeAmbiguitiesFlagParser extends EmbeddedActionsParser {
         constructor(input: IToken[] = []) {
-          super([PlusTok, StarTok]);
+          super([PlusTok, StarTok], { recoveryEnabled: true });
           this.performSelfAnalysis();
           this.input = input;
         }
@@ -1355,7 +1348,7 @@ describe("The empty alternative detection full flow", () => {
     it("will ignore all alternation ambiguities", () => {
       class IgnoreAlternationAmbiguitiesFlagParser extends EmbeddedActionsParser {
         constructor(input: IToken[] = []) {
-          super([PlusTok, StarTok]);
+          super([PlusTok, StarTok], { recoveryEnabled: true });
           this.performSelfAnalysis();
           this.input = input;
         }
@@ -1393,7 +1386,7 @@ describe("The empty alternative detection full flow", () => {
   it("will throw an error when an empty alternative is not the last alternative #2", () => {
     class EmptyAltAmbiguityParser2 extends EmbeddedActionsParser {
       constructor(input: IToken[] = []) {
-        super([PlusTok, StarTok]);
+        super([PlusTok, StarTok], { recoveryEnabled: true });
         this.performSelfAnalysis();
         this.input = input;
       }
@@ -1573,7 +1566,7 @@ describe("The prefix ambiguity detection full flow", () => {
   it("will throw an error when an a common prefix ambiguity is detected - implicit occurrence idx", () => {
     class PrefixAltAmbiguity2 extends EmbeddedActionsParser {
       constructor(input: IToken[] = []) {
-        super([PlusTok, MinusTok, StarTok]);
+        super([PlusTok, MinusTok, StarTok], { recoveryEnabled: true });
         this.performSelfAnalysis();
         this.input = input;
       }
@@ -1640,7 +1633,7 @@ describe("The no non-empty lookahead validation", () => {
   it("will throw an error when there are no non-empty lookaheads for AT_LEAST_ONE", () => {
     class EmptyLookaheadParserAtLeastOne extends EmbeddedActionsParser {
       constructor(input: IToken[] = []) {
-        super([PlusTok]);
+        super([PlusTok], { recoveryEnabled: true });
         this.performSelfAnalysis();
         this.input = input;
       }

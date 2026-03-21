@@ -6,6 +6,9 @@ const options = {
     // this path seems to be relative to the `worker_impel.js` file
     // where this path will be imported using `WorkerGlobalScope.importScripts()`
     bundle: "./esm_wrappers/chevrotain_next.mjs",
+    lexerConfig: {
+      positionTracking: "onlyOffset",
+    },
     parserConfig: {
       maxLookahead: 2,
       outputCst: false,
@@ -14,6 +17,9 @@ const options = {
   latest: {
     // bundle: "../chevrotain.js",
     bundle: "./esm_wrappers/chevrotain_latest.mjs",
+    lexerConfig: {
+      positionTracking: "onlyOffset",
+    },
     parserConfig: {
       maxLookahead: 2,
       outputCst: false,

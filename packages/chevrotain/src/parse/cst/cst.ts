@@ -67,11 +67,10 @@ export function addTerminalToCst(
   token: IToken,
   tokenTypeName: string,
 ): void {
-  if (node.children[tokenTypeName] === undefined) {
-    node.children[tokenTypeName] = [token];
-  } else {
-    node.children[tokenTypeName].push(token);
-  }
+  // ??= avoids the hidden-class transition that `= [token]` causes on first
+  // occurrence (empty array and single-element array have different V8 internal
+  // representations). All child arrays are created empty and grown via push.
+  (node.children[tokenTypeName] ??= []).push(token);
 }
 
 export function addNoneTerminalToCst(
@@ -79,9 +78,5 @@ export function addNoneTerminalToCst(
   ruleName: string,
   ruleResult: any,
 ): void {
-  if (node.children[ruleName] === undefined) {
-    node.children[ruleName] = [ruleResult];
-  } else {
-    node.children[ruleName].push(ruleResult);
-  }
+  (node.children[ruleName] ??= []).push(ruleResult);
 }

@@ -7,6 +7,9 @@ onmessage = async function (event) {
     if (event.data.parserConfig) {
       self.parserConfig = event.data.parserConfig;
     }
+    if (event.data.lexerConfig) {
+      self.lexerConfig = event.data.lexerConfig;
+    }
 
     for (const elem of event.data.importScripts) {
       await import(elem);
@@ -31,6 +34,7 @@ onmessage = async function (event) {
         parser,
         startRule,
         options,
+        lexerConfig,
         parserConfig,
       );
       postMessage(0);

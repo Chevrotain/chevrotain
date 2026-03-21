@@ -191,8 +191,8 @@ export function analyzeTokenTypes(
       (clazz: any) => clazz.PUSH_MODE,
     );
 
-    patternIdxToPopMode = onlyRelevantTypes.map((clazz: any) =>
-      Object.hasOwn(clazz, "POP_MODE"),
+    patternIdxToPopMode = onlyRelevantTypes.map(
+      (clazz: any) => clazz.POP_MODE === true,
     );
   });
 
@@ -204,7 +204,7 @@ export function analyzeTokenTypes(
     patternIdxToCanLineTerminator = onlyRelevantTypes.map((tokType) => false);
     if (options.positionTracking !== "onlyOffset") {
       patternIdxToCanLineTerminator = onlyRelevantTypes.map((tokType) => {
-        if (Object.hasOwn(tokType, "LINE_BREAKS")) {
+        if (tokType.LINE_BREAKS !== undefined) {
           return !!tokType.LINE_BREAKS;
         } else {
           return (
@@ -403,7 +403,7 @@ export function findMissingPatterns(
   tokenTypes: TokenType[],
 ): ILexerFilterResult {
   const tokenTypesWithMissingPattern = tokenTypes.filter((currType) => {
-    return !Object.hasOwn(currType, PATTERN);
+    return currType[PATTERN] == null;
   });
 
   const errors = tokenTypesWithMissingPattern.map((currType) => {
@@ -641,7 +641,7 @@ export function findInvalidGroupType(
   tokenTypes: TokenType[],
 ): ILexerDefinitionError[] {
   const invalidTypes = tokenTypes.filter((clazz: any) => {
-    if (!Object.hasOwn(clazz, "GROUP")) {
+    if (clazz.GROUP === undefined) {
       return false;
     }
     const group = clazz.GROUP;
@@ -849,7 +849,7 @@ export function performRuntimeChecks(
               `<${currModeName}> at index: <${currIdx}>\n`,
             type: LexerDefinitionErrorType.LEXER_DEFINITION_CANNOT_CONTAIN_UNDEFINED,
           });
-        } else if (Object.hasOwn(currTokType, "LONGER_ALT")) {
+        } else if (currTokType.LONGER_ALT !== undefined) {
           const longerAlt = Array.isArray(currTokType.LONGER_ALT)
             ? currTokType.LONGER_ALT
             : [currTokType.LONGER_ALT];
@@ -900,7 +900,7 @@ export function performWarningRuntimeChecks(
         warnings.push(warningDescriptor);
       } else {
         // we don't want to attempt to scan if the user explicitly specified the line_breaks option.
-        if (Object.hasOwn(tokType, "LINE_BREAKS")) {
+        if (tokType.LINE_BREAKS !== undefined) {
           if (tokType.LINE_BREAKS === true) {
             hasAnyLineBreak = true;
           }
@@ -1014,7 +1014,7 @@ function checkLineBreaksIssues(
       errMsg?: string;
     }
   | false {
-  if (Object.hasOwn(tokType, "LINE_BREAKS")) {
+  if (tokType.LINE_BREAKS !== undefined) {
     // if the user explicitly declared the line_breaks option we will respect their choice
     // and assume it is correct.
     return false;

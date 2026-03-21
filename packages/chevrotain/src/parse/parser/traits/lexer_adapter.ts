@@ -1,6 +1,6 @@
 import { END_OF_FILE } from "../parser.js";
 import { IToken } from "@chevrotain/types";
-import { MixedInParser } from "./parser_traits.js";
+import type { MixedInParser } from "./parser_traits.js";
 
 /**
  * Trait responsible abstracting over the interaction with Lexer output (Token vector).
@@ -23,10 +23,9 @@ export class LexerAdapter {
   set input(newInput: IToken[]) {
     // @ts-ignore - `this parameter` not supported in setters/getters
     //   - https://www.typescriptlang.org/docs/handbook/functions.html#this-parameters
-    if (this.selfAnalysisDone !== true) {
-      throw Error(
-        `Missing <performSelfAnalysis> invocation at the end of the Parser's constructor.`,
-      );
+    const parser = this as unknown as MixedInParser;
+    if (!parser.selfAnalysisDone) {
+      parser.ensureGastProductionsCachePopulated();
     }
     // @ts-ignore - `this parameter` not supported in setters/getters
     //   - https://www.typescriptlang.org/docs/handbook/functions.html#this-parameters
