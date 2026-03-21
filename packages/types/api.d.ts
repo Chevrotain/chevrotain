@@ -7,7 +7,7 @@ export type ParserMethod<ARGS extends unknown[], R> = (...args: ARGS) => R;
  * This is just a helper to avoid duplications in the Type Definitions
  * Of `CstParser` and `EmbeddedActionsParser`
  */
-declare abstract class BaseParser {
+export declare abstract class BaseParser {
   /**
    * This must be called at the end of a Parser constructor.
    * See: http://chevrotain.io/docs/tutorial/step2_parsing.html#under-the-hood
@@ -54,6 +54,26 @@ declare abstract class BaseParser {
   getGAstProductions(): Record<string, Rule>;
 
   getSerializedGastProductions(): ISerializedGast[];
+
+  /**
+   * Override hook: snapshot any extra mutable state before a speculative parse
+   * attempt (OPTION, MANY, OR alt). Return value is passed to `restoreCheckpoint`
+   * if the attempt fails. Call `super.saveCheckpoint()` and wrap the result so the
+   * base CST state is also restored.
+   *
+   * @example
+   * protected override saveCheckpoint(): any {
+   *   return { cst: super.saveCheckpoint(), myStack: this.myStack.length };
+   * }
+   * protected override restoreCheckpoint(save: ReturnType<typeof this.saveCheckpoint>): void {
+   *   super.restoreCheckpoint(save.cst);
+   *   this.myStack.length = save.myStack;
+   * }
+   */
+  protected saveCheckpoint(): any;
+
+  /** @see saveCheckpoint */
+  protected restoreCheckpoint(save: any): void;
 
   /**
    * @param grammarRule - The rule to try and parse in backtracking mode.
@@ -112,8 +132,10 @@ declare abstract class BaseParser {
    * ...
    * @see OR
    */
-  protected or(idx: number, altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
-  protected or<T>(idx: number, altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
+  protected or<T = unknown>(
+    idx: number,
+    altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>,
+  ): T;
 
   /**
    * Like `MANY` with the numerical suffix as a parameter, e.g:
@@ -397,71 +419,61 @@ declare abstract class BaseParser {
    *
    * @returns The result of invoking the chosen alternative.
    */
-  protected OR<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR<T = unknown>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR1<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR1(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR1<T = unknown>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR2<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR2(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR2<T = unknown>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR3<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR3(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR3<T = unknown>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR4<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR4(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR4<T = unknown>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR5<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR5(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR5<T = unknown>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR6<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR6(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR6<T = unknown>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR7<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR7(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR7<T = unknown>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR8<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR8(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR8<T = unknown>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR9<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR9(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR9<T = unknown>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
 
   /**
    * Parsing DSL method, that indicates a repetition of zero or more.
@@ -868,30 +880,6 @@ declare abstract class BaseParser {
    * See: {@link BaseParser.LA}
    */
   protected LA_FAST(howMuch: number): IToken;
-
-  /**
-   * Returns the CstNode currently being built by the active rule.
-   *
-   * This allows accessing and modifying the current CST node from within
-   * a rule's implementation, without resorting to internal APIs.
-   *
-   * @example
-   * $.RULE("functionDecl", () => {
-   *   const startIdx = this.currIdx
-   *   $.CONSUME(FunctionKw)
-   *   $.CONSUME(Identifier)
-   *   $.CONSUME(LParen)
-   *   // ...
-   *   $.CONSUME(RParen)
-   *   // Attach the token vector range to the current CstNode for source mapping
-   *   this.ACTION(() => {
-   *     this.currCSTNode.tokVectorRange = { from: startIdx, to: this.currIdx }
-   *   })
-   * })
-   *
-   * Only available when the parser is configured to output CST (`CstParser`).
-   */
-  protected get currCSTNode(): CstNode;
 }
 
 /**
@@ -901,7 +889,7 @@ declare abstract class BaseParser {
  *    - https://chevrotain.io/docs/guide/concrete_syntax_tree.html
  * For in depth docs.
  */
-export declare class CstParser extends BaseParser {
+export declare class CstParser extends StrictParser {
   /**
    * Creates a Grammar Rule
    *
@@ -1048,7 +1036,7 @@ export declare class CstParser extends BaseParser {
  *   - https://chevrotain.io/docs/tutorial/step3_adding_actions_root.html#alternatives
  *   - https://chevrotain.io/docs/tutorial/step3b_adding_actions_embedded.html#simple-example
  */
-export declare class EmbeddedActionsParser extends BaseParser {
+export declare class EmbeddedActionsParser extends StrictParser {
   /**
    * Creates a Grammar Rule
    *
@@ -1084,6 +1072,11 @@ export declare class EmbeddedActionsParser extends BaseParser {
     ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts<ARGS>,
   ): R;
+  protected subrule<R>(
+    idx: number,
+    ruleToCall: (...args: unknown[]) => R,
+    options?: SubruleMethodOpts<unknown[]>,
+  ): R;
 
   /**
    * The Parsing DSL Method is used by one rule to call another.
@@ -1106,6 +1099,10 @@ export declare class EmbeddedActionsParser extends BaseParser {
     ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts<ARGS>,
   ): R;
+  protected SUBRULE<R>(
+    ruleToCall: (...args: unknown[]) => R,
+    options?: SubruleMethodOpts<unknown[]>,
+  ): R;
 
   /**
    * @see SUBRULE
@@ -1114,6 +1111,10 @@ export declare class EmbeddedActionsParser extends BaseParser {
   protected SUBRULE1<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts<ARGS>,
+  ): R;
+  protected SUBRULE1<R>(
+    ruleToCall: (...args: unknown[]) => R,
+    options?: SubruleMethodOpts<unknown[]>,
   ): R;
 
   /**
@@ -1124,6 +1125,10 @@ export declare class EmbeddedActionsParser extends BaseParser {
     ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts<ARGS>,
   ): R;
+  protected SUBRULE2<R>(
+    ruleToCall: (...args: unknown[]) => R,
+    options?: SubruleMethodOpts<unknown[]>,
+  ): R;
 
   /**
    * @see SUBRULE
@@ -1132,6 +1137,10 @@ export declare class EmbeddedActionsParser extends BaseParser {
   protected SUBRULE3<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts<ARGS>,
+  ): R;
+  protected SUBRULE3<R>(
+    ruleToCall: (...args: unknown[]) => R,
+    options?: SubruleMethodOpts<unknown[]>,
   ): R;
 
   /**
@@ -1142,6 +1151,10 @@ export declare class EmbeddedActionsParser extends BaseParser {
     ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts<ARGS>,
   ): R;
+  protected SUBRULE4<R>(
+    ruleToCall: (...args: unknown[]) => R,
+    options?: SubruleMethodOpts<unknown[]>,
+  ): R;
 
   /**
    * @see SUBRULE
@@ -1150,6 +1163,10 @@ export declare class EmbeddedActionsParser extends BaseParser {
   protected SUBRULE5<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts<ARGS>,
+  ): R;
+  protected SUBRULE5<R>(
+    ruleToCall: (...args: unknown[]) => R,
+    options?: SubruleMethodOpts<unknown[]>,
   ): R;
 
   /**
@@ -1160,6 +1177,10 @@ export declare class EmbeddedActionsParser extends BaseParser {
     ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts<ARGS>,
   ): R;
+  protected SUBRULE6<R>(
+    ruleToCall: (...args: unknown[]) => R,
+    options?: SubruleMethodOpts<unknown[]>,
+  ): R;
 
   /**
    * @see SUBRULE
@@ -1168,6 +1189,10 @@ export declare class EmbeddedActionsParser extends BaseParser {
   protected SUBRULE7<ARGS extends unknown[], R>(
     ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts<ARGS>,
+  ): R;
+  protected SUBRULE7<R>(
+    ruleToCall: (...args: unknown[]) => R,
+    options?: SubruleMethodOpts<unknown[]>,
   ): R;
 
   /**
@@ -1178,6 +1203,10 @@ export declare class EmbeddedActionsParser extends BaseParser {
     ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts<ARGS>,
   ): R;
+  protected SUBRULE8<R>(
+    ruleToCall: (...args: unknown[]) => R,
+    options?: SubruleMethodOpts<unknown[]>,
+  ): R;
 
   /**
    * @see SUBRULE
@@ -1187,7 +1216,15 @@ export declare class EmbeddedActionsParser extends BaseParser {
     ruleToCall: ParserMethod<ARGS, R>,
     options?: SubruleMethodOpts<ARGS>,
   ): R;
+  protected SUBRULE9<R>(
+    ruleToCall: (...args: unknown[]) => R,
+    options?: SubruleMethodOpts<unknown[]>,
+  ): R;
 }
+
+export declare class StrictParser extends BaseParser {}
+export declare class ForgivingParser extends BaseParser {}
+export declare class SmartParser extends ForgivingParser {}
 
 export interface ILexerDefinitionError {
   message: string;
@@ -1638,6 +1675,8 @@ export interface TokenType {
   };
   isParent?: boolean;
   START_CHARS_HINT?: (string | number)[];
+  /** @internal Bitset for O(1) category membership checks. Replaces categoryMatchesMap at runtime. */
+  MATCH_SET?: Uint32Array | null;
 }
 
 /**

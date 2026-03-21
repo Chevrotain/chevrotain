@@ -935,7 +935,7 @@ describe("lookahead Regular Tokens Mode", () => {
     it("will throw an error when two alternatives have the same single token (lookahead 1) prefix", () => {
       class OrAmbiguityLookAheadParser extends EmbeddedActionsParser {
         constructor(input: IToken[] = []) {
-          super(ALL_TOKENS, {});
+          super(ALL_TOKENS, { recoveryEnabled: true });
 
           this.performSelfAnalysis();
           this.input = input;
@@ -974,15 +974,17 @@ describe("lookahead Regular Tokens Mode", () => {
       }
 
       expect(() => new OrAmbiguityLookAheadParser()).to.throw(
-        "Ambiguous Alternatives Detected:",
+        "Ambiguous Alternatives Detected",
       );
-      expect(() => new OrAmbiguityLookAheadParser()).to.throw("OneTok");
+      expect(() => new OrAmbiguityLookAheadParser()).to.throw(
+        "<OneTok> may appears as a prefix path",
+      );
     });
 
     it("will throw an error when two alternatives have the same multi token (lookahead > 1) prefix", () => {
       class OrAmbiguityMultiTokenLookAheadParser extends EmbeddedActionsParser {
         constructor(input: IToken[] = []) {
-          super(ALL_TOKENS, {});
+          super(ALL_TOKENS, { recoveryEnabled: true });
 
           this.performSelfAnalysis();
           this.input = input;
@@ -1018,10 +1020,10 @@ describe("lookahead Regular Tokens Mode", () => {
         }
       }
       expect(() => new OrAmbiguityMultiTokenLookAheadParser()).to.throw(
-        "Ambiguous Alternatives Detected:",
+        "Ambiguous Alternatives Detected",
       );
       expect(() => new OrAmbiguityMultiTokenLookAheadParser()).to.throw(
-        "TwoTok, ThreeTok, FourTok",
+        "<TwoTok, ThreeTok, FourTok> may appears as a prefix path",
       );
     });
   });

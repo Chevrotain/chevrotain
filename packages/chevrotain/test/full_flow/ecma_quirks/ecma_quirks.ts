@@ -7,6 +7,7 @@ import {
 
 import { END_OF_FILE } from "../../../src/parse/parser/parser.js";
 import { MismatchedTokenException } from "../../../src/parse/exceptions_public.js";
+import { SPEC_FAIL } from "../../../src/parse/parser/traits/recognizer_engine.js";
 
 import type {
   ILookaheadStrategy,
@@ -282,13 +283,20 @@ class EcmaScriptQuirksParser extends EmbeddedActionsParser {
   consumeInternal(
     this: MixedInParser & EcmaScriptQuirksParser,
     tokClass: TokenType,
-    idx: number,
+    _idx: number,
   ): IToken {
+    const savedTextIdx = this.textIdx;
     this.skipWhitespace();
     const nextToken = this.consumeExpected(tokClass);
     if (nextToken !== false) {
       return nextToken;
     } else {
+      // During speculative execution restore textIdx and throw SPEC_FAIL so
+      // the caller's save/restore mechanism can roll back cleanly.
+      if (this.IS_SPECULATING) {
+        this.textIdx = savedTextIdx;
+        throw SPEC_FAIL;
+      }
       const errorToken = {
         tokenType: ErrorToken,
         tokenTypeIdx: ErrorToken.tokenTypeIdx!,

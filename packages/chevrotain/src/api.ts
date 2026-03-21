@@ -4,8 +4,11 @@
 export { VERSION } from "./version.js";
 
 export {
+  StrictParser,
+  ForgivingParser,
   CstParser,
   EmbeddedActionsParser,
+  SmartParser,
   ParserDefinitionErrorType,
   EMPTY_ALT,
 } from "./parse/parser/parser.js";

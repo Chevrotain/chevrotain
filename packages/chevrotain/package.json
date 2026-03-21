@@ -29,9 +29,9 @@
   "types": "./chevrotain.d.ts",
   "exports": {
     ".": {
+      "types": "./chevrotain.d.ts",
       "import": "./lib/src/api.js",
-      "require": "./lib/src/api.js",
-      "types": "./chevrotain.d.ts"
+      "require": "./lib/src/api.js"
     }
   },
   "files": [
@@ -61,7 +61,7 @@
     "unit-tests": "mocha --enable-source-maps",
     "quick-build": "tsc && npm-run-all bundle",
     "---------- BUILD STEPS --------": "",
-    "clean": "rimraf coverage dev lib temp",
+    "clean": "shx rm -rf coverage dev lib temp",
     "compile": "tsc",
     "compile:watch": "tsc -w",
     "coverage": "c8 mocha --enable-source-maps",

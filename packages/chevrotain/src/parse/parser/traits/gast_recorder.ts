@@ -48,7 +48,10 @@ const RECORDING_NULL_OBJECT = {
 Object.freeze(RECORDING_NULL_OBJECT);
 
 const HANDLE_SEPARATOR = true;
-const MAX_METHOD_IDX = Math.pow(2, BITS_FOR_OCCURRENCE_IDX) - 1;
+// Hardcoded ceiling so validation stays correct regardless of BITS_FOR_OCCURRENCE_IDX.
+// _dslCounter can reach values well above 2^BITS_FOR_OCCURRENCE_IDX (it encodes
+// the flat sequence of all DSL calls in a rule body), so we cap at 127 (7-bit).
+const MAX_METHOD_IDX = 127;
 
 const RFT = createToken({ name: "RECORDING_PHASE_TOKEN", pattern: Lexer.NA });
 augmentTokenTypes([RFT]);
@@ -89,103 +92,10 @@ export class GastRecorder {
 
   enableRecording(this: MixedInParser): void {
     this.RECORDING_PHASE = true;
-
-    this.TRACE_INIT("Enable Recording", () => {
-      /**
-       * Warning Dark Voodoo Magic upcoming!
-       * We are "replacing" the public parsing DSL methods API
-       * With **new** alternative implementations on the Parser **instance**
-       *
-       * So far this is the only way I've found to avoid performance regressions during parsing time.
-       * - Approx 30% performance regression was measured on Chrome 75 Canary when attempting to replace the "internal"
-       *   implementations directly instead.
-       */
-      for (let i = 0; i < 10; i++) {
-        const idx = i > 0 ? i : "";
-        this[`CONSUME${idx}` as "CONSUME"] = function (arg1, arg2) {
-          return this.consumeInternalRecord(arg1, i, arg2);
-        };
-        this[`SUBRULE${idx}` as "SUBRULE"] = function (arg1, arg2) {
-          return this.subruleInternalRecord(arg1, i, arg2) as any;
-        };
-        this[`OPTION${idx}` as "OPTION"] = function (arg1) {
-          return this.optionInternalRecord(arg1, i);
-        };
-        this[`OR${idx}` as "OR"] = function (arg1) {
-          return this.orInternalRecord(arg1, i);
-        };
-        this[`MANY${idx}` as "MANY"] = function (arg1) {
-          this.manyInternalRecord(i, arg1);
-        };
-        this[`MANY_SEP${idx}` as "MANY_SEP"] = function (arg1) {
-          this.manySepFirstInternalRecord(i, arg1);
-        };
-        this[`AT_LEAST_ONE${idx}` as "AT_LEAST_ONE"] = function (arg1) {
-          this.atLeastOneInternalRecord(i, arg1);
-        };
-        this[`AT_LEAST_ONE_SEP${idx}` as "AT_LEAST_ONE_SEP"] = function (arg1) {
-          this.atLeastOneSepFirstInternalRecord(i, arg1);
-        };
-      }
-
-      // DSL methods with the idx(suffix) as an argument
-      this[`consume`] = function (idx, arg1, arg2) {
-        return this.consumeInternalRecord(arg1, idx, arg2);
-      };
-      this[`subrule`] = function (idx, arg1, arg2) {
-        return this.subruleInternalRecord(arg1, idx, arg2) as any;
-      };
-      this[`option`] = function (idx, arg1) {
-        return this.optionInternalRecord(arg1, idx);
-      };
-      this[`or`] = function (idx, arg1) {
-        return this.orInternalRecord(arg1, idx);
-      };
-      this[`many`] = function (idx, arg1) {
-        this.manyInternalRecord(idx, arg1);
-      };
-      this[`atLeastOne`] = function (idx, arg1) {
-        this.atLeastOneInternalRecord(idx, arg1);
-      };
-
-      this.ACTION = this.ACTION_RECORD;
-      this.BACKTRACK = this.BACKTRACK_RECORD;
-      this.LA = this.LA_RECORD;
-    });
   }
 
   disableRecording(this: MixedInParser) {
     this.RECORDING_PHASE = false;
-    // By deleting these **instance** properties, any future invocation
-    // will be deferred to the original methods on the **prototype** object
-    // This seems to get rid of any incorrect optimizations that V8 may
-    // do during the recording phase.
-    this.TRACE_INIT("Deleting Recording methods", () => {
-      const that: any = this;
-
-      for (let i = 0; i < 10; i++) {
-        const idx = i > 0 ? i : "";
-        delete that[`CONSUME${idx}`];
-        delete that[`SUBRULE${idx}`];
-        delete that[`OPTION${idx}`];
-        delete that[`OR${idx}`];
-        delete that[`MANY${idx}`];
-        delete that[`MANY_SEP${idx}`];
-        delete that[`AT_LEAST_ONE${idx}`];
-        delete that[`AT_LEAST_ONE_SEP${idx}`];
-      }
-
-      delete that[`consume`];
-      delete that[`subrule`];
-      delete that[`option`];
-      delete that[`or`];
-      delete that[`many`];
-      delete that[`atLeastOne`];
-
-      delete that.ACTION;
-      delete that.BACKTRACK;
-      delete that.LA;
-    });
   }
 
   //   Parser methods are called inside an ACTION?
@@ -211,12 +121,26 @@ export class GastRecorder {
     return END_OF_FILE;
   }
 
-  topLevelRuleRecord(name: string, def: Function): Rule {
+  topLevelRuleRecord(this: MixedInParser, name: string, def: Function): Rule {
     try {
       const newTopLevelRule = new Rule({ definition: [], name: name });
       newTopLevelRule.name = name;
       this.recordingProdStack.push(newTopLevelRule);
+      // Set up rule state so auto-occurrence counters work during recording.
+      // We manage RULE_STACK_IDX directly instead of calling
+      // ruleInvocationStateUpdate (which has CST side effects).
+      const depth = ++this.RULE_STACK_IDX;
+      const shortName = this.fullRuleNameToShort[name] ?? 0;
+      this.RULE_STACK[depth] = shortName;
+      this.currRuleShortName = shortName;
+      this._dslCounterStack[depth] = this._dslCounter;
+      this._dslCounter = 0;
       def.call(this);
+      this._dslCounter = this._dslCounterStack[depth];
+      this.RULE_STACK_IDX--;
+      if (this.RULE_STACK_IDX >= 0) {
+        this.currRuleShortName = this.RULE_STACK[this.RULE_STACK_IDX];
+      }
       this.recordingProdStack.pop();
       return newTopLevelRule;
     } catch (originalError) {
@@ -416,7 +340,19 @@ function recordOrProd(mainProdArg: any, occurrence: number): any {
 
   prevProd.definition.push(newOrProd);
 
+  // Save _dslCounter before iterating alternatives. During recording ALL
+  // alts are walked sequentially, each getting unique counter ranges.
+  // At runtime only ONE alt is chosen, so we record each alt's starting
+  // offset and the total delta. At runtime, _dslCounter is set to the
+  // chosen alt's starting offset before execution, and advanced to the
+  // total delta afterwards.
+  const savedDslCounter = this._dslCounter;
+  const altStarts: number[] = [];
+
   alts.forEach((currAlt) => {
+    // Record this alt's starting offset relative to savedDslCounter.
+    altStarts.push(this._dslCounter - savedDslCounter);
+
     const currAltFlat = new Alternative({ definition: [] });
     newOrProd.definition.push(currAltFlat);
     if (Object.hasOwn(currAlt, "IGNORE_AMBIGUITIES")) {
@@ -430,11 +366,25 @@ function recordOrProd(mainProdArg: any, occurrence: number): any {
     currAlt.ALT.call(this);
     this.recordingProdStack.pop();
   });
+
+  // Total delta across all alternatives.
+  const totalDelta = this._dslCounter - savedDslCounter;
+
+  // Store per-alt starting offsets and total delta so orInternal can set
+  // the counter to the correct offset before executing the chosen alt,
+  // and advance past the OR afterwards.
+  const mapKey = this.currRuleShortName | occurrence;
+  this._orCounterDeltas[mapKey] = totalDelta;
+  this._orAltCounterStarts[mapKey] = altStarts;
+
   return RECORDING_NULL_OBJECT;
 }
 
-function getIdxSuffix(idx: number): string {
-  return idx === 0 ? "" : `${idx}`;
+function getIdxSuffix(_idx: number): string {
+  // With auto-occurrence counting, the idx is an internal auto-assigned
+  // value, not the user's explicit method suffix. Always return empty
+  // so error messages show the base method name (CONSUME, SUBRULE, etc.).
+  return "";
 }
 
 function assertMethodIdxIsValid(idx: number): void {

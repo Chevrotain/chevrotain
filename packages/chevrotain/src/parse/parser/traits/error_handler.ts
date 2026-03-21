@@ -2,6 +2,7 @@ import {
   IParserConfig,
   IParserErrorMessageProvider,
   IRecognitionException,
+  TokenType,
 } from "@chevrotain/types";
 import {
   EarlyExitException,
@@ -15,6 +16,7 @@ import {
 } from "../../grammar/lookahead.js";
 import { MixedInParser } from "./parser_traits.js";
 import { DEFAULT_PARSER_CONFIG } from "../parser.js";
+import { SPEC_FAIL } from "./recognizer_engine.js";
 
 /**
  * Trait responsible for runtime parsing errors.
@@ -39,7 +41,7 @@ export class ErrorHandler {
         ruleStack: this.getHumanReadableRuleStack(),
         ruleOccurrenceStack: this.RULE_OCCURRENCE_STACK.slice(
           0,
-          this.RULE_OCCURRENCE_STACK_IDX + 1,
+          this.RULE_STACK_IDX + 1,
         ),
       };
       this._errors.push(error);
@@ -66,21 +68,30 @@ export class ErrorHandler {
     prodType: PROD_TYPE,
     userDefinedErrMsg: string | undefined,
   ): never {
+    // During speculative execution the result is discarded anyway — skip the
+    // expensive GAST traversal and exception allocation.
+    if (this.IS_SPECULATING) throw SPEC_FAIL;
     const ruleName = this.getCurrRuleFullName();
     const ruleGrammar = this.getGAstProductions()[ruleName];
-    const lookAheadPathsPerAlternative = getLookaheadPathsForOptionalProd(
-      occurrence,
-      ruleGrammar,
-      prodType,
-      this.maxLookahead,
-    );
-    const insideProdPaths = lookAheadPathsPerAlternative[0];
+
+    // GAST is only available when recoveryEnabled (recording ran).
+    // Without it, build a simpler error message without expected-token paths.
+    let insideProdPaths: TokenType[][] | undefined;
+    if (ruleGrammar !== undefined) {
+      const lookAheadPathsPerAlternative = getLookaheadPathsForOptionalProd(
+        occurrence,
+        ruleGrammar,
+        prodType,
+        this.maxLookahead,
+      );
+      insideProdPaths = lookAheadPathsPerAlternative[0];
+    }
     const actualTokens = [];
     for (let i = 1; i <= this.maxLookahead; i++) {
       actualTokens.push(this.LA(i));
     }
     const msg = this.errorMessageProvider.buildEarlyExitMessage({
-      expectedIterationPaths: insideProdPaths,
+      expectedIterationPaths: insideProdPaths ?? [],
       actual: actualTokens,
       previous: this.LA(0),
       customUserDescription: userDefinedErrMsg,
@@ -96,6 +107,9 @@ export class ErrorHandler {
     occurrence: number,
     errMsgTypes: string | undefined,
   ): never {
+    // During speculative execution the result is discarded anyway — skip the
+    // expensive GAST traversal and exception allocation.
+    if (this.IS_SPECULATING) throw SPEC_FAIL;
     const ruleName = this.getCurrRuleFullName();
     const ruleGrammar = this.getGAstProductions()[ruleName];
     // TODO: getLookaheadPathsForOr can be slow for large enough maxLookahead and certain grammars, consider caching ?
