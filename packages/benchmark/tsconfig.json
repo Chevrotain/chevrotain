@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "composite": false,
+    "declaration": false,
+    "sourceMap": false,
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "allowJs": true,
+    "lib": ["ES2024"],
+    "types": ["node"]
+  },
+  "include": [
+    "src/**/*.ts",
+    "../../examples/grammars/json/benchmark_fixture.js",
+    "../../examples/grammars/css/benchmark_fixture.js"
+  ]
+}

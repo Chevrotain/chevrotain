@@ -1,0 +1,17 @@
+{
+  "name": "@chevrotain/benchmark",
+  "version": "12.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "ci": "bun run build && bun run test",
+    "bench": "bun run src/cli.ts",
+    "build": "bun run compile",
+    "compile": "tsc --noEmit",
+    "test": "bun run smoke",
+    "smoke": "bun run bench --mode all --parser all --samples 1 --iterations 100"
+  },
+  "dependencies": {
+    "chevrotain": "workspace:*"
+  }
+}

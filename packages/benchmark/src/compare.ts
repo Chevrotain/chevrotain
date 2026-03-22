@@ -1,0 +1,163 @@
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+import type { CliOptions, ComparisonRow, WorkerResult } from "./types.js";
+
+const MS_PARITY_THRESHOLD = 0.2;
+
+function median(values: number[]) {
+  const xs = [...values].sort((a, b) => a - b);
+  return xs[Math.floor(xs.length / 2)];
+}
+
+function round(value: number, digits = 2) {
+  const factor = 10 ** digits;
+  return Math.round(value * factor) / factor;
+}
+
+function isMillisecondPhase(phase: string) {
+  return (
+    phase === "construction" || phase === "cold" || phase === "first-parse"
+  );
+}
+
+function getParityNote(phase: string, absoluteDeltaMs: number) {
+  if (!isMillisecondPhase(phase)) {
+    return "";
+  }
+
+  if (absoluteDeltaMs <= MS_PARITY_THRESHOLD) {
+    return `parity (<= ${MS_PARITY_THRESHOLD.toFixed(1)} ms)`;
+  }
+
+  return "";
+}
+
+function runWorker(libUrl: string, options: CliOptions): WorkerResult {
+  const workerPath = fileURLToPath(new URL("./worker.ts", import.meta.url));
+  const args = [
+    workerPath,
+    "--lib",
+    libUrl,
+    "--mode",
+    options.mode,
+    "--parser",
+    options.selectedParser,
+    "--iterations",
+    String(options.iterations),
+    "--samples",
+    String(options.samples),
+    "--json",
+  ];
+
+  if (options.useCst) {
+    args.push("--cst");
+  }
+
+  const result = spawnSync(process.execPath, args, {
+    cwd: process.cwd(),
+    encoding: "utf8",
+  });
+
+  if (result.status !== 0) {
+    throw new Error(
+      `Benchmark subprocess failed for ${libUrl}\n${result.stderr || result.stdout}`,
+    );
+  }
+
+  return JSON.parse(result.stdout) as WorkerResult;
+}
+
+export function measureComparison(options: CliOptions) {
+  const roundPairs: Array<{ baseline: WorkerResult; current: WorkerResult }> =
+    [];
+  const totalRounds = options.compareWarmupRounds + options.compareRuns;
+
+  for (let i = 0; i < totalRounds; i++) {
+    let baselineMeasurement: WorkerResult;
+    let currentMeasurement: WorkerResult;
+
+    if (i % 2 === 0) {
+      baselineMeasurement = runWorker(options.baselineLibUrl!, options);
+      currentMeasurement = runWorker(options.thisPrLibUrl, options);
+    } else {
+      currentMeasurement = runWorker(options.thisPrLibUrl, options);
+      baselineMeasurement = runWorker(options.baselineLibUrl!, options);
+    }
+
+    if (i >= options.compareWarmupRounds) {
+      roundPairs.push({
+        baseline: baselineMeasurement,
+        current: currentMeasurement,
+      });
+    }
+  }
+
+  const rowOrder = roundPairs[0].baseline.rows.map(
+    (row) => `${row.fixture}::${row.phase}`,
+  );
+  const pairedMetrics = new Map<
+    string,
+    {
+      fixture: string;
+      phase: ComparisonRow["phase"];
+      baselineValues: number[];
+      currentValues: number[];
+      deltaPctValues: number[];
+      absoluteDeltaValues: number[];
+    }
+  >();
+
+  for (const pair of roundPairs) {
+    pair.baseline.rows.forEach((baselineRow, index) => {
+      const currentRow = pair.current.rows[index];
+      const key = `${baselineRow.fixture}::${baselineRow.phase}`;
+      const entry = pairedMetrics.get(key) ?? {
+        fixture: baselineRow.fixture,
+        phase: baselineRow.phase,
+        baselineValues: [],
+        currentValues: [],
+        deltaPctValues: [],
+        absoluteDeltaValues: [],
+      };
+
+      entry.baselineValues.push(baselineRow.thisPr);
+      entry.currentValues.push(currentRow.thisPr);
+      entry.absoluteDeltaValues.push(
+        Math.abs(currentRow.thisPr - baselineRow.thisPr),
+      );
+
+      if (baselineRow.thisPr !== 0) {
+        entry.deltaPctValues.push(
+          ((currentRow.thisPr - baselineRow.thisPr) / baselineRow.thisPr) * 100,
+        );
+      }
+
+      pairedMetrics.set(key, entry);
+    });
+  }
+
+  const rows: ComparisonRow[] = rowOrder.map((key) => {
+    const entry = pairedMetrics.get(key)!;
+    const baseline = round(median(entry.baselineValues), 3);
+    const thisPr = round(median(entry.currentValues), 3);
+    const deltaPct =
+      entry.deltaPctValues.length === 0
+        ? Number.NaN
+        : median(entry.deltaPctValues);
+
+    return {
+      fixture: entry.fixture,
+      phase: entry.phase,
+      baseline,
+      thisPr,
+      deltaPct,
+      note: getParityNote(entry.phase, median(entry.absoluteDeltaValues)),
+    };
+  });
+
+  return {
+    parser: roundPairs[0].current.parser,
+    fixtures: roundPairs[0].current.fixtures,
+    rows,
+  };
+}

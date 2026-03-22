@@ -77,32 +77,6 @@ So **use with care**.
 
 ### Node CLI benchmark
 
-For small performance PRs it can be useful to measure construction, cold, and warm phases separately
-without the browser harness. After building the repo, run:
+The phase-oriented Node CLI benchmark now lives in [`packages/benchmark`](../../benchmark/README.md).
 
-```bash
-node packages/chevrotain/benchmark_web/benchmark.mjs --mode all --parser all
-```
-
-This prints a table for the current build.
-
-To compare a published or baseline build against the current local build, pass a second bundle:
-
-```bash
-node packages/chevrotain/benchmark_web/benchmark.mjs \
-  --baseline-lib /path/to/chevrotain-v12.0.0.mjs \
-  --baseline-label v12.0.0 \
-  --lib packages/chevrotain/lib/chevrotain.mjs \
-  --mode all \
-  --parser all
-```
-
-The CLI can also target a different current build via `--lib /path/to/chevrotain.mjs`.
-
-Comparison mode runs repeated subprocess measurements to reduce cross-run JIT and GC noise, so it is slower than the single-build mode by design.
-
-In short, the compare mode is intentionally heavier because:
-
-- same-build vs same-build should land close to zero
-- alternating subprocess rounds help avoid favoring one side with hotter process state
-- tiny millisecond deltas are treated as parity when they fall within the configured threshold instead of being overstated as meaningful wins or regressions
+That keeps the browser harness here and the PR-focused CLI benchmark separate.
