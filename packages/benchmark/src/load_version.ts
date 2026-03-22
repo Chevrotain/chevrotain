@@ -1,0 +1,65 @@
+/**
+ * Download and cache chevrotain versions for benchmarking.
+ */
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { resolve, dirname } from "node:path";
+
+const CACHE_DIR = resolve(dirname(import.meta.dirname!), ".cache");
+
+/**
+ * Ensure the "latest" published chevrotain is downloaded and cached locally.
+ * Returns the absolute path to the cached .mjs file.
+ */
+export async function ensureLatestVersion(
+  url: string,
+  noCache: boolean,
+): Promise<string> {
+  mkdirSync(CACHE_DIR, { recursive: true });
+  const cachedPath = resolve(CACHE_DIR, "chevrotain-latest.mjs");
+
+  if (!noCache && existsSync(cachedPath)) {
+    return cachedPath;
+  }
+
+  console.log(`Downloading latest chevrotain from ${url} ...`);
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to download chevrotain from ${url}: ${response.status} ${response.statusText}`,
+    );
+  }
+
+  const body = await response.text();
+
+  // Basic sanity check — the file should contain an export statement
+  if (!body.includes("export")) {
+    throw new Error(
+      `Downloaded file from ${url} does not appear to be a valid ESM module.`,
+    );
+  }
+
+  writeFileSync(cachedPath, body, "utf-8");
+  console.log(`Cached to ${cachedPath}`);
+  return cachedPath;
+}
+
+/**
+ * Resolve and verify the "next" (locally built) chevrotain version.
+ * Returns the absolute path to the local .mjs file.
+ *
+ * @param relativePath Path relative to the benchmark package root.
+ */
+export function ensureNextVersion(relativePath: string): string {
+  const packageRoot = resolve(dirname(import.meta.dirname!));
+  const absPath = resolve(packageRoot, relativePath);
+
+  if (!existsSync(absPath)) {
+    throw new Error(
+      `Next (local) chevrotain build not found at: ${absPath}\n` +
+        `Run 'bun run compile && bun run --filter chevrotain bundle' from the repo root first.`,
+    );
+  }
+
+  return absPath;
+}

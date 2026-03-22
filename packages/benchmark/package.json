@@ -1,0 +1,13 @@
+{
+  "name": "@chevrotain/benchmark",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "bench": "bun src/run.ts",
+    "clean": "rimraf results .cache"
+  },
+  "dependencies": {
+    "mitata": "^1.0.34",
+    "xregexp": "^5.1.1"
+  }
+}
