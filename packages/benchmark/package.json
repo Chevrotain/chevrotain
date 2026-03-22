@@ -3,8 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "bench": "bun src/run.ts",
-    "clean": "rimraf results .cache"
+    "bench": "node --experimental-strip-types src/run.ts",
+    "clean": "rimraf results"
   },
   "dependencies": {
     "mitata": "^1.0.34",

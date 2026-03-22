@@ -15,17 +15,15 @@ export interface BenchmarkConfig {
     latest: { url: string };
     next: { path: string };
   };
-  /** Minimum number of samples for mitata. */
-  minSamples: number;
+  /** Minimum CPU time per benchmark variant in milliseconds. Passed to mitata as min_cpu_time. */
+  minCpuTimeMs: number;
   /** Directory to write result JSON files. */
   resultsDir: string;
 }
 
 export const DEFAULT_CONFIG: BenchmarkConfig = {
-  // grammars: ["json", "css"],
   grammars: ["json"],
-  // phases: ["lexer", "parser", "full"],
-  phases: ["full"],
+  phases: ["lexer", "parser"],
   outputCst: false,
   versions: {
     latest: {
@@ -36,14 +34,16 @@ export const DEFAULT_CONFIG: BenchmarkConfig = {
       path: "../chevrotain/lib/chevrotain.mjs",
     },
   },
-  minSamples: 100,
+  // 642ms is the default of mitata
+  // might need to increase the multiple for more stable results
+  // particularly when measuring small performance improvements (e.g. 1-2%)
+  minCpuTimeMs: 642 * 5,
   resultsDir: "./results",
 };
 
 export interface CliArgs {
   grammar?: string;
   phase?: Phase;
-  noCache: boolean;
   noCst: boolean;
 }
 
@@ -53,12 +53,10 @@ export interface CliArgs {
  * Supported flags:
  *   --grammar=json       Run only this grammar
  *   --phase=parser       Run only this phase
- *   --no-cache           Force re-download of latest version
  *   --no-cst             Disable CST creation (outputCst: false)
  */
 export function parseCliArgs(argv: string[]): CliArgs {
   const args: CliArgs = {
-    noCache: false,
     noCst: false,
   };
 
@@ -67,8 +65,6 @@ export function parseCliArgs(argv: string[]): CliArgs {
       args.grammar = arg.slice("--grammar=".length);
     } else if (arg.startsWith("--phase=")) {
       args.phase = arg.slice("--phase=".length) as Phase;
-    } else if (arg === "--no-cache") {
-      args.noCache = true;
     } else if (arg === "--no-cst") {
       args.noCst = true;
     }

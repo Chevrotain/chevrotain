@@ -1,26 +1,16 @@
 /**
- * Download and cache chevrotain versions for benchmarking.
+ * Download chevrotain versions for benchmarking.
  */
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 
-const CACHE_DIR = resolve(dirname(import.meta.dirname!), ".cache");
-
 /**
- * Ensure the "latest" published chevrotain is downloaded and cached locally.
- * Returns the absolute path to the cached .mjs file.
+ * Download the "latest" published chevrotain from a CDN URL.
+ * Always fetches fresh — no caching — so the result is always
+ * the actual latest published version.
+ * Returns the downloaded content as a string.
  */
-export async function ensureLatestVersion(
-  url: string,
-  noCache: boolean,
-): Promise<string> {
-  mkdirSync(CACHE_DIR, { recursive: true });
-  const cachedPath = resolve(CACHE_DIR, "chevrotain-latest.mjs");
-
-  if (!noCache && existsSync(cachedPath)) {
-    return cachedPath;
-  }
-
+export async function downloadLatestVersion(url: string): Promise<string> {
   console.log(`Downloading latest chevrotain from ${url} ...`);
   const response = await fetch(url);
 
@@ -39,9 +29,7 @@ export async function ensureLatestVersion(
     );
   }
 
-  writeFileSync(cachedPath, body, "utf-8");
-  console.log(`Cached to ${cachedPath}`);
-  return cachedPath;
+  return body;
 }
 
 /**

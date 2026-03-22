@@ -5,16 +5,17 @@
  * using mitata, and writes the result to a JSON file.
  *
  * Usage:
- *   node src/worker.ts \
+ *   node --experimental-strip-types src/worker.ts \
  *     --grammar=json \
  *     --phase=full \
  *     --version=latest \
  *     --chevrotain-path=/abs/path/chevrotain.mjs \
  *     --output=/abs/path/result.json \
- *     --output-cst=true
+ *     --output-cst=true \
+ *     --min-cpu-time-ms=642
  */
 import { writeFileSync } from "node:fs";
-import { bench, run } from "mitata";
+import { measure } from "mitata";
 import { GRAMMARS } from "./grammars/index.ts";
 import type { BenchmarkResult, Phase } from "./types.ts";
 
@@ -34,6 +35,9 @@ function parseWorkerArgs(argv: string[]) {
   const chevrotainPath = args["chevrotain-path"];
   const outputFile = args["output"];
   const outputCst = args["output-cst"] === "true";
+  const minCpuTimeMs = args["min-cpu-time-ms"]
+    ? parseFloat(args["min-cpu-time-ms"])
+    : 642;
 
   if (!grammar || !phase || !versionLabel || !chevrotainPath || !outputFile) {
     console.error("Missing required worker arguments.");
@@ -50,6 +54,7 @@ function parseWorkerArgs(argv: string[]) {
     chevrotainPath,
     outputFile,
     outputCst,
+    minCpuTimeMs,
   };
 }
 
@@ -82,72 +87,53 @@ async function main() {
     grammar.parse(tokens);
   }
 
-  // ---------- Define mitata benchmark ----------
-  const label = `${grammar.name} | ${args.phase} | ${args.versionLabel}`;
-
-  const gcMode = "once";
+  // ---------- Build the function to measure ----------
+  let fn: () => void;
   if (args.phase === "lexer") {
-    bench(label, () => {
+    fn = () => {
       grammar.lex(sampleInput);
-    }).gc(gcMode);
+    };
   } else if (args.phase === "parser") {
-    // Lex once, reuse tokens for every iteration
+    // Lex once upfront; only the parse step is measured each iteration
     const tokens = grammar.lex(sampleInput);
-    bench(label, () => {
+    fn = () => {
       grammar.parse(tokens);
-    }).gc(gcMode);
+    };
   } else {
     // "full" — lex + parse every iteration
-    bench(label, () => {
+    fn = () => {
       grammar.fullFlow(sampleInput);
-    }).gc(gcMode);
-  }
-
-  // ---------- Run benchmark ----------
-  const report = await run({ format: "quiet" });
-
-  // ---------- Extract stats ----------
-  const trial = report.benchmarks[0];
-  const runResult = trial?.runs?.[0];
-
-  let result: BenchmarkResult;
-
-  if (runResult?.error) {
-    result = {
-      grammar: args.grammar,
-      phase: args.phase,
-      version: args.versionLabel,
-      outputCst: args.outputCst,
-      stats: { avg: 0, min: 0, max: 0, p50: 0, p75: 0, p99: 0, samples: 0 },
-      error: String(runResult.error),
-    };
-  } else if (runResult?.stats) {
-    const s = runResult.stats;
-    result = {
-      grammar: args.grammar,
-      phase: args.phase,
-      version: args.versionLabel,
-      outputCst: args.outputCst,
-      stats: {
-        avg: s.avg,
-        min: s.min,
-        max: s.max,
-        p50: s.p50,
-        p75: s.p75,
-        p99: s.p99,
-        samples: s.samples?.length ?? 0,
-      },
-    };
-  } else {
-    result = {
-      grammar: args.grammar,
-      phase: args.phase,
-      version: args.versionLabel,
-      outputCst: args.outputCst,
-      stats: { avg: 0, min: 0, max: 0, p50: 0, p75: 0, p99: 0, samples: 0 },
-      error: "No benchmark results produced",
     };
   }
+
+  // ---------- Run benchmark via mitata measure() ----------
+  // min_cpu_time is in nanoseconds; config provides it in milliseconds.
+  // inner_gc: run GC between each sample to prevent GC pauses skewing results
+  //   (this automatically doubles min_cpu_time inside mitata)
+  // warmup_samples: extra iterations to let V8 TurboFan reach steady-state JIT
+  //   before measurement begins
+  const s = await measure(fn, {
+    min_cpu_time: args.minCpuTimeMs * 1e6,
+    inner_gc: true,
+    warmup_samples: 20,
+  });
+
+  // ---------- Build result ----------
+  const result: BenchmarkResult = {
+    grammar: args.grammar,
+    phase: args.phase,
+    version: args.versionLabel,
+    outputCst: args.outputCst,
+    stats: {
+      avg: s.avg,
+      min: s.min,
+      max: s.max,
+      p50: s.p50,
+      p75: s.p75,
+      p99: s.p99,
+      samples: s.samples?.length ?? 0,
+    },
+  };
 
   // ---------- Write result ----------
   writeFileSync(args.outputFile, JSON.stringify(result, null, 2), "utf-8");

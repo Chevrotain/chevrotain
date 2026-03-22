@@ -6,17 +6,23 @@
  * and prints a comparison table.
  *
  * Usage:
- *   node src/run.ts                          # Run all benchmarks
- *   node src/run.ts --grammar=json           # Only JSON grammar
- *   node src/run.ts --phase=parser           # Only parser phase
- *   node src/run.ts --no-cst                 # Disable CST creation
- *   node src/run.ts --no-cache               # Re-download latest version
+ *   node --experimental-strip-types src/run.ts                # Run all benchmarks
+ *   node --experimental-strip-types src/run.ts --grammar=json # Only JSON grammar
+ *   node --experimental-strip-types src/run.ts --phase=parser # Only parser phase
+ *   node --experimental-strip-types src/run.ts --no-cst       # Disable CST creation
  */
-import { mkdirSync, readFileSync, existsSync } from "node:fs";
-import { resolve, dirname } from "node:path";
+import {
+  mkdirSync,
+  readFileSync,
+  existsSync,
+  writeFileSync,
+  unlinkSync,
+} from "node:fs";
+import { resolve, dirname, join } from "node:path";
+import { tmpdir } from "node:os";
 import { spawn } from "node:child_process";
 import { parseCliArgs, buildConfig } from "./config.ts";
-import { ensureLatestVersion, ensureNextVersion } from "./load_version.ts";
+import { downloadLatestVersion, ensureNextVersion } from "./load_version.ts";
 import { formatResults } from "./format.ts";
 import { GRAMMARS } from "./grammars/index.ts";
 import type { BenchmarkResult, Phase } from "./types.ts";
@@ -30,8 +36,16 @@ interface Variant {
   chevrotainPath: string;
 }
 
+const NODE_TS_FLAGS = [
+  // --experimental-strip-types: run .ts files directly (Node 22.6+)
+  "--experimental-strip-types",
+  // --expose-gc: enables global.gc() so mitata can trigger GC properly between
+  //   samples; without it mitata falls back to allocating a ~1GB array to pressure GC
+  "--expose-gc",
+];
+
 /**
- * Spawn a child process and wait for it to exit.
+ * Spawn a Node.js child process and wait for it to exit.
  * Returns the exit code and captured stderr.
  */
 function spawnWorker(
@@ -39,7 +53,7 @@ function spawnWorker(
   cwd: string,
 ): Promise<{ exitCode: number; stderr: string }> {
   return new Promise((resolve) => {
-    const proc = spawn("node", args, {
+    const proc = spawn("node", [...NODE_TS_FLAGS, ...args], {
       cwd,
       stdio: ["ignore", "pipe", "pipe"],
     });
@@ -85,15 +99,14 @@ async function main() {
   // ---------- Resolve chevrotain versions ----------
   console.log("Resolving chevrotain versions...\n");
 
-  let latestPath: string;
+  // Download latest fresh into a temp file for this run
+  const latestTmpPath = join(tmpdir(), "chevrotain-benchmark-latest.mjs");
   try {
-    latestPath = await ensureLatestVersion(
-      config.versions.latest.url,
-      cliArgs.noCache,
-    );
-    console.log(`  latest: ${latestPath}`);
+    const body = await downloadLatestVersion(config.versions.latest.url);
+    writeFileSync(latestTmpPath, body, "utf-8");
+    console.log(`  latest: ${config.versions.latest.url}`);
   } catch (err: any) {
-    console.error(`Failed to resolve latest version: ${err.message}`);
+    console.error(`Failed to download latest version: ${err.message}`);
     process.exit(1);
   }
 
@@ -114,7 +127,7 @@ async function main() {
         grammar,
         phase,
         versionLabel: "latest",
-        chevrotainPath: latestPath,
+        chevrotainPath: latestTmpPath,
       });
       variants.push({
         grammar,
@@ -134,78 +147,86 @@ async function main() {
   const results: BenchmarkResult[] = [];
   let hasErrors = false;
 
-  for (let i = 0; i < variants.length; i++) {
-    const v = variants[i];
-    const outputFile = resolve(
-      resultsDir,
-      `${v.grammar}-${v.phase}-${v.versionLabel}.json`,
-    );
-    const grammarName = GRAMMARS[v.grammar]?.name ?? v.grammar;
+  try {
+    for (let i = 0; i < variants.length; i++) {
+      const v = variants[i];
+      const outputFile = resolve(
+        resultsDir,
+        `${v.grammar}-${v.phase}-${v.versionLabel}.json`,
+      );
+      const grammarName = GRAMMARS[v.grammar]?.name ?? v.grammar;
 
-    const progress = `[${i + 1}/${variants.length}]`;
-    process.stdout.write(
-      `${progress} ${grammarName} | ${v.phase} | ${v.versionLabel} ...`,
-    );
+      const progress = `[${i + 1}/${variants.length}]`;
+      process.stdout.write(
+        `${progress} ${grammarName} | ${v.phase} | ${v.versionLabel} ...`,
+      );
 
-    const { exitCode, stderr } = await spawnWorker(
-      [
-        workerScript,
-        `--grammar=${v.grammar}`,
-        `--phase=${v.phase}`,
-        `--version=${v.versionLabel}`,
-        `--chevrotain-path=${v.chevrotainPath}`,
-        `--output=${outputFile}`,
-        `--output-cst=${config.outputCst}`,
-      ],
-      PACKAGE_ROOT,
-    );
+      const { exitCode, stderr } = await spawnWorker(
+        [
+          workerScript,
+          `--grammar=${v.grammar}`,
+          `--phase=${v.phase}`,
+          `--version=${v.versionLabel}`,
+          `--chevrotain-path=${v.chevrotainPath}`,
+          `--output=${outputFile}`,
+          `--output-cst=${config.outputCst}`,
+          `--min-cpu-time-ms=${config.minCpuTimeMs}`,
+        ],
+        PACKAGE_ROOT,
+      );
 
-    if (exitCode !== 0) {
-      console.log(` FAILED (exit code ${exitCode})`);
-      if (stderr.trim()) {
-        console.error(`  stderr: ${stderr.trim()}`);
-      }
-      hasErrors = true;
-
-      // Write an error result so the table still shows this variant
-      results.push({
-        grammar: v.grammar,
-        phase: v.phase,
-        version: v.versionLabel,
-        outputCst: config.outputCst,
-        stats: { avg: 0, min: 0, max: 0, p50: 0, p75: 0, p99: 0, samples: 0 },
-        error: `Worker exited with code ${exitCode}`,
-      });
-      continue;
-    }
-
-    // Read the result file
-    if (existsSync(outputFile)) {
-      try {
-        const resultJson = readFileSync(outputFile, "utf-8");
-        const result: BenchmarkResult = JSON.parse(resultJson);
-        results.push(result);
-
-        if (result.error) {
-          console.log(` ERROR: ${result.error}`);
-          hasErrors = true;
-        } else {
-          const opsPerSec =
-            result.stats.avg > 0
-              ? (1e9 / result.stats.avg).toLocaleString("en-US", {
-                  maximumFractionDigits: 0,
-                })
-              : "N/A";
-          console.log(` done (${opsPerSec} op/s)`);
+      if (exitCode !== 0) {
+        console.log(` FAILED (exit code ${exitCode})`);
+        if (stderr.trim()) {
+          console.error(`  stderr: ${stderr.trim()}`);
         }
-      } catch {
-        console.log(" FAILED (could not read result file)");
+        hasErrors = true;
+
+        // Write an error result so the table still shows this variant
+        results.push({
+          grammar: v.grammar,
+          phase: v.phase,
+          version: v.versionLabel,
+          outputCst: config.outputCst,
+          stats: { avg: 0, min: 0, max: 0, p50: 0, p75: 0, p99: 0, samples: 0 },
+          error: `Worker exited with code ${exitCode}`,
+        });
+        continue;
+      }
+
+      // Read the result file
+      if (existsSync(outputFile)) {
+        try {
+          const resultJson = readFileSync(outputFile, "utf-8");
+          const result: BenchmarkResult = JSON.parse(resultJson);
+          results.push(result);
+
+          if (result.error) {
+            console.log(` ERROR: ${result.error}`);
+            hasErrors = true;
+          } else {
+            const opsPerSec =
+              result.stats.avg > 0
+                ? (1e9 / result.stats.avg).toLocaleString("en-US", {
+                    maximumFractionDigits: 0,
+                  })
+                : "N/A";
+            console.log(` done (${opsPerSec} op/s)`);
+          }
+        } catch {
+          console.log(" FAILED (could not read result file)");
+          hasErrors = true;
+        }
+      } else {
+        console.log(" FAILED (no result file produced)");
         hasErrors = true;
       }
-    } else {
-      console.log(" FAILED (no result file produced)");
-      hasErrors = true;
     }
+  } finally {
+    // Clean up the temp file for the latest version
+    try {
+      unlinkSync(latestTmpPath);
+    } catch {}
   }
 
   // ---------- Print results table ----------
