@@ -8,7 +8,7 @@ import {
 import { Lexer } from "../../src/scan/lexer_public.js";
 import { singleAssignCategoriesToksMap } from "../../src/scan/tokens.js";
 import { expect } from "chai";
-import { TokenType } from "@chevrotain/types";
+import { ITokenConfig, TokenType } from "@chevrotain/types";
 
 describe("The Chevrotain Tokens namespace", () => {
   context("createToken", () => {
@@ -178,6 +178,36 @@ describe("The Chevrotain Tokens namespace", () => {
           parent: "oops",
         }),
       ).to.throw("The parent property is no longer supported");
+    });
+
+    it("can read inherited token config properties", () => {
+      const Category = createToken({ name: "Category" });
+      const LongerAlt = createToken({ name: "LongerAlt" });
+      const baseConfig = {
+        pattern: /\nfoo/,
+        categories: Category,
+        label: "Foo",
+        group: Lexer.SKIPPED,
+        push_mode: "attribute",
+        pop_mode: true,
+        longer_alt: LongerAlt,
+        line_breaks: true,
+        start_chars_hint: ["f"],
+      };
+      const config = Object.create(baseConfig) as ITokenConfig;
+      config.name = "InheritedConfigTok";
+
+      const tokType = createToken(config);
+
+      expect(tokType.PATTERN).to.equal(baseConfig.pattern);
+      expect(tokType.CATEGORIES).to.deep.equal([Category]);
+      expect(tokType.LABEL).to.equal("Foo");
+      expect(tokType.GROUP).to.equal(Lexer.SKIPPED);
+      expect(tokType.PUSH_MODE).to.equal("attribute");
+      expect(tokType.POP_MODE).to.be.true;
+      expect(tokType.LONGER_ALT).to.equal(LongerAlt);
+      expect(tokType.LINE_BREAKS).to.be.true;
+      expect(tokType.START_CHARS_HINT).to.deep.equal(["f"]);
     });
 
     it("will not go into infinite loop due to cyclic categories", () => {
