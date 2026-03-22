@@ -1,5 +1,9 @@
 import type { Fixture } from "./types.js";
+// These fixtures intentionally live in the examples tree so the benchmark
+// measures real example grammars rather than local benchmark-only copies.
+// @ts-expect-error No local type declarations are needed for these JS helpers.
 import { createCssBenchmarkFixture } from "../../../examples/grammars/css/benchmark_fixture.js";
+// @ts-expect-error No local type declarations are needed for these JS helpers.
 import { createJsonBenchmarkFixture } from "../../../examples/grammars/json/benchmark_fixture.js";
 
 type ChevrotainModule = Record<string, unknown>;

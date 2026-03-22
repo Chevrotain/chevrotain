@@ -502,6 +502,7 @@ export function createCssBenchmarkFixture(chevrotain, options = {}) {
 
   return {
     name: "CSS",
+    charsPerOp: sample.length,
     makeParser() {
       return new CssParser();
     },

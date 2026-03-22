@@ -8,6 +8,7 @@ export const ALL_PHASES = [
 ] as const;
 
 export type BenchmarkPhase = (typeof ALL_PHASES)[number];
+export type BenchmarkRuntime = "node" | "bun";
 
 export interface MeasureOptions {
   mode: BenchmarkPhase | "all";
@@ -24,6 +25,7 @@ export interface WorkerOptions extends MeasureOptions {
 
 export interface Fixture {
   name: string;
+  charsPerOp: number;
   makeParser(): unknown;
   parseWith(parser: any, tokens: any[]): void;
   tokenize(): any[];
@@ -31,10 +33,18 @@ export interface Fixture {
   run(): void;
 }
 
+export interface ThroughputMetrics {
+  charsPerOp: number;
+  tokensPerOp: number;
+  charsPerSec: number;
+  tokensPerSec: number;
+}
+
 export interface MeasuredRow {
   fixture: string;
   phase: BenchmarkPhase;
   thisPr: number;
+  throughput?: ThroughputMetrics;
 }
 
 export interface WorkerResult {
@@ -52,6 +62,8 @@ export interface CliOptions extends MeasureOptions {
   baselineLibUrl?: string;
   baselineLabel: string;
   currentLabel: string;
+  runtime: BenchmarkRuntime;
+  compareRuntime: boolean;
   jsonOutput: boolean;
   compareRuns: number;
   compareWarmupRounds: number;
@@ -64,4 +76,6 @@ export interface ComparisonRow {
   thisPr: number;
   deltaPct: number;
   note: string;
+  baselineThroughput?: ThroughputMetrics;
+  thisPrThroughput?: ThroughputMetrics;
 }

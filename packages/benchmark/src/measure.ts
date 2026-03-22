@@ -140,38 +140,57 @@ function measurePhase(
   warmup: number,
   iterations: number,
   samples: number,
+  tokensPerOp: number,
 ) {
   if (phase === "construction") {
-    return round(measureConstruction(fixture));
+    return { value: round(measureConstruction(fixture)) };
   }
 
   if (phase === "cold") {
-    return round(measureCold(fixture));
+    return { value: round(measureCold(fixture)) };
   }
 
   if (phase === "first-parse") {
-    return round(measureFirstParse(fixture), 3);
+    return { value: round(measureFirstParse(fixture), 3) };
   }
 
   if (phase === "warm-lex") {
-    return round(
+    const opsPerSec = round(
       measureWarmOps(() => fixture.tokenize(), warmup, iterations, samples),
       0,
     );
+    return {
+      value: opsPerSec,
+      throughput: {
+        charsPerOp: fixture.charsPerOp,
+        tokensPerOp,
+        charsPerSec: round(opsPerSec * fixture.charsPerOp, 0),
+        tokensPerSec: round(opsPerSec * tokensPerOp, 0),
+      },
+    };
   }
 
   if (phase === "warm-parse") {
     const tokens = fixture.tokenize();
-    return round(
-      measureWarmOps(() => fixture.parse(tokens), warmup, iterations, samples),
-      0,
-    );
+    return {
+      value: round(
+        measureWarmOps(
+          () => fixture.parse(tokens),
+          warmup,
+          iterations,
+          samples,
+        ),
+        0,
+      ),
+    };
   }
 
-  return round(
-    measureWarmOps(() => fixture.run(), warmup, iterations, samples),
-    0,
-  );
+  return {
+    value: round(
+      measureWarmOps(() => fixture.run(), warmup, iterations, samples),
+      0,
+    ),
+  };
 }
 
 function getSelectedPhases(mode: MeasureOptions["mode"]) {
@@ -191,17 +210,22 @@ export function measureLibrary(
   const rows: MeasuredRow[] = [];
 
   for (const fixture of fixtures) {
+    const tokensPerOp = fixture.tokenize().length;
+
     for (const phase of phases) {
+      const measured = measurePhase(
+        fixture,
+        phase,
+        options.warmup,
+        options.iterations,
+        options.samples,
+        tokensPerOp,
+      );
       rows.push({
         fixture: fixture.name,
         phase,
-        thisPr: measurePhase(
-          fixture,
-          phase,
-          options.warmup,
-          options.iterations,
-          options.samples,
-        ),
+        thisPr: measured.value,
+        throughput: measured.throughput,
       });
     }
   }

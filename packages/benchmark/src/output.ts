@@ -8,6 +8,35 @@ function formatOps(value: number) {
   return `${Math.round(value).toLocaleString()} ops/sec`;
 }
 
+function formatCount(value: number) {
+  return Math.round(value).toLocaleString();
+}
+
+function findWarmLexRow(
+  rows: MeasuredRow[] | ComparisonRow[],
+  fixture: string,
+) {
+  return rows.find(
+    (row) => row.fixture === fixture && row.phase === "warm-lex",
+  );
+}
+
+function getRowThroughput(row: MeasuredRow | ComparisonRow | undefined) {
+  if (!row) {
+    return undefined;
+  }
+
+  if ("throughput" in row) {
+    return row.throughput;
+  }
+
+  if ("baselineThroughput" in row) {
+    return row.baselineThroughput ?? row.thisPrThroughput;
+  }
+
+  return undefined;
+}
+
 export function formatPhaseValue(phase: BenchmarkPhase, value: number) {
   if (phase === "construction" || phase === "cold") {
     return formatMs(value, 2);
@@ -72,4 +101,91 @@ export function toComparisonRows(
       row.note,
     ]),
   };
+}
+
+export function printWarmLexThroughputSingle(
+  rows: MeasuredRow[],
+  currentLabel: string,
+) {
+  const warmLexRows = rows.filter(
+    (row) => row.phase === "warm-lex" && row.throughput,
+  );
+
+  if (warmLexRows.length === 0) {
+    return;
+  }
+
+  console.log("\nWarm-Lex Normalized Throughput");
+  printTable(
+    ["Fixture", `${currentLabel} tokens/sec`],
+    warmLexRows.map((row) => [
+      row.fixture,
+      formatCount(row.throughput!.tokensPerSec),
+    ]),
+  );
+}
+
+export function printWarmLexThroughputComparison(
+  rows: ComparisonRow[],
+  baselineLabel: string,
+  currentLabel: string,
+) {
+  const warmLexRows = rows.filter(
+    (row) =>
+      row.phase === "warm-lex" &&
+      row.baselineThroughput &&
+      row.thisPrThroughput,
+  );
+
+  if (warmLexRows.length === 0) {
+    return;
+  }
+
+  console.log("\nWarm-Lex Normalized Throughput");
+  printTable(
+    [
+      "Fixture",
+      `${baselineLabel} tokens/sec`,
+      `${currentLabel} tokens/sec`,
+      "Delta",
+    ],
+    warmLexRows.map((row) => [
+      row.fixture,
+      formatCount(row.baselineThroughput!.tokensPerSec),
+      formatCount(row.thisPrThroughput!.tokensPerSec),
+      formatDelta(
+        ((row.thisPrThroughput!.tokensPerSec -
+          row.baselineThroughput!.tokensPerSec) /
+          row.baselineThroughput!.tokensPerSec) *
+          100,
+      ),
+    ]),
+  );
+}
+
+export function printFixtureStats(rows: MeasuredRow[] | ComparisonRow[]) {
+  const fixtures = [...new Set(rows.map((row) => row.fixture))];
+  const statsRows = fixtures
+    .map((fixture) => {
+      const row = findWarmLexRow(rows, fixture);
+      const throughput = getRowThroughput(row);
+
+      if (!throughput) {
+        return undefined;
+      }
+
+      return [
+        fixture,
+        formatCount(throughput.charsPerOp),
+        formatCount(throughput.tokensPerOp),
+      ];
+    })
+    .filter((row): row is string[] => Boolean(row));
+
+  if (statsRows.length === 0) {
+    return;
+  }
+
+  console.log("\nFixture Workload");
+  printTable(["Fixture", "Chars/op", "Tokens/op"], statsRows);
 }

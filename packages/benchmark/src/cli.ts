@@ -1,17 +1,33 @@
 import { parseCliArgs } from "./args.js";
-import { measureComparison } from "./compare.js";
-import { measureLibrary } from "./measure.js";
-import { printTable, toComparisonRows, toSingleBuildRows } from "./output.js";
+import {
+  measureComparison,
+  measureRuntimeComparison,
+  runWorker,
+} from "./compare.js";
+import {
+  printFixtureStats,
+  printTable,
+  printWarmLexThroughputComparison,
+  printWarmLexThroughputSingle,
+  toComparisonRows,
+  toSingleBuildRows,
+} from "./output.js";
 
 const options = parseCliArgs(process.argv.slice(2), import.meta.url);
 
-if (options.baselineLibUrl) {
-  const comparison = measureComparison(options);
+if (options.baselineLibUrl || options.compareRuntime) {
+  const comparison = options.compareRuntime
+    ? measureRuntimeComparison(options)
+    : measureComparison(options);
+  const baselineLabel = options.compareRuntime ? "Node" : options.baselineLabel;
+  const currentLabel = options.compareRuntime ? "Bun" : options.currentLabel;
 
   if (options.jsonOutput) {
     console.log(
       JSON.stringify({
         mode: options.mode,
+        runtime: options.runtime,
+        comparisonMode: options.compareRuntime ? "runtime" : "build",
         parser: comparison.parser,
         iterations: options.iterations,
         warmup: options.warmup,
@@ -19,11 +35,13 @@ if (options.baselineLibUrl) {
         compareRuns: options.compareRuns,
         compareWarmupRounds: options.compareWarmupRounds,
         baseline: {
-          label: options.baselineLabel,
-          lib: options.baselineLibUrl,
+          label: baselineLabel,
+          lib: options.compareRuntime
+            ? options.thisPrLibUrl
+            : options.baselineLibUrl,
         },
         thisPr: {
-          label: options.currentLabel,
+          label: currentLabel,
           lib: options.thisPrLibUrl,
         },
         rows: comparison.rows.map((row) => ({
@@ -43,6 +61,10 @@ if (options.baselineLibUrl) {
 
   console.log("\nChevrotain benchmark");
   console.log(`  parser:     ${comparison.parser}`);
+  console.log(`  comparison: ${options.compareRuntime ? "runtime" : "build"}`);
+  console.log(
+    `  runtime:    ${options.compareRuntime ? "node vs bun" : options.runtime}`,
+  );
   console.log(`  mode:       ${options.mode}`);
   console.log(
     `  iterations: ${options.iterations.toLocaleString()} (+ ${options.warmup.toLocaleString()} warmup)`,
@@ -51,28 +73,29 @@ if (options.baselineLibUrl) {
   console.log(
     `  compare-runs: ${options.compareRuns} (+ ${options.compareWarmupRounds} warmup round${options.compareWarmupRounds === 1 ? "" : "s"})`,
   );
-  console.log(`  ${options.baselineLabel}: ${options.baselineLibUrl}`);
-  console.log(`  ${options.currentLabel}: ${options.thisPrLibUrl}\n`);
-
-  const table = toComparisonRows(
-    comparison.rows,
-    options.baselineLabel,
-    options.currentLabel,
+  console.log(
+    `  ${baselineLabel}: ${options.compareRuntime ? options.thisPrLibUrl : options.baselineLibUrl}`,
   );
+  console.log(`  ${currentLabel}: ${options.thisPrLibUrl}\n`);
+
+  const table = toComparisonRows(comparison.rows, baselineLabel, currentLabel);
   printTable(table.headers, table.rows);
+  printFixtureStats(comparison.rows);
+  printWarmLexThroughputComparison(
+    comparison.rows,
+    baselineLabel,
+    currentLabel,
+  );
   process.exit(0);
 }
 
-const chevrotain = (await import(options.thisPrLibUrl)) as Record<
-  string,
-  unknown
->;
-const result = measureLibrary(chevrotain, options);
+const result = runWorker(options.thisPrLibUrl, options);
 
 if (options.jsonOutput) {
   console.log(
     JSON.stringify({
       mode: options.mode,
+      runtime: options.runtime,
       parser: result.parser,
       iterations: options.iterations,
       warmup: options.warmup,
@@ -90,6 +113,7 @@ if (options.jsonOutput) {
 
 console.log("\nChevrotain benchmark");
 console.log(`  parser:     ${result.parser}`);
+console.log(`  runtime:    ${options.runtime}`);
 console.log(`  mode:       ${options.mode}`);
 console.log(
   `  iterations: ${options.iterations.toLocaleString()} (+ ${options.warmup.toLocaleString()} warmup)`,
@@ -99,3 +123,5 @@ console.log(`  ${options.currentLabel}: ${options.thisPrLibUrl}\n`);
 
 const table = toSingleBuildRows(result.rows, options.currentLabel);
 printTable(table.headers, table.rows);
+printFixtureStats(result.rows);
+printWarmLexThroughputSingle(result.rows, options.currentLabel);

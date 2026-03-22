@@ -73,6 +73,9 @@ export function parseCliArgs(
       : undefined,
     baselineLabel: getArg(args, "--baseline-label", DEFAULT_BASELINE_LABEL)!,
     currentLabel: getArg(args, "--current-label", DEFAULT_CURRENT_LABEL)!,
+    runtime:
+      (getArg(args, "--runtime", "node") as CliOptions["runtime"]) ?? "node",
+    compareRuntime: hasFlag(args, "--compare-runtime"),
     jsonOutput: hasFlag(args, "--json"),
     compareRuns: Math.max(
       3,

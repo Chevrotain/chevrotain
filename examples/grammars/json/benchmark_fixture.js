@@ -119,6 +119,7 @@ export function createJsonBenchmarkFixture(chevrotain, options = {}) {
 
   return {
     name: "JSON",
+    charsPerOp: sample.length,
     makeParser() {
       return new JsonParser();
     },

@@ -1,6 +1,11 @@
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import type { CliOptions, ComparisonRow, WorkerResult } from "./types.js";
+import type {
+  BenchmarkRuntime,
+  CliOptions,
+  ComparisonRow,
+  WorkerResult,
+} from "./types.js";
 
 const MS_PARITY_THRESHOLD = 0.2;
 
@@ -32,8 +37,16 @@ function getParityNote(phase: string, absoluteDeltaMs: number) {
   return "";
 }
 
-function runWorker(libUrl: string, options: CliOptions): WorkerResult {
-  const workerPath = fileURLToPath(new URL("./worker.ts", import.meta.url));
+function getRuntimeCommand(options: CliOptions) {
+  return options.runtime === "bun" ? "bun" : process.execPath;
+}
+
+export function runWorker(
+  libUrl: string,
+  options: CliOptions,
+  runtimeOverride?: BenchmarkRuntime,
+): WorkerResult {
+  const workerPath = fileURLToPath(new URL("./worker.js", import.meta.url));
   const args = [
     workerPath,
     "--lib",
@@ -53,10 +66,18 @@ function runWorker(libUrl: string, options: CliOptions): WorkerResult {
     args.push("--cst");
   }
 
-  const result = spawnSync(process.execPath, args, {
-    cwd: process.cwd(),
-    encoding: "utf8",
-  });
+  const result = spawnSync(
+    runtimeOverride === undefined
+      ? getRuntimeCommand(options)
+      : runtimeOverride === "bun"
+        ? "bun"
+        : process.execPath,
+    args,
+    {
+      cwd: process.cwd(),
+      encoding: "utf8",
+    },
+  );
 
   if (result.status !== 0) {
     throw new Error(
@@ -68,6 +89,26 @@ function runWorker(libUrl: string, options: CliOptions): WorkerResult {
 }
 
 export function measureComparison(options: CliOptions) {
+  return finalizeComparison(
+    options,
+    () => runWorker(options.baselineLibUrl!, options),
+    () => runWorker(options.thisPrLibUrl, options),
+  );
+}
+
+export function measureRuntimeComparison(options: CliOptions) {
+  return finalizeComparison(
+    options,
+    () => runWorker(options.thisPrLibUrl, options, "node"),
+    () => runWorker(options.thisPrLibUrl, options, "bun"),
+  );
+}
+
+function finalizeComparison(
+  options: CliOptions,
+  runBaseline: () => WorkerResult,
+  runCurrent: () => WorkerResult,
+) {
   const roundPairs: Array<{ baseline: WorkerResult; current: WorkerResult }> =
     [];
   const totalRounds = options.compareWarmupRounds + options.compareRuns;
@@ -77,11 +118,11 @@ export function measureComparison(options: CliOptions) {
     let currentMeasurement: WorkerResult;
 
     if (i % 2 === 0) {
-      baselineMeasurement = runWorker(options.baselineLibUrl!, options);
-      currentMeasurement = runWorker(options.thisPrLibUrl, options);
+      baselineMeasurement = runBaseline();
+      currentMeasurement = runCurrent();
     } else {
-      currentMeasurement = runWorker(options.thisPrLibUrl, options);
-      baselineMeasurement = runWorker(options.baselineLibUrl!, options);
+      currentMeasurement = runCurrent();
+      baselineMeasurement = runBaseline();
     }
 
     if (i >= options.compareWarmupRounds) {
@@ -152,6 +193,20 @@ export function measureComparison(options: CliOptions) {
       thisPr,
       deltaPct,
       note: getParityNote(entry.phase, median(entry.absoluteDeltaValues)),
+      baselineThroughput: roundPairThroughput(
+        roundPairs[0].baseline.rows.find(
+          (row) => key === `${row.fixture}::${row.phase}`,
+        )!,
+        "baseline",
+        roundPairs,
+      ),
+      thisPrThroughput: roundPairThroughput(
+        roundPairs[0].current.rows.find(
+          (row) => key === `${row.fixture}::${row.phase}`,
+        )!,
+        "current",
+        roundPairs,
+      ),
     };
   });
 
@@ -159,5 +214,42 @@ export function measureComparison(options: CliOptions) {
     parser: roundPairs[0].current.parser,
     fixtures: roundPairs[0].current.fixtures,
     rows,
+  };
+}
+
+function roundPairThroughput(
+  referenceRow: WorkerResult["rows"][number],
+  side: "baseline" | "current",
+  roundPairs: Array<{ baseline: WorkerResult; current: WorkerResult }>,
+) {
+  if (!referenceRow.throughput) {
+    return undefined;
+  }
+
+  const sourceRows = roundPairs
+    .map((pair) =>
+      side === "baseline" ? pair.baseline.rows : pair.current.rows,
+    )
+    .map((rows) =>
+      rows.find(
+        (row) =>
+          row.fixture === referenceRow.fixture &&
+          row.phase === referenceRow.phase,
+      ),
+    )
+    .filter((row): row is NonNullable<typeof row> => Boolean(row));
+
+  const charsPerSec = median(
+    sourceRows.map((row) => row.throughput?.charsPerSec ?? Number.NaN),
+  );
+  const tokensPerSec = median(
+    sourceRows.map((row) => row.throughput?.tokensPerSec ?? Number.NaN),
+  );
+
+  return {
+    charsPerOp: referenceRow.throughput.charsPerOp,
+    tokensPerOp: referenceRow.throughput.tokensPerOp,
+    charsPerSec: round(charsPerSec, 0),
+    tokensPerSec: round(tokensPerSec, 0),
   };
 }

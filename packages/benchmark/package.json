@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "ci": "bun run build && bun run test",
-    "bench": "bun run src/cli.ts",
-    "build": "bun run compile",
-    "compile": "tsc --noEmit",
+    "bench": "bun run build && node lib/cli.js",
+    "bench:built": "node lib/cli.js",
+    "build": "rimraf lib && tsc --project tsconfig.json",
+    "compile": "bun run build",
     "test": "bun run smoke",
-    "smoke": "bun run bench --mode all --parser all --samples 1 --iterations 100"
+    "smoke": "bun run bench:built --mode all --parser all --samples 1 --iterations 100"
   },
   "dependencies": {
     "chevrotain": "workspace:*"
