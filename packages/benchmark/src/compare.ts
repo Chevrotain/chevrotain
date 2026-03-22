@@ -182,9 +182,13 @@ function finalizeComparison(
     const baseline = round(median(entry.baselineValues), 3);
     const thisPr = round(median(entry.currentValues), 3);
     const deltaPct =
-      entry.deltaPctValues.length === 0
-        ? Number.NaN
-        : median(entry.deltaPctValues);
+      baseline === 0 ? Number.NaN : ((thisPr - baseline) / baseline) * 100;
+    const baselineReferenceRow = roundPairs[0].baseline.rows.find(
+      (row) => key === `${row.fixture}::${row.phase}`,
+    )!;
+    const currentReferenceRow = roundPairs[0].current.rows.find(
+      (row) => key === `${row.fixture}::${row.phase}`,
+    )!;
 
     return {
       fixture: entry.fixture,
@@ -193,20 +197,11 @@ function finalizeComparison(
       thisPr,
       deltaPct,
       note: getParityNote(entry.phase, median(entry.absoluteDeltaValues)),
-      baselineThroughput: roundPairThroughput(
-        roundPairs[0].baseline.rows.find(
-          (row) => key === `${row.fixture}::${row.phase}`,
-        )!,
-        "baseline",
-        roundPairs,
+      baselineThroughput: deriveThroughputFromOps(
+        baselineReferenceRow,
+        baseline,
       ),
-      thisPrThroughput: roundPairThroughput(
-        roundPairs[0].current.rows.find(
-          (row) => key === `${row.fixture}::${row.phase}`,
-        )!,
-        "current",
-        roundPairs,
-      ),
+      thisPrThroughput: deriveThroughputFromOps(currentReferenceRow, thisPr),
     };
   });
 
@@ -217,39 +212,18 @@ function finalizeComparison(
   };
 }
 
-function roundPairThroughput(
+function deriveThroughputFromOps(
   referenceRow: WorkerResult["rows"][number],
-  side: "baseline" | "current",
-  roundPairs: Array<{ baseline: WorkerResult; current: WorkerResult }>,
+  opsPerSec: number,
 ) {
   if (!referenceRow.throughput) {
     return undefined;
   }
 
-  const sourceRows = roundPairs
-    .map((pair) =>
-      side === "baseline" ? pair.baseline.rows : pair.current.rows,
-    )
-    .map((rows) =>
-      rows.find(
-        (row) =>
-          row.fixture === referenceRow.fixture &&
-          row.phase === referenceRow.phase,
-      ),
-    )
-    .filter((row): row is NonNullable<typeof row> => Boolean(row));
-
-  const charsPerSec = median(
-    sourceRows.map((row) => row.throughput?.charsPerSec ?? Number.NaN),
-  );
-  const tokensPerSec = median(
-    sourceRows.map((row) => row.throughput?.tokensPerSec ?? Number.NaN),
-  );
-
   return {
     charsPerOp: referenceRow.throughput.charsPerOp,
     tokensPerOp: referenceRow.throughput.tokensPerOp,
-    charsPerSec: round(charsPerSec, 0),
-    tokensPerSec: round(tokensPerSec, 0),
+    charsPerSec: round(opsPerSec * referenceRow.throughput.charsPerOp, 0),
+    tokensPerSec: round(opsPerSec * referenceRow.throughput.tokensPerOp, 0),
   };
 }
