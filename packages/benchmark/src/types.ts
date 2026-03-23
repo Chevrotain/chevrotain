@@ -5,17 +5,30 @@
 /** Benchmark phase — which part of the parsing pipeline to measure. */
 export type Phase = "lexer" | "parser" | "full";
 
-/** Arguments passed to each worker sub-process via CLI flags. */
-export interface WorkerArgs {
-  grammar: string;
-  phase: Phase;
-  versionLabel: string;
-  chevrotainPath: string;
-  resultsFile: string;
-  outputCst: boolean;
-}
+// ---------- IPC Messages ----------
 
-/** Result written by each worker to its JSON output file. */
+/** Messages sent from the orchestrator to a worker process. */
+export type WorkerCommand =
+  | {
+      type: "init";
+      grammar: string;
+      phase: Phase;
+      chevrotainPath: string;
+      outputCst: boolean;
+      warmupIterations: number;
+    }
+  | { type: "measure"; batchSize: number }
+  | { type: "exit" };
+
+/** Messages sent from a worker process to the orchestrator. */
+export type WorkerResponse =
+  | { type: "ready" }
+  | { type: "samples"; samples: number[] }
+  | { type: "error"; message: string };
+
+// ---------- Results ----------
+
+/** Final benchmark result written to disk after merging all rounds. */
 export interface BenchmarkResult {
   grammar: string;
   phase: Phase;

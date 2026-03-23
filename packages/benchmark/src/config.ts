@@ -15,15 +15,37 @@ export interface BenchmarkConfig {
     latest: { url: string };
     next: { path: string };
   };
-  /** Minimum CPU time per benchmark variant in milliseconds. Passed to mitata as min_cpu_time. */
-  minCpuTimeMs: number;
-  /** Directory to write result JSON files. */
+  /**
+   * Number of samples collected per batch per variant per round.
+   * Each round, the orchestrator requests this many samples from each
+   * variant's long-lived worker process.
+   */
+  batchSize: number;
+  /**
+   * Total number of interleaved rounds.
+   * Total samples per variant = batchSize × rounds.
+   * Higher values distribute temporal noise more evenly across variants.
+   */
+  rounds: number;
+  /**
+   * Number of warmup iterations run in each worker process after loading
+   * the grammar and before any measurement. Allows V8 TurboFan to reach
+   * steady-state JIT compilation.
+   */
+  warmupIterations: number;
+  /**
+   * Fraction of samples to trim from each end before computing final stats.
+   * e.g. 0.1 removes the lowest 10% and highest 10% (20% total).
+   * Applied once on the merged samples from all rounds.
+   */
+  trimPercent: number;
+  /** Directory for final result JSON files. */
   resultsDir: string;
 }
 
 export const DEFAULT_CONFIG: BenchmarkConfig = {
-  grammars: ["json"],
-  phases: ["lexer", "parser"],
+  grammars: ["json", "css"],
+  phases: ["lexer", "parser", "full"],
   outputCst: false,
   versions: {
     latest: {
@@ -34,10 +56,13 @@ export const DEFAULT_CONFIG: BenchmarkConfig = {
       path: "../chevrotain/lib/chevrotain.mjs",
     },
   },
-  // 642ms is the default of mitata
-  // might need to increase the multiple for more stable results
-  // particularly when measuring small performance improvements (e.g. 1-2%)
-  minCpuTimeMs: 642 * 5,
+  batchSize: 100,
+  rounds: 100,
+  // warmup runs in parallel, so we can go overboard without increasing total runtime too much
+  // while increasing the consistency of the results by giving V8 more time to optimize
+  warmupIterations: 10000,
+  // trim outliers aggressively for more consistent results.
+  trimPercent: 0.2,
   resultsDir: "./results",
 };
 

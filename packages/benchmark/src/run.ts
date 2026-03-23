@@ -1,9 +1,10 @@
 /**
  * Benchmark orchestrator — the main entry point.
  *
- * Reads configuration, downloads/verifies chevrotain versions,
- * spawns worker sub-processes for each variant, collects results,
- * and prints a comparison table.
+ * Spawns one long-lived worker process per variant (grammar × phase × version).
+ * Round-robins across all workers, requesting small batches of samples from each.
+ * After all rounds complete, merges samples per variant, trims outliers,
+ * computes final stats, and prints a comparison table.
  *
  * Usage:
  *   node --experimental-strip-types src/run.ts                # Run all benchmarks
@@ -11,23 +12,27 @@
  *   node --experimental-strip-types src/run.ts --phase=parser # Only parser phase
  *   node --experimental-strip-types src/run.ts --no-cst       # Disable CST creation
  */
-import {
-  mkdirSync,
-  readFileSync,
-  existsSync,
-  writeFileSync,
-  unlinkSync,
-} from "node:fs";
+import { mkdirSync, writeFileSync, unlinkSync } from "node:fs";
 import { resolve, dirname, join } from "node:path";
 import { tmpdir } from "node:os";
-import { spawn } from "node:child_process";
+import { spawn, type ChildProcess } from "node:child_process";
 import { parseCliArgs, buildConfig } from "./config.ts";
 import { downloadLatestVersion, ensureNextVersion } from "./load_version.ts";
+import { trimAndComputeStats } from "./stats.ts";
 import { formatResults } from "./format.ts";
 import { GRAMMARS } from "./grammars/index.ts";
-import type { BenchmarkResult, Phase } from "./types.ts";
+import type {
+  BenchmarkResult,
+  Phase,
+  WorkerCommand,
+  WorkerResponse,
+} from "./types.ts";
 
 const PACKAGE_ROOT = resolve(dirname(import.meta.dirname!));
+
+// --experimental-strip-types: run .ts files directly (Node 22.6+)
+// --expose-gc: enables global.gc() so the worker can trigger GC between batches
+const NODE_FLAGS = ["--experimental-strip-types", "--expose-gc"];
 
 interface Variant {
   grammar: string;
@@ -36,38 +41,46 @@ interface Variant {
   chevrotainPath: string;
 }
 
-const NODE_TS_FLAGS = [
-  // --experimental-strip-types: run .ts files directly (Node 22.6+)
-  "--experimental-strip-types",
-  // --expose-gc: enables global.gc() so mitata can trigger GC properly between
-  //   samples; without it mitata falls back to allocating a ~1GB array to pressure GC
-  "--expose-gc",
-];
+interface VariantWorker {
+  variant: Variant;
+  proc: ChildProcess;
+  samples: number[];
+  error?: string;
+}
+
+// ---------- IPC helpers ----------
 
 /**
- * Spawn a Node.js child process and wait for it to exit.
- * Returns the exit code and captured stderr.
+ * Send a command to a worker process via IPC.
  */
-function spawnWorker(
-  args: string[],
-  cwd: string,
-): Promise<{ exitCode: number; stderr: string }> {
-  return new Promise((resolve) => {
-    const proc = spawn("node", [...NODE_TS_FLAGS, ...args], {
-      cwd,
-      stdio: ["ignore", "pipe", "pipe"],
-    });
+function sendCommand(proc: ChildProcess, cmd: WorkerCommand) {
+  proc.send(cmd);
+}
 
-    let stderrData = "";
-    proc.stderr?.on("data", (chunk: Buffer) => {
-      stderrData += chunk.toString();
-    });
-
-    proc.on("close", (code) => {
-      resolve({ exitCode: code ?? 1, stderr: stderrData });
-    });
+/**
+ * Wait for a single IPC message from a worker process.
+ * Rejects if the process exits before sending a message.
+ */
+function waitForMessage(proc: ChildProcess): Promise<WorkerResponse> {
+  return new Promise((resolve, reject) => {
+    function onMessage(msg: WorkerResponse) {
+      cleanup();
+      resolve(msg);
+    }
+    function onClose(code: number | null) {
+      cleanup();
+      reject(new Error(`Worker exited with code ${code} before responding`));
+    }
+    function cleanup() {
+      proc.removeListener("message", onMessage);
+      proc.removeListener("close", onClose);
+    }
+    proc.once("message", onMessage);
+    proc.once("close", onClose);
   });
 }
+
+// ---------- Main ----------
 
 async function main() {
   const cliArgs = parseCliArgs(process.argv.slice(2));
@@ -99,7 +112,6 @@ async function main() {
   // ---------- Resolve chevrotain versions ----------
   console.log("Resolving chevrotain versions...\n");
 
-  // Download latest fresh into a temp file for this run
   const latestTmpPath = join(tmpdir(), "chevrotain-benchmark-latest.mjs");
   try {
     const body = await downloadLatestVersion(config.versions.latest.url);
@@ -119,7 +131,7 @@ async function main() {
     process.exit(1);
   }
 
-  // ---------- Build variant matrix ----------
+  // ---------- Build variant list ----------
   const variants: Variant[] = [];
   for (const grammar of config.grammars) {
     for (const phase of config.phases) {
@@ -138,95 +150,159 @@ async function main() {
     }
   }
 
+  const totalSamples = config.batchSize * config.rounds;
   console.log(
-    `\nRunning ${variants.length} benchmark variants (outputCst: ${config.outputCst})...\n`,
+    `\nBenchmarking ${variants.length} variants ` +
+      `(${config.rounds} rounds × ${config.batchSize} samples/batch = ${totalSamples} samples each, ` +
+      `outputCst: ${config.outputCst})\n`,
   );
 
-  // ---------- Run variants sequentially ----------
+  // ---------- Spawn one long-lived worker per variant ----------
   const workerScript = resolve(PACKAGE_ROOT, "src", "worker.ts");
-  const results: BenchmarkResult[] = [];
+  const workers: VariantWorker[] = [];
+
+  console.log("Spawning and initializing workers...");
+
+  for (const variant of variants) {
+    const proc = spawn("node", [...NODE_FLAGS, workerScript], {
+      cwd: PACKAGE_ROOT,
+      stdio: ["ignore", "ignore", "pipe", "ipc"],
+    });
+
+    // Capture stderr for error reporting
+    let stderrBuf = "";
+    proc.stderr?.on("data", (chunk: Buffer) => {
+      stderrBuf += chunk.toString();
+    });
+
+    workers.push({ variant, proc, samples: [] });
+
+    // Send init command
+    sendCommand(proc, {
+      type: "init",
+      grammar: variant.grammar,
+      phase: variant.phase,
+      chevrotainPath: variant.chevrotainPath,
+      outputCst: config.outputCst,
+      warmupIterations: config.warmupIterations,
+    });
+  }
+
+  // Wait for all workers to report ready
   let hasErrors = false;
-
-  try {
-    for (let i = 0; i < variants.length; i++) {
-      const v = variants[i];
-      const outputFile = resolve(
-        resultsDir,
-        `${v.grammar}-${v.phase}-${v.versionLabel}.json`,
-      );
-      const grammarName = GRAMMARS[v.grammar]?.name ?? v.grammar;
-
-      const progress = `[${i + 1}/${variants.length}]`;
-      process.stdout.write(
-        `${progress} ${grammarName} | ${v.phase} | ${v.versionLabel} ...`,
-      );
-
-      const { exitCode, stderr } = await spawnWorker(
-        [
-          workerScript,
-          `--grammar=${v.grammar}`,
-          `--phase=${v.phase}`,
-          `--version=${v.versionLabel}`,
-          `--chevrotain-path=${v.chevrotainPath}`,
-          `--output=${outputFile}`,
-          `--output-cst=${config.outputCst}`,
-          `--min-cpu-time-ms=${config.minCpuTimeMs}`,
-        ],
-        PACKAGE_ROOT,
-      );
-
-      if (exitCode !== 0) {
-        console.log(` FAILED (exit code ${exitCode})`);
-        if (stderr.trim()) {
-          console.error(`  stderr: ${stderr.trim()}`);
-        }
+  for (const w of workers) {
+    const grammarName = GRAMMARS[w.variant.grammar]?.name ?? w.variant.grammar;
+    const label = `${grammarName} | ${w.variant.phase} | ${w.variant.versionLabel}`;
+    try {
+      const msg = await waitForMessage(w.proc);
+      if (msg.type === "ready") {
+        console.log(`  ${label} — ready`);
+      } else if (msg.type === "error") {
+        console.error(`  ${label} — init error: ${msg.message}`);
+        w.error = msg.message;
         hasErrors = true;
-
-        // Write an error result so the table still shows this variant
-        results.push({
-          grammar: v.grammar,
-          phase: v.phase,
-          version: v.versionLabel,
-          outputCst: config.outputCst,
-          stats: { avg: 0, min: 0, max: 0, p50: 0, p75: 0, p99: 0, samples: 0 },
-          error: `Worker exited with code ${exitCode}`,
-        });
-        continue;
       }
+    } catch (err: any) {
+      console.error(`  ${label} — ${err.message}`);
+      w.error = err.message;
+      hasErrors = true;
+    }
+  }
 
-      // Read the result file
-      if (existsSync(outputFile)) {
-        try {
-          const resultJson = readFileSync(outputFile, "utf-8");
-          const result: BenchmarkResult = JSON.parse(resultJson);
-          results.push(result);
+  // ---------- Round-robin measurement loop ----------
+  console.log("\nMeasuring...");
 
-          if (result.error) {
-            console.log(` ERROR: ${result.error}`);
-            hasErrors = true;
-          } else {
-            const opsPerSec =
-              result.stats.avg > 0
-                ? (1e9 / result.stats.avg).toLocaleString("en-US", {
-                    maximumFractionDigits: 0,
-                  })
-                : "N/A";
-            console.log(` done (${opsPerSec} op/s)`);
+  const activeWorkers = workers.filter((w) => !w.error);
+
+  for (let round = 0; round < config.rounds; round++) {
+    // Progress display every 10th round (or first/last)
+    if (round % 10 === 0 || round === config.rounds - 1) {
+      const padded = String(round + 1).padStart(String(config.rounds).length);
+      process.stdout.write(`\r  Round ${padded}/${config.rounds}`);
+    }
+
+    for (const w of activeWorkers) {
+      await sleep(10);
+      sendCommand(w.proc, { type: "measure", batchSize: config.batchSize });
+
+      try {
+        const msg = await waitForMessage(w.proc);
+        if (msg.type === "samples") {
+          // Append batch samples to the accumulator
+          for (const s of msg.samples) {
+            w.samples.push(s);
           }
-        } catch {
-          console.log(" FAILED (could not read result file)");
+        } else if (msg.type === "error") {
+          const label = `${w.variant.grammar} | ${w.variant.phase} | ${w.variant.versionLabel}`;
+          console.error(
+            `\n  ${label} — error in round ${round + 1}: ${msg.message}`,
+          );
+          w.error = msg.message;
           hasErrors = true;
         }
-      } else {
-        console.log(" FAILED (no result file produced)");
+      } catch (err: any) {
+        const label = `${w.variant.grammar} | ${w.variant.phase} | ${w.variant.versionLabel}`;
+        console.error(
+          `\n  ${label} — crashed in round ${round + 1}: ${err.message}`,
+        );
+        w.error = err.message;
         hasErrors = true;
       }
     }
-  } finally {
-    // Clean up the temp file for the latest version
+  }
+
+  console.log("\n");
+
+  // ---------- Shut down all workers ----------
+  for (const w of workers) {
     try {
-      unlinkSync(latestTmpPath);
-    } catch {}
+      sendCommand(w.proc, { type: "exit" });
+    } catch {
+      // Worker may have already exited
+    }
+  }
+
+  // Clean up temp file
+  try {
+    unlinkSync(latestTmpPath);
+  } catch {}
+
+  // ---------- Compute final stats and build results ----------
+  const results: BenchmarkResult[] = [];
+
+  for (const w of workers) {
+    if (w.error) {
+      results.push({
+        grammar: w.variant.grammar,
+        phase: w.variant.phase,
+        version: w.variant.versionLabel,
+        outputCst: config.outputCst,
+        stats: { avg: 0, min: 0, max: 0, p50: 0, p75: 0, p99: 0, samples: 0 },
+        error: w.error,
+      });
+      continue;
+    }
+
+    // Sort all samples, then trim and compute stats
+    w.samples.sort((a, b) => a - b);
+    const stats = trimAndComputeStats(w.samples, config.trimPercent);
+
+    const result: BenchmarkResult = {
+      grammar: w.variant.grammar,
+      phase: w.variant.phase,
+      version: w.variant.versionLabel,
+      outputCst: config.outputCst,
+      stats,
+    };
+
+    results.push(result);
+
+    // Write individual result file
+    const outputFile = resolve(
+      resultsDir,
+      `${w.variant.grammar}-${w.variant.phase}-${w.variant.versionLabel}.json`,
+    );
+    writeFileSync(outputFile, JSON.stringify(result, null, 2), "utf-8");
   }
 
   // ---------- Print results table ----------
@@ -242,3 +318,7 @@ main().catch((err) => {
   console.error("Benchmark orchestrator failed:", err);
   process.exit(1);
 });
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

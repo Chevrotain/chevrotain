@@ -1,145 +1,126 @@
 /**
- * Benchmark worker — runs in a separate sub-process for isolation.
+ * Benchmark worker — a long-lived sub-process that communicates via IPC.
  *
- * Receives configuration via CLI arguments, runs a single benchmark variant
- * using mitata, and writes the result to a JSON file.
+ * The orchestrator spawns one worker per variant (grammar × phase × version).
+ * The worker loads chevrotain, creates the grammar, warms up V8, then waits
+ * for "measure" commands. Each command runs a small batch of samples and
+ * sends the timing data back. This keeps V8 warm across all rounds.
  *
- * Usage:
- *   node --experimental-strip-types src/worker.ts \
- *     --grammar=json \
- *     --phase=full \
- *     --version=latest \
- *     --chevrotain-path=/abs/path/chevrotain.mjs \
- *     --output=/abs/path/result.json \
- *     --output-cst=true \
- *     --min-cpu-time-ms=642
+ * IPC Protocol:
+ *   Parent → Child:
+ *     { type: "init", grammar, phase, chevrotainPath, outputCst, warmupIterations }
+ *     { type: "measure", batchSize }
+ *     { type: "exit" }
+ *
+ *   Child → Parent:
+ *     { type: "ready" }
+ *     { type: "samples", samples: number[] }
+ *     { type: "error", message: string }
  */
-import { writeFileSync } from "node:fs";
-import { measure } from "mitata";
 import { GRAMMARS } from "./grammars/index.ts";
-import type { BenchmarkResult, Phase } from "./types.ts";
+import type { WorkerCommand, WorkerResponse, Phase } from "./types.ts";
 
-// ---------- Parse CLI args ----------
-function parseWorkerArgs(argv: string[]) {
-  const args: Record<string, string> = {};
-  for (const arg of argv) {
-    const match = arg.match(/^--([^=]+)=(.+)$/);
-    if (match) {
-      args[match[1]] = match[2];
+// Resolve gc() — available when Node is started with --expose-gc
+const gc: (() => void) | undefined =
+  typeof globalThis.gc === "function" ? globalThis.gc : undefined;
+
+// High-resolution timer: performance.now() returns ms, we convert to ns
+const now = performance.now.bind(performance);
+
+let fn: (() => void) | null = null;
+
+function send(msg: WorkerResponse) {
+  process.send!(msg);
+}
+
+async function handleInit(cmd: Extract<WorkerCommand, { type: "init" }>) {
+  try {
+    // Load the correct chevrotain version
+    const chevrotain = await import(cmd.chevrotainPath);
+
+    // Look up grammar factory
+    const grammarDef = GRAMMARS[cmd.grammar];
+    if (!grammarDef) {
+      send({
+        type: "error",
+        message: `Unknown grammar: "${cmd.grammar}". Available: ${Object.keys(GRAMMARS).join(", ")}`,
+      });
+      return;
     }
+
+    // Create grammar instance
+    const grammar = grammarDef.factory(chevrotain, {
+      outputCst: cmd.outputCst,
+    });
+    const sampleInput = grammarDef.sampleInput;
+
+    // Build the function to measure based on phase
+    if (cmd.phase === "lexer") {
+      fn = () => {
+        grammar.lex(sampleInput);
+      };
+    } else if (cmd.phase === "parser") {
+      // Lex once upfront; only the parse step is measured each iteration
+      const tokens = grammar.lex(sampleInput);
+      fn = () => {
+        grammar.parse(tokens);
+      };
+    } else {
+      // "full" — lex + parse every iteration
+      fn = () => {
+        grammar.fullFlow(sampleInput);
+      };
+    }
+
+    // Warmup: run fn() many times to let V8 TurboFan reach steady-state
+    if (gc) gc();
+    for (let i = 0; i < cmd.warmupIterations; i++) {
+      fn();
+    }
+    if (gc) gc();
+
+    send({ type: "ready" });
+  } catch (err: any) {
+    send({ type: "error", message: err.message ?? String(err) });
   }
-
-  const grammar = args["grammar"];
-  const phase = args["phase"] as Phase;
-  const versionLabel = args["version"];
-  const chevrotainPath = args["chevrotain-path"];
-  const outputFile = args["output"];
-  const outputCst = args["output-cst"] === "true";
-  const minCpuTimeMs = args["min-cpu-time-ms"]
-    ? parseFloat(args["min-cpu-time-ms"])
-    : 642;
-
-  if (!grammar || !phase || !versionLabel || !chevrotainPath || !outputFile) {
-    console.error("Missing required worker arguments.");
-    console.error(
-      "Required: --grammar, --phase, --version, --chevrotain-path, --output",
-    );
-    process.exit(1);
-  }
-
-  return {
-    grammar,
-    phase,
-    versionLabel,
-    chevrotainPath,
-    outputFile,
-    outputCst,
-    minCpuTimeMs,
-  };
 }
 
-async function main() {
-  const args = parseWorkerArgs(process.argv.slice(2));
-
-  // ---------- Load chevrotain version ----------
-  const chevrotain = await import(args.chevrotainPath);
-
-  // ---------- Look up grammar ----------
-  const grammarDef = GRAMMARS[args.grammar];
-  if (!grammarDef) {
-    throw new Error(
-      `Unknown grammar: "${args.grammar}". Available: ${Object.keys(GRAMMARS).join(", ")}`,
-    );
+function handleMeasure(cmd: Extract<WorkerCommand, { type: "measure" }>) {
+  if (!fn) {
+    send({ type: "error", message: "Worker not initialized" });
+    return;
   }
 
-  // ---------- Create grammar instance ----------
-  const grammar = grammarDef.factory(chevrotain, {
-    outputCst: args.outputCst,
-  });
-  const sampleInput = grammarDef.sampleInput;
+  try {
+    // GC once before the batch to start from a clean state
+    if (gc) gc();
 
-  // ---------- Sanity check: run once to verify it works ----------
-  if (args.phase === "lexer" || args.phase === "full") {
-    grammar.fullFlow(sampleInput);
+    const samples = new Array<number>(cmd.batchSize);
+    for (let i = 0; i < cmd.batchSize; i++) {
+      const t0 = now();
+      fn();
+      const t1 = now();
+      // Convert ms to ns
+      samples[i] = (t1 - t0) * 1e6;
+    }
+
+    send({ type: "samples", samples });
+  } catch (err: any) {
+    send({ type: "error", message: err.message ?? String(err) });
   }
-  if (args.phase === "parser") {
-    const tokens = grammar.lex(sampleInput);
-    grammar.parse(tokens);
-  }
-
-  // ---------- Build the function to measure ----------
-  let fn: () => void;
-  if (args.phase === "lexer") {
-    fn = () => {
-      grammar.lex(sampleInput);
-    };
-  } else if (args.phase === "parser") {
-    // Lex once upfront; only the parse step is measured each iteration
-    const tokens = grammar.lex(sampleInput);
-    fn = () => {
-      grammar.parse(tokens);
-    };
-  } else {
-    // "full" — lex + parse every iteration
-    fn = () => {
-      grammar.fullFlow(sampleInput);
-    };
-  }
-
-  // ---------- Run benchmark via mitata measure() ----------
-  // min_cpu_time is in nanoseconds; config provides it in milliseconds.
-  // inner_gc: run GC between each sample to prevent GC pauses skewing results
-  //   (this automatically doubles min_cpu_time inside mitata)
-  // warmup_samples: extra iterations to let V8 TurboFan reach steady-state JIT
-  //   before measurement begins
-  const s = await measure(fn, {
-    min_cpu_time: args.minCpuTimeMs * 1e6,
-    inner_gc: true,
-    warmup_samples: 20,
-  });
-
-  // ---------- Build result ----------
-  const result: BenchmarkResult = {
-    grammar: args.grammar,
-    phase: args.phase,
-    version: args.versionLabel,
-    outputCst: args.outputCst,
-    stats: {
-      avg: s.avg,
-      min: s.min,
-      max: s.max,
-      p50: s.p50,
-      p75: s.p75,
-      p99: s.p99,
-      samples: s.samples?.length ?? 0,
-    },
-  };
-
-  // ---------- Write result ----------
-  writeFileSync(args.outputFile, JSON.stringify(result, null, 2), "utf-8");
 }
 
-main().catch((err) => {
-  console.error("Worker failed:", err);
-  process.exit(1);
+// ---------- Main: listen for IPC messages ----------
+process.on("message", async (msg: WorkerCommand) => {
+  switch (msg.type) {
+    case "init":
+      await handleInit(msg);
+      break;
+    case "measure":
+      handleMeasure(msg);
+      break;
+    case "exit":
+      process.exit(0);
+      break;
+  }
 });

@@ -7,7 +7,6 @@
     "clean": "rimraf results"
   },
   "dependencies": {
-    "mitata": "^1.0.34",
     "xregexp": "^5.1.1"
   }
 }
