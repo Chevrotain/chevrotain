@@ -44,20 +44,21 @@ export interface BenchmarkConfig {
 }
 
 export const DEFAULT_CONFIG: BenchmarkConfig = {
-  grammars: ["json", "css"],
-  phases: ["lexer", "parser", "full"],
+  grammars: ["css"],
+  phases: ["lexer", "parser"],
   outputCst: false,
   versions: {
     latest: {
-      url: "https://unpkg.com/chevrotain@latest/lib/chevrotain.mjs",
+      url: "https://unpkg.com/chevrotain@12.0.0/lib/chevrotain.mjs",
+      // url: "https://unpkg.com/chevrotain@11.1.1/lib/chevrotain.mjs",
     },
     next: {
       // Relative to the benchmark package root
       path: "../chevrotain/lib/chevrotain.mjs",
     },
   },
-  batchSize: 100,
-  rounds: 100,
+  batchSize: 50,
+  rounds: 50,
   // warmup runs in parallel, so we can go overboard without increasing total runtime too much
   // while increasing the consistency of the results by giving V8 more time to optimize
   warmupIterations: 10000,

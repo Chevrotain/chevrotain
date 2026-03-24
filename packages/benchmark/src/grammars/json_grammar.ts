@@ -50,10 +50,14 @@ export const createJsonBenchmark: GrammarFactory = (chevrotain, options) => {
   // ----------------- Lexer -----------------
   const lexer = new Lexer(jsonTokens);
 
+  const BaseParser = options.outputCst
+    ? chevrotain.CstParser
+    : chevrotain.EmbeddedActionsParser;
+
   // ----------------- Parser -----------------
-  class JsonParser extends CstParser {
+  class JsonParser extends BaseParser {
     constructor() {
-      super(jsonTokens, { outputCst: options.outputCst });
+      super(jsonTokens);
 
       const $ = this as any;
 
@@ -121,13 +125,13 @@ export const createJsonBenchmark: GrammarFactory = (chevrotain, options) => {
 
     parse(tokens: any[]) {
       parser.input = tokens;
-      parser.json();
+      return parser.json();
     },
 
     fullFlow(text: string) {
       const lexResult = lexer.tokenize(text);
       parser.input = lexResult.tokens;
-      parser.json();
+      return parser.json();
     },
 
     name: "JSON",

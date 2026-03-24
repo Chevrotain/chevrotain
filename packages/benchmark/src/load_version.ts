@@ -19,6 +19,9 @@ export async function downloadLatestVersion(url: string): Promise<string> {
       `Failed to download chevrotain from ${url}: ${response.status} ${response.statusText}`,
     );
   }
+  console.log(
+    `Downloaded latest chevrotain from re-directed url: ${response.url}: ${response.statusText}`,
+  );
 
   const body = await response.text();
 

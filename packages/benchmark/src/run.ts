@@ -28,7 +28,8 @@ import type {
   WorkerResponse,
 } from "./types.ts";
 
-const PACKAGE_ROOT = resolve(dirname(import.meta.dirname!));
+const __dirname = import.meta.dirname;
+const PACKAGE_ROOT = resolve(__dirname, "..");
 
 // --experimental-strip-types: run .ts files directly (Node 22.6+)
 // --expose-gc: enables global.gc() so the worker can trigger GC between batches
@@ -112,10 +113,12 @@ async function main() {
   // ---------- Resolve chevrotain versions ----------
   console.log("Resolving chevrotain versions...\n");
 
-  const latestTmpPath = join(tmpdir(), "chevrotain-benchmark-latest.mjs");
+  const downloadsDir = resolve(__dirname, "..", "downloads");
+  mkdirSync(downloadsDir, { recursive: true });
+  const latestDownloadPath = join(downloadsDir, `chevrotain-latest.mjs`);
   try {
     const body = await downloadLatestVersion(config.versions.latest.url);
-    writeFileSync(latestTmpPath, body, "utf-8");
+    writeFileSync(latestDownloadPath, body, "utf-8");
     console.log(`  latest: ${config.versions.latest.url}`);
   } catch (err: any) {
     console.error(`Failed to download latest version: ${err.message}`);
@@ -139,7 +142,7 @@ async function main() {
         grammar,
         phase,
         versionLabel: "latest",
-        chevrotainPath: latestTmpPath,
+        chevrotainPath: latestDownloadPath,
       });
       variants.push({
         grammar,
@@ -166,7 +169,7 @@ async function main() {
   for (const variant of variants) {
     const proc = spawn("node", [...NODE_FLAGS, workerScript], {
       cwd: PACKAGE_ROOT,
-      stdio: ["ignore", "ignore", "pipe", "ipc"],
+      stdio: ["inherit", "inherit", "pipe", "ipc"],
     });
 
     // Capture stderr for error reporting
@@ -261,11 +264,6 @@ async function main() {
       // Worker may have already exited
     }
   }
-
-  // Clean up temp file
-  try {
-    unlinkSync(latestTmpPath);
-  } catch {}
 
   // ---------- Compute final stats and build results ----------
   const results: BenchmarkResult[] = [];

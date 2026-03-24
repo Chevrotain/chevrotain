@@ -3,10 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "bench": "node --experimental-strip-types src/run.ts",
-    "clean": "rimraf results"
+    "bench": "bun run clean && bun run --filter chevrotain quick-build && node --experimental-strip-types src/run.ts",
+    "clean": "rimraf results downloads"
   },
   "dependencies": {
-    "xregexp": "^5.1.1"
+    "chevrotain": "workspace:*",
+    "xregexp": "5.1.1"
   }
 }

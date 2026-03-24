@@ -37,6 +37,8 @@ async function handleInit(cmd: Extract<WorkerCommand, { type: "init" }>) {
   try {
     // Load the correct chevrotain version
     const chevrotain = await import(cmd.chevrotainPath);
+    console.log(`chevrotain version ${chevrotain.VERSION} loaded in worker`);
+    console.error(`chevrotain version ${chevrotain.VERSION} loaded in worker`);
 
     // Look up grammar factory
     const grammarDef = GRAMMARS[cmd.grammar];
@@ -57,18 +59,19 @@ async function handleInit(cmd: Extract<WorkerCommand, { type: "init" }>) {
     // Build the function to measure based on phase
     if (cmd.phase === "lexer") {
       fn = () => {
-        grammar.lex(sampleInput);
+        do_not_optimize(grammar.lex(sampleInput));
       };
     } else if (cmd.phase === "parser") {
       // Lex once upfront; only the parse step is measured each iteration
       const tokens = grammar.lex(sampleInput);
       fn = () => {
-        grammar.parse(tokens);
+        const x = do_not_optimize(grammar.parse(tokens));
+        const y = 5;
       };
     } else {
       // "full" — lex + parse every iteration
       fn = () => {
-        grammar.fullFlow(sampleInput);
+        do_not_optimize(grammar.fullFlow(sampleInput));
       };
     }
 
@@ -124,3 +127,15 @@ process.on("message", async (msg: WorkerCommand) => {
       break;
   }
 });
+
+function do_not_optimize(v) {
+  $._ = v;
+  return v;
+}
+const $ = {
+  _: null,
+  __() {
+    // @ts-ignore
+    return print($._);
+  },
+};

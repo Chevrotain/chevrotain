@@ -227,10 +227,14 @@ export const createCssBenchmark: GrammarFactory = (chevrotain, options) => {
   // ---------- Lexer ----------
   const lexer = new Lexer(cssTokens);
 
+  const BaseParser = options.outputCst
+    ? chevrotain.CstParser
+    : chevrotain.EmbeddedActionsParser;
+
   // ---------- Parser ----------
-  class CssParser extends CstParser {
+  class CssParser extends BaseParser {
     constructor() {
-      super(cssTokens, { outputCst: options.outputCst });
+      super(cssTokens);
 
       const $ = this as any;
 
