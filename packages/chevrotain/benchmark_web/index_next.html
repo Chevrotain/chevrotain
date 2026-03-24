@@ -42,6 +42,12 @@
             <div id="wait" style="margin-left: auto; margin-right: auto">
               &nbsp;
             </div>
+            <div
+              id="warmup-status"
+              style="margin-left: auto; margin-right: auto"
+            >
+              &nbsp;
+            </div>
             <div class="headerRow">
               <div class="benchName">Library</div>
               <div class="benchRate">Ops/sec</div>
@@ -101,8 +107,6 @@
 
     <script src="lib/iframe_loader.js"></script>
     <script>
-      localStorage.setItem("myCat", "Tom");
-
       self.mode = "next";
       var jsonNextFrame = includeTestIFrame(
         "JSON",

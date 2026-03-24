@@ -1,3 +1,20 @@
+// ---- Warmup Configuration ----
+// Number of times each benchmark scenario is run before the actual measurement starts.
+// Warmup allows the V8 engine to JIT-compile and optimize the hot code paths,
+// leading to more consistent and representative benchmark results.
+var warmupIterations = 3000;
+
+// Tracks which (testCase, mode) combinations have already been warmed up this session.
+// Keys are like "JSON:both", "CSS:lexerOnly", "ECMA5:parserOnly".
+// Warmup only runs once per unique combination -- re-running the benchmark skips it.
+var warmedUpKeys = new Set();
+
+function getWarmupModeKey() {
+  if (lexerOnly) return "lexerOnly";
+  if (parserOnly) return "parserOnly";
+  return "both";
+}
+
 var orgData = {
   labels: [],
   datasets: [
@@ -31,7 +48,44 @@ function clearResults() {
   clearData();
 }
 
-function onRunAll(options) {
+async function runWarmup(enabledTestCaseNames) {
+  var $warmupStatus = $("#warmup-status");
+  var modeKey = getWarmupModeKey();
+
+  var coldNames = enabledTestCaseNames.filter(function (name) {
+    return !warmedUpKeys.has(name + ":" + modeKey);
+  });
+
+  if (coldNames.length === 0) {
+    return;
+  }
+
+  for (var i = 0; i < coldNames.length; i++) {
+    var name = coldNames[i];
+    var iframe = document.getElementById(name);
+    var parseAction = iframe.contentWindow.parse;
+
+    for (var j = 0; j < warmupIterations; j++) {
+      await new Promise(function (resolve) {
+        parseAction(
+          { lexerOnly: lexerOnly, parserOnly: parserOnly },
+          { resolve: resolve },
+        );
+      });
+      $warmupStatus.text(name + " (" + (j + 1) + "/" + warmupIterations + ")");
+    }
+
+    warmedUpKeys.add(name + ":" + modeKey);
+  }
+
+  $warmupStatus.text("Warmup complete");
+  await new Promise(function (resolve) {
+    setTimeout(resolve, 800);
+  });
+  $warmupStatus.html("&nbsp;");
+}
+
+async function onRunAll(options) {
   lexerOnly = options && options.lexerOnly === true;
   parserOnly = options && options.parserOnly === true;
   clearResults();
@@ -57,18 +111,42 @@ function onRunAll(options) {
   $("#runAllButton_lexer").prop("disabled", true);
   $("#runAllButton_parser").prop("disabled", true);
 
-  //handle "Running..."
-  var valueBeforeTheDots = "Running";
-  wait.innerHTML = valueBeforeTheDots;
-  var dots = window.setInterval(function () {
-    var wait = document.getElementById("wait");
-    if (wait.innerHTML.length >= valueBeforeTheDots.length + 3)
-      wait.innerHTML = valueBeforeTheDots;
-    else wait.innerHTML += ".";
-  }, 500);
+  // --- Warmup phase ---
+  // Only runs for (grammar, mode) combinations not yet warmed up this session.
+  var modeKey = getWarmupModeKey();
+  var coldNames = enabledTestCaseNames.filter(function (name) {
+    return !warmedUpKeys.has(name + ":" + modeKey);
+  });
 
+  var warmupDots;
+  if (coldNames.length > 0) {
+    var warmupLabel = "Warming up";
+    document.getElementById("wait").innerHTML = warmupLabel;
+    warmupDots = window.setInterval(function () {
+      var waitEl = document.getElementById("wait");
+      if (waitEl.innerHTML.length >= warmupLabel.length + 3)
+        waitEl.innerHTML = warmupLabel;
+      else waitEl.innerHTML += ".";
+    }, 500);
+  }
+
+  await runWarmup(enabledTestCaseNames);
+  if (warmupDots !== undefined) {
+    window.clearInterval(warmupDots);
+  }
+
+  // --- Benchmark phase ---
   // more minSamples (default=5) for more accurate & consistent results.
   Benchmark.options.minSamples = 25;
+
+  var runningLabel = "Running";
+  document.getElementById("wait").innerHTML = runningLabel;
+  var dots = window.setInterval(function () {
+    var waitEl = document.getElementById("wait");
+    if (waitEl.innerHTML.length >= runningLabel.length + 3)
+      waitEl.innerHTML = runningLabel;
+    else waitEl.innerHTML += ".";
+  }, 500);
 
   var suite = new Benchmark.Suite();
 
