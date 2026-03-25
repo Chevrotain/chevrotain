@@ -32,7 +32,7 @@ import { LLkLookaheadStrategy } from "../../grammar/llk_lookahead.js";
  */
 export class LooksAhead {
   maxLookahead: number;
-  lookAheadFuncsCache: any;
+  lookAheadFuncsCache: Function[];
   dynamicTokensEnabled: boolean;
   lookaheadStrategy: ILookaheadStrategy;
 
@@ -49,7 +49,7 @@ export class LooksAhead {
       ? (config.lookaheadStrategy as ILookaheadStrategy) // assumes end user provides the correct config value/type
       : new LLkLookaheadStrategy({ maxLookahead: this.maxLookahead });
 
-    this.lookAheadFuncsCache = new Map();
+    this.lookAheadFuncsCache = [];
   }
 
   preComputeLookaheadFunctions(this: MixedInParser, rules: Rule[]): void {
@@ -171,7 +171,6 @@ export class LooksAhead {
     );
   }
 
-  // this actually returns a number, but it is always used as a string (object prop key)
   getKeyForAutomaticLookahead(
     this: MixedInParser,
     dslMethodIdx: number,
@@ -185,12 +184,12 @@ export class LooksAhead {
   }
 
   getLaFuncFromCache(this: MixedInParser, key: number): Function {
-    return this.lookAheadFuncsCache.get(key);
+    return this.lookAheadFuncsCache[key];
   }
 
   /* istanbul ignore next */
   setLaFuncCache(this: MixedInParser, key: number, value: Function): void {
-    this.lookAheadFuncsCache.set(key, value);
+    this.lookAheadFuncsCache[key] = value;
   }
 }
 

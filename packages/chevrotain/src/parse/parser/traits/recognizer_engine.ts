@@ -77,7 +77,6 @@ export class RecognizerEngine {
   gastProductionsCache: Record<string, Rule>;
   shortRuleNameToFull: Record<string, string>;
   fullRuleNameToShort: Record<string, number>;
-  // The shortName Index must be coded "after" the first 8bits to enable building unique lookahead keys
   ruleShortNameIdx: number;
   tokenMatcher: TokenMatcher;
   subruleIdx: number;
@@ -93,7 +92,7 @@ export class RecognizerEngine {
     // TODO: would using an ES6 Map or plain object be faster (CST building scenario)
     this.shortRuleNameToFull = {};
     this.fullRuleNameToShort = {};
-    this.ruleShortNameIdx = 256;
+    this.ruleShortNameIdx = 0;
     this.tokenMatcher = tokenStructuredMatcherNoCategories;
     this.subruleIdx = 0;
     this.currRuleShortName = 0;
