@@ -168,6 +168,20 @@ async function onRunAll(options) {
   parserOnly = options && options.parserOnly === true;
   initLexer = options && options.initLexer === true;
   initParser = options && options.initParser === true;
+
+  // Highlight the active variant button so it is visible in screenshots.
+  $("button.activeVariant").removeClass("activeVariant");
+  var activeId = "runAllButton";
+  if (options) {
+    if (options.lexerOnly) activeId = "runAllButton_lexer";
+    else if (options.parserOnly) activeId = "runAllButton_parser";
+    else if (options.initLexer && options.initParser)
+      activeId = "runAllButton_initBoth";
+    else if (options.initLexer) activeId = "runAllButton_initLexer";
+    else if (options.initParser) activeId = "runAllButton_initParser";
+  }
+  $("#" + activeId).addClass("activeVariant");
+
   clearResults();
 
   // These names are in the order in which they appear in the DOM

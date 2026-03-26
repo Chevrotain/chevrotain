@@ -220,6 +220,11 @@ div.benchInclude {
   z-index: 89;
 }
 
+button.activeVariant {
+  background-color: #cce5ff;
+  outline: 2px solid #004085;
+}
+
 /*bootstrap customization*/
 @media (min-width: 1200px) {
   .container {
