@@ -4,15 +4,85 @@
 // leading to more consistent and representative benchmark results.
 var warmupIterations = 3000;
 
+// Initialization benchmarks are much slower per iteration (each creates new
+// Lexer/Parser instances), so we use far fewer warmup iterations.
+var initWarmupIterations = 100;
+
 // Tracks which (testCase, mode) combinations have already been warmed up this session.
 // Keys are like "JSON:both", "CSS:lexerOnly", "ECMA5:parserOnly".
 // Warmup only runs once per unique combination -- re-running the benchmark skips it.
 var warmedUpKeys = new Set();
 
 function getWarmupModeKey() {
+  if (initLexer && initParser) return "initBoth";
+  if (initLexer) return "initLexer";
+  if (initParser) return "initParser";
   if (lexerOnly) return "lexerOnly";
   if (parserOnly) return "parserOnly";
   return "both";
+}
+
+// ---- localStorage helpers ----
+// All "latest" benchmark results are stored under a single key as structured JSON:
+//   {
+//     version: "12.0.0",          // Chevrotain version used when benching "latest"
+//     results: {
+//       "JSON":  { "both": 1234, "lexerOnly": 2345, "parserOnly": 3456 },
+//       "CSS":   { ... },
+//       "ECMA5": { ... }
+//     }
+//   }
+var STORAGE_KEY = "chevrotain_bench_latest";
+
+function getVariantKey() {
+  if (initLexer && initParser) return "initBoth";
+  if (initLexer) return "initLexer";
+  if (initParser) return "initParser";
+  if (lexerOnly) return "lexerOnly";
+  if (parserOnly) return "parserOnly";
+  return "both";
+}
+
+// Returns true if the current mode involves lexer measurement.
+// ECMA5 uses a custom lexer (Acorn), not Chevrotain's Lexer, so its
+// results are not applicable for any mode that measures lexer performance.
+function isLexerInvolvedMode() {
+  if (lexerOnly) return true;
+  if (initLexer) return true;
+  // Default "both" mode (lex + parse) also involves the lexer.
+  if (!parserOnly && !initParser) return true;
+  return false;
+}
+
+function loadStoredResults() {
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : { version: null, results: {} };
+  } catch (e) {
+    return { version: null, results: {} };
+  }
+}
+
+function saveStoredResults(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+// Read the Chevrotain VERSION that was loaded inside the Web Worker.
+// The worker posts it after initialization and worker_api.js exposes it
+// as `self.chevrotainVersion` on the iframe's contentWindow.
+function getChevrotainVersion() {
+  var iframeIds = ["JSON", "CSS", "ECMA5"];
+  for (var i = 0; i < iframeIds.length; i++) {
+    var iframe = document.getElementById(iframeIds[i]);
+    if (
+      iframe &&
+      iframe.contentWindow &&
+      iframe.contentWindow.chevrotainVersion
+    ) {
+      return iframe.contentWindow.chevrotainVersion;
+    }
+  }
+  return null;
 }
 
 var orgData = {
@@ -39,6 +109,7 @@ function clearTable() {
   // when using .empty() the cells collapse... so, use non-breaking space
   $(".dataRow .benchRate .value").html("&nbsp;");
   $(".dataRow .benchRate .delta").html("&nbsp;");
+  $(".dataRow .benchTime").html("&nbsp;");
   $(".dataRow .benchSpeed").html("&nbsp;");
   $(".fastestRow").removeClass("fastestRow");
 }
@@ -51,6 +122,8 @@ function clearResults() {
 async function runWarmup(enabledTestCaseNames) {
   var $warmupStatus = $("#warmup-status");
   var modeKey = getWarmupModeKey();
+  var isInitMode = initLexer || initParser;
+  var iterations = isInitMode ? initWarmupIterations : warmupIterations;
 
   var coldNames = enabledTestCaseNames.filter(function (name) {
     return !warmedUpKeys.has(name + ":" + modeKey);
@@ -65,14 +138,19 @@ async function runWarmup(enabledTestCaseNames) {
     var iframe = document.getElementById(name);
     var parseAction = iframe.contentWindow.parse;
 
-    for (var j = 0; j < warmupIterations; j++) {
+    for (var j = 0; j < iterations; j++) {
       await new Promise(function (resolve) {
         parseAction(
-          { lexerOnly: lexerOnly, parserOnly: parserOnly },
+          {
+            lexerOnly: lexerOnly,
+            parserOnly: parserOnly,
+            initLexer: initLexer,
+            initParser: initParser,
+          },
           { resolve: resolve },
         );
       });
-      $warmupStatus.text(name + " (" + (j + 1) + "/" + warmupIterations + ")");
+      $warmupStatus.text(name + " (" + (j + 1) + "/" + iterations + ")");
     }
 
     warmedUpKeys.add(name + ":" + modeKey);
@@ -88,6 +166,8 @@ async function runWarmup(enabledTestCaseNames) {
 async function onRunAll(options) {
   lexerOnly = options && options.lexerOnly === true;
   parserOnly = options && options.parserOnly === true;
+  initLexer = options && options.initLexer === true;
+  initParser = options && options.initParser === true;
   clearResults();
 
   // These names are in the order in which they appear in the DOM
@@ -101,6 +181,18 @@ async function onRunAll(options) {
     },
   );
 
+  // ECMA5 uses a custom (Acorn) lexer, not Chevrotain's Lexer.
+  // Skip it for any mode that involves lexer measurement.
+  if (isLexerInvolvedMode()) {
+    enabledTestCaseNames = enabledTestCaseNames.filter(function (name) {
+      return name !== "ECMA5";
+    });
+    $(".ECMA5 .benchRate .value").html("N/A");
+    $(".ECMA5 .benchRate .delta").html("&nbsp;");
+    $(".ECMA5 .benchTime").html("N/A");
+    $(".ECMA5 .benchSpeed").html("N/A");
+  }
+
   if (_.isEmpty(enabledTestCaseNames)) {
     // otherwise the run button will never become enabled again and
     // the performance page will be stuck indefinitely.
@@ -110,6 +202,9 @@ async function onRunAll(options) {
   $("#runAllButton").prop("disabled", true);
   $("#runAllButton_lexer").prop("disabled", true);
   $("#runAllButton_parser").prop("disabled", true);
+  $("#runAllButton_initLexer").prop("disabled", true);
+  $("#runAllButton_initParser").prop("disabled", true);
+  $("#runAllButton_initBoth").prop("disabled", true);
 
   // --- Warmup phase ---
   // Only runs for (grammar, mode) combinations not yet warmed up this session.
@@ -166,26 +261,45 @@ async function onRunAll(options) {
       $rate.html(rate);
       $delta.html("&plusmn;" + suite.stats.rme.toFixed(2) + "%");
 
+      var avgTimeUs = ((1 / suite.hz) * 1000000).toFixed(2);
+      $("." + suite.name + " .benchTime").html(avgTimeUs + " &micro;s");
+
       data.labels.push(suite.name);
       data.datasets[0].data.push(rate);
 
       try {
+        var variantKey = getVariantKey();
+
         if (self.mode === "latest") {
-          // store latest released version results to compare with dev version
-          // in the other window.
-          localStorage.setItem(suite.name, suite.hz);
+          // Store latest released version results to compare with dev version
+          // in the other window. Results are keyed by grammar and variant so
+          // all three variants can coexist in localStorage.
+          var stored = loadStoredResults();
+          stored.version = getChevrotainVersion();
+          if (!stored.results[suite.name]) {
+            stored.results[suite.name] = {};
+          }
+          stored.results[suite.name][variantKey] = suite.hz;
+          saveStoredResults(stored);
 
           var cell = $("." + suite.name + " .benchSpeed");
           cell.html("100%");
         }
         if (self.mode === "next") {
           var cell = $("." + suite.name + " .benchSpeed");
-          var storedLatestHz = localStorage.getItem(suite.name);
+          var stored = loadStoredResults();
+          var grammarResults = stored.results && stored.results[suite.name];
+          var storedLatestHz = grammarResults && grammarResults[variantKey];
+
           if (storedLatestHz) {
             var speed = ((suite.hz / storedLatestHz).toFixed(4) * 100).toFixed(
               2,
             );
-            cell.html(speed + "%");
+            var label = speed + "%";
+            if (stored.version) {
+              label += " (vs " + stored.version + ")";
+            }
+            cell.html(label);
           } else {
             cell.html("???");
           }
@@ -209,6 +323,9 @@ async function onRunAll(options) {
           $("#runAllButton").prop("disabled", false);
           $("#runAllButton_lexer").prop("disabled", false);
           $("#runAllButton_parser").prop("disabled", false);
+          $("#runAllButton_initLexer").prop("disabled", false);
+          $("#runAllButton_initParser").prop("disabled", false);
+          $("#runAllButton_initBoth").prop("disabled", false);
         }, 1000);
       }
     })

@@ -6,8 +6,13 @@ function initWorker(options) {
   parserWorker = new Worker("../worker_impel.js", { type: "module" });
 
   parserWorker.postMessage(options);
-  parserWorker.onmessage = function (errCode) {
-    globalDeferred.resolve();
+  parserWorker.onmessage = function (event) {
+    if (event.data && event.data.type === "init") {
+      // Capture the Chevrotain version reported by the worker after initialization.
+      self.chevrotainVersion = event.data.version;
+    } else {
+      globalDeferred.resolve();
+    }
   };
 }
 
