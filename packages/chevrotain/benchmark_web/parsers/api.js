@@ -67,3 +67,29 @@ self.parseBench = function (
     };
   }
 };
+
+// ----------------- initialization benchmarking -----------------
+// Unlike parseBench which reuses singleton instances, initBench creates
+// NEW Lexer/Parser instances on every call to measure construction time.
+self.initBench = function (
+  lexerDefinition,
+  customLexer,
+  parser,
+  parserConfig,
+  options,
+) {
+  if (options.initLexer) {
+    if (customLexer !== undefined) {
+      // Custom lexers (e.g., ECMA5/Acorn) are external to Chevrotain
+      // and cannot be meaningfully re-created.
+    } else {
+      new chevrotain.Lexer(lexerDefinition, {
+        positionTracking: "onlyOffset",
+      });
+    }
+  }
+
+  if (options.initParser) {
+    new parser(parserConfig);
+  }
+};

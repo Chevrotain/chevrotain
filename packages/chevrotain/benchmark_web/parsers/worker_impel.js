@@ -20,19 +20,33 @@ onmessage = async function (event) {
       self.sample = xhrObj.responseText;
     }
     self.startRule = event.data.startRule;
+
+    // Notify the iframe of the loaded Chevrotain version so the main page
+    // can include it when storing benchmark results in localStorage.
+    postMessage({ type: "init", version: self.chevrotain.VERSION });
   } else {
     var options = event.data[0];
 
     try {
-      self.parseBench(
-        self.sample,
-        self.lexerDefinition || undefined,
-        self.customLexer || undefined,
-        parser,
-        startRule,
-        options,
-        parserConfig,
-      );
+      if (options.initLexer || options.initParser) {
+        self.initBench(
+          self.lexerDefinition || undefined,
+          self.customLexer || undefined,
+          parser,
+          parserConfig,
+          options,
+        );
+      } else {
+        self.parseBench(
+          self.sample,
+          self.lexerDefinition || undefined,
+          self.customLexer || undefined,
+          parser,
+          startRule,
+          options,
+          parserConfig,
+        );
+      }
       postMessage(0);
     } catch (e) {
       console.error(e.message);
