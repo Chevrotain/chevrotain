@@ -18,6 +18,8 @@ import {
   findStartOfInputAnchor,
   findUnreachablePatterns,
   findUnsupportedFlags,
+  performRuntimeChecks,
+  performWarningRuntimeChecks,
 } from "../../src/scan/lexer.js";
 import { setEquality } from "../utils/matchers.js";
 import { tokenStructuredMatcher } from "../../src/scan/tokens.js";
@@ -584,6 +586,81 @@ function defineLexerSpecs(
             LexerDefinitionErrorType.INVALID_GROUP_TYPE_FOUND,
           );
           expect(errors[0].message).to.contain("InvalidGroupNumber");
+        });
+
+        it("accepts inherited PATTERN metadata", () => {
+          const tokenType = Object.create({
+            PATTERN: /abc/,
+          }) as TokenType;
+          tokenType.name = "InheritedPattern";
+
+          const result = findMissingPatterns([tokenType]);
+
+          expect(result.errors).to.be.empty;
+          expect(result.valid).to.deep.equal([tokenType]);
+        });
+
+        it("accepts inherited GROUP metadata", () => {
+          const tokenType = Object.create({
+            GROUP: Lexer.SKIPPED,
+          }) as TokenType;
+          tokenType.name = "InheritedGroup";
+          tokenType.PATTERN = /abc/;
+
+          const errors = findInvalidGroupType([tokenType]);
+
+          expect(errors).to.be.empty;
+        });
+
+        it("accepts inherited LONGER_ALT metadata in runtime checks", () => {
+          const longerAlt = createToken({
+            name: "LongerAlt",
+            pattern: /abc/,
+          });
+          const tokenType = Object.create({
+            LONGER_ALT: longerAlt,
+          }) as TokenType;
+          tokenType.name = "InheritedLongerAlt";
+          tokenType.PATTERN = /ab/;
+
+          const errors = performRuntimeChecks(
+            {
+              defaultMode: "defaultMode",
+              modes: {
+                defaultMode: [tokenType],
+              },
+            },
+            false,
+            ["\r", "\n"],
+          );
+
+          expect(errors).to.have.length(1);
+          expect(errors[0].type).to.equal(
+            LexerDefinitionErrorType.MULTI_MODE_LEXER_LONGER_ALT_NOT_IN_CURRENT_MODE,
+          );
+          expect(errors[0].message).to.contain("InheritedLongerAlt");
+          expect(errors[0].message).to.contain("LongerAlt");
+        });
+
+        it("accepts inherited LINE_BREAKS metadata in warning checks", () => {
+          const tokenType = Object.create({
+            LINE_BREAKS: true,
+          }) as TokenType;
+          tokenType.name = "InheritedLineBreaks";
+          tokenType.PATTERN = / /;
+
+          const warnings = performWarningRuntimeChecks(
+            {
+              defaultMode: "defaultMode",
+              modes: {
+                defaultMode: [tokenType],
+              },
+            },
+            true,
+            ["\r", "\n"],
+          );
+
+          expect(warnings).to.be.empty;
         });
       });
     }
