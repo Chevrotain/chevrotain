@@ -39,12 +39,38 @@
             >
               Run Parser Only
             </button>
+            <br />
+            <button
+              onclick="onRunAll({ initLexer: true, initParser: false })"
+              id="runAllButton_initLexer"
+            >
+              Init Lexer
+            </button>
+            <button
+              onclick="onRunAll({ initLexer: false, initParser: true })"
+              id="runAllButton_initParser"
+            >
+              Init Parser
+            </button>
+            <button
+              onclick="onRunAll({ initLexer: true, initParser: true })"
+              id="runAllButton_initBoth"
+            >
+              Init Lexer + Parser
+            </button>
             <div id="wait" style="margin-left: auto; margin-right: auto">
               &nbsp;
             </div>
+            <div
+              id="warmup-status"
+              style="margin-left: auto; margin-right: auto"
+            >
+              &nbsp;
+            </div>
             <div class="headerRow">
-              <div class="benchName">Library</div>
+              <div class="benchName">Grammar</div>
               <div class="benchRate">Ops/sec</div>
+              <div class="benchTime">Avg Time</div>
               <div class="benchSpeed">Relative Speed</div>
               <div class="benchInclude">?</div>
             </div>
@@ -58,6 +84,7 @@
                   <div class="value">&nbsp;</div>
                   <div class="delta">&nbsp;</div>
                 </div>
+                <div class="benchTime">&nbsp;</div>
                 <div class="benchSpeed">&nbsp;</div>
                 <div class="benchInclude">
                   <input type="checkbox" checked="checked" />
@@ -72,6 +99,7 @@
                   <div class="value">&nbsp;</div>
                   <div class="delta">&nbsp;</div>
                 </div>
+                <div class="benchTime">&nbsp;</div>
                 <div class="benchSpeed">&nbsp;</div>
                 <div class="benchInclude">
                   <input type="checkbox" checked="checked" />
@@ -86,6 +114,7 @@
                   <div class="value">&nbsp;</div>
                   <div class="delta">&nbsp;</div>
                 </div>
+                <div class="benchTime">&nbsp;</div>
                 <div class="benchSpeed">&nbsp;</div>
                 <div class="benchInclude">
                   <input type="checkbox" checked="checked" />
@@ -96,7 +125,19 @@
         </div>
       </div>
 
-      <hr />
+      <hr style="margin-top: 140px" />
+      <p style="font-size: 0.85em; color: #666; text-align: center">
+        <strong>Note:</strong> The ECMA5 grammar uses a custom lexer (Acorn),
+        not Chevrotain's Lexer. ECMA5 results are only shown for parser-only
+        variants. All other variants display "N/A" for ECMA5.
+      </p>
+      <p style="font-size: 0.85em; color: #666; text-align: center">
+        <strong>Note:</strong> Init benchmarks are not representative of a real
+        cold start. They only measure parser/lexer construction logic and skip
+        the one-time <code>charCodeToOptimizedIdxMap</code> initialization
+        (~3ms) which is module-scoped and only runs on the very first Lexer
+        construction.
+      </p>
     </div>
 
     <script src="lib/iframe_loader.js"></script>

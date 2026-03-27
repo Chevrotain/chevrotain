@@ -23,6 +23,10 @@ onmessage = async function (event) {
       self.sample = xhrObj.responseText;
     }
     self.startRule = event.data.startRule;
+
+    // Notify the iframe of the loaded Chevrotain version so the main page
+    // can include it when storing benchmark results in localStorage.
+    postMessage({ type: "init", version: self.chevrotain.VERSION });
   } else {
     var options = event.data[0];
 

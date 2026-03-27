@@ -8,6 +8,15 @@
   padding: 15px;
 }
 
+#warmup-status {
+  color: #b8860b;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 4px;
+  min-height: 1.2em;
+}
+
 #runAllButton {
   width: 100px;
   height: 50px;
@@ -36,6 +45,7 @@
 
 #dataRows {
   position: relative;
+  min-height: 150px; /* 3 rows × 50px each */
 }
 
 .headerRow,
@@ -73,6 +83,7 @@
 }
 
 .headerRow .benchRate,
+.headerRow .benchTime,
 .headerRow .benchSpeed,
 .headerRow .benchInclude {
   text-align: center;
@@ -93,6 +104,7 @@
 
 .benchName,
 .benchRate,
+.benchTime,
 .benchSpeed,
 .benchInclude {
 }
@@ -104,6 +116,10 @@ div.benchName {
 }
 
 .benchRate {
+  width: 125px;
+}
+
+.benchTime {
   width: 125px;
 }
 
@@ -120,6 +136,7 @@ div.benchInclude {
 }
 
 .benchRate,
+.benchTime,
 .benchSpeed,
 .benchInclude,
 .benchName {
@@ -201,6 +218,11 @@ div.benchInclude {
 #dataRows div.dataRow:nth-child(12) {
   transform: translate3d(0, 1100%, 0);
   z-index: 89;
+}
+
+button.activeVariant {
+  background-color: #cce5ff;
+  outline: 2px solid #004085;
 }
 
 /*bootstrap customization*/
