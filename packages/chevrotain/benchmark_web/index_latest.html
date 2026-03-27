@@ -19,6 +19,11 @@
 
     <div class="container">
       <h1 style="text-align: center">Latest</h1>
+      <div id="browser-info"></div>
+      <script>
+        document.getElementById("browser-info").textContent =
+          navigator.userAgent;
+      </script>
       <!-- left part -->
       <div class="row">
         <!--right part-->
