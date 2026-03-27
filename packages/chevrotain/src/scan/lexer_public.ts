@@ -1,7 +1,6 @@
 import {
   analyzeTokenTypes,
   charCodeToOptimizedIndex,
-  cloneEmptyGroups,
   DEFAULT_MODE,
   IAnalyzeResult,
   IPatternConfig,
@@ -88,6 +87,7 @@ export class Lexer {
   protected modes: string[] = [];
   protected defaultMode!: string;
   protected emptyGroups: { [groupName: string]: IToken } = {};
+  private cachedGroupKeys: string[] = [];
 
   private config: Required<ILexerConfig>;
   private trackStartLines: boolean = true;
@@ -262,6 +262,7 @@ export class Lexer {
       );
 
       this.defaultMode = actualDefinition.defaultMode;
+      this.cachedGroupKeys = Object.keys(this.emptyGroups);
 
       if (
         this.lexerDefinitionErrors.length > 0 &&
@@ -408,7 +409,12 @@ export class Lexer {
     const errors: ILexingError[] = [];
     let line = this.trackStartLines ? 1 : undefined;
     let column = this.trackStartLines ? 1 : undefined;
-    const groups: any = cloneEmptyGroups(this.emptyGroups);
+    const groups: { [groupName: string]: IToken[] } = {};
+    // fast clone implementation for the empty Groups.
+    // provides a slight ~1% performance boost
+    for (let gi = 0; gi < this.cachedGroupKeys.length; gi++) {
+      groups[this.cachedGroupKeys[gi]] = [];
+    }
     const trackLines = this.trackStartLines;
     const lineTerminatorPattern = this.config.lineTerminatorsPattern;
 
@@ -470,8 +476,6 @@ export class Lexer {
         this.charCodeToPatternIdxToConfig[newMode];
 
       patternIdxToConfig = this.patternIdxToConfig[newMode];
-      currModePatternsLength = patternIdxToConfig.length;
-
       currModePatternsLength = patternIdxToConfig.length;
       const modeCanBeOptimized =
         this.canModeBeOptimized[newMode] && this.config.safeMode === false;
@@ -808,7 +812,7 @@ export class Lexer {
     startOffset: number,
     tokenTypeIdx: number,
     tokenType: TokenType,
-  ) {
+  ): IToken {
     return {
       image,
       startOffset,
@@ -824,7 +828,7 @@ export class Lexer {
     tokenType: TokenType,
     startLine: number,
     startColumn: number,
-  ) {
+  ): IToken {
     return {
       image,
       startOffset,

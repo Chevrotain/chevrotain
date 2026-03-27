@@ -929,26 +929,6 @@ export function performWarningRuntimeChecks(
   return warnings;
 }
 
-export function cloneEmptyGroups(emptyGroups: {
-  [groupName: string]: IToken;
-}): { [groupName: string]: IToken } {
-  const clonedResult: any = {};
-  const groupKeys = Object.keys(emptyGroups);
-
-  groupKeys.forEach((currKey) => {
-    const currGroupValue = emptyGroups[currKey];
-
-    /* istanbul ignore else */
-    if (Array.isArray(currGroupValue)) {
-      clonedResult[currKey] = [];
-    } else {
-      throw Error("non exhaustive match");
-    }
-  });
-
-  return clonedResult;
-}
-
 // TODO: refactor to avoid duplication
 export function isCustomPattern(tokenType: TokenType): boolean {
   const pattern = tokenType.PATTERN;
