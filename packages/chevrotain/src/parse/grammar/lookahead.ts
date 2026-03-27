@@ -1,3 +1,4 @@
+import { first } from "./first.js";
 import { possiblePathsFrom } from "./interpreter.js";
 import { RestWalker } from "./rest.js";
 import { Predicate, TokenMatcher } from "../parser/parser.js";
@@ -221,22 +222,23 @@ export function buildAlternativesLookAheadFunc(
       return currAlt.flat();
     });
 
-    const choiceToAlt = singleTokenAlts.reduce(
-      (result, currAlt, idx) => {
-        currAlt.forEach((currTokType) => {
-          if (!(currTokType.tokenTypeIdx! in result)) {
-            result[currTokType.tokenTypeIdx!] = idx;
+    // Use an Array instead of a plain object so V8 uses fast indexed element
+    // storage (direct slot load ~1-2 ns) rather than hash-table property
+    // lookup. tokenTypeIdx values are small sequential integers assigned by
+    // augmentTokenTypes, so the array stays compact.
+    const choiceToAlt: number[] = [];
+    singleTokenAlts.forEach((currAlt, idx) => {
+      currAlt.forEach((currTokType) => {
+        if (choiceToAlt[currTokType.tokenTypeIdx!] === undefined) {
+          choiceToAlt[currTokType.tokenTypeIdx!] = idx;
+        }
+        currTokType.categoryMatches!.forEach((currExtendingType) => {
+          if (choiceToAlt[currExtendingType] === undefined) {
+            choiceToAlt[currExtendingType] = idx;
           }
-          currTokType.categoryMatches!.forEach((currExtendingType) => {
-            if (!Object.hasOwn(result, currExtendingType)) {
-              result[currExtendingType] = idx;
-            }
-          });
         });
-        return result;
-      },
-      {} as Record<number, number>,
-    );
+      });
+    });
 
     /**
      * @returns {number} - The chosen alternative index
@@ -654,6 +656,32 @@ export function getLookaheadPathsForOr(
   );
   ruleGrammar.accept(visitor);
   return lookAheadSequenceFromAlternatives(visitor.result, k);
+}
+
+/**
+ * Returns the first-token info for each alternative of an OR production.
+ * Used by the fast-path to record and filter by exact vs category match.
+ */
+export function getOrFirstTokenInfo(
+  rule: Rule,
+  occurrence: number,
+): { tokenType: TokenType | undefined; isCategory: boolean }[] {
+  const visitor = new InsideDefinitionFinderVisitor(
+    occurrence,
+    PROD_TYPE.ALTERNATION,
+  );
+  rule.accept(visitor);
+  const alts = visitor.result as AlternativeGAST[];
+  return alts.map((alt) => {
+    const firstToks = first(alt);
+    const tokenType = firstToks[0];
+    if (tokenType === undefined) {
+      return { tokenType: undefined, isCategory: false };
+    }
+    const isCategory =
+      tokenType.MATCH_SET != null && tokenType.MATCH_SET.length > 0;
+    return { tokenType, isCategory };
+  });
 }
 
 export function getLookaheadPathsForOptionalProd(

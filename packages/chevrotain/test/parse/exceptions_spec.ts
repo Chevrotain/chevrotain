@@ -88,40 +88,46 @@ describe("Chevrotain's Parsing Exceptions", () => {
       }
     }
 
+    // Arrow functions may be reported as "<anonymous>", "anonymous", or undefined
+    // depending on Node/V8 version — accept any of these for the throw-site frame.
+    const anonymousFunctionNames = ["<anonymous>", "anonymous", undefined];
+
+    function assertValidStacktrace(exceptionInstance: Error) {
+      const stacktrace = ErrorStackParser.parse(exceptionInstance);
+      expect(stacktrace.length).to.be.at.least(2);
+      expect(anonymousFunctionNames).to.include(
+        stacktrace[0].functionName,
+        "throw-site frame should be anonymous/lambda",
+      );
+      expect(stacktrace[1].functionName).to.equal("throwAndCatchException");
+    }
+
     it("EarlyExitException", () => {
       const exceptionInstance = throwAndCatchException(
         () => new EarlyExitException("", dummyToken, dummyToken),
       );
-      const stacktrace = ErrorStackParser.parse(exceptionInstance);
-      expect(stacktrace[0].functionName).to.equal("<anonymous>"); // lambda function
-      expect(stacktrace[1].functionName).to.equal("throwAndCatchException");
+      assertValidStacktrace(exceptionInstance);
     });
 
     it("NoViableAltException", () => {
       const exceptionInstance = throwAndCatchException(
         () => new NoViableAltException("", dummyToken, dummyToken),
       );
-      const stacktrace = ErrorStackParser.parse(exceptionInstance);
-      expect(stacktrace[0].functionName).to.equal("<anonymous>"); // lambda function
-      expect(stacktrace[1].functionName).to.equal("throwAndCatchException");
+      assertValidStacktrace(exceptionInstance);
     });
 
     it("NotAllInputParsedException", () => {
       const exceptionInstance = throwAndCatchException(
         () => new NotAllInputParsedException("", dummyToken),
       );
-      const stacktrace = ErrorStackParser.parse(exceptionInstance);
-      expect(stacktrace[0].functionName).to.equal("<anonymous>"); // lambda function
-      expect(stacktrace[1].functionName).to.equal("throwAndCatchException");
+      assertValidStacktrace(exceptionInstance);
     });
 
     it("MismatchedTokenException", () => {
       const exceptionInstance = throwAndCatchException(
         () => new MismatchedTokenException("", dummyToken, dummyToken),
       );
-      const stacktrace = ErrorStackParser.parse(exceptionInstance);
-      expect(stacktrace[0].functionName).to.equal("<anonymous>"); // lambda function
-      expect(stacktrace[1].functionName).to.equal("throwAndCatchException");
+      assertValidStacktrace(exceptionInstance);
     });
   });
 });

@@ -7,6 +7,9 @@ onmessage = async function (event) {
     if (event.data.parserConfig) {
       self.parserConfig = event.data.parserConfig;
     }
+    if (event.data.lexerConfig) {
+      self.lexerConfig = event.data.lexerConfig;
+    }
 
     for (const elem of event.data.importScripts) {
       await import(elem);
@@ -28,25 +31,16 @@ onmessage = async function (event) {
     var options = event.data[0];
 
     try {
-      if (options.initLexer || options.initParser) {
-        self.initBench(
-          self.lexerDefinition || undefined,
-          self.customLexer || undefined,
-          parser,
-          parserConfig,
-          options,
-        );
-      } else {
-        self.parseBench(
-          self.sample,
-          self.lexerDefinition || undefined,
-          self.customLexer || undefined,
-          parser,
-          startRule,
-          options,
-          parserConfig,
-        );
-      }
+      self.parseBench(
+        self.sample,
+        self.lexerDefinition || undefined,
+        self.customLexer || undefined,
+        parser,
+        startRule,
+        options,
+        lexerConfig,
+        parserConfig,
+      );
       postMessage(0);
     } catch (e) {
       console.error(e.message);

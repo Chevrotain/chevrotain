@@ -1,5 +1,12 @@
 import { IToken, TokenType } from "@chevrotain/types";
 
+/**
+ * Checks whether `tokInstance` is of type `tokConstructor` or one of its
+ * category ancestors. Uses a Uint32Array bitset (MATCH_SET) instead of the
+ * old categoryMatchesMap object lookup — one bitwise AND vs. a property read
+ * and coercion, and stays monomorphic because MATCH_SET is always the same
+ * type (Uint32Array | null).
+ */
 export function tokenStructuredMatcher(
   tokInstance: IToken,
   tokConstructor: TokenType,
@@ -7,16 +14,19 @@ export function tokenStructuredMatcher(
   const instanceType = tokInstance.tokenTypeIdx;
   if (instanceType === tokConstructor.tokenTypeIdx) {
     return true;
-  } else {
-    return (
-      tokConstructor.isParent === true &&
-      tokConstructor.categoryMatchesMap![instanceType] === true
-    );
   }
+  const matchSet = tokConstructor.MATCH_SET;
+  return (
+    matchSet !== null &&
+    matchSet !== undefined &&
+    (matchSet[instanceType >> 5] & (1 << (instanceType & 31))) !== 0
+  );
 }
 
-// Optimized tokenMatcher in case our grammar does not use token categories
-// Being so tiny it is much more likely to be in-lined and this avoid the function call overhead
+/**
+ * Fast path for grammars with no token categories. Tiny enough for V8 to
+ * inline at every call site, avoiding the MATCH_SET branch entirely.
+ */
 export function tokenStructuredMatcherNoCategories(
   token: IToken,
   tokType: TokenType,
@@ -31,15 +41,30 @@ export function augmentTokenTypes(tokenTypes: TokenType[]): void {
   // collect the parent Token Types as well.
   const tokenTypesAndParents = expandCategories(tokenTypes);
 
-  // add required tokenType and categoryMatches properties
+  // assign tokenTypeIdx and normalize CATEGORIES on any token not yet augmented
   assignTokenDefaultProps(tokenTypesAndParents);
 
-  // fill up the categoryMatches
+  // fill up the categoryMatchesMap (used by lookahead, kept for compatibility)
   assignCategoriesMapProp(tokenTypesAndParents);
   assignCategoriesTokensProp(tokenTypesAndParents);
 
   tokenTypesAndParents.forEach((tokType) => {
     tokType.isParent = tokType.categoryMatches!.length > 0;
+  });
+
+  // Build MATCH_SET bitsets after all indices are finalized so the array is
+  // sized correctly. One word covers 32 token indices.
+  const setSize = (tokenShortNameIdx >>> 5) + 1;
+  tokenTypesAndParents.forEach((tokType) => {
+    if (tokType.isParent) {
+      const matchSet = new Uint32Array(setSize);
+      tokType.categoryMatches!.forEach((idx) => {
+        matchSet[idx >> 5] |= 1 << (idx & 31);
+      });
+      tokType.MATCH_SET = matchSet;
+    } else {
+      tokType.MATCH_SET = null;
+    }
   });
 }
 
@@ -133,8 +158,15 @@ export function singleAssignCategoriesToksMap(
   });
 }
 
+/**
+ * Returns true if `tokType` has already been assigned a tokenTypeIdx by
+ * augmentTokenTypes(). Uses a value check (non-zero) rather than
+ * Object.hasOwn because tokenTypeIdx is now always pre-declared as 0.
+ * Null guard preserved because gast_recorder.ts passes user-supplied values
+ * that may be null.
+ */
 export function hasShortKeyProperty(tokType: TokenType): boolean {
-  return Object.hasOwn(tokType ?? {}, "tokenTypeIdx");
+  return tokType != null && !!tokType.tokenTypeIdx;
 }
 
 export function hasCategoriesProperty(tokType: TokenType): boolean {

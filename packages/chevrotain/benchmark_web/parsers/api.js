@@ -10,6 +10,7 @@ self.parseBench = function (
   parser,
   rootRule,
   options,
+  lexerConfig,
   parserConfig,
 ) {
   if (lexerInstance === undefined) {
@@ -17,10 +18,7 @@ self.parseBench = function (
       lexerInstance = customLexer;
     } else {
       var start = new Date().getTime();
-      lexerInstance = new chevrotain.Lexer(lexerDefinition, {
-        // TODO: extract lexer options to global config
-        positionTracking: "onlyOffset",
-      });
+      lexerInstance = new chevrotain.Lexer(lexerDefinition, lexerConfig);
       var end = new Date().getTime();
       console.log("Lexer init time: " + (end - start));
     }

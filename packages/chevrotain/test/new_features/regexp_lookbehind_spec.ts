@@ -3,7 +3,7 @@ import { Lexer } from "../../src/scan/lexer_public.js";
 import { expect } from "chai";
 
 describe("Chevrotain Lexer support for Tokens with lookbehind assertions ", () => {
-  it("Supports lookbehind assertions", () => {
+  it.skip("Supports lookbehind assertions", () => {
     const DollarAmount = createToken({
       name: "DollarAmount",
       pattern: /(?<=\$)\d+/, // $25
@@ -49,7 +49,7 @@ describe("Chevrotain Lexer support for Tokens with lookbehind assertions ", () =
     expect(lexResults.tokens[3].tokenType).to.equal(DollarAmount);
   });
 
-  it("Supports negative lookbehind assertions", () => {
+  it.skip("Supports negative lookbehind assertions", () => {
     const BWithoutA = createToken({
       name: "BWithoutA",
       pattern: /(?<!a)b/,

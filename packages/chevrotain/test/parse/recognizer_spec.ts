@@ -461,7 +461,7 @@ function defineRecognizerSpecs(
           [PlusTok],
           {},
         ) as any;
-        parser.isBackTrackingStack.push(true);
+        parser.IS_SPECULATING = true;
         parser.onBeforeParse("someRule");
         expect(
           parser.shouldInRepetitionRecoveryBeTried(MinusTok, 1, true),
@@ -665,7 +665,7 @@ function defineRecognizerSpecs(
                 },
               },
               {
-                ALT: () => {
+                ALT: (): number | string => {
                   this.CONSUME1(PlusTok);
                   return "bamba";
                 },
@@ -852,7 +852,6 @@ function defineRecognizerSpecs(
         class WrongOrderOfSelfAnalysisParser extends EmbeddedActionsParser {
           constructor() {
             super(ALL_TOKENS);
-
             this.RULE("goodRule", () => {
               this.CONSUME(IntTok);
             });

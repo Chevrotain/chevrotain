@@ -12,6 +12,7 @@
       // relative to the worker impel file
       initWorker({
         startRule: "json",
+        lexerConfig: window.globalOptions.lexerConfig,
         parserConfig: window.globalOptions.parserConfig,
         importScripts: [
           window.globalOptions.bundle,
