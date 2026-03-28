@@ -2,8 +2,15 @@
   text-align: center;
   font-size: 0.85em;
   color: #666;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   word-break: break-all;
+}
+
+#options-info {
+  text-align: center;
+  font-size: 0.85em;
+  color: #666;
+  margin-bottom: 14px;
 }
 
 .fastestRow div {

@@ -20,6 +20,7 @@
     <div class="container">
       <h1 style="text-align: center">Latest</h1>
       <div id="browser-info"></div>
+      <div id="options-info"></div>
       <script>
         document.getElementById("browser-info").textContent =
           navigator.userAgent;
@@ -163,6 +164,14 @@
         "./parsers/ecma5/ecma5.html",
         self.mode,
       );
+
+      document.getElementById("JSON").addEventListener("load", function () {
+        var opts = this.contentWindow && this.contentWindow.globalOptions;
+        if (opts && opts.parserConfig) {
+          document.getElementById("options-info").textContent =
+            "outputCst: " + opts.parserConfig.outputCst;
+        }
+      });
 
       var testCases = {
         JSON: function (suite) {

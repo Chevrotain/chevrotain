@@ -1,3 +1,4 @@
+const outputCst = false;
 const options = {
   // Tip: disable CST building to emphasize performance changes
   // due to parser engine changes, e.g better implementation of `defineRule`
@@ -8,7 +9,7 @@ const options = {
     bundle: "./esm_wrappers/chevrotain_next.mjs",
     parserConfig: {
       maxLookahead: 2,
-      outputCst: false,
+      outputCst,
     },
   },
   latest: {
@@ -16,7 +17,7 @@ const options = {
     bundle: "./esm_wrappers/chevrotain_latest.mjs",
     parserConfig: {
       maxLookahead: 2,
-      outputCst: false,
+      outputCst,
     },
   },
 };
