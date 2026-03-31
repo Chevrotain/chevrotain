@@ -73,18 +73,18 @@ export class RecognizerApi {
     );
   }
 
-  many(
+  many<OUT>(
     this: MixedInParser,
     idx: number,
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
   ): void {
     return this.manyInternal(idx, actionORMethodDef);
   }
 
-  atLeastOne(
+  atLeastOne<OUT>(
     this: MixedInParser,
     idx: number,
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
   ): void {
     return this.atLeastOneInternal(idx, actionORMethodDef);
   }
