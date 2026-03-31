@@ -1,9 +1,9 @@
 /**
  * Type-safety regression tests for the Parsing DSL public API.
  *
- * Strategy: Each test parser contains a `@ts-expect-error` directive that
- * suppresses a type error that only exists **after** the corresponding type
- * improvement has been applied.
+ * Strategy: Each test contains a `@ts-expect-error` directive that suppresses
+ * a type error that only exists **after** the corresponding type improvement
+ * has been applied.
  *
  * If a type improvement is ever reverted, `@ts-expect-error` becomes an
  * "unused directive" (TS2578) and the build fails — catching the regression.
@@ -25,11 +25,6 @@ describe("API type safety", () => {
     let MinusTok: TokenType;
     let parser: OrUnionTypeParser;
 
-    /**
-     * Parser whose rule exercises OR with two alternatives returning different
-     * types.  The compile-time assertion below verifies that the inferred
-     * return type is `number | string` (not `any`).
-     */
     class OrUnionTypeParser extends EmbeddedActionsParser {
       constructor() {
         super([PlusTok, MinusTok]);
@@ -64,16 +59,23 @@ describe("API type safety", () => {
       parser.input = [createRegularToken(PlusTok)];
       const result = parser.orRule();
       expect(parser.errors).to.be.empty;
-      expect(result).to.be.a("number");
       expect(result).to.equal(1);
+      // Compile-time guard: result must be `number | string`, not `any`.
+      // If OR returned `any` this assignment would be silently valid and the
+      // directive would become "unused" (TS2578), breaking the build.
+      // @ts-expect-error  Type 'number | string' is not assignable to type 'boolean'
+      const _assertNotAny: boolean = result;
+      void _assertNotAny;
     });
 
     it("returns the value from the matched alternative (MinusTok → 'hello')", () => {
       parser.input = [createRegularToken(MinusTok)];
       const result = parser.orRule();
       expect(parser.errors).to.be.empty;
-      expect(result).to.be.a("string");
       expect(result).to.equal("hello");
+      // @ts-expect-error  Type 'number | string' is not assignable to type 'boolean'
+      const _assertNotAny: boolean = result;
+      void _assertNotAny;
     });
   });
 
@@ -85,37 +87,30 @@ describe("API type safety", () => {
     let PlusTok: TokenType;
     let parser: BacktrackTypeParser;
 
-    /**
-     * Parser with a parameterized rule used as the target of BACKTRACK.
-     * The typeCheckRule holds the compile-time assertion.
-     */
     class BacktrackTypeParser extends EmbeddedActionsParser {
       constructor() {
         super([PlusTok]);
         this.performSelfAnalysis();
       }
 
-      /** Parameterized rule: takes an optional number, consumes PlusTok. */
       public paramRule = this.RULE("paramRule", (x?: number) => {
         this.CONSUME(PlusTok);
         return x ?? 0;
       });
 
-      /**
-       * Compile-time assertion: BACKTRACK's `args` must match the rule's
-       * parameter types.  Before the fix, args was `any[]`, so passing
-       * `["wrong"]` was silently valid.  After the fix, ARGS is inferred as
-       * `[x?: number]` from paramRule, so `["wrong"]` is a type error that
-       * we must suppress with @ts-expect-error.
-       */
-      public typeCheckRule = this.RULE("typeCheckRule", () => {
-        // Valid: no args
-        this.BACKTRACK(this.paramRule);
-        // Valid: correct arg type
-        this.BACKTRACK(this.paramRule, [42]);
+      // Compile-time guard: `args` must match paramRule's parameter types.
+      // Before the fix args was `any[]` so `["wrong"]` was silently valid.
+      // After the fix ARGS is inferred as `[x?: number]`, so `["wrong"]` is
+      // a type error — suppressed here so the build stays green.
+      //
+      // BACKTRACK is protected so this must live inside the class body.
+      // The call is a safe no-op at runtime: BACKTRACK returns a closure
+      // without invoking the rule.
+      private readonly _backtrackArgTypeCheck = this.BACKTRACK(
+        this.paramRule,
         // @ts-expect-error  Type 'string' is not assignable to type 'number | undefined'
-        this.BACKTRACK(this.paramRule, ["wrong"]);
-      });
+        ["wrong"],
+      );
     }
 
     before(() => {
@@ -135,6 +130,70 @@ describe("API type safety", () => {
       const result = parser.paramRule(99);
       expect(parser.errors).to.be.empty;
       expect(result).to.equal(99);
+    });
+  });
+
+  // ===========================================================================
+  // Step 5 — OR object form: union return type inference for { DEF: [...] }
+  // ===========================================================================
+
+  describe("OR({DEF: [...]}) object form union return type inference", () => {
+    let PlusTok: TokenType;
+    let MinusTok: TokenType;
+    let parser: OrObjectFormParser;
+
+    class OrObjectFormParser extends EmbeddedActionsParser {
+      constructor() {
+        super([PlusTok, MinusTok]);
+        this.performSelfAnalysis();
+      }
+
+      public orWithOptsRule = this.RULE("orWithOptsRule", () => {
+        return this.OR({
+          DEF: [
+            {
+              ALT: () => {
+                this.CONSUME(PlusTok);
+                return 1 as number;
+              },
+            },
+            {
+              ALT: () => {
+                this.CONSUME(MinusTok);
+                return "hello" as string;
+              },
+            },
+          ],
+          ERR_MSG: "expected plus or minus",
+        });
+      });
+    }
+
+    before(() => {
+      PlusTok = createToken({ name: "OROBJ_PlusTok" });
+      MinusTok = createToken({ name: "OROBJ_MinusTok" });
+      parser = new OrObjectFormParser();
+    });
+
+    it("returns the value from the matched alternative (PlusTok → 1)", () => {
+      parser.input = [createRegularToken(PlusTok)];
+      const result = parser.orWithOptsRule();
+      expect(parser.errors).to.be.empty;
+      expect(result).to.equal(1);
+      // Compile-time guard: same as Step 1 but for the object form.
+      // @ts-expect-error  Type 'number | string' is not assignable to type 'boolean'
+      const _assertNotAny: boolean = result;
+      void _assertNotAny;
+    });
+
+    it("returns the value from the matched alternative (MinusTok → 'hello')", () => {
+      parser.input = [createRegularToken(MinusTok)];
+      const result = parser.orWithOptsRule();
+      expect(parser.errors).to.be.empty;
+      expect(result).to.equal("hello");
+      // @ts-expect-error  Type 'number | string' is not assignable to type 'boolean'
+      const _assertNotAny: boolean = result;
+      void _assertNotAny;
     });
   });
 });

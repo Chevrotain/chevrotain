@@ -116,7 +116,10 @@ declare abstract class BaseParser {
     idx: number,
     altsOrOpts: [...Alts],
   ): InferOr<Alts>;
-  protected or<T>(idx: number, altsOrOpts: OrMethodOpts<T>): T;
+  protected or<Alts extends readonly IOrAlt<any>[]>(
+    idx: number,
+    altsOrOpts: { DEF: [...Alts] } & Omit<OrMethodOpts<any>, "DEF">,
+  ): InferOr<Alts>;
 
   /**
    * Like `MANY` with the numerical suffix as a parameter, e.g:
@@ -403,7 +406,9 @@ declare abstract class BaseParser {
   protected OR<Alts extends readonly IOrAlt<any>[]>(
     altsOrOpts: [...Alts],
   ): InferOr<Alts>;
-  protected OR<T>(altsOrOpts: OrMethodOpts<T>): T;
+  protected OR<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: { DEF: [...Alts] } & Omit<OrMethodOpts<any>, "DEF">,
+  ): InferOr<Alts>;
 
   /**
    * @see OR
@@ -412,7 +417,9 @@ declare abstract class BaseParser {
   protected OR1<Alts extends readonly IOrAlt<any>[]>(
     altsOrOpts: [...Alts],
   ): InferOr<Alts>;
-  protected OR1<T>(altsOrOpts: OrMethodOpts<T>): T;
+  protected OR1<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: { DEF: [...Alts] } & Omit<OrMethodOpts<any>, "DEF">,
+  ): InferOr<Alts>;
 
   /**
    * @see OR
@@ -421,7 +428,9 @@ declare abstract class BaseParser {
   protected OR2<Alts extends readonly IOrAlt<any>[]>(
     altsOrOpts: [...Alts],
   ): InferOr<Alts>;
-  protected OR2<T>(altsOrOpts: OrMethodOpts<T>): T;
+  protected OR2<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: { DEF: [...Alts] } & Omit<OrMethodOpts<any>, "DEF">,
+  ): InferOr<Alts>;
 
   /**
    * @see OR
@@ -430,7 +439,9 @@ declare abstract class BaseParser {
   protected OR3<Alts extends readonly IOrAlt<any>[]>(
     altsOrOpts: [...Alts],
   ): InferOr<Alts>;
-  protected OR3<T>(altsOrOpts: OrMethodOpts<T>): T;
+  protected OR3<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: { DEF: [...Alts] } & Omit<OrMethodOpts<any>, "DEF">,
+  ): InferOr<Alts>;
 
   /**
    * @see OR
@@ -439,7 +450,9 @@ declare abstract class BaseParser {
   protected OR4<Alts extends readonly IOrAlt<any>[]>(
     altsOrOpts: [...Alts],
   ): InferOr<Alts>;
-  protected OR4<T>(altsOrOpts: OrMethodOpts<T>): T;
+  protected OR4<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: { DEF: [...Alts] } & Omit<OrMethodOpts<any>, "DEF">,
+  ): InferOr<Alts>;
 
   /**
    * @see OR
@@ -448,7 +461,9 @@ declare abstract class BaseParser {
   protected OR5<Alts extends readonly IOrAlt<any>[]>(
     altsOrOpts: [...Alts],
   ): InferOr<Alts>;
-  protected OR5<T>(altsOrOpts: OrMethodOpts<T>): T;
+  protected OR5<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: { DEF: [...Alts] } & Omit<OrMethodOpts<any>, "DEF">,
+  ): InferOr<Alts>;
 
   /**
    * @see OR
@@ -457,7 +472,9 @@ declare abstract class BaseParser {
   protected OR6<Alts extends readonly IOrAlt<any>[]>(
     altsOrOpts: [...Alts],
   ): InferOr<Alts>;
-  protected OR6<T>(altsOrOpts: OrMethodOpts<T>): T;
+  protected OR6<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: { DEF: [...Alts] } & Omit<OrMethodOpts<any>, "DEF">,
+  ): InferOr<Alts>;
 
   /**
    * @see OR
@@ -466,7 +483,9 @@ declare abstract class BaseParser {
   protected OR7<Alts extends readonly IOrAlt<any>[]>(
     altsOrOpts: [...Alts],
   ): InferOr<Alts>;
-  protected OR7<T>(altsOrOpts: OrMethodOpts<T>): T;
+  protected OR7<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: { DEF: [...Alts] } & Omit<OrMethodOpts<any>, "DEF">,
+  ): InferOr<Alts>;
 
   /**
    * @see OR
@@ -475,7 +494,9 @@ declare abstract class BaseParser {
   protected OR8<Alts extends readonly IOrAlt<any>[]>(
     altsOrOpts: [...Alts],
   ): InferOr<Alts>;
-  protected OR8<T>(altsOrOpts: OrMethodOpts<T>): T;
+  protected OR8<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: { DEF: [...Alts] } & Omit<OrMethodOpts<any>, "DEF">,
+  ): InferOr<Alts>;
 
   /**
    * @see OR
@@ -484,7 +505,9 @@ declare abstract class BaseParser {
   protected OR9<Alts extends readonly IOrAlt<any>[]>(
     altsOrOpts: [...Alts],
   ): InferOr<Alts>;
-  protected OR9<T>(altsOrOpts: OrMethodOpts<T>): T;
+  protected OR9<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: { DEF: [...Alts] } & Omit<OrMethodOpts<any>, "DEF">,
+  ): InferOr<Alts>;
 
   /**
    * Parsing DSL method, that indicates a repetition of zero or more.
