@@ -674,7 +674,7 @@ export class RecognizerApi {
     name: string,
     implementation: (...implArgs: any[]) => T,
     config: IRuleConfig<T> = DEFAULT_RULE_CONFIG,
-  ): (idxInCallingRule?: number, ...args: any[]) => T | any {
+  ): ParserMethodInternal<any[], T> {
     if (this.definedRulesNames.includes(name)) {
       const errMsg =
         defaultGrammarValidatorErrorProvider.buildDuplicateRuleNameError({
@@ -702,7 +702,7 @@ export class RecognizerApi {
     name: string,
     impl: (...implArgs: any[]) => T,
     config: IRuleConfig<T> = DEFAULT_RULE_CONFIG,
-  ): (idxInCallingRule?: number, ...args: any[]) => T {
+  ): ParserMethodInternal<any[], T> {
     const ruleErrors: IParserDefinitionError[] = validateRuleIsOverridden(
       name,
       this.definedRulesNames,
