@@ -112,8 +112,11 @@ declare abstract class BaseParser {
    * ...
    * @see OR
    */
-  protected or(idx: number, altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
-  protected or<T>(idx: number, altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
+  protected or<Alts extends readonly IOrAlt<any>[]>(
+    idx: number,
+    altsOrOpts: [...Alts],
+  ): InferOr<Alts>;
+  protected or<T>(idx: number, altsOrOpts: OrMethodOpts<T>): T;
 
   /**
    * Like `MANY` with the numerical suffix as a parameter, e.g:
@@ -397,71 +400,91 @@ declare abstract class BaseParser {
    *
    * @returns The result of invoking the chosen alternative.
    */
-  protected OR<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: [...Alts],
+  ): InferOr<Alts>;
+  protected OR<T>(altsOrOpts: OrMethodOpts<T>): T;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR1<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR1(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR1<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: [...Alts],
+  ): InferOr<Alts>;
+  protected OR1<T>(altsOrOpts: OrMethodOpts<T>): T;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR2<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR2(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR2<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: [...Alts],
+  ): InferOr<Alts>;
+  protected OR2<T>(altsOrOpts: OrMethodOpts<T>): T;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR3<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR3(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR3<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: [...Alts],
+  ): InferOr<Alts>;
+  protected OR3<T>(altsOrOpts: OrMethodOpts<T>): T;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR4<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR4(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR4<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: [...Alts],
+  ): InferOr<Alts>;
+  protected OR4<T>(altsOrOpts: OrMethodOpts<T>): T;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR5<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR5(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR5<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: [...Alts],
+  ): InferOr<Alts>;
+  protected OR5<T>(altsOrOpts: OrMethodOpts<T>): T;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR6<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR6(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR6<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: [...Alts],
+  ): InferOr<Alts>;
+  protected OR6<T>(altsOrOpts: OrMethodOpts<T>): T;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR7<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR7(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR7<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: [...Alts],
+  ): InferOr<Alts>;
+  protected OR7<T>(altsOrOpts: OrMethodOpts<T>): T;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR8<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR8(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR8<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: [...Alts],
+  ): InferOr<Alts>;
+  protected OR8<T>(altsOrOpts: OrMethodOpts<T>): T;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR9<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR9(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR9<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: [...Alts],
+  ): InferOr<Alts>;
+  protected OR9<T>(altsOrOpts: OrMethodOpts<T>): T;
 
   /**
    * Parsing DSL method, that indicates a repetition of zero or more.
@@ -1925,6 +1948,20 @@ export interface IOrAlt<T> {
 export interface IOrAltWithGate<T> extends IOrAlt<T> {
   // TODO: deprecate this interface
 }
+
+/**
+ * Infers the union of return types from a tuple of {@link IOrAlt} alternatives.
+ *
+ * @example
+ * // Inferred as `number | string`
+ * const result = this.OR([
+ *   { ALT: () => 1 },
+ *   { ALT: () => "hello" },
+ * ]);
+ */
+export type InferOr<Alts extends readonly IOrAlt<any>[]> = ReturnType<
+  Alts[number]["ALT"]
+>;
 
 export interface ICstVisitor<IN, OUT> {
   visit(cstNode: CstNode | CstNode[], param?: IN): OUT;
