@@ -4,6 +4,7 @@ import {
   DSLMethodOpts,
   DSLMethodOptsWithErr,
   GrammarAction,
+  InferOr,
   IOrAlt,
   IRuleConfig,
   ISerializedGast,
@@ -61,26 +62,29 @@ export class RecognizerApi {
     return this.optionInternal(actionORMethodDef, idx);
   }
 
-  or(
+  or<Alts extends readonly IOrAlt<any>[]>(
     this: MixedInParser,
     idx: number,
-    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>,
-  ): any {
-    return this.orInternal(altsOrOpts, idx);
+    altsOrOpts: [...Alts] | OrMethodOpts<unknown>,
+  ): InferOr<Alts> {
+    return this.orInternal(
+      altsOrOpts as IOrAlt<any>[] | OrMethodOpts<unknown>,
+      idx,
+    );
   }
 
-  many(
+  many<OUT>(
     this: MixedInParser,
     idx: number,
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
   ): void {
     return this.manyInternal(idx, actionORMethodDef);
   }
 
-  atLeastOne(
+  atLeastOne<OUT>(
     this: MixedInParser,
     idx: number,
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
   ): void {
     return this.atLeastOneInternal(idx, actionORMethodDef);
   }
@@ -315,74 +319,104 @@ export class RecognizerApi {
     return this.optionInternal(actionORMethodDef, 9);
   }
 
-  OR<T>(
+  OR<Alts extends readonly IOrAlt<any>[]>(
     this: MixedInParser,
-    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>,
-  ): T {
-    return this.orInternal(altsOrOpts, 0);
+    altsOrOpts: [...Alts] | OrMethodOpts<unknown>,
+  ): InferOr<Alts> {
+    return this.orInternal(
+      altsOrOpts as IOrAlt<any>[] | OrMethodOpts<unknown>,
+      0,
+    );
   }
 
-  OR1<T>(
+  OR1<Alts extends readonly IOrAlt<any>[]>(
     this: MixedInParser,
-    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>,
-  ): T {
-    return this.orInternal(altsOrOpts, 1);
+    altsOrOpts: [...Alts] | OrMethodOpts<unknown>,
+  ): InferOr<Alts> {
+    return this.orInternal(
+      altsOrOpts as IOrAlt<any>[] | OrMethodOpts<unknown>,
+      1,
+    );
   }
 
-  OR2<T>(
+  OR2<Alts extends readonly IOrAlt<any>[]>(
     this: MixedInParser,
-    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>,
-  ): T {
-    return this.orInternal(altsOrOpts, 2);
+    altsOrOpts: [...Alts] | OrMethodOpts<unknown>,
+  ): InferOr<Alts> {
+    return this.orInternal(
+      altsOrOpts as IOrAlt<any>[] | OrMethodOpts<unknown>,
+      2,
+    );
   }
 
-  OR3<T>(
+  OR3<Alts extends readonly IOrAlt<any>[]>(
     this: MixedInParser,
-    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>,
-  ): T {
-    return this.orInternal(altsOrOpts, 3);
+    altsOrOpts: [...Alts] | OrMethodOpts<unknown>,
+  ): InferOr<Alts> {
+    return this.orInternal(
+      altsOrOpts as IOrAlt<any>[] | OrMethodOpts<unknown>,
+      3,
+    );
   }
 
-  OR4<T>(
+  OR4<Alts extends readonly IOrAlt<any>[]>(
     this: MixedInParser,
-    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>,
-  ): T {
-    return this.orInternal(altsOrOpts, 4);
+    altsOrOpts: [...Alts] | OrMethodOpts<unknown>,
+  ): InferOr<Alts> {
+    return this.orInternal(
+      altsOrOpts as IOrAlt<any>[] | OrMethodOpts<unknown>,
+      4,
+    );
   }
 
-  OR5<T>(
+  OR5<Alts extends readonly IOrAlt<any>[]>(
     this: MixedInParser,
-    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>,
-  ): T {
-    return this.orInternal(altsOrOpts, 5);
+    altsOrOpts: [...Alts] | OrMethodOpts<unknown>,
+  ): InferOr<Alts> {
+    return this.orInternal(
+      altsOrOpts as IOrAlt<any>[] | OrMethodOpts<unknown>,
+      5,
+    );
   }
 
-  OR6<T>(
+  OR6<Alts extends readonly IOrAlt<any>[]>(
     this: MixedInParser,
-    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>,
-  ): T {
-    return this.orInternal(altsOrOpts, 6);
+    altsOrOpts: [...Alts] | OrMethodOpts<unknown>,
+  ): InferOr<Alts> {
+    return this.orInternal(
+      altsOrOpts as IOrAlt<any>[] | OrMethodOpts<unknown>,
+      6,
+    );
   }
 
-  OR7<T>(
+  OR7<Alts extends readonly IOrAlt<any>[]>(
     this: MixedInParser,
-    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>,
-  ): T {
-    return this.orInternal(altsOrOpts, 7);
+    altsOrOpts: [...Alts] | OrMethodOpts<unknown>,
+  ): InferOr<Alts> {
+    return this.orInternal(
+      altsOrOpts as IOrAlt<any>[] | OrMethodOpts<unknown>,
+      7,
+    );
   }
 
-  OR8<T>(
+  OR8<Alts extends readonly IOrAlt<any>[]>(
     this: MixedInParser,
-    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>,
-  ): T {
-    return this.orInternal(altsOrOpts, 8);
+    altsOrOpts: [...Alts] | OrMethodOpts<unknown>,
+  ): InferOr<Alts> {
+    return this.orInternal(
+      altsOrOpts as IOrAlt<any>[] | OrMethodOpts<unknown>,
+      8,
+    );
   }
 
-  OR9<T>(
+  OR9<Alts extends readonly IOrAlt<any>[]>(
     this: MixedInParser,
-    altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>,
-  ): T {
-    return this.orInternal(altsOrOpts, 9);
+    altsOrOpts: [...Alts] | OrMethodOpts<unknown>,
+  ): InferOr<Alts> {
+    return this.orInternal(
+      altsOrOpts as IOrAlt<any>[] | OrMethodOpts<unknown>,
+      9,
+    );
   }
 
   MANY<OUT>(
@@ -640,7 +674,7 @@ export class RecognizerApi {
     name: string,
     implementation: (...implArgs: any[]) => T,
     config: IRuleConfig<T> = DEFAULT_RULE_CONFIG,
-  ): (idxInCallingRule?: number, ...args: any[]) => T | any {
+  ): ParserMethodInternal<any[], T> {
     if (this.definedRulesNames.includes(name)) {
       const errMsg =
         defaultGrammarValidatorErrorProvider.buildDuplicateRuleNameError({
@@ -668,7 +702,7 @@ export class RecognizerApi {
     name: string,
     impl: (...implArgs: any[]) => T,
     config: IRuleConfig<T> = DEFAULT_RULE_CONFIG,
-  ): (idxInCallingRule?: number, ...args: any[]) => T {
+  ): ParserMethodInternal<any[], T> {
     const ruleErrors: IParserDefinitionError[] = validateRuleIsOverridden(
       name,
       this.definedRulesNames,
@@ -681,10 +715,10 @@ export class RecognizerApi {
     return ruleImplementation;
   }
 
-  BACKTRACK<T>(
+  BACKTRACK<ARGS extends unknown[], T>(
     this: MixedInParser,
-    grammarRule: (...args: any[]) => T,
-    args?: any[],
+    grammarRule: (...args: ARGS) => T,
+    args?: ARGS,
   ): () => boolean {
     // Use coreRule to bypass root-level hooks (onBeforeParse/onAfterParse).
     // Backtracking is speculative and should not trigger parse lifecycle hooks.

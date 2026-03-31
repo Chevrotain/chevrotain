@@ -61,9 +61,9 @@ declare abstract class BaseParser {
    *
    * @return a lookahead function that will try to parse the given grammarRule and will return true if succeed.
    */
-  protected BACKTRACK<T>(
-    grammarRule: (...args: any[]) => T,
-    args?: any[],
+  protected BACKTRACK<ARGS extends unknown[], T>(
+    grammarRule: (...args: ARGS) => T,
+    args?: ARGS,
   ): () => boolean;
 
   /**
@@ -112,8 +112,14 @@ declare abstract class BaseParser {
    * ...
    * @see OR
    */
-  protected or(idx: number, altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
-  protected or<T>(idx: number, altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
+  protected or<Alts extends readonly IOrAlt<any>[]>(
+    idx: number,
+    altsOrOpts: [...Alts],
+  ): InferOr<Alts>;
+  protected or<Alts extends readonly IOrAlt<any>[]>(
+    idx: number,
+    altsOrOpts: { DEF: [...Alts] } & Omit<OrMethodOpts<any>, "DEF">,
+  ): InferOr<Alts>;
 
   /**
    * Like `MANY` with the numerical suffix as a parameter, e.g:
@@ -123,9 +129,9 @@ declare abstract class BaseParser {
    * ...
    * @see MANY
    */
-  protected many(
+  protected many<OUT>(
     idx: number,
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
   ): void;
 
   /**
@@ -136,9 +142,9 @@ declare abstract class BaseParser {
    * ...
    * @see AT_LEAST_ONE
    */
-  protected atLeastOne(
+  protected atLeastOne<OUT>(
     idx: number,
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
   ): void;
 
   /**
@@ -397,71 +403,111 @@ declare abstract class BaseParser {
    *
    * @returns The result of invoking the chosen alternative.
    */
-  protected OR<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: [...Alts],
+  ): InferOr<Alts>;
+  protected OR<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: { DEF: [...Alts] } & Omit<OrMethodOpts<any>, "DEF">,
+  ): InferOr<Alts>;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR1<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR1(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR1<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: [...Alts],
+  ): InferOr<Alts>;
+  protected OR1<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: { DEF: [...Alts] } & Omit<OrMethodOpts<any>, "DEF">,
+  ): InferOr<Alts>;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR2<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR2(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR2<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: [...Alts],
+  ): InferOr<Alts>;
+  protected OR2<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: { DEF: [...Alts] } & Omit<OrMethodOpts<any>, "DEF">,
+  ): InferOr<Alts>;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR3<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR3(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR3<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: [...Alts],
+  ): InferOr<Alts>;
+  protected OR3<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: { DEF: [...Alts] } & Omit<OrMethodOpts<any>, "DEF">,
+  ): InferOr<Alts>;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR4<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR4(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR4<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: [...Alts],
+  ): InferOr<Alts>;
+  protected OR4<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: { DEF: [...Alts] } & Omit<OrMethodOpts<any>, "DEF">,
+  ): InferOr<Alts>;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR5<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR5(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR5<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: [...Alts],
+  ): InferOr<Alts>;
+  protected OR5<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: { DEF: [...Alts] } & Omit<OrMethodOpts<any>, "DEF">,
+  ): InferOr<Alts>;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR6<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR6(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR6<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: [...Alts],
+  ): InferOr<Alts>;
+  protected OR6<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: { DEF: [...Alts] } & Omit<OrMethodOpts<any>, "DEF">,
+  ): InferOr<Alts>;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR7<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR7(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR7<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: [...Alts],
+  ): InferOr<Alts>;
+  protected OR7<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: { DEF: [...Alts] } & Omit<OrMethodOpts<any>, "DEF">,
+  ): InferOr<Alts>;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR8<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR8(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR8<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: [...Alts],
+  ): InferOr<Alts>;
+  protected OR8<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: { DEF: [...Alts] } & Omit<OrMethodOpts<any>, "DEF">,
+  ): InferOr<Alts>;
 
   /**
    * @see OR
    * @hidden
    */
-  protected OR9<T>(altsOrOpts: IOrAlt<T>[] | OrMethodOpts<T>): T;
-  protected OR9(altsOrOpts: IOrAlt<any>[] | OrMethodOpts<any>): any;
+  protected OR9<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: [...Alts],
+  ): InferOr<Alts>;
+  protected OR9<Alts extends readonly IOrAlt<any>[]>(
+    altsOrOpts: { DEF: [...Alts] } & Omit<OrMethodOpts<any>, "DEF">,
+  ): InferOr<Alts>;
 
   /**
    * Parsing DSL method, that indicates a repetition of zero or more.
@@ -497,80 +543,80 @@ declare abstract class BaseParser {
    *                             or an "OPTIONS" object describing the grammar action and optional properties.
    *
    */
-  protected MANY(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+  protected MANY<OUT>(
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
   ): void;
 
   /**
    * @see MANY
    * @hidden
    */
-  protected MANY1(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+  protected MANY1<OUT>(
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
   ): void;
 
   /**
    * @see MANY
    * @hidden
    */
-  protected MANY2(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+  protected MANY2<OUT>(
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
   ): void;
 
   /**
    * @see MANY
    * @hidden
    */
-  protected MANY3(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+  protected MANY3<OUT>(
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
   ): void;
 
   /**
    * @see MANY
    * @hidden
    */
-  protected MANY4(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+  protected MANY4<OUT>(
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
   ): void;
 
   /**
    * @see MANY
    * @hidden
    */
-  protected MANY5(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+  protected MANY5<OUT>(
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
   ): void;
 
   /**
    * @see MANY
    * @hidden
    */
-  protected MANY6(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+  protected MANY6<OUT>(
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
   ): void;
 
   /**
    * @see MANY
    * @hidden
    */
-  protected MANY7(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+  protected MANY7<OUT>(
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
   ): void;
 
   /**
    * @see MANY
    * @hidden
    */
-  protected MANY8(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+  protected MANY8<OUT>(
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
   ): void;
 
   /**
    * @see MANY
    * @hidden
    */
-  protected MANY9(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOpts<any>,
+  protected MANY9<OUT>(
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
   ): void;
 
   /**
@@ -602,61 +648,61 @@ declare abstract class BaseParser {
    * @param options - An object defining the grammar of each iteration and the separator between iterations
    *
    */
-  protected MANY_SEP(options: ManySepMethodOpts<any>): void;
+  protected MANY_SEP<OUT>(options: ManySepMethodOpts<OUT>): void;
 
   /**
    * @see MANY_SEP
    * @hidden
    */
-  protected MANY_SEP1(options: ManySepMethodOpts<any>): void;
+  protected MANY_SEP1<OUT>(options: ManySepMethodOpts<OUT>): void;
 
   /**
    * @see MANY_SEP
    * @hidden
    */
-  protected MANY_SEP2(options: ManySepMethodOpts<any>): void;
+  protected MANY_SEP2<OUT>(options: ManySepMethodOpts<OUT>): void;
 
   /**
    * @see MANY_SEP
    * @hidden
    */
-  protected MANY_SEP3(options: ManySepMethodOpts<any>): void;
+  protected MANY_SEP3<OUT>(options: ManySepMethodOpts<OUT>): void;
 
   /**
    * @see MANY_SEP
    * @hidden
    */
-  protected MANY_SEP4(options: ManySepMethodOpts<any>): void;
+  protected MANY_SEP4<OUT>(options: ManySepMethodOpts<OUT>): void;
 
   /**
    * @see MANY_SEP
    * @hidden
    */
-  protected MANY_SEP5(options: ManySepMethodOpts<any>): void;
+  protected MANY_SEP5<OUT>(options: ManySepMethodOpts<OUT>): void;
 
   /**
    * @see MANY_SEP
    * @hidden
    */
-  protected MANY_SEP6(options: ManySepMethodOpts<any>): void;
+  protected MANY_SEP6<OUT>(options: ManySepMethodOpts<OUT>): void;
 
   /**
    * @see MANY_SEP
    * @hidden
    */
-  protected MANY_SEP7(options: ManySepMethodOpts<any>): void;
+  protected MANY_SEP7<OUT>(options: ManySepMethodOpts<OUT>): void;
 
   /**
    * @see MANY_SEP
    * @hidden
    */
-  protected MANY_SEP8(options: ManySepMethodOpts<any>): void;
+  protected MANY_SEP8<OUT>(options: ManySepMethodOpts<OUT>): void;
 
   /**
    * @see MANY_SEP
    * @hidden
    */
-  protected MANY_SEP9(options: ManySepMethodOpts<any>): void;
+  protected MANY_SEP9<OUT>(options: ManySepMethodOpts<OUT>): void;
 
   /**
    * Convenience method, same as MANY but the repetition is of one or more.
@@ -669,80 +715,80 @@ declare abstract class BaseParser {
    *                             or an "OPTIONS" object describing the grammar action and optional properties.
    *
    */
-  protected AT_LEAST_ONE(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+  protected AT_LEAST_ONE<OUT>(
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
   ): void;
 
   /**
    * @see AT_LEAST_ONE
    * @hidden
    */
-  protected AT_LEAST_ONE1(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+  protected AT_LEAST_ONE1<OUT>(
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
   ): void;
 
   /**
    * @see AT_LEAST_ONE
    * @hidden
    */
-  protected AT_LEAST_ONE2(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+  protected AT_LEAST_ONE2<OUT>(
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
   ): void;
 
   /**
    * @see AT_LEAST_ONE
    * @hidden
    */
-  protected AT_LEAST_ONE3(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+  protected AT_LEAST_ONE3<OUT>(
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
   ): void;
 
   /**
    * @see AT_LEAST_ONE
    * @hidden
    */
-  protected AT_LEAST_ONE4(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+  protected AT_LEAST_ONE4<OUT>(
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
   ): void;
 
   /**
    * @see AT_LEAST_ONE
    * @hidden
    */
-  protected AT_LEAST_ONE5(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+  protected AT_LEAST_ONE5<OUT>(
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
   ): void;
 
   /**
    * @see AT_LEAST_ONE
    * @hidden
    */
-  protected AT_LEAST_ONE6(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+  protected AT_LEAST_ONE6<OUT>(
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
   ): void;
 
   /**
    * @see AT_LEAST_ONE
    * @hidden
    */
-  protected AT_LEAST_ONE7(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+  protected AT_LEAST_ONE7<OUT>(
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
   ): void;
 
   /**
    * @see AT_LEAST_ONE
    * @hidden
    */
-  protected AT_LEAST_ONE8(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+  protected AT_LEAST_ONE8<OUT>(
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
   ): void;
 
   /**
    * @see AT_LEAST_ONE
    * @hidden
    */
-  protected AT_LEAST_ONE9(
-    actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>,
+  protected AT_LEAST_ONE9<OUT>(
+    actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
   ): void;
 
   /**
@@ -758,61 +804,61 @@ declare abstract class BaseParser {
    *
    * @return {ISeparatedIterationResult<OUT>}
    */
-  protected AT_LEAST_ONE_SEP(options: AtLeastOneSepMethodOpts<any>): void;
+  protected AT_LEAST_ONE_SEP<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void;
 
   /**
    * @see AT_LEAST_ONE_SEP
    * @hidden
    */
-  protected AT_LEAST_ONE_SEP1(options: AtLeastOneSepMethodOpts<any>): void;
+  protected AT_LEAST_ONE_SEP1<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void;
 
   /**
    * @see AT_LEAST_ONE_SEP
    * @hidden
    */
-  protected AT_LEAST_ONE_SEP2(options: AtLeastOneSepMethodOpts<any>): void;
+  protected AT_LEAST_ONE_SEP2<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void;
 
   /**
    * @see AT_LEAST_ONE_SEP
    * @hidden
    */
-  protected AT_LEAST_ONE_SEP3(options: AtLeastOneSepMethodOpts<any>): void;
+  protected AT_LEAST_ONE_SEP3<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void;
 
   /**
    * @see AT_LEAST_ONE_SEP
    * @hidden
    */
-  protected AT_LEAST_ONE_SEP4(options: AtLeastOneSepMethodOpts<any>): void;
+  protected AT_LEAST_ONE_SEP4<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void;
 
   /**
    * @see AT_LEAST_ONE_SEP
    * @hidden
    */
-  protected AT_LEAST_ONE_SEP5(options: AtLeastOneSepMethodOpts<any>): void;
+  protected AT_LEAST_ONE_SEP5<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void;
 
   /**
    * @see AT_LEAST_ONE_SEP
    * @hidden
    */
-  protected AT_LEAST_ONE_SEP6(options: AtLeastOneSepMethodOpts<any>): void;
+  protected AT_LEAST_ONE_SEP6<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void;
 
   /**
    * @see AT_LEAST_ONE_SEP
    * @hidden
    */
-  protected AT_LEAST_ONE_SEP7(options: AtLeastOneSepMethodOpts<any>): void;
+  protected AT_LEAST_ONE_SEP7<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void;
 
   /**
    * @see AT_LEAST_ONE_SEP
    * @hidden
    */
-  protected AT_LEAST_ONE_SEP8(options: AtLeastOneSepMethodOpts<any>): void;
+  protected AT_LEAST_ONE_SEP8<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void;
 
   /**
    * @see AT_LEAST_ONE_SEP
    * @hidden
    */
-  protected AT_LEAST_ONE_SEP9(options: AtLeastOneSepMethodOpts<any>): void;
+  protected AT_LEAST_ONE_SEP9<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void;
 
   /**
    * Returns an "imaginary" Token to insert when Single Token Insertion is done
@@ -1925,6 +1971,20 @@ export interface IOrAlt<T> {
 export interface IOrAltWithGate<T> extends IOrAlt<T> {
   // TODO: deprecate this interface
 }
+
+/**
+ * Infers the union of return types from a tuple of {@link IOrAlt} alternatives.
+ *
+ * @example
+ * // Inferred as `number | string`
+ * const result = this.OR([
+ *   { ALT: () => 1 },
+ *   { ALT: () => "hello" },
+ * ]);
+ */
+export type InferOr<Alts extends readonly IOrAlt<any>[]> = ReturnType<
+  Alts[number]["ALT"]
+>;
 
 export interface ICstVisitor<IN, OUT> {
   visit(cstNode: CstNode | CstNode[], param?: IN): OUT;
