@@ -2,6 +2,9 @@
 
 #### Minor Changes
 
+- [Stricter TypeScript Types for DSL methods](https://github.com/Chevrotain/chevrotain/pull/2183)
+  - No effect on runtime, but potentially "Soft Breaking" (TypeScript compilation only), due to enabling stricter type inference.
+
 - [feat: expose `currCSTNode` API to access the current CstNode during parsing](https://github.com/Chevrotain/chevrotain/issues/1032)
 
 ## 12.0.0 (3-13-2026)
