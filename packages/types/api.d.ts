@@ -61,9 +61,9 @@ declare abstract class BaseParser {
    *
    * @return a lookahead function that will try to parse the given grammarRule and will return true if succeed.
    */
-  protected BACKTRACK<T>(
-    grammarRule: (...args: any[]) => T,
-    args?: any[],
+  protected BACKTRACK<ARGS extends unknown[], T>(
+    grammarRule: (...args: ARGS) => T,
+    args?: ARGS,
   ): () => boolean;
 
   /**

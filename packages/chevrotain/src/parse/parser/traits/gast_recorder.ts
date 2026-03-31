@@ -196,9 +196,9 @@ export class GastRecorder {
   }
 
   // Executing backtracking logic will break our recording logic assumptions
-  BACKTRACK_RECORD<T>(
-    grammarRule: (...args: any[]) => T,
-    args?: any[],
+  BACKTRACK_RECORD<ARGS extends unknown[], T>(
+    grammarRule: (...args: ARGS) => T,
+    args?: ARGS,
   ): () => boolean {
     return () => true;
   }

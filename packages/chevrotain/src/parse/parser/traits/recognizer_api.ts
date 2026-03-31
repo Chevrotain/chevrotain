@@ -715,10 +715,10 @@ export class RecognizerApi {
     return ruleImplementation;
   }
 
-  BACKTRACK<T>(
+  BACKTRACK<ARGS extends unknown[], T>(
     this: MixedInParser,
-    grammarRule: (...args: any[]) => T,
-    args?: any[],
+    grammarRule: (...args: ARGS) => T,
+    args?: ARGS,
   ): () => boolean {
     // Use coreRule to bypass root-level hooks (onBeforeParse/onAfterParse).
     // Backtracking is speculative and should not trigger parse lifecycle hooks.
