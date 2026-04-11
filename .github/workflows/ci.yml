@@ -25,7 +25,7 @@ jobs:
           node-version: ${{ matrix.node_version }}
 
       - name: Cache for Turbo
-        uses: rharkor/caching-for-turbo@v2.3.11
+        uses: rharkor/caching-for-turbo@v2.3.13
 
       - name: Install dependencies
         run: bun install
