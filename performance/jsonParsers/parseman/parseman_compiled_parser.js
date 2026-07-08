@@ -3,8 +3,8 @@
 // Rebuild: pnpm build:chevrotain-bench
 
 const _re0 = /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/y
-const _fx0 = ["/\"(?:[^\\\\\"]|\\\\(?:[bfnrtv\"\\\\/]|u[0-9a-fA-F]{4}))*\"/"]
-const _fx1 = ["/-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?/"]
+const _fx0 = ["string"]
+const _fx1 = ["number"]
 const _fx2 = ["\"{\""]
 const _fx3 = ["\":\""]
 const _fx4 = ["\"}\""]
@@ -13,7 +13,7 @@ const _fx6 = ["\"]\""]
 const _fx7 = ["\"true\""]
 const _fx8 = ["\"false\""]
 const _fx9 = ["\"null\""]
-const _fx10 = ["/\"(?:[^\\\\\"]|\\\\(?:[bfnrtv\"\\\\/]|u[0-9a-fA-F]{4}))*\"/","/-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?/","\"{\"","\"[\"","\"true\"","\"false\"","\"null\""]
+const _fx10 = ["string","number","\"{\"","\"[\"","\"true\"","\"false\"","\"null\""]
 
 const _pfFail = {}
 let _pfEnd
@@ -36,31 +36,38 @@ function _tf0(input, _pos, _ctx, _cap) {
 
 function _pf1(input, _pos, _ctx) {
   _pfail: {
-    const _start31 = _pos
-    let _cur32 = _pos
-    _re0.lastIndex = _cur32
-    const _m33 = _re0.exec(input)
-    if (_m33 === null) {
-      { _ctx._fe = _cur32; _ctx._fx = _fx0; break _pfail }
+    const _start33 = _pos
+    let _cur34 = _pos
+    let _lbl35ok = false, _lbl35v, _lbl35e = _cur34
+    _lbl35: {
+      _re0.lastIndex = _cur34
+      const _m36 = _re0.exec(input)
+      if (_m36 === null) {
+        break _lbl35
+      }
+      const _v37 = _m36[0]
+      _lbl35v = _v37; _lbl35e = _cur34 + _v37.length; _lbl35ok = true
     }
-    const _v34 = _m33[0]
-    _cur32 = _cur32 + _v34.length
-    _cur32 = _tf0(input, _cur32, _ctx)
-    if (_cur32 >= input.length || input.charCodeAt(_cur32) !== 58) {
-      { _ctx._fe = _cur32; _ctx._fx = _fx3; break _pfail }
+    if (!_lbl35ok) {
+      { _ctx._fe = _cur34; _ctx._fx = _fx0; break _pfail }
     }
-    const _v35 = ":"
-    _cur32 = _cur32 + 1
-    _cur32 = _tf0(input, _cur32, _ctx)
-    const _pfv36 = _pf0(input, _cur32, _ctx)
-    if (_pfv36 === _pfFail) {
+    _cur34 = _lbl35e
+    _cur34 = _tf0(input, _cur34, _ctx)
+    if (_cur34 >= input.length || input.charCodeAt(_cur34) !== 58) {
+      { _ctx._fe = _cur34; _ctx._fx = _fx3; break _pfail }
+    }
+    const _v38 = ":"
+    _cur34 = _cur34 + 1
+    _cur34 = _tf0(input, _cur34, _ctx)
+    const _pfv39 = _pf0(input, _cur34, _ctx)
+    if (_pfv39 === _pfFail) {
       break _pfail
     }
-    const _pfe37 = _pfEnd
-    _cur32 = _pfe37
-    const _arr38 = [_v34, _v35, _pfv36]
-    _pfEnd = _cur32
-    return _arr38
+    const _pfe40 = _pfEnd
+    _cur34 = _pfe40
+    const _arr41 = [_lbl35v, _v38, _pfv39]
+    _pfEnd = _cur34
+    return _arr41
   }
   return _pfFail
 }
@@ -70,255 +77,269 @@ function _pf0(input, _pos, _ctx) {
     const _code0 = _pos < input.length ? (input.codePointAt(_pos) ?? -1) : -1
     let _chv1, _che2 = _pos
     if (_code0 === 34) {
-      _re0.lastIndex = _pos
-      const _m3 = _re0.exec(input)
-      if (_m3 === null) {
+      let _lbl3ok = false, _lbl3v, _lbl3e = _pos
+      _lbl3: {
+        _re0.lastIndex = _pos
+        const _m4 = _re0.exec(input)
+        if (_m4 === null) {
+          break _lbl3
+        }
+        const _v5 = _m4[0]
+        _lbl3v = _v5; _lbl3e = _pos + _v5.length; _lbl3ok = true
+      }
+      if (!_lbl3ok) {
         { _ctx._fe = _pos; _ctx._fx = _fx0; break _pfail }
       }
-      const _v4 = _m3[0]
-      const _mapped5 = _mf[0](_v4, { start: _pos, end: _pos + _v4.length })
-      _chv1 = _mapped5
-      _che2 = _pos + _v4.length
+      const _mapped6 = _mf[0](_lbl3v, { start: _pos, end: _lbl3e })
+      _chv1 = _mapped6
+      _che2 = _lbl3e
     }
     else if (_code0 === 45 || (_code0 >= 48 && _code0 <= 57)) {
-      let _e7 = _pos
-      let _ok8 = false
-      do {
-        if (_e7 + 1 <= input.length && (input.charCodeAt(_e7) === 45)) _e7 += 1
-        let _ok9 = false
-        let _end10 = _e7
-        if (_e7 < input.length && (input.charCodeAt(_e7) === 48)) {
-          let _e11 = _e7
-          let _ok12 = false
-          do {
-            if (!(_e11 + 1 <= input.length && (input.charCodeAt(_e11) === 48))) break
-            _e11 += 1
-            _ok12 = true
-          } while (false)
-          if (!_ok12) _e11 = _e7
-          _ok9 = _ok12
-          _end10 = _ok12 ? _e11 : _e7
-        }
-        else if (_e7 < input.length && ((input.charCodeAt(_e7) >= 49 && input.charCodeAt(_e7) <= 57))) {
-          let _e13 = _e7
-          if (_e7 < input.length && ((input.charCodeAt(_e7) >= 49 && input.charCodeAt(_e7) <= 57))) {
-            _e13 = _e7 + 1
-            while (_e13 < input.length && ((input.charCodeAt(_e13) >= 48 && input.charCodeAt(_e13) <= 57))) _e13++
+      let _lbl7ok = false, _lbl7v, _lbl7e = _pos
+      _lbl7: {
+        let _e9 = _pos
+        let _ok10 = false
+        do {
+          if (_e9 + 1 <= input.length && (input.charCodeAt(_e9) === 45)) _e9 += 1
+          let _ok11 = false
+          let _end12 = _e9
+          if (_e9 < input.length && (input.charCodeAt(_e9) === 48)) {
+            let _e13 = _e9
+            let _ok14 = false
+            do {
+              if (!(_e13 + 1 <= input.length && (input.charCodeAt(_e13) === 48))) break
+              _e13 += 1
+              _ok14 = true
+            } while (false)
+            if (!_ok14) _e13 = _e9
+            _ok11 = _ok14
+            _end12 = _ok14 ? _e13 : _e9
           }
-          _ok9 = _e13 > _e7
-          _end10 = _e13 > _e7 ? _e13 : _e7
+          else if (_e9 < input.length && ((input.charCodeAt(_e9) >= 49 && input.charCodeAt(_e9) <= 57))) {
+            let _e15 = _e9
+            if (_e9 < input.length && ((input.charCodeAt(_e9) >= 49 && input.charCodeAt(_e9) <= 57))) {
+              _e15 = _e9 + 1
+              while (_e15 < input.length && ((input.charCodeAt(_e15) >= 48 && input.charCodeAt(_e15) <= 57))) _e15++
+            }
+            _ok11 = _e15 > _e9
+            _end12 = _e15 > _e9 ? _e15 : _e9
+          }
+          if (!(_ok11)) break
+          _e9 = _end12
+          let _e16 = _e9
+          let _ok17 = false
+          do {
+            if (!(_e16 + 1 <= input.length && (input.charCodeAt(_e16) === 46))) break
+            _e16 += 1
+            const _s18 = _e16
+            while (_e16 < input.length && ((input.charCodeAt(_e16) >= 48 && input.charCodeAt(_e16) <= 57))) _e16++
+            if (_e16 === _s18) break
+            _ok17 = true
+          } while (false)
+          if (!_ok17) _e16 = _e9
+          if (_ok17) _e9 = _e16
+          let _e19 = _e9
+          let _ok20 = false
+          do {
+            if (!(_e19 < input.length && (input.charCodeAt(_e19) === 101 || input.charCodeAt(_e19) === 69))) break
+            _e19++
+            if (_e19 < input.length && (input.charCodeAt(_e19) === 43 || input.charCodeAt(_e19) === 45)) _e19++
+            const _s21 = _e19
+            while (_e19 < input.length && ((input.charCodeAt(_e19) >= 48 && input.charCodeAt(_e19) <= 57))) _e19++
+            if (_e19 === _s21) break
+            _ok20 = true
+          } while (false)
+          if (!_ok20) _e19 = _e9
+          if (_ok20) _e9 = _e19
+          _ok10 = true
+        } while (false)
+        if (!_ok10) _e9 = _pos
+        if (!(_ok10)) {
+          break _lbl7
         }
-        if (!(_ok9)) break
-        _e7 = _end10
-        let _e14 = _e7
-        let _ok15 = false
-        do {
-          if (!(_e14 + 1 <= input.length && (input.charCodeAt(_e14) === 46))) break
-          _e14 += 1
-          const _s16 = _e14
-          while (_e14 < input.length && ((input.charCodeAt(_e14) >= 48 && input.charCodeAt(_e14) <= 57))) _e14++
-          if (_e14 === _s16) break
-          _ok15 = true
-        } while (false)
-        if (!_ok15) _e14 = _e7
-        if (_ok15) _e7 = _e14
-        let _e17 = _e7
-        let _ok18 = false
-        do {
-          if (!(_e17 < input.length && (input.charCodeAt(_e17) === 101 || input.charCodeAt(_e17) === 69))) break
-          _e17++
-          if (_e17 < input.length && (input.charCodeAt(_e17) === 43 || input.charCodeAt(_e17) === 45)) _e17++
-          const _s19 = _e17
-          while (_e17 < input.length && ((input.charCodeAt(_e17) >= 48 && input.charCodeAt(_e17) <= 57))) _e17++
-          if (_e17 === _s19) break
-          _ok18 = true
-        } while (false)
-        if (!_ok18) _e17 = _e7
-        if (_ok18) _e7 = _e17
-        _ok8 = true
-      } while (false)
-      if (!_ok8) _e7 = _pos
-      if (!(_ok8)) {
+        const _v8 = input.slice(_pos, _e9)
+        _lbl7v = _v8; _lbl7e = _e9; _lbl7ok = true
+      }
+      if (!_lbl7ok) {
         { _ctx._fe = _pos; _ctx._fx = _fx1; break _pfail }
       }
-      const _v6 = input.slice(_pos, _e7)
-      const _mapped20 = _mf[1](_v6, { start: _pos, end: _e7 })
-      _chv1 = _mapped20
-      _che2 = _e7
+      const _mapped22 = _mf[1](_lbl7v, { start: _pos, end: _lbl7e })
+      _chv1 = _mapped22
+      _che2 = _lbl7e
     }
     else if (_code0 === 123) {
-      let _lbl21ok = false, _lbl21v, _lbl21e = _pos
-      _lbl21: {
-        const _start49 = _pos
-        let _cur50 = _pos
-        if (_cur50 >= input.length || input.charCodeAt(_cur50) !== 123) {
-          { _ctx._fe = _cur50; _ctx._fx = _fx2; break _lbl21 }
+      let _lbl23ok = false, _lbl23v, _lbl23e = _pos
+      _lbl23: {
+        const _start52 = _pos
+        let _cur53 = _pos
+        if (_cur53 >= input.length || input.charCodeAt(_cur53) !== 123) {
+          { _ctx._fe = _cur53; _ctx._fx = _fx2; break _lbl23 }
         }
-        const _v51 = "{"
-        _cur50 = _cur50 + 1
-        _cur50 = _tf0(input, _cur50, _ctx)
-        let _lbl54ok = false, _lbl54v, _lbl54e = _cur50
-        _lbl54: {
-          const _arr55 = []
-          let _cur56 = _cur50
-          let _lbl57ok = false, _lbl57v, _lbl57e = _cur50
-          _lbl57: {
-            const _pfv58 = _pf1(input, _cur50, _ctx)
-            if (_pfv58 === _pfFail) {
-              break _lbl57
+        const _v54 = "{"
+        _cur53 = _cur53 + 1
+        _cur53 = _tf0(input, _cur53, _ctx)
+        let _lbl57ok = false, _lbl57v, _lbl57e = _cur53
+        _lbl57: {
+          const _arr58 = []
+          let _cur59 = _cur53
+          let _lbl60ok = false, _lbl60v, _lbl60e = _cur53
+          _lbl60: {
+            const _pfv61 = _pf1(input, _cur53, _ctx)
+            if (_pfv61 === _pfFail) {
+              break _lbl60
             }
-            const _pfe59 = _pfEnd
-            _lbl57v = _pfv58; _lbl57e = _pfe59; _lbl57ok = true
+            const _pfe62 = _pfEnd
+            _lbl60v = _pfv61; _lbl60e = _pfe62; _lbl60ok = true
           }
-          if (_lbl57ok) {
-            _arr55.push(_lbl57v)
-            _cur56 = _lbl57e
-            while (_cur56 < input.length) {
-              const _sp60 = _tf0(input, _cur56, _ctx)
-              let _lbl61ok = false, _lbl61v, _lbl61e = _sp60
-              _lbl61: {
-                if (_sp60 >= input.length || input.charCodeAt(_sp60) !== 44) {
-                  break _lbl61
-                }
-                const _v62 = ","
-                _lbl61v = _v62; _lbl61e = _sp60 + 1; _lbl61ok = true
-              }
-              if (!_lbl61ok) break
-              const _np63 = _tf0(input, _lbl61e, _ctx)
-              let _lbl64ok = false, _lbl64v, _lbl64e = _np63
+          if (_lbl60ok) {
+            _arr58.push(_lbl60v)
+            _cur59 = _lbl60e
+            while (_cur59 < input.length) {
+              const _sp63 = _tf0(input, _cur59, _ctx)
+              let _lbl64ok = false, _lbl64v, _lbl64e = _sp63
               _lbl64: {
-                const _pfv65 = _pf1(input, _np63, _ctx)
-                if (_pfv65 === _pfFail) {
+                if (_sp63 >= input.length || input.charCodeAt(_sp63) !== 44) {
                   break _lbl64
                 }
-                const _pfe66 = _pfEnd
-                _lbl64v = _pfv65; _lbl64e = _pfe66; _lbl64ok = true
+                const _v65 = ","
+                _lbl64v = _v65; _lbl64e = _sp63 + 1; _lbl64ok = true
               }
               if (!_lbl64ok) break
-              _arr55.push(_lbl64v)
-              _cur56 = _lbl64e
+              const _np66 = _tf0(input, _lbl64e, _ctx)
+              let _lbl67ok = false, _lbl67v, _lbl67e = _np66
+              _lbl67: {
+                const _pfv68 = _pf1(input, _np66, _ctx)
+                if (_pfv68 === _pfFail) {
+                  break _lbl67
+                }
+                const _pfe69 = _pfEnd
+                _lbl67v = _pfv68; _lbl67e = _pfe69; _lbl67ok = true
+              }
+              if (!_lbl67ok) break
+              _arr58.push(_lbl67v)
+              _cur59 = _lbl67e
             }
           }
-          _lbl54v = _arr55; _lbl54e = _cur56; _lbl54ok = true
+          _lbl57v = _arr58; _lbl57e = _cur59; _lbl57ok = true
         }
-        const _opt52 = _lbl54ok ? _lbl54v : null
-        const _opte53 = _lbl54ok ? _lbl54e : _cur50
-        _cur50 = _opte53
-        _cur50 = _tf0(input, _cur50, _ctx)
-        if (_cur50 >= input.length || input.charCodeAt(_cur50) !== 125) {
-          { _ctx._fe = _cur50; _ctx._fx = _fx4; break _lbl21 }
+        const _opt55 = _lbl57ok ? _lbl57v : null
+        const _opte56 = _lbl57ok ? _lbl57e : _cur53
+        _cur53 = _opte56
+        _cur53 = _tf0(input, _cur53, _ctx)
+        if (_cur53 >= input.length || input.charCodeAt(_cur53) !== 125) {
+          { _ctx._fe = _cur53; _ctx._fx = _fx4; break _lbl23 }
         }
-        const _v67 = "}"
-        _cur50 = _cur50 + 1
-        const _arr68 = [_v51, _opt52, _v67]
-        const _mapped69 = _mf[2](_arr68, { start: _pos, end: _cur50 })
-        _lbl21v = _mapped69; _lbl21e = _cur50; _lbl21ok = true
+        const _v70 = "}"
+        _cur53 = _cur53 + 1
+        const _arr71 = [_v54, _opt55, _v70]
+        const _mapped72 = _mf[2](_arr71, { start: _pos, end: _cur53 })
+        _lbl23v = _mapped72; _lbl23e = _cur53; _lbl23ok = true
       }
-      if (!_lbl21ok) {
+      if (!_lbl23ok) {
         { _ctx._fe = _pos; _ctx._fx = _ctx._fx; break _pfail }
       }
-      _chv1 = _lbl21v
-      _che2 = _lbl21e
+      _chv1 = _lbl23v
+      _che2 = _lbl23e
     }
     else if (_code0 === 91) {
-      let _lbl70ok = false, _lbl70v, _lbl70e = _pos
-      _lbl70: {
-        const _start90 = _pos
-        let _cur91 = _pos
-        if (_cur91 >= input.length || input.charCodeAt(_cur91) !== 91) {
-          { _ctx._fe = _cur91; _ctx._fx = _fx5; break _lbl70 }
+      let _lbl73ok = false, _lbl73v, _lbl73e = _pos
+      _lbl73: {
+        const _start93 = _pos
+        let _cur94 = _pos
+        if (_cur94 >= input.length || input.charCodeAt(_cur94) !== 91) {
+          { _ctx._fe = _cur94; _ctx._fx = _fx5; break _lbl73 }
         }
-        const _v92 = "["
-        _cur91 = _cur91 + 1
-        _cur91 = _tf0(input, _cur91, _ctx)
-        let _lbl95ok = false, _lbl95v, _lbl95e = _cur91
-        _lbl95: {
-          const _arr96 = []
-          let _cur97 = _cur91
-          let _lbl98ok = false, _lbl98v, _lbl98e = _cur91
-          _lbl98: {
-            const _pfv99 = _pf0(input, _cur91, _ctx)
-            if (_pfv99 === _pfFail) {
-              break _lbl98
+        const _v95 = "["
+        _cur94 = _cur94 + 1
+        _cur94 = _tf0(input, _cur94, _ctx)
+        let _lbl98ok = false, _lbl98v, _lbl98e = _cur94
+        _lbl98: {
+          const _arr99 = []
+          let _cur100 = _cur94
+          let _lbl101ok = false, _lbl101v, _lbl101e = _cur94
+          _lbl101: {
+            const _pfv102 = _pf0(input, _cur94, _ctx)
+            if (_pfv102 === _pfFail) {
+              break _lbl101
             }
-            const _pfe100 = _pfEnd
-            _lbl98v = _pfv99; _lbl98e = _pfe100; _lbl98ok = true
+            const _pfe103 = _pfEnd
+            _lbl101v = _pfv102; _lbl101e = _pfe103; _lbl101ok = true
           }
-          if (_lbl98ok) {
-            _arr96.push(_lbl98v)
-            _cur97 = _lbl98e
-            while (_cur97 < input.length) {
-              const _sp101 = _tf0(input, _cur97, _ctx)
-              let _lbl102ok = false, _lbl102v, _lbl102e = _sp101
-              _lbl102: {
-                if (_sp101 >= input.length || input.charCodeAt(_sp101) !== 44) {
-                  break _lbl102
-                }
-                const _v103 = ","
-                _lbl102v = _v103; _lbl102e = _sp101 + 1; _lbl102ok = true
-              }
-              if (!_lbl102ok) break
-              const _np104 = _tf0(input, _lbl102e, _ctx)
-              let _lbl105ok = false, _lbl105v, _lbl105e = _np104
+          if (_lbl101ok) {
+            _arr99.push(_lbl101v)
+            _cur100 = _lbl101e
+            while (_cur100 < input.length) {
+              const _sp104 = _tf0(input, _cur100, _ctx)
+              let _lbl105ok = false, _lbl105v, _lbl105e = _sp104
               _lbl105: {
-                const _pfv106 = _pf0(input, _np104, _ctx)
-                if (_pfv106 === _pfFail) {
+                if (_sp104 >= input.length || input.charCodeAt(_sp104) !== 44) {
                   break _lbl105
                 }
-                const _pfe107 = _pfEnd
-                _lbl105v = _pfv106; _lbl105e = _pfe107; _lbl105ok = true
+                const _v106 = ","
+                _lbl105v = _v106; _lbl105e = _sp104 + 1; _lbl105ok = true
               }
               if (!_lbl105ok) break
-              _arr96.push(_lbl105v)
-              _cur97 = _lbl105e
+              const _np107 = _tf0(input, _lbl105e, _ctx)
+              let _lbl108ok = false, _lbl108v, _lbl108e = _np107
+              _lbl108: {
+                const _pfv109 = _pf0(input, _np107, _ctx)
+                if (_pfv109 === _pfFail) {
+                  break _lbl108
+                }
+                const _pfe110 = _pfEnd
+                _lbl108v = _pfv109; _lbl108e = _pfe110; _lbl108ok = true
+              }
+              if (!_lbl108ok) break
+              _arr99.push(_lbl108v)
+              _cur100 = _lbl108e
             }
           }
-          _lbl95v = _arr96; _lbl95e = _cur97; _lbl95ok = true
+          _lbl98v = _arr99; _lbl98e = _cur100; _lbl98ok = true
         }
-        const _opt93 = _lbl95ok ? _lbl95v : null
-        const _opte94 = _lbl95ok ? _lbl95e : _cur91
-        _cur91 = _opte94
-        _cur91 = _tf0(input, _cur91, _ctx)
-        if (_cur91 >= input.length || input.charCodeAt(_cur91) !== 93) {
-          { _ctx._fe = _cur91; _ctx._fx = _fx6; break _lbl70 }
+        const _opt96 = _lbl98ok ? _lbl98v : null
+        const _opte97 = _lbl98ok ? _lbl98e : _cur94
+        _cur94 = _opte97
+        _cur94 = _tf0(input, _cur94, _ctx)
+        if (_cur94 >= input.length || input.charCodeAt(_cur94) !== 93) {
+          { _ctx._fe = _cur94; _ctx._fx = _fx6; break _lbl73 }
         }
-        const _v108 = "]"
-        _cur91 = _cur91 + 1
-        const _arr109 = [_v92, _opt93, _v108]
-        const _mapped110 = _mf[3](_arr109, { start: _pos, end: _cur91 })
-        _lbl70v = _mapped110; _lbl70e = _cur91; _lbl70ok = true
+        const _v111 = "]"
+        _cur94 = _cur94 + 1
+        const _arr112 = [_v95, _opt96, _v111]
+        const _mapped113 = _mf[3](_arr112, { start: _pos, end: _cur94 })
+        _lbl73v = _mapped113; _lbl73e = _cur94; _lbl73ok = true
       }
-      if (!_lbl70ok) {
+      if (!_lbl73ok) {
         { _ctx._fe = _pos; _ctx._fx = _ctx._fx; break _pfail }
       }
-      _chv1 = _lbl70v
-      _che2 = _lbl70e
+      _chv1 = _lbl73v
+      _che2 = _lbl73e
     }
     else if (_code0 === 116) {
       if (_pos + 4 > input.length || input.charCodeAt(_pos) !== 116 || input.charCodeAt(_pos + 1) !== 114 || input.charCodeAt(_pos + 2) !== 117 || input.charCodeAt(_pos + 3) !== 101) {
         { _ctx._fe = _pos; _ctx._fx = _fx7; break _pfail }
       }
-      const _v111 = "true"
-      const _mapped112 = _mf[4](_v111, { start: _pos, end: _pos + 4 })
-      _chv1 = _mapped112
+      const _v114 = "true"
+      const _mapped115 = _mf[4](_v114, { start: _pos, end: _pos + 4 })
+      _chv1 = _mapped115
       _che2 = _pos + 4
     }
     else if (_code0 === 102) {
       if (_pos + 5 > input.length || input.charCodeAt(_pos) !== 102 || input.charCodeAt(_pos + 1) !== 97 || input.charCodeAt(_pos + 2) !== 108 || input.charCodeAt(_pos + 3) !== 115 || input.charCodeAt(_pos + 4) !== 101) {
         { _ctx._fe = _pos; _ctx._fx = _fx8; break _pfail }
       }
-      const _v113 = "false"
-      const _mapped114 = _mf[5](_v113, { start: _pos, end: _pos + 5 })
-      _chv1 = _mapped114
+      const _v116 = "false"
+      const _mapped117 = _mf[5](_v116, { start: _pos, end: _pos + 5 })
+      _chv1 = _mapped117
       _che2 = _pos + 5
     }
     else if (_code0 === 110) {
       if (_pos + 4 > input.length || input.charCodeAt(_pos) !== 110 || input.charCodeAt(_pos + 1) !== 117 || input.charCodeAt(_pos + 2) !== 108 || input.charCodeAt(_pos + 3) !== 108) {
         { _ctx._fe = _pos; _ctx._fx = _fx9; break _pfail }
       }
-      const _v115 = "null"
-      const _mapped116 = _mf[6](_v115, { start: _pos, end: _pos + 4 })
-      _chv1 = _mapped116
+      const _v118 = "null"
+      const _mapped119 = _mf[6](_v118, { start: _pos, end: _pos + 4 })
+      _chv1 = _mapped119
       _che2 = _pos + 4
     }
     else {
@@ -333,12 +354,12 @@ const _mf = [function(_v,_s){return undefined}, function(_v,_s){return undefined
 
 function _parse(input, _pos, _rp, _mf, _build, _ctx) {
   let pos = _pos
-  const _pfv117 = _pf0(input, _pos, _ctx)
-  if (_pfv117 === _pfFail) {
+  const _pfv120 = _pf0(input, _pos, _ctx)
+  if (_pfv120 === _pfFail) {
     return { ok: false, expected: [..._ctx._fx], span: { start: _ctx._fe, end: _ctx._fe } }
   }
-  const _pfe118 = _pfEnd
-  return { ok: true, value: _pfv117, span: { start: _pos, end: _pfe118 } }
+  const _pfe121 = _pfEnd
+  return { ok: true, value: _pfv120, span: { start: _pos, end: _pfe121 } }
 }
 
 window.parse = function parse_json_parseman_compiled(input) {

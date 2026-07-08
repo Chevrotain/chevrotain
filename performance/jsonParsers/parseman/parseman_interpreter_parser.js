@@ -6692,6 +6692,18 @@
       parse: combinator.parse.bind(combinator)
     };
   }
+  function label(name, combinator) {
+    return {
+      _tag: combinator._tag,
+      _meta: combinator._meta,
+      _def: { tag: "label", label: name, parser: combinator },
+      parse(input, pos, ctx) {
+        const result = combinator.parse(input, pos, ctx);
+        if (!result.ok) return { ...result, expected: [name] };
+        return result;
+      }
+    };
+  }
 
   // src/compiler/line-index.ts
   function buildLineIndex(input) {
@@ -6781,8 +6793,8 @@
 
   // examples/json/chevrotain-bench.ts
   var ws = trivia(regex(/[ \t\n\r]*/));
-  var stringToken = regex(/"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/);
-  var numberToken = regex(/-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/);
+  var stringToken = label("string", regex(/"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/));
+  var numberToken = label("number", regex(/-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/));
   var voidOf = (c) => transform(c, () => void 0);
   var { jsonValue } = rules((g) => {
     const comma = literal(",");
