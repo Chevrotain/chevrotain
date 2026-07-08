@@ -43,6 +43,26 @@
                        href="https://github.com/Chevrotain/chevrotain/blob/gh-pages/performance/jsonParsers/parsimmon/parsimmon_json_parser.js">implementation</a>
                 </p></li>
 
+                <li><p>
+                    <a rel="nofollow" href="https://matthew-dean.github.io/parseman/">Parséman</a> (compiled)
+                    <a rel="nofollow"
+                       href="https://github.com/matthew-dean/parseman/blob/main/examples/json/chevrotain-bench.ts">grammar</a>
+                    ->
+                    <a rel="nofollow"
+                       href="https://github.com/Chevrotain/chevrotain/blob/gh-pages/performance/jsonParsers/parseman/parseman_compiled_parser.js">generated
+                        code</a>
+                </p></li>
+
+                <li><p>
+                    <a rel="nofollow" href="https://matthew-dean.github.io/parseman/">Parséman</a> (interpreted)
+                    <a rel="nofollow"
+                       href="https://github.com/matthew-dean/parseman/blob/main/examples/json/chevrotain-bench.ts">grammar</a>
+                    ->
+                    <a rel="nofollow"
+                       href="https://github.com/Chevrotain/chevrotain/blob/gh-pages/performance/jsonParsers/parseman/parseman_interpreter_parser.js">interpreter
+                        bundle</a>
+                </p></li>
+
                 <li><p><a rel="nofollow" href="http://www.antlr.org/">ANTLR4</a> Parser Generator
                     <a rel="nofollow"
                        href="https://github.com/Chevrotain/chevrotain/blob/gh-pages/performance/jsonParsers/antlr/JSON_ANTLR.g4">grammar</a>
@@ -142,7 +162,7 @@
 
                     <div class="benchName">Library</div>
                     <div class="benchRate">Ops/sec</div>
-                    <div class="benchSpeed">Relative Speed</div>
+                    <div class="benchSpeed">Relative<br>Speed</div>
                     <div class="benchInclude">?</div>
 
                 </div>
@@ -178,6 +198,32 @@
                     <div class="dataRow Parsimmon">
 
                         <div class="benchName"><a rel="nofollow" href="https://github.com/jneen/parsimmon">Parsimmon</a>
+                        </div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                    </div>
+
+                    <div class="dataRow ParsemanCompiled">
+
+                        <div class="benchName"><a rel="nofollow" href="https://matthew-dean.github.io/parseman/">Parséman</a> (compiled)
+                        </div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                    </div>
+
+                    <div class="dataRow ParsemanInterpreted">
+
+                        <div class="benchName"><a rel="nofollow" href="https://matthew-dean.github.io/parseman/">Parséman</a> (interpreted)
                         </div>
                         <div class="benchRate">
                             <div class="value">&nbsp;</div>
@@ -257,7 +303,7 @@
                             <div class="delta">&nbsp;</div>
                         </div>
                         <div class="benchSpeed">&nbsp;</div>
-                        <div class="benchInclude"><input type="checkbox"/></div>
+                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
 
                     </div>
                 </div>
@@ -288,6 +334,8 @@
     var nearleyFrame = includeTestIFrame("nearley", "./jsonParsers/nearley/nearley.html")
     var ohmFrame = includeTestIFrame("ohm", "./jsonParsers/ohm/ohm.html")
     var parsimmonFrame = includeTestIFrame("parsimmon", "./jsonParsers/parsimmon/parsimmon.html")
+    var parsemanCompiledFrame = includeTestIFrame("parsemanCompiled", "./jsonParsers/parseman/parseman_compiled.html")
+    var parsemanInterpretedFrame = includeTestIFrame("parsemanInterpreted", "./jsonParsers/parseman/parseman_interpreter.html")
     var peggyFrame = includeTestIFrame("peggy", "./jsonParsers/peggy/peggy.html")
     var parserCombinatorsFrame = includeTestIFrame("parserCombinators", "./jsonParsers/parser-combinators/parser-combinators.html")
 
@@ -412,6 +460,14 @@
 
         Parsimmon: function (suite) {
             addTest(suite, 'Parsimmon', parsimmonFrame.parse)
+        },
+
+        ParsemanCompiled: function (suite) {
+            addTest(suite, 'ParsemanCompiled', parsemanCompiledFrame.parse)
+        },
+
+        ParsemanInterpreted: function (suite) {
+            addTest(suite, 'ParsemanInterpreted', parsemanInterpretedFrame.parse)
         },
 
         Antlr: function (suite) {

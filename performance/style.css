@@ -63,6 +63,11 @@
     text-align: center;
 }
 
+.headerRow .benchSpeed {
+    line-height: 1.3;
+    padding-top: 7px;
+}
+
 .dataRow {
     height: 50px;
     background-color: white;
@@ -80,7 +85,7 @@
 }
 
 div.benchName {
-    width: 175px;
+    width: 230px;
     padding-right: 10px;
     border-left: 1px solid black;
 }
@@ -90,7 +95,7 @@ div.benchName {
 }
 
 .benchSpeed {
-    width: 175px;
+    width: 120px;
 }
 
 div.benchInclude {
@@ -190,5 +195,4 @@ div.benchInclude {
         width: 98%;
     }
 }
-
 
