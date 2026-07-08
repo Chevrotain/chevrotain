@@ -1,6 +1,6 @@
 # Parséman
 
-[Parséman](https://matthew-dean.github.io/parseman/) 0.18.1 — parse combinator / generator library for JavaScript.
+[Parséman](https://matthew-dean.github.io/parseman/) 0.18.2 — parse combinator / generator library for JavaScript.
 
 ## What is benchmarked
 
@@ -22,7 +22,7 @@ It is **recognition-only** (no string unescape, no JSON object materialization),
 
 ## How the `.js` files are produced
 
-From a Parséman 0.18.1 checkout:
+From a Parséman 0.18.2 checkout:
 
 ```bash
 pnpm build:chevrotain-bench path/to/performance/jsonParsers/parseman
