@@ -57,9 +57,9 @@ function isLexerInvolvedMode() {
 function loadStoredResults() {
   try {
     var raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : { version: null, results: {} };
+    return raw ? JSON.parse(raw) : { version: null, results: {}, records: {} };
   } catch (e) {
-    return { version: null, results: {} };
+    return { version: null, results: {}, records: {} };
   }
 }
 
@@ -117,6 +117,206 @@ function clearTable() {
 function clearResults() {
   clearTable();
   clearData();
+  var metadata = document.getElementById("benchmark-metadata");
+  if (metadata) {
+    metadata.textContent = "";
+  }
+}
+
+function setRunButtonsDisabled(disabled) {
+  $("#runAllButton").prop("disabled", disabled);
+  $("#runAllButton_lexer").prop("disabled", disabled);
+  $("#runAllButton_parser").prop("disabled", disabled);
+  $("#runAllButton_initLexer").prop("disabled", disabled);
+  $("#runAllButton_initParser").prop("disabled", disabled);
+  $("#runAllButton_initBoth").prop("disabled", disabled);
+}
+
+function parserOverheadRatio(result) {
+  return Math.max(
+    0,
+    (result.roundTripMs - result.elapsedMs) / result.elapsedMs,
+  );
+}
+
+function appendParserMetadata(name, record) {
+  var metadata = document.getElementById("benchmark-metadata");
+  if (!metadata) {
+    return;
+  }
+  var details = record.candidateMetadata;
+  var summary = {
+    grammar: name,
+    version: details.chevrotainVersion,
+    sample: details.sampleId,
+    inputBytes: details.inputBytes,
+    inputChecksum: details.inputChecksum,
+    tokenCount: details.tokenCount,
+    tokenChecksum: details.tokenChecksum,
+    parserConfig: details.parserConfig,
+    batchIterations: record.iterations,
+    workerOverheadPercent: (record.workerOverheadRatio * 100).toFixed(2),
+    warmupMs: Math.round(record.warmup.elapsedMs),
+    warmupStable: record.warmup.stable,
+    samples: record.candidateStats.sampleCount,
+  };
+  metadata.textContent += JSON.stringify(summary) + "\n";
+}
+
+function renderParserResult(name, record) {
+  var stats = record.candidateStats;
+  $("." + name + " .benchRate .value").html(stats.hz.toFixed(2));
+  $("." + name + " .benchRate .delta").html(
+    "&plusmn;" + stats.rme.toFixed(2) + "%",
+  );
+  $("." + name + " .benchTime").html(
+    (stats.meanMs * 1000).toFixed(2) + " &micro;s",
+  );
+
+  var speedCell = $("." + name + " .benchSpeed");
+  if (record.pairedSpeed !== undefined) {
+    speedCell.html(
+      (record.pairedSpeed * 100).toFixed(2) +
+        "% (vs " +
+        record.baselineMetadata.chevrotainVersion +
+        ")",
+    );
+  } else {
+    speedCell.html("100%");
+  }
+  appendParserMetadata(name, record);
+}
+
+async function waitForParserFrame(frame) {
+  var started = performance.now();
+  while (typeof frame.restartWorker !== "function") {
+    if (performance.now() - started > 30000) {
+      throw Error("Parser benchmark iframe did not load");
+    }
+    await new Promise(function (resolve) {
+      setTimeout(resolve, 25);
+    });
+  }
+  await frame.waitForWorkerReady();
+}
+
+async function runParserOnlyCase(name) {
+  var candidateFrame = self.parserBenchmarkFrames[name];
+  var baselineFrame =
+    self.parserBaselineFrames && self.parserBaselineFrames[name];
+  var frames = baselineFrame
+    ? [baselineFrame, candidateFrame]
+    : [candidateFrame];
+
+  await Promise.all(frames.map(waitForParserFrame));
+  await Promise.all(
+    frames.map(function (frame) {
+      return frame.restartWorker();
+    }),
+  );
+
+  var metadata = [];
+  for (var i = 0; i < frames.length; i++) {
+    metadata.push(await frames[i].setupParserBenchmark());
+  }
+  if (baselineFrame) {
+    var mismatch = ParserBenchmark.metadataMismatch(metadata[0], metadata[1]);
+    if (mismatch !== undefined) {
+      throw Error(name + " baseline metadata mismatch: " + mismatch);
+    }
+  }
+
+  var calibrations = [];
+  for (var j = 0; j < frames.length; j++) {
+    calibrations.push(await ParserBenchmark.calibrate(frames[j]));
+  }
+  var iterations = Math.max.apply(
+    null,
+    calibrations.map(function (calibration) {
+      return calibration.iterations;
+    }),
+  );
+
+  var warmup = await ParserBenchmark.warm(
+    frames,
+    iterations,
+    function (elapsedMs) {
+      $("#warmup-status").text(name + " (" + elapsedMs + "ms)");
+    },
+  );
+  if (!warmup.stable) {
+    throw Error(name + " parser throughput did not stabilize during warmup");
+  }
+  var stats = await ParserBenchmark.measure(frames, iterations);
+  var overheadResult = await candidateFrame.runParserBatch(iterations);
+
+  var record = {
+    candidateMetadata: metadata[baselineFrame ? 1 : 0],
+    candidateStats: stats[baselineFrame ? 1 : 0],
+    baselineMetadata: baselineFrame ? metadata[0] : undefined,
+    baselineStats: baselineFrame ? stats[0] : undefined,
+    pairedSpeed: baselineFrame
+      ? ParserBenchmark.pairedSpeed(stats[0].samples, stats[1].samples)
+      : undefined,
+    iterations: iterations,
+    warmup: warmup,
+    workerOverheadRatio: parserOverheadRatio(overheadResult),
+    measuredAt: new Date().toISOString(),
+  };
+
+  renderParserResult(name, record);
+  if (self.mode === "latest") {
+    var stored = loadStoredResults();
+    stored.version = record.candidateMetadata.chevrotainVersion;
+    stored.results[name] = stored.results[name] || {};
+    stored.results[name].parserOnly = record.candidateStats.hz;
+    stored.records = stored.records || {};
+    stored.records[name] = stored.records[name] || {};
+    stored.records[name].parserOnly = record;
+    saveStoredResults(stored);
+  }
+  return record;
+}
+
+async function runParserOnlyBenchmarks(enabledTestCaseNames) {
+  if (self.ensureParserBaselineFrames) {
+    self.parserBaselineFrames =
+      self.ensureParserBaselineFrames(enabledTestCaseNames);
+  }
+  var allFrames = enabledTestCaseNames.map(function (name) {
+    return self.parserBenchmarkFrames[name];
+  });
+  if (self.parserBaselineFrames) {
+    allFrames = allFrames.concat(
+      enabledTestCaseNames.map(function (name) {
+        return self.parserBaselineFrames[name];
+      }),
+    );
+  }
+  await Promise.all(allFrames.map(waitForParserFrame));
+
+  document.getElementById("wait").textContent = "Running parser batches";
+  var records = {};
+  try {
+    for (var i = 0; i < enabledTestCaseNames.length; i++) {
+      var name = enabledTestCaseNames[i];
+      try {
+        records[name] = await runParserOnlyCase(name);
+      } catch (error) {
+        $("." + name + " .benchRate .value").text("ERROR");
+        $("." + name + " .benchTime").text(error.message);
+        throw error;
+      }
+    }
+  } finally {
+    if (self.parserBaselineFrames) {
+      enabledTestCaseNames.forEach(function (name) {
+        self.parserBaselineFrames[name].stopWorker();
+      });
+    }
+  }
+  self.lastParserBenchmarkRecords = records;
+  return records;
 }
 
 async function runWarmup(enabledTestCaseNames) {
@@ -139,7 +339,7 @@ async function runWarmup(enabledTestCaseNames) {
     var parseAction = iframe.contentWindow.parse;
 
     for (var j = 0; j < iterations; j++) {
-      await new Promise(function (resolve) {
+      await new Promise(function (resolve, reject) {
         parseAction(
           {
             lexerOnly: lexerOnly,
@@ -147,7 +347,7 @@ async function runWarmup(enabledTestCaseNames) {
             initLexer: initLexer,
             initParser: initParser,
           },
-          { resolve: resolve },
+          { resolve: resolve, reject: reject },
         );
       });
       $warmupStatus.text(name + " (" + (j + 1) + "/" + iterations + ")");
@@ -213,12 +413,21 @@ async function onRunAll(options) {
     return;
   }
 
-  $("#runAllButton").prop("disabled", true);
-  $("#runAllButton_lexer").prop("disabled", true);
-  $("#runAllButton_parser").prop("disabled", true);
-  $("#runAllButton_initLexer").prop("disabled", true);
-  $("#runAllButton_initParser").prop("disabled", true);
-  $("#runAllButton_initBoth").prop("disabled", true);
+  setRunButtonsDisabled(true);
+
+  if (parserOnly) {
+    try {
+      await runParserOnlyBenchmarks(enabledTestCaseNames);
+      $("#warmup-status").html("&nbsp;");
+      $("#wait").html("&nbsp;");
+    } catch (error) {
+      console.error(error);
+      $("#wait").text("Parser benchmark failed: " + error.message);
+    } finally {
+      setRunButtonsDisabled(false);
+    }
+    return;
+  }
 
   // --- Warmup phase ---
   // Only runs for (grammar, mode) combinations not yet warmed up this session.
@@ -239,7 +448,17 @@ async function onRunAll(options) {
     }, 500);
   }
 
-  await runWarmup(enabledTestCaseNames);
+  try {
+    await runWarmup(enabledTestCaseNames);
+  } catch (error) {
+    if (warmupDots !== undefined) {
+      window.clearInterval(warmupDots);
+    }
+    $("#wait").text("Benchmark warmup failed: " + error.message);
+    $("#warmup-status").html("&nbsp;");
+    setRunButtonsDisabled(false);
+    return;
+  }
   if (warmupDots !== undefined) {
     window.clearInterval(warmupDots);
   }
@@ -334,12 +553,7 @@ async function onRunAll(options) {
       } finally {
         // TODO: investigate hack around strange race condition
         setTimeout(function () {
-          $("#runAllButton").prop("disabled", false);
-          $("#runAllButton_lexer").prop("disabled", false);
-          $("#runAllButton_parser").prop("disabled", false);
-          $("#runAllButton_initLexer").prop("disabled", false);
-          $("#runAllButton_initParser").prop("disabled", false);
-          $("#runAllButton_initBoth").prop("disabled", false);
+          setRunButtonsDisabled(false);
         }, 1000);
       }
     })

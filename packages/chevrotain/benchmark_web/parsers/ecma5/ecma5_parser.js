@@ -683,7 +683,7 @@ class ECMAScript5Parser extends ChevrotainParser {
         // there is no danger of inRule recovery (single token insertion/deletion)
         // happening in this case because that type of recovery can only happen if CONSUME(...) was invoked.
         this.SAVE_ERROR(
-          new chevrotain.exceptions.MismatchedTokenException(
+          new chevrotain.MismatchedTokenException(
             "Line Terminator not allowed before Expression in Throw Statement",
             // TODO: create line terminator token on the fly?
           ),
@@ -875,7 +875,7 @@ class ECMAScript5Parser extends ChevrotainParser {
     const seekEnd = nextToken.startOffset - 1;
 
     let i = seekStart;
-    while (i < seekEnd) {
+    while (i <= seekEnd) {
       const code = this._orgText.charCodeAt(i);
       if (code === 10 || code === 13 || code === 0x2028 || code === 0x2029) {
         return true;

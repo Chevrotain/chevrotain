@@ -1,39 +1,77 @@
 self.initialized = false;
 
+function postSuccess(requestId, result) {
+  postMessage({ type: "response", requestId, ok: true, result });
+}
+
+function postFailure(requestId, phase, error) {
+  postMessage({
+    type: "response",
+    requestId,
+    ok: false,
+    error: {
+      phase,
+      name: error && error.name ? error.name : "Error",
+      message: error && error.message ? error.message : String(error),
+      stack: error && error.stack ? error.stack : undefined,
+    },
+  });
+}
+
 onmessage = async function (event) {
-  if (!initialized) {
-    self.initialized = true;
+  var request = event.data;
+  var requestId = request.requestId;
 
-    if (event.data.parserConfig) {
-      self.parserConfig = event.data.parserConfig;
+  try {
+    if (request.type === "init") {
+      var config = request.config;
+      self.parserConfig = config.parserConfig;
+      self.benchmarkConfig = config;
+
+      for (const elem of config.importScripts) {
+        await import(elem);
+      }
+
+      if (config.sampleUrl) {
+        var response = await fetch(config.sampleUrl);
+        if (!response.ok) {
+          throw Error(`Unable to load sample: ${response.status}`);
+        }
+        self.sample = await response.text();
+      }
+      self.startRule = config.startRule;
+      self.initialized = true;
+      postSuccess(requestId, { version: self.chevrotain.VERSION });
+      return;
     }
 
-    for (const elem of event.data.importScripts) {
-      await import(elem);
+    if (!self.initialized) {
+      throw Error("Worker has not been initialized");
     }
 
-    if (event.data.sampleUrl) {
-      var xhrObj = new XMLHttpRequest();
-      xhrObj.open("GET", event.data.sampleUrl, false);
-      xhrObj.send("");
-
-      self.sample = xhrObj.responseText;
-    }
-    self.startRule = event.data.startRule;
-
-    // Notify the iframe of the loaded Chevrotain version so the main page
-    // can include it when storing benchmark results in localStorage.
-    postMessage({ type: "init", version: self.chevrotain.VERSION });
-  } else {
-    var options = event.data[0];
-
-    try {
+    if (request.type === "setup") {
+      postSuccess(
+        requestId,
+        self.setupParserBench(
+          self.sample,
+          self.lexerDefinition || undefined,
+          self.customLexer || undefined,
+          self.parser,
+          self.startRule,
+          self.parserConfig,
+          self.benchmarkConfig,
+        ),
+      );
+    } else if (request.type === "batch") {
+      postSuccess(requestId, self.runParserBatch(request.iterations));
+    } else if (request.type === "legacyRun") {
+      var options = request.options;
       if (options.initLexer || options.initParser) {
         self.initBench(
           self.lexerDefinition || undefined,
           self.customLexer || undefined,
-          parser,
-          parserConfig,
+          self.parser,
+          self.parserConfig,
           options,
         );
       } else {
@@ -41,17 +79,18 @@ onmessage = async function (event) {
           self.sample,
           self.lexerDefinition || undefined,
           self.customLexer || undefined,
-          parser,
-          startRule,
+          self.parser,
+          self.startRule,
           options,
-          parserConfig,
+          self.parserConfig,
         );
       }
-      postMessage(0);
-    } catch (e) {
-      console.error(e.message);
-      console.error(e.stack);
-      postMessage(1);
+      postSuccess(requestId, null);
+    } else {
+      throw Error(`Unknown worker request type: ${request.type}`);
     }
+  } catch (error) {
+    console.error(error);
+    postFailure(requestId, request.type, error);
   }
 };

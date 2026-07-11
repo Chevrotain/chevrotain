@@ -11,6 +11,9 @@
     <script>
       // relative to the worker impel file
       initWorker({
+        grammarId: "ECMA5",
+        sampleId: "benchmark@2.1.4/benchmark.js",
+        validateEcmaLineTerminators: true,
         startRule: "Program",
         parserConfig: window.globalOptions.parserConfig,
         importScripts: [

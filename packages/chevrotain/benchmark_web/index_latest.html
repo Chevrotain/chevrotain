@@ -127,6 +127,7 @@
                 </div>
               </div>
             </div>
+            <pre id="benchmark-metadata"></pre>
           </div>
         </div>
       </div>
@@ -146,6 +147,7 @@
       </p>
     </div>
 
+    <script src="parser_benchmark.js"></script>
     <script src="lib/iframe_loader.js"></script>
     <script>
       self.mode = "latest";
@@ -186,6 +188,12 @@
           addTest(suite, "ECMA5", ecma5LatestFrame.parse);
         },
       };
+      self.parserBenchmarkFrames = {
+        JSON: jsonLatestFrame,
+        CSS: cssLatestFrame,
+        ECMA5: ecma5LatestFrame,
+      };
+      self.parserBaselineFrames = undefined;
     </script>
     <script src="lib/bench_logic.js"></script>
   </body>
