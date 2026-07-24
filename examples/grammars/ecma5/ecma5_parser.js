@@ -897,7 +897,7 @@ export class ECMAScript5Parser extends EmbeddedActionsParser {
 const insertedSemiColon = {
   tokenTypeIdx: t.Semicolon.tokenTypeIdx,
   image: ";",
-  startOffset: NaN,
-  endOffset: NaN,
+  startOffset: -1,
+  endOffset: -1,
   automaticallyInserted: true,
 };

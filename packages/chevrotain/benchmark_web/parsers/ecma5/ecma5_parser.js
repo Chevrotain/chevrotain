@@ -889,8 +889,8 @@ class ECMAScript5Parser extends ChevrotainParser {
 const insertedSemiColon = {
   tokenType: t.Semicolon.tokenType,
   image: ";",
-  startOffset: NaN,
-  endOffset: NaN,
+  startOffset: -1,
+  endOffset: -1,
   automaticallyInserted: true,
 };
 

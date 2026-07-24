@@ -35,16 +35,7 @@ import { Rule } from "@chevrotain/gast";
 import { IParserConfigInternal, ParserMethodInternal } from "./types.js";
 import { validateLookahead } from "../grammar/checks.js";
 
-export const END_OF_FILE = createTokenInstance(
-  EOF,
-  "",
-  NaN,
-  NaN,
-  NaN,
-  NaN,
-  NaN,
-  NaN,
-);
+export const END_OF_FILE = createTokenInstance(EOF, "", -1, -1, -1, -1, -1, -1);
 Object.freeze(END_OF_FILE);
 
 export type TokenMatcher = (token: IToken, tokType: TokenType) => boolean;

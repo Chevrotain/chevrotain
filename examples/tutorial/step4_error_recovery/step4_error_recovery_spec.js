@@ -74,12 +74,12 @@ describe("Chevrotain Tutorial", () => {
                       Colon: [
                         {
                           image: "",
-                          startOffset: NaN,
-                          endOffset: NaN,
-                          startLine: NaN,
-                          endLine: NaN,
-                          startColumn: NaN,
-                          endColumn: NaN,
+                          startOffset: -1,
+                          endOffset: -1,
+                          startLine: -1,
+                          endLine: -1,
+                          startColumn: -1,
+                          endColumn: -1,
                           isInsertedInRecovery: true,
                           tokenType: Colon,
                         },

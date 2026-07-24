@@ -12,8 +12,8 @@ export function setNodeLocationOnlyOffset(
   newLocationInfo: Required<Pick<IToken, "startOffset" | "endOffset">>,
 ): void {
   // First (valid) update for this cst node
-  if (isNaN(currNodeLocation.startOffset) === true) {
-    // assumption1: Token location information is either NaN or a valid number
+  if (currNodeLocation.startOffset === -1) {
+    // assumption1: Token location information is either invalid or a valid number
     // assumption2: Token location information is fully valid if it exist
     // (both start/end offsets exist and are numbers).
     currNodeLocation.startOffset = newLocationInfo.startOffset;
@@ -22,7 +22,7 @@ export function setNodeLocationOnlyOffset(
   // Once the startOffset has been updated with a valid number it should never receive
   // any farther updates as the Token vector is sorted.
   // We still have to check this this condition for every new possible location info
-  // because with error recovery enabled we may encounter invalid tokens (NaN location props)
+  // because with error recovery enabled we may encounter invalid token locations.
   else if (currNodeLocation.endOffset! < newLocationInfo.endOffset === true) {
     currNodeLocation.endOffset = newLocationInfo.endOffset;
   }
@@ -40,8 +40,8 @@ export function setNodeLocationFull(
   newLocationInfo: CstNodeLocation,
 ): void {
   // First (valid) update for this cst node
-  if (isNaN(currNodeLocation.startOffset) === true) {
-    // assumption1: Token location information is either NaN or a valid number
+  if (currNodeLocation.startOffset === -1) {
+    // assumption1: Token location information is either invalid or a valid number
     // assumption2: Token location information is fully valid if it exist
     // (all start/end props exist and are numbers).
     currNodeLocation.startOffset = newLocationInfo.startOffset;
@@ -54,7 +54,7 @@ export function setNodeLocationFull(
   // Once the start props has been updated with a valid number it should never receive
   // any farther updates as the Token vector is sorted.
   // We still have to check this this condition for every new possible location info
-  // because with error recovery enabled we may encounter invalid tokens (NaN location props)
+  // because with error recovery enabled we may encounter invalid token locations.
   else if (currNodeLocation.endOffset! < newLocationInfo.endOffset! === true) {
     currNodeLocation.endOffset = newLocationInfo.endOffset;
     currNodeLocation.endColumn = newLocationInfo.endColumn;

@@ -269,7 +269,7 @@ Caveats
     must include the relevant location properties to allow the Chevrotain Parser to compute the CstNode locations.
 
 - A CstNode may be empty, for example when the matching grammar rule has not matched any token.
-  In that case the default value for the location properties is NaN.
+  In that case the default value for the location properties is `-1`.
 
 - This feature has a slight performance and memory cost.
   This performance impact is **linear** and was measured at 5-10% for a full lexing + parsing flow.

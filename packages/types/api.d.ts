@@ -1702,6 +1702,9 @@ interface ICustomPattern {
  *
  * - A Token's image is it's **literal** text.
  *   e.g unicode escaping is untouched.
+ *
+ * - Synthetic tokens without a source location, such as parser EOF and tokens inserted
+ *   during error recovery, use `-1` for their location properties.
  */
 export interface IToken {
   /** The textual representation of the Token as it appeared in the text. */
@@ -2031,6 +2034,8 @@ export interface CstNode {
 /**
  *  The Column/Line properties will only be present when
  *  The {@link IParserConfig.nodeLocationTracking} is set to "full".
+ *
+ *  Empty CST nodes use `-1` for location properties that are unavailable.
  */
 export interface CstNodeLocation {
   startOffset: number;

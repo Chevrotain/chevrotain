@@ -103,8 +103,8 @@ export class TreeBuilder {
     cstNode: any,
   ): void {
     cstNode.location = {
-      startOffset: NaN,
-      endOffset: NaN,
+      startOffset: -1,
+      endOffset: -1,
     };
   }
 
@@ -118,18 +118,18 @@ export class TreeBuilder {
       // For invalid inputs there won't be any CSTOutput so this potential
       // inaccuracy does not matter
       startOffset: this.LA_FAST(1).startOffset,
-      endOffset: NaN,
+      endOffset: -1,
     };
   }
 
   setInitialNodeLocationFullRecovery(this: MixedInParser, cstNode: any): void {
     cstNode.location = {
-      startOffset: NaN,
-      startLine: NaN,
-      startColumn: NaN,
-      endOffset: NaN,
-      endLine: NaN,
-      endColumn: NaN,
+      startOffset: -1,
+      startLine: -1,
+      startColumn: -1,
+      endOffset: -1,
+      endLine: -1,
+      endColumn: -1,
     };
   }
 
@@ -144,9 +144,9 @@ export class TreeBuilder {
       startOffset: nextToken.startOffset,
       startLine: nextToken.startLine,
       startColumn: nextToken.startColumn,
-      endOffset: NaN,
-      endLine: NaN,
-      endColumn: NaN,
+      endOffset: -1,
+      endLine: -1,
+      endColumn: -1,
     };
   }
 
@@ -174,16 +174,19 @@ export class TreeBuilder {
 
     // If this condition is true it means we consumed at least one Token
     // In this CstNode.
-    if (loc.startOffset <= prevToken.startOffset === true) {
+    if (
+      loc.startOffset !== -1 &&
+      loc.startOffset <= prevToken.startOffset === true
+    ) {
       loc.endOffset = prevToken.endOffset;
       loc.endLine = prevToken.endLine;
       loc.endColumn = prevToken.endColumn;
     }
     // "empty" CstNode edge case
     else {
-      loc.startOffset = NaN;
-      loc.startLine = NaN;
-      loc.startColumn = NaN;
+      loc.startOffset = -1;
+      loc.startLine = -1;
+      loc.startColumn = -1;
     }
   }
 
@@ -195,12 +198,15 @@ export class TreeBuilder {
 
     // If this condition is true it means we consumed at least one Token
     // In this CstNode.
-    if (loc.startOffset <= prevToken.startOffset === true) {
+    if (
+      loc.startOffset !== -1 &&
+      loc.startOffset <= prevToken.startOffset === true
+    ) {
       loc.endOffset = prevToken.endOffset;
     }
     // "empty" CstNode edge case
     else {
-      loc.startOffset = NaN;
+      loc.startOffset = -1;
     }
   }
 

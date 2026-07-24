@@ -1,5 +1,11 @@
 # Breaking Changes
 
+## 13.0.0
+
+- The sentinel for unavailable location properties on parser EOF tokens, recovery-inserted tokens, and empty CST nodes changed from `NaN` to `-1`.
+  No change is needed when identifying EOF with `tokenMatcher(token, EOF)`; its behavior is unchanged.
+  Only code that directly checks unavailable location values must replace checks such as `Number.isNaN(token.startOffset)` with `token.startOffset === -1`.
+
 ## 12.0.0
 
 - Dropped support for nodejs v20.
