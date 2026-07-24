@@ -48,7 +48,8 @@ async function main() {
   const after = process.memoryUsage().heapUsed;
 
   console.log(((after - before) / objectCount).toFixed(1), "bytes per object");
-  // Keep the measured objects live through the final GC and heap measurement.
+  // This later read keeps the objects live during the preceding GC. The log runs
+  // after the heap sample, so it is excluded from `after`.
   console.log("keep-alive:", objects[objectCount - 1].startOffset);
 }
 

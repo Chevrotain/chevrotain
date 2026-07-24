@@ -63,7 +63,8 @@ async function main() {
   const after = process.memoryUsage().heapUsed;
 
   console.log(((after - before) / objectCount).toFixed(1), "bytes per object");
-  // Keep both the measured objects and CST hidden class live through the measurement.
+  // These later reads keep the objects (and CST shape metadata) live during the
+  // preceding GC. The log runs after the heap sample, so it is excluded from `after`.
   console.log(
     "keep-alive:",
     objects[objectCount - 1].startOffset,
