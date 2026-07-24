@@ -63,6 +63,7 @@ async function main() {
   const after = process.memoryUsage().heapUsed;
 
   console.log(((after - before) / objectCount).toFixed(1), "bytes per object");
+  // Keep both the measured objects and CST hidden class live through the measurement.
   console.log(
     "keep-alive:",
     objects[objectCount - 1].startOffset,
