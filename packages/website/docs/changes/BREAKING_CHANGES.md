@@ -1,5 +1,10 @@
 # Breaking Changes
 
+## 13.0.0
+
+- Unavailable location properties on parser EOF tokens, recovery-inserted tokens, and empty CST nodes now use `-1` instead of `NaN`.
+  Replace checks such as `Number.isNaN(token.startOffset)` with `token.startOffset === -1`.
+
 ## 12.0.0
 
 - Dropped support for nodejs v20.

@@ -57,8 +57,8 @@ const RECORDING_PHASE_TOKEN = createTokenInstance(
   "This IToken indicates the Parser is in Recording Phase\n\t" +
     "" +
     "See: https://chevrotain.io/docs/guide/internals.html#grammar-recording for details",
-  // Using "-1" instead of NaN (as in EOF) because an actual number is less likely to
-  // cause errors if the output of LA or CONSUME would be (incorrectly) used during the recording phase.
+  // Negative positions are less likely to cause errors if the output of LA or CONSUME
+  // is incorrectly used during the recording phase.
   -1,
   -1,
   -1,

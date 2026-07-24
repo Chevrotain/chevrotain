@@ -637,12 +637,14 @@ function defineRecognizerSpecs(
 
         expect(insertedToken.isInsertedInRecovery).to.be.true;
         expect(insertedToken.image).to.equal("");
-        expect(insertedToken.startOffset).to.be.NaN;
-        expect(insertedToken.endOffset).to.be.NaN;
-        expect(insertedToken.startLine).to.be.NaN;
-        expect(insertedToken.endLine).to.be.NaN;
-        expect(insertedToken.startColumn).to.be.NaN;
-        expect(insertedToken.endColumn).to.be.NaN;
+        expect(insertedToken).to.include({
+          startOffset: -1,
+          endOffset: -1,
+          startLine: -1,
+          endLine: -1,
+          startColumn: -1,
+          endColumn: -1,
+        });
       });
     });
 
@@ -774,7 +776,14 @@ function defineRecognizerSpecs(
 
         parser.CONSUME(IntTok);
         parser.CONSUME(PlusTok);
-        expect(tokenMatcher(parser.LA(1), EOF));
+        expect(parser.LA(1)).to.include({
+          startOffset: -1,
+          endOffset: -1,
+          startLine: -1,
+          endLine: -1,
+          startColumn: -1,
+          endColumn: -1,
+        });
         expect(tokenMatcher(parser.LA(1), EOF));
         expect(tokenMatcher(parser.SKIP_TOKEN(), EOF));
         expect(tokenMatcher(parser.SKIP_TOKEN(), EOF));

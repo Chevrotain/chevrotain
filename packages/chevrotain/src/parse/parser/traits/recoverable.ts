@@ -65,12 +65,12 @@ export class Recoverable {
     const tokToInsert = createTokenInstance(
       tokType,
       "",
-      NaN,
-      NaN,
-      NaN,
-      NaN,
-      NaN,
-      NaN,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
     );
     tokToInsert.isInsertedInRecovery = true;
     return tokToInsert;
