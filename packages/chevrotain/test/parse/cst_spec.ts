@@ -2,6 +2,10 @@ import { createToken } from "../../src/scan/tokens_public.js";
 import { CstParser } from "../../src/parse/parser/traits/parser_traits.js";
 import { tokenStructuredMatcher as tokenStructuredMatcherStrict } from "../../src/scan/tokens.js";
 import { createRegularToken } from "../utils/matchers.js";
+import {
+  setNodeLocationFull,
+  setNodeLocationOnlyOffset,
+} from "../../src/parse/cst/cst.js";
 
 import { CstElement, CstNode, IToken, TokenType } from "@chevrotain/types";
 import { expect } from "chai";
@@ -529,12 +533,12 @@ function defineTestSuite(recoveryMode: boolean) {
       });
 
       expect((cst.children.empty[0] as CstNode).location).to.deep.equal({
-        startOffset: NaN,
-        startLine: NaN,
-        startColumn: NaN,
-        endOffset: NaN,
-        endLine: NaN,
-        endColumn: NaN,
+        startOffset: -1,
+        startLine: -1,
+        startColumn: -1,
+        endOffset: -1,
+        endLine: -1,
+        endColumn: -1,
       });
 
       expect(cst.location).to.deep.equal({
@@ -578,10 +582,10 @@ function defineTestSuite(recoveryMode: boolean) {
       }
 
       const input = [
-        createRegularToken(A, "1", 1, NaN, NaN, 2),
-        createRegularToken(B, "2", 12, NaN, NaN, 13),
-        createRegularToken(C, "3", 15, NaN, NaN, 16),
-        createRegularToken(D, "4", 17, NaN, NaN, 18),
+        createRegularToken(A, "1", 1, -1, -1, 2),
+        createRegularToken(B, "2", 12, -1, -1, 13),
+        createRegularToken(C, "3", 15, -1, -1, 16),
+        createRegularToken(D, "4", 17, -1, -1, 18),
       ];
       const parser = new CstTerminalParser(input);
       const cst = parser.testRule();
@@ -606,8 +610,8 @@ function defineTestSuite(recoveryMode: boolean) {
       });
 
       expect((cst.children.empty[0] as CstNode).location).to.deep.equal({
-        startOffset: NaN,
-        endOffset: NaN,
+        startOffset: -1,
+        endOffset: -1,
       });
 
       expect(cst.location).to.deep.equal({
@@ -615,6 +619,58 @@ function defineTestSuite(recoveryMode: boolean) {
         endOffset: 18,
       });
     });
+
+    if (recoveryMode === false) {
+      it("uses -1 for an empty CST node at EOF", () => {
+        for (const nodeLocationTracking of ["full", "onlyOffset"] as const) {
+          class EmptyAtEofParser extends CstParser {
+            constructor(input: IToken[]) {
+              super(ALL_TOKENS, { nodeLocationTracking });
+              this.performSelfAnalysis();
+              this.input = input;
+            }
+
+            public testRule = this.RULE("testRule", () => {
+              this.CONSUME(A);
+              this.SUBRULE(this.empty);
+            });
+
+            public empty = this.RULE("empty", () => {});
+          }
+
+          const parser = new EmptyAtEofParser([
+            createRegularToken(A, "", 1, 1, 1, 2, 1, 2),
+          ]);
+          const cst = parser.testRule();
+          const empty = cst.children.empty[0] as CstNode;
+
+          expect(empty.location).to.deep.equal(
+            nodeLocationTracking === "full"
+              ? {
+                  startOffset: -1,
+                  startLine: -1,
+                  startColumn: -1,
+                  endOffset: -1,
+                  endLine: -1,
+                  endColumn: -1,
+                }
+              : { startOffset: -1, endOffset: -1 },
+          );
+          expect(cst.location).to.deep.equal(
+            nodeLocationTracking === "full"
+              ? {
+                  startOffset: 1,
+                  startLine: 1,
+                  startColumn: 1,
+                  endOffset: 2,
+                  endLine: 1,
+                  endColumn: 2,
+                }
+              : { startOffset: 1, endOffset: 2 },
+          );
+        }
+      });
+    }
 
     it("Can output a CST with no location information", () => {
       class CstTerminalParser extends CstParser {
@@ -892,6 +948,49 @@ function defineTestSuite(recoveryMode: boolean) {
     });
   });
 }
+
+it("ignores synthetic tokens when updating CST locations", () => {
+  const onlyOffset = { startOffset: -1, endOffset: -1 };
+  setNodeLocationOnlyOffset(onlyOffset, {
+    startOffset: -1,
+    endOffset: -1,
+  });
+  setNodeLocationOnlyOffset(onlyOffset, { startOffset: 1, endOffset: 2 });
+  expect(onlyOffset).to.deep.equal({ startOffset: 1, endOffset: 2 });
+
+  const full = {
+    startOffset: -1,
+    startLine: -1,
+    startColumn: -1,
+    endOffset: -1,
+    endLine: -1,
+    endColumn: -1,
+  };
+  setNodeLocationFull(full, {
+    startOffset: -1,
+    startLine: -1,
+    startColumn: -1,
+    endOffset: -1,
+    endLine: -1,
+    endColumn: -1,
+  });
+  setNodeLocationFull(full, {
+    startOffset: 1,
+    startLine: 2,
+    startColumn: 3,
+    endOffset: 4,
+    endLine: 5,
+    endColumn: 6,
+  });
+  expect(full).to.deep.equal({
+    startOffset: 1,
+    startLine: 2,
+    startColumn: 3,
+    endOffset: 4,
+    endLine: 5,
+    endColumn: 6,
+  });
+});
 
 defineTestSuite(true);
 defineTestSuite(false);

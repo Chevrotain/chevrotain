@@ -87,7 +87,7 @@ function matchIndentBase(text, offset, matchedTokens, groups, type) {
       for (let i = iStart; i < numberOfDedents; i++) {
         indentStack.pop();
         matchedTokens.push(
-          createTokenInstance(Outdent, "", NaN, NaN, NaN, NaN, NaN, NaN),
+          createTokenInstance(Outdent, "", -1, -1, -1, -1, -1, -1),
         );
       }
 
@@ -174,7 +174,7 @@ export function tokenize(text) {
   //add remaining Outdents
   while (indentStack.length > 1) {
     lexResult.tokens.push(
-      createTokenInstance(Outdent, "", NaN, NaN, NaN, NaN, NaN, NaN),
+      createTokenInstance(Outdent, "", -1, -1, -1, -1, -1, -1),
     );
     indentStack.pop();
   }

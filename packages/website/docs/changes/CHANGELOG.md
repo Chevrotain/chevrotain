@@ -1,5 +1,9 @@
 ## X.Y.Z (INSERT_DATE_HERE)
 
+#### Breaking Changes
+
+- [Unavailable token and CST locations now use `-1` instead of `NaN`](https://github.com/Chevrotain/chevrotain/issues/2192).
+
 #### Minor Changes
 
 - [Stricter TypeScript Types for DSL methods](https://github.com/Chevrotain/chevrotain/pull/2183)
