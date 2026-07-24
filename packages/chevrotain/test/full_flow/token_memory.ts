@@ -16,7 +16,8 @@ interface TokenShape {
 
 async function main() {
   if (process.argv.includes("--import-chevrotain")) {
-    // Importing Chevrotain used to generalize V8's shared token shape and double
+    // Importing Chevrotain to trigger the side effect which caused the original
+    // memory consumption bug.
     // token memory: https://github.com/Chevrotain/chevrotain/issues/2192
     await import(new URL("../../chevrotain.mjs", import.meta.url).href);
   }

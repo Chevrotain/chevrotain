@@ -17,6 +17,10 @@ async function main() {
   let initializedCst: CstNode | undefined;
 
   if (process.argv.includes("--create-empty-cst")) {
+    // Import Chevrotain and create an empty CST before allocation to reproduce the
+    // shape-initialization side effect from the original token issue. NaN sentinels
+    // used to generalize V8's shared location shape and box later integer fields:
+    // https://github.com/Chevrotain/chevrotain/issues/2192
     const { createToken, CstParser } = await import(
       new URL("../../chevrotain.mjs", import.meta.url).href
     );
