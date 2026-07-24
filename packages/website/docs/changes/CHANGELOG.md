@@ -3,6 +3,9 @@
 #### Breaking Changes
 
 - [Unavailable token and CST locations now use `-1` instead of `NaN`](https://github.com/Chevrotain/chevrotain/issues/2192).
+  - Using the small-integer sentinel prevents V8 from generalizing shared object shapes and boxing integer location fields as `HeapNumber` objects.
+  - This reduces retained memory per token from 192 to 96 bytes (50%) and per CST location object from 120 to 72 bytes (40%).
+  - EOF detection with `tokenMatcher(token, EOF)` is unaffected; only direct checks for unavailable location values must change.
 
 #### Minor Changes
 
