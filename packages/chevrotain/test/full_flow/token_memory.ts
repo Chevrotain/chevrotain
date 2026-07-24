@@ -1,6 +1,6 @@
 // Run `bun run build` from packages/chevrotain first.
 // Baseline: node --expose-gc lib/test/full_flow/token_memory.js
-// Imported: node --expose-gc lib/test/full_flow/token_memory.js chevrotain
+// Imported: node --expose-gc lib/test/full_flow/token_memory.js --import-chevrotain
 
 interface TokenShape {
   image: string;
@@ -15,7 +15,7 @@ interface TokenShape {
 }
 
 async function main() {
-  if (process.argv.includes("chevrotain")) {
+  if (process.argv.includes("--import-chevrotain")) {
     await import(new URL("../../chevrotain.mjs", import.meta.url).href);
   }
 

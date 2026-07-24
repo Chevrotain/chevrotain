@@ -2,7 +2,7 @@ import type { CstNode } from "@chevrotain/types";
 
 // Run `bun run build` from packages/chevrotain first.
 // Baseline: node --expose-gc lib/test/full_flow/cst_memory.js
-// Initialized: node --expose-gc lib/test/full_flow/cst_memory.js chevrotain
+// Initialized: node --expose-gc lib/test/full_flow/cst_memory.js --create-empty-cst
 
 interface CstLocationShape {
   startOffset: number;
@@ -16,7 +16,7 @@ interface CstLocationShape {
 async function main() {
   let initializedCst: CstNode | undefined;
 
-  if (process.argv.includes("chevrotain")) {
+  if (process.argv.includes("--create-empty-cst")) {
     const { createToken, CstParser } = await import(
       new URL("../../chevrotain.mjs", import.meta.url).href
     );

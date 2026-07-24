@@ -9,6 +9,10 @@ const cstHarnessPath = fileURLToPath(
   new URL("./cst_memory.js", import.meta.url),
 );
 
+// One boxed HeapNumber adds 16 bytes: 16.7% for tokens and 22.2% for CST
+// locations. This tolerates measurement noise while still catching one boxed field.
+const MAX_MEMORY_RATIO = 1.1;
+
 function measureRetainedBytes(harnessPath: string, args: string[]): number {
   const env = { ...process.env };
   delete env.NODE_V8_COVERAGE;
@@ -32,22 +36,26 @@ describe("location object memory", () => {
   it("does not increase token size when Chevrotain is imported", function () {
     this.timeout(20_000);
     const baseline = measureRetainedBytes(tokenHarnessPath, []);
-    const imported = measureRetainedBytes(tokenHarnessPath, ["chevrotain"]);
+    const imported = measureRetainedBytes(tokenHarnessPath, [
+      "--import-chevrotain",
+    ]);
 
     expect(
       imported,
       `baseline: ${baseline}, imported: ${imported}`,
-    ).to.be.at.most(baseline * 1.1);
+    ).to.be.at.most(baseline * MAX_MEMORY_RATIO);
   });
 
   it("does not increase CST location size after creating an empty CST", function () {
     this.timeout(20_000);
     const baseline = measureRetainedBytes(cstHarnessPath, []);
-    const initialized = measureRetainedBytes(cstHarnessPath, ["chevrotain"]);
+    const initialized = measureRetainedBytes(cstHarnessPath, [
+      "--create-empty-cst",
+    ]);
 
     expect(
       initialized,
       `baseline: ${baseline}, initialized: ${initialized}`,
-    ).to.be.at.most(baseline * 1.1);
+    ).to.be.at.most(baseline * MAX_MEMORY_RATIO);
   });
 });
