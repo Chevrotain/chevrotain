@@ -776,7 +776,9 @@ function defineRecognizerSpecs(
 
         parser.CONSUME(IntTok);
         parser.CONSUME(PlusTok);
-        expect(parser.LA(1)).to.include({
+        const eof = parser.LA(1);
+        expect(tokenMatcher(eof, EOF)).to.be.true;
+        expect(eof).to.include({
           startOffset: -1,
           endOffset: -1,
           startLine: -1,
@@ -784,9 +786,9 @@ function defineRecognizerSpecs(
           startColumn: -1,
           endColumn: -1,
         });
-        expect(tokenMatcher(parser.LA(1), EOF));
-        expect(tokenMatcher(parser.SKIP_TOKEN(), EOF));
-        expect(tokenMatcher(parser.SKIP_TOKEN(), EOF));
+        expect(tokenMatcher(parser.LA(1), EOF)).to.be.true;
+        expect(tokenMatcher(parser.SKIP_TOKEN(), EOF)).to.be.true;
+        expect(tokenMatcher(parser.SKIP_TOKEN(), EOF)).to.be.true;
         // and we can go on and on and on... this avoid returning null/undefined
         // see: https://en.wikipedia.org/wiki/Tony_Hoare#Apologies_and_retractions
       });

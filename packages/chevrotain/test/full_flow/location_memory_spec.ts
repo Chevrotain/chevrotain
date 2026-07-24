@@ -1,8 +1,10 @@
 import { spawnSync } from "node:child_process";
-import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 
-const harnessPath = resolve("test/full_flow/location_memory.mjs");
+const harnessPath = fileURLToPath(
+  new URL("./location_memory.js", import.meta.url),
+);
 
 function measureRetainedBytes(args: string[]): number {
   const env = { ...process.env };
