@@ -34,7 +34,6 @@ function measureRetainedBytes(harnessPath: string, args: string[]): number {
 
 describe("location object memory", () => {
   it("does not increase token size when Chevrotain is imported", function () {
-    this.timeout(20_000);
     const baseline = measureRetainedBytes(tokenHarnessPath, []);
     const imported = measureRetainedBytes(tokenHarnessPath, [
       "--import-chevrotain",
@@ -47,7 +46,6 @@ describe("location object memory", () => {
   });
 
   it("does not increase CST location size after creating an empty CST", function () {
-    this.timeout(20_000);
     const baseline = measureRetainedBytes(cstHarnessPath, []);
     const initialized = measureRetainedBytes(cstHarnessPath, [
       "--create-empty-cst",
