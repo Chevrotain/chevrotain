@@ -2,11 +2,14 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 
-const harnessPath = fileURLToPath(
-  new URL("./location_memory.js", import.meta.url),
+const tokenHarnessPath = fileURLToPath(
+  new URL("./token_memory.js", import.meta.url),
+);
+const cstHarnessPath = fileURLToPath(
+  new URL("./cst_memory.js", import.meta.url),
 );
 
-function measureRetainedBytes(args: string[]): number {
+function measureRetainedBytes(harnessPath: string, args: string[]): number {
   const env = { ...process.env };
   delete env.NODE_V8_COVERAGE;
 
@@ -28,8 +31,8 @@ function measureRetainedBytes(args: string[]): number {
 describe("location object memory", () => {
   it("does not increase token size when Chevrotain is imported", function () {
     this.timeout(20_000);
-    const baseline = measureRetainedBytes([]);
-    const imported = measureRetainedBytes(["chevrotain"]);
+    const baseline = measureRetainedBytes(tokenHarnessPath, []);
+    const imported = measureRetainedBytes(tokenHarnessPath, ["chevrotain"]);
 
     expect(
       imported,
@@ -39,8 +42,8 @@ describe("location object memory", () => {
 
   it("does not increase CST location size after creating an empty CST", function () {
     this.timeout(20_000);
-    const baseline = measureRetainedBytes(["cst"]);
-    const initialized = measureRetainedBytes(["cst", "chevrotain"]);
+    const baseline = measureRetainedBytes(cstHarnessPath, []);
+    const initialized = measureRetainedBytes(cstHarnessPath, ["chevrotain"]);
 
     expect(
       initialized,
