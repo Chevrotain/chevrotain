@@ -63,8 +63,9 @@ async function main() {
   const after = process.memoryUsage().heapUsed;
 
   console.log(((after - before) / objectCount).toFixed(1), "bytes per object");
-  // These later reads keep the objects (and CST shape metadata) live during the
-  // preceding GC. The log runs after the heap sample, so it is excluded from `after`.
+  // V8 may collect values that are never used again. Reading them after `after` is
+  // captured forces the preceding `gc()` to retain the measured objects and their
+  // CST shape metadata. The log itself runs too late to affect the measurement.
   console.log(
     "keep-alive:",
     objects[objectCount - 1].startOffset,
