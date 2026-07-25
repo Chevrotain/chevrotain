@@ -1,18 +1,17 @@
 {
-  extends: ["config:base"],
+  extends: ["config:recommended"],
   dependencyDashboard: true,
   labels: ["dependencies"],
   packageRules: [
     {
       groupName: "all non-major dev dependencies",
       groupSlug: "all-dev-minor-patch",
-      matchPackagePatterns: ["*"],
-      excludePackagePatterns: [
+      matchPackageNames: [
         // typedoc upgrades require manually validating the generated website
-        "typedoc",
+        "!/typedoc/",
         // vuepress and related deps tend to break things often and require manual inspection
-        "vue",
-        "vuepress",
+        "!/vue/",
+        "!/vuepress/",
       ],
       matchDepTypes: ["devDependencies"],
       matchUpdateTypes: ["minor", "patch"],
