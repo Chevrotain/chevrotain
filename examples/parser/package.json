@@ -1,6 +1,6 @@
 {
   "name": "chevrotain_examples_parser",
-  "version": "12.0.0",
+  "version": "13.0.0",
   "type": "module",
   "scripts": {
     "ci": "bun run test",
