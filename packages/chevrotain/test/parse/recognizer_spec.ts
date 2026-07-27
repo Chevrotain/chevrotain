@@ -22,6 +22,7 @@ import {
   TokenType,
 } from "@chevrotain/types";
 import { MixedInParser } from "../../src/parse/parser/traits/parser_traits";
+import { AT_LEAST_ONE_IDX, MANY_IDX } from "../../src/parse/grammar/keys.js";
 
 function defineRecognizerSpecs(
   contextName: string,
@@ -481,6 +482,32 @@ function defineRecognizerSpecs(
         const parser = new ManyRepetitionRecovery(input);
         expect(parser.qualifiedName()).to.deep.equal(["a", "b", "c"]);
         expect(parser.errors.length).to.equal(1);
+      });
+
+      it("keeps recovery metadata separate for repetition methods", () => {
+        class SharedOccurrenceRecoveryParser extends EmbeddedActionsParser {
+          constructor() {
+            super(ALL_TOKENS, { recoveryEnabled: true });
+            this.performSelfAnalysis();
+          }
+
+          public topRule = this.RULE("topRule", () => {
+            this.MANY(() => this.CONSUME(IdentTok));
+            this.CONSUME(PlusTok);
+            this.AT_LEAST_ONE(() => this.CONSUME(MinusTok));
+          });
+        }
+
+        const parser = new SharedOccurrenceRecoveryParser();
+        parser.input = [IdentTok, PlusTok, MinusTok].map((tokType) =>
+          createTokenInstance(tokType),
+        );
+        parser.topRule();
+
+        const cache = (parser as any).firstAfterRepMap[0];
+        expect(cache[MANY_IDX].token).to.equal(PlusTok);
+        expect(cache[AT_LEAST_ONE_IDX].isEndOfRule).to.equal(true);
+        expect(parser.errors).to.be.empty;
       });
 
       it("can disable in-repetition recovery for MANY grammar rule", () => {

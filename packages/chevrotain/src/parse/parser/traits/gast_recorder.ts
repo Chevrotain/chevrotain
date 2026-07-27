@@ -38,7 +38,6 @@ import {
   createTokenInstance,
 } from "../../../scan/tokens_public.js";
 import { END_OF_FILE } from "../parser.js";
-import { BITS_FOR_OCCURRENCE_IDX } from "../../grammar/keys.js";
 import { ParserMethodInternal } from "../types.js";
 
 type ProdWithDef = IProduction & { definition?: IProduction[] };
@@ -48,7 +47,7 @@ const RECORDING_NULL_OBJECT = {
 Object.freeze(RECORDING_NULL_OBJECT);
 
 const HANDLE_SEPARATOR = true;
-const MAX_METHOD_IDX = Math.pow(2, BITS_FOR_OCCURRENCE_IDX) - 1;
+const MAX_METHOD_IDX = 255;
 
 const RFT = createToken({ name: "RECORDING_PHASE_TOKEN", pattern: Lexer.NA });
 augmentTokenTypes([RFT]);

@@ -132,6 +132,103 @@ describe("lookahead Regular Tokens Mode", () => {
       const parser = new OptionsImplicitLookAheadParser(input);
       expect(parser.manyOptionsRule()).to.equal("6");
     });
+
+    it("restores the parent rule lookahead table after a nested rule", () => {
+      class NestedOptionsParser extends EmbeddedActionsParser {
+        constructor() {
+          super(ALL_TOKENS);
+          this.performSelfAnalysis();
+        }
+
+        public parent = this.RULE("parent", () => {
+          let result = this.SUBRULE(this.child);
+          this.OPTION(() => {
+            this.CONSUME(OneTok);
+            result += "-parent";
+          });
+          return result;
+        });
+
+        public child = this.RULE("child", () => {
+          let result = "";
+          this.OPTION(() => {
+            this.CONSUME(TwoTok);
+            result = "child";
+          });
+          return result;
+        });
+      }
+
+      const parser = new NestedOptionsParser();
+      parser.input = [createRegularToken(TwoTok), createRegularToken(OneTok)];
+
+      expect(parser.parent()).to.equal("child-parent");
+      expect(parser.errors).to.be.empty;
+    });
+
+    it("keeps DSL methods with the same occurrence separate", () => {
+      class SharedOccurrenceParser extends EmbeddedActionsParser {
+        constructor() {
+          super(ALL_TOKENS);
+          this.performSelfAnalysis();
+        }
+
+        public topRule = this.RULE("topRule", () => {
+          const result: string[] = [];
+          this.OPTION(() => {
+            this.CONSUME(OneTok);
+            result.push("option");
+          });
+          this.MANY(() => {
+            this.CONSUME(TwoTok);
+            result.push("many");
+          });
+          this.AT_LEAST_ONE(() => {
+            this.CONSUME(ThreeTok);
+            result.push("atLeastOne");
+          });
+          this.MANY_SEP({
+            SEP: Comma,
+            DEF: () => {
+              this.CONSUME(FourTok);
+              result.push("manySep");
+            },
+          });
+          this.AT_LEAST_ONE_SEP({
+            SEP: Comma,
+            DEF: () => {
+              this.CONSUME(FiveTok);
+              result.push("atLeastOneSep");
+            },
+          });
+          this.OR([
+            {
+              ALT: () => {
+                this.CONSUME(SixTok);
+                result.push("or");
+              },
+            },
+            { ALT: () => this.CONSUME(SevenTok) },
+          ]);
+          return result;
+        });
+      }
+
+      const parser = new SharedOccurrenceParser();
+      parser.input = [OneTok, TwoTok, ThreeTok, FourTok, FiveTok, SixTok].map(
+        (tokType) => createRegularToken(tokType),
+      );
+
+      expect(parser.topRule()).to.deep.equal([
+        "option",
+        "many",
+        "atLeastOne",
+        "manySep",
+        "atLeastOneSep",
+        "or",
+      ]);
+      expect(parser.errors).to.be.empty;
+    });
   });
 
   describe("The implicit lookahead calculation functionality of the Recognizer For MANY", () => {
