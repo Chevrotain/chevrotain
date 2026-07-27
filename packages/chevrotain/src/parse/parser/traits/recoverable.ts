@@ -42,11 +42,11 @@ export class InRuleRecoveryException extends Error {
  */
 export class Recoverable {
   recoveryEnabled: boolean;
-  firstAfterRepMap: Record<string, IFirstAfterRepetition>;
+  firstAfterRepMap: IFirstAfterRepetition[][];
   resyncFollows: Record<string, TokenType[]>;
 
   initRecoverable(config: IParserConfig) {
-    this.firstAfterRepMap = {};
+    this.firstAfterRepMap = [];
     this.resyncFollows = {};
 
     this.recoveryEnabled = Object.hasOwn(config, "recoveryEnabled")
@@ -441,15 +441,16 @@ export function attemptInRepetitionRecovery(
   nextToksWalker: typeof AbstractNextTerminalAfterProductionWalker,
   notStuck?: boolean,
 ): void {
-  const key = this.getKeyForAutomaticLookahead(dslMethodIdx, prodOccurrence);
-  let firstAfterRepInfo = this.firstAfterRepMap[key];
+  const key = dslMethodIdx | prodOccurrence;
+  const ruleCache = (this.firstAfterRepMap[this.currRuleShortName] ??= []);
+  let firstAfterRepInfo = ruleCache[key];
   if (firstAfterRepInfo === undefined) {
     const currRuleName = this.getCurrRuleFullName();
     const ruleGrammar = this.getGAstProductions()[currRuleName];
     const walker: AbstractNextTerminalAfterProductionWalker =
       new nextToksWalker(ruleGrammar, prodOccurrence);
     firstAfterRepInfo = walker.startWalking();
-    this.firstAfterRepMap[key] = firstAfterRepInfo;
+    ruleCache[key] = firstAfterRepInfo;
   }
 
   let expectTokAfterLastMatch = firstAfterRepInfo.token;

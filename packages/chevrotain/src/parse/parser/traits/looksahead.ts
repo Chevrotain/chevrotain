@@ -7,7 +7,6 @@ import {
 import {
   AT_LEAST_ONE_IDX,
   AT_LEAST_ONE_SEP_IDX,
-  getKeyForAutomaticLookahead,
   MANY_IDX,
   MANY_SEP_IDX,
   OPTION_IDX,
@@ -32,7 +31,10 @@ import { LLkLookaheadStrategy } from "../../grammar/llk_lookahead.js";
  */
 export class LooksAhead {
   maxLookahead: number;
-  lookAheadFuncsCache: any;
+  // Indexed by rule, then by the DSL method and occurrence local to that rule.
+  lookAheadFuncsCache: Function[][];
+  // Cached rule table for the active rule
+  currRuleLookaheadFuncs: Function[];
   dynamicTokensEnabled: boolean;
   lookaheadStrategy: ILookaheadStrategy;
 
@@ -49,7 +51,8 @@ export class LooksAhead {
       ? (config.lookaheadStrategy as ILookaheadStrategy) // assumes end user provides the correct config value/type
       : new LLkLookaheadStrategy({ maxLookahead: this.maxLookahead });
 
-    this.lookAheadFuncsCache = new Map();
+    this.lookAheadFuncsCache = [];
+    this.currRuleLookaheadFuncs = [];
   }
 
   preComputeLookaheadFunctions(this: MixedInParser, rules: Rule[]): void {
@@ -75,12 +78,11 @@ export class LooksAhead {
               dynamicTokensEnabled: this.dynamicTokensEnabled,
             });
 
-            const key = getKeyForAutomaticLookahead(
+            this.setLaFuncCache(
               this.fullRuleNameToShort[currRule.name],
-              OR_IDX,
-              currProd.idx,
+              OR_IDX | currProd.idx,
+              laFunc,
             );
-            this.setLaFuncCache(key, laFunc);
           });
         });
 
@@ -161,36 +163,27 @@ export class LooksAhead {
           dynamicTokensEnabled: this.dynamicTokensEnabled,
           prodType,
         });
-        const key = getKeyForAutomaticLookahead(
+        this.setLaFuncCache(
           this.fullRuleNameToShort[rule.name],
-          prodKey,
-          prodOccurrence,
+          prodKey | prodOccurrence,
+          laFunc,
         );
-        this.setLaFuncCache(key, laFunc);
       },
     );
   }
 
-  // this actually returns a number, but it is always used as a string (object prop key)
-  getKeyForAutomaticLookahead(
+  setLaFuncCache(
     this: MixedInParser,
-    dslMethodIdx: number,
-    occurrence: number,
-  ): number {
-    return getKeyForAutomaticLookahead(
-      this.currRuleShortName,
-      dslMethodIdx,
-      occurrence,
-    );
-  }
-
-  getLaFuncFromCache(this: MixedInParser, key: number): Function {
-    return this.lookAheadFuncsCache.get(key);
-  }
-
-  /* istanbul ignore next */
-  setLaFuncCache(this: MixedInParser, key: number, value: Function): void {
-    this.lookAheadFuncsCache.set(key, value);
+    ruleIdx: number,
+    key: number,
+    value: Function,
+  ): void {
+    let ruleLookaheadFuncs = this.lookAheadFuncsCache[ruleIdx];
+    if (ruleLookaheadFuncs === undefined) {
+      ruleLookaheadFuncs = [];
+      this.lookAheadFuncsCache[ruleIdx] = ruleLookaheadFuncs;
+    }
+    ruleLookaheadFuncs[key] = value;
   }
 }
 

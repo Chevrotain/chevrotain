@@ -20,8 +20,6 @@ import {
 import {
   AT_LEAST_ONE_IDX,
   AT_LEAST_ONE_SEP_IDX,
-  BITS_FOR_METHOD_TYPE,
-  BITS_FOR_OCCURRENCE_IDX,
   MANY_IDX,
   MANY_SEP_IDX,
   OPTION_IDX,
@@ -75,9 +73,8 @@ export class RecognizerEngine {
   definedRulesNames: string[];
   tokensMap: { [fqn: string]: TokenType };
   gastProductionsCache: Record<string, Rule>;
-  shortRuleNameToFull: Record<string, string>;
+  shortRuleNameToFull: string[];
   fullRuleNameToShort: Record<string, number>;
-  // The shortName Index must be coded "after" the first 8bits to enable building unique lookahead keys
   ruleShortNameIdx: number;
   tokenMatcher: TokenMatcher;
   subruleIdx: number;
@@ -91,12 +88,12 @@ export class RecognizerEngine {
   ) {
     this.className = this.constructor.name;
     // TODO: would using an ES6 Map or plain object be faster (CST building scenario)
-    this.shortRuleNameToFull = {};
+    this.shortRuleNameToFull = [];
     this.fullRuleNameToShort = {};
-    this.ruleShortNameIdx = 256;
+    this.ruleShortNameIdx = 0;
     this.tokenMatcher = tokenStructuredMatcherNoCategories;
     this.subruleIdx = 0;
-    this.currRuleShortName = 0;
+    this.currRuleShortName = -1;
 
     this.definedRulesNames = [];
     this.tokensMap = {};
@@ -214,12 +211,7 @@ export class RecognizerEngine {
       ? (config.recoveryValueFunc as () => R) // assumes end user provides the correct config value/type
       : DEFAULT_RULE_CONFIG.recoveryValueFunc;
 
-    // performance optimization: Use small integers as keys for the longer human readable "full" rule names.
-    // this greatly improves Map access time (as much as 8% for some performance benchmarks).
-    const shortName =
-      this.ruleShortNameIdx << (BITS_FOR_METHOD_TYPE + BITS_FOR_OCCURRENCE_IDX);
-
-    this.ruleShortNameIdx++;
+    const shortName = this.ruleShortNameIdx++;
     this.shortRuleNameToFull[shortName] = ruleName;
     this.fullRuleNameToShort[ruleName] = shortName;
 
@@ -341,7 +333,7 @@ export class RecognizerEngine {
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
     occurrence: number,
   ): OUT | undefined {
-    const key = this.getKeyForAutomaticLookahead(OPTION_IDX, occurrence);
+    const key = OPTION_IDX | occurrence;
     return this.optionInternalLogic(actionORMethodDef, occurrence, key);
   }
 
@@ -351,7 +343,7 @@ export class RecognizerEngine {
     occurrence: number,
     key: number,
   ): OUT | undefined {
-    let lookAheadFunc = this.getLaFuncFromCache(key);
+    let lookAheadFunc = this.currRuleLookaheadFuncs[key];
     let action: GrammarAction<OUT>;
     if (typeof actionORMethodDef !== "function") {
       action = actionORMethodDef.DEF;
@@ -378,15 +370,8 @@ export class RecognizerEngine {
     prodOccurrence: number,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
   ): void {
-    const laKey = this.getKeyForAutomaticLookahead(
-      AT_LEAST_ONE_IDX,
-      prodOccurrence,
-    );
-    return this.atLeastOneInternalLogic(
-      prodOccurrence,
-      actionORMethodDef,
-      laKey,
-    );
+    const key = AT_LEAST_ONE_IDX | prodOccurrence;
+    return this.atLeastOneInternalLogic(prodOccurrence, actionORMethodDef, key);
   }
 
   atLeastOneInternalLogic<OUT>(
@@ -395,7 +380,7 @@ export class RecognizerEngine {
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
     key: number,
   ): void {
-    let lookAheadFunc = this.getLaFuncFromCache(key);
+    let lookAheadFunc = this.currRuleLookaheadFuncs[key];
     let action;
     if (typeof actionORMethodDef !== "function") {
       action = actionORMethodDef.DEF;
@@ -447,11 +432,8 @@ export class RecognizerEngine {
     prodOccurrence: number,
     options: AtLeastOneSepMethodOpts<OUT>,
   ): void {
-    const laKey = this.getKeyForAutomaticLookahead(
-      AT_LEAST_ONE_SEP_IDX,
-      prodOccurrence,
-    );
-    this.atLeastOneSepFirstInternalLogic(prodOccurrence, options, laKey);
+    const key = AT_LEAST_ONE_SEP_IDX | prodOccurrence;
+    this.atLeastOneSepFirstInternalLogic(prodOccurrence, options, key);
   }
 
   atLeastOneSepFirstInternalLogic<OUT>(
@@ -463,7 +445,7 @@ export class RecognizerEngine {
     const action = options.DEF;
     const separator = options.SEP;
 
-    const firstIterationLookaheadFunc = this.getLaFuncFromCache(key);
+    const firstIterationLookaheadFunc = this.currRuleLookaheadFuncs[key];
 
     // 1st iteration
     if (firstIterationLookaheadFunc.call(this) === true) {
@@ -513,8 +495,8 @@ export class RecognizerEngine {
     prodOccurrence: number,
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
   ): void {
-    const laKey = this.getKeyForAutomaticLookahead(MANY_IDX, prodOccurrence);
-    return this.manyInternalLogic(prodOccurrence, actionORMethodDef, laKey);
+    const key = MANY_IDX | prodOccurrence;
+    return this.manyInternalLogic(prodOccurrence, actionORMethodDef, key);
   }
 
   manyInternalLogic<OUT>(
@@ -523,7 +505,7 @@ export class RecognizerEngine {
     actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
     key: number,
   ) {
-    let lookaheadFunction = this.getLaFuncFromCache(key);
+    let lookaheadFunction = this.currRuleLookaheadFuncs[key];
     let action;
     if (typeof actionORMethodDef !== "function") {
       action = actionORMethodDef.DEF;
@@ -566,11 +548,8 @@ export class RecognizerEngine {
     prodOccurrence: number,
     options: ManySepMethodOpts<OUT>,
   ): void {
-    const laKey = this.getKeyForAutomaticLookahead(
-      MANY_SEP_IDX,
-      prodOccurrence,
-    );
-    this.manySepFirstInternalLogic(prodOccurrence, options, laKey);
+    const key = MANY_SEP_IDX | prodOccurrence;
+    this.manySepFirstInternalLogic(prodOccurrence, options, key);
   }
 
   manySepFirstInternalLogic<OUT>(
@@ -581,7 +560,7 @@ export class RecognizerEngine {
   ): void {
     const action = options.DEF;
     const separator = options.SEP;
-    const firstIterationLaFunc = this.getLaFuncFromCache(key);
+    const firstIterationLaFunc = this.currRuleLookaheadFuncs[key];
 
     // 1st iteration
     if (firstIterationLaFunc.call(this) === true) {
@@ -669,10 +648,10 @@ export class RecognizerEngine {
     altsOrOpts: IOrAlt<any>[] | OrMethodOpts<unknown>,
     occurrence: number,
   ): T {
-    const laKey = this.getKeyForAutomaticLookahead(OR_IDX, occurrence);
+    const key = OR_IDX | occurrence;
     const alts = Array.isArray(altsOrOpts) ? altsOrOpts : altsOrOpts.DEF;
 
-    const laFunc = this.getLaFuncFromCache(laKey);
+    const laFunc = this.currRuleLookaheadFuncs[key];
     const altIdxToTake = laFunc.call(this, alts);
     if (altIdxToTake !== undefined) {
       const chosenAlternative: any = alts[altIdxToTake];
@@ -688,11 +667,12 @@ export class RecognizerEngine {
     this.RULE_STACK_IDX--;
     this.RULE_OCCURRENCE_STACK_IDX--;
 
-    // Restore the cached short name to the parent rule.
-    // When the stack is empty (top-level rule exiting), the stale value
-    // is harmless — no DSL methods will be called before the next ruleInvocationStateUpdate.
+    // Restore the parent rule's cached index and lookahead table. When the stack
+    // is empty, stale values are harmless because the next rule entry replaces them.
     if (this.RULE_STACK_IDX >= 0) {
       this.currRuleShortName = this.RULE_STACK[this.RULE_STACK_IDX];
+      this.currRuleLookaheadFuncs =
+        this.lookAheadFuncsCache[this.currRuleShortName];
     }
 
     // NOOP when cst is disabled
@@ -850,9 +830,11 @@ export class RecognizerEngine {
       this.RULE_STACK[i] = saved[i];
     }
     this.RULE_STACK_IDX = saved.length - 1;
-    // Restore cached short name from the restored stack
+    // Restore the current-rule caches from the restored stack.
     if (this.RULE_STACK_IDX >= 0) {
       this.currRuleShortName = this.RULE_STACK[this.RULE_STACK_IDX];
+      this.currRuleLookaheadFuncs =
+        this.lookAheadFuncsCache[this.currRuleShortName];
     }
   }
 
@@ -866,6 +848,7 @@ export class RecognizerEngine {
       idxInCallingRule;
     this.RULE_STACK[++this.RULE_STACK_IDX] = shortName;
     this.currRuleShortName = shortName;
+    this.currRuleLookaheadFuncs = this.lookAheadFuncsCache[shortName];
     // NOOP when cst is disabled
     this.cstInvocationStateUpdate(fullName);
   }
@@ -890,7 +873,8 @@ export class RecognizerEngine {
   public reset(this: MixedInParser): void {
     this.resetLexerState();
     this.subruleIdx = 0;
-    this.currRuleShortName = 0;
+    this.currRuleShortName = -1;
+    this.currRuleLookaheadFuncs = [];
     this.isBackTrackingStack = [];
     this.errors = [];
     // Reset depth counters but keep arrays allocated to avoid re-allocation.
