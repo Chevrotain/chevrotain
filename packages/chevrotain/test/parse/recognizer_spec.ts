@@ -492,6 +492,8 @@ function defineRecognizerSpecs(
           }
 
           public topRule = this.RULE("topRule", () => {
+            // Both repetitions use occurrence 0,
+            // so to work properly the DSL method must be part of the cache key.
             this.MANY(() => this.CONSUME(IdentTok));
             this.CONSUME(PlusTok);
             this.AT_LEAST_ONE(() => this.CONSUME(MinusTok));
@@ -505,6 +507,7 @@ function defineRecognizerSpecs(
         parser.topRule();
 
         const cache = (parser as any).firstAfterRepMap[0];
+        // MANY is followed by PlusTok, while AT_LEAST_ONE ends the rule.
         expect(cache[MANY_IDX].token).to.equal(PlusTok);
         expect(cache[AT_LEAST_ONE_IDX].isEndOfRule).to.equal(true);
         expect(parser.errors).to.be.empty;

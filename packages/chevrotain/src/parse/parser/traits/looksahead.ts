@@ -33,8 +33,7 @@ export class LooksAhead {
   maxLookahead: number;
   // Indexed by rule, then by the DSL method and occurrence local to that rule.
   lookAheadFuncsCache: Function[][];
-  // Cached rule table for the active rule. Rule entry, nested exit, state
-  // reload, and reset keep it synchronized with the parser's rule stack.
+  // Cached rule table for the active rule
   currRuleLookaheadFuncs: Function[];
   dynamicTokensEnabled: boolean;
   lookaheadStrategy: ILookaheadStrategy;
@@ -179,7 +178,12 @@ export class LooksAhead {
     key: number,
     value: Function,
   ): void {
-    (this.lookAheadFuncsCache[ruleIdx] ??= [])[key] = value;
+    let ruleLookaheadFuncs = this.lookAheadFuncsCache[ruleIdx];
+    if (ruleLookaheadFuncs === undefined) {
+      ruleLookaheadFuncs = [];
+      this.lookAheadFuncsCache[ruleIdx] = ruleLookaheadFuncs;
+    }
+    ruleLookaheadFuncs[key] = value;
   }
 }
 

@@ -143,6 +143,8 @@ describe("lookahead Regular Tokens Mode", () => {
         public parent = this.RULE("parent", () => {
           let result = this.SUBRULE(this.child);
           this.OPTION(() => {
+            // If the local rule lookahead table was not restored
+            // this consume would fail
             this.CONSUME(OneTok);
             result += "-parent";
           });
@@ -166,7 +168,7 @@ describe("lookahead Regular Tokens Mode", () => {
       expect(parser.errors).to.be.empty;
     });
 
-    it("keeps DSL methods with the same occurrence separate", () => {
+    it("Can locate lookahead functions for different DSL methods with the same occurrence", () => {
       class SharedOccurrenceParser extends EmbeddedActionsParser {
         constructor() {
           super(ALL_TOKENS);
