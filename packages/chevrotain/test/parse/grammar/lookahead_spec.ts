@@ -2,6 +2,7 @@ import { END_OF_FILE } from "../../../src/parse/parser/parser.js";
 import { createToken } from "../../../src/scan/tokens_public.js";
 import {
   buildAlternativesLookAheadFunc,
+  buildAlternativesLookAheadFuncK2,
   buildLookaheadFuncForOptionalProd,
   buildLookaheadFuncForOr,
   buildSingleAlternativeLookaheadFunction,
@@ -947,6 +948,18 @@ context("lookahead specs", () => {
         expect(laFunc.call(new MockParser([Alpha]))).to.equal(0);
         expect(laFunc.call(new MockParser([]))).to.equal(1); // empty alternative always matches
         expect(laFunc.call(new MockParser([Delta]))).to.equal(1); // empty alternative always matches
+      });
+
+      it("preserves empty alternative priority with K=2 paths", () => {
+        const laFunc = buildAlternativesLookAheadFuncK2(
+          [[[Alpha, Beta]], [[]], [[Alpha, Gamma]]],
+          false,
+          tokenStructuredMatcher,
+          false,
+        );
+
+        expect(laFunc.call(new MockParser([Alpha, Beta]))).to.equal(0);
+        expect(laFunc.call(new MockParser([Alpha, Gamma]))).to.equal(1);
       });
 
       it("simple optional - positive", () => {

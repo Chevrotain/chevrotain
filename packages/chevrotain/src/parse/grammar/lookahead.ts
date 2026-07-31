@@ -18,6 +18,7 @@ import {
 import {
   BaseParser,
   IOrAlt,
+  IToken,
   IProduction,
   IProductionWithOccurrence,
   LookaheadProductionType,
@@ -154,6 +155,155 @@ export function buildLookaheadFuncForOptionalProd(
 }
 
 export type Alternative = TokenType[][];
+
+interface K2OrCandidate {
+  alternative: number;
+  second?: TokenType;
+}
+
+function matchingTokenTypeIdxs(tokenType: TokenType): number[] {
+  return [tokenType.tokenTypeIdx!, ...tokenType.categoryMatches!];
+}
+
+function hasSharedFirstToken(paths: LookaheadSequence): boolean {
+  const seen = new Set<number>();
+  return paths.some((path) => {
+    return (
+      path.length > 0 &&
+      matchingTokenTypeIdxs(path[0]).some((tokenTypeIdx) => {
+        if (seen.has(tokenTypeIdx)) {
+          return true;
+        }
+        seen.add(tokenTypeIdx);
+        return false;
+      })
+    );
+  });
+}
+
+function buildK2AlternativesLookAheadFunc(
+  alts: LookaheadSequence[],
+  tokenMatcher: TokenMatcher,
+): () => number | undefined {
+  const candidatesByFirst: Record<number, K2OrCandidate[]> =
+    Object.create(null);
+  let emptyAlternative: number | undefined;
+
+  alts.forEach((alt, alternative) => {
+    alt.forEach((path) => {
+      if (path.length === 0) {
+        emptyAlternative ??= alternative;
+        return;
+      }
+      matchingTokenTypeIdxs(path[0]).forEach((tokenTypeIdx) => {
+        (candidatesByFirst[tokenTypeIdx] ??= []).push({
+          alternative,
+          second: path[1],
+        });
+      });
+    });
+  });
+
+  return function (this: BaseParser): number | undefined {
+    const candidates = candidatesByFirst[this.LA_FAST(1).tokenTypeIdx];
+    if (candidates === undefined) {
+      return emptyAlternative;
+    }
+
+    let secondToken: IToken | undefined;
+    for (let i = 0; i < candidates.length; i++) {
+      const candidate = candidates[i];
+      if (
+        emptyAlternative !== undefined &&
+        emptyAlternative < candidate.alternative
+      ) {
+        return emptyAlternative;
+      }
+      if (candidate.second === undefined) {
+        return candidate.alternative;
+      }
+      secondToken ??= this.LA_FAST(2);
+      if (tokenMatcher(secondToken, candidate.second)) {
+        return candidate.alternative;
+      }
+    }
+    return emptyAlternative;
+  };
+}
+
+function buildK2SingleAlternativeLookaheadFunction(
+  alt: LookaheadSequence,
+  tokenMatcher: TokenMatcher,
+): () => boolean {
+  const candidatesByFirst: Record<number, (TokenType | undefined)[]> =
+    Object.create(null);
+
+  alt.forEach((path) => {
+    matchingTokenTypeIdxs(path[0]).forEach((tokenTypeIdx) => {
+      (candidatesByFirst[tokenTypeIdx] ??= []).push(path[1]);
+    });
+  });
+
+  return function (this: BaseParser): boolean {
+    const candidates = candidatesByFirst[this.LA_FAST(1).tokenTypeIdx];
+    if (candidates === undefined) {
+      return false;
+    }
+
+    let secondToken: IToken | undefined;
+    for (let i = 0; i < candidates.length; i++) {
+      const second = candidates[i];
+      if (second === undefined) {
+        return true;
+      }
+      secondToken ??= this.LA_FAST(2);
+      if (tokenMatcher(secondToken, second)) {
+        return true;
+      }
+    }
+    return false;
+  };
+}
+
+export function buildAlternativesLookAheadFuncK2(
+  alts: LookaheadSequence[],
+  hasPredicates: boolean,
+  tokenMatcher: TokenMatcher,
+  dynamicTokensEnabled: boolean,
+): (orAlts: IOrAlt<any>[]) => number | undefined {
+  const maxPathLength = Math.max(
+    ...alts.flatMap((alt) => alt.map((path) => path.length)),
+  );
+  return !hasPredicates &&
+    !dynamicTokensEnabled &&
+    maxPathLength === 2 &&
+    hasSharedFirstToken(alts.flat())
+    ? buildK2AlternativesLookAheadFunc(alts, tokenMatcher)
+    : buildAlternativesLookAheadFunc(
+        alts,
+        hasPredicates,
+        tokenMatcher,
+        dynamicTokensEnabled,
+      );
+}
+
+export function buildSingleAlternativeLookaheadFunctionK2(
+  alt: LookaheadSequence,
+  tokenMatcher: TokenMatcher,
+  dynamicTokensEnabled: boolean,
+): () => boolean {
+  const maxPathLength = Math.max(...alt.map((path) => path.length));
+  return !dynamicTokensEnabled &&
+    maxPathLength === 2 &&
+    alt.every((path) => path.length > 0) &&
+    hasSharedFirstToken(alt)
+    ? buildK2SingleAlternativeLookaheadFunction(alt, tokenMatcher)
+    : buildSingleAlternativeLookaheadFunction(
+        alt,
+        tokenMatcher,
+        dynamicTokensEnabled,
+      );
+}
 
 export function buildAlternativesLookAheadFunc(
   alts: LookaheadSequence[],

@@ -15,10 +15,10 @@ import {
   validateSomeNonEmptyLookaheadPath,
 } from "./checks.js";
 import {
-  buildAlternativesLookAheadFunc,
+  buildAlternativesLookAheadFuncK2,
   buildLookaheadFuncForOptionalProd,
   buildLookaheadFuncForOr,
-  buildSingleAlternativeLookaheadFunction,
+  buildSingleAlternativeLookaheadFunctionK2,
   getProdType,
 } from "./lookahead.js";
 import { IParserDefinitionError } from "./types.js";
@@ -115,7 +115,7 @@ export class LLkLookaheadStrategy implements ILookaheadStrategy {
       options.maxLookahead,
       options.hasPredicates,
       options.dynamicTokensEnabled,
-      buildAlternativesLookAheadFunc,
+      buildAlternativesLookAheadFuncK2,
     );
   }
 
@@ -132,7 +132,7 @@ export class LLkLookaheadStrategy implements ILookaheadStrategy {
       options.maxLookahead,
       options.dynamicTokensEnabled,
       getProdType(options.prodType),
-      buildSingleAlternativeLookaheadFunction,
+      buildSingleAlternativeLookaheadFunctionK2,
     );
   }
 }
