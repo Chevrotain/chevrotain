@@ -1,3 +1,10 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Performance
+
+- [Faster parser lookahead function lookup](https://github.com/Chevrotain/chevrotain/pull/2196)
+  - Improves pure parsing (excluding lexing) throughput by approximately 3.5-10% on modern V8.
+
 ## 13.0.0 (7-25-2026)
 
 #### Breaking Changes
