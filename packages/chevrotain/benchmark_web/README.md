@@ -30,6 +30,15 @@ Lexing, worker messaging, checksums, error inspection, and result rendering are 
 
 The complete metadata, statistics, and raw samples from the last parser-only run are available as `window.lastParserBenchmarkRecords` in DevTools.
 
+The same paired parser-only benchmark can run on Node with local baseline and candidate bundles:
+
+```shell
+bun run benchmark:parser:node -- baseline.mjs candidate.mjs results.json
+```
+
+Run the script with the Node executable being measured. Each artifact runs in an isolated VM context on the same thread; the output contains the same metadata, statistics, and raw samples as the Chromium benchmark.
+The default two runs reverse artifact setup order to cancel context-initialization bias. Pass a larger even run count as the fourth argument for acceptance measurements.
+
 The ECMA5 parser input and Acorn lexer are fetched from versioned unpkg URLs, so ECMA5 runs require network access. The fetched input checksum is included in the benchmark metadata but is not enforced against a predefined value.
 
 For lexer, combined, and initialization scenarios, use the legacy latest-then-next flow:

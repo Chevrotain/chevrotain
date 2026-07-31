@@ -59,6 +59,7 @@
     "---------- DEV FLOWS --------": "",
     "watch": "tsc -w",
     "unit-tests": "mocha --enable-source-maps",
+    "benchmark:parser:node": "node --experimental-vm-modules ./benchmark_web/node_parser_benchmark.mjs",
     "quick-build": "tsc && npm-run-all bundle",
     "---------- BUILD STEPS --------": "",
     "clean": "rimraf coverage dev lib temp",

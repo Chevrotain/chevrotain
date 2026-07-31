@@ -148,4 +148,188 @@ Representative median local-build results across three independent runs:
 
 The prior one-message-per-parse path reported 13,248 JSON, 4,772 CSS, and 747 ECMA5 operations/sec in the same Chromium session. The difference is measurement overhead, not a library speedup: transport understated parser throughput by approximately 25% for JSON, 10% for CSS, and 2% for ECMA5.
 
-Per the mandatory review gate, implementation stops here pending human feedback. Deferred Phases 1-6 have not been started.
+Per the mandatory review gate, runtime implementation stopped here pending human feedback. The later Phase 1 potential check below was performed after approval.
+
+## Phase 1 Potential Results
+
+Phase 1 was experimentally evaluated on 2026-07-25. The baseline import was temporarily pinned to `chevrotain@13.0.0`; Phase 0 contains no parser runtime changes relative to that release. An unchanged local build compared neutral with the pinned bundle before the experiments: +0.26% JSON, +0.16% CSS, and -0.06% ECMA5 in one paired run.
+
+The source-level opportunity count per parse was:
+
+| Candidate                               |       JSON |                           CSS |          ECMA5 |
+| --------------------------------------- | ---------: | ----------------------------: | -------------: |
+| Skip disabled-recovery repetition setup | 133 arrays | 1,449 arrays and 222 closures |   9,297 arrays |
+| Remove gated OPTION wrapper             | 0 closures |                    0 closures | 2,711 closures |
+| Remove gated MANY/AT_LEAST_ONE wrappers |          0 |                             0 |              0 |
+| Remove gated OR predicate array         |          0 |                             0 |              0 |
+
+Three independent headless Chromium runs were collected for each implemented candidate. Each run used the Phase 0 harness's 25 alternating paired samples. The reported confidence intervals are 10,000-sample percentile bootstrap intervals over the 75 pooled paired ratios; RSD is calculated over the candidate parse-time samples.
+
+| Candidate                                | Grammar | Median paired change |           95% CI |   RSD | Independent run medians |
+| ---------------------------------------- | ------- | -------------------: | ---------------: | ----: | ----------------------- |
+| Guard disabled-recovery repetition setup | JSON    |               +0.09% | -0.09% to +0.18% | 2.02% | +0.09%, +0.09%, -0.09%  |
+|                                          | CSS     |               -0.72% | -1.08% to -0.42% | 2.14% | -1.13%, -0.68%, -0.55%  |
+|                                          | ECMA5   |               -0.23% | -0.54% to -0.03% | 1.63% | -0.39%, +0.20%, -0.36%  |
+| Direct gated OPTION branch               | JSON    |               -3.82% | -3.92% to -3.66% | 2.52% | -3.57%, -3.66%, -4.27%  |
+|                                          | CSS     |               +0.21% | +0.11% to +0.37% | 2.00% | +0.05%, +0.05%, +0.59%  |
+|                                          | ECMA5   |               +2.25% | +2.10% to +2.31% | 1.32% | +2.30%, +2.21%, +2.25%  |
+
+Environment: Node 26.5.0, Bun 1.3.11, headless Chromium 150, macOS. Every run stabilized and kept worker overhead below 1%.
+
+Both candidates were dropped. The repetition guards were neutral or slower despite making the allocation expressions unreachable. The direct gated OPTION branch produced a repeatable ECMA5 gain but missed the 5% targeted threshold and materially regressed JSON due to the changed shared function shape. A second OPTION layout that preserved the ungated source path produced the same result; the table reports that final layout. No combined candidate was measured because neither isolated candidate passed its acceptance threshold.
+
+Gated MANY, gated AT_LEAST_ONE, and gated OR were not implemented because the current samples execute none of those paths. A synthetic gated-OR probe showed that its kernel can improve, but it is outside the current workload target and direct gate access changes eager `GATE` getter semantics.
+
+The experimental runtime and test changes were reverted. Allocation and minor-GC profiling was not pursued because no throughput candidate survived and the current browser harness does not expose those metrics. Phase 1 therefore produces no parser runtime change.
+
+## Phase 2 Potential Results
+
+Phase 2 was experimentally evaluated on 2026-07-25 against a frozen local `e32c96b4` bundle built with the same toolchain as every candidate. Its SHA-256 was `8781bcb46b1f06cdd687fb19e4d54e01b1b42664557932cd6720d76859184a5a`. An unchanged local A/A run was neutral: -0.13% JSON, +0.41% CSS, and +0.33% ECMA5.
+
+Candidates with a material regression were stopped after one 25-pair screening session:
+
+| Candidate                              |   JSON |    CSS |  ECMA5 | Decision                           |
+| -------------------------------------- | -----: | -----: | -----: | ---------------------------------- |
+| No-recovery `consumeInternal`          | -3.45% | -0.50% | +0.21% | Dropped: material JSON regression  |
+| Combined no-CST terminal/subrule posts | -2.20% | +1.74% | +0.59% | Split because the result was mixed |
+| No-CST terminal post only              | -3.49% | -0.55% | -0.27% | Dropped: material JSON regression  |
+
+The remaining candidates completed three independent headless Chromium sessions. Each session used 25 alternating paired samples. Confidence intervals use 10,000 stratified paired bootstrap resamples within sessions; RSD is calculated over candidate parse-time samples.
+
+| Candidate                   | Grammar | Median paired change |           95% CI |   RSD | Independent run medians |
+| --------------------------- | ------- | -------------------: | ---------------: | ----: | ----------------------- |
+| No-CST subrule post only    | JSON    |               +1.05% | +0.86% to +1.30% | 1.14% | +1.04%, +1.46%, +0.68%  |
+|                             | CSS     |               +2.12% | +1.83% to +2.25% | 1.46% | +2.54%, +1.80%, +2.13%  |
+|                             | ECMA5   |               +1.22% | +0.75% to +1.61% | 1.09% | +2.78%, +0.35%, +0.63%  |
+| No-CST subrule catch        | JSON    |               -0.30% | -0.51% to -0.04% | 1.68% | -0.00%, +0.00%, -0.70%  |
+|                             | CSS     |               +0.36% | +0.16% to +0.42% | 1.31% | +0.77%, -0.10%, +0.26%  |
+|                             | ECMA5   |               +0.12% | +0.00% to +0.30% | 0.91% | +0.09%, +0.27%, +0.09%  |
+| No-CST rule lifecycle hooks | JSON    |               +0.26% | +0.00% to +0.52% | 1.38% | +0.26%, +0.61%, -0.00%  |
+|                             | CSS     |               +0.89% | +0.57% to +1.28% | 1.19% | +1.71%, +1.26%, +0.41%  |
+|                             | ECMA5   |               +0.52% | +0.12% to +0.79% | 1.38% | +0.12%, +0.03%, +1.75%  |
+
+Environment: Node 26.5.0, Bun 1.3.11, headless Chromium 150, macOS. Every warmup stabilized. Candidate worker overhead checks remained below 1%; the A/A CSS post-measurement check was 1.03% after calibration had met the threshold.
+
+No candidate met the broad acceptance requirement of at least 2% on two workloads. The strongest result, removing successful no-CST subrule posting, reached +2.12% on CSS but only +1.05% on JSON and +1.22% on ECMA5. Removing terminal posting caused the same large JSON regression seen when changing other shared hot function shapes. Removing subrule catches and rule CST hooks was neutral to small.
+
+Because no isolated candidate survived, no combined or Node acceptance benchmark was run. The experimental runtime and test changes, local baseline artifact, and temporary baseline import were reverted. Allocation and minor-GC profiling was again skipped because no throughput candidate survived. Phase 2 therefore produces no parser runtime change.
+
+## Phase 3 Potential Results
+
+Phase 3 was experimentally evaluated on 2026-07-25 against the same frozen local `e32c96b4` bundle and toolchain used for Phase 2. Its SHA-256 was `8781bcb46b1f06cdd687fb19e4d54e01b1b42664557932cd6720d76859184a5a`. An unchanged local A/A run was neutral: +0.00% JSON, +0.67% CSS, and +0.21% ECMA5.
+
+Instrumentation showed that every timed nested rule invocation was zero-argument:
+
+| Opportunity per parse                 |  JSON |   CSS |  ECMA5 |
+| ------------------------------------- | ----: | ----: | -----: |
+| Root calls without arguments          |     1 |     1 |      1 |
+| Nested `SUBRULE` calls without `ARGS` | 1,607 | 4,122 | 20,301 |
+| Nested calls with `ARGS`              |     0 |     0 |      0 |
+
+Each candidate completed one stabilized Chromium screening session with 25 alternating paired samples:
+
+| Candidate                                |   JSON |    CSS |  ECMA5 | Decision                                           |
+| ---------------------------------------- | -----: | -----: | -----: | -------------------------------------------------- |
+| Direct no-argument `SUBRULE` dispatch    | +0.17% | -0.59% | +0.58% | Dropped: fewer than two plausible 1% gains         |
+| Additive zero-argument core wrapper      | -0.69% | -0.41% | +0.72% | Dropped: fewer than two plausible 1% gains         |
+| No-recovery nested wrapper without catch | +0.00% | +0.51% | +0.09% | Dropped: neutral; CSS overhead check reached 1.02% |
+
+Environment: Node 26.5.0, Bun 1.3.11, headless Chromium 150, macOS. Every warmup stabilized. Candidate S and W worker overhead checks remained below 1%; candidate N's CSS post-measurement check was 1.02% after calibration had met the threshold.
+
+The direct dispatch result shows that V8 already optimizes `apply(this, undefined)` effectively. Adding one zero-argument core wrapper per grammar rule, then replacing both the outer `apply` and inner rest/`impl.apply` path, remained neutral and increased wrapper count. Removing nested catches while retaining `finally` state unwinding was also neutral.
+
+The root-only fast path was not implemented because it has one event per parse and cannot meet the broad acceptance threshold without changing a shared wrapper shape. No candidate reached the promotion rule for three-session confidence intervals, so no combination, Node acceptance benchmark, or allocation profiling was run.
+
+The experimental runtime and test changes, local baseline artifact, and temporary baseline import were reverted. Phase 3 therefore produces no parser runtime change.
+
+## Phase 4 Potential Results
+
+Phase 4 was experimentally evaluated on 2026-07-25 against the same frozen local `e32c96b4` bundle and toolchain used for Phases 2-3. Its SHA-256 was `8781bcb46b1f06cdd687fb19e4d54e01b1b42664557932cd6720d76859184a5a`. An unchanged local A/A run was neutral: +0.26% JSON, +0.87% CSS, and -0.18% ECMA5.
+
+The exact valid-workload opportunities were:
+
+| Opportunity per parse                             |  JSON |   CSS |  ECMA5 |
+| ------------------------------------------------- | ----: | ----: | -----: |
+| Non-separated repetition bodies                   |   725 | 1,002 |  3,596 |
+| Progress-helper method calls removable            | 2,900 | 4,008 | 14,384 |
+| Proven `MANY_SEP` separators consumed generically |     0 |   336 |      0 |
+| Stuck/zero-progress bodies                        |     0 |     0 |      0 |
+
+Each implemented candidate completed one stabilized Chromium screening session with 25 alternating paired samples:
+
+| Candidate                             |   JSON |    CSS |  ECMA5 | Decision                                                    |
+| ------------------------------------- | -----: | -----: | -----: | ----------------------------------------------------------- |
+| Known-match `MANY_SEP` consumption    | +0.09% | -1.05% | -0.97% | Dropped: CSS missed the targeted 5% threshold and regressed |
+| Direct `currIdx` progress upper bound | +0.13% | +1.04% | -1.32% | Dropped: fewer than two plausible 1% gains                  |
+
+Environment: Node 26.5.0, Bun 1.3.11, headless Chromium 150, macOS. Every warmup stabilized and worker overhead checks remained below 1%.
+
+The separator candidate successfully removed the second category-aware token match for all 336 CSS separators while preserving token advancement and CST posting, but the changed loop shape was slower. The progress candidate removed the complete default `getLexerPosition -> exportLexerState` method chain, yet only CSS reached +1%; V8 already inlines the default path effectively. Because this unsafe upper bound was not promising, the custom-adapter-safe selector was not implemented.
+
+Progress-before-lookahead ordering was intentionally skipped. Valid benchmark actions never get stuck, so it removes no work and would change observable gate/custom-lookahead callback counts only for invalid or runtime-conditional grammar flow.
+
+No candidate reached promotion to three-session confidence intervals. No combination, Node acceptance benchmark, or allocation profiling was run. The experimental runtime and test changes, local baseline artifact, and temporary baseline import were reverted. Phase 4 therefore produces no parser runtime change.
+
+## Phase 5 Potential Results
+
+Phase 5 was experimentally evaluated on 2026-07-26 against the same frozen local `e32c96b4` bundle used for Phases 2-4. An unchanged local Chromium A/A run was neutral: +0.17% JSON, -0.16% CSS, and +0.32% ECMA5.
+
+The measured opportunities per parse were:
+
+| Opportunity                                    |  JSON |   CSS |          ECMA5 |
+| ---------------------------------------------- | ----: | ----: | -------------: |
+| Lookahead-cache reads                          | 1,125 | 4,848 |         26,512 |
+| Current K>1 `LA_FAST` reads                    |     - |     - |         44,474 |
+| Modeled indexed K=2 `LA_FAST` reads            |     - |     - |          2,321 |
+| Generic concrete/category-parent token matches |     - |     - | 37,228 / 7,246 |
+
+Three candidates were screened independently in headless Chromium with 25 alternating paired samples per session:
+
+| Candidate                                      |   JSON |    CSS |   ECMA5 | Decision                                     |
+| ---------------------------------------------- | -----: | -----: | ------: | -------------------------------------------- |
+| Compact per-rule lookahead tables, median of 3 | +5.36% | +9.32% | +11.28% | Cross-engine validation                      |
+| Indexed static K=2 paths                       | -0.51% | +0.50% | +17.54% | Cross-engine validation                      |
+| Per-expected-token direct matching             | -0.25% | -0.20% |  +0.50% | Dropped: neutral                             |
+| Combined tables and indexed K=2 paths          | +6.27% | +2.88% | +24.97% | Not retained independently of its components |
+
+The compact-table candidate failed under Bun 1.3.11: -0.76% JSON, -1.66% CSS, and -2.10% ECMA5. It was dropped despite its repeatable Chromium gains.
+
+The K=2 candidate was narrowed to shared first-token prefixes and dispatched outside the existing generic builders to preserve their runtime shape. Its final cross-engine screening results were:
+
+| Engine       |   JSON |    CSS |   ECMA5 |
+| ------------ | -----: | -----: | ------: |
+| Chromium 150 | +0.26% | +1.04% | +16.78% |
+| Node 26.5.0  | -2.71% | -0.44% |  +6.72% |
+| Bun 1.3.11   | -0.11% | +0.53% | +12.85% |
+
+The K=2 specialization exceeded the targeted 5% ECMA5 threshold in every engine, but Node's material JSON regression violated the non-target neutrality requirement. All 791 unit tests, including an empty-alternative priority regression test, passed while the candidate was present.
+
+No Phase 5 candidate met the cross-engine acceptance gate. The experimental runtime and test changes, local baseline artifact, and temporary baseline import were reverted. Phase 5 therefore produces no parser runtime change.
+
+## V8-First Lookahead Follow-Up
+
+Lookahead experiments were revisited on 2026-07-26 with Chromium and Node treated as acceptance engines and Bun performance made advisory. A retained Node parser-only runner now executes both artifacts in isolated VM contexts on one thread, reuses the Chromium calibration/statistics code, and reverses setup order between runs. Balanced A/A sessions were within 1% after pooling on Node 24.18.0 and Node 26.5.0.
+
+A runtime-weighted census reduced the candidate set:
+
+| Grammar | LL(1) decisions/calls | Shared K=2 decisions/calls | Other executed shapes |
+| ------- | --------------------: | -------------------------: | --------------------: |
+| JSON    |             6 / 1,850 |                      0 / 0 |                     0 |
+| CSS     |            34 / 5,850 |                      0 / 0 |                     0 |
+| ECMA5   |           54 / 28,433 |                  5 / 1,621 |                     0 |
+
+One-path K>1, mixed K=2, and gated decisions were not implemented because the benchmark executes none of them. The remaining independent candidates completed one screening session per engine unless noted:
+
+| Candidate                           |  Chromium JSON/CSS/ECMA5 |   Node 24 JSON/CSS/ECMA5 |   Node 26 JSON/CSS/ECMA5 | Decision                                                                                    |
+| ----------------------------------- | -----------------------: | -----------------------: | -----------------------: | ------------------------------------------------------------------------------------------- |
+| Compact per-rule tables             | +6.41% / +3.64% / +5.84% | +2.05% / +0.31% / +0.43% | +1.28% / -1.09% / -1.42% | Dropped: Chromium win did not generalize to Node; medians of 3 Chromium and 2 Node sessions |
+| Cache shared K=2 token reads        | +1.79% / +0.10% / -0.94% | -0.26% / -0.59% / +1.23% | -0.19% / +0.35% / +0.23% | Dropped: neutral                                                                            |
+| Direct numeric key composition      | -4.36% / +0.36% / -0.81% | -0.84% / -0.46% / +2.50% | -0.74% / +1.04% / +0.67% | Dropped: Chromium JSON regression                                                           |
+| Direct `Map.get` at DSL call sites  | -4.00% / +0.05% / +0.30% | -0.25% / +0.25% / +1.30% | -1.89% / +1.29% / +1.96% | Dropped: JSON regression                                                                    |
+| Fixed comparisons for 1-4 LL(1) IDs | +7.20% / +0.87% / +1.21% | +0.35% / -1.58% / -0.28% | +1.84% / -3.79% / +3.34% | Dropped: Node CSS regression                                                                |
+| Dense typed LL(1) tables            | -2.82% / -0.10% / -1.69% | -0.94% / -0.60% / +0.71% | -1.88% / -0.77% / -1.51% | Dropped: broad regressions                                                                  |
+| Current-rule inner-table pointer    | -0.26% / +1.52% / +4.89% | -4.16% / -7.81% / +2.06% | -0.08% / -0.07% / +1.88% | Dropped: Chrome gains did not generalize to Node 24                                         |
+
+The current-rule pointer candidate moved the outer table lookup to rule entry and restored the parent table on rule exit and backtracking-state reload. It passed all 791 unit tests, including a focused nested-rule restoration case. Results are medians of three Chromium and two balanced Node sessions; the advisory Bun screen was -6.39% JSON, -7.41% CSS, and -5.08% ECMA5.
+
+All experimental runtime and focused test changes were reverted. The Node benchmark runner and its documentation were retained; this follow-up produces no parser runtime change.
