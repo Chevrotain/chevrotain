@@ -1,5 +1,6 @@
 import {
   analyzeTokenTypes,
+  ASCII_CLASS_MATCH,
   charCodeToOptimizedIndex,
   CUSTOM_MATCH,
   DEFAULT_MODE,
@@ -546,6 +547,20 @@ export class Lexer {
               matchedImage = null;
             }
             break;
+          case ASCII_CLASS_MATCH: {
+            const asciiClass = currConfig.asciiClass!;
+            if (asciiClass[nextCharCode] !== 1) {
+              (currPattern as RegExp).lastIndex = 0;
+              break;
+            }
+            let endOffset = offset + 1;
+            while (asciiClass[orgText.charCodeAt(endOffset)] === 1) {
+              endOffset++;
+            }
+            imageLength = endOffset - offset;
+            (currPattern as RegExp).lastIndex = endOffset;
+            break;
+          }
           case REG_EXP_MATCH:
             (currPattern as RegExp).lastIndex = offset;
             imageLength = this.matchLength(currPattern as RegExp, text, offset);
@@ -712,6 +727,7 @@ export class Lexer {
                     groups,
                   ) !== null;
                 break;
+              case ASCII_CLASS_MATCH:
               case REG_EXP_MATCH:
                 (currPattern as RegExp).lastIndex = offset;
                 foundResyncPoint = (currPattern as RegExp).exec(text) !== null;
