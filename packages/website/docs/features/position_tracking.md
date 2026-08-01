@@ -7,7 +7,7 @@ This means:
 - start and end lines.
 - start and end columns.
 
-The level of position information tracking can be reduced by using the [**positionTracking**](https://chevrotain.io/documentation/13_1_0/interfaces/ILexerConfig.html#positionTracking) lexer config option.
+The level of position information tracking can be reduced by using the [**positionTracking**](https://chevrotain.io/documentation/13_2_0/interfaces/ILexerConfig.html#positionTracking) lexer config option.
 For example:
 
 ```javascript

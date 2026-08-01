@@ -18,7 +18,7 @@ $.RULE("Statement", (allowDeclaration) => {
 });
 ```
 
-Using the [Look Ahead](https://chevrotain.io/documentation/13_1_0/classes/CstParser.html#LA) method is often helpful with the use of Gates to determine if a path should be followed or not, for example:
+Using the [Look Ahead](https://chevrotain.io/documentation/13_2_0/classes/CstParser.html#LA) method is often helpful with the use of Gates to determine if a path should be followed or not, for example:
 
 ```javascript
 // foo(a, b, c)   - three arguments

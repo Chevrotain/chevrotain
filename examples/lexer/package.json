@@ -1,6 +1,6 @@
 {
   "name": "chevrotain_examples_lexer",
-  "version": "13.1.0",
+  "version": "13.2.0",
   "type": "module",
   "scripts": {
     "ci": "bun run test",

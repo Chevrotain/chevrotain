@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 13.2.0 (8-1-2026)
 
 #### Performance
 
