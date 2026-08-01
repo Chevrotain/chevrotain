@@ -24,11 +24,20 @@ const PATTERN = "PATTERN";
 export const DEFAULT_MODE = "defaultMode";
 export const MODES = "modes";
 
+export const SINGLE_CHAR_MATCH = 0;
+export const CUSTOM_MATCH = 1;
+export const REG_EXP_MATCH = 2;
+
+type MatchType =
+  | typeof SINGLE_CHAR_MATCH
+  | typeof CUSTOM_MATCH
+  | typeof REG_EXP_MATCH;
+
 export interface IPatternConfig {
   pattern: IRegExpExec | string;
   longerAlt: number[] | undefined;
   canLineTerminator: boolean;
-  isCustom: boolean;
+  matchType: MatchType;
   short: number | false;
   group: string | undefined | false;
   push: string | undefined;
@@ -244,7 +253,12 @@ export function analyzeTokenTypes(
           pattern: allTransformedPatterns[idx],
           longerAlt: patternIdxToLongerAltIdxArr[idx],
           canLineTerminator: patternIdxToCanLineTerminator[idx],
-          isCustom: patternIdxToIsCustom[idx],
+          matchType:
+            patternIdxToShort[idx] !== false
+              ? SINGLE_CHAR_MATCH
+              : patternIdxToIsCustom[idx]
+                ? CUSTOM_MATCH
+                : REG_EXP_MATCH,
           short: patternIdxToShort[idx],
           group: patternIdxToGroup[idx],
           push: patternIdxToPushMode[idx],
