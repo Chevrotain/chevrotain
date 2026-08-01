@@ -74,3 +74,22 @@ on performance inspections more quickly.
 However, this script is a legacy from before this project was re-structured into a mono-repo.
 So it does not take into account the (possible) need to re-build other sub-packages in this mono-repo.
 So **use with care**.
+
+### DFA lookahead microbenchmark
+
+The DFA benchmark compares the original lookahead builders, the production
+profitability selector, and a forced DFA using the actual production modules.
+It retains shared-path fanouts from x2 through the ECMA5 x22/x36 cases so the
+selection threshold can be reevaluated later.
+
+Build its local browser bundle from the repository root:
+
+```sh
+bunx esbuild packages/chevrotain/benchmark_web/lookahead_dfa_micro.ts \
+  --bundle --platform=browser --format=iife \
+  --alias:@chevrotain/gast=./packages/gast/src/api.ts \
+  --outfile=packages/chevrotain/benchmark_web/lookahead_dfa_micro.bundle.js
+```
+
+Then open `lookahead_dfa_micro.html` in Chrome. Add `?autorun` to start it
+automatically. The generated bundle is a local artifact and is not committed.
