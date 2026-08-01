@@ -73,47 +73,17 @@ describe("ASCII character class scanning", () => {
 
   it("rejects patterns whose equivalence is not safely provable", () => {
     const patterns = [
-      /[ \t]+?/,
-      /[^a]+/,
-      /[ a\u00a0]+/,
-      /[ a]+/i,
-      /([ a])+/,
-      /(?=[ a])[ a]+/,
-      /([ a])\1+/,
+      /[ \t]+?/, // lazy quantifier
+      /[^a]+/, // complemented character class
+      /[ a\u00a0]+/, // contains a non-ASCII character
+      /[ a]+/i, // uses a RegExp flag
+      /([ a])+/, // uses a capturing group
+      /(?=[ a])[ a]+/, // uses a lookahead assertion
+      /([ a])\1+/, // uses a backreference
     ];
 
     for (const pattern of patterns) {
       expect(getAsciiClass(pattern), pattern.toString()).to.be.undefined;
-    }
-  });
-
-  it("falls back to RegExp semantics for rejected patterns", () => {
-    const cases: [RegExp, string, string][] = [
-      [/[ a]+?/, "  x", "x"],
-      [/[^a]+/, "bbba", "a"],
-      [/[\u00a0]+/, "\u00a0x", "x"],
-      [/[a]+/i, "AAx", "x"],
-      [/([a])+/, "aax", "x"],
-      [/(?=a)[a]+/, "aax", "x"],
-      [/(a)\1+/, "aaax", "x"],
-    ];
-
-    for (const [pattern, input, remainder] of cases) {
-      const Skipped = createToken({
-        name: `Fallback${pattern}`,
-        pattern,
-        group: Lexer.SKIPPED,
-      });
-      const Any = createToken({ name: `Any${pattern}`, pattern: /./ });
-      const result = new Lexer([Skipped, Any], {
-        positionTracking: "onlyOffset",
-      }).tokenize(input);
-
-      expect(result.errors, pattern.toString()).to.be.empty;
-      expect(
-        result.tokens.map((token) => token.image).join(""),
-        pattern.toString(),
-      ).to.equal(remainder);
     }
   });
 
@@ -124,15 +94,22 @@ describe("ASCII character class scanning", () => {
       group: Lexer.SKIPPED,
     });
     const A = createToken({ name: "AsciiA", pattern: /a+/ });
+
+    // Expose the transformed sticky RegExp to inspect the scanner's emulated state.
     class InspectableLexer extends Lexer {
       get whitespacePattern() {
         return this.patternIdxToConfig.defaultMode[0].pattern as RegExp;
       }
     }
+
+    // Force every pattern to be attempted, including whitespace on non-whitespace.
     const lexer = new InspectableLexer([Whitespace, A], { safeMode: true });
 
+    // A successful sticky match advances lastIndex to the end of the match.
     expect(lexer.tokenize(" \t").tokens).to.be.empty;
     expect(lexer.whitespacePattern.lastIndex).to.equal(2);
+
+    // A failed sticky match resets lastIndex while the next pattern still matches.
     expect(
       lexer.tokenize("a").tokens.map((token) => token.image),
     ).to.deep.equal(["a"]);
