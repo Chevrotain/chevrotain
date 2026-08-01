@@ -1,4 +1,5 @@
 /.idea
+/.worktrees
 **/node_modules/
 
 # build artifacts

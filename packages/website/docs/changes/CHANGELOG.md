@@ -1,3 +1,12 @@
+## 13.2.0 (INSERT_DATE_HERE)
+
+#### Performance
+
+Together, these changes improve pure lexing throughput on modern V8 by approximately 6% in the CSS benchmark and 22% in the JSON benchmark.
+
+- [Faster lexer strategy dispatch using a switch statement](https://github.com/Chevrotain/chevrotain/pull/2201)
+- [Faster scanning for skipped ASCII character-class tokens](https://github.com/Chevrotain/chevrotain/pull/2200)
+
 ## 13.1.0 (7-31-2026)
 
 #### Performance
