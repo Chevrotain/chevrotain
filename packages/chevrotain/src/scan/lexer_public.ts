@@ -1,12 +1,15 @@
 import {
   analyzeTokenTypes,
   charCodeToOptimizedIndex,
+  CUSTOM_MATCH,
   DEFAULT_MODE,
   IAnalyzeResult,
   IPatternConfig,
   LineTerminatorOptimizedTester,
   performRuntimeChecks,
   performWarningRuntimeChecks,
+  REG_EXP_MATCH,
+  SINGLE_CHAR_MATCH,
   validatePatterns,
 } from "./lexer.js";
 import { PRINT_WARNING, timer, toFastProperties } from "@chevrotain/utils";
@@ -518,32 +521,35 @@ export class Lexer {
         payload = null;
 
         // manually in-lined because > 600 chars won't be in-lined in V8
-        const singleCharCode = currConfig.short;
-        if (singleCharCode !== false) {
-          if (nextCharCode === singleCharCode) {
-            // single character string
-            imageLength = 1;
-            matchedImage = currPattern as string;
-          }
-        } else if (currConfig.isCustom === true) {
-          match = (currPattern as IRegExpExec).exec(
-            orgText,
-            offset,
-            matchedTokens,
-            groups,
-          );
-          if (match !== null) {
-            matchedImage = match[0];
-            imageLength = matchedImage.length;
-            if ((match as CustomPatternMatcherReturn).payload !== undefined) {
-              payload = (match as CustomPatternMatcherReturn).payload;
+        switch (currConfig.matchType) {
+          case SINGLE_CHAR_MATCH:
+            if (nextCharCode === currConfig.short) {
+              // single character string
+              imageLength = 1;
+              matchedImage = currPattern as string;
             }
-          } else {
-            matchedImage = null;
-          }
-        } else {
-          (currPattern as RegExp).lastIndex = offset;
-          imageLength = this.matchLength(currPattern as RegExp, text, offset);
+            break;
+          case CUSTOM_MATCH:
+            match = (currPattern as IRegExpExec).exec(
+              orgText,
+              offset,
+              matchedTokens,
+              groups,
+            );
+            if (match !== null) {
+              matchedImage = match[0];
+              imageLength = matchedImage.length;
+              if ((match as CustomPatternMatcherReturn).payload !== undefined) {
+                payload = (match as CustomPatternMatcherReturn).payload;
+              }
+            } else {
+              matchedImage = null;
+            }
+            break;
+          case REG_EXP_MATCH:
+            (currPattern as RegExp).lastIndex = offset;
+            imageLength = this.matchLength(currPattern as RegExp, text, offset);
+            break;
         }
 
         // longer alts handling
@@ -561,7 +567,7 @@ export class Lexer {
 
               // single Char can never be a longer alt so no need to test it.
               // manually in-lined because > 600 chars won't be in-lined in V8
-              if (longerAltConfig.isCustom === true) {
+              if (longerAltConfig.matchType === CUSTOM_MATCH) {
                 match = (longerAltPattern as IRegExpExec).exec(
                   orgText,
                   offset,
@@ -690,23 +696,26 @@ export class Lexer {
             const currPattern = currConfig.pattern;
 
             // manually in-lined because > 600 chars won't be in-lined in V8
-            const singleCharCode = currConfig.short;
-            if (singleCharCode !== false) {
-              if (orgText.charCodeAt(offset) === singleCharCode) {
-                // single character string
-                foundResyncPoint = true;
-              }
-            } else if (currConfig.isCustom === true) {
-              foundResyncPoint =
-                (currPattern as IRegExpExec).exec(
-                  orgText,
-                  offset,
-                  matchedTokens,
-                  groups,
-                ) !== null;
-            } else {
-              (currPattern as RegExp).lastIndex = offset;
-              foundResyncPoint = (currPattern as RegExp).exec(text) !== null;
+            switch (currConfig.matchType) {
+              case SINGLE_CHAR_MATCH:
+                if (orgText.charCodeAt(offset) === currConfig.short) {
+                  // single character string
+                  foundResyncPoint = true;
+                }
+                break;
+              case CUSTOM_MATCH:
+                foundResyncPoint =
+                  (currPattern as IRegExpExec).exec(
+                    orgText,
+                    offset,
+                    matchedTokens,
+                    groups,
+                  ) !== null;
+                break;
+              case REG_EXP_MATCH:
+                (currPattern as RegExp).lastIndex = offset;
+                foundResyncPoint = (currPattern as RegExp).exec(text) !== null;
+                break;
             }
 
             if (foundResyncPoint === true) {
