@@ -1,4 +1,4 @@
-import { BaseRegExpVisitor } from "@chevrotain/regexp-to-ast";
+import { BaseRegExpVisitor, Quantifier, Set } from "@chevrotain/regexp-to-ast";
 import {
   IRegExpExec,
   Lexer,
@@ -27,14 +27,17 @@ export const MODES = "modes";
 export const SINGLE_CHAR_MATCH = 0;
 export const CUSTOM_MATCH = 1;
 export const REG_EXP_MATCH = 2;
+export const ASCII_CLASS_MATCH = 3;
 
 type MatchType =
   | typeof SINGLE_CHAR_MATCH
   | typeof CUSTOM_MATCH
-  | typeof REG_EXP_MATCH;
+  | typeof REG_EXP_MATCH
+  | typeof ASCII_CLASS_MATCH;
 
 export interface IPatternConfig {
   pattern: IRegExpExec | string;
+  asciiClass: Uint8Array | undefined;
   longerAlt: number[] | undefined;
   canLineTerminator: boolean;
   matchType: MatchType;
@@ -249,16 +252,25 @@ export function analyzeTokenTypes(
 
     patternIdxToConfig = allTransformedPatterns.map(
       (x, idx): IPatternConfig => {
+        const asciiClass =
+          patternIdxToGroup[idx] === undefined &&
+          patternIdxToLongerAltIdxArr[idx] === undefined
+            ? getAsciiClass(onlyRelevantTypes[idx].PATTERN)
+            : undefined;
+
         return {
           pattern: allTransformedPatterns[idx],
+          asciiClass,
           longerAlt: patternIdxToLongerAltIdxArr[idx],
           canLineTerminator: patternIdxToCanLineTerminator[idx],
           matchType:
-            patternIdxToShort[idx] !== false
-              ? SINGLE_CHAR_MATCH
-              : patternIdxToIsCustom[idx]
-                ? CUSTOM_MATCH
-                : REG_EXP_MATCH,
+            asciiClass !== undefined
+              ? ASCII_CLASS_MATCH
+              : patternIdxToShort[idx] !== false
+                ? SINGLE_CHAR_MATCH
+                : patternIdxToIsCustom[idx]
+                  ? CUSTOM_MATCH
+                  : REG_EXP_MATCH,
           short: patternIdxToShort[idx],
           group: patternIdxToGroup[idx],
           push: patternIdxToPushMode[idx],
@@ -359,6 +371,70 @@ export function analyzeTokenTypes(
     hasCustom: hasCustom,
     canBeOptimized: canBeOptimized,
   };
+}
+
+function getAsciiClass(pattern: unknown): Uint8Array | undefined {
+  // Flags may change character-set semantics, so only analyze plain RegExps.
+  if (!(pattern instanceof RegExp) || pattern.flags !== "") {
+    return undefined;
+  }
+
+  let ast;
+  try {
+    ast = getRegExpAst(pattern);
+  } catch {
+    return undefined;
+  }
+
+  // The fast scanner can only replace one alternative containing one atom.
+  if (ast.value.value.length !== 1 || ast.value.value[0].value.length !== 1) {
+    return undefined;
+  }
+
+  // Unwrap noncapturing single-atom groups while retaining the sole quantifier.
+  let atom = ast.value.value[0].value[0];
+  let quantifier: Quantifier | undefined;
+  while (atom.type === "Group") {
+    if (
+      atom.capturing ||
+      (atom.quantifier !== undefined && quantifier !== undefined) ||
+      atom.value.value.length !== 1 ||
+      atom.value.value[0].value.length !== 1
+    ) {
+      return undefined;
+    }
+    quantifier = atom.quantifier ?? quantifier;
+    atom = atom.value.value[0].value[0];
+  }
+
+  // The remaining atom must be a non-complement set repeated greedily 1+ times.
+  if (
+    atom.type !== "Set" ||
+    atom.complement ||
+    (atom.quantifier !== undefined && quantifier !== undefined)
+  ) {
+    return undefined;
+  }
+  quantifier = atom.quantifier ?? quantifier;
+  if (
+    quantifier?.atLeast !== 1 ||
+    quantifier.atMost !== Infinity ||
+    !quantifier.greedy
+  ) {
+    return undefined;
+  }
+
+  // Materialize ASCII membership, rejecting any code point outside the table.
+  const result = new Uint8Array(128);
+  for (const item of (atom as Set).value) {
+    const from = typeof item === "number" ? item : item.from;
+    const to = typeof item === "number" ? item : item.to;
+    if (from < 0 || to >= result.length) {
+      return undefined;
+    }
+    result.fill(1, from, to + 1);
+  }
+  return result;
 }
 
 export function validatePatterns(
