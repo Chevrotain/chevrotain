@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>DFA lookahead microbenchmark</title>
+    <style>
+      body {
+        font:
+          14px system-ui,
+          sans-serif;
+        margin: 24px;
+      }
+      button {
+        padding: 8px 16px;
+      }
+      table {
+        border-collapse: collapse;
+        margin-top: 16px;
+        width: 100%;
+      }
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 6px 8px;
+        text-align: right;
+      }
+      th:first-child,
+      th:nth-child(2),
+      td:first-child,
+      td:nth-child(2) {
+        text-align: left;
+      }
+      .fastest {
+        background: #dff4df;
+      }
+      #status {
+        margin-left: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>DFA lookahead microbenchmark</h1>
+    <p id="browser"></p>
+    <button id="run">Run</button><span id="status">Idle</span>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Variant</th>
+          <th>Million calls/s</th>
+          <th>vs original</th>
+          <th>RME</th>
+          <th>Build us</th>
+          <th>Selected</th>
+          <th>States</th>
+          <th>Transitions</th>
+          <th>Max candidates</th>
+        </tr>
+      </thead>
+      <tbody id="results"></tbody>
+    </table>
+    <script src="https://unpkg.com/lodash@4.17.21/lodash.min.js"></script>
+    <script src="https://unpkg.com/benchmark@2.1.4/benchmark.js"></script>
+    <script src="lookahead_dfa_micro.bundle.js"></script>
+  </body>
+</html>
