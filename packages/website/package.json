@@ -25,8 +25,8 @@
     "@vuepress/plugin-docsearch": "2.0.0-rc.123",
     "@vuepress/theme-default": "2.0.0-rc.123",
     "gitty": "3.7.2",
-    "jsonfile": "6.2.0",
-    "sass-embedded": "1.97.3",
+    "jsonfile": "6.2.1",
+    "sass-embedded": "1.100.0",
     "vuepress": "2.0.0-rc.26"
   }
 }
