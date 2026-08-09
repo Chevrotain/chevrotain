@@ -28,7 +28,7 @@
     },
     "examples/grammars": {
       "name": "chevrotain_examples_grammars",
-      "version": "12.0.0",
+      "version": "13.2.0",
       "dependencies": {
         "acorn": "8.8.0",
         "chevrotain": "workspace:*",
@@ -40,7 +40,7 @@
     },
     "examples/implementation_languages": {
       "name": "chevrotain_examples_implementation_languages",
-      "version": "12.0.0",
+      "version": "13.2.0",
       "dependencies": {
         "chevrotain": "workspace:*",
       },
@@ -51,14 +51,14 @@
     },
     "examples/lexer": {
       "name": "chevrotain_examples_lexer",
-      "version": "12.0.0",
+      "version": "13.2.0",
       "dependencies": {
         "chevrotain": "workspace:*",
       },
     },
     "examples/parser": {
       "name": "chevrotain_examples_parser",
-      "version": "12.0.0",
+      "version": "13.2.0",
       "dependencies": {
         "chevrotain": "workspace:*",
       },
@@ -68,14 +68,14 @@
     },
     "examples/tutorial": {
       "name": "chevrotain_examples_tutorial",
-      "version": "12.0.0",
+      "version": "13.2.0",
       "dependencies": {
         "chevrotain": "workspace:*",
       },
     },
     "packages/chevrotain": {
       "name": "chevrotain",
-      "version": "12.0.0",
+      "version": "13.2.0",
       "dependencies": {
         "@chevrotain/cst-dts-gen": "workspace:*",
         "@chevrotain/gast": "workspace:*",
@@ -101,7 +101,7 @@
     },
     "packages/cst-dts-gen": {
       "name": "@chevrotain/cst-dts-gen",
-      "version": "12.0.0",
+      "version": "13.2.0",
       "dependencies": {
         "@chevrotain/gast": "workspace:*",
         "@chevrotain/types": "workspace:*",
@@ -109,7 +109,7 @@
     },
     "packages/cst-dts-gen-test": {
       "name": "@chevrotain/cst-dts-gen-test",
-      "version": "12.0.0",
+      "version": "13.2.0",
       "dependencies": {
         "@chevrotain/cst-dts-gen": "workspace:*",
         "@chevrotain/gast": "workspace:*",
@@ -122,18 +122,26 @@
     },
     "packages/gast": {
       "name": "@chevrotain/gast",
-      "version": "12.0.0",
+      "version": "13.2.0",
       "dependencies": {
         "@chevrotain/types": "workspace:*",
       },
     },
+    "packages/lookahead-dfa-benchmark": {
+      "name": "@chevrotain/lookahead-dfa-benchmark",
+      "version": "13.2.0",
+      "dependencies": {
+        "@chevrotain/types": "workspace:*",
+        "chevrotain": "workspace:*",
+      },
+    },
     "packages/regexp-to-ast": {
       "name": "@chevrotain/regexp-to-ast",
-      "version": "12.0.0",
+      "version": "13.2.0",
     },
     "packages/types": {
       "name": "@chevrotain/types",
-      "version": "12.0.0",
+      "version": "13.2.0",
       "devDependencies": {
         "typedoc": "0.28.17",
         "typescript": "5.9.3",
@@ -141,11 +149,11 @@
     },
     "packages/utils": {
       "name": "@chevrotain/utils",
-      "version": "12.0.0",
+      "version": "13.2.0",
     },
     "packages/website": {
       "name": "@chevrotain/website",
-      "version": "12.0.0",
+      "version": "13.2.0",
       "devDependencies": {
         "@mdit-vue/shared": "3.0.2",
         "@vuepress/bundler-vite": "2.0.0-rc.26",
@@ -191,6 +199,8 @@
     "@chevrotain/cst-dts-gen-test": ["@chevrotain/cst-dts-gen-test@workspace:packages/cst-dts-gen-test"],
 
     "@chevrotain/gast": ["@chevrotain/gast@workspace:packages/gast"],
+
+    "@chevrotain/lookahead-dfa-benchmark": ["@chevrotain/lookahead-dfa-benchmark@workspace:packages/lookahead-dfa-benchmark"],
 
     "@chevrotain/regexp-to-ast": ["@chevrotain/regexp-to-ast@workspace:packages/regexp-to-ast"],
 

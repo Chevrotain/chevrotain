@@ -20,6 +20,7 @@ yarn-error.log
 /packages/**/.nyc_output
 /packages/chevrotain/.nyc_output
 /packages/chevrotain/coverage
+/packages/lookahead-dfa-benchmark/report/
 /packages/chevrotain/scripts/gh-pages
 /packages/chevrotain/gh-pages
 

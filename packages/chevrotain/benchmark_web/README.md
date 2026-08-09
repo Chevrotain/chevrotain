@@ -77,19 +77,22 @@ So **use with care**.
 
 ### DFA lookahead microbenchmark
 
-The DFA benchmark compares the original lookahead builders, the production
-profitability selector, and a forced DFA using the actual production modules.
-It retains shared-path fanouts from x2 through the ECMA5 x22/x36 cases so the
-selection threshold can be reevaluated later.
+The DFA microbenchmark now runs in the private
+`@chevrotain/lookahead-dfa-benchmark` package. It compares the original
+lookahead implementation with the DFA using the actual production modules and
+marks which implementation the production profitability selector chooses.
 
-Build its local browser bundle from the repository root:
+Run the full benchmark from the repository root:
 
 ```sh
-bunx esbuild packages/chevrotain/benchmark_web/lookahead_dfa_micro.ts \
-  --bundle --platform=browser --format=iife \
-  --alias:@chevrotain/gast=./packages/gast/src/api.ts \
-  --outfile=packages/chevrotain/benchmark_web/lookahead_dfa_micro.bundle.js
+bun --filter @chevrotain/lookahead-dfa-benchmark benchmark
 ```
 
-Then open `lookahead_dfa_micro.html` in Chrome. Add `?autorun` to start it
-automatically. The generated bundle is a local artifact and is not committed.
+The full benchmark takes roughly 20 seconds. Its short smoke mode runs
+automatically in CI and validates the benchmark without collecting sustained
+performance measurements. Full results overwrite the ignored
+`packages/lookahead-dfa-benchmark/report/lookahead_dfa_benchmark.md` report.
+The report separately lists production choices that are more than the
+configurable `MAX_SELECTION_REGRESSION_PERCENT` slower than the alternative.
+The browser benchmark in this directory remains useful for JSON, CSS, and
+ECMAScript macrobenchmarks.

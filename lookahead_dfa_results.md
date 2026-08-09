@@ -96,19 +96,27 @@ about 22%, K3 x4 was neutral, and K3 x5 improved about 17%.
 
 ## Persistent Microbenchmark
 
-Files:
+Package: `packages/lookahead-dfa-benchmark`
 
-- `packages/chevrotain/benchmark_web/lookahead_dfa_micro.ts`
-- `packages/chevrotain/benchmark_web/lookahead_dfa_micro.html`
-- Build instructions in `packages/chevrotain/benchmark_web/README.md`
+The benchmark imports the real production modules, compares the original and
+DFA implementations, and marks which one the production selector chooses.
 
-The benchmark imports the real production modules and compares:
+Run it with:
 
-- Original builder.
-- Production-selected builder.
-- Forced DFA.
+```sh
+bun --filter @chevrotain/lookahead-dfa-benchmark benchmark
+```
 
-The generated browser bundle is intentionally not committed.
+The full benchmark takes roughly 20 seconds. CI runs a short smoke mode that
+verifies every scenario and timing path without collecting sustained
+measurements or asserting noisy throughput thresholds. Full results overwrite
+the ignored
+`packages/lookahead-dfa-benchmark/report/lookahead_dfa_benchmark.md` report.
+The report separately lists production choices that are more than the
+configurable `MAX_SELECTION_REGRESSION_PERCENT` slower than the alternative.
+The results below were measured using the original Chrome 151 browser harness
+and are retained as historical data; they are not directly comparable to
+Node.js measurements.
 
 ### OR Results
 
@@ -227,8 +235,9 @@ construction.
 Verification:
 
 - Focused DFA suite: 12 passing.
-- Full Chevrotain package: 799 passing.
-- Full monorepo CI: 13 of 13 tasks successful.
+- Full Chevrotain package: 803 passing.
+- DFA benchmark smoke: 30 scenarios and 60 variants passing.
+- Full monorepo CI: 14 of 14 tasks successful.
 - Formatting and TypeScript compilation pass.
 
 ## Recommendation
