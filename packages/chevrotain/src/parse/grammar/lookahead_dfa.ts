@@ -1,17 +1,18 @@
-import {
-  BaseParser,
-  IOrAlt,
-  LookaheadSequence,
-  TokenType,
-} from "@chevrotain/types";
+import { IOrAlt, LookaheadSequence, TokenType } from "@chevrotain/types";
 import { TokenMatcher } from "../parser/parser.js";
 import {
   buildAlternativesLookAheadFunc,
   buildSingleAlternativeLookaheadFunction,
 } from "./lookahead.js";
+import {
+  buildDenseDfaAlternativesLookAheadFunc,
+  buildDenseDfaSingleAlternativeLookaheadFunction,
+} from "./dfa/dense.js";
 
 const MIN_DFA_SCORE = 5;
 const MIN_SINGLE_DFA_CANDIDATES = 5;
+const MIN_OR_DFA_PATHS = 3;
+const MIN_SINGLE_DFA_PATHS = 4;
 const MAX_DFA_PATH_LENGTH = 32;
 
 interface DfaCandidate {
@@ -21,15 +22,18 @@ interface DfaCandidate {
   position: number;
 }
 
-interface DfaState {
-  transitions: Record<number, number>;
-  fallback: number | undefined;
+interface DfaTransition {
+  state: number;
+  tokenTypeIdx: number;
+  target: number;
 }
 
 export interface DfaLookaheadMachine {
   root: number | undefined;
-  states: DfaState[];
-  transitions: number;
+  fallbacks: (number | undefined)[];
+  transitions: DfaTransition[];
+  minTokenTypeIdx: number;
+  maxTokenTypeIdx: number;
   maxCandidates: number;
 }
 
@@ -38,19 +42,19 @@ function matchingTokenTypeIdxs(tokenType: TokenType): number[] {
 }
 
 /**
- * The DFA interpreter only pays off after enough repeated suffix comparisons are
- * removed. For each concrete first token, estimate that work as the sum of the
- * remaining path lengths. A score of five deliberately keeps K2 x2/x4 on the
- * original implementation while selecting wide/deep paths such as ECMA5's
- * Identifier x22 and LCurly x36 buckets.
+ * Dense dispatch pays off either when enough paths avoid the original ordered
+ * scan or when shared prefixes remove enough repeated suffix comparisons.
  */
 function isDfaLookaheadProfitableFor(
   alternatives: LookaheadSequence[],
   minCandidateCount: number,
+  minPathCount: number,
 ): boolean {
   let hasMultiTokenPath = false;
+  let pathCount = 0;
   for (const alternative of alternatives) {
     for (const path of alternative) {
+      pathCount++;
       // The compiler recursively advances one token per state. Preserve support
       // for unusually large maxLookahead values by using the original scanner.
       if (path.length > MAX_DFA_PATH_LENGTH) return false;
@@ -58,6 +62,7 @@ function isDfaLookaheadProfitableFor(
     }
   }
   if (!hasMultiTokenPath) return false;
+  if (pathCount >= minPathCount) return true;
 
   const candidatesByFirst: Record<
     number,
@@ -88,24 +93,27 @@ function isDfaLookaheadProfitableFor(
 }
 
 /**
- * OR starts paying off with fewer candidates than single-production lookahead
- * because the original implementation also scans preceding alternatives. The
- * retained benchmark shows the score threshold selects only measured wins.
+ * OR starts paying off with fewer paths than single-production lookahead because
+ * the original implementation also scans preceding alternatives.
  */
 export function isDfaLookaheadProfitable(
   alternatives: LookaheadSequence[],
 ): boolean {
-  return isDfaLookaheadProfitableFor(alternatives, 2);
+  return isDfaLookaheadProfitableFor(alternatives, 2, MIN_OR_DFA_PATHS);
 }
 
 /**
- * Single-production lookahead has a cheaper original loop. Chrome benchmarks
- * show K3 x3 regresses and K3 x4 is neutral, while x5 is consistently faster.
+ * Single-production lookahead has a cheaper original loop, so narrow fanout
+ * remains on the original implementation.
  */
 export function isDfaSingleLookaheadProfitable(
   alternative: LookaheadSequence,
 ): boolean {
-  return isDfaLookaheadProfitableFor([alternative], MIN_SINGLE_DFA_CANDIDATES);
+  return isDfaLookaheadProfitableFor(
+    [alternative],
+    MIN_SINGLE_DFA_CANDIDATES,
+    MIN_SINGLE_DFA_PATHS,
+  );
 }
 
 export function buildDfaLookaheadMachine(
@@ -133,9 +141,11 @@ export function buildDfaLookaheadMachine(
     }
   }
 
-  const states: DfaState[] = [];
+  const fallbacks: (number | undefined)[] = [];
+  const transitions: DfaTransition[] = [];
   const memoizedStates = new Map<string, number>();
-  let transitionCount = 0;
+  let minTokenTypeIdx = Infinity;
+  let maxTokenTypeIdx = -Infinity;
   let maxCandidates = 0;
 
   function encodeAlternative(alternative: number): number {
@@ -164,13 +174,12 @@ export function buildDfaLookaheadMachine(
     const memoizedState = memoizedStates.get(key);
     if (memoizedState !== undefined) return memoizedState;
 
-    const stateIdx = states.length;
+    const stateIdx = fallbacks.length;
     const fallback =
       completedAlternative === undefined
         ? undefined
         : encodeAlternative(completedAlternative);
-    const transitions: Record<number, number> = Object.create(null);
-    states.push({ fallback, transitions });
+    fallbacks.push(fallback);
     memoizedStates.set(key, stateIdx);
 
     const actualTokenTypeIdxs = new Set<number>();
@@ -208,8 +217,9 @@ export function buildDfaLookaheadMachine(
 
       const target = compileState(nextCandidates, nextCompletedAlternative);
       if (target !== undefined && target !== fallback) {
-        transitions[tokenTypeIdx] = target;
-        transitionCount++;
+        transitions.push({ state: stateIdx, tokenTypeIdx, target });
+        minTokenTypeIdx = Math.min(minTokenTypeIdx, tokenTypeIdx);
+        maxTokenTypeIdx = Math.max(maxTokenTypeIdx, tokenTypeIdx);
       }
     }
 
@@ -218,52 +228,11 @@ export function buildDfaLookaheadMachine(
 
   return {
     root: compileState(candidates, fallbackAlternative),
-    states,
-    transitions: transitionCount,
+    fallbacks,
+    transitions,
+    minTokenTypeIdx,
+    maxTokenTypeIdx,
     maxCandidates,
-  };
-}
-
-export function buildDfaAlternativesLookAheadFunc(
-  alternatives: LookaheadSequence[],
-): () => number | undefined {
-  const { root, states } = buildDfaLookaheadMachine(alternatives);
-  if (root === undefined) return () => undefined;
-  if (root < 0) {
-    const alternative = -root - 1;
-    return () => alternative;
-  }
-
-  return function (this: BaseParser): number | undefined {
-    let stateIdx = root;
-    for (let offset = 1; ; offset++) {
-      const state = states[stateIdx];
-      const target =
-        state.transitions[this.LA_FAST(offset).tokenTypeIdx] ?? state.fallback;
-      if (target === undefined) return undefined;
-      if (target < 0) return -target - 1;
-      stateIdx = target;
-    }
-  };
-}
-
-export function buildDfaSingleAlternativeLookaheadFunction(
-  alternative: LookaheadSequence,
-): () => boolean {
-  const { root, states } = buildDfaLookaheadMachine([alternative]);
-  if (root === undefined) return () => false;
-  if (root < 0) return () => true;
-
-  return function (this: BaseParser): boolean {
-    let stateIdx = root;
-    for (let offset = 1; ; offset++) {
-      const state = states[stateIdx];
-      const target =
-        state.transitions[this.LA_FAST(offset).tokenTypeIdx] ?? state.fallback;
-      if (target === undefined) return false;
-      if (target < 0) return true;
-      stateIdx = target;
-    }
   };
 }
 
@@ -273,16 +242,22 @@ export function buildAlternativesLookAheadFuncDfa(
   tokenMatcher: TokenMatcher,
   dynamicTokensEnabled: boolean,
 ): (orAlts: IOrAlt<any>[]) => number | undefined {
-  return !hasPredicates &&
+  if (
+    !hasPredicates &&
     !dynamicTokensEnabled &&
     isDfaLookaheadProfitable(alternatives)
-    ? buildDfaAlternativesLookAheadFunc(alternatives)
-    : buildAlternativesLookAheadFunc(
-        alternatives,
-        hasPredicates,
-        tokenMatcher,
-        dynamicTokensEnabled,
-      );
+  ) {
+    const dense = buildDenseDfaAlternativesLookAheadFunc(
+      buildDfaLookaheadMachine(alternatives),
+    );
+    if (dense !== undefined) return dense;
+  }
+  return buildAlternativesLookAheadFunc(
+    alternatives,
+    hasPredicates,
+    tokenMatcher,
+    dynamicTokensEnabled,
+  );
 }
 
 export function buildSingleAlternativeLookaheadFunctionDfa(
@@ -290,11 +265,15 @@ export function buildSingleAlternativeLookaheadFunctionDfa(
   tokenMatcher: TokenMatcher,
   dynamicTokensEnabled: boolean,
 ): () => boolean {
-  return !dynamicTokensEnabled && isDfaSingleLookaheadProfitable(alternative)
-    ? buildDfaSingleAlternativeLookaheadFunction(alternative)
-    : buildSingleAlternativeLookaheadFunction(
-        alternative,
-        tokenMatcher,
-        dynamicTokensEnabled,
-      );
+  if (!dynamicTokensEnabled && isDfaSingleLookaheadProfitable(alternative)) {
+    const dense = buildDenseDfaSingleAlternativeLookaheadFunction(
+      buildDfaLookaheadMachine([alternative]),
+    );
+    if (dense !== undefined) return dense;
+  }
+  return buildSingleAlternativeLookaheadFunction(
+    alternative,
+    tokenMatcher,
+    dynamicTokensEnabled,
+  );
 }

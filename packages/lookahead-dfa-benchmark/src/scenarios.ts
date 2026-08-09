@@ -33,6 +33,7 @@ const E = tokenType("E", 14);
 const F = tokenType("F", 15);
 const CATEGORY_AB = tokenType("CategoryAB", 20, [10, 11]);
 const CATEGORY_BC = tokenType("CategoryBC", 21, [11, 12]);
+const HIGH_A = tokenType("HighA", 100_000);
 
 function ending(idx: number): TokenType {
   return tokenType(`T${idx}`, 100 + idx);
@@ -67,6 +68,57 @@ function fanoutInputs(prefix: TokenType[], count: number): number[][] {
   ]);
 }
 
+function nonSharedK2Paths(count: number): TokenType[][] {
+  return Array.from({ length: count }, (_, idx) => [
+    ending(idx * 2),
+    ending(idx * 2 + 1),
+  ]);
+}
+
+function nonSharedK2Inputs(paths: TokenType[][]): number[][] {
+  const ids = paths.map((path) => path.map((token) => token.tokenTypeIdx!));
+  const middle = ids[Math.floor(ids.length / 2)];
+  return uniqueInputs([
+    ids[0],
+    middle,
+    ids[ids.length - 1],
+    [middle[0], 998],
+    [998],
+    [],
+  ]);
+}
+
+function earlyBiased(inputs: number[][]): number[][] {
+  const [first, ...rest] = inputs;
+  return [...Array.from({ length: rest.length * 4 }, () => first), ...rest];
+}
+
+function customFanoutOr(
+  prefix: TokenType[],
+  endingTokenTypeIdxs: number[],
+): LookaheadSequence[] {
+  return endingTokenTypeIdxs.map((tokenTypeIdx, idx) => [
+    [...prefix, tokenType(`CustomT${idx}`, tokenTypeIdx)],
+  ]);
+}
+
+function customFanoutInputs(
+  prefix: TokenType[],
+  endingTokenTypeIdxs: number[],
+): number[][] {
+  const prefixIds = prefix.map((token) => token.tokenTypeIdx!);
+  return [
+    [...prefixIds, endingTokenTypeIdxs[0]],
+    [
+      ...prefixIds,
+      endingTokenTypeIdxs[Math.floor(endingTokenTypeIdxs.length / 2)],
+    ],
+    [...prefixIds, endingTokenTypeIdxs[endingTokenTypeIdxs.length - 1]],
+    [...prefixIds, 998],
+    [],
+  ];
+}
+
 const MIXED_OR: LookaheadSequence[] = [
   [[A]],
   [[B, C]],
@@ -82,7 +134,7 @@ export const SCENARIOS: Scenario[] = [
     paths: fanoutOr([], 8),
     inputs: fanoutInputs([], 8),
   },
-  ...[2, 3, 4, 5, 8, 22, 36].map(
+  ...[2, 3, 4, 5, 8, 22, 31, 32, 33, 36].map(
     (count): Scenario => ({
       name: `OR K2 shared x${count}`,
       kind: "or",
@@ -90,6 +142,25 @@ export const SCENARIOS: Scenario[] = [
       inputs: fanoutInputs([A], count),
     }),
   ),
+  ...[2, 3, 4, 5, 8, 22, 36].flatMap((count): Scenario[] => {
+    const paths = nonSharedK2Paths(count);
+    const inputs = nonSharedK2Inputs(paths);
+    const alternatives = paths.map((path) => [path]);
+    return [
+      {
+        name: `OR K2 non-shared balanced x${count}`,
+        kind: "or",
+        paths: alternatives,
+        inputs,
+      },
+      {
+        name: `OR K2 non-shared early80 x${count}`,
+        kind: "or",
+        paths: alternatives,
+        inputs: earlyBiased(inputs),
+      },
+    ];
+  }),
   ...[2, 3, 4, 5, 8].map(
     (count): Scenario => ({
       name: `OR K3 shared x${count}`,
@@ -117,12 +188,30 @@ export const SCENARIOS: Scenario[] = [
     inputs: [[10, 11], [10, 12], [10, 998], [998], []],
   },
   {
+    name: "OR K2 high contiguous IDs x5",
+    kind: "or",
+    paths: customFanoutOr(
+      [HIGH_A],
+      [100_100, 100_101, 100_102, 100_103, 100_104],
+    ),
+    inputs: customFanoutInputs(
+      [HIGH_A],
+      [100_100, 100_101, 100_102, 100_103, 100_104],
+    ),
+  },
+  {
+    name: "OR K2 sparse IDs x5",
+    kind: "or",
+    paths: customFanoutOr([A], [100, 10_000, 20_000, 30_000, 40_000]),
+    inputs: customFanoutInputs([A], [100, 10_000, 20_000, 30_000, 40_000]),
+  },
+  {
     name: "Single K1 x8",
     kind: "single",
     paths: fanoutSingle([], 8),
     inputs: fanoutInputs([], 8),
   },
-  ...[2, 3, 4, 5, 8, 22, 36].map(
+  ...[2, 3, 4, 5, 8, 22, 31, 32, 33, 36].map(
     (count): Scenario => ({
       name: `Single K2 shared x${count}`,
       kind: "single",
@@ -130,6 +219,24 @@ export const SCENARIOS: Scenario[] = [
       inputs: fanoutInputs([A], count),
     }),
   ),
+  ...[2, 3, 4, 5, 8, 22, 36].flatMap((count): Scenario[] => {
+    const paths = nonSharedK2Paths(count);
+    const inputs = nonSharedK2Inputs(paths);
+    return [
+      {
+        name: `Single K2 non-shared balanced x${count}`,
+        kind: "single",
+        paths,
+        inputs,
+      },
+      {
+        name: `Single K2 non-shared early80 x${count}`,
+        kind: "single",
+        paths,
+        inputs: earlyBiased(inputs),
+      },
+    ];
+  }),
   ...[2, 3, 4, 5, 8].map(
     (count): Scenario => ({
       name: `Single K3 shared x${count}`,

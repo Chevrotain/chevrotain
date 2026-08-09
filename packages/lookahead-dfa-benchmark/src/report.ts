@@ -30,6 +30,8 @@ export function writeReport(
         100
       ).toFixed(1)}%`,
       "Build us": variant.buildMicros.toFixed(2),
+      Layout: variant.layout,
+      Cells: variant.cells ?? "-",
       "Production selected": variant.productionSelected,
       States: variant.states ?? "-",
       Transitions: variant.transitions ?? "-",

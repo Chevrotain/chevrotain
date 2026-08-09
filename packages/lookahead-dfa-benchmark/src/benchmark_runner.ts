@@ -2,7 +2,12 @@ import assert from "node:assert/strict";
 import { performance } from "node:perf_hooks";
 import type { IToken } from "@chevrotain/types";
 import { maxPathLength, type Scenario } from "./scenarios.ts";
-import { productionDecision, VARIANTS, type Variant } from "./variants.ts";
+import {
+  productionDecision,
+  VARIANTS,
+  type BuiltVariant,
+  type Variant,
+} from "./variants.ts";
 
 export interface BenchmarkOptions {
   batchSize: number;
@@ -22,6 +27,8 @@ export interface VariantResult {
   states?: number;
   transitions?: number;
   maxCandidates?: number;
+  layout: string;
+  cells?: number;
 }
 
 export interface SelectionError {
@@ -63,6 +70,8 @@ interface Measurement {
   name: string;
   callsPerSecond: number;
   buildMicros: number;
+  layout: string;
+  cells?: number;
 }
 
 const EOF_TOKEN = { tokenTypeIdx: 999999 } as IToken;
@@ -74,7 +83,7 @@ const parser: BenchmarkParser = {
   },
 };
 
-let buildSink: Function | undefined;
+let buildSink: BuiltVariant | undefined;
 let benchmarkChecksum = 0;
 
 function makeWorkload(
@@ -168,7 +177,7 @@ function measureRuntime(
 }
 
 function measureBuild(
-  builder: Variant["build"],
+  variant: Variant,
   scenario: Scenario,
   options: BenchmarkOptions,
 ): number {
@@ -176,7 +185,7 @@ function measureBuild(
   for (let sample = 0; sample < options.buildSamples; sample++) {
     const start = performance.now();
     for (let iteration = 0; iteration < options.buildsPerSample; iteration++) {
-      buildSink = builder(scenario);
+      buildSink = variant.build(scenario);
     }
     samples.push(
       ((performance.now() - start) * 1000) / options.buildsPerSample,
@@ -188,7 +197,8 @@ function measureBuild(
 }
 
 function assertEquivalent(scenario: Scenario, batchSize: number): void {
-  const functions = VARIANTS.map(({ build }) => build(scenario));
+  const variants = VARIANTS;
+  const functions = variants.map(({ build }) => build(scenario).fn);
   const workload = makeWorkload(
     scenario.inputs,
     Math.max(1, maxPathLength(scenario)),
@@ -203,7 +213,7 @@ function assertEquivalent(scenario: Scenario, batchSize: number): void {
       assert.strictEqual(
         actual,
         expected,
-        `${scenario.name}: ${VARIANTS[variant].name} for [${scenario.inputs[idx]}]`,
+        `${scenario.name}: ${variants[variant].name} for [${scenario.inputs[idx]}]`,
       );
     }
   }
@@ -213,7 +223,7 @@ function assertEquivalent(scenario: Scenario, batchSize: number): void {
     assert.strictEqual(
       batchChecksum(functions[variant], workload),
       expectedChecksum,
-      `${scenario.name}: ${VARIANTS[variant].name} checksum`,
+      `${scenario.name}: ${variants[variant].name} checksum`,
     );
   }
 }
@@ -230,23 +240,26 @@ function runScenario(
     options.batchSize,
   );
   const decision = productionDecision(scenario);
+  const variants = VARIANTS;
   const orderedVariants = [
-    ...VARIANTS.slice(index % VARIANTS.length),
-    ...VARIANTS.slice(0, index % VARIANTS.length),
+    ...variants.slice(index % variants.length),
+    ...variants.slice(0, index % variants.length),
   ];
   const measured = new Map<string, Measurement>();
 
   for (const variant of orderedVariants) {
-    const fn = variant.build(scenario);
+    const built = variant.build(scenario);
     measured.set(variant.name, {
       name: variant.name,
-      callsPerSecond: measureRuntime(fn, workload, options),
-      buildMicros: measureBuild(variant.build, scenario, options),
+      callsPerSecond: measureRuntime(built.fn, workload, options),
+      buildMicros: measureBuild(variant, scenario, options),
+      layout: built.layout,
+      cells: built.cells,
     });
   }
 
   const original = measured.get("Original")!;
-  const dfa = measured.get("DFA")!;
+  const dfa = measured.get("DFA Dense")!;
   const selected = decision.usesDfa ? dfa : original;
   const other = decision.usesDfa ? original : dfa;
   const regressionPercent =
@@ -254,15 +267,21 @@ function runScenario(
 
   return {
     scenario: scenario.name,
-    variants: VARIANTS.map(({ name }) => {
+    variants: variants.map(({ name }) => {
       const result = measured.get(name)!;
       return {
         ...result,
         productionSelected:
-          name === "DFA" ? decision.usesDfa : !decision.usesDfa,
-        states: name === "DFA" ? decision.states : undefined,
-        transitions: name === "DFA" ? decision.transitions : undefined,
-        maxCandidates: name === "DFA" ? decision.maxCandidates : undefined,
+          name === "DFA Dense"
+            ? decision.usesDfa
+            : name === "Original"
+              ? !decision.usesDfa
+              : false,
+        states: name.startsWith("DFA") ? decision.states : undefined,
+        transitions: name.startsWith("DFA") ? decision.transitions : undefined,
+        maxCandidates: name.startsWith("DFA")
+          ? decision.maxCandidates
+          : undefined,
       };
     }),
     selectionError:

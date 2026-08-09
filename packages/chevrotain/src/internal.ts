@@ -4,9 +4,13 @@ export {
   buildSingleAlternativeLookaheadFunction,
 } from "./parse/grammar/lookahead.js";
 export {
-  buildDfaAlternativesLookAheadFunc,
+  buildDenseDfaAlternativesLookAheadFunc,
+  buildDenseDfaSingleAlternativeLookaheadFunction,
+  denseDfaCellCount,
+  MAX_DENSE_DFA_CELLS,
+} from "./parse/grammar/dfa/dense.js";
+export {
   buildDfaLookaheadMachine,
-  buildDfaSingleAlternativeLookaheadFunction,
   isDfaLookaheadProfitable,
   isDfaSingleLookaheadProfitable,
 } from "./parse/grammar/lookahead_dfa.js";
