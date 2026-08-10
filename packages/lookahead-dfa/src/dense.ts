@@ -9,8 +9,8 @@ interface LookaheadHost {
 interface DenseDfaMachine {
   base: number;
   width: number;
+  stride: number;
   transitions: Int32Array;
-  fallbacks: Int32Array;
 }
 
 export function denseDfaCellCount(machine: DfaLookaheadMachine): number {
@@ -30,22 +30,28 @@ function toDenseDfaMachine(
   const cellCount = machine.fallbacks.length * width;
   if (cellCount > MAX_DENSE_DFA_CELLS) return undefined;
 
-  const transitions = new Int32Array(cellCount);
-  const fallbacks = new Int32Array(machine.fallbacks.length);
+  const stride = width + 1;
+  const transitions = new Int32Array(machine.fallbacks.length * stride);
   for (let stateIdx = 0; stateIdx < machine.fallbacks.length; stateIdx++) {
-    fallbacks[stateIdx] = machine.fallbacks[stateIdx] ?? 0;
+    const fallback = machine.fallbacks[stateIdx] ?? 0;
+    if (fallback !== 0) {
+      const rowStart = stateIdx * stride;
+      transitions.fill(fallback, rowStart, rowStart + stride);
+    }
   }
   for (const transition of machine.transitions) {
     const column = transition.tokenTypeIdx - minTokenTypeIdx;
-    transitions[transition.state * width + column] =
-      transition.target < 0 ? transition.target : transition.target + 1;
+    transitions[transition.state * stride + 1 + column] =
+      transition.target < 0
+        ? transition.target
+        : transition.target * stride + 1;
   }
 
   return {
     base: Number.isFinite(minTokenTypeIdx) ? minTokenTypeIdx : 0,
     width,
+    stride,
     transitions,
-    fallbacks,
   };
 }
 
@@ -61,20 +67,17 @@ export function buildDenseDfaAlternativesLookAheadFunc(
 
   const dense = toDenseDfaMachine(machine);
   if (dense === undefined) return undefined;
-  const { base, width, transitions, fallbacks } = dense;
+  const { base, width, stride, transitions } = dense;
 
   return function (this: LookaheadHost): number | undefined {
-    let stateIdx = root;
+    let row = root * stride + 1;
     for (let offset = 1; ; offset++) {
       const column = this.LA_FAST(offset).tokenTypeIdx - base;
-      const transition =
-        column >= 0 && column < width
-          ? transitions[stateIdx * width + column]
-          : 0;
-      const target = transition || fallbacks[stateIdx];
+      const target =
+        transitions[column >= 0 && column < width ? row + column : row - 1];
       if (target === 0) return undefined;
       if (target < 0) return -target - 1;
-      stateIdx = target - 1;
+      row = target;
     }
   };
 }
@@ -88,20 +91,17 @@ export function buildDenseDfaSingleAlternativeLookaheadFunction(
 
   const dense = toDenseDfaMachine(machine);
   if (dense === undefined) return undefined;
-  const { base, width, transitions, fallbacks } = dense;
+  const { base, width, stride, transitions } = dense;
 
   return function (this: LookaheadHost): boolean {
-    let stateIdx = root;
+    let row = root * stride + 1;
     for (let offset = 1; ; offset++) {
       const column = this.LA_FAST(offset).tokenTypeIdx - base;
-      const transition =
-        column >= 0 && column < width
-          ? transitions[stateIdx * width + column]
-          : 0;
-      const target = transition || fallbacks[stateIdx];
+      const target =
+        transitions[column >= 0 && column < width ? row + column : row - 1];
       if (target === 0) return false;
       if (target < 0) return true;
-      stateIdx = target - 1;
+      row = target;
     }
   };
 }

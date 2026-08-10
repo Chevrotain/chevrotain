@@ -72,37 +72,32 @@ passes to the existing path-generation functions.
 The policy is documented beside its implementation in
 `packages/lookahead-dfa/src/lookahead_dfa.ts`.
 
-For each concrete first-token bucket:
+Only multi-token paths participate in profitability selection. Empty and K1
+paths do not count as DFA work. The thresholds are:
 
-```text
-candidateCount = matching non-empty paths
-score = sum(path.length - 1)
-```
+| Shape                                 | Minimum multi-token paths |
+| ------------------------------------- | ------------------------: |
+| Shared first token, OR or Single      |                         2 |
+| Non-shared OR                         |                         3 |
+| Non-shared Single/optional/repetition |                         4 |
 
-OR selects DFA when:
+First-token sharing includes both `tokenTypeIdx` and `categoryMatches` so
+concrete tokens and categories overlap correctly. The selector first counts
+paths without allocating overlap data. It only builds a first-token `Set` for
+narrow decisions below the non-shared threshold.
 
-```text
-candidateCount >= 2 && score >= 5
-```
-
-Single/optional/repetition lookahead selects DFA when:
-
-```text
-candidateCount >= 5 && score >= 5
-```
-
-All-K1 path sets exit before allocating bucket data. Threshold evaluation also
-returns immediately once a qualifying bucket is found.
+All-K1 and empty-only path sets remain on Original without allocating overlap
+data.
 
 Paths longer than 32 tokens remain on the original implementation. DFA
 construction recursively advances one token per state, so this private guard
 preserves support for unusually large configured lookahead without risking a
 JavaScript call-stack overflow.
 
-The different OR and single candidate thresholds are intentional. The
-original OR scanner pays for preceding alternatives, while the original
-single scanner is cheaper. Chrome measurements found single K3 x3 regressed
-about 22%, K3 x4 was neutral, and K3 x5 improved about 17%.
+The different non-shared OR and Single thresholds are intentional. The Original
+OR scanner pays for preceding alternatives, while the Original Single scanner
+is cheaper. A shared first token makes even a two-path Dense decision worthwhile
+because Original repeats the same prefix comparison.
 
 ## Persistent Microbenchmark
 
@@ -124,6 +119,9 @@ the ignored
 `packages/lookahead-dfa-benchmark/report/lookahead_dfa_benchmark.md` report.
 The report separately lists production choices that are more than the
 configurable `MAX_SELECTION_REGRESSION_PERCENT` slower than the alternative.
+The Node.js 26 report after applying the threshold matrix contains five
+remaining conservative non-shared misses and no selected-Dense regression over
+5%.
 The results below were measured using the original Chrome 151 browser harness
 and are retained as historical data; they are not directly comparable to
 Node.js measurements.
@@ -229,6 +227,51 @@ precheck:
 The midpoint difference is approximately 2.2%, or about 0.1 ms per parser
 construction.
 
+### Forced-Dense Initialization
+
+This benchmark isolates lookahead construction by comparing two local bundles
+from the same source revision:
+
+- Forced Original uses the original builders for every decision.
+- Forced Dense ignores profitability and builds Dense for every technically
+  eligible decision.
+
+The existing browser benchmark's **Init Parser** mode was used with
+`maxLookahead: 2`, CST output disabled, 100 warmup constructions, and
+Benchmark.js `minSamples: 25`. Each value below came from a fresh headless
+Chrome 151 process on macOS arm64.
+
+| Grammar    | Original times (us)       | Dense times (us)          | Original median | Dense median |          Overhead |
+| ---------- | ------------------------- | ------------------------- | --------------: | -----------: | ----------------: |
+| JSON       | 1049.39, 975.89, 1042.34  | 1058.23, 1059.56, 1046.62 |      1042.34 us |   1058.23 us |  15.89 us (1.52%) |
+| CSS        | 1901.28, 1920.94, 1912.19 | 1971.87, 1983.05, 1976.02 |      1912.19 us |   1976.02 us |  63.83 us (3.34%) |
+| ECMAScript | 4207.36, 4177.35, 4254.81 | 4588.88, 4590.01, 4533.27 |      4207.36 us |   4588.88 us | 381.52 us (9.07%) |
+
+JSON and CSS used Dense for every lookahead decision. Neither grammar exceeded
+the dense cell cap. ECMAScript used Dense for every decision except the one OR
+with a runtime `GATE`, which must retain Original predicate handling. Its four
+OPTION gates remain Dense-compatible because those predicates are evaluated
+outside the lookahead closure. ECMAScript also had no dense-cap fallback.
+
+These measurements cover repeated parser construction logic, not module loading
+or a real process cold start.
+
+### Selector Matrix Initialization
+
+The previous production selector and the new threshold matrix were compared
+using the same Init Parser protocol and three fresh Chrome processes per
+grammar. The forced-Dense measurements above remain the upper bound; this table
+shows the incremental cost of broadening only shared narrow decisions.
+
+| Grammar    | Previous-selector times (us) | Matrix-selector times (us) | Previous median | Matrix median |             Change |
+| ---------- | ---------------------------- | -------------------------- | --------------: | ------------: | -----------------: |
+| JSON       | 1077.08, 1118.91, 1139.83    | 1132.60, 1100.90, 1128.43  |      1118.91 us |    1128.43 us |    9.52 us (0.85%) |
+| CSS        | 1965.96, 2047.78, 1986.67    | 2034.43, 1981.59, 1927.85  |      1986.67 us |    1981.59 us |  -5.08 us (-0.26%) |
+| ECMAScript | 4771.31, 4597.36, 4637.23    | 4686.94, 4625.51, 4626.50  |      4637.23 us |    4626.50 us | -10.73 us (-0.23%) |
+
+All three changes are within process-to-process variation; no measurable parser
+initialization penalty was observed from the selector change.
+
 ## Correctness And CI
 
 The package and Chevrotain `lookahead_dfa_spec.ts` suites cover:
@@ -244,18 +287,18 @@ The package and Chevrotain `lookahead_dfa_spec.ts` suites cover:
 
 Verification:
 
-- Extracted DFA package suite: 15 passing.
+- Extracted DFA package suite: 17 passing.
 - Full Chevrotain package: 796 passing.
-- DFA benchmark smoke: 66 scenarios and 132 variants passing.
+- DFA benchmark smoke: 75 scenarios and 150 variants passing.
 - Full monorepo CI: 15 of 15 tasks successful.
 - Formatting and TypeScript compilation pass.
 
 ## Recommendation
 
-Keep the conservative thresholds for the initial production version. They
-capture the real ECMAScript x22/x36 gain while every measured regression stays
-on the original implementation.
+Use Dense for shared two-path decisions, non-shared OR decisions with at least
+three multi-token paths, and non-shared Single decisions with at least four.
+This removes six measured shared-shape false negatives without introducing a
+selected-Dense regression or measurable initialization penalty.
 
-Use the retained microbenchmark before changing either threshold. A lower OR
-threshold may eventually capture x3/x4 wins, but should be justified by actual
-grammar frequency distributions rather than synthetic fanout alone.
+Keep narrower non-shared decisions on Original. Their runtime result depends on
+input-frequency bias that cannot be inferred from grammar shape.

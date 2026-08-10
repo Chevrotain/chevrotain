@@ -1,9 +1,7 @@
 import type { LookaheadSequence, TokenType } from "@chevrotain/types";
 
-const MIN_DFA_SCORE = 5;
-const MIN_SINGLE_DFA_CANDIDATES = 5;
-const MIN_OR_DFA_PATHS = 3;
-const MIN_SINGLE_DFA_PATHS = 4;
+const MIN_OR_NON_SHARED_DFA_PATHS = 3;
+const MIN_SINGLE_NON_SHARED_DFA_PATHS = 4;
 const MAX_DFA_PATH_LENGTH = 32;
 
 interface DfaCandidate {
@@ -32,51 +30,32 @@ function matchingTokenTypeIdxs(tokenType: TokenType): number[] {
   return [tokenType.tokenTypeIdx!, ...tokenType.categoryMatches!];
 }
 
-/**
- * Dense dispatch pays off either when enough paths avoid the original ordered
- * scan or when shared prefixes remove enough repeated suffix comparisons.
- */
 function isDfaLookaheadProfitableFor(
   alternatives: LookaheadSequence[],
-  minCandidateCount: number,
-  minPathCount: number,
+  minimumNonSharedMultiTokenPathCount: number,
 ): boolean {
-  let hasMultiTokenPath = false;
-  let pathCount = 0;
+  let multiTokenPathCount = 0;
   for (const alternative of alternatives) {
     for (const path of alternative) {
-      pathCount++;
       // The compiler recursively advances one token per state. Preserve support
       // for unusually large maxLookahead values by using the original scanner.
       if (path.length > MAX_DFA_PATH_LENGTH) return false;
-      if (path.length > 1) hasMultiTokenPath = true;
+      if (path.length > 1) multiTokenPathCount++;
     }
   }
-  if (!hasMultiTokenPath) return false;
-  if (pathCount >= minPathCount) return true;
+  if (multiTokenPathCount >= minimumNonSharedMultiTokenPathCount) return true;
+  if (multiTokenPathCount < 2) return false;
 
-  const candidatesByFirst: Record<
-    number,
-    { candidateCount: number; score: number }
-  > = Object.create(null);
-
+  const seenFirstTokenTypeIdxs = new Set<number>();
   for (const alternative of alternatives) {
     for (const path of alternative) {
-      if (path.length === 0) continue;
-      for (const tokenTypeIdx of matchingTokenTypeIdxs(path[0])) {
-        const bucket = (candidatesByFirst[tokenTypeIdx] ??= {
-          candidateCount: 0,
-          score: 0,
-        });
-        bucket.candidateCount++;
-        bucket.score += path.length - 1;
-        if (
-          bucket.candidateCount >= minCandidateCount &&
-          bucket.score >= MIN_DFA_SCORE
-        ) {
-          return true;
-        }
+      if (path.length <= 1) continue;
+      const acceptedFirstTokenTypeIdxs = matchingTokenTypeIdxs(path[0]);
+      for (const tokenTypeIdx of acceptedFirstTokenTypeIdxs) {
+        if (seenFirstTokenTypeIdxs.has(tokenTypeIdx)) return true;
       }
+      for (const tokenTypeIdx of acceptedFirstTokenTypeIdxs)
+        seenFirstTokenTypeIdxs.add(tokenTypeIdx);
     }
   }
 
@@ -90,7 +69,7 @@ function isDfaLookaheadProfitableFor(
 export function isDfaLookaheadProfitable(
   alternatives: LookaheadSequence[],
 ): boolean {
-  return isDfaLookaheadProfitableFor(alternatives, 2, MIN_OR_DFA_PATHS);
+  return isDfaLookaheadProfitableFor(alternatives, MIN_OR_NON_SHARED_DFA_PATHS);
 }
 
 /**
@@ -102,8 +81,7 @@ export function isDfaSingleLookaheadProfitable(
 ): boolean {
   return isDfaLookaheadProfitableFor(
     [alternative],
-    MIN_SINGLE_DFA_CANDIDATES,
-    MIN_SINGLE_DFA_PATHS,
+    MIN_SINGLE_NON_SHARED_DFA_PATHS,
   );
 }
 

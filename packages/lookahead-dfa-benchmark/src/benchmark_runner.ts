@@ -74,7 +74,7 @@ interface Measurement {
   cells?: number;
 }
 
-const EOF_TOKEN = { tokenTypeIdx: 999999 } as IToken;
+const EOF_TOKEN = { tokenTypeIdx: 1 } as IToken;
 const parser: BenchmarkParser = {
   tokVector: [],
   currIdx: -1,

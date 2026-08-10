@@ -119,6 +119,39 @@ function customFanoutInputs(
   ];
 }
 
+function sharedProbeScenarios(
+  kind: "or" | "single",
+  prefix: TokenType[],
+  depth: 2 | 3,
+  inRangeMiss: TokenType,
+): Scenario[] {
+  const paths = kind === "or" ? fanoutOr(prefix, 8) : fanoutSingle(prefix, 8);
+  const prefixIds = prefix.map((token) => token.tokenTypeIdx!);
+  const label = kind === "or" ? "OR" : "Single";
+  return [
+    {
+      name: `${label} K${depth} shared hit-only x8`,
+      kind,
+      paths,
+      inputs: [
+        [...prefixIds, 100],
+        [...prefixIds, 104],
+        [...prefixIds, 107],
+      ],
+    },
+    {
+      name: `${label} K${depth} shared miss-only x8`,
+      kind,
+      paths,
+      inputs: [
+        [...prefixIds, inRangeMiss.tokenTypeIdx!],
+        [...prefixIds, 1],
+        [...prefixIds, 998],
+      ],
+    },
+  ];
+}
+
 const MIXED_OR: LookaheadSequence[] = [
   [[A]],
   [[B, C]],
@@ -250,6 +283,22 @@ export const SCENARIOS: Scenario[] = [
     kind: "single",
     paths: MIXED_OR.flat(),
     inputs: [[10], [11, 12], [11, 13, 14], [11, 13, 15], [12], [11, 998], []],
+  },
+  ...sharedProbeScenarios("or", [A], 2, B),
+  ...sharedProbeScenarios("or", [A, B], 3, C),
+  ...sharedProbeScenarios("single", [A], 2, B),
+  ...sharedProbeScenarios("single", [A, B], 3, C),
+  {
+    name: "OR K3 in-range fallback80",
+    kind: "or",
+    paths: [[[A, B, C]], [[A, B]], [[D, E, F]]],
+    inputs: earlyBiased([
+      [10, 11, 13],
+      [10, 11, 12],
+      [13, 14, 15],
+      [10, 11, 998],
+      [998],
+    ]),
   },
 ];
 

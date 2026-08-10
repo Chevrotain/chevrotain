@@ -90,9 +90,11 @@ describe("DFA lookahead", () => {
   }
 
   describe("profitability", () => {
-    it("keeps narrow shared paths on the original implementation", () => {
-      expect(isDfaLookaheadProfitable(fanout(2))).to.be.false;
-      expect(isDfaLookaheadProfitable(fanout(2, [A, B]))).to.be.false;
+    it("selects two paths with a shared first token", () => {
+      expect(isDfaLookaheadProfitable(fanout(2))).to.be.true;
+      expect(isDfaLookaheadProfitable(fanout(2, [A, B]))).to.be.true;
+      expect(isDfaSingleLookaheadProfitable(fanout(2).flat())).to.be.true;
+      expect(isDfaSingleLookaheadProfitable(fanout(3).flat())).to.be.true;
     });
 
     it("selects wide and deep shared paths", () => {
@@ -110,9 +112,10 @@ describe("DFA lookahead", () => {
       ).to.be.true;
     });
 
-    it("selects two paths when shared-prefix savings reach the score", () => {
-      expect(isDfaLookaheadProfitable([[[A, B, C, D]], [[A, E, F]]])).to.be
-        .true;
+    it("detects shared first tokens through categories", () => {
+      const alternatives = [[[CategoryAB, D]], [[ChildB, E]]];
+      expect(isDfaLookaheadProfitable(alternatives)).to.be.true;
+      expect(isDfaSingleLookaheadProfitable(alternatives.flat())).to.be.true;
     });
 
     it("keeps single-token paths on the original implementation", () => {
@@ -121,14 +124,10 @@ describe("DFA lookahead", () => {
       expect(isDfaSingleLookaheadProfitable(alternatives.flat())).to.be.false;
     });
 
-    it("uses a conservative threshold for single-production lookahead", () => {
-      expect(isDfaSingleLookaheadProfitable(fanout(3).flat())).to.be.false;
-      expect(isDfaSingleLookaheadProfitable(fanout(4).flat())).to.be.true;
-      expect(isDfaSingleLookaheadProfitable(fanout(5).flat())).to.be.true;
-      expect(isDfaSingleLookaheadProfitable(fanout(3, [A, B]).flat())).to.be
-        .false;
-      expect(isDfaSingleLookaheadProfitable(fanout(4, [A, B]).flat())).to.be
-        .true;
+    it("does not count K1 or empty paths as multi-token work", () => {
+      const alternatives = [[[A, B]], [[C]], [[]]];
+      expect(isDfaLookaheadProfitable(alternatives)).to.be.false;
+      expect(isDfaSingleLookaheadProfitable(alternatives.flat())).to.be.false;
     });
 
     it("selects non-shared fanout above the dense boundaries", () => {
@@ -177,6 +176,32 @@ describe("DFA lookahead", () => {
       expect(callOr(lookahead, [ChildB, E])).to.equal(1);
       expect(callOr(lookahead, [ChildC, F])).to.equal(2);
       expect(callOr(lookahead, [ChildB, F])).to.equal(2);
+    });
+
+    it("handles K3 matches and bounds for both closures", () => {
+      const alternatives = fanout(8, [A, B]);
+      const orLookahead = buildDenseOr(alternatives);
+      const singleLookahead = buildDenseSingle(alternatives.flat());
+      const high = tokenType("DfaHigh", [], 100_000);
+
+      expect(callOr(orLookahead, [A, B, endings[0]])).to.equal(0);
+      expect(callOr(orLookahead, [A, B, endings[7]])).to.equal(7);
+      expect(callOr(orLookahead, [A, B, C])).to.be.undefined;
+      expect(callOr(orLookahead, [A, B])).to.be.undefined;
+      expect(callOr(orLookahead, [A, B, high])).to.be.undefined;
+
+      expect(callSingle(singleLookahead, [A, B, endings[0]])).to.be.true;
+      expect(callSingle(singleLookahead, [A, B, endings[7]])).to.be.true;
+      expect(callSingle(singleLookahead, [A, B, C])).to.be.false;
+      expect(callSingle(singleLookahead, [A, B])).to.be.false;
+      expect(callSingle(singleLookahead, [A, B, high])).to.be.false;
+    });
+
+    it("uses a shorter alternative as a deep in-range fallback", () => {
+      const lookahead = buildDenseOr([[[A, B, C]], [[A, B]], [[D, E, F]]]);
+
+      expect(callOr(lookahead, [A, B, C])).to.equal(0);
+      expect(callOr(lookahead, [A, B, D])).to.equal(1);
     });
 
     it("preserves short and empty alternative priority", () => {
