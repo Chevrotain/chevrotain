@@ -78,6 +78,7 @@
   "dependencies": {
     "@chevrotain/cst-dts-gen": "workspace:*",
     "@chevrotain/gast": "workspace:*",
+    "@chevrotain/lookahead-dfa": "workspace:*",
     "@chevrotain/regexp-to-ast": "workspace:*",
     "@chevrotain/types": "workspace:*",
     "@chevrotain/utils": "workspace:*"

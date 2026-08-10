@@ -16,6 +16,7 @@
     "typecheck:watch": "tsc --noEmit -w"
   },
   "dependencies": {
+    "@chevrotain/lookahead-dfa": "workspace:*",
     "@chevrotain/types": "workspace:*",
     "chevrotain": "workspace:*"
   }

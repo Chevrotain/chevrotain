@@ -5,11 +5,12 @@
 Chevrotain now has two production lookahead paths in this worktree:
 
 1. The unchanged original implementation in `lookahead.ts`.
-2. A runtime-built DFA in `lookahead_dfa.ts` for measured profitable shapes.
+2. A runtime-built DFA in `@chevrotain/lookahead-dfa` for measured profitable
+   shapes.
 
 There is no indexed-static-K2 implementation and no source-code generation.
-The DFA is built as in-memory state and transition objects during parser
-self-analysis.
+The DFA is compiled to an in-memory state graph and dense transition table
+during parser self-analysis.
 
 Chrome 151 results:
 
@@ -41,26 +42,35 @@ The original implementation remains active for:
 
 ### DFA
 
-`packages/chevrotain/src/parse/grammar/lookahead_dfa.ts` contains:
+`packages/lookahead-dfa/src/` contains:
 
 - Profitability selection.
 - One DFA compiler shared by OR and single-production lookahead.
 - Two small runtime closures mapping DFA terminal results to OR indexes or
   booleans.
-- Fallback wrappers calling the original builders.
 
-States use null-prototype transition objects keyed by concrete
-`tokenTypeIdx`. Categories are expanded during construction. Overlapping
-category transitions advance all matching candidates. Completed alternatives
-are retained as state fallbacks so empty and short-path priority matches the
-original source-order semantics.
+`packages/chevrotain/src/parse/grammar/lookahead_dfa.ts` contains only the
+integration wrappers that select the DFA or call the original builders.
+
+The compiler emits a flat transition list, which the runtime converts into a
+dense `Int32Array` table keyed by concrete `tokenTypeIdx`. Categories are
+expanded during construction. Overlapping category transitions advance all
+matching candidates. Completed alternatives are retained as state fallbacks so
+empty and short-path priority matches the original source-order semantics.
+
+The wrappers retain:
+
+- Predicate and dynamic-token fallback.
+- Profitability and dense-table-cap selection.
+- Fallback wrappers calling the original builders.
 
 `llk_lookahead.ts` only changes which builder wrappers the default strategy
 passes to the existing path-generation functions.
 
 ## Selection Policy
 
-The policy is documented beside its implementation in `lookahead_dfa.ts`.
+The policy is documented beside its implementation in
+`packages/lookahead-dfa/src/lookahead_dfa.ts`.
 
 For each concrete first-token bucket:
 
@@ -221,7 +231,7 @@ construction.
 
 ## Correctness And CI
 
-`lookahead_dfa_spec.ts` covers:
+The package and Chevrotain `lookahead_dfa_spec.ts` suites cover:
 
 - OR and single profitability boundaries.
 - Wide shared prefixes.
@@ -234,10 +244,10 @@ construction.
 
 Verification:
 
-- Focused DFA suite: 12 passing.
-- Full Chevrotain package: 803 passing.
-- DFA benchmark smoke: 30 scenarios and 60 variants passing.
-- Full monorepo CI: 14 of 14 tasks successful.
+- Extracted DFA package suite: 15 passing.
+- Full Chevrotain package: 796 passing.
+- DFA benchmark smoke: 66 scenarios and 132 variants passing.
+- Full monorepo CI: 15 of 15 tasks successful.
 - Formatting and TypeScript compilation pass.
 
 ## Recommendation

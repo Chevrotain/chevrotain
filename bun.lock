@@ -79,6 +79,7 @@
       "dependencies": {
         "@chevrotain/cst-dts-gen": "workspace:*",
         "@chevrotain/gast": "workspace:*",
+        "@chevrotain/lookahead-dfa": "workspace:*",
         "@chevrotain/regexp-to-ast": "workspace:*",
         "@chevrotain/types": "workspace:*",
         "@chevrotain/utils": "workspace:*",
@@ -127,10 +128,18 @@
         "@chevrotain/types": "workspace:*",
       },
     },
+    "packages/lookahead-dfa": {
+      "name": "@chevrotain/lookahead-dfa",
+      "version": "13.2.0",
+      "dependencies": {
+        "@chevrotain/types": "workspace:*",
+      },
+    },
     "packages/lookahead-dfa-benchmark": {
       "name": "@chevrotain/lookahead-dfa-benchmark",
       "version": "13.2.0",
       "dependencies": {
+        "@chevrotain/lookahead-dfa": "workspace:*",
         "@chevrotain/types": "workspace:*",
         "chevrotain": "workspace:*",
       },
@@ -199,6 +208,8 @@
     "@chevrotain/cst-dts-gen-test": ["@chevrotain/cst-dts-gen-test@workspace:packages/cst-dts-gen-test"],
 
     "@chevrotain/gast": ["@chevrotain/gast@workspace:packages/gast"],
+
+    "@chevrotain/lookahead-dfa": ["@chevrotain/lookahead-dfa@workspace:packages/lookahead-dfa"],
 
     "@chevrotain/lookahead-dfa-benchmark": ["@chevrotain/lookahead-dfa-benchmark@workspace:packages/lookahead-dfa-benchmark"],
 

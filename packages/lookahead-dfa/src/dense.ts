@@ -1,7 +1,10 @@
-import type { BaseParser } from "@chevrotain/types";
-import type { DfaLookaheadMachine } from "../lookahead_dfa.js";
+import type { DfaLookaheadMachine } from "./lookahead_dfa.js";
 
 export const MAX_DENSE_DFA_CELLS = 4096;
+
+interface LookaheadHost {
+  LA_FAST(howMuch: number): { tokenTypeIdx: number };
+}
 
 interface DenseDfaMachine {
   base: number;
@@ -60,7 +63,7 @@ export function buildDenseDfaAlternativesLookAheadFunc(
   if (dense === undefined) return undefined;
   const { base, width, transitions, fallbacks } = dense;
 
-  return function (this: BaseParser): number | undefined {
+  return function (this: LookaheadHost): number | undefined {
     let stateIdx = root;
     for (let offset = 1; ; offset++) {
       const column = this.LA_FAST(offset).tokenTypeIdx - base;
@@ -87,7 +90,7 @@ export function buildDenseDfaSingleAlternativeLookaheadFunction(
   if (dense === undefined) return undefined;
   const { base, width, transitions, fallbacks } = dense;
 
-  return function (this: BaseParser): boolean {
+  return function (this: LookaheadHost): boolean {
     let stateIdx = root;
     for (let offset = 1; ; offset++) {
       const column = this.LA_FAST(offset).tokenTypeIdx - base;

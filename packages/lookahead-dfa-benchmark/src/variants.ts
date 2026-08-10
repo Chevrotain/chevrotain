@@ -1,15 +1,17 @@
 import type { LookaheadSequence } from "@chevrotain/types";
 import {
-  areTokenCategoriesNotUsed,
-  buildAlternativesLookAheadFunc,
   buildDenseDfaAlternativesLookAheadFunc,
   buildDenseDfaSingleAlternativeLookaheadFunction,
   buildDfaLookaheadMachine,
-  buildSingleAlternativeLookaheadFunction,
   denseDfaCellCount,
   isDfaLookaheadProfitable,
   isDfaSingleLookaheadProfitable,
   MAX_DENSE_DFA_CELLS,
+} from "@chevrotain/lookahead-dfa";
+import {
+  areTokenCategoriesNotUsed,
+  buildAlternativesLookAheadFunc,
+  buildSingleAlternativeLookaheadFunction,
   tokenStructuredMatcher,
   tokenStructuredMatcherNoCategories,
 } from "chevrotain/internal";

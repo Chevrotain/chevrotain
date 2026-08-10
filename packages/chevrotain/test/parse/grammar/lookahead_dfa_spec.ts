@@ -5,6 +5,12 @@ import {
   LookaheadSequence,
   TokenType,
 } from "@chevrotain/types";
+import {
+  buildDenseDfaAlternativesLookAheadFunc,
+  buildDenseDfaSingleAlternativeLookaheadFunction,
+  buildDfaLookaheadMachine,
+  MAX_DENSE_DFA_CELLS,
+} from "@chevrotain/lookahead-dfa";
 import { END_OF_FILE } from "../../../src/parse/parser/parser.js";
 import {
   buildAlternativesLookAheadFunc,
@@ -12,17 +18,8 @@ import {
 } from "../../../src/parse/grammar/lookahead.js";
 import {
   buildAlternativesLookAheadFuncDfa,
-  buildDfaLookaheadMachine,
   buildSingleAlternativeLookaheadFunctionDfa,
-  isDfaLookaheadProfitable,
-  isDfaSingleLookaheadProfitable,
 } from "../../../src/parse/grammar/lookahead_dfa.js";
-import {
-  buildDenseDfaAlternativesLookAheadFunc,
-  buildDenseDfaSingleAlternativeLookaheadFunction,
-  denseDfaCellCount,
-  MAX_DENSE_DFA_CELLS,
-} from "../../../src/parse/grammar/dfa/dense.js";
 import {
   augmentTokenTypes,
   tokenStructuredMatcher,
@@ -81,12 +78,6 @@ describe("DFA lookahead", () => {
       .map((ending): TokenType[][] => [[...prefix, ending]]);
   }
 
-  function nonSharedFanout(count: number) {
-    return Array.from({ length: count }, (_, idx): TokenType[][] => [
-      [endings[idx * 2], endings[idx * 2 + 1]],
-    ]);
-  }
-
   function tokenType(name: string, tokenTypeIdx: number): TokenType {
     return {
       name,
@@ -95,18 +86,6 @@ describe("DFA lookahead", () => {
       categoryMatchesMap: Object.create(null),
       isParent: false,
     } as TokenType;
-  }
-
-  function buildDenseOr(alternatives: LookaheadSequence[]) {
-    return buildDenseDfaAlternativesLookAheadFunc(
-      buildDfaLookaheadMachine(alternatives),
-    )!;
-  }
-
-  function buildDenseSingle(alternative: LookaheadSequence) {
-    return buildDenseDfaSingleAlternativeLookaheadFunction(
-      buildDfaLookaheadMachine([alternative]),
-    )!;
   }
 
   function callOr(
@@ -125,122 +104,6 @@ describe("DFA lookahead", () => {
   ) {
     return lookahead.call(new MockParser(input, maxLookahead));
   }
-
-  describe("profitability", () => {
-    it("keeps narrow shared paths on the original implementation", () => {
-      expect(isDfaLookaheadProfitable(fanout(2))).to.be.false;
-      expect(isDfaLookaheadProfitable(fanout(2, [A, B]))).to.be.false;
-    });
-
-    it("selects wide and deep shared paths", () => {
-      expect(isDfaLookaheadProfitable(fanout(3))).to.be.true;
-      expect(isDfaLookaheadProfitable(fanout(8))).to.be.true;
-      expect(isDfaLookaheadProfitable(fanout(8, [A, B]))).to.be.true;
-      expect(
-        isDfaLookaheadProfitable([
-          [[A]],
-          [[B, C]],
-          [[B, D, E]],
-          [[B, D, F]],
-          [[C]],
-        ]),
-      ).to.be.true;
-    });
-
-    it("uses a conservative threshold for single-production lookahead", () => {
-      expect(isDfaSingleLookaheadProfitable(fanout(3).flat())).to.be.false;
-      expect(isDfaSingleLookaheadProfitable(fanout(4).flat())).to.be.true;
-      expect(isDfaSingleLookaheadProfitable(fanout(5).flat())).to.be.true;
-      expect(isDfaSingleLookaheadProfitable(fanout(3, [A, B]).flat())).to.be
-        .false;
-      expect(isDfaSingleLookaheadProfitable(fanout(4, [A, B]).flat())).to.be
-        .true;
-    });
-
-    it("selects non-shared fanout above the dense boundaries", () => {
-      expect(isDfaLookaheadProfitable(nonSharedFanout(2))).to.be.false;
-      expect(isDfaLookaheadProfitable(nonSharedFanout(3))).to.be.true;
-      expect(isDfaSingleLookaheadProfitable(nonSharedFanout(3).flat())).to.be
-        .false;
-      expect(isDfaSingleLookaheadProfitable(nonSharedFanout(4).flat())).to.be
-        .true;
-    });
-
-    it("keeps unusually long paths on the original implementation", () => {
-      const longPath = Array.from({ length: 33 }, () => A);
-      expect(isDfaLookaheadProfitable([...fanout(8), [longPath]])).to.be.false;
-      expect(isDfaSingleLookaheadProfitable([...fanout(8).flat(), longPath])).to
-        .be.false;
-    });
-  });
-
-  describe("runtime", () => {
-    it("selects alternatives through a wide shared prefix", () => {
-      const lookahead = buildDenseOr(fanout(8));
-
-      expect(callOr(lookahead, [A, endings[0]], 2)).to.equal(0);
-      expect(callOr(lookahead, [A, endings[4]], 2)).to.equal(4);
-      expect(callOr(lookahead, [A, endings[7]], 2)).to.equal(7);
-      expect(callOr(lookahead, [A, B], 2)).to.be.undefined;
-    });
-
-    it("matches a wide single alternative", () => {
-      const lookahead = buildDenseSingle(fanout(8).flat());
-
-      expect(callSingle(lookahead, [A, endings[0]], 2)).to.be.true;
-      expect(callSingle(lookahead, [A, endings[7]], 2)).to.be.true;
-      expect(callSingle(lookahead, [A, B], 2)).to.be.false;
-    });
-
-    it("handles overlapping categories at multiple states", () => {
-      const lookahead = buildDenseOr([
-        [[CategoryAB, D]],
-        [[ChildB, E]],
-        [[CategoryBC, F]],
-      ]);
-
-      expect(callOr(lookahead, [ChildA, D], 2)).to.equal(0);
-      expect(callOr(lookahead, [ChildB, E], 2)).to.equal(1);
-      expect(callOr(lookahead, [ChildC, F], 2)).to.equal(2);
-      expect(callOr(lookahead, [ChildB, F], 2)).to.equal(2);
-    });
-
-    it("preserves short and empty alternative priority", () => {
-      const emptyLookahead = buildDenseOr([[[A, B]], [[]], [[A, C]]]);
-      expect(callOr(emptyLookahead, [A, B], 2)).to.equal(0);
-      expect(callOr(emptyLookahead, [A, C], 2)).to.equal(1);
-      expect(callOr(emptyLookahead, [D], 2)).to.equal(1);
-
-      const shortLookahead = buildDenseOr([[[A, B]], [[A]]]);
-      expect(callOr(shortLookahead, [A, B], 2)).to.equal(0);
-      expect(callOr(shortLookahead, [A, C], 2)).to.equal(1);
-    });
-
-    it("handles constant and missing single alternatives", () => {
-      expect(callSingle(buildDenseSingle([[]]), [], 1)).to.be.true;
-      expect(callSingle(buildDenseSingle([]), [], 1)).to.be.false;
-    });
-
-    it("handles 32 alternatives in the dense representation", () => {
-      const alternatives = fanout(32);
-      const lookahead = buildDenseDfaAlternativesLookAheadFunc(
-        buildDfaLookaheadMachine(alternatives),
-      )!;
-
-      expect(callOr(lookahead, [A, endings[31]], 2)).to.equal(31);
-      expect(callOr(lookahead, [A, B], 2)).to.be.undefined;
-    });
-
-    it("rejects dense machines above the cell cap", () => {
-      const machine = buildDfaLookaheadMachine([
-        [[tokenType("Low", 1)]],
-        [[tokenType("High", MAX_DENSE_DFA_CELLS + 1)]],
-      ]);
-
-      expect(denseDfaCellCount(machine)).to.equal(MAX_DENSE_DFA_CELLS + 1);
-      expect(buildDenseDfaAlternativesLookAheadFunc(machine)).to.be.undefined;
-    });
-  });
 
   describe("fallback", () => {
     it("uses dense lookahead for profitable static paths", () => {
