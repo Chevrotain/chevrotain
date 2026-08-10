@@ -75,29 +75,38 @@ The policy is documented beside its implementation in
 Only multi-token paths participate in profitability selection. Empty and K1
 paths do not count as DFA work. The thresholds are:
 
-| Shape                                 | Minimum multi-token paths |
-| ------------------------------------- | ------------------------: |
-| Shared first token, OR or Single      |                         2 |
-| Non-shared OR                         |                         3 |
-| Non-shared Single/optional/repetition |                         4 |
+| Shape                            | Minimum multi-token paths |
+| -------------------------------- | ------------------------: |
+| Shared first token, OR or Single |                         2 |
+| Non-shared OR                    |                         2 |
+| Non-shared Single                |                         2 |
 
-First-token sharing includes both `tokenTypeIdx` and `categoryMatches` so
-concrete tokens and categories overlap correctly. The selector first counts
-paths without allocating overlap data. It only builds a first-token `Set` for
-narrow decisions below the non-shared threshold.
-
-All-K1 and empty-only path sets remain on Original without allocating overlap
-data.
+First-token sharing does not affect the threshold. Categories are still
+expanded by the DFA compiler so concrete tokens and categories overlap
+correctly. All-K1 and empty-only path sets remain on Original.
 
 Paths longer than 32 tokens remain on the original implementation. DFA
 construction recursively advances one token per state, so this private guard
 preserves support for unusually large configured lookahead without risking a
 JavaScript call-stack overflow.
 
-The different non-shared OR and Single thresholds are intentional. The Original
-OR scanner pays for preceding alternatives, while the Original Single scanner
-is cheaper. A shared first token makes even a two-path Dense decision worthwhile
-because Original repeats the same prefix comparison.
+The common two-path threshold favors overall throughput. Dense was 45.3% faster
+for balanced non-shared OR x2 and 11.4% faster with 80% of inputs matching the
+first alternative.
+
+For non-shared Single x2/x3, balanced inputs favored Dense at every measured
+depth. With 80% of inputs matching the first path, however, K3 and K4 favored
+Original:
+
+| Depth | Balanced x2 | Early-80 x2 | Balanced x3 | Early-80 x3 |
+| ----- | ----------: | ----------: | ----------: | ----------: |
+| K2    |      +25.9% |       +2.0% |      +49.4% |       +6.1% |
+| K3    |      +19.5% |       -6.6% |      +36.6% |       -2.8% |
+| K4    |      +12.6% |      -14.0% |      +29.3% |       -9.6% |
+
+The balanced gains are substantially larger than the early-biased losses, so
+the selector uses Dense from two paths at every eligible depth. This favors
+overall throughput while accepting input-distribution-specific regressions.
 
 ## Persistent Microbenchmark
 
@@ -119,9 +128,9 @@ the ignored
 `packages/lookahead-dfa-benchmark/report/lookahead_dfa_benchmark.md` report.
 The report separately lists production choices that are more than the
 configurable `MAX_SELECTION_REGRESSION_PERCENT` slower than the alternative.
-The Node.js 26 report after applying the threshold matrix contains five
-remaining conservative non-shared misses and no selected-Dense regression over
-5%.
+The Node.js 26 report after applying the threshold matrix contains three
+selected-Dense early-biased regressions over 5%, accepted in exchange for the
+larger balanced gains.
 The results below were measured using the original Chrome 151 browser harness
 and are retained as historical data; they are not directly comparable to
 Node.js measurements.
@@ -289,16 +298,12 @@ Verification:
 
 - Extracted DFA package suite: 17 passing.
 - Full Chevrotain package: 796 passing.
-- DFA benchmark smoke: 75 scenarios and 150 variants passing.
+- DFA benchmark smoke: 83 scenarios and 166 variants passing.
 - Full monorepo CI: 15 of 15 tasks successful.
 - Formatting and TypeScript compilation pass.
 
 ## Recommendation
 
-Use Dense for shared two-path decisions, non-shared OR decisions with at least
-three multi-token paths, and non-shared Single decisions with at least four.
-This removes six measured shared-shape false negatives without introducing a
-selected-Dense regression or measurable initialization penalty.
-
-Keep narrower non-shared decisions on Original. Their runtime result depends on
-input-frequency bias that cannot be inferred from grammar shape.
+Use Dense for OR and Single decisions with at least two multi-token paths. This
+captures the larger balanced gains for deep non-shared Single decisions while
+accepting smaller early-biased regressions.

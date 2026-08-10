@@ -63,9 +63,12 @@ describe("DFA lookahead", () => {
       .map((ending): TokenType[][] => [[...prefix, ending]]);
   }
 
-  function nonSharedFanout(count: number) {
+  function nonSharedFanout(count: number, depth = 2) {
     return Array.from({ length: count }, (_, idx): TokenType[][] => [
-      [endings[idx * 2], endings[idx * 2 + 1]],
+      Array.from(
+        { length: depth },
+        (_, tokenIdx) => endings[idx * depth + tokenIdx],
+      ),
     ]);
   }
 
@@ -131,11 +134,14 @@ describe("DFA lookahead", () => {
     });
 
     it("selects non-shared fanout above the dense boundaries", () => {
-      expect(isDfaLookaheadProfitable(nonSharedFanout(2))).to.be.false;
-      expect(isDfaLookaheadProfitable(nonSharedFanout(3))).to.be.true;
+      expect(isDfaLookaheadProfitable(nonSharedFanout(2))).to.be.true;
+      expect(isDfaSingleLookaheadProfitable(nonSharedFanout(2).flat())).to.be
+        .true;
       expect(isDfaSingleLookaheadProfitable(nonSharedFanout(3).flat())).to.be
-        .false;
-      expect(isDfaSingleLookaheadProfitable(nonSharedFanout(4).flat())).to.be
+        .true;
+      expect(isDfaSingleLookaheadProfitable(nonSharedFanout(2, 3).flat())).to.be
+        .true;
+      expect(isDfaSingleLookaheadProfitable(nonSharedFanout(2, 4).flat())).to.be
         .true;
     });
 

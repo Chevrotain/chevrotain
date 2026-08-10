@@ -1,7 +1,6 @@
 import type { LookaheadSequence, TokenType } from "@chevrotain/types";
 
-const MIN_OR_NON_SHARED_DFA_PATHS = 3;
-const MIN_SINGLE_NON_SHARED_DFA_PATHS = 4;
+const MIN_DFA_MULTI_TOKEN_PATHS = 2;
 const MAX_DFA_PATH_LENGTH = 32;
 
 interface DfaCandidate {
@@ -32,7 +31,6 @@ function matchingTokenTypeIdxs(tokenType: TokenType): number[] {
 
 function isDfaLookaheadProfitableFor(
   alternatives: LookaheadSequence[],
-  minimumNonSharedMultiTokenPathCount: number,
 ): boolean {
   let multiTokenPathCount = 0;
   for (const alternative of alternatives) {
@@ -43,23 +41,7 @@ function isDfaLookaheadProfitableFor(
       if (path.length > 1) multiTokenPathCount++;
     }
   }
-  if (multiTokenPathCount >= minimumNonSharedMultiTokenPathCount) return true;
-  if (multiTokenPathCount < 2) return false;
-
-  const seenFirstTokenTypeIdxs = new Set<number>();
-  for (const alternative of alternatives) {
-    for (const path of alternative) {
-      if (path.length <= 1) continue;
-      const acceptedFirstTokenTypeIdxs = matchingTokenTypeIdxs(path[0]);
-      for (const tokenTypeIdx of acceptedFirstTokenTypeIdxs) {
-        if (seenFirstTokenTypeIdxs.has(tokenTypeIdx)) return true;
-      }
-      for (const tokenTypeIdx of acceptedFirstTokenTypeIdxs)
-        seenFirstTokenTypeIdxs.add(tokenTypeIdx);
-    }
-  }
-
-  return false;
+  return multiTokenPathCount >= MIN_DFA_MULTI_TOKEN_PATHS;
 }
 
 /**
@@ -69,20 +51,13 @@ function isDfaLookaheadProfitableFor(
 export function isDfaLookaheadProfitable(
   alternatives: LookaheadSequence[],
 ): boolean {
-  return isDfaLookaheadProfitableFor(alternatives, MIN_OR_NON_SHARED_DFA_PATHS);
+  return isDfaLookaheadProfitableFor(alternatives);
 }
 
-/**
- * Single-production lookahead has a cheaper original loop, so narrow fanout
- * remains on the original implementation.
- */
 export function isDfaSingleLookaheadProfitable(
   alternative: LookaheadSequence,
 ): boolean {
-  return isDfaLookaheadProfitableFor(
-    [alternative],
-    MIN_SINGLE_NON_SHARED_DFA_PATHS,
-  );
+  return isDfaLookaheadProfitableFor([alternative]);
 }
 
 export function buildDfaLookaheadMachine(

@@ -41,7 +41,7 @@ function matcherFor(alternatives: LookaheadSequence[]) {
     : tokenStructuredMatcher;
 }
 
-function originalFunction(scenario: Scenario): Function {
+function pathScanFunction(scenario: Scenario): Function {
   const alternatives = alternativesFor(scenario);
   const matcher = matcherFor(alternatives);
   return scenario.kind === "or"
@@ -49,8 +49,8 @@ function originalFunction(scenario: Scenario): Function {
     : buildSingleAlternativeLookaheadFunction(alternatives[0], matcher, false);
 }
 
-function buildOriginal(scenario: Scenario): BuiltVariant {
-  return { fn: originalFunction(scenario), layout: "path scan" };
+function buildPathScan(scenario: Scenario): BuiltVariant {
+  return { fn: pathScanFunction(scenario), layout: "path scan" };
 }
 
 const denseCellCounts = new WeakMap<Scenario, number>();
@@ -68,7 +68,7 @@ function buildDenseDfa(scenario: Scenario): BuiltVariant {
   }
   return fn === undefined
     ? {
-        fn: originalFunction(scenario),
+        fn: pathScanFunction(scenario),
         layout: `naive fallback (>${MAX_DENSE_DFA_CELLS})`,
         cells,
       }
@@ -76,8 +76,8 @@ function buildDenseDfa(scenario: Scenario): BuiltVariant {
 }
 
 export const VARIANTS: Variant[] = [
-  { name: "Original", build: buildOriginal },
-  { name: "DFA Dense", build: buildDenseDfa },
+  { name: "Path Scan", build: buildPathScan },
+  { name: "Dense DFA", build: buildDenseDfa },
 ];
 
 export function productionDecision(scenario: Scenario): ProductionDecision {

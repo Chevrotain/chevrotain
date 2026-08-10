@@ -35,7 +35,7 @@ if (SMOKE) {
   );
   console.log(summary);
   console.log(
-    `${run.selectionErrors.length} production selection errors exceeded ${MAX_SELECTION_REGRESSION_PERCENT}%`,
+    `${run.selectionErrors.length} production selection mistakes exceeded ${MAX_SELECTION_REGRESSION_PERCENT}%`,
   );
   console.log(`Report: ${reportPath}`);
 }

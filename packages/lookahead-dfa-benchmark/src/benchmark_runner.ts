@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { performance } from "node:perf_hooks";
 import type { IToken } from "@chevrotain/types";
-import { maxPathLength, type Scenario } from "./scenarios.ts";
+import { maxPathLength, scenarioLabel, type Scenario } from "./scenarios.ts";
 import {
   productionDecision,
   VARIANTS,
@@ -32,7 +32,8 @@ export interface VariantResult {
 }
 
 export interface SelectionError {
-  scenario: string;
+  shape: string;
+  workload: string;
   productionSelected: string;
   fasterVariant: string;
   selectedCallsPerSecond: number;
@@ -41,7 +42,8 @@ export interface SelectionError {
 }
 
 export interface ScenarioResult {
-  scenario: string;
+  shape: string;
+  workload: string;
   variants: VariantResult[];
   selectionError?: SelectionError;
 }
@@ -213,7 +215,7 @@ function assertEquivalent(scenario: Scenario, batchSize: number): void {
       assert.strictEqual(
         actual,
         expected,
-        `${scenario.name}: ${variants[variant].name} for [${scenario.inputs[idx]}]`,
+        `${scenarioLabel(scenario)}: ${variants[variant].name} for [${scenario.inputs[idx]}]`,
       );
     }
   }
@@ -223,7 +225,7 @@ function assertEquivalent(scenario: Scenario, batchSize: number): void {
     assert.strictEqual(
       batchChecksum(functions[variant], workload),
       expectedChecksum,
-      `${scenario.name}: ${variants[variant].name} checksum`,
+      `${scenarioLabel(scenario)}: ${variants[variant].name} checksum`,
     );
   }
 }
@@ -258,36 +260,37 @@ function runScenario(
     });
   }
 
-  const original = measured.get("Original")!;
-  const dfa = measured.get("DFA Dense")!;
-  const selected = decision.usesDfa ? dfa : original;
-  const other = decision.usesDfa ? original : dfa;
+  const pathScan = measured.get("Path Scan")!;
+  const denseDfa = measured.get("Dense DFA")!;
+  const selected = decision.usesDfa ? denseDfa : pathScan;
+  const other = decision.usesDfa ? pathScan : denseDfa;
   const regressionPercent =
     (1 - selected.callsPerSecond / other.callsPerSecond) * 100;
 
   return {
-    scenario: scenario.name,
+    shape: scenario.shape,
+    workload: scenario.workload ?? "representative",
     variants: variants.map(({ name }) => {
       const result = measured.get(name)!;
       return {
         ...result,
         productionSelected:
-          name === "DFA Dense"
+          name === "Dense DFA"
             ? decision.usesDfa
-            : name === "Original"
+            : name === "Path Scan"
               ? !decision.usesDfa
               : false,
-        states: name.startsWith("DFA") ? decision.states : undefined,
-        transitions: name.startsWith("DFA") ? decision.transitions : undefined,
-        maxCandidates: name.startsWith("DFA")
-          ? decision.maxCandidates
-          : undefined,
+        states: name === "Dense DFA" ? decision.states : undefined,
+        transitions: name === "Dense DFA" ? decision.transitions : undefined,
+        maxCandidates:
+          name === "Dense DFA" ? decision.maxCandidates : undefined,
       };
     }),
     selectionError:
       regressionPercent > options.maxSelectionRegressionPercent
         ? {
-            scenario: scenario.name,
+            shape: scenario.shape,
+            workload: scenario.workload ?? "representative",
             productionSelected: selected.name,
             fasterVariant: other.name,
             selectedCallsPerSecond: selected.callsPerSecond,
@@ -306,7 +309,7 @@ export function runBenchmark(
   buildSink = undefined;
   benchmarkChecksum = 0;
   const scenarioResults = scenarios.map((scenario, index) => {
-    onProgress?.(index + 1, scenarios.length, scenario.name);
+    onProgress?.(index + 1, scenarios.length, scenarioLabel(scenario));
     return runScenario(scenario, index, options);
   });
   assert.ok(buildSink !== undefined);
