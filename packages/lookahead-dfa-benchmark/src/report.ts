@@ -101,15 +101,6 @@ export function writeReport(
             "Behind by": `${error.regressionPercent.toFixed(1)}%`,
           })),
         );
-  const diagnostics = comparisons.map((comparison) => ({
-    Shape: comparison.shape,
-    Workload: comparison.workload,
-    "Path Scan build us": comparison.pathScan.buildMicros.toFixed(2),
-    "Dense DFA build us": comparison.denseDfa.buildMicros.toFixed(2),
-    "Dense layout": comparison.denseDfa.layout,
-    Cells: comparison.denseDfa.cells ?? "-",
-    "S/T/C": `${comparison.denseDfa.states ?? "-"}/${comparison.denseDfa.transitions ?? "-"}/${comparison.denseDfa.maxCandidates ?? "-"}`,
-  }));
   const reportDirectory = new URL("../report/", import.meta.url);
   const reportUrl = new URL("lookahead_dfa_benchmark.md", reportDirectory);
   mkdirSync(reportDirectory, { recursive: true });
@@ -129,7 +120,6 @@ export function writeReport(
 - **Dense DFA**: compiled dense Int32Array transition table.
 - **M/s**: million lookahead calls per second; higher is better.
 - **Selected**: variant chosen by the production selector.
-- **S/T/C**: DFA states / transitions / maximum active candidates.
 
 | Shape term | Meaning |
 | --- | --- |
@@ -175,13 +165,6 @@ ${runtimeSection(pathScanWins)}
 ### Within ${maxSelectionRegressionPercent}%
 
 ${runtimeSection(nearTies)}
-
-<details>
-<summary>Construction diagnostics</summary>
-
-${markdownTable(diagnostics)}
-
-</details>
 
 ${summary}
 `,

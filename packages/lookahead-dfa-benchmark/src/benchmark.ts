@@ -9,8 +9,6 @@ const options: BenchmarkOptions = {
   sampleCount: SMOKE ? 1 : 9,
   sampleDurationMs: SMOKE ? 2 : 25,
   warmupDurationMs: SMOKE ? 0 : 25,
-  buildSamples: SMOKE ? 1 : 3,
-  buildsPerSample: SMOKE ? 1 : 100,
   maxSelectionRegressionPercent: MAX_SELECTION_REGRESSION_PERCENT,
 };
 

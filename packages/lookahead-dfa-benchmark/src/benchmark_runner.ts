@@ -2,33 +2,20 @@ import assert from "node:assert/strict";
 import { performance } from "node:perf_hooks";
 import type { IToken } from "@chevrotain/types";
 import { maxPathLength, scenarioLabel, type Scenario } from "./scenarios.ts";
-import {
-  productionDecision,
-  VARIANTS,
-  type BuiltVariant,
-  type Variant,
-} from "./variants.ts";
+import { productionUsesDfa, VARIANTS } from "./variants.ts";
 
 export interface BenchmarkOptions {
   batchSize: number;
   sampleCount: number;
   sampleDurationMs: number;
   warmupDurationMs: number;
-  buildSamples: number;
-  buildsPerSample: number;
   maxSelectionRegressionPercent: number;
 }
 
 export interface VariantResult {
   name: string;
   callsPerSecond: number;
-  buildMicros: number;
   productionSelected: boolean;
-  states?: number;
-  transitions?: number;
-  maxCandidates?: number;
-  layout: string;
-  cells?: number;
 }
 
 export interface SelectionError {
@@ -71,9 +58,6 @@ interface Workload {
 interface Measurement {
   name: string;
   callsPerSecond: number;
-  buildMicros: number;
-  layout: string;
-  cells?: number;
 }
 
 const EOF_TOKEN = { tokenTypeIdx: 1 } as IToken;
@@ -85,7 +69,6 @@ const parser: BenchmarkParser = {
   },
 };
 
-let buildSink: BuiltVariant | undefined;
 let benchmarkChecksum = 0;
 
 function makeWorkload(
@@ -178,29 +161,9 @@ function measureRuntime(
   return callsPerSecond;
 }
 
-function measureBuild(
-  variant: Variant,
-  scenario: Scenario,
-  options: BenchmarkOptions,
-): number {
-  const samples: number[] = [];
-  for (let sample = 0; sample < options.buildSamples; sample++) {
-    const start = performance.now();
-    for (let iteration = 0; iteration < options.buildsPerSample; iteration++) {
-      buildSink = variant.build(scenario);
-    }
-    samples.push(
-      ((performance.now() - start) * 1000) / options.buildsPerSample,
-    );
-  }
-  const buildMicros = median(samples);
-  assert.ok(Number.isFinite(buildMicros) && buildMicros > 0);
-  return buildMicros;
-}
-
 function assertEquivalent(scenario: Scenario, batchSize: number): void {
   const variants = VARIANTS;
-  const functions = variants.map(({ build }) => build(scenario).fn);
+  const functions = variants.map(({ build }) => build(scenario));
   const workload = makeWorkload(
     scenario.inputs,
     Math.max(1, maxPathLength(scenario)),
@@ -241,7 +204,7 @@ function runScenario(
     Math.max(1, maxPathLength(scenario)),
     options.batchSize,
   );
-  const decision = productionDecision(scenario);
+  const usesDfa = productionUsesDfa(scenario);
   const variants = VARIANTS;
   const orderedVariants = [
     ...variants.slice(index % variants.length),
@@ -250,20 +213,17 @@ function runScenario(
   const measured = new Map<string, Measurement>();
 
   for (const variant of orderedVariants) {
-    const built = variant.build(scenario);
+    const fn = variant.build(scenario);
     measured.set(variant.name, {
       name: variant.name,
-      callsPerSecond: measureRuntime(built.fn, workload, options),
-      buildMicros: measureBuild(variant, scenario, options),
-      layout: built.layout,
-      cells: built.cells,
+      callsPerSecond: measureRuntime(fn, workload, options),
     });
   }
 
   const pathScan = measured.get("Path Scan")!;
   const denseDfa = measured.get("Dense DFA")!;
-  const selected = decision.usesDfa ? denseDfa : pathScan;
-  const other = decision.usesDfa ? pathScan : denseDfa;
+  const selected = usesDfa ? denseDfa : pathScan;
+  const other = usesDfa ? pathScan : denseDfa;
   const regressionPercent =
     (1 - selected.callsPerSecond / other.callsPerSecond) * 100;
 
@@ -276,14 +236,10 @@ function runScenario(
         ...result,
         productionSelected:
           name === "Dense DFA"
-            ? decision.usesDfa
+            ? usesDfa
             : name === "Path Scan"
-              ? !decision.usesDfa
+              ? !usesDfa
               : false,
-        states: name === "Dense DFA" ? decision.states : undefined,
-        transitions: name === "Dense DFA" ? decision.transitions : undefined,
-        maxCandidates:
-          name === "Dense DFA" ? decision.maxCandidates : undefined,
       };
     }),
     selectionError:
@@ -306,14 +262,11 @@ export function runBenchmark(
   options: BenchmarkOptions,
   onProgress?: (current: number, total: number, name: string) => void,
 ): BenchmarkRun {
-  buildSink = undefined;
   benchmarkChecksum = 0;
   const scenarioResults = scenarios.map((scenario, index) => {
     onProgress?.(index + 1, scenarios.length, scenarioLabel(scenario));
     return runScenario(scenario, index, options);
   });
-  assert.ok(buildSink !== undefined);
-
   return {
     scenarioResults,
     selectionErrors: scenarioResults.flatMap((result) =>

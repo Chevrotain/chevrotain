@@ -19,20 +19,7 @@ import { alternativesFor, type Scenario } from "./scenarios.ts";
 
 export interface Variant {
   name: string;
-  build(scenario: Scenario): BuiltVariant;
-}
-
-export interface BuiltVariant {
-  fn: Function;
-  layout: string;
-  cells?: number;
-}
-
-export interface ProductionDecision {
-  usesDfa: boolean;
-  states: number;
-  transitions: number;
-  maxCandidates: number;
+  build(scenario: Scenario): Function;
 }
 
 function matcherFor(alternatives: LookaheadSequence[]) {
@@ -49,30 +36,17 @@ function pathScanFunction(scenario: Scenario): Function {
     : buildSingleAlternativeLookaheadFunction(alternatives[0], matcher, false);
 }
 
-function buildPathScan(scenario: Scenario): BuiltVariant {
-  return { fn: pathScanFunction(scenario), layout: "path scan" };
+function buildPathScan(scenario: Scenario): Function {
+  return pathScanFunction(scenario);
 }
 
-const denseCellCounts = new WeakMap<Scenario, number>();
-
-function buildDenseDfa(scenario: Scenario): BuiltVariant {
+function buildDenseDfa(scenario: Scenario): Function {
   const machine = buildDfaLookaheadMachine(alternativesFor(scenario));
   const fn =
     scenario.kind === "or"
       ? buildDenseDfaAlternativesLookAheadFunc(machine)
       : buildDenseDfaSingleAlternativeLookaheadFunction(machine);
-  let cells = denseCellCounts.get(scenario);
-  if (cells === undefined) {
-    cells = denseDfaCellCount(machine);
-    denseCellCounts.set(scenario, cells);
-  }
-  return fn === undefined
-    ? {
-        fn: pathScanFunction(scenario),
-        layout: `naive fallback (>${MAX_DENSE_DFA_CELLS})`,
-        cells,
-      }
-    : { fn, layout: "dense Int32", cells };
+  return fn ?? pathScanFunction(scenario);
 }
 
 export const VARIANTS: Variant[] = [
@@ -80,17 +54,12 @@ export const VARIANTS: Variant[] = [
   { name: "Dense DFA", build: buildDenseDfa },
 ];
 
-export function productionDecision(scenario: Scenario): ProductionDecision {
+export function productionUsesDfa(scenario: Scenario): boolean {
   const alternatives = alternativesFor(scenario);
   const machine = buildDfaLookaheadMachine(alternatives);
   const profitable =
     scenario.kind === "or"
       ? isDfaLookaheadProfitable(alternatives)
       : isDfaSingleLookaheadProfitable(alternatives[0]);
-  return {
-    usesDfa: profitable && denseDfaCellCount(machine) <= MAX_DENSE_DFA_CELLS,
-    states: machine.fallbacks.length,
-    transitions: machine.transitions.length,
-    maxCandidates: machine.maxCandidates,
-  };
+  return profitable && denseDfaCellCount(machine) <= MAX_DENSE_DFA_CELLS;
 }

@@ -281,6 +281,13 @@ shows the incremental cost of broadening only shared narrow decisions.
 All three changes are within process-to-process variation; no measurable parser
 initialization penalty was observed from the selector change.
 
+The initialization cost is acceptable without recurring per-shape measurement.
+Even forcing every technically eligible decision to Dense increased ECMAScript
+parser initialization by 9.07%, with smaller increases for CSS and JSON; the
+production selector uses Dense for only a subset of decisions. If initialization
+later becomes material, an optional code-generation path could precompute the
+DFA structures instead of rebuilding them during parser construction.
+
 ## Correctness And CI
 
 The package and Chevrotain `lookahead_dfa_spec.ts` suites cover:

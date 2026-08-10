@@ -74,25 +74,3 @@ on performance inspections more quickly.
 However, this script is a legacy from before this project was re-structured into a mono-repo.
 So it does not take into account the (possible) need to re-build other sub-packages in this mono-repo.
 So **use with care**.
-
-### DFA lookahead microbenchmark
-
-The DFA microbenchmark now runs in the private
-`@chevrotain/lookahead-dfa-benchmark` package. It compares the original
-lookahead implementation with the DFA using the actual production modules and
-marks which implementation the production profitability selector chooses.
-
-Run the full benchmark from the repository root:
-
-```sh
-bun --filter @chevrotain/lookahead-dfa-benchmark benchmark
-```
-
-The full benchmark takes roughly 20 seconds. Its short smoke mode runs
-automatically in CI and validates the benchmark without collecting sustained
-performance measurements. Full results overwrite the ignored
-`packages/lookahead-dfa-benchmark/report/lookahead_dfa_benchmark.md` report.
-The report separately lists production choices that are more than the
-configurable `MAX_SELECTION_REGRESSION_PERCENT` slower than the alternative.
-The browser benchmark in this directory remains useful for JSON, CSS, and
-ECMAScript macrobenchmarks.
