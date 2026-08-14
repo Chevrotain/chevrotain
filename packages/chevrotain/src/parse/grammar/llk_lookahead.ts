@@ -20,9 +20,9 @@ import {
   getProdType,
 } from "./lookahead.js";
 import {
-  buildAlternativesLookAheadFuncDfa,
-  buildSingleAlternativeLookaheadFunctionDfa,
-} from "./lookahead_dfa.js";
+  buildOptimizedAlternativesLookAheadFunc,
+  buildOptimizedSingleAlternativeLookaheadFunction,
+} from "./lookahead_optimization.js";
 import { IParserDefinitionError } from "./types.js";
 
 export class LLkLookaheadStrategy implements ILookaheadStrategy {
@@ -117,7 +117,7 @@ export class LLkLookaheadStrategy implements ILookaheadStrategy {
       options.maxLookahead,
       options.hasPredicates,
       options.dynamicTokensEnabled,
-      buildAlternativesLookAheadFuncDfa,
+      buildOptimizedAlternativesLookAheadFunc,
     );
   }
 
@@ -134,7 +134,7 @@ export class LLkLookaheadStrategy implements ILookaheadStrategy {
       options.maxLookahead,
       options.dynamicTokensEnabled,
       getProdType(options.prodType),
-      buildSingleAlternativeLookaheadFunctionDfa,
+      buildOptimizedSingleAlternativeLookaheadFunction,
     );
   }
 }

@@ -17,9 +17,9 @@ import {
   buildSingleAlternativeLookaheadFunction,
 } from "../../../src/parse/grammar/lookahead.js";
 import {
-  buildAlternativesLookAheadFuncDfa,
-  buildSingleAlternativeLookaheadFunctionDfa,
-} from "../../../src/parse/grammar/lookahead_dfa.js";
+  buildOptimizedAlternativesLookAheadFunc,
+  buildOptimizedSingleAlternativeLookaheadFunction,
+} from "../../../src/parse/grammar/lookahead_optimization.js";
 import {
   augmentTokenTypes,
   tokenStructuredMatcher,
@@ -108,13 +108,13 @@ describe("DFA lookahead", () => {
   describe("fallback", () => {
     it("uses dense lookahead for profitable static paths", () => {
       const alternatives = fanout(8);
-      const optimizedOr = buildAlternativesLookAheadFuncDfa(
+      const optimizedOr = buildOptimizedAlternativesLookAheadFunc(
         alternatives,
         false,
         tokenStructuredMatcher,
         false,
       );
-      const optimizedSingle = buildSingleAlternativeLookaheadFunctionDfa(
+      const optimizedSingle = buildOptimizedSingleAlternativeLookaheadFunction(
         alternatives.flat(),
         tokenStructuredMatcher,
         false,
@@ -129,13 +129,13 @@ describe("DFA lookahead", () => {
       const alternatives = Array.from({ length: 5 }, (_, idx) => [
         [shared, tokenType(`Far${idx}`, MAX_DENSE_DFA_CELLS + 1 + idx)],
       ]);
-      const optimizedOr = buildAlternativesLookAheadFuncDfa(
+      const optimizedOr = buildOptimizedAlternativesLookAheadFunc(
         alternatives,
         false,
         tokenStructuredMatcher,
         false,
       );
-      const optimizedSingle = buildSingleAlternativeLookaheadFunctionDfa(
+      const optimizedSingle = buildOptimizedSingleAlternativeLookaheadFunction(
         alternatives.flat(),
         tokenStructuredMatcher,
         false,
@@ -146,7 +146,7 @@ describe("DFA lookahead", () => {
     });
 
     it("preserves predicates", () => {
-      const lookahead = buildAlternativesLookAheadFuncDfa(
+      const lookahead = buildOptimizedAlternativesLookAheadFunc(
         fanout(8),
         true,
         tokenStructuredMatcher,
@@ -162,7 +162,7 @@ describe("DFA lookahead", () => {
 
     it("preserves dynamic-token lookahead", () => {
       const alternatives = fanout(8);
-      const optimizedOr = buildAlternativesLookAheadFuncDfa(
+      const optimizedOr = buildOptimizedAlternativesLookAheadFunc(
         alternatives,
         false,
         tokenStructuredMatcher,
@@ -179,7 +179,7 @@ describe("DFA lookahead", () => {
       );
 
       const alternative = alternatives.flat();
-      const optimizedSingle = buildSingleAlternativeLookaheadFunctionDfa(
+      const optimizedSingle = buildOptimizedSingleAlternativeLookaheadFunction(
         alternative,
         tokenStructuredMatcher,
         true,

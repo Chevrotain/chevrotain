@@ -12,7 +12,8 @@ import {
   buildSingleAlternativeLookaheadFunction,
 } from "./lookahead.js";
 
-export function buildAlternativesLookAheadFuncDfa(
+// Select Dense DFA for eligible static lookahead, otherwise build Path Scan.
+export function buildOptimizedAlternativesLookAheadFunc(
   alternatives: LookaheadSequence[],
   hasPredicates: boolean,
   tokenMatcher: TokenMatcher,
@@ -36,7 +37,7 @@ export function buildAlternativesLookAheadFuncDfa(
   );
 }
 
-export function buildSingleAlternativeLookaheadFunctionDfa(
+export function buildOptimizedSingleAlternativeLookaheadFunction(
   alternative: LookaheadSequence,
   tokenMatcher: TokenMatcher,
   dynamicTokensEnabled: boolean,

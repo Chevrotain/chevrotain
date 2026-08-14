@@ -1,7 +1,7 @@
 import type { LookaheadSequence, TokenType } from "@chevrotain/types";
 
-const MIN_DFA_MULTI_TOKEN_PATHS = 2;
-const MAX_DFA_PATH_LENGTH = 32;
+const MIN_MULTI_TOKEN_PATHS_FOR_DFA = 2;
+const MAX_RECURSIVE_DFA_PATH_LENGTH = 32;
 
 interface DfaCandidate {
   id: number;
@@ -29,35 +29,37 @@ function matchingTokenTypeIdxs(tokenType: TokenType): number[] {
   return [tokenType.tokenTypeIdx!, ...tokenType.categoryMatches!];
 }
 
-function isDfaLookaheadProfitableFor(
-  alternatives: LookaheadSequence[],
-): boolean {
-  let multiTokenPathCount = 0;
+/**
+ * Applies the benchmark-derived path-shape gate shared by OR and Single
+ * lookahead. Dense table size is checked separately when building the runtime.
+ *
+ * Every path must be inspected: one path beyond K32 rejects the whole decision
+ * because the compiler recursively advances one token per state. Empty and K1
+ * paths do not count because Path Scan handles them without multi-token work.
+ * With no overlong path, two multi-token paths are enough to favor DFA overall,
+ * regardless of first-token sharing or whether the decision is OR or Single.
+ */
+function isDfaPathShapeProfitable(alternatives: LookaheadSequence[]): boolean {
+  let qualifyingMultiTokenPathCount = 0;
   for (const alternative of alternatives) {
     for (const path of alternative) {
-      // The compiler recursively advances one token per state. Preserve support
-      // for unusually large maxLookahead values by using the original scanner.
-      if (path.length > MAX_DFA_PATH_LENGTH) return false;
-      if (path.length > 1) multiTokenPathCount++;
+      if (path.length > MAX_RECURSIVE_DFA_PATH_LENGTH) return false;
+      if (path.length > 1) qualifyingMultiTokenPathCount++;
     }
   }
-  return multiTokenPathCount >= MIN_DFA_MULTI_TOKEN_PATHS;
+  return qualifyingMultiTokenPathCount >= MIN_MULTI_TOKEN_PATHS_FOR_DFA;
 }
 
-/**
- * OR starts paying off with fewer paths than single-production lookahead because
- * the original implementation also scans preceding alternatives.
- */
 export function isDfaLookaheadProfitable(
   alternatives: LookaheadSequence[],
 ): boolean {
-  return isDfaLookaheadProfitableFor(alternatives);
+  return isDfaPathShapeProfitable(alternatives);
 }
 
 export function isDfaSingleLookaheadProfitable(
   alternative: LookaheadSequence,
 ): boolean {
-  return isDfaLookaheadProfitableFor([alternative]);
+  return isDfaPathShapeProfitable([alternative]);
 }
 
 export function buildDfaLookaheadMachine(
