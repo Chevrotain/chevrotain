@@ -112,8 +112,8 @@ overall throughput while accepting input-distribution-specific regressions.
 
 Package: `packages/lookahead-dfa-benchmark`
 
-The benchmark imports the real production modules, compares the original and
-DFA implementations, and marks which one the production selector chooses.
+The benchmark imports the real production modules, compares Path Scan and Dense
+DFA, and marks which one the production selector chooses.
 
 Run it with:
 
@@ -128,9 +128,9 @@ the ignored
 `packages/lookahead-dfa-benchmark/report/lookahead_dfa_benchmark.md` report.
 The report separately lists production choices that are more than the
 configurable `MAX_SELECTION_REGRESSION_PERCENT` slower than the alternative.
-The Node.js 26 report after applying the threshold matrix contains three
-selected-Dense early-biased regressions over 5%, accepted in exchange for the
-larger balanced gains.
+The latest report contains five selection mistakes over 5%: three selected-Dense
+early-biased regressions and two conservative one-multi-path false negatives.
+The latter remain in the matrix to inform future selector changes.
 The results below were measured using the original Chrome 151 browser harness
 and are retained as historical data; they are not directly comparable to
 Node.js measurements.
@@ -305,7 +305,7 @@ Verification:
 
 - Extracted DFA package suite: 17 passing.
 - Full Chevrotain package: 796 passing.
-- DFA benchmark smoke: 83 scenarios and 166 variants passing.
+- DFA benchmark smoke: 36 scenarios and 72 variants passing.
 - Full monorepo CI: 15 of 15 tasks successful.
 - Formatting and TypeScript compilation pass.
 

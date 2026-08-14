@@ -2,7 +2,13 @@ import type { LookaheadSequence, TokenType } from "@chevrotain/types";
 
 export interface Scenario {
   shape: string;
-  workload?: "balanced" | "early80" | "hit-only" | "miss-only" | "fallback80";
+  workload?:
+    | "balanced"
+    | "early80"
+    | "first-alt80"
+    | "hit-only"
+    | "miss-only"
+    | "fallback80";
   kind: "or" | "single";
   paths: LookaheadSequence[] | LookaheadSequence;
   inputs: number[][];
@@ -85,20 +91,33 @@ function nonSharedPaths(count: number, depth = 2): TokenType[][] {
 
 function nonSharedInputs(paths: TokenType[][]): number[][] {
   const ids = paths.map((path) => path.map((token) => token.tokenTypeIdx!));
+  if (ids.length === 2) {
+    return [ids[0], ids[1], [ids[1][0], 998], []];
+  }
   const middle = ids[Math.floor(ids.length / 2)];
-  return uniqueInputs([
-    ids[0],
-    middle,
-    ids[ids.length - 1],
-    [middle[0], 998],
-    [998],
-    [],
-  ]);
+  return [ids[0], middle, ids[ids.length - 1], [middle[0], 998], [998], []];
 }
 
 function earlyBiased(inputs: number[][]): number[][] {
   const [first, ...rest] = inputs;
   return [...Array.from({ length: rest.length * 4 }, () => first), ...rest];
+}
+
+function nonSharedScenarios(
+  kind: "or" | "single",
+  depth: number,
+  count: number,
+  workloads: ("balanced" | "early80")[],
+): Scenario[] {
+  const paths = nonSharedPaths(count, depth);
+  const inputs = nonSharedInputs(paths);
+  return workloads.map((workload) => ({
+    shape: `${kind === "or" ? "OR" : "Single"} K${depth} non-shared x${count}`,
+    workload,
+    kind,
+    paths: kind === "or" ? paths.map((path) => [path]) : paths,
+    inputs: workload === "balanced" ? inputs : earlyBiased(inputs),
+  }));
 }
 
 function customFanoutOr(
@@ -170,6 +189,24 @@ const MIXED_OR: LookaheadSequence[] = [
   [[C]],
 ];
 
+const ONE_MULTI_PATHS: TokenType[][] = [[A, B], [C], [D], [E]];
+const ONE_MULTI_INPUTS = [
+  [10, 11],
+  [12],
+  [13],
+  [14],
+  [10, 998],
+  [11],
+  [998],
+  [],
+];
+const CATEGORY_PATHS: TokenType[][] = [
+  [CATEGORY_AB, D],
+  [B, E],
+  [CATEGORY_BC, F],
+];
+const CATEGORY_INPUTS = [[10, 13], [11, 13], [11, 14], [12, 15], [11, 998], []];
+
 export const SCENARIOS: Scenario[] = [
   {
     shape: "OR K1 x8",
@@ -177,7 +214,7 @@ export const SCENARIOS: Scenario[] = [
     paths: fanoutOr([], 8),
     inputs: fanoutInputs([], 8),
   },
-  ...[2, 3, 4, 5, 8, 22, 31, 32, 33, 36].map(
+  ...[2, 8, 22, 36].map(
     (count): Scenario => ({
       shape: `OR K2 shared x${count}`,
       kind: "or",
@@ -185,35 +222,38 @@ export const SCENARIOS: Scenario[] = [
       inputs: fanoutInputs([A], count),
     }),
   ),
-  ...[2, 3, 4, 5, 8, 22, 36].flatMap((count): Scenario[] => {
-    const paths = nonSharedPaths(count);
-    const inputs = nonSharedInputs(paths);
-    const alternatives = paths.map((path) => [path]);
-    return [
-      {
-        shape: `OR K2 non-shared x${count}`,
-        workload: "balanced",
-        kind: "or",
-        paths: alternatives,
-        inputs,
-      },
-      {
-        shape: `OR K2 non-shared x${count}`,
-        workload: "early80",
-        kind: "or",
-        paths: alternatives,
-        inputs: earlyBiased(inputs),
-      },
-    ];
-  }),
-  ...[2, 3, 4, 5, 8].map(
-    (count): Scenario => ({
-      shape: `OR K3 shared x${count}`,
-      kind: "or",
-      paths: fanoutOr([A, B], count),
-      inputs: fanoutInputs([A, B], count),
-    }),
-  ),
+  ...nonSharedScenarios("or", 2, 2, ["balanced", "early80"]),
+  ...nonSharedScenarios("or", 2, 8, ["balanced"]),
+  {
+    shape: "OR K3 shared x2",
+    kind: "or",
+    paths: fanoutOr([A, B], 2),
+    inputs: fanoutInputs([A, B], 2),
+  },
+  ...nonSharedScenarios("or", 4, 2, ["balanced", "early80"]),
+  {
+    shape: "OR mixed K1-K2 one-multi x4",
+    workload: "balanced",
+    kind: "or",
+    paths: ONE_MULTI_PATHS.map((path) => [path]),
+    inputs: ONE_MULTI_INPUTS,
+  },
+  {
+    shape: "OR K2 grouped 2-alt x8",
+    workload: "first-alt80",
+    kind: "or",
+    paths: [
+      Array.from({ length: 4 }, (_, idx) => [A, ending(idx)]),
+      Array.from({ length: 4 }, (_, idx) => [B, ending(idx + 4)]),
+    ],
+    inputs: [
+      ...Array.from({ length: 16 }, (_, idx) => [10, 100 + (idx % 4)]),
+      [11, 104],
+      [11, 107],
+      [11, 998],
+      [998],
+    ],
+  },
   {
     shape: "OR mixed K1-K3",
     kind: "or",
@@ -223,8 +263,8 @@ export const SCENARIOS: Scenario[] = [
   {
     shape: "OR K2 category overlap",
     kind: "or",
-    paths: [[[CATEGORY_AB, D]], [[B, E]], [[CATEGORY_BC, F]]],
-    inputs: [[10, 13], [11, 13], [11, 14], [12, 15], [11, 998], []],
+    paths: CATEGORY_PATHS.map((path) => [path]),
+    inputs: CATEGORY_INPUTS,
   },
   {
     shape: "OR K2 final empty",
@@ -245,18 +285,12 @@ export const SCENARIOS: Scenario[] = [
     ),
   },
   {
-    shape: "OR K2 sparse IDs x5",
-    kind: "or",
-    paths: customFanoutOr([A], [100, 10_000, 20_000, 30_000, 40_000]),
-    inputs: customFanoutInputs([A], [100, 10_000, 20_000, 30_000, 40_000]),
-  },
-  {
     shape: "Single K1 x8",
     kind: "single",
     paths: fanoutSingle([], 8),
     inputs: fanoutInputs([], 8),
   },
-  ...[2, 3, 4, 5, 8, 22, 31, 32, 33, 36].map(
+  ...[2, 8].map(
     (count): Scenario => ({
       shape: `Single K2 shared x${count}`,
       kind: "single",
@@ -264,65 +298,36 @@ export const SCENARIOS: Scenario[] = [
       inputs: fanoutInputs([A], count),
     }),
   ),
-  ...[2, 3, 4, 5, 8, 22, 36].flatMap((count): Scenario[] => {
-    const paths = nonSharedPaths(count);
-    const inputs = nonSharedInputs(paths);
-    return [
-      {
-        shape: `Single K2 non-shared x${count}`,
-        workload: "balanced",
-        kind: "single",
-        paths,
-        inputs,
-      },
-      {
-        shape: `Single K2 non-shared x${count}`,
-        workload: "early80",
-        kind: "single",
-        paths,
-        inputs: earlyBiased(inputs),
-      },
-    ];
-  }),
-  ...([3, 4] as const).flatMap((depth) =>
-    [2, 3].flatMap((count): Scenario[] => {
-      const paths = nonSharedPaths(count, depth);
-      const inputs = nonSharedInputs(paths);
-      return [
-        {
-          shape: `Single K${depth} non-shared x${count}`,
-          workload: "balanced",
-          kind: "single",
-          paths,
-          inputs,
-        },
-        {
-          shape: `Single K${depth} non-shared x${count}`,
-          workload: "early80",
-          kind: "single",
-          paths,
-          inputs: earlyBiased(inputs),
-        },
-      ];
-    }),
-  ),
-  ...[2, 3, 4, 5, 8].map(
-    (count): Scenario => ({
-      shape: `Single K3 shared x${count}`,
-      kind: "single",
-      paths: fanoutSingle([A, B], count),
-      inputs: fanoutInputs([A, B], count),
-    }),
-  ),
+  ...nonSharedScenarios("single", 2, 2, ["balanced", "early80"]),
+  ...nonSharedScenarios("single", 2, 8, ["balanced"]),
+  {
+    shape: "Single K3 shared x2",
+    kind: "single",
+    paths: fanoutSingle([A, B], 2),
+    inputs: fanoutInputs([A, B], 2),
+  },
+  ...nonSharedScenarios("single", 3, 2, ["balanced", "early80"]),
+  ...nonSharedScenarios("single", 4, 2, ["balanced", "early80"]),
+  {
+    shape: "Single mixed K1-K2 one-multi x4",
+    workload: "balanced",
+    kind: "single",
+    paths: ONE_MULTI_PATHS,
+    inputs: ONE_MULTI_INPUTS,
+  },
   {
     shape: "Single mixed K1-K3",
     kind: "single",
     paths: MIXED_OR.flat(),
     inputs: [[10], [11, 12], [11, 13, 14], [11, 13, 15], [12], [11, 998], []],
   },
-  ...sharedProbeScenarios("or", [A], 2, B),
+  {
+    shape: "Single K2 category overlap",
+    kind: "single",
+    paths: CATEGORY_PATHS,
+    inputs: CATEGORY_INPUTS,
+  },
   ...sharedProbeScenarios("or", [A, B], 3, C),
-  ...sharedProbeScenarios("single", [A], 2, B),
   ...sharedProbeScenarios("single", [A, B], 3, C),
   {
     shape: "OR K3 in-range",

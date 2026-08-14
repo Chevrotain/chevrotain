@@ -129,9 +129,11 @@ export function writeReport(
 | x&lt;n&gt; | Number of lookahead paths. |
 | shared / non-shared | Paths do / do not overlap on the first token. |
 | mixed | Combines path depths from K1 through K3. |
+| one-multi | Exactly one path requires more than one token. |
+| grouped | An OR alternative contains multiple lookahead paths. |
 | category overlap | Token categories overlap between paths. |
 | final empty | The final alternative has an empty path. |
-| contiguous / sparse IDs | Token type IDs are tightly packed / far apart. |
+| high contiguous IDs | High token type IDs with tightly packed endings. |
 | in-range | A mismatch uses a completed shorter-path fallback. |
 
 | Workload | Meaning |
@@ -139,6 +141,7 @@ export function writeReport(
 | representative | Standard mixture of representative hits, misses, and EOF probes. |
 | balanced | Representative hits and misses have equal weight. |
 | early80 | A full match of the first path is 80% of calls. |
+| first-alt80 | Successful matches in the first OR alternative are 80% of calls. |
 | hit-only / miss-only | Contains only successful / unsuccessful probes. |
 | fallback80 | A completed shorter path handles 80% of calls. |
 

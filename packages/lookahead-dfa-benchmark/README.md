@@ -19,7 +19,7 @@ It requires Node.js 22.18 or newer.
 Run commands from the repository root:
 
 ```sh
-# Sustained benchmark, currently roughly 50 seconds
+# Sustained benchmark, currently roughly 25 seconds
 bun --filter @chevrotain/lookahead-dfa-benchmark benchmark
 
 # Short equivalence and execution smoke test
@@ -31,6 +31,10 @@ bun --filter @chevrotain/lookahead-dfa-benchmark ci
 
 The smoke test verifies benchmark behavior without collecting sustained timing
 samples or asserting noisy throughput thresholds.
+
+The matrix favors selector boundaries and distinct path topologies over dense
+fanout sweeps. Intermediate points are omitted when they only repeat a monotonic
+result.
 
 ## Report
 

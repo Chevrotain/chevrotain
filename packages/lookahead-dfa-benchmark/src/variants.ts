@@ -15,7 +15,7 @@ import {
   tokenStructuredMatcher,
   tokenStructuredMatcherNoCategories,
 } from "chevrotain/internal";
-import { alternativesFor, type Scenario } from "./scenarios.ts";
+import { alternativesFor, scenarioLabel, type Scenario } from "./scenarios.ts";
 
 export interface Variant {
   name: string;
@@ -46,7 +46,10 @@ function buildDenseDfa(scenario: Scenario): Function {
     scenario.kind === "or"
       ? buildDenseDfaAlternativesLookAheadFunc(machine)
       : buildDenseDfaSingleAlternativeLookaheadFunction(machine);
-  return fn ?? pathScanFunction(scenario);
+  if (fn === undefined) {
+    throw new Error(`${scenarioLabel(scenario)} cannot use Dense DFA`);
+  }
+  return fn;
 }
 
 export const VARIANTS: Variant[] = [

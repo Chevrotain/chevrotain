@@ -145,10 +145,14 @@ describe("DFA lookahead", () => {
         .true;
     });
 
-    it("keeps unusually long paths on the original implementation", () => {
-      const longPath = Array.from({ length: 33 }, () => A);
-      expect(isDfaLookaheadProfitable([...fanout(8), [longPath]])).to.be.false;
-      expect(isDfaSingleLookaheadProfitable([...fanout(8).flat(), longPath])).to
+    it("supports K32 and keeps K33 on the original implementation", () => {
+      const path32 = Array.from({ length: 32 }, () => A);
+      const path33 = Array.from({ length: 33 }, () => A);
+      expect(isDfaLookaheadProfitable([...fanout(2), [path32]])).to.be.true;
+      expect(isDfaSingleLookaheadProfitable([...fanout(2).flat(), path32])).to
+        .be.true;
+      expect(isDfaLookaheadProfitable([...fanout(2), [path33]])).to.be.false;
+      expect(isDfaSingleLookaheadProfitable([...fanout(2).flat(), path33])).to
         .be.false;
     });
   });
@@ -238,14 +242,20 @@ describe("DFA lookahead", () => {
       expect(callOr(lookahead, [A, B])).to.be.undefined;
     });
 
-    it("rejects dense machines above the cell cap", () => {
-      const machine = buildDfaLookaheadMachine([
-        [[tokenType("Low", [], 1)]],
-        [[tokenType("High", [], MAX_DENSE_DFA_CELLS + 1)]],
+    it("accepts the dense cell cap and rejects the first cell above it", () => {
+      const atCap = buildDfaLookaheadMachine([
+        [[tokenType("AtCapLow", [], 1)]],
+        [[tokenType("AtCapHigh", [], MAX_DENSE_DFA_CELLS)]],
+      ]);
+      const overCap = buildDfaLookaheadMachine([
+        [[tokenType("OverCapLow", [], 1)]],
+        [[tokenType("OverCapHigh", [], MAX_DENSE_DFA_CELLS + 1)]],
       ]);
 
-      expect(denseDfaCellCount(machine)).to.equal(MAX_DENSE_DFA_CELLS + 1);
-      expect(buildDenseDfaAlternativesLookAheadFunc(machine)).to.be.undefined;
+      expect(denseDfaCellCount(atCap)).to.equal(MAX_DENSE_DFA_CELLS);
+      expect(buildDenseDfaAlternativesLookAheadFunc(atCap)).not.to.be.undefined;
+      expect(denseDfaCellCount(overCap)).to.equal(MAX_DENSE_DFA_CELLS + 1);
+      expect(buildDenseDfaAlternativesLookAheadFunc(overCap)).to.be.undefined;
     });
   });
 });
