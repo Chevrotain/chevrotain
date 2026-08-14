@@ -1,0 +1,23 @@
+{
+  "name": "@chevrotain/lookahead-dfa-benchmark",
+  "version": "13.2.0",
+  "private": true,
+  "description": "Benchmarks Chevrotain DFA lookahead implementations",
+  "license": "Apache-2.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "ci": "npm-run-all typecheck test",
+    "test": "node --enable-source-maps ./src/benchmark.ts --smoke",
+    "benchmark": "time node --enable-source-maps ./src/benchmark.ts",
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit -w"
+  },
+  "dependencies": {
+    "@chevrotain/lookahead-dfa": "workspace:*",
+    "@chevrotain/types": "workspace:*",
+    "chevrotain": "workspace:*"
+  }
+}

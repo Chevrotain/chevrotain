@@ -32,6 +32,10 @@
       "import": "./lib/src/api.js",
       "require": "./lib/src/api.js",
       "types": "./chevrotain.d.ts"
+    },
+    "./internal": {
+      "types": "./lib/src/internal.d.ts",
+      "import": "./lib/src/internal.js"
     }
   },
   "files": [
@@ -40,6 +44,7 @@
     "lib/chevrotain.mjs",
     "lib/src/**/*.js",
     "lib/src/**/*.map",
+    "lib/src/**/*.d.ts",
     "src/**/*.ts",
     "diagrams/**/*.*",
     "BREAKING_CHANGES.md",
@@ -73,6 +78,7 @@
   "dependencies": {
     "@chevrotain/cst-dts-gen": "workspace:*",
     "@chevrotain/gast": "workspace:*",
+    "@chevrotain/lookahead-dfa": "workspace:*",
     "@chevrotain/regexp-to-ast": "workspace:*",
     "@chevrotain/types": "workspace:*",
     "@chevrotain/utils": "workspace:*"
