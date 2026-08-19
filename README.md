@@ -82,12 +82,12 @@ A small-curated list:
 
 3. [Prettier-Java](https://github.com/jhipster/prettier-java)
    - A Prettier Plugin for Java
-   - [source](https://github.com/jhipster/prettier-java/tree/main/packages/java-parser)
+   - [source](https://github.com/jhipster/prettier-java/tree/main/src)
 
 4. [JHipster Domain Language](https://www.jhipster.tech/jdl/intro)
    - The JDL is a JHipster-specific domain language where you can describe all your applications, deployments, entities
      and their relationships in a single file (or more than one) with a user-friendly syntax.
-   - [source](https://github.com/jhipster/generator-jhipster/tree/main/jdl/parsing)
+   - [source](https://github.com/jhipster/generator-jhipster/tree/main/lib/jdl)
 
 5. [Argdown](https://github.com/christianvoigt/argdown)
    - Argdown is a simple syntax for analyzing complex argumentation.
