@@ -2,6 +2,7 @@ import {
   IParserConfig,
   IParserErrorMessageProvider,
   IRecognitionException,
+  LookaheadSequence,
 } from "@chevrotain/types";
 import {
   EarlyExitException,
@@ -22,9 +23,14 @@ import { DEFAULT_PARSER_CONFIG } from "../parser.js";
 export class ErrorHandler {
   _errors: IRecognitionException[];
   errorMessageProvider: IParserErrorMessageProvider;
+  // The expected lookahead paths depend only on the (immutable after self-analysis) grammar,
+  // yet computing them can be very expensive for large alternations, so they are computed
+  // at most once per production. Keyed by production type, occurrence and rule name.
+  lookaheadPathsForErrorsCache: Map<string, LookaheadSequence[]>;
 
   initErrorHandler(config: IParserConfig) {
     this._errors = [];
+    this.lookaheadPathsForErrorsCache = new Map();
     this.errorMessageProvider = Object.hasOwn(config, "errorMessageProvider")
       ? (config.errorMessageProvider as IParserErrorMessageProvider) // assumes end user provides the correct config value/type
       : DEFAULT_PARSER_CONFIG.errorMessageProvider;
@@ -59,7 +65,30 @@ export class ErrorHandler {
     this._errors = newErrors;
   }
 
-  // TODO: consider caching the error message computed information
+  getLookaheadPathsForError(
+    this: MixedInParser,
+    ruleName: string,
+    occurrence: number,
+    prodType: PROD_TYPE,
+  ): LookaheadSequence[] {
+    const cacheKey = `${prodType}_${occurrence}_${ruleName}`;
+    let paths = this.lookaheadPathsForErrorsCache.get(cacheKey);
+    if (paths === undefined) {
+      const ruleGrammar = this.getGAstProductions()[ruleName];
+      paths =
+        prodType === PROD_TYPE.ALTERNATION
+          ? getLookaheadPathsForOr(occurrence, ruleGrammar, this.maxLookahead)
+          : getLookaheadPathsForOptionalProd(
+              occurrence,
+              ruleGrammar,
+              prodType,
+              this.maxLookahead,
+            );
+      this.lookaheadPathsForErrorsCache.set(cacheKey, paths);
+    }
+    return paths;
+  }
+
   raiseEarlyExitException(
     this: MixedInParser,
     occurrence: number,
@@ -67,12 +96,10 @@ export class ErrorHandler {
     userDefinedErrMsg: string | undefined,
   ): never {
     const ruleName = this.getCurrRuleFullName();
-    const ruleGrammar = this.getGAstProductions()[ruleName];
-    const lookAheadPathsPerAlternative = getLookaheadPathsForOptionalProd(
+    const lookAheadPathsPerAlternative = this.getLookaheadPathsForError(
+      ruleName,
       occurrence,
-      ruleGrammar,
       prodType,
-      this.maxLookahead,
     );
     const insideProdPaths = lookAheadPathsPerAlternative[0];
     const actualTokens = [];
@@ -90,19 +117,16 @@ export class ErrorHandler {
     throw this.SAVE_ERROR(new EarlyExitException(msg, this.LA(1), this.LA(0)));
   }
 
-  // TODO: consider caching the error message computed information
   raiseNoAltException(
     this: MixedInParser,
     occurrence: number,
     errMsgTypes: string | undefined,
   ): never {
     const ruleName = this.getCurrRuleFullName();
-    const ruleGrammar = this.getGAstProductions()[ruleName];
-    // TODO: getLookaheadPathsForOr can be slow for large enough maxLookahead and certain grammars, consider caching ?
-    const lookAheadPathsPerAlternative = getLookaheadPathsForOr(
+    const lookAheadPathsPerAlternative = this.getLookaheadPathsForError(
+      ruleName,
       occurrence,
-      ruleGrammar,
-      this.maxLookahead,
+      PROD_TYPE.ALTERNATION,
     );
 
     const actualTokens = [];
@@ -116,7 +140,7 @@ export class ErrorHandler {
       actual: actualTokens,
       previous: previousToken,
       customUserDescription: errMsgTypes,
-      ruleName: this.getCurrRuleFullName(),
+      ruleName: ruleName,
     });
 
     throw this.SAVE_ERROR(
