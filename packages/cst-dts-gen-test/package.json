@@ -29,6 +29,6 @@
     "chevrotain": "workspace:*"
   },
   "devDependencies": {
-    "glob": "13.0.6"
+    "glob": "13.0.7"
   }
 }
